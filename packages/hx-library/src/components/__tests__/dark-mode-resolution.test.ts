@@ -22,6 +22,9 @@ import '../hx-button/index.js';
 import '../hx-pagination/index.js';
 import '../hx-tooltip/index.js';
 import '../hx-side-nav/index.js';
+import '../hx-status-indicator/index.js';
+import '../hx-stat/index.js';
+import '../hx-steps/index.js';
 
 afterEach(cleanup);
 
@@ -87,6 +90,58 @@ describe('dark-mode token resolution', () => {
     // regression guard: if host were bound to neutral-900 directly, dark mode
     // would freeze at the Light-palette value.
     expect(dark.color).not.toBe(light.color);
+  });
+
+  it('status-indicator show-label text-strong flips between light and dark', async () => {
+    const markup = '<hx-status-indicator status="online" show-label label="Online"></hx-status-indicator>';
+    const light = await resolveStyles('light', markup, 'hx-status-indicator', '.indicator__label');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-status-indicator', '.indicator__label');
+    expect(dark.color).not.toBe(light.color);
+  });
+
+  it('stat value/label semantic text tokens flip between light and dark', async () => {
+    const markup = '<hx-stat value="42" label="Patients"></hx-stat>';
+    const lightValue = await resolveStyles('light', markup, 'hx-stat', '.stat__value');
+    cleanup();
+    const darkValue = await resolveStyles('dark', markup, 'hx-stat', '.stat__value');
+    cleanup();
+    const lightLabel = await resolveStyles('light', markup, 'hx-stat', '.stat__label');
+    cleanup();
+    const darkLabel = await resolveStyles('dark', markup, 'hx-stat', '.stat__label');
+    expect(darkValue.color).not.toBe(lightValue.color);
+    expect(darkLabel.color).not.toBe(lightLabel.color);
+  });
+
+  it('step label + description semantic text tokens flip between light and dark', async () => {
+    const markup =
+      '<hx-steps><hx-step label="One" description="First"></hx-step></hx-steps>';
+    const lightLabel = await resolveStyles('light', markup, 'hx-step', '.step__label');
+    cleanup();
+    const darkLabel = await resolveStyles('dark', markup, 'hx-step', '.step__label');
+    cleanup();
+    const lightDesc = await resolveStyles('light', markup, 'hx-step', '.step__description');
+    cleanup();
+    const darkDesc = await resolveStyles('dark', markup, 'hx-step', '.step__description');
+    expect(darkLabel.color).not.toBe(lightLabel.color);
+    expect(darkDesc.color).not.toBe(lightDesc.color);
+  });
+
+  it('form error-text + success-text tokens override in high-contrast mode', async () => {
+    // Regression guard for hx-theme._hcOverrides completeness: if
+    // error-text / success-text drop out of the override map, validation
+    // messaging keeps its light palette in HC mode and fails the 7:1 contract.
+    // We read the tokens directly off the theme host in HC mode.
+    const wrapper = await fixture<HelixTheme>(
+      '<hx-theme theme="high-contrast"><hx-button>x</hx-button></hx-theme>',
+    );
+    await wrapper.updateComplete;
+    const cs = getComputedStyle(wrapper);
+    const errorText = cs.getPropertyValue('--hx-color-error-text').trim();
+    const successText = cs.getPropertyValue('--hx-color-success-text').trim();
+    // HC palette: light red / light green on #000 background (see tokens.json).
+    expect(errorText.toLowerCase()).toBe('#fca5a5');
+    expect(successText.toLowerCase()).toBe('#86efac');
   });
 
   it('tooltip surface-inverse + text-inverse flip between light and dark', async () => {

@@ -10,7 +10,7 @@ export const helixStatStyles = css`
     flex-direction: column;
     gap: var(--hx-stat-gap, var(--hx-space-1, 0.25rem));
     font-family: var(--hx-stat-font-family, var(--hx-font-family-sans, sans-serif));
-    color: var(--hx-stat-color, var(--hx-color-neutral-800, #1e293b));
+    color: var(--hx-stat-color, var(--hx-color-text-strong, #1e293b));
   }
 
   /* ─── Size Variants ─── */
@@ -54,13 +54,13 @@ export const helixStatStyles = css`
   }
 
   .stat__value {
-    color: var(--hx-stat-value-color, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-stat-value-color, var(--hx-color-text-primary, #0f172a));
   }
 
   /* ─── Label ─── */
 
   .stat__label {
-    color: var(--hx-stat-label-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-stat-label-color, var(--hx-color-text-muted, #64748b));
     font-weight: var(--hx-font-weight-normal, 400);
   }
 
