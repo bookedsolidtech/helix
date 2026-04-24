@@ -26,8 +26,8 @@ export const helixDialogStyles = css`
     display: flex;
     flex-direction: column;
     position: relative;
-    background-color: var(--hx-dialog-bg, var(--hx-color-neutral-0));
-    color: var(--hx-dialog-color, var(--hx-color-neutral-900));
+    background-color: var(--hx-dialog-bg, var(--hx-color-surface-default));
+    color: var(--hx-dialog-color, var(--hx-color-text-primary));
     border-radius: var(--hx-dialog-border-radius, var(--hx-border-radius-lg));
     box-shadow: var(--hx-dialog-shadow, var(--hx-shadow-xl));
     width: var(--hx-dialog-width, var(--hx-container-narrow, 32rem));
@@ -62,7 +62,7 @@ export const helixDialogStyles = css`
   /* ─── Native backdrop (modal mode) ─── */
 
   dialog::backdrop {
-    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
+    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-surface-overlay));
     opacity: 0;
     transition: opacity var(--hx-duration-normal, 200ms) var(--hx-easing-out, ease-out);
   }
@@ -82,7 +82,7 @@ export const helixDialogStyles = css`
   .dialog-backdrop {
     position: fixed;
     inset: 0;
-    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-neutral-900));
+    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-surface-overlay));
     opacity: var(--hx-dialog-backdrop-opacity, 0.5);
     /* D5 — backdrop z-index must be lower than the dialog element's z-index */
     z-index: var(--hx-z-index-modal, 1400);
@@ -96,7 +96,7 @@ export const helixDialogStyles = css`
     justify-content: space-between;
     padding: var(--hx-dialog-header-padding, var(--hx-space-5) var(--hx-space-6));
     border-bottom: var(--hx-border-width-thin) solid
-      var(--hx-dialog-header-border-color, var(--hx-color-neutral-200));
+      var(--hx-dialog-header-border-color, var(--hx-color-border-default));
     gap: var(--hx-space-4);
     flex-shrink: 0;
   }
@@ -107,7 +107,7 @@ export const helixDialogStyles = css`
     font-size: var(--hx-font-size-lg);
     font-weight: var(--hx-font-weight-semibold);
     line-height: var(--hx-line-height-tight);
-    color: var(--hx-dialog-heading-color, var(--hx-color-neutral-900));
+    color: var(--hx-dialog-heading-color, var(--hx-color-text-primary));
     flex: 1 1 auto;
   }
 
@@ -129,7 +129,7 @@ export const helixDialogStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
-    color: var(--hx-color-neutral-500, #64748b);
+    color: var(--hx-color-text-muted, #64748b);
     font-size: var(--hx-font-size-xl, 1.25rem);
     line-height: 1; /* intentional literal: icon button needs line-height 1; no token maps to exactly 1 */
     transition:
@@ -142,8 +142,8 @@ export const helixDialogStyles = css`
   }
 
   .dialog__close-btn:hover {
-    color: var(--hx-color-neutral-900);
-    background-color: var(--hx-color-neutral-100);
+    color: var(--hx-color-text-primary);
+    background-color: var(--hx-color-surface-sunken);
   }
 
   .dialog__close-btn:focus-visible {
@@ -173,7 +173,7 @@ export const helixDialogStyles = css`
     gap: var(--hx-space-3);
     padding: var(--hx-dialog-footer-padding, var(--hx-space-4) var(--hx-space-6));
     border-top: var(--hx-border-width-thin) solid
-      var(--hx-dialog-footer-border-color, var(--hx-color-neutral-200));
+      var(--hx-dialog-footer-border-color, var(--hx-color-border-default));
     flex-shrink: 0;
   }
 
