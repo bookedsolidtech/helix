@@ -27,7 +27,7 @@ export const helixProgressBarStyles = css`
     font-family: var(--hx-progress-bar-label-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-progress-bar-label-font-size, var(--hx-font-size-sm, 0.875rem));
     font-weight: var(--hx-progress-bar-label-font-weight, var(--hx-font-weight-medium, 500));
-    color: var(--hx-progress-bar-label-color, var(--hx-color-neutral-700));
+    color: var(--hx-progress-bar-label-color, var(--hx-color-text-strong));
     line-height: var(--hx-line-height-tight, 1.25);
   }
 
@@ -35,7 +35,7 @@ export const helixProgressBarStyles = css`
     position: relative;
     overflow: hidden;
     border-radius: var(--hx-progress-bar-border-radius, var(--hx-border-radius-full, 9999px));
-    background-color: var(--hx-progress-bar-track-bg, var(--hx-color-neutral-100));
+    background-color: var(--hx-progress-bar-track-bg, var(--hx-color-surface-sunken));
     width: 100%;
   }
 

@@ -34,7 +34,7 @@ export const helixCheckboxGroupStyles = css`
     gap: var(--hx-space-1);
     font-size: var(--hx-font-size-sm);
     font-weight: var(--hx-font-weight-medium);
-    color: var(--hx-checkbox-group-label-color, var(--hx-color-neutral-700));
+    color: var(--hx-checkbox-group-label-color, var(--hx-color-text-strong));
     line-height: var(--hx-line-height-normal);
     padding: 0;
     margin-bottom: var(--hx-space-1);
@@ -68,7 +68,7 @@ export const helixCheckboxGroupStyles = css`
 
   .fieldset__help-text {
     font-size: var(--hx-font-size-xs);
-    color: var(--hx-checkbox-group-help-text-color, var(--hx-color-neutral-500));
+    color: var(--hx-checkbox-group-help-text-color, var(--hx-color-text-muted));
     line-height: var(--hx-line-height-normal);
   }
 
