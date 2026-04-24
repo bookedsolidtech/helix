@@ -110,18 +110,30 @@ run_target() {
 
   echo "[$idx/$TOTAL] $tag started=$target_started" | tee -a "$RUN_LOG"
 
+  # Truncate the last-message file before invocation. Without this, a retry
+  # against a target that already has a stale `$slug.last.txt` on disk (from a
+  # prior crashed or non-zero-exit run) would re-ingest the previous run's
+  # findings and misreport the retry as a pass.
+  : > "$last_msg"
+
   # Redirect codex stdin to /dev/null: the outer `while read < "$TARGET_LIST"`
   # loop shares its stdin with every child process by default, and `codex exec`
   # reads stdin to append as an `<stdin>` block — which silently drains the
   # target list file and causes the outer loop to exit after target 1.
+  local codex_rc=0
   if ! codex "${CODEX_ARGS[@]}" -o "$last_msg" "$rendered" </dev/null >"$transcript" 2>&1; then
+    codex_rc=1
     echo "[$idx/$TOTAL] $tag CODEX_EXIT_NONZERO (see $transcript)" | tee -a "$RUN_LOG"
   fi
 
-  # The final agent message is the authoritative JSONL block. Fall back to
-  # transcript-scraping only if --output-last-message produced nothing.
+  # The final agent message is the authoritative JSONL block. On non-zero exit
+  # we do NOT fall back to scraping the raw transcript — a failed invocation's
+  # partial transcript is not a valid findings source, and treating it as one
+  # would turn a crashed Codex run into a silent "clean" verdict.
   local source_file="$last_msg"
-  [[ -s "$source_file" ]] || source_file="$transcript"
+  if [[ $codex_rc -eq 0 ]]; then
+    [[ -s "$source_file" ]] || source_file="$transcript"
+  fi
 
   local parsed=0 rejected=0
   local tmpf; tmpf="$(mktemp)"
