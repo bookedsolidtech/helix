@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixCardStyles } from './hx-card.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextCardId = createIdCounter('hx-card');
@@ -74,7 +75,7 @@ export class HelixCard extends HelixElement {
     delegatesFocus: true,
   };
 
-  static override styles = [helixCardStyles];
+  static override styles = [helixCardStyles, forcedColorsSurface];
 
   /**
    * Visual style variant of the card.

@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixPopoverStyles } from './hx-popover.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 const _nextPopoverId = createIdCounter('hx-popover');
 
@@ -63,7 +64,7 @@ const _nextPopoverId = createIdCounter('hx-popover');
 
 @customElement('hx-popover')
 export class HelixPopover extends HelixElement {
-  static override styles = [helixPopoverStyles];
+  static override styles = [helixPopoverStyles, forcedColorsSurface];
 
   /**
    * Whether the popover is open.

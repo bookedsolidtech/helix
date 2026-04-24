@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixToastStyles } from './hx-toast.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -62,7 +63,7 @@ export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
  */
 @customElement('hx-toast')
 export class HelixToast extends HelixElement {
-  static override styles = [helixToastStyles];
+  static override styles = [helixToastStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

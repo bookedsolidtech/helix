@@ -7,6 +7,7 @@ import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.j
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 const _nextDrawerId = createIdCounter('hx-drawer');
 
@@ -135,7 +136,7 @@ const FOCUSABLE_SELECTORS = [
  */
 @customElement('hx-drawer')
 export class HelixDrawer extends HelixElement {
-  static override styles = [helixDrawerStyles];
+  static override styles = [helixDrawerStyles, forcedColorsSurface];
 
   // ─── Queries ───
 

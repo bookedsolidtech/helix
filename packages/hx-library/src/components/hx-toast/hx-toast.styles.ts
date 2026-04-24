@@ -1,5 +1,15 @@
 import { css } from 'lit';
 
+/**
+ * hx-toast styles.
+ *
+ * Component-tier tokens with two-level var() fallback:
+ *   var(--hx-toast-{prop}, var(--hx-color-{semantic}, #hex))
+ * Inner hex fallbacks track the "precision cool" palette (3.2.0):
+ *   neutral-0 = #FFFFFF, neutral-900 = #0D1825 (surface-inverse anchor),
+ *   primary-600 = #0F7078, success-600 = #0E8A4A, warning-500 = #C2711C,
+ *   error-600 = #C92A2A.
+ */
 export const helixToastStyles = css`
   /* ─── hx-toast host ─── */
 
@@ -20,7 +30,7 @@ export const helixToastStyles = css`
     gap: var(--hx-space-3, 0.75rem);
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
     border-radius: var(--hx-toast-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-toast-bg, var(--hx-color-surface-inverse, #0f172a));
+    background-color: var(--hx-toast-bg, var(--hx-color-surface-inverse, #0d1825));
     color: var(--hx-toast-color, var(--hx-color-text-inverse, #ffffff));
     font-family: var(--hx-toast-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
@@ -47,22 +57,22 @@ export const helixToastStyles = css`
   /* ─── Variant overrides ─── */
 
   .toast--success {
-    --hx-toast-bg: var(--hx-color-success-600, #15803d);
-    --hx-toast-color: var(--hx-color-text-on-success, #ffffff);
+    --hx-toast-bg: var(--hx-color-success-600, #0e8a4a);
+    --hx-toast-color: var(--hx-color-text-on-success, #0d1825);
   }
 
   .toast--warning {
-    --hx-toast-bg: var(--hx-color-warning-500, #d97706);
-    --hx-toast-color: var(--hx-color-text-on-warning, #0f172a);
+    --hx-toast-bg: var(--hx-color-warning-500, #c2711c);
+    --hx-toast-color: var(--hx-color-text-on-warning, #0d1825);
   }
 
   .toast--danger {
-    --hx-toast-bg: var(--hx-color-error-600, #b91c1c);
+    --hx-toast-bg: var(--hx-color-error-600, #c92a2a);
     --hx-toast-color: var(--hx-color-text-on-error, #ffffff);
   }
 
   .toast--info {
-    --hx-toast-bg: var(--hx-color-primary-600, #1d4ed8);
+    --hx-toast-bg: var(--hx-color-primary-600, #0f7078);
     --hx-toast-color: var(--hx-color-text-on-primary, #ffffff);
   }
 
@@ -156,6 +166,7 @@ export const helixToastStyles = css`
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */
+  /* Belt-and-suspenders: rich per-class HC overrides PLUS the forcedColorsSurface mixin. */
 
   @media (forced-colors: active) {
     .toast {

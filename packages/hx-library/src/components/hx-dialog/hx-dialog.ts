@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextDialogId = createIdCounter('hx-dialog');
@@ -122,7 +123,7 @@ const FOCUSABLE_SELECTORS = [
  */
 @customElement('hx-dialog')
 export class HelixDialog extends HelixElement {
-  static override styles = [helixDialogStyles];
+  static override styles = [helixDialogStyles, forcedColorsSurface];
 
   // D10 — observe aria-label attribute without shadowing ARIAMixin.ariaLabel
   static override get observedAttributes(): string[] {
