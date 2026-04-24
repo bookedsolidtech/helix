@@ -29,7 +29,12 @@ if (!campaign) {
 
 const campaignDir = resolve(`.reports/codex/campaigns/${campaign}`);
 const jsonlPath = resolve(campaignDir, 'findings.jsonl');
-const targetsPath = resolve(`scripts/codex-campaigns/campaign-${campaign}`, 'targets.txt');
+const fullManifestPath = resolve(`scripts/codex-campaigns/campaign-${campaign}`, 'targets.txt');
+// Per-run manifest written by run-campaign.sh — lists only the targets the
+// most recent invocation actually processed (honors --limit / --targets).
+// Prefer this over the full manifest so partial runs don't pre-seed un-run
+// targets as `verdict: "pass"`.
+const processedManifestPath = resolve(campaignDir, 'targets-processed.txt');
 
 if (!existsSync(jsonlPath)) {
   console.error(`findings file not found: ${jsonlPath}`);
@@ -41,8 +46,9 @@ if (!existsSync(jsonlPath)) {
 // this, the scoreboard only surfaces targets with at least one finding and
 // cannot distinguish "passed cleanly" from "never ran."
 function loadTargetManifest(): string[] {
-  if (!existsSync(targetsPath)) return [];
-  return readFileSync(targetsPath, 'utf8')
+  const path = existsSync(processedManifestPath) ? processedManifestPath : fullManifestPath;
+  if (!existsSync(path)) return [];
+  return readFileSync(path, 'utf8')
     .split('\n')
     .map((l) => l.trim())
     .filter((l) => l.length > 0 && !l.startsWith('#'));

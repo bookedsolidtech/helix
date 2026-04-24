@@ -392,7 +392,12 @@ jobs:
           exit $rc
         working-directory: packages/hx-library
       - name: Enforce coverage thresholds for changed components
-        if: steps.run-tests.outputs.tests_ran == 'true' && matrix.shard == '1/4'
+        # Run on every shard. The shard-aware check-coverage logic intersects
+        # HX_COVERAGE_COMPONENTS with the components whose tests actually ran
+        # on this shard (read from .cache/test-results.json), so each shard
+        # enforces its own slice. Restricting to shard 1/4 would let any
+        # component whose test landed on shards 2-4 regress unchecked.
+        if: steps.run-tests.outputs.tests_ran == 'true'
         env:
           HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
         run: node scripts/check-coverage.mjs

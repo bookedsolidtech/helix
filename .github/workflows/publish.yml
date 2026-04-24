@@ -301,10 +301,13 @@ jobs:
           if [ -z "${VERSION}" ]; then
             VERSION="run-${GITHUB_RUN_ID}"
           fi
-          # Include GITHUB_RUN_ID so reruns of the same published version do
-          # not collide with a pre-existing release-manifest branch (which
-          # would cause a non-fast-forward push and orphan the PR).
-          BRANCH="release-manifest/${VERSION}-${GITHUB_RUN_ID}"
+          # Include both GITHUB_RUN_ID and GITHUB_RUN_ATTEMPT so reruns of the
+          # same published version produce a unique branch name. GITHUB_RUN_ID
+          # is stable across reruns of a single workflow run; only RUN_ATTEMPT
+          # increments. Without RUN_ATTEMPT, a rerun would collide with the
+          # pre-existing release-manifest branch from the failed first attempt
+          # and cause a non-fast-forward push that orphans the PR.
+          BRANCH="release-manifest/${VERSION}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
