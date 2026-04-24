@@ -27,14 +27,14 @@ export const helixDataTableStyles = css`
   /* ─── Head ─── */
 
   thead {
-    background-color: var(--hx-data-table-header-bg, var(--hx-color-neutral-50, #f8fafc));
+    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   :host([sticky-header]) thead th {
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: var(--hx-data-table-header-bg, var(--hx-color-neutral-50, #f8fafc));
+    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   /* ─── Cells ─── */
@@ -44,18 +44,18 @@ export const helixDataTableStyles = css`
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
     text-align: start;
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-data-table-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-data-table-border-color, var(--hx-color-border-default, #e2e8f0));
     vertical-align: middle;
   }
 
   th {
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-data-table-header-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-data-table-header-color, var(--hx-color-text-strong, #334155));
     white-space: nowrap;
   }
 
   td {
-    color: var(--hx-data-table-cell-color, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-data-table-cell-color, var(--hx-color-text-primary, #0f172a));
   }
 
   /* ─── Checkbox Column ─── */
@@ -129,7 +129,7 @@ export const helixDataTableStyles = css`
   }
 
   tbody tr:hover {
-    background-color: var(--hx-data-table-row-hover-bg, var(--hx-color-neutral-50, #f8fafc));
+    background-color: var(--hx-data-table-row-hover-bg, var(--hx-color-surface-raised, #f8fafc));
   }
 
   tbody tr[aria-selected='true'] {
@@ -151,6 +151,7 @@ export const helixDataTableStyles = css`
     display: block;
     height: 1em;
     border-radius: var(--hx-border-radius-sm, 2px);
+    /* Skeleton shimmer: intentionally primitive so the animation reads the same across all modes. */
     background: linear-gradient(
       90deg,
       var(--hx-color-neutral-200, #e2e8f0) 25%,
@@ -204,7 +205,7 @@ export const helixDataTableStyles = css`
 
   .empty-cell {
     text-align: center;
-    color: var(--hx-data-table-empty-color, var(--hx-color-neutral-600, #475569));
+    color: var(--hx-data-table-empty-color, var(--hx-color-text-secondary, #475569));
     padding: var(--hx-space-8, 2rem) var(--hx-space-4, 1rem);
   }
 
