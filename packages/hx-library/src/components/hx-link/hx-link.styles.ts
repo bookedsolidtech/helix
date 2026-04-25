@@ -50,7 +50,7 @@ export const helixLinkStyles = css`
   /* --- Variant: subtle --- */
 
   .link--subtle {
-    color: var(--hx-link-color-subtle, var(--hx-color-text-secondary, #313E4B));
+    color: var(--hx-link-color-subtle, var(--hx-color-text-secondary, #313e4b));
     text-decoration: none;
   }
 

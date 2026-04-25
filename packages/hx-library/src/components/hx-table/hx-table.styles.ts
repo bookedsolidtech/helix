@@ -33,7 +33,7 @@ export const helixTableStyles = css`
     text-align: start;
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-table-header-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-table-header-color, var(--hx-color-text-strong, #202b39));
     font-size: var(--hx-font-size-md, 1rem);
   }
 

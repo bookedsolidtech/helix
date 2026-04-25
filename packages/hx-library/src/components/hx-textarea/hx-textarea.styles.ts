@@ -182,7 +182,7 @@ export const helixTextareaStyles = css`
 
   .field__counter {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-textarea-counter-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-textarea-counter-color, var(--hx-color-text-muted, #4a5362));
     line-height: var(--hx-line-height-normal, 1.5);
     text-align: end;
   }
@@ -205,7 +205,7 @@ export const helixTextareaStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-textarea-help-text-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-textarea-help-text-color, var(--hx-color-text-muted, #4a5362));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

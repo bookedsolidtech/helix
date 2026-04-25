@@ -27,7 +27,7 @@ export const helixProgressBarStyles = css`
     font-family: var(--hx-progress-bar-label-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-progress-bar-label-font-size, var(--hx-font-size-sm, 0.875rem));
     font-weight: var(--hx-progress-bar-label-font-weight, var(--hx-font-weight-medium, 500));
-    color: var(--hx-progress-bar-label-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-progress-bar-label-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-tight, 1.25);
   }
 

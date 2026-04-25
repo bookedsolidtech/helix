@@ -154,7 +154,7 @@ export const helixCodeSnippetStyles = css`
     display: inline-block;
     min-width: var(--hx-space-8, 2rem);
     padding-inline-end: var(--hx-space-3, 0.75rem);
-    color: var(--hx-code-snippet-line-number-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-code-snippet-line-number-color, var(--hx-color-text-muted, #4a5362));
     user-select: none;
     text-align: end;
   }

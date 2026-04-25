@@ -92,7 +92,7 @@ export const helixPaginationStyles = css`
     justify-content: center;
     min-width: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
-    color: var(--hx-pagination-ellipsis-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-pagination-ellipsis-color, var(--hx-color-text-muted, #4a5362));
     font-size: var(--hx-font-size-sm, 0.875rem);
     user-select: none;
   }
@@ -113,7 +113,7 @@ export const helixPaginationStyles = css`
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-pagination-page-size-label-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-pagination-page-size-label-color, var(--hx-color-text-muted, #4a5362));
     white-space: nowrap;
   }
 

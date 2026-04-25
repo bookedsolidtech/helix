@@ -28,7 +28,7 @@ export const helixTopNavStyles = css`
 
   .nav {
     background-color: var(--hx-top-nav-bg, var(--hx-color-surface-default, #ffffff));
-    color: var(--hx-top-nav-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-top-nav-color, var(--hx-color-text-strong, #202b39));
     border-bottom: var(--hx-border-width-thin, 1px) solid
       var(--hx-top-nav-border-color, var(--hx-color-border-default, #d6dbd5));
     font-family: var(--hx-top-nav-font-family, var(--hx-font-family-sans, sans-serif));
@@ -64,7 +64,7 @@ export const helixTopNavStyles = css`
     background: transparent;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
-    color: var(--hx-top-nav-toggle-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-top-nav-toggle-color, var(--hx-color-text-strong, #202b39));
     cursor: pointer;
     line-height: 0;
   }

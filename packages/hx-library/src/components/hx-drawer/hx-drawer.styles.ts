@@ -208,7 +208,7 @@ export const helixDrawerStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: transparent;
-    color: var(--hx-drawer-close-btn-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-drawer-close-btn-color, var(--hx-color-text-muted, #4a5362));
     cursor: pointer;
     flex-shrink: 0;
     transition: background-color var(--hx-duration-fast, 100ms) var(--hx-easing-default, ease);

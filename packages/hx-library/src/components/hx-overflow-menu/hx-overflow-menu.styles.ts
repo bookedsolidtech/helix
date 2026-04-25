@@ -20,7 +20,7 @@ export const helixOverflowMenuStyles = css`
     border: var(--hx-border-width-thin, 1px) solid transparent;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background-color: transparent;
-    color: var(--hx-overflow-menu-button-color, var(--hx-color-text-secondary, #313E4B));
+    color: var(--hx-overflow-menu-button-color, var(--hx-color-text-secondary, #313e4b));
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms ease),

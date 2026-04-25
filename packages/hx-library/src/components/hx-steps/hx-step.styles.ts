@@ -65,7 +65,7 @@ export const helixStepStyles = css`
     border: var(--hx-border-width-medium, 2px) solid
       var(--hx-steps-indicator-border-color, var(--hx-color-border-strong, #66787b));
     background-color: var(--hx-steps-indicator-bg, var(--hx-color-surface-default, #ffffff));
-    color: var(--hx-steps-indicator-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-steps-indicator-color, var(--hx-color-text-muted, #4a5362));
     font-size: var(--hx-steps-indicator-font-size, var(--hx-font-size-sm));
     font-weight: var(--hx-font-weight-semibold);
     font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
@@ -109,14 +109,14 @@ export const helixStepStyles = css`
     font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-steps-label-font-size, var(--hx-font-size-sm));
     font-weight: var(--hx-font-weight-medium);
-    color: var(--hx-steps-label-color, var(--hx-color-text-secondary, #313E4B));
+    color: var(--hx-steps-label-color, var(--hx-color-text-secondary, #313e4b));
     line-height: var(--hx-line-height-tight, 1.25);
   }
 
   .step__description {
     font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-steps-description-font-size, var(--hx-font-size-xs));
-    color: var(--hx-steps-description-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-steps-description-color, var(--hx-color-text-muted, #4a5362));
     margin-top: var(--hx-space-1, 0.25rem);
     line-height: var(--hx-line-height-normal, 1.5);
   }

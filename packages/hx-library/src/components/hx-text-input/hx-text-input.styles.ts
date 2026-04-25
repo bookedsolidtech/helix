@@ -103,7 +103,7 @@ export const helixTextInputStyles = css`
     );
     --_text-input-help-text-color: var(
       --hx-text-input-help-text-color,
-      var(--hx-color-text-muted, #4A5362)
+      var(--hx-color-text-muted, #4a5362)
     );
     --_text-input-error-color: var(
       --hx-text-input-error-color,
@@ -216,7 +216,7 @@ export const helixTextInputStyles = css`
   .field__suffix {
     display: flex;
     align-items: center;
-    color: var(--hx-color-text-muted, #4A5362);
+    color: var(--hx-color-text-muted, #4a5362);
     flex-shrink: 0;
   }
 

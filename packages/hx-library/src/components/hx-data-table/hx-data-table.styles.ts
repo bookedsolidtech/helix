@@ -50,7 +50,7 @@ export const helixDataTableStyles = css`
 
   th {
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-data-table-header-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-data-table-header-color, var(--hx-color-text-strong, #202b39));
     white-space: nowrap;
   }
 
@@ -211,7 +211,7 @@ export const helixDataTableStyles = css`
 
   .empty-cell {
     text-align: center;
-    color: var(--hx-data-table-empty-color, var(--hx-color-text-secondary, #313E4B));
+    color: var(--hx-data-table-empty-color, var(--hx-color-text-secondary, #313e4b));
     padding: var(--hx-space-8, 2rem) var(--hx-space-4, 1rem);
   }
 

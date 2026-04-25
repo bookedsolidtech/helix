@@ -10,7 +10,7 @@ export const helixStatStyles = css`
     flex-direction: column;
     gap: var(--hx-stat-gap, var(--hx-space-1, 0.25rem));
     font-family: var(--hx-stat-font-family, var(--hx-font-family-sans, sans-serif));
-    color: var(--hx-stat-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-stat-color, var(--hx-color-text-strong, #202b39));
   }
 
   /* ─── Size Variants ─── */
@@ -60,7 +60,7 @@ export const helixStatStyles = css`
   /* ─── Label ─── */
 
   .stat__label {
-    color: var(--hx-stat-label-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-stat-label-color, var(--hx-color-text-muted, #4a5362));
     font-weight: var(--hx-font-weight-normal, 400);
   }
 

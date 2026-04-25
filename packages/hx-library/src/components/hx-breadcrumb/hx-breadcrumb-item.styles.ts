@@ -45,7 +45,7 @@ export const helixBreadcrumbItemStyles = css`
   }
 
   [part='text'] {
-    color: var(--hx-breadcrumb-text-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-breadcrumb-text-color, var(--hx-color-text-strong, #202b39));
     font-family: inherit;
     font-size: inherit;
     max-width: var(--hx-breadcrumb-item-max-width);
@@ -56,7 +56,7 @@ export const helixBreadcrumbItemStyles = css`
 
   .separator {
     margin-inline: var(--hx-breadcrumb-separator-gap, var(--hx-space-1, 0.25rem));
-    color: var(--hx-breadcrumb-separator-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-breadcrumb-separator-color, var(--hx-color-text-muted, #4a5362));
     user-select: none;
   }
 

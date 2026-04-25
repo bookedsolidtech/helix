@@ -19,7 +19,7 @@ export const helixPhiFieldStyles = css`
   .phi-field__value--masked {
     user-select: none;
     -webkit-user-select: none;
-    color: var(--hx-phi-field-masked-color, var(--hx-color-text-muted, #4A5362));
+    color: var(--hx-phi-field-masked-color, var(--hx-color-text-muted, #4a5362));
     letter-spacing: var(--hx-phi-field-letter-spacing, 0.1em);
   }
 

@@ -162,7 +162,7 @@ export const helixCardStyles = css`
      * host flows into the body slot (and through to slotted light-DOM
      * descendants via flat-tree inheritance).
      */
-    color: var(--hx-card-body-color, var(--hx-card-color, var(--hx-color-text-secondary, #313E4B)));
+    color: var(--hx-card-body-color, var(--hx-card-color, var(--hx-color-text-secondary, #313e4b)));
   }
 
   .card__footer {
