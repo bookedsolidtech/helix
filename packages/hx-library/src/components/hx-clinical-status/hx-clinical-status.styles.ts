@@ -36,11 +36,11 @@ export const helixClinicalStatusStyles = css`
     gap: var(--hx-clinical-status-gap, var(--hx-space-3, 0.75rem));
     padding: var(--hx-clinical-status-padding, var(--hx-space-4, 1rem));
     border: var(--hx-clinical-status-border-width, var(--hx-border-width-thin, 1px)) solid
-      var(--hx-clinical-status-border-color, var(--hx-color-info-200, #BEDCFC));
+      var(--hx-clinical-status-border-color, var(--hx-color-info-200, #bedcfc));
     border-inline-start: var(--hx-clinical-status-accent-width, 4px) solid
-      var(--hx-clinical-status-accent-color, var(--hx-color-info-500, #0C8BEB));
+      var(--hx-clinical-status-accent-color, var(--hx-color-info-500, #0c8beb));
     border-radius: var(--hx-clinical-status-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-clinical-status-bg, var(--hx-color-info-50, #EFF6FE));
+    background-color: var(--hx-clinical-status-bg, var(--hx-color-info-50, #eff6fe));
     color: var(--hx-clinical-status-color, var(--hx-color-info-800, #064172));
     font-family: var(--hx-clinical-status-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
@@ -62,41 +62,41 @@ export const helixClinicalStatusStyles = css`
 
   :host([severity='info']) .clinical-status,
   :host(:not([severity])) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-info-50, #EFF6FE);
-    --hx-clinical-status-border-color: var(--hx-color-info-200, #BEDCFC);
-    --hx-clinical-status-accent-color: var(--hx-color-info-500, #0C8BEB);
+    --hx-clinical-status-bg: var(--hx-color-info-50, #eff6fe);
+    --hx-clinical-status-border-color: var(--hx-color-info-200, #bedcfc);
+    --hx-clinical-status-accent-color: var(--hx-color-info-500, #0c8beb);
     --hx-clinical-status-color: var(--hx-color-info-800, #064172);
-    --hx-clinical-status-icon-color: var(--hx-color-info-500, #0C8BEB);
+    --hx-clinical-status-icon-color: var(--hx-color-info-500, #0c8beb);
   }
 
   /* ─── Severity: warning ─── */
 
   :host([severity='warning']) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-warning-50, #FFF3EA);
-    --hx-clinical-status-border-color: var(--hx-color-warning-200, #FACFAE);
-    --hx-clinical-status-accent-color: var(--hx-color-warning-500, #C2711C);
+    --hx-clinical-status-bg: var(--hx-color-warning-50, #fff3ea);
+    --hx-clinical-status-border-color: var(--hx-color-warning-200, #facfae);
+    --hx-clinical-status-accent-color: var(--hx-color-warning-500, #c2711c);
     --hx-clinical-status-color: var(--hx-color-warning-800, #603301);
-    --hx-clinical-status-icon-color: var(--hx-color-warning-500, #C2711C);
+    --hx-clinical-status-icon-color: var(--hx-color-warning-500, #c2711c);
   }
 
   /* ─── Severity: critical ─── */
 
   :host([severity='critical']) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-error-50, #FFF2F0);
-    --hx-clinical-status-border-color: var(--hx-color-error-200, #FCCBC4);
-    --hx-clinical-status-accent-color: var(--hx-color-error-500, #E5493E);
-    --hx-clinical-status-color: var(--hx-color-error-800, #7A090A);
-    --hx-clinical-status-icon-color: var(--hx-color-error-500, #E5493E);
+    --hx-clinical-status-bg: var(--hx-color-error-50, #fff2f0);
+    --hx-clinical-status-border-color: var(--hx-color-error-200, #fccbc4);
+    --hx-clinical-status-accent-color: var(--hx-color-error-500, #e5493e);
+    --hx-clinical-status-color: var(--hx-color-error-800, #7a090a);
+    --hx-clinical-status-icon-color: var(--hx-color-error-500, #e5493e);
   }
 
   /* ─── Severity: emergent ─── */
 
   :host([severity='emergent']) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-error-50, #FFF2F0);
-    --hx-clinical-status-border-color: var(--hx-color-error-300, #FDA79C);
-    --hx-clinical-status-accent-color: var(--hx-color-error-700, #A21312);
-    --hx-clinical-status-color: var(--hx-color-error-900, #530D0A);
-    --hx-clinical-status-icon-color: var(--hx-color-error-700, #A21312);
+    --hx-clinical-status-bg: var(--hx-color-error-50, #fff2f0);
+    --hx-clinical-status-border-color: var(--hx-color-error-300, #fda79c);
+    --hx-clinical-status-accent-color: var(--hx-color-error-700, #a21312);
+    --hx-clinical-status-color: var(--hx-color-error-900, #530d0a);
+    --hx-clinical-status-icon-color: var(--hx-color-error-700, #a21312);
     border-inline-start-width: var(--hx-clinical-status-emergent-accent-width, 6px);
     font-weight: var(--hx-font-weight-semibold, 600);
   }
@@ -107,7 +107,7 @@ export const helixClinicalStatusStyles = css`
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-clinical-status-icon-color, var(--hx-color-info-500, #0C8BEB));
+    color: var(--hx-clinical-status-icon-color, var(--hx-color-info-500, #0c8beb));
   }
 
   .clinical-status__icon svg {

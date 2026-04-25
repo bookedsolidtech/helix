@@ -28,9 +28,9 @@ export class HelixTableCell extends HelixElement {
       td {
         padding: var(--_hx-table-cell-padding, var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem));
         text-align: left;
-        color: var(--hx-table-cell-color, var(--hx-color-neutral-900, #0D1825));
+        color: var(--hx-table-cell-color, var(--hx-color-neutral-900, #0d1825));
         border-bottom: var(--hx-border-width-thin, 1px) solid
-          var(--hx-table-border-color, var(--hx-color-neutral-200, #D6DBD5));
+          var(--hx-table-border-color, var(--hx-color-neutral-200, #d6dbd5));
         vertical-align: middle;
       }
 
@@ -68,7 +68,7 @@ export class HelixTableCell extends HelixElement {
           content: attr(data-label);
           font-weight: var(--hx-font-weight-semibold, 600);
           float: left;
-          color: var(--hx-table-header-color, var(--hx-color-neutral-700, #313E4B));
+          color: var(--hx-table-header-color, var(--hx-color-neutral-700, #313e4b));
         }
       }
     `,

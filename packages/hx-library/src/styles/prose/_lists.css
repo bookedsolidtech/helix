@@ -9,7 +9,7 @@ ol {
   margin-top: 0;
   margin-bottom: var(--wc-space-4, 1rem);
   padding-left: var(--wc-space-6, 1.5rem);
-  color: var(--wc-prose-color, var(--wc-color-neutral-700, #313E4B));
+  color: var(--wc-prose-color, var(--wc-color-neutral-700, #313e4b));
 }
 
 ul {
@@ -73,7 +73,7 @@ ul ul ol {
 
 ul ::marker,
 ol ::marker {
-  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #66787B));
+  color: var(--wc-color-text-muted, var(--wc-color-neutral-500, #66787b));
 }
 
 /* ─── Definition Lists ─── */
@@ -85,7 +85,7 @@ dl {
 
 dt {
   font-weight: var(--wc-font-weight-semibold, 600);
-  color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #0D1825));
+  color: var(--wc-prose-heading-color, var(--wc-color-neutral-900, #0d1825));
   margin-bottom: var(--wc-space-1, 0.25rem);
 }
 
@@ -96,7 +96,7 @@ dt + dt {
 dd {
   margin-left: var(--wc-space-6, 1.5rem);
   margin-bottom: var(--wc-space-4, 1rem);
-  color: var(--wc-prose-color, var(--wc-color-neutral-700, #313E4B));
+  color: var(--wc-prose-color, var(--wc-color-neutral-700, #313e4b));
 }
 
 dd:last-child {

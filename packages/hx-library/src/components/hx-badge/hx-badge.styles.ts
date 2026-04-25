@@ -53,11 +53,11 @@ export const helixBadgeStyles = css`
   }
 
   .badge--secondary {
-    --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #EBEEE9));
-    --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #313E4B));
+    --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #ebeee9));
+    --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #313e4b));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #EBEEE9))
+      var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #ebeee9))
     );
   }
 
@@ -71,38 +71,38 @@ export const helixBadgeStyles = css`
   }
 
   .badge--warning {
-    --hx-badge-bg: var(--hx-badge-warning-bg, var(--hx-color-warning-500, #C2711C));
-    --hx-badge-color: var(--hx-badge-warning-color, var(--hx-color-neutral-900, #0D1825));
+    --hx-badge-bg: var(--hx-badge-warning-bg, var(--hx-color-warning-500, #c2711c));
+    --hx-badge-color: var(--hx-badge-warning-color, var(--hx-color-neutral-900, #0d1825));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-warning-bg, var(--hx-color-warning-500, #C2711C))
+      var(--hx-badge-warning-bg, var(--hx-color-warning-500, #c2711c))
     );
   }
 
   .badge--error {
-    --hx-badge-bg: var(--hx-badge-error-bg, var(--hx-color-error-500, #E5493E));
+    --hx-badge-bg: var(--hx-badge-error-bg, var(--hx-color-error-500, #e5493e));
     --hx-badge-color: var(--hx-badge-error-color, var(--hx-color-neutral-0, #ffffff));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-error-bg, var(--hx-color-error-500, #E5493E))
+      var(--hx-badge-error-bg, var(--hx-color-error-500, #e5493e))
     );
   }
 
   .badge--neutral {
-    --hx-badge-bg: var(--hx-badge-neutral-bg, var(--hx-color-neutral-200, #D6DBD5));
-    --hx-badge-color: var(--hx-badge-neutral-color, var(--hx-color-neutral-700, #313E4B));
+    --hx-badge-bg: var(--hx-badge-neutral-bg, var(--hx-color-neutral-200, #d6dbd5));
+    --hx-badge-color: var(--hx-badge-neutral-color, var(--hx-color-neutral-700, #313e4b));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-neutral-bg, var(--hx-color-neutral-200, #D6DBD5))
+      var(--hx-badge-neutral-bg, var(--hx-color-neutral-200, #d6dbd5))
     );
   }
 
   .badge--info {
-    --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #0E5997));
+    --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #0e5997));
     --hx-badge-color: var(--hx-badge-info-color, var(--hx-color-neutral-0, #ffffff));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-info-bg, var(--hx-color-info-700, #0E5997))
+      var(--hx-badge-info-bg, var(--hx-color-info-700, #0e5997))
     );
   }
 

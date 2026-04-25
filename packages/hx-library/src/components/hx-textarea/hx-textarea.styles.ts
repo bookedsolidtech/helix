@@ -7,26 +7,26 @@ export const helixTextareaStyles = css`
     /* ─── Component tokens (3.2.0) ──────────────────────────────────── */
     --_textarea-bg: var(
       --hx-textarea-bg,
-      var(--hx-input-bg, var(--hx-color-surface-default, #FFFFFF))
+      var(--hx-input-bg, var(--hx-color-surface-default, #ffffff))
     );
     --_textarea-color: var(
       --hx-textarea-color,
-      var(--hx-input-color, var(--hx-color-text-strong, #202B39))
+      var(--hx-input-color, var(--hx-color-text-strong, #202b39))
     );
     --_textarea-border-color: var(
       --hx-textarea-border-color,
-      var(--hx-input-border-color, var(--hx-color-border-strong, #8E9C98))
+      var(--hx-input-border-color, var(--hx-color-border-strong, #8e9c98))
     );
     --_textarea-border-color-focus: var(
       --hx-textarea-border-color-focus,
       var(
         --hx-input-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6AB1B1))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       )
     );
     --_textarea-border-color-invalid: var(
       --hx-textarea-border-color-invalid,
-      var(--hx-input-error-color, var(--hx-color-error-600, #C92A2A))
+      var(--hx-input-error-color, var(--hx-color-error-600, #c92a2a))
     );
     --_textarea-border-radius: var(
       --hx-textarea-border-radius,
@@ -37,7 +37,7 @@ export const helixTextareaStyles = css`
     --_textarea-font-size: var(--hx-textarea-font-size, var(--hx-font-size-md, 1rem));
     --_textarea-placeholder-color: var(
       --hx-textarea-placeholder-color,
-      var(--hx-color-text-placeholder, #66787B)
+      var(--hx-color-text-placeholder, #66787b)
     );
   }
 
@@ -74,7 +74,7 @@ export const helixTextareaStyles = css`
     font-weight: var(--hx-font-weight-medium, 500);
     color: var(
       --hx-textarea-label-color,
-      var(--hx-input-label-color, var(--hx-color-text-strong, #202B39))
+      var(--hx-input-label-color, var(--hx-color-text-strong, #202b39))
     );
     line-height: var(--hx-line-height-normal, 1.5);
   }
@@ -82,7 +82,7 @@ export const helixTextareaStyles = css`
   .field__required-marker {
     color: var(
       --hx-textarea-error-color,
-      var(--hx-input-error-color, var(--hx-color-error-text, #C92A2A))
+      var(--hx-input-error-color, var(--hx-color-error-text, #c92a2a))
     );
     font-weight: var(--hx-font-weight-bold, 700);
   }
@@ -106,8 +106,7 @@ export const helixTextareaStyles = css`
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--_textarea-border-color-focus)
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_textarea-border-color-focus) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -123,8 +122,7 @@ export const helixTextareaStyles = css`
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--_textarea-border-color-invalid)
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_textarea-border-color-invalid) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -184,7 +182,7 @@ export const helixTextareaStyles = css`
 
   .field__counter {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-textarea-counter-color, var(--hx-color-text-muted, #66787B));
+    color: var(--hx-textarea-counter-color, var(--hx-color-text-muted, #66787b));
     line-height: var(--hx-line-height-normal, 1.5);
     text-align: end;
   }
@@ -207,7 +205,7 @@ export const helixTextareaStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-textarea-help-text-color, var(--hx-color-text-muted, #66787B));
+    color: var(--hx-textarea-help-text-color, var(--hx-color-text-muted, #66787b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -215,7 +213,7 @@ export const helixTextareaStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     color: var(
       --hx-textarea-error-color,
-      var(--hx-input-error-color, var(--hx-color-error-text, #C92A2A))
+      var(--hx-input-error-color, var(--hx-color-error-text, #c92a2a))
     );
     line-height: var(--hx-line-height-normal, 1.5);
   }

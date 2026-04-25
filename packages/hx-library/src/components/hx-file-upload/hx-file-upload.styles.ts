@@ -29,7 +29,7 @@ export const helixFileUploadStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-color-text-strong, #202B39);
+    color: var(--hx-color-text-strong, #202b39);
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -44,9 +44,9 @@ export const helixFileUploadStyles = css`
     min-height: var(--hx-space-32, 8rem);
     padding: var(--hx-space-6, 1.5rem) var(--hx-space-4, 1rem);
     border: var(--hx-border-width-thin, 1px) dashed
-      var(--hx-file-upload-dropzone-border-color, var(--hx-color-border-strong, #8E9C98));
+      var(--hx-file-upload-dropzone-border-color, var(--hx-color-border-strong, #8e9c98));
     border-radius: var(--hx-file-upload-dropzone-border-radius, var(--hx-border-radius-lg, 0.5rem));
-    background-color: var(--hx-file-upload-dropzone-bg, var(--hx-color-surface-raised, #F5F8F3));
+    background-color: var(--hx-file-upload-dropzone-bg, var(--hx-color-surface-raised, #f5f8f3));
     cursor: pointer;
     text-align: center;
     transition:
@@ -54,7 +54,7 @@ export const helixFileUploadStyles = css`
       background-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
     user-select: none;
-    color: var(--hx-color-text-secondary, #4A5362);
+    color: var(--hx-color-text-secondary, #4a5362);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 
@@ -78,14 +78,14 @@ export const helixFileUploadStyles = css`
       color-mix(
         in srgb,
         var(--hx-color-primary-500, #429797) 8%,
-        var(--hx-color-surface-default, #FFFFFF)
+        var(--hx-color-surface-default, #ffffff)
       )
     );
     border-style: solid;
   }
 
   .dropzone--error {
-    border-color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #E5493E));
+    border-color: var(--hx-file-upload-error-color, var(--hx-color-error-500, #e5493e));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -130,9 +130,9 @@ export const helixFileUploadStyles = css`
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #D6DBD5);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-default, #d6dbd5);
     border-radius: var(--hx-border-radius-md, 0.375rem);
-    background-color: var(--hx-color-surface-default, #FFFFFF);
+    background-color: var(--hx-color-surface-default, #ffffff);
   }
 
   .file-item__row {
@@ -145,7 +145,7 @@ export const helixFileUploadStyles = css`
     flex: 1;
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-color-text-strong, #202B39);
+    color: var(--hx-color-text-strong, #202b39);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -154,7 +154,7 @@ export const helixFileUploadStyles = css`
   .file-item__size {
     flex-shrink: 0;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-text-muted, #66787B);
+    color: var(--hx-color-text-muted, #66787b);
   }
 
   .file-item__remove {
@@ -168,7 +168,7 @@ export const helixFileUploadStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-color-text-muted, #66787B);
+    color: var(--hx-color-text-muted, #66787b);
     cursor: pointer;
     line-height: 1;
     transition:
@@ -177,8 +177,8 @@ export const helixFileUploadStyles = css`
   }
 
   .file-item__remove:hover {
-    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #C92A2A));
-    background-color: color-mix(in srgb, var(--hx-color-error-500, #E5493E) 8%, transparent);
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #c92a2a));
+    background-color: color-mix(in srgb, var(--hx-color-error-500, #e5493e) 8%, transparent);
   }
 
   .file-item__remove:focus-visible {
@@ -201,7 +201,7 @@ export const helixFileUploadStyles = css`
   .progress-track {
     width: 100%;
     height: var(--hx-file-upload-progress-height, var(--hx-space-1, 0.25rem));
-    background-color: var(--hx-color-border-default, #D6DBD5);
+    background-color: var(--hx-color-border-default, #d6dbd5);
     border-radius: var(--hx-border-radius-full, 9999px);
     overflow: hidden;
   }
@@ -240,7 +240,7 @@ export const helixFileUploadStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #C92A2A));
+    color: var(--hx-file-upload-error-color, var(--hx-color-error-text, #c92a2a));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

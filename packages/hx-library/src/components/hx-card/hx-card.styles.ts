@@ -95,7 +95,10 @@ export const helixCardStyles = css`
 
   .card--interactive:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-card-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797)));
+      var(
+        --hx-card-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

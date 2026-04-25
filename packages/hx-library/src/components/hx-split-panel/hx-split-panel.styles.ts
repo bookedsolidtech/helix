@@ -4,7 +4,7 @@ export const helixSplitPanelStyles = css`
   :host {
     display: flex;
     --_divider-size: var(--hx-split-panel-divider-size, 4px);
-    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-border-default, #D6DBD5));
+    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-border-default, #d6dbd5));
     --_divider-hover-color: var(
       --hx-split-panel-divider-hover-color,
       var(--hx-color-primary-500, #429797)

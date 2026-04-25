@@ -24,7 +24,7 @@ export const helixMeterStyles = css`
   .meter__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-meter-label-color, var(--hx-color-neutral-700, #313E4B));
+    color: var(--hx-meter-label-color, var(--hx-color-neutral-700, #313e4b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -32,7 +32,7 @@ export const helixMeterStyles = css`
     position: relative;
     width: 100%;
     height: var(--hx-meter-track-height, var(--hx-space-2, 0.5rem));
-    background-color: var(--hx-meter-track-color, var(--hx-color-neutral-200, #D6DBD5));
+    background-color: var(--hx-meter-track-color, var(--hx-color-neutral-200, #d6dbd5));
     border-radius: var(--hx-meter-track-radius, var(--hx-border-radius-full, 9999px));
     overflow: hidden;
   }
@@ -67,15 +67,15 @@ export const helixMeterStyles = css`
   /* ─── Semantic state colors ─── */
 
   :host([data-state='optimum']) {
-    --_indicator-color: var(--hx-meter-color-optimum, var(--hx-color-success-500, #3B9E58));
+    --_indicator-color: var(--hx-meter-color-optimum, var(--hx-color-success-500, #3b9e58));
   }
 
   :host([data-state='warning']) {
-    --_indicator-color: var(--hx-meter-color-warning, var(--hx-color-warning-500, #C2711C));
+    --_indicator-color: var(--hx-meter-color-warning, var(--hx-color-warning-500, #c2711c));
   }
 
   :host([data-state='danger']) {
-    --_indicator-color: var(--hx-meter-color-danger, var(--hx-color-error-500, #E5493E));
+    --_indicator-color: var(--hx-meter-color-danger, var(--hx-color-error-500, #e5493e));
   }
 
   /* ─── State Label (WCAG 1.4.1) ─── */
@@ -99,7 +99,7 @@ export const helixMeterStyles = css`
   }
 
   .meter__state-label[data-state='danger'] {
-    color: var(--hx-meter-color-danger, var(--hx-color-error-700, #A21312));
+    color: var(--hx-meter-color-danger, var(--hx-color-error-700, #a21312));
   }
 
   /* ─── Native meter hidden (we use custom rendering) ─── */

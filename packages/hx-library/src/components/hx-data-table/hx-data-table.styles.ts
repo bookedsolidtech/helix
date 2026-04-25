@@ -27,14 +27,14 @@ export const helixDataTableStyles = css`
   /* ─── Head ─── */
 
   thead {
-    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #F5F8F3));
+    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   :host([sticky-header]) thead th {
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #F5F8F3));
+    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   /* ─── Cells ─── */
@@ -44,18 +44,18 @@ export const helixDataTableStyles = css`
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
     text-align: start;
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-data-table-border-color, var(--hx-color-border-default, #D6DBD5));
+      var(--hx-data-table-border-color, var(--hx-color-border-default, #d6dbd5));
     vertical-align: middle;
   }
 
   th {
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-data-table-header-color, var(--hx-color-text-strong, #313E4B));
+    color: var(--hx-data-table-header-color, var(--hx-color-text-strong, #313e4b));
     white-space: nowrap;
   }
 
   td {
-    color: var(--hx-data-table-cell-color, var(--hx-color-text-primary, #0D1825));
+    color: var(--hx-data-table-cell-color, var(--hx-color-text-primary, #0d1825));
   }
 
   /* ─── Checkbox Column ─── */
@@ -132,11 +132,11 @@ export const helixDataTableStyles = css`
   }
 
   tbody tr:hover {
-    background-color: var(--hx-data-table-row-hover-bg, var(--hx-color-surface-raised, #F5F8F3));
+    background-color: var(--hx-data-table-row-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   tbody tr[aria-selected='true'] {
-    background-color: var(--hx-data-table-row-selected-bg, var(--hx-color-primary-50, #EBF8F8));
+    background-color: var(--hx-data-table-row-selected-bg, var(--hx-color-primary-50, #ebf8f8));
   }
 
   /* ─── Checkbox Input ─── */
@@ -157,9 +157,9 @@ export const helixDataTableStyles = css`
     /* Skeleton shimmer: intentionally primitive so the animation reads the same across all modes. */
     background: linear-gradient(
       90deg,
-      var(--hx-color-neutral-200, #D6DBD5) 25%,
-      var(--hx-color-neutral-100, #EBEEE9) 50%,
-      var(--hx-color-neutral-200, #D6DBD5) 75%
+      var(--hx-color-neutral-200, #d6dbd5) 25%,
+      var(--hx-color-neutral-100, #ebeee9) 50%,
+      var(--hx-color-neutral-200, #d6dbd5) 75%
     );
     background-size: 200% 100%;
     animation: hx-shimmer var(--hx-data-table-shimmer-duration, 1.5s) infinite;
@@ -211,7 +211,7 @@ export const helixDataTableStyles = css`
 
   .empty-cell {
     text-align: center;
-    color: var(--hx-data-table-empty-color, var(--hx-color-text-secondary, #4A5362));
+    color: var(--hx-data-table-empty-color, var(--hx-color-text-secondary, #4a5362));
     padding: var(--hx-space-8, 2rem) var(--hx-space-4, 1rem);
   }
 

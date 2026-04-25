@@ -32,7 +32,7 @@ export const helixTreeItemStyles = css`
     border-radius: var(--hx-tree-item-border-radius, var(--hx-border-radius-sm, 0.25rem));
     cursor: pointer;
     outline: none;
-    color: var(--hx-tree-item-color, var(--hx-color-neutral-900, #0D1825));
+    color: var(--hx-tree-item-color, var(--hx-color-neutral-900, #0d1825));
     font-family: var(--hx-tree-item-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tree-item-font-size, var(--hx-font-size-sm, 0.875rem));
     line-height: var(--hx-line-height-normal, 1.5);
@@ -41,7 +41,7 @@ export const helixTreeItemStyles = css`
   }
 
   .item-row:hover {
-    background-color: var(--hx-tree-item-hover-bg, var(--hx-color-neutral-100, #EBEEE9));
+    background-color: var(--hx-tree-item-hover-bg, var(--hx-color-neutral-100, #ebeee9));
   }
 
   .item-row:focus-visible {
@@ -56,12 +56,12 @@ export const helixTreeItemStyles = css`
   /* ─── Selected State ─── */
 
   :host([selected]) .item-row {
-    background-color: var(--hx-tree-item-selected-bg, var(--hx-color-primary-100, #DBF0F0));
-    color: var(--hx-tree-item-selected-color, var(--hx-color-primary-800, #07494A));
+    background-color: var(--hx-tree-item-selected-bg, var(--hx-color-primary-100, #dbf0f0));
+    color: var(--hx-tree-item-selected-color, var(--hx-color-primary-800, #07494a));
   }
 
   :host([selected]) .item-row:hover {
-    background-color: var(--hx-tree-item-selected-hover-bg, var(--hx-color-primary-200, #BCE1E1));
+    background-color: var(--hx-tree-item-selected-hover-bg, var(--hx-color-primary-200, #bce1e1));
   }
 
   /* ─── Disabled State ─── */
@@ -92,7 +92,7 @@ export const helixTreeItemStyles = css`
     padding: 0;
     border: none;
     background: transparent;
-    color: var(--hx-tree-item-expand-icon-color, var(--hx-color-neutral-500, #66787B));
+    color: var(--hx-tree-item-expand-icon-color, var(--hx-color-neutral-500, #66787b));
     cursor: pointer;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     transition: transform var(--hx-transition-fast, 150ms ease);
@@ -142,7 +142,7 @@ export const helixTreeItemStyles = css`
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-tree-item-icon-color, var(--hx-color-neutral-500, #66787B));
+    color: var(--hx-tree-item-icon-color, var(--hx-color-neutral-500, #66787b));
   }
 
   .item-icon:empty {

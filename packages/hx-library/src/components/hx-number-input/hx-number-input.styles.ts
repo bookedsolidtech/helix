@@ -38,7 +38,7 @@ export const helixNumberInputStyles = css`
   }
 
   .field__required-marker {
-    color: var(--hx-number-input-error-color, var(--hx-color-error-text, #C92A2A));
+    color: var(--hx-number-input-error-color, var(--hx-color-error-text, #c92a2a));
     font-weight: var(--hx-font-weight-bold);
   }
 
@@ -74,18 +74,18 @@ export const helixNumberInputStyles = css`
   /* ─── Error State ─── */
 
   .field--error .field__input-wrapper {
-    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #E5493E));
+    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #e5493e));
   }
 
   .field--error .field__input-wrapper:focus-within {
-    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #E5493E));
+    border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #e5493e));
     /* Fallback for Safari < 16.2 (no color-mix support) */
     box-shadow: 0 0 0 var(--hx-focus-ring-width)
-      var(--hx-number-input-error-color, var(--hx-color-error-500, #E5493E));
+      var(--hx-number-input-error-color, var(--hx-color-error-500, #e5493e));
     box-shadow: 0 0 0 var(--hx-focus-ring-width)
       color-mix(
         in srgb,
-        var(--hx-number-input-error-color, var(--hx-color-error-500, #E5493E))
+        var(--hx-number-input-error-color, var(--hx-color-error-500, #e5493e))
           calc(var(--hx-focus-ring-opacity) * 100%),
         transparent
       );
@@ -231,7 +231,7 @@ export const helixNumberInputStyles = css`
 
   .field__error {
     font-size: var(--hx-font-size-xs);
-    color: var(--hx-number-input-error-color, var(--hx-color-error-text, #C92A2A));
+    color: var(--hx-number-input-error-color, var(--hx-color-error-text, #c92a2a));
     line-height: var(--hx-line-height-normal);
   }
 

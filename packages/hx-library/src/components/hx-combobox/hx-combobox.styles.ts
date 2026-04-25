@@ -24,11 +24,11 @@ export const helixComboboxStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-combobox-label-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-combobox-label-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__required-marker {
-    color: var(--hx-combobox-error-color, var(--hx-color-error-text, #C92A2A));
+    color: var(--hx-combobox-error-color, var(--hx-color-error-text, #c92a2a));
     font-weight: var(--hx-font-weight-bold, 700);
   }
   .field__input-wrapper {
@@ -36,9 +36,9 @@ export const helixComboboxStyles = css`
     display: flex;
     align-items: center;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-combobox-border-color, var(--hx-color-border-strong, #8E9C98));
+      var(--hx-combobox-border-color, var(--hx-color-border-strong, #8e9c98));
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-combobox-bg, var(--hx-color-surface-default, #FFFFFF));
+    background-color: var(--hx-combobox-bg, var(--hx-color-surface-default, #ffffff));
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
@@ -46,28 +46,28 @@ export const helixComboboxStyles = css`
   .field__input-wrapper:focus-within {
     border-color: var(
       --hx-combobox-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6AB1B1))
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
     );
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
         var(
             --hx-combobox-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-400, #6AB1B1))
+            var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
           )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
   .field--error .field__input-wrapper {
-    border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #E5493E));
+    border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #e5493e));
   }
   .field--error .field__input-wrapper:focus-within {
-    border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #E5493E));
+    border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #e5493e));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-combobox-error-color, var(--hx-color-error-500, #E5493E))
+        var(--hx-combobox-error-color, var(--hx-color-error-500, #e5493e))
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
@@ -77,7 +77,7 @@ export const helixComboboxStyles = css`
     display: flex;
     align-items: center;
     padding: 0 var(--hx-space-2, 0.5rem);
-    color: var(--hx-color-text-muted, #66787B);
+    color: var(--hx-color-text-muted, #66787b);
     flex-shrink: 0;
   }
   .field__input {
@@ -90,11 +90,11 @@ export const helixComboboxStyles = css`
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-combobox-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-combobox-color, var(--hx-color-text-strong, #202b39));
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
   }
   .field__input::placeholder {
-    color: var(--hx-color-text-placeholder, #66787B);
+    color: var(--hx-color-text-placeholder, #66787b);
   }
   .field__input--sm {
     min-height: var(--hx-input-height-sm, var(--hx-size-8, 2rem));
@@ -113,7 +113,7 @@ export const helixComboboxStyles = css`
     justify-content: center;
     margin-inline-end: var(--hx-space-2, 0.5rem);
     flex-shrink: 0;
-    color: var(--hx-color-text-placeholder, #66787B);
+    color: var(--hx-color-text-placeholder, #66787b);
   }
   .field__clear-button {
     width: 1.25rem;
@@ -126,7 +126,7 @@ export const helixComboboxStyles = css`
     transition: color var(--hx-transition-fast, 150ms ease);
   }
   .field__clear-button:hover {
-    color: var(--hx-color-text-strong, #202B39);
+    color: var(--hx-color-text-strong, #202b39);
   }
   .field__clear-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
@@ -161,13 +161,13 @@ export const helixComboboxStyles = css`
     left: 0;
     right: 0;
     z-index: var(--hx-z-index-dropdown, 1000);
-    background-color: var(--hx-combobox-listbox-bg, var(--hx-color-surface-default, #FFFFFF));
+    background-color: var(--hx-combobox-listbox-bg, var(--hx-color-surface-default, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-combobox-border-color, var(--hx-color-border-strong, #8E9C98));
+      var(--hx-combobox-border-color, var(--hx-color-border-strong, #8e9c98));
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-combobox-listbox-shadow,
-      0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900, #0D1825) 12%, transparent)
+      0 4px 16px color-mix(in srgb, var(--hx-color-neutral-900, #0d1825) 12%, transparent)
     );
     max-height: var(--hx-combobox-listbox-max-height, 16rem);
     overflow: hidden;
@@ -188,27 +188,27 @@ export const helixComboboxStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-combobox-color, var(--hx-color-text-strong, #202B39));
+    color: var(--hx-combobox-color, var(--hx-color-text-strong, #202b39));
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     transition: background-color var(--hx-transition-fast, 150ms ease);
   }
   .field__option:hover {
-    background-color: var(--hx-combobox-option-hover-bg, var(--hx-color-primary-50, #EBF8F8));
+    background-color: var(--hx-combobox-option-hover-bg, var(--hx-color-primary-50, #ebf8f8));
   }
   .field__option--selected {
-    background-color: var(--hx-combobox-option-selected-bg, var(--hx-color-primary-100, #DBF0F0));
+    background-color: var(--hx-combobox-option-selected-bg, var(--hx-color-primary-100, #dbf0f0));
     font-weight: var(--hx-font-weight-medium, 500);
   }
   .field__option--focused {
-    background-color: var(--hx-combobox-option-hover-bg, var(--hx-color-primary-50, #EBF8F8));
+    background-color: var(--hx-combobox-option-hover-bg, var(--hx-color-primary-50, #ebf8f8));
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
     outline-offset: var(--hx-combobox-option-focus-ring-offset, -2px);
   }
   .field__option--focused.field__option--selected {
-    background-color: var(--hx-combobox-option-selected-bg, var(--hx-color-primary-100, #DBF0F0));
+    background-color: var(--hx-combobox-option-selected-bg, var(--hx-color-primary-100, #dbf0f0));
   }
   .field__option--disabled {
     opacity: var(--hx-opacity-disabled, 0.5);
@@ -224,7 +224,7 @@ export const helixComboboxStyles = css`
   .field__no-options {
     padding: var(--hx-space-3, 0.75rem);
     text-align: center;
-    color: var(--hx-color-text-placeholder, #66787B);
+    color: var(--hx-color-text-placeholder, #66787b);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
   .field__sr-only {
@@ -244,10 +244,10 @@ export const helixComboboxStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__help-text {
-    color: var(--hx-color-text-muted, #66787B);
+    color: var(--hx-color-text-muted, #66787b);
   }
   .field__error {
-    color: var(--hx-combobox-error-color, var(--hx-color-error-text, #C92A2A));
+    color: var(--hx-combobox-error-color, var(--hx-color-error-text, #c92a2a));
   }
   @media (prefers-reduced-motion: reduce) {
     .field__input-wrapper,
@@ -352,8 +352,8 @@ export const helixComboboxStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     padding: 0 var(--hx-space-1, 0.25rem) 0 var(--hx-space-2, 0.5rem);
     height: 1.5rem;
-    background-color: var(--hx-combobox-chip-bg, var(--hx-color-primary-100, #DBF0F0));
-    color: var(--hx-combobox-chip-color, var(--hx-color-primary-800, #07494A));
+    background-color: var(--hx-combobox-chip-bg, var(--hx-color-primary-100, #dbf0f0));
+    color: var(--hx-combobox-chip-color, var(--hx-color-primary-800, #07494a));
     border-radius: var(--hx-border-radius-full, 9999px);
     font-size: var(--hx-font-size-sm, 0.875rem);
     white-space: nowrap;
@@ -384,7 +384,7 @@ export const helixComboboxStyles = css`
   }
   .field__chip-remove:hover {
     opacity: 1;
-    background-color: var(--hx-combobox-chip-remove-hover-bg, var(--hx-color-primary-200, #BCE1E1));
+    background-color: var(--hx-combobox-chip-remove-hover-bg, var(--hx-color-primary-200, #bce1e1));
   }
   .field__chip-remove:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid

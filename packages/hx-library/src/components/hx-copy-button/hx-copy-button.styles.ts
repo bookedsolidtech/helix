@@ -80,10 +80,7 @@ export const helixCopyButtonStyles = css`
     );
     /* Secondary non-color indicator required per WCAG 1.4.1 (use of color).
        A border provides visual differentiation for users with color blindness. */
-    border-color: var(
-      --hx-copy-button-copied-border-color,
-      var(--hx-color-success-500, #3B9E58)
-    );
+    border-color: var(--hx-copy-button-copied-border-color, var(--hx-color-success-500, #3b9e58));
   }
 
   /* ─── Icon Container ─── */

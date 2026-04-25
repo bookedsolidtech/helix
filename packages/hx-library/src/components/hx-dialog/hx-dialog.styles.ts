@@ -159,10 +159,7 @@ export const helixDialogStyles = css`
 
   .dialog__close-btn:hover {
     color: var(--hx-dialog-close-btn-hover-color, var(--hx-color-text-primary, #0d1825));
-    background-color: var(
-      --hx-dialog-close-btn-hover-bg,
-      var(--hx-color-surface-sunken, #ebeee9)
-    );
+    background-color: var(--hx-dialog-close-btn-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
   }
 
   .dialog__close-btn:focus-visible {

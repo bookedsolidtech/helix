@@ -215,10 +215,7 @@ export const helixDrawerStyles = css`
   }
 
   .drawer-close-button:hover {
-    background-color: var(
-      --hx-drawer-close-btn-hover-bg,
-      var(--hx-color-surface-sunken, #ebeee9)
-    );
+    background-color: var(--hx-drawer-close-btn-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
     color: var(--hx-drawer-close-btn-hover-color, var(--hx-color-text-primary, #0d1825));
   }
 

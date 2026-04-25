@@ -38,13 +38,13 @@ export class HelixTableHeader extends HelixElement {
         padding: var(--_hx-table-cell-padding, var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem));
         text-align: left;
         font-weight: var(--hx-font-weight-semibold, 600);
-        color: var(--hx-table-header-color, var(--hx-color-neutral-700, #313E4B));
+        color: var(--hx-table-header-color, var(--hx-color-neutral-700, #313e4b));
         background-color: var(
           --_hx-table-cell-bg,
-          var(--hx-table-header-bg, var(--hx-color-neutral-50, #F5F8F3))
+          var(--hx-table-header-bg, var(--hx-color-neutral-50, #f5f8f3))
         );
         border-bottom: var(--hx-border-width-thin, 1px) solid
-          var(--hx-table-border-color, var(--hx-color-neutral-200, #D6DBD5));
+          var(--hx-table-border-color, var(--hx-color-neutral-200, #d6dbd5));
         white-space: nowrap;
         vertical-align: middle;
         position: var(--_hx-table-th-position, static);

@@ -41,10 +41,10 @@ export const helixCarouselStyles = css`
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-carousel-nav-btn-border-color, var(--hx-color-neutral-200, #D6DBD5));
+      var(--hx-carousel-nav-btn-border-color, var(--hx-color-neutral-200, #d6dbd5));
     border-radius: var(--hx-border-radius-full, 9999px);
-    background: var(--hx-carousel-nav-btn-bg, var(--hx-color-neutral-0, #FFFFFF));
-    color: var(--hx-carousel-nav-btn-color, var(--hx-color-neutral-700, #313E4B));
+    background: var(--hx-carousel-nav-btn-bg, var(--hx-color-neutral-0, #ffffff));
+    color: var(--hx-carousel-nav-btn-color, var(--hx-color-neutral-700, #313e4b));
     cursor: pointer;
     padding: 0;
     transition:
@@ -55,10 +55,10 @@ export const helixCarouselStyles = css`
   }
 
   .nav-btn:hover:not([disabled]) {
-    background: var(--hx-carousel-nav-btn-hover-bg, var(--hx-color-neutral-50, #F5F8F3));
+    background: var(--hx-carousel-nav-btn-hover-bg, var(--hx-color-neutral-50, #f5f8f3));
     border-color: var(
       --hx-carousel-nav-btn-hover-border-color,
-      var(--hx-color-neutral-400, #8E9C98)
+      var(--hx-color-neutral-400, #8e9c98)
     );
   }
 
@@ -92,7 +92,7 @@ export const helixCarouselStyles = css`
     border: var(--hx-border-width-thin, 1px) solid transparent;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: transparent;
-    color: var(--hx-carousel-play-pause-color, var(--hx-color-neutral-500, #66787B));
+    color: var(--hx-carousel-play-pause-color, var(--hx-color-neutral-500, #66787b));
     cursor: pointer;
     padding: 0;
     font-size: var(--hx-font-size-sm, 0.875rem);
@@ -101,7 +101,7 @@ export const helixCarouselStyles = css`
   }
 
   .play-pause-btn:hover {
-    background: var(--hx-carousel-play-pause-hover-bg, var(--hx-color-neutral-100, #EBEEE9));
+    background: var(--hx-carousel-play-pause-hover-bg, var(--hx-color-neutral-100, #ebeee9));
   }
 
   .play-pause-btn:focus-visible {
@@ -164,7 +164,7 @@ export const helixCarouselStyles = css`
     width: var(--hx-carousel-pagination-dot-size, 0.5rem);
     height: var(--hx-carousel-pagination-dot-size, 0.5rem);
     border-radius: var(--hx-border-radius-full, 9999px);
-    background: var(--hx-carousel-pagination-dot-bg, var(--hx-color-neutral-300, #B6BFB9));
+    background: var(--hx-carousel-pagination-dot-bg, var(--hx-color-neutral-300, #b6bfb9));
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
       transform var(--hx-transition-fast, 150ms ease);
@@ -172,10 +172,7 @@ export const helixCarouselStyles = css`
 
   .pagination-item[aria-current='true'] .pagination-dot,
   .pagination-item.is-active .pagination-dot {
-    background: var(
-      --hx-carousel-pagination-dot-active-bg,
-      var(--hx-color-primary-600, #0F7078)
-    );
+    background: var(--hx-carousel-pagination-dot-active-bg, var(--hx-color-primary-600, #0f7078));
     transform: scale(1.25);
   }
 

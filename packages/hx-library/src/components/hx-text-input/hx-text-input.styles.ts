@@ -19,35 +19,38 @@ export const helixTextInputStyles = css`
     /* ─── Component tokens (3.2.0) ──────────────────────────────────── */
 
     /* Surface */
-    --_text-input-bg: var(--hx-text-input-bg, var(--hx-input-bg, var(--hx-color-surface-default, #FFFFFF)));
+    --_text-input-bg: var(
+      --hx-text-input-bg,
+      var(--hx-input-bg, var(--hx-color-surface-default, #ffffff))
+    );
     --_text-input-color: var(
       --hx-text-input-color,
-      var(--hx-input-color, var(--hx-color-text-strong, #202B39))
+      var(--hx-input-color, var(--hx-color-text-strong, #202b39))
     );
     --_text-input-placeholder-color: var(
       --hx-text-input-placeholder-color,
-      var(--hx-color-text-placeholder, #66787B)
+      var(--hx-color-text-placeholder, #66787b)
     );
 
     /* Border */
     --_text-input-border-color: var(
       --hx-text-input-border-color,
-      var(--hx-input-border-color, var(--hx-color-border-strong, #8E9C98))
+      var(--hx-input-border-color, var(--hx-color-border-strong, #8e9c98))
     );
     --_text-input-border-color-hover: var(
       --hx-text-input-border-color-hover,
-      var(--hx-color-border-strong, #8E9C98)
+      var(--hx-color-border-strong, #8e9c98)
     );
     --_text-input-border-color-focus: var(
       --hx-text-input-border-color-focus,
       var(
         --hx-input-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6AB1B1))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       )
     );
     --_text-input-border-color-invalid: var(
       --hx-text-input-border-color-invalid,
-      var(--hx-input-error-color, var(--hx-color-error-600, #C92A2A))
+      var(--hx-input-error-color, var(--hx-color-error-600, #c92a2a))
     );
     --_text-input-border-width: var(--hx-text-input-border-width, var(--hx-border-width-thin, 1px));
     --_text-input-border-radius: var(
@@ -71,7 +74,7 @@ export const helixTextInputStyles = css`
       --hx-text-input-focus-ring-color,
       var(
         --hx-input-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6AB1B1))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       )
     );
     --_text-input-focus-ring-width: var(
@@ -86,25 +89,25 @@ export const helixTextInputStyles = css`
     /* Disabled */
     --_text-input-disabled-bg: var(
       --hx-text-input-disabled-bg,
-      var(--hx-color-surface-sunken, #EBEEE9)
+      var(--hx-color-surface-sunken, #ebeee9)
     );
     --_text-input-disabled-color: var(
       --hx-text-input-disabled-color,
-      var(--hx-color-text-disabled, #8E9C98)
+      var(--hx-color-text-disabled, #8e9c98)
     );
 
     /* Label / help / error */
     --_text-input-label-color: var(
       --hx-text-input-label-color,
-      var(--hx-input-label-color, var(--hx-color-text-strong, #202B39))
+      var(--hx-input-label-color, var(--hx-color-text-strong, #202b39))
     );
     --_text-input-help-text-color: var(
       --hx-text-input-help-text-color,
-      var(--hx-color-text-muted, #66787B)
+      var(--hx-color-text-muted, #66787b)
     );
     --_text-input-error-color: var(
       --hx-text-input-error-color,
-      var(--hx-input-error-color, var(--hx-color-error-text, #C92A2A))
+      var(--hx-input-error-color, var(--hx-color-error-text, #c92a2a))
     );
   }
 
@@ -126,8 +129,7 @@ export const helixTextInputStyles = css`
     box-shadow: 0 0 0 var(--_text-input-focus-ring-width)
       color-mix(
         in srgb,
-        var(--_text-input-border-color-focus)
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_text-input-border-color-focus) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -187,8 +189,7 @@ export const helixTextInputStyles = css`
     box-shadow: 0 0 0 var(--_text-input-focus-ring-width)
       color-mix(
         in srgb,
-        var(--_text-input-border-color-focus)
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_text-input-border-color-focus) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -204,8 +205,7 @@ export const helixTextInputStyles = css`
     box-shadow: 0 0 0 var(--_text-input-focus-ring-width)
       color-mix(
         in srgb,
-        var(--_text-input-border-color-invalid)
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_text-input-border-color-invalid) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -216,7 +216,7 @@ export const helixTextInputStyles = css`
   .field__suffix {
     display: flex;
     align-items: center;
-    color: var(--hx-color-text-muted, #66787B);
+    color: var(--hx-color-text-muted, #66787b);
     flex-shrink: 0;
   }
 

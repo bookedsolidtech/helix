@@ -89,13 +89,13 @@ export const helixSpinnerStyles = css`
   /* ─── Variant Colors ─── */
 
   :host([variant='default']) {
-    --_spinner-color: var(--hx-spinner-color, var(--hx-color-neutral-600, #4A5362));
-    --_spinner-track-color: var(--hx-spinner-track-color, var(--hx-color-neutral-200, #D6DBD5));
+    --_spinner-color: var(--hx-spinner-color, var(--hx-color-neutral-600, #4a5362));
+    --_spinner-track-color: var(--hx-spinner-track-color, var(--hx-color-neutral-200, #d6dbd5));
   }
 
   :host([variant='primary']) {
     --_spinner-color: var(--hx-spinner-color, var(--hx-color-primary-500, #429797));
-    --_spinner-track-color: var(--hx-spinner-track-color, var(--hx-color-primary-100, #DBF0F0));
+    --_spinner-track-color: var(--hx-spinner-track-color, var(--hx-color-primary-100, #dbf0f0));
   }
 
   :host([variant='inverted']) {

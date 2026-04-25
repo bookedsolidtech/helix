@@ -16,7 +16,7 @@ export const helixColorPickerStyles = css`
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
     padding: var(--hx-space-1, 0.25rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #B6BFB9);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: var(--hx-color-neutral-0, #ffffff);
     cursor: pointer;
@@ -48,7 +48,7 @@ export const helixColorPickerStyles = css`
   }
   .trigger-label {
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-700, #313E4B);
+    color: var(--hx-color-neutral-700, #313e4b);
     font-family: var(--hx-font-family-mono, monospace);
     white-space: nowrap;
   }
@@ -58,7 +58,7 @@ export const helixColorPickerStyles = css`
     top: calc(100% + 4px);
     left: 0;
     background: var(--hx-color-neutral-0, #ffffff);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d6dbd5);
     border-radius: var(--hx-border-radius-lg, 0.5rem);
     box-shadow: 0 8px 24px
       var(--hx-color-picker-panel-shadow, var(--hx-overlay-black-15, rgba(0, 0, 0, 0.15)));
@@ -72,7 +72,7 @@ export const helixColorPickerStyles = css`
   :host([inline]) .panel {
     position: static;
     box-shadow: none;
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d6dbd5);
     border-radius: var(--hx-border-radius-lg, 0.5rem);
   }
   .gradient-grid {
@@ -185,12 +185,12 @@ export const helixColorPickerStyles = css`
   .format-btn {
     flex-shrink: 0;
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    background: var(--hx-color-neutral-100, #EBEEE9);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #B6BFB9);
+    background: var(--hx-color-neutral-100, #ebeee9);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-600, #4A5362);
+    color: var(--hx-color-neutral-600, #4a5362);
     text-transform: uppercase;
     font-weight: var(--hx-font-weight-semibold, 600);
     letter-spacing: 0.05em;
@@ -199,11 +199,11 @@ export const helixColorPickerStyles = css`
     flex: 1;
     min-width: 0;
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #B6BFB9);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     font-family: var(--hx-font-family-mono, monospace);
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-900, #0D1825);
+    color: var(--hx-color-neutral-900, #0d1825);
     background: var(--hx-color-neutral-0, #ffffff);
     outline: none;
   }

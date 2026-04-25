@@ -9,14 +9,14 @@ p {
   margin-bottom: var(--hx-space-4, 1rem);
   font-size: var(--hx-prose-font-size, var(--hx-font-size-md, 1rem));
   line-height: var(--hx-prose-line-height, var(--hx-line-height-relaxed, 1.75));
-  color: var(--hx-prose-color, var(--hx-color-neutral-700, #313E4B));
+  color: var(--hx-prose-color, var(--hx-color-neutral-700, #313e4b));
 }
 
 /* Lead paragraph — first paragraph or explicit .lead class */
 p:first-child,
 p.lead {
   font-size: var(--hx-prose-lead-font-size, var(--hx-font-size-lg, 1.125rem));
-  color: var(--hx-prose-lead-color, var(--hx-color-neutral-600, #4A5362));
+  color: var(--hx-prose-lead-color, var(--hx-color-neutral-600, #4a5362));
 }
 
 /* ─── Blockquote ─── */
@@ -28,10 +28,10 @@ blockquote {
   margin-right: 0;
   padding: var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem);
   border-left: var(--hx-border-width-thick, 3px) solid var(--hx-color-primary-500, #429797);
-  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #F5F8F3));
+  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f5f8f3));
   border-radius: 0 var(--hx-border-radius-sm, 0.25rem) var(--hx-border-radius-sm, 0.25rem) 0;
   font-style: italic;
-  color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #4A5362));
+  color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #4a5362));
 }
 
 blockquote p {
@@ -48,7 +48,7 @@ blockquote cite {
   font-size: var(--hx-font-size-sm, 0.875rem);
   font-style: normal;
   font-weight: var(--hx-font-weight-medium, 500);
-  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787b));
 }
 
 blockquote cite::before {
@@ -60,7 +60,7 @@ blockquote cite::before {
 hr {
   border: 0;
   border-top: var(--hx-divider-width, var(--hx-border-width-thin, 1px)) solid
-    var(--hx-divider-color, var(--hx-color-border-default, var(--hx-color-neutral-200, #D6DBD5)));
+    var(--hx-divider-color, var(--hx-color-border-default, var(--hx-color-neutral-200, #d6dbd5)));
   margin-top: var(--hx-space-8, 2rem);
   margin-bottom: var(--hx-space-8, 2rem);
 }
@@ -70,7 +70,7 @@ hr {
 strong,
 b {
   font-weight: var(--hx-font-weight-semibold, 600);
-  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #0D1825));
+  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #0d1825));
 }
 
 em,
@@ -80,12 +80,12 @@ i {
 
 small {
   font-size: var(--hx-font-size-sm, 0.875rem);
-  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787b));
 }
 
 mark {
-  background-color: var(--hx-color-warning-100, #FEE6D4);
-  color: var(--hx-color-neutral-900, #0D1825);
+  background-color: var(--hx-color-warning-100, #fee6d4);
+  color: var(--hx-color-neutral-900, #0d1825);
   padding: var(--hx-space-0, 0) var(--hx-space-1, 0.25rem);
   border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
@@ -93,17 +93,17 @@ mark {
 del,
 s {
   text-decoration: line-through;
-  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787b));
 }
 
 ins {
   text-decoration: underline;
-  text-decoration-color: var(--hx-color-success-300, #94D3A1);
+  text-decoration-color: var(--hx-color-success-300, #94d3a1);
 }
 
 abbr[title] {
   text-decoration: underline dotted;
-  text-decoration-color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
+  text-decoration-color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787b));
   cursor: help;
   text-underline-offset: 0.15em;
 }
@@ -129,10 +129,10 @@ sub {
 a {
   color: var(
     --hx-prose-link-color,
-    var(--hx-color-text-link, var(--hx-color-primary-600, #0F7078))
+    var(--hx-color-text-link, var(--hx-color-primary-600, #0f7078))
   );
   text-decoration: underline;
-  text-decoration-color: var(--hx-color-primary-200, #BCE1E1);
+  text-decoration-color: var(--hx-color-primary-200, #bce1e1);
   text-underline-offset: 0.15em;
   transition:
     color var(--hx-transition-fast, 150ms ease),
@@ -140,16 +140,16 @@ a {
 }
 
 a:hover {
-  color: var(--hx-color-text-link-hover, var(--hx-color-primary-700, #0F6363));
+  color: var(--hx-color-text-link-hover, var(--hx-color-primary-700, #0f6363));
   text-decoration-color: currentColor;
 }
 
 a:visited {
-  color: var(--hx-color-text-link-visited, var(--hx-color-secondary-600, #0F6B7E));
+  color: var(--hx-color-text-link-visited, var(--hx-color-secondary-600, #0f6b7e));
 }
 
 a:active {
-  color: var(--hx-color-text-link-active, var(--hx-color-primary-800, #07494A));
+  color: var(--hx-color-text-link-active, var(--hx-color-primary-800, #07494a));
 }
 
 a:focus-visible {

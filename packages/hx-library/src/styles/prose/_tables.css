@@ -12,7 +12,7 @@ table {
   margin-bottom: var(--hx-space-6, 1.5rem);
   font-size: var(--hx-prose-font-size, var(--hx-font-size-md, 1rem));
   line-height: var(--hx-line-height-normal, 1.5);
-  color: var(--hx-prose-color, var(--hx-color-neutral-700, #313E4B));
+  color: var(--hx-prose-color, var(--hx-color-neutral-700, #313e4b));
   overflow-x: auto;
   display: block;
 }
@@ -29,47 +29,47 @@ caption {
   padding-bottom: var(--hx-space-3, 0.75rem);
   font-size: var(--hx-font-size-sm, 0.875rem);
   font-weight: var(--hx-font-weight-medium, 500);
-  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787b));
   text-align: left;
   caption-side: bottom;
 }
 
 thead {
   border-bottom: var(--hx-border-width-medium, 2px) solid
-    var(--hx-color-border-default, var(--hx-color-neutral-200, #D6DBD5));
+    var(--hx-color-border-default, var(--hx-color-neutral-200, #d6dbd5));
 }
 
 tfoot {
   border-top: var(--hx-border-width-medium, 2px) solid
-    var(--hx-color-border-default, var(--hx-color-neutral-200, #D6DBD5));
+    var(--hx-color-border-default, var(--hx-color-neutral-200, #d6dbd5));
 }
 
 th {
   padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
   font-weight: var(--hx-font-weight-semibold, 600);
-  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #0D1825));
+  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #0d1825));
   text-align: left;
   white-space: nowrap;
-  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #F5F8F3));
+  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f5f8f3));
 }
 
 td {
   padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
   border-bottom: var(--hx-border-width-thin, 1px) solid
-    var(--hx-color-border-default, var(--hx-color-neutral-200, #D6DBD5));
+    var(--hx-color-border-default, var(--hx-color-neutral-200, #d6dbd5));
   vertical-align: top;
 }
 
 /* ─── Zebra Striping ─── */
 
 tbody tr:nth-child(even) {
-  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #F5F8F3));
+  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f5f8f3));
 }
 
 /* ─── Row Hover ─── */
 
 tbody tr:hover {
-  background-color: var(--hx-color-primary-50, #EBF8F8);
+  background-color: var(--hx-color-primary-50, #ebf8f8);
 }
 
 /* ─── Alignment Helpers (CKEditor output) ─── */
