@@ -78,8 +78,21 @@ const meta = {
         >
           This content inherits <code>--hx-*</code> design tokens from the theme provider.
         </p>
-        <p style="margin: 0; color: var(--hx-color-primary-500, #429797);">
+        <p style="margin: 0; color: var(--hx-color-text-link, var(--hx-color-primary-600, #0F7078));">
           Primary color: <code>var(--hx-color-primary-500)</code>
+          <span
+            style="
+              display: inline-block;
+              width: 0.875em;
+              height: 0.875em;
+              vertical-align: middle;
+              margin-left: 0.25em;
+              border-radius: 2px;
+              background: var(--hx-color-primary-500, #429797);
+              border: 1px solid var(--hx-color-border-default, #D6DBD5);
+            "
+            aria-hidden="true"
+          ></span>
         </p>
       </div>
     </hx-theme>
@@ -180,7 +193,7 @@ export const ThemeSwitcherDemo: Story = {
           "
         >
           <p style="margin: 0 0 0.5rem; font-weight: 600;">Themed Content</p>
-          <p style="margin: 0; color: var(--hx-color-primary-500);">
+          <p style="margin: 0; color: var(--hx-color-text-link);">
             Primary color — updates when you switch theme
           </p>
           <p
@@ -250,7 +263,7 @@ export const SideBySide: Story = {
               font-size: 0.875rem;
             "
           >
-            <p style="margin: 0; color: var(--hx-color-primary-500);">Primary color</p>
+            <p style="margin: 0; color: var(--hx-color-text-link);">Primary color</p>
             <p style="margin: 0.25rem 0 0; color: var(--hx-color-text-secondary);">
               Secondary text
             </p>
