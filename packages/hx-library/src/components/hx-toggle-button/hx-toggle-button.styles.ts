@@ -84,10 +84,16 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-border-color: transparent;
   }
 
+  /*
+   * secondary/ghost paint primary text on the surface (white). primary-500
+   * (#429797) on white = 3.43:1 — fails AA at body sizes. shift to
+   * primary-600 (#0F7078) = 6.06:1 — AA pass. border keeps primary-500
+   * for the brand affordance (3:1 non-text contrast still met).
+   */
   .button--secondary {
     --hx-toggle-button-bg: transparent;
-    --hx-toggle-button-color: var(--hx-color-primary-500, #429797);
-    --hx-toggle-button-border-color: var(--hx-color-primary-500, #429797);
+    --hx-toggle-button-color: var(--hx-color-primary-600, #0f7078);
+    --hx-toggle-button-border-color: var(--hx-color-primary-600, #0f7078);
   }
 
   .button--secondary:hover {
@@ -106,7 +112,7 @@ export const helixToggleButtonStyles = css`
 
   .button--ghost {
     --hx-toggle-button-bg: transparent;
-    --hx-toggle-button-color: var(--hx-color-primary-500, #429797);
+    --hx-toggle-button-color: var(--hx-color-primary-600, #0f7078);
     --hx-toggle-button-border-color: transparent;
   }
 
