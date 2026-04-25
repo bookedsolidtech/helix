@@ -96,8 +96,8 @@ export const helixButtonStyles = css`
 
   .button--secondary {
     --hx-button-bg: transparent;
-    /* primary-500 (#429797) text on white surface = 3.43:1 — fails AA.
-       primary-600 (#0F7078) on white = 6.06:1 — AA pass. */
+    /* primary-500 (#429797) text on white surface = 3.44:1 — fails AA.
+       primary-600 (#0F7078) on white = 5.82:1 — AA pass. */
     --hx-button-color: var(--hx-color-action-secondary-fg, #0f7078);
     --hx-button-border-color: var(--hx-color-action-secondary-border, #0f7078);
   }
@@ -137,8 +137,8 @@ export const helixButtonStyles = css`
 
   .button--ghost {
     --hx-button-bg: transparent;
-    /* primary-500 (#429797) text on white surface = 3.43:1 — fails AA.
-       primary-600 (#0F7078) on white = 6.06:1 — AA pass. */
+    /* primary-500 (#429797) text on white surface = 3.44:1 — fails AA.
+       primary-600 (#0F7078) on white = 5.82:1 — AA pass. */
     --hx-button-color: var(--hx-color-action-ghost-fg, #0f7078);
     --hx-button-border-color: transparent;
   }

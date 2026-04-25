@@ -4,7 +4,6 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixToastStyles } from './hx-toast.styles.js';
-import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -67,7 +66,13 @@ export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
  */
 @customElement('hx-toast')
 export class HelixToast extends HelixElement {
-  static override styles = [helixToastStyles, forcedColorsSurface];
+  // 3.2.1: forced-colors deference is owned by the bespoke @media block in
+  // hx-toast.styles.ts (per-class overrides on .toast and .toast__close —
+  // strictly more than the shared mixin's :host/[part] surface contract).
+  // XOR rule per styles/forced-colors.ts: do NOT also compose
+  // forcedColorsSurface — overlapping selectors inside the same media query
+  // create a fragile specificity war.
+  static override styles = [helixToastStyles];
 
   // ─── Public Properties ───
 
