@@ -986,6 +986,38 @@ describe('hx-button', () => {
         'rgb(235, 248, 248)',
       );
     });
+
+    // ─── Variant :active token binding (3.2.1 round-6 regression net) ───
+    //
+    // Codex round-6 caught that filled-variant :active states were still
+    // routing through the generic .button:active filter:brightness(0.8) instead
+    // of consuming action.{primary,danger}.bg-active + text.on-{primary,error}-strong.
+    // Effective pressed colors after the filter were sub-AA (primary 3.70:1,
+    // danger 3.26:1). These assertions pin both filled variants to the
+    // semantic action layer and verify the action.*.bg-active tokens resolve
+    // to the AA-passing primary-700/error-700 stops.
+
+    it('primary :active rule references --hx-color-action-primary-bg-active', async () => {
+      const el = await fixture<HelixButton>('<hx-button variant="primary">Click</hx-button>');
+      const css = cssSource(el);
+      expect(css).toMatch(/\.button--primary:active\s*\{[^}]*--hx-color-action-primary-bg-active/);
+      expect(css).toMatch(/\.button--primary:active\s*\{[^}]*filter:\s*none/);
+    });
+
+    it('danger :active rule references --hx-color-action-danger-bg-active', async () => {
+      const el = await fixture<HelixButton>('<hx-button variant="danger">Click</hx-button>');
+      const css = cssSource(el);
+      expect(css).toMatch(/\.button--danger:active\s*\{[^}]*--hx-color-action-danger-bg-active/);
+      expect(css).toMatch(/\.button--danger:active\s*\{[^}]*filter:\s*none/);
+    });
+
+    it('action.primary.bg-active resolves to primary-700 (#0F6363)', async () => {
+      expect(await resolveSemantic('--hx-color-action-primary-bg-active')).toBe('rgb(15, 99, 99)');
+    });
+
+    it('action.danger.bg-active resolves to error-700 (#A21312)', async () => {
+      expect(await resolveSemantic('--hx-color-action-danger-bg-active')).toBe('rgb(162, 19, 18)');
+    });
   });
 
   // ─── Property: type — form integration ───
