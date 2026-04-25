@@ -241,12 +241,21 @@ jobs:
       - run: pnpm turbo run type-check --filter='!docs'
 
   # ── Tests (need Playwright browsers) ────────────────────────────────────
-  # Path-filtered by changed components, then split across a 4-way shard
+  # Path-filtered by changed components, then split across an 8-way shard
   # matrix via vitest's native --shard flag. Each shard runs its slice of the
-  # selected test files in its own Chromium, so wall time drops ~4x on
+  # selected test files in its own Chromium, so wall time drops ~8x on
   # large-touch PRs while single-component PRs short-circuit empty shards
   # quickly. The shared watchdog (scripts/lib/vitest-watchdog.sh) handles the
   # Vitest 3.x Chromium teardown hang — still present on sharded runs.
+  #
+  # Why 8 and not 4: full-tree feature PRs (e.g. 3.2.0 palette refresh which
+  # touched ~80 .styles.ts files and re-instrumented every component under v8
+  # coverage) regularly drove shards 1 and 3 of the 4-way matrix to a hang
+  # signature — ~12s of vitest output, then 600s of total silence, then
+  # watchdog kill. Halving the per-shard load (~19 → ~10 test files, ~1300 →
+  # ~650 tests) keeps each Chromium process well under the threshold where
+  # coverage instrumentation + browser-mode + a freshly-imported shared mixin
+  # module appear to deadlock collection.
 
   test:
     name: Test (${{ matrix.shard }})
@@ -257,7 +266,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ['1/4', '2/4', '3/4', '4/4']
+        shard: ['1/8', '2/8', '3/8', '4/8', '5/8', '6/8', '7/8', '8/8']
     env:
       AGENT_RUN: '1'
       VITEST_SHARD: ${{ matrix.shard }}
@@ -416,12 +425,12 @@ jobs:
         # Run on every shard. The shard-aware check-coverage logic intersects
         # HX_COVERAGE_COMPONENTS with the components whose tests actually ran
         # on this shard (read from .cache/test-results.json), so each shard
-        # enforces its own slice. Restricting to shard 1/4 would let any
-        # component whose test landed on shards 2-4 regress unchecked.
+        # enforces its own slice. Restricting to shard 1 would let any
+        # component whose test landed on shards 2–8 regress unchecked.
         # Skipped on shared-test/unscoped runs: the gate is per-component
         # scope enforcement and an empty HX_COVERAGE_COMPONENTS makes the
         # script fall back to "check all components", which fails every shard
-        # by definition (each shard only runs ~1/4 of test files).
+        # by definition (each shard only runs ~1/8 of test files).
         if: steps.run-tests.outputs.tests_ran == 'true' && steps.changed.outputs.shared_tests_changed != 'true'
         env:
           HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
@@ -435,7 +444,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
       - name: Upload coverage report
-        if: always() && matrix.shard == '1/4'
+        if: always() && matrix.shard == '1/8'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -443,7 +452,7 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
       - name: Post coverage summary as PR comment
-        if: github.event_name == 'pull_request' && matrix.shard == '1/4' && steps.changed.outputs.shared_tests_changed != 'true' && always()
+        if: github.event_name == 'pull_request' && matrix.shard == '1/8' && steps.changed.outputs.shared_tests_changed != 'true' && always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
