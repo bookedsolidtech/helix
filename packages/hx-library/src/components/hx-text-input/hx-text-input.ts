@@ -8,7 +8,6 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FocusMixin } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextInputStyles } from './hx-text-input.styles.js';
-import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
@@ -45,14 +44,14 @@ export interface HxTextInputDetail {
  * @csspart help-text - The help text container.
  * @csspart error - The error message container.
  *
- * @cssprop [--hx-input-bg=var(--hx-color-neutral-0)] - Input background color.
- * @cssprop [--hx-input-color=var(--hx-color-neutral-800)] - Input text color.
- * @cssprop [--hx-input-border-color=var(--hx-color-neutral-300)] - Input border color.
+ * @cssprop [--hx-input-bg=var(--hx-color-surface-default)] - Input background color.
+ * @cssprop [--hx-input-color=var(--hx-color-text-strong)] - Input text color.
+ * @cssprop [--hx-input-border-color=var(--hx-color-border-strong)] - Input border color.
  * @cssprop [--hx-input-border-radius=var(--hx-border-radius-md)] - Input border radius.
  * @cssprop [--hx-input-font-family=var(--hx-font-family-sans)] - Input font family.
  * @cssprop [--hx-input-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
- * @cssprop [--hx-input-error-color=var(--hx-color-error-500)] - Error state color.
- * @cssprop [--hx-input-label-color=var(--hx-color-neutral-700)] - Label text color.
+ * @cssprop [--hx-input-error-color=var(--hx-color-error-text)] - Error state color.
+ * @cssprop [--hx-input-label-color=var(--hx-color-text-strong)] - Label text color.
  * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  * @cssprop [--hx-opacity-disabled] - Opacity.
@@ -88,7 +87,12 @@ export interface HxTextInputDetail {
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
-  static override styles = [helixTextInputStyles, forcedColorsField];
+  // 3.2.1: forced-colors deference is owned by the bespoke @media block in
+  // hx-text-input.styles.ts (covers wrapper/input/placeholder/focus/disabled/
+  // error/label/help-text — strictly more than the shared mixin). XOR rule:
+  // do NOT also compose forcedColorsField — overlapping selectors inside the
+  // same media query create a fragile specificity war.
+  static override styles = [helixTextInputStyles];
 
   // ─── Form Association ───
 

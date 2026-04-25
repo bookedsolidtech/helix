@@ -6,7 +6,6 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
-import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /** Detail for the hx-click event dispatched by hx-button. */
@@ -93,7 +92,12 @@ export interface HxButtonClickDetail {
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {
-  static override styles = [helixButtonStyles, forcedColorsInteractive];
+  // 3.2.1: forced-colors deference is owned by the bespoke @media block in
+  // hx-button.styles.ts (covers loading/disabled/focus, not just the base).
+  // Do NOT also compose forcedColorsInteractive here — the mixin's docstring
+  // forbids dual composition (XOR rule) and the dual approach was flagged in
+  // the token-cascade campaign findings.
+  static override styles = [helixButtonStyles];
 
   // ─── Form Association ───
 
