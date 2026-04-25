@@ -1,0 +1,89 @@
+{
+  "tag": "@helixui/library@3.2.0",
+  "commit_sha": "08e7ec809f0f08432debf94fbcdc97ebdbb9b3a3",
+  "ref": "refs/heads/main",
+  "repository": "bookedsolidtech/helix",
+  "published_at": "2026-04-25T16:51:13.728Z",
+  "publisher": "himerus",
+  "ci_run_id": "24935754995",
+  "ci_run_url": "https://github.com/bookedsolidtech/helix/actions/runs/24935754995",
+  "packages": {
+    "@helixui/library": "3.2.0",
+    "@helixui/tokens": "3.2.0",
+    "@helixui/react": "3.2.0"
+  },
+  "changeset_files": [],
+  "published_packages": [
+    {
+      "name": "@helixui/library",
+      "version": "3.2.0"
+    },
+    {
+      "name": "@helixui/react",
+      "version": "3.2.0"
+    },
+    {
+      "name": "@helixui/tokens",
+      "version": "3.2.0"
+    }
+  ],
+  "merged_prs_since_last_tag": [
+    1559,
+    1558,
+    1557,
+    1554,
+    1552,
+    1551,
+    1550,
+    1549,
+    1548,
+    1547,
+    1546,
+    1545,
+    1544,
+    1543,
+    1541,
+    1539
+  ],
+  "last_tag": "@helixui/drupal-behaviors@3.0.1",
+  "cem_sha256": "af9054b9ac65e82a238cbb88ab5381ddb5abdda1790259d09f5636c22f2c729e",
+  "cdn_budget_snapshot": {
+    "comment": "CDN bundle size budgets for @helixui/library (gzipped bytes). Enforced in CI by scripts/check-cdn-size.mjs. Changes require code review and a justification in the PR description. The CDN build emits several artifacts with different size profiles — this file tracks per-artifact budgets rather than a single aggregate ceiling so drift in one strategy (A vs B) is surfaced precisely.",
+    "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2. Current gz sizes (2026-04-17): full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A (JS+CSS)=229.7 KB. Ceilings give ~8-15% headroom for near-term component additions without being a floor. Warnings trigger at roughly half that headroom for early-signal drift.",
+    "budgets": {
+      "fullBundleJs": {
+        "file": "helix-{version}.min.js",
+        "description": "Strategy A full self-contained JS bundle (all 81 components + Lit).",
+        "ceilingBytes": 204800,
+        "warnBytes": 194560,
+        "currentBytes": 187802,
+        "currentNote": "183.4 KB gz at v2.1.2"
+      },
+      "fullBundleCss": {
+        "file": "helix-{version}.min.css",
+        "description": "Strategy A full CSS bundle (all component shadow-root-adoptable CSS).",
+        "ceilingBytes": 56320,
+        "warnBytes": 51200,
+        "currentBytes": 47411,
+        "currentNote": "46.3 KB gz at v2.1.2"
+      },
+      "coreBundleJs": {
+        "file": "helix-core-{version}.min.js",
+        "description": "Strategy B shared Lit runtime (loaded once, cached across components).",
+        "ceilingBytes": 12288,
+        "warnBytes": 10240,
+        "currentBytes": 8602,
+        "currentNote": "8.4 KB gz at v2.1.2"
+      },
+      "strategyATotal": {
+        "description": "Aggregate Strategy A consumer payload (full JS + full CSS). This is what a page that loads the full bundle actually downloads.",
+        "ceilingBytes": 266240,
+        "warnBytes": 250880,
+        "currentBytes": 235213,
+        "currentNote": "229.7 KB gz at v2.1.2"
+      }
+    }
+  },
+  "coderabbit_final_review_sha": null,
+  "notes": "Emitted by scripts/generate-release-manifest.mjs during the publish workflow after changesets/action publishes to npm. Committed back to main via a dedicated step in publish.yml — not part of the version-bump PR."
+}
