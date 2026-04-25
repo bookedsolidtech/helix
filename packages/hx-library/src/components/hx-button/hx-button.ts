@@ -35,60 +35,40 @@ export interface HxButtonClickDetail {
  * @csspart suffix - The suffix slot container span.
  * @csspart spinner - The loading spinner SVG element.
  *
- * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
- * @cssprop [--hx-button-hover-bg] - Hover background color override. When set, overrides the variant default hover background from outside the shadow DOM.
- * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
- * @cssprop [--hx-button-border-color=transparent] - Button border color.
+ * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).
+ * @cssprop [--hx-button-hover-bg] - Hover background override; when set, overrides the variant default hover background from outside the shadow DOM.
+ * @cssprop [--hx-button-color=var(--hx-color-text-on-primary)] - Button text color (variants route through text.on-{role} / text.on-{role}-strong).
+ * @cssprop [--hx-button-border-color=transparent] - Button border color (secondary/outline variants route through action.secondary.border).
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
  * @cssprop [--hx-button-font-family=var(--hx-font-family-sans)] - Button font family.
  * @cssprop [--hx-button-font-weight=var(--hx-font-weight-semibold)] - Button font weight.
  * @cssprop [--hx-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  *
- * @cssprop [--hx-button-inverted-color=#ffffff] - Text color when inverted.
- * @cssprop [--hx-button-inverted-ghost-hover-bg=rgba(255,255,255,0.15)] - Ghost hover bg when inverted.
- * @cssprop [--hx-button-inverted-focus-ring-color=rgba(255,255,255,0.5)] - Focus ring color when inverted.
- * @cssprop [--hx-opacity-disabled] - Opacity.
- * @cssprop [--hx-space-2] - Spacing token.
- * @cssprop [--hx-border-width-thin] - Width.
- * @cssprop [--hx-border-radius-md] - CSS custom property.
- * @cssprop [--hx-color-primary-500] - Color.
- * @cssprop [--hx-color-neutral-0] - Color.
- * @cssprop [--hx-font-family-sans] - Font family.
- * @cssprop [--hx-font-weight-semibold] - Font weight.
- * @cssprop [--hx-line-height-tight] - Line height.
- * @cssprop [--hx-transition-fast] - Transition timing.
- * @cssprop [--hx-focus-ring-width] - Width.
- * @cssprop [--hx-focus-ring-color] - Color.
- * @cssprop [--hx-focus-ring-offset] - CSS custom property.
- * @cssprop [--hx-filter-brightness-hover] - CSS filter.
- * @cssprop [--hx-filter-brightness-active] - CSS filter.
- * @cssprop [--hx-space-1] - Spacing token.
- * @cssprop [--hx-space-3] - Spacing token.
- * @cssprop [--hx-font-size-sm] - Font size.
- * @cssprop [--hx-touch-target-min] - Minimum touch target size.
- * @cssprop [--hx-space-4] - Spacing token.
- * @cssprop [--hx-font-size-md] - Font size.
- * @cssprop [--hx-size-10] - Size token.
- * @cssprop [--hx-space-6] - Spacing token.
- * @cssprop [--hx-font-size-lg] - Font size.
- * @cssprop [--hx-size-12] - Size token.
- * @cssprop [--hx-color-primary-50] - Color.
- * @cssprop [--hx-color-neutral-100] - Color.
- * @cssprop [--hx-color-neutral-900] - Color.
- * @cssprop [--hx-color-neutral-200] - Color.
- * @cssprop [--hx-color-error-500] - Color.
- * @cssprop [--hx-color-error-600] - Color.
- * @cssprop [--hx-color-neutral-300] - Color.
- * @cssprop [--hx-color-neutral-50] - Color.
- * @cssprop [--hx-color-primary-600] - Color.
- * @cssprop [--hx-duration-spinner] - Animation duration.
- * @cssprop [--hx-opacity-muted] - Opacity.
- * @cssprop [--hx-overlay-white-50] - Overlay color.
- * @cssprop [--hx-color-primary-400] - Color.
- * @cssprop [--hx-overlay-white-70] - Overlay color.
- * @cssprop [--hx-overlay-white-15] - Overlay color.
- * @cssprop [--hx-overlay-white-25] - Overlay color.
- * @cssprop [--hx-overlay-white-20] - Overlay color.
+ * @cssprop [--hx-button-inverted-color=var(--hx-color-text-on-dark)] - Text color when inverted (anchor #ffffff).
+ * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-overlay-white-15)] - Ghost hover bg when inverted (overlay-white-15 primitive).
+ * @cssprop [--hx-button-inverted-focus-ring-color=var(--hx-color-border-on-dark-strong)] - Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).
+ *
+ * @cssprop [--hx-color-action-primary-bg] - Primary variant resting fill (3.2.1 semantic action layer).
+ * @cssprop [--hx-color-action-primary-bg-hover] - Primary variant hover fill.
+ * @cssprop [--hx-color-action-primary-bg-active] - Primary variant active/pressed fill.
+ * @cssprop [--hx-color-action-secondary-fg] - Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark).
+ * @cssprop [--hx-color-action-secondary-border] - Secondary/outline variant border.
+ * @cssprop [--hx-color-action-secondary-bg-hover] - Secondary/outline variant hover fill.
+ * @cssprop [--hx-color-action-ghost-fg] - Ghost variant fg.
+ * @cssprop [--hx-color-action-ghost-bg-hover] - Ghost variant hover fill.
+ * @cssprop [--hx-color-action-danger-bg] - Danger variant resting fill.
+ * @cssprop [--hx-color-action-danger-bg-hover] - Danger variant hover fill.
+ * @cssprop [--hx-color-action-danger-bg-active] - Danger variant active fill.
+ * @cssprop [--hx-color-text-on-primary] - Foreground for primary fill (resolves to neutral-900 — AA-tuned for primary-500).
+ * @cssprop [--hx-color-text-on-primary-strong] - Foreground for primary-hover fill (resolves to neutral-0 across modes).
+ * @cssprop [--hx-color-text-on-error] - Foreground for danger fill (resolves to neutral-900).
+ * @cssprop [--hx-color-text-on-error-strong] - Foreground for danger-hover fill (resolves to neutral-0 across modes).
+ * @cssprop [--hx-color-text-primary] - Foreground for tertiary variant on surface.sunken.
+ * @cssprop [--hx-color-surface-sunken] - Tertiary variant resting fill.
+ * @cssprop [--hx-color-surface-raised] - Tertiary variant hover fill.
+ * @cssprop [--hx-color-border-on-dark-subtle] - Inverted-tertiary resting border (overlay-white-10).
+ * @cssprop [--hx-color-border-on-dark-default] - Inverted-tertiary hover border + inverted-secondary/ghost hover border (overlay-white-30).
+ * @cssprop [--hx-color-border-on-dark-strong] - Inverted focus-visible outline (overlay-white-70).
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {

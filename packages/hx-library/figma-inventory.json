@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T21:18:39.950Z",
+  "generatedAt": "2026-04-25T21:56:35.933Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2690,36 +2690,36 @@
       ],
       "cssProperties": [
         {
-          "description": "Button background color.",
+          "description": "Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).",
           "name": "--hx-button-bg",
-          "default": "var(--hx-color-primary-500)",
+          "default": "var(--hx-color-action-primary-bg)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/primary",
-            "fallbackPrimitive": "color/primary/500",
+            "semanticToken": "color/action/primary/bg",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
-          "description": "Hover background color override. When set, overrides the variant default hover background from outside the shadow DOM.",
+          "description": "Hover background override; when set, overrides the variant default hover background from outside the shadow DOM.",
           "name": "--hx-button-hover-bg",
           "figmaBinding": null
         },
         {
-          "description": "Button text color.",
+          "description": "Button text color (variants route through text.on-{role} / text.on-{role}-strong).",
           "name": "--hx-button-color",
-          "default": "var(--hx-color-neutral-0)",
+          "default": "var(--hx-color-text-on-primary)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/0",
+            "semanticToken": "color/text/on/primary",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
-          "description": "Button border color.",
+          "description": "Button border color (secondary/outline variants route through action.secondary.border).",
           "name": "--hx-button-border-color",
           "default": "transparent",
           "figmaBinding": {
@@ -2779,249 +2779,144 @@
           }
         },
         {
-          "description": "Text color when inverted.",
+          "description": "Text color when inverted (anchor #ffffff).",
           "name": "--hx-button-inverted-color",
-          "default": "#ffffff",
+          "default": "var(--hx-color-text-on-dark)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": null,
+            "semanticToken": "color/text/on/dark",
             "fallbackPrimitive": null,
-            "literalFallback": "#ffffff"
+            "literalFallback": null
           }
         },
         {
-          "description": "Ghost hover bg when inverted.",
+          "description": "Ghost hover bg when inverted (overlay-white-15 primitive).",
           "name": "--hx-button-inverted-ghost-hover-bg",
-          "default": "rgba(255,255,255,0.15)",
+          "default": "var(--hx-color-overlay-white-15)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": null,
-            "fallbackPrimitive": null,
-            "literalFallback": "rgba(255,255,255,0.15)"
+            "semanticToken": "color/overlay/white",
+            "fallbackPrimitive": "color/overlay/white/15",
+            "literalFallback": null
           }
         },
         {
-          "description": "Focus ring color when inverted.",
+          "description": "Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).",
           "name": "--hx-button-inverted-focus-ring-color",
-          "default": "rgba(255,255,255,0.5)",
+          "default": "var(--hx-color-border-on-dark-strong)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": null,
+            "semanticToken": "color/border/on/dark/strong",
             "fallbackPrimitive": null,
-            "literalFallback": "rgba(255,255,255,0.5)"
+            "literalFallback": null
           }
         },
         {
-          "description": "Opacity.",
-          "name": "--hx-opacity-disabled",
+          "description": "Primary variant resting fill (3.2.1 semantic action layer).",
+          "name": "--hx-color-action-primary-bg",
           "figmaBinding": null
         },
         {
-          "description": "Spacing token.",
-          "name": "--hx-space-2",
+          "description": "Primary variant hover fill.",
+          "name": "--hx-color-action-primary-bg-hover",
           "figmaBinding": null
         },
         {
-          "description": "Width.",
-          "name": "--hx-border-width-thin",
+          "description": "Primary variant active/pressed fill.",
+          "name": "--hx-color-action-primary-bg-active",
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
-          "name": "--hx-border-radius-md",
+          "description": "Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark).",
+          "name": "--hx-color-action-secondary-fg",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-primary-500",
+          "description": "Secondary/outline variant border.",
+          "name": "--hx-color-action-secondary-border",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-neutral-0",
+          "description": "Secondary/outline variant hover fill.",
+          "name": "--hx-color-action-secondary-bg-hover",
           "figmaBinding": null
         },
         {
-          "description": "Font family.",
-          "name": "--hx-font-family-sans",
+          "description": "Ghost variant fg.",
+          "name": "--hx-color-action-ghost-fg",
           "figmaBinding": null
         },
         {
-          "description": "Font weight.",
-          "name": "--hx-font-weight-semibold",
+          "description": "Ghost variant hover fill.",
+          "name": "--hx-color-action-ghost-bg-hover",
           "figmaBinding": null
         },
         {
-          "description": "Line height.",
-          "name": "--hx-line-height-tight",
+          "description": "Danger variant resting fill.",
+          "name": "--hx-color-action-danger-bg",
           "figmaBinding": null
         },
         {
-          "description": "Transition timing.",
-          "name": "--hx-transition-fast",
+          "description": "Danger variant hover fill.",
+          "name": "--hx-color-action-danger-bg-hover",
           "figmaBinding": null
         },
         {
-          "description": "Width.",
-          "name": "--hx-focus-ring-width",
+          "description": "Danger variant active fill.",
+          "name": "--hx-color-action-danger-bg-active",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-focus-ring-color",
+          "description": "Foreground for primary fill (resolves to neutral-900 — AA-tuned for primary-500).",
+          "name": "--hx-color-text-on-primary",
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
-          "name": "--hx-focus-ring-offset",
+          "description": "Foreground for primary-hover fill (resolves to neutral-0 across modes).",
+          "name": "--hx-color-text-on-primary-strong",
           "figmaBinding": null
         },
         {
-          "description": "CSS filter.",
-          "name": "--hx-filter-brightness-hover",
+          "description": "Foreground for danger fill (resolves to neutral-900).",
+          "name": "--hx-color-text-on-error",
           "figmaBinding": null
         },
         {
-          "description": "CSS filter.",
-          "name": "--hx-filter-brightness-active",
+          "description": "Foreground for danger-hover fill (resolves to neutral-0 across modes).",
+          "name": "--hx-color-text-on-error-strong",
           "figmaBinding": null
         },
         {
-          "description": "Spacing token.",
-          "name": "--hx-space-1",
+          "description": "Foreground for tertiary variant on surface.sunken.",
+          "name": "--hx-color-text-primary",
           "figmaBinding": null
         },
         {
-          "description": "Spacing token.",
-          "name": "--hx-space-3",
+          "description": "Tertiary variant resting fill.",
+          "name": "--hx-color-surface-sunken",
           "figmaBinding": null
         },
         {
-          "description": "Font size.",
-          "name": "--hx-font-size-sm",
+          "description": "Tertiary variant hover fill.",
+          "name": "--hx-color-surface-raised",
           "figmaBinding": null
         },
         {
-          "description": "Minimum touch target size.",
-          "name": "--hx-touch-target-min",
+          "description": "Inverted-tertiary resting border (overlay-white-10).",
+          "name": "--hx-color-border-on-dark-subtle",
           "figmaBinding": null
         },
         {
-          "description": "Spacing token.",
-          "name": "--hx-space-4",
+          "description": "Inverted-tertiary hover border + inverted-secondary/ghost hover border (overlay-white-30).",
+          "name": "--hx-color-border-on-dark-default",
           "figmaBinding": null
         },
         {
-          "description": "Font size.",
-          "name": "--hx-font-size-md",
-          "figmaBinding": null
-        },
-        {
-          "description": "Size token.",
-          "name": "--hx-size-10",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-6",
-          "figmaBinding": null
-        },
-        {
-          "description": "Font size.",
-          "name": "--hx-font-size-lg",
-          "figmaBinding": null
-        },
-        {
-          "description": "Size token.",
-          "name": "--hx-size-12",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-primary-50",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-100",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-900",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-200",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-error-500",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-error-600",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-300",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-50",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-primary-600",
-          "figmaBinding": null
-        },
-        {
-          "description": "Animation duration.",
-          "name": "--hx-duration-spinner",
-          "figmaBinding": null
-        },
-        {
-          "description": "Opacity.",
-          "name": "--hx-opacity-muted",
-          "figmaBinding": null
-        },
-        {
-          "description": "Overlay color.",
-          "name": "--hx-overlay-white-50",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-primary-400",
-          "figmaBinding": null
-        },
-        {
-          "description": "Overlay color.",
-          "name": "--hx-overlay-white-70",
-          "figmaBinding": null
-        },
-        {
-          "description": "Overlay color.",
-          "name": "--hx-overlay-white-15",
-          "figmaBinding": null
-        },
-        {
-          "description": "Overlay color.",
-          "name": "--hx-overlay-white-25",
-          "figmaBinding": null
-        },
-        {
-          "description": "Overlay color.",
-          "name": "--hx-overlay-white-20",
+          "description": "Inverted focus-visible outline (overlay-white-70).",
+          "name": "--hx-color-border-on-dark-strong",
           "figmaBinding": null
         }
       ],
@@ -17732,98 +17627,23 @@
           }
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-neutral-900",
+          "description": "Side-nav surface fill (resolves to neutral-900 light, near-black dark).",
+          "name": "--hx-color-surface-inverse",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-neutral-100",
+          "description": "Side-nav text color (resolves to neutral-0).",
+          "name": "--hx-color-text-inverse",
           "figmaBinding": null
         },
         {
-          "description": "Transition timing.",
-          "name": "--hx-transition-normal",
+          "description": "Header/footer divider border.",
+          "name": "--hx-color-border-strong",
           "figmaBinding": null
         },
         {
-          "description": "Width.",
-          "name": "--hx-border-width-thin",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-700",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-4",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-14",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-3",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-2",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-8",
-          "figmaBinding": null
-        },
-        {
-          "description": "CSS custom property.",
-          "name": "--hx-border-radius-sm",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-400",
-          "figmaBinding": null
-        },
-        {
-          "description": "Transition timing.",
-          "name": "--hx-transition-fast",
-          "figmaBinding": null
-        },
-        {
-          "description": "Overlay color.",
-          "name": "--hx-overlay-white-10",
-          "figmaBinding": null
-        },
-        {
-          "description": "Width.",
-          "name": "--hx-focus-ring-width",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-focus-ring-color",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-primary-400",
-          "figmaBinding": null
-        },
-        {
-          "description": "CSS custom property.",
-          "name": "--hx-focus-ring-offset",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-5",
+          "description": "Toggle button hover surface (overlay-white-10 primitive — semantic layer for inverted affordances).",
+          "name": "--hx-color-border-on-dark-subtle",
           "figmaBinding": null
         }
       ],
@@ -23522,153 +23342,86 @@
           }
         },
         {
-          "description": "Opacity.",
-          "name": "--hx-opacity-disabled",
+          "description": "Outer border-width override (canonical hx-{tag}-* prefix; sits above --hx-input-* aliases in the cascade).",
+          "name": "--hx-text-input-border-width",
+          "default": "var(--hx-border-width-thin)",
+          "figmaBinding": {
+            "target": "Stroke",
+            "layerSelector": "root",
+            "semanticToken": "border/width/thin",
+            "fallbackPrimitive": null,
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Outer horizontal padding override.",
+          "name": "--hx-text-input-padding-x",
+          "default": "var(--hx-space-3)",
+          "figmaBinding": {
+            "target": "Padding",
+            "layerSelector": "root",
+            "semanticToken": "space",
+            "fallbackPrimitive": "space/3",
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Outer vertical padding override.",
+          "name": "--hx-text-input-padding-y",
+          "default": "var(--hx-space-2)",
+          "figmaBinding": {
+            "target": "Padding",
+            "layerSelector": "root",
+            "semanticToken": "space",
+            "fallbackPrimitive": "space/2",
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Outer font-size override.",
+          "name": "--hx-text-input-font-size",
+          "default": "var(--hx-font-size-md)",
+          "figmaBinding": {
+            "target": "FontSize",
+            "layerSelector": "root",
+            "semanticToken": null,
+            "fallbackPrimitive": "font-size/md",
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Outer sm-variant font-size override (falls through to --hx-input-sm-font-size).",
+          "name": "--hx-text-input-sm-font-size",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-focus-ring-color",
+          "description": "Outer lg-variant font-size override (falls through to --hx-input-lg-font-size).",
+          "name": "--hx-text-input-lg-font-size",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-primary-400",
+          "description": "Resting field surface (semantic).",
+          "name": "--hx-color-surface-default",
           "figmaBinding": null
         },
         {
-          "description": "Width.",
-          "name": "--hx-focus-ring-width",
+          "description": "Resting input text + label color (semantic).",
+          "name": "--hx-color-text-strong",
           "figmaBinding": null
         },
         {
-          "description": "CSS custom property.",
-          "name": "--hx-focus-ring-opacity",
+          "description": "Resting border color (semantic).",
+          "name": "--hx-color-border-strong",
           "figmaBinding": null
         },
         {
-          "description": "Spacing token.",
-          "name": "--hx-space-1",
-          "figmaBinding": null
-        },
-        {
-          "description": "Font family.",
-          "name": "--hx-font-family-sans",
-          "figmaBinding": null
-        },
-        {
-          "description": "Font size.",
-          "name": "--hx-font-size-sm",
-          "figmaBinding": null
-        },
-        {
-          "description": "Font weight.",
-          "name": "--hx-font-weight-medium",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-700",
-          "figmaBinding": null
-        },
-        {
-          "description": "Line height.",
-          "name": "--hx-line-height-normal",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
+          "description": "Error state text + border color (semantic).",
           "name": "--hx-color-error-text",
           "figmaBinding": null
         },
         {
-          "description": "Font weight.",
-          "name": "--hx-font-weight-bold",
-          "figmaBinding": null
-        },
-        {
-          "description": "Width.",
-          "name": "--hx-border-width-thin",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-300",
-          "figmaBinding": null
-        },
-        {
-          "description": "CSS custom property.",
-          "name": "--hx-border-radius-md",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-0",
-          "figmaBinding": null
-        },
-        {
-          "description": "Transition timing.",
-          "name": "--hx-transition-fast",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-error-500",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-500",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-3",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-2",
-          "figmaBinding": null
-        },
-        {
-          "description": "Font size.",
-          "name": "--hx-font-size-md",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-800",
-          "figmaBinding": null
-        },
-        {
-          "description": "Size token.",
-          "name": "--hx-size-10",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
-          "name": "--hx-color-neutral-400",
-          "figmaBinding": null
-        },
-        {
-          "description": "Size token.",
-          "name": "--hx-size-8",
-          "figmaBinding": null
-        },
-        {
-          "description": "Spacing token.",
-          "name": "--hx-space-4",
-          "figmaBinding": null
-        },
-        {
-          "description": "Size token.",
-          "name": "--hx-size-12",
-          "figmaBinding": null
-        },
-        {
-          "description": "Font size.",
-          "name": "--hx-font-size-xs",
+          "description": "Error border primitive fallback inside the focus-state cascade.",
+          "name": "--hx-color-error-600",
           "figmaBinding": null
         }
       ],
