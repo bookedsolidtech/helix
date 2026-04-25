@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T20:44:50.116Z",
+  "generatedAt": "2026-04-25T21:18:39.950Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -25085,13 +25085,13 @@
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-neutral-900",
+          "description": "Default-variant background semantic (neutral-900 anchor; flipped per mode).",
+          "name": "--hx-color-surface-inverse",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-neutral-0",
+          "description": "Default-variant foreground semantic (neutral-0 anchor; flipped per mode).",
+          "name": "--hx-color-text-inverse",
           "figmaBinding": null
         },
         {
@@ -25149,23 +25149,43 @@
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-success-600",
+          "description": "Success-variant background semantic (3.2.1 cascade).",
+          "name": "--hx-color-surface-success-strong",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-warning-500",
+          "description": "Warning-variant background semantic (3.2.1 cascade).",
+          "name": "--hx-color-surface-warning-strong",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-error-600",
+          "description": "Danger-variant background semantic (3.2.1 cascade).",
+          "name": "--hx-color-surface-danger-strong",
           "figmaBinding": null
         },
         {
-          "description": "Color.",
-          "name": "--hx-color-primary-600",
+          "description": "Info-variant background semantic (3.2.1 cascade).",
+          "name": "--hx-color-surface-info-strong",
+          "figmaBinding": null
+        },
+        {
+          "description": "Success-variant foreground semantic (neutral-0 across modes).",
+          "name": "--hx-color-text-on-success-strong",
+          "figmaBinding": null
+        },
+        {
+          "description": "Warning-variant foreground semantic (neutral-900; warning sits on lighter -500 fill).",
+          "name": "--hx-color-text-on-warning",
+          "figmaBinding": null
+        },
+        {
+          "description": "Danger-variant foreground semantic (neutral-0 across modes).",
+          "name": "--hx-color-text-on-error-strong",
+          "figmaBinding": null
+        },
+        {
+          "description": "Info-variant foreground semantic (neutral-0 across modes).",
+          "name": "--hx-color-text-on-primary-strong",
           "figmaBinding": null
         },
         {
