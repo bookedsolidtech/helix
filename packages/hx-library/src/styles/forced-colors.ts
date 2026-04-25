@@ -15,6 +15,27 @@
  * the only reliable theming surface in forced-colors mode — browsers strip
  * decorative hex values. Use `forced-color-adjust: none` sparingly — only
  * where default mapping erases critical affordance.
+ *
+ * ──────────────────────────────────────────────────────────────────────────
+ * COMPOSITION RULES — READ BEFORE USING
+ *
+ * Compose these mixins ONLY when the host component does not define its own
+ * `@media (forced-colors: active) { ... }` block in the same `.styles.ts`.
+ * Two stylesheets defining overlapping selectors inside the same media query
+ * specificity-war: the later-loaded sheet wins, but the result depends on
+ * `static styles` array order and is fragile to refactor.
+ *
+ * Pick exactly one of two approaches per component:
+ *   1. Compose a mixin (preferred for the common cases). Don't add your own
+ *      forced-colors block.
+ *   2. Author a bespoke forced-colors block inline in the component's
+ *      `.styles.ts`. Don't compose a mixin.
+ *
+ * If you genuinely need both (e.g., a niche component-specific affordance
+ * the mixin doesn't cover), put the bespoke rules AFTER the mixin in the
+ * `static styles` array and scope them to selectors the mixin does not
+ * target. Document the divergence inline.
+ * ──────────────────────────────────────────────────────────────────────────
  */
 import { css } from 'lit';
 
@@ -33,10 +54,6 @@ import { css } from 'lit';
  */
 export const forcedColorsInteractive = css`
   @media (forced-colors: active) {
-    :host {
-      forced-color-adjust: auto;
-    }
-
     button,
     [part='button'],
     [part='control'] {
@@ -119,10 +136,6 @@ export const forcedColorsSurface = css`
  */
 export const forcedColorsField = css`
   @media (forced-colors: active) {
-    :host {
-      forced-color-adjust: auto;
-    }
-
     input,
     textarea,
     select,
