@@ -2,7 +2,6 @@ import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
-import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
 
 const _nextNavItemId = createIdCounter('hx-nav-item');
@@ -36,7 +35,11 @@ const _nextNavItemId = createIdCounter('hx-nav-item');
  */
 @customElement('hx-nav-item')
 export class HelixNavItem extends HelixElement {
-  static override styles = [helixNavItemStyles, forcedColorsInteractive];
+  // 3.2.1: forced-colors deference is owned by the bespoke @media block in
+  // hx-nav-item.styles.ts (active border, focus outline, tooltip border).
+  // Do NOT also compose forcedColorsInteractive — XOR rule per the mixin
+  // docstring.
+  static override styles = [helixNavItemStyles];
 
   /** @internal — per-instance tooltip ID */
   private _tooltipId = `${_nextNavItemId()}-tooltip`;

@@ -75,10 +75,7 @@ export const helixNavItemStyles = css`
 
   .nav-item__link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-nav-item-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      );
+      var(--hx-nav-item-focus-ring-color, var(--hx-focus-ring-color, #6ab1b1));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -88,14 +85,23 @@ export const helixNavItemStyles = css`
     /* Active state sits on the darker primary-600 (#0F7078) fill. White text
        (#ffffff) on primary-600 = 5.39:1 WCAG AA pass. text-on-primary now
        resolves to neutral-900 (intended for the lighter primary-500 surface)
-       which would fail here, so we hold the active fg at neutral-0. */
-    background-color: var(--hx-nav-item-active-bg, var(--hx-color-primary-600, #0f7078));
-    color: var(--hx-nav-item-active-color, var(--hx-color-neutral-0, #ffffff));
+       which would fail here. text.on-primary-strong holds at neutral-0 across
+       modes (no dark flip) so the active fg stays AA. 3.2.1: routed through
+       the action.* / on-{role}-strong semantic tier per token-cascade
+       remediation (no more bare primary-600 / neutral-0 consumption). */
+    background-color: var(
+      --hx-nav-item-active-bg,
+      var(--hx-color-action-primary-bg-hover, #0f7078)
+    );
+    color: var(--hx-nav-item-active-color, var(--hx-color-text-on-primary-strong, #ffffff));
   }
 
   :host([active]) .nav-item__link:hover {
-    /* text-on-primary (#ffffff) on primary-700 (#0F6363) = WCAG AA ✓ */
-    background-color: var(--hx-nav-item-active-hover-bg, var(--hx-color-primary-700, #0f6363));
+    /* text.on-primary-strong (#ffffff) on primary-700 (#0F6363) = WCAG AA ✓ */
+    background-color: var(
+      --hx-nav-item-active-hover-bg,
+      var(--hx-color-action-primary-bg-active, #0f6363)
+    );
   }
 
   /* ─── Disabled State ─── */
@@ -186,9 +192,10 @@ export const helixNavItemStyles = css`
     top: 50%;
     transform: translateY(-50%);
     /* tooltip is an inverted surface — flips per mode via surface-inverse /
-       text-inverse. */
-    background-color: var(--hx-color-surface-inverse, #0d1825);
-    color: var(--hx-color-text-inverse, #ebeee9);
+       text-inverse. 3.2.1: wrapped with component-tier slots so consumers can
+       theme tooltip surface/text without overriding the global semantics. */
+    background-color: var(--hx-nav-item-tooltip-bg, var(--hx-color-surface-inverse, #0d1825));
+    color: var(--hx-nav-item-tooltip-color, var(--hx-color-text-inverse, #ffffff));
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     font-size: var(--hx-font-size-xs, 0.75rem);

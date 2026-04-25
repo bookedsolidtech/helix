@@ -564,6 +564,39 @@ const PAIRS: PairSpec[] = [
     threshold: 4.5,
     label: 'action.ghost.fg on surface.default',
   },
+  // 3.2.1 token-cascade remediation: surface.{role}-strong tokens (the
+  // emphasis-prominence sibling of surface.{role}, used by hx-toast variant
+  // fills and any other "loud" status surface). Each pairs with the
+  // on-{role}-strong text semantic the consuming component actually paints —
+  // these on-strong text tokens hold at neutral-0 across modes (no dark
+  // override) precisely so emphasis fills paint white-on-dark in both light
+  // and dark mode rather than flipping with text.inverse. Warning is the
+  // exception (warming-500 is light enough that neutral-900 reads better),
+  // matching the existing on-warning contract.
+  {
+    text: '--hx-color-text-on-success-strong',
+    surface: '--hx-color-surface-success-strong',
+    threshold: 4.5,
+    label: 'text.on-success-strong on surface.success-strong',
+  },
+  {
+    text: '--hx-color-text-on-warning',
+    surface: '--hx-color-surface-warning-strong',
+    threshold: 4.5,
+    label: 'text.on-warning on surface.warning-strong',
+  },
+  {
+    text: '--hx-color-text-on-error-strong',
+    surface: '--hx-color-surface-danger-strong',
+    threshold: 4.5,
+    label: 'text.on-error-strong on surface.danger-strong',
+  },
+  {
+    text: '--hx-color-text-on-primary-strong',
+    surface: '--hx-color-surface-info-strong',
+    threshold: 4.5,
+    label: 'text.on-primary-strong on surface.info-strong',
+  },
   // Link text on body surface
   {
     text: '--hx-color-text-link',
