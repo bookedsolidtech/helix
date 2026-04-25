@@ -916,6 +916,67 @@ describe('hx-radio-group', () => {
     });
   });
 
+  // ─── Keyboard handler early-return branches ───
+
+  describe('Keyboard: handler early-return branches', () => {
+    it('keydown returns early when there are no enabled radios', async () => {
+      // All radios disabled — _getEnabledRadios returns [], handler returns at line 339.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A" disabled></hx-radio>
+          <hx-radio value="b" label="B" disabled></hx-radio>
+        </hx-radio-group>
+      `);
+      let eventFired = false;
+      el.addEventListener('hx-change', () => {
+        eventFired = true;
+      });
+      // Dispatch on host so closest() does not find a radio either way.
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+      expect(eventFired).toBe(false);
+    });
+
+    it('keydown ignores keys outside the handled set without preventing default', async () => {
+      // Hits the `if (!isHandledKey) return;` branch (line 352) — no preventDefault, no event.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Test">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+        </hx-radio-group>
+      `);
+      let eventFired = false;
+      el.addEventListener('hx-change', () => {
+        eventFired = true;
+      });
+      const radioA = el.querySelector('hx-radio[value="a"]') as HxRadio;
+      radioA.focus();
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true, cancelable: true });
+      radioA.dispatchEvent(event);
+      await el.updateComplete;
+      expect(eventFired).toBe(false);
+      expect(event.defaultPrevented).toBe(false);
+    });
+
+    it('ArrowDown dispatched on host (no radio target) falls back to checked-radio index', async () => {
+      // Exercises the `enabledRadios.findIndex((radio) => radio.checked)` branch (line 375)
+      // when closest('hx-radio') returns null. With value="b" checked, ArrowDown should
+      // advance to "c".
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Test" value="b">
+          <hx-radio value="a" label="A"></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+          <hx-radio value="c" label="C"></hx-radio>
+        </hx-radio-group>
+      `);
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
+      // Dispatch directly on the host element — e.target is the host, not an hx-radio.
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('c');
+    });
+  });
+
   // ─── reportValidity (2) ───
 
   describe('reportValidity', () => {
