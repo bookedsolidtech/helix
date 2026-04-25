@@ -1,5 +1,97 @@
 # @helixui/tokens
 
+## 3.2.0
+
+### Minor Changes
+
+- c1c93f5: Component-tier token build-out, forced-colors mixin, and contrast regression gate.
+
+  Three structural additions land alongside the Precision Cool palette refresh:
+
+  **Forced-colors mixin (`packages/hx-library/src/styles/forced-colors.ts`):**
+  Four reusable Lit `css` mixins — `forcedColorsInteractive`, `forcedColorsSurface`, `forcedColorsField`, `forcedColorsLink` — composed into every visual component's `static styles` array. Components now defer to OS-level Windows High Contrast / `forced-colors: active` system colors (`ButtonText`, `CanvasText`, `Highlight`, `LinkText`) at the same time as the in-app `data-hx-contrast="high"` overrides. Belt-and-suspenders: the existing rich per-component HC blocks remain; the mixin layers OS-deference on top. Layout-only primitives (stack, grid, prose, form, visually-hidden, style-scope, theme, format-date) skip the mixin since they paint no surfaces.
+
+  **Component-tier token completeness:**
+  Every component in `packages/hx-library/src/components/` now exposes a complete component-tier token surface following the canonical `var(--hx-{component}-{property}, var(--hx-{semantic}, #hex))` two-level fallback pattern. Five architecture violations fixed (hx-avatar, hx-steps, hx-text, hx-icon-button, hx-image — were emitting bare primitives without `var()` fallback). Coverage gaps closed across padding, border, focus-ring families. hx-text-input gains a full token surface (was 280 lines of styled CSS with zero override surface). Inline hex fallbacks across all `.styles.ts` files resynced to the Precision Cool palette so `var()` chains resolve to matching values when the outer token is undefined.
+
+  **`tokens.json` `component:` manifest block:**
+  Adds an 834-token, 72-component manifest documenting every component-tier token surface. **Manifest-only — not CSS-emitted.** `scripts/generate-css.ts` skips the `component:` key alongside `dark:` and `high-contrast:`, preserving the cascade-driven "undefined unless overridden" runtime model where component tokens stay authored inline in `.styles.ts`. The manifest exists as the source of truth for the Figma kit (`/Volumes/Development/booked/figma-tokens/`), audit tooling, and external integrators. A new vitest (`component-manifest-sync.test.ts`) asserts set equality between the manifest and live extraction from `.styles.ts` — drift fails CI.
+
+  **Contrast regression matrix (`contrast.test.ts`):**
+  A new vitest iterates every `text.* × surface.*` semantic pair across light / dark / high-contrast modes against WCAG 2.1 AA (4.5:1 body, 3:1 large/UI). 76 contrast assertions plus meta-tests. Permanent CI gate against the class of bugs that produced the original `text.on-success` and `text.on-{primary,secondary,error,info}` regressions caught earlier in this release. Authoring this gate surfaced one additional pre-existing palette bug — `text.muted` on `surface.raised` light at 4.32:1 — fixed in the same release by rebinding muted to `neutral-600` and bumping `text.secondary` to `neutral-700` to preserve the muted < secondary visual hierarchy.
+
+  **`@helixui/react` peer bump:**
+  React wrappers regenerated from CEM via `scripts/generate-react-wrappers.ts`. No public API surface change — wrappers were already in sync; the regen artifact (`figma-inventory.json`) re-emits two `literalFallback` hexes against the new neutral-900 (`#0f172a` → `#0D1825`).
+
+- ef049df: "Precision Cool" palette refresh — every primitive color ramp regenerated from OKLCH math.
+
+  The previous primitive ramps were effectively Tailwind defaults (`blue-600` primary, slate neutrals, violet accent, amber warning). The 3.2.0 refresh replaces all seven chromatic families — `primary`, `secondary`, `accent`, `neutral`, `success`, `warning`, `error`, `info` — with hand-tuned OKLCH ramps anchored on the brand teal `#0F7078`. No Tailwind-derivative values remain.
+
+  **Anchor colors (stop 600):**
+  - `primary` `#0F7078` — brand teal, 5.82:1 on white (AA pass)
+  - `secondary` `#0F6B7E` — deeper sea-teal, coordinated cousin of primary (6.13:1)
+  - `accent` `#3A4BC9` — cool steel-indigo, replaces Tailwind violet (6.93:1)
+  - `neutral` `#4A5362` — hand-tuned cool gray; blue cast at the dark end, warm drift at the bright end
+  - `success` `#0E8A4A` — deeper than Tailwind green-500, pairs with dark-on-green text
+  - `warning` `#B8650E` — burnt amber, warmer than Tailwind amber and less yellow than gold
+  - `error` `#C92A2A` — powerful red, 5.46:1 (AA pass)
+  - `info` `#1B6FD4` — clear medium-blue, differentiable from teal primary (4.92:1)
+
+  **Semantic token changes:**
+  - `--hx-color-success-text` rebound from `success-600` to `success-700`. The new precision-cool `success-600` (`#0E8A4A`) sits at 4.42:1 on white — just under WCAG AA body-text threshold. `success-700` (`#146831`) restores 6.88:1 AA headroom. Matches the `error-text` / `warning-text` pattern at the same stop.
+  - Dark-mode `text.placeholder` bumped from `neutral-500` to `neutral-400`. The new precision-cool `neutral-500` (`#66787B`) is 3.86:1 on dark surface.default — fails AA for placeholder text. `neutral-400` (`#8E9C98`) = 6.27:1.
+  - Overlay RGB fallback values (`overlay.primary.25`, `overlay.error.25`, `overlay.neutral.12`) resynced against the new -500 / -900 hexes so color-mix()-less browsers match the CSS custom property values.
+
+  **Reproducibility:**
+  All ramps generated by `scripts/generate-palette.ts` — a deterministic OKLCH→sRGB generator (hand-rolled, zero runtime deps) that takes anchor hex + stop + curve params and emits all 11 stops. Run `pnpm tsx scripts/generate-palette.ts` to reproduce the JSON exactly. Same inputs always emit the same hexes; the math lives in the repo alongside the tokens.
+
+  **Expected visual impact:**
+  Largest single-commit visual change in the repo's history. Every surface that paints primary/accent/status color flips tone. Dark-mode surfaces shift from cool-slate to slightly blue-tinted cool gray (chromatic elevation). HC mode overrides (Windows High Contrast fidelity) are unaffected — they remain system-color-deferent.
+
+  No token names renamed. No stops removed or added. Existing component-level `var(--hx-button-bg, var(--hx-color-primary-500, #...))` two-level fallback chains continue to resolve — the inner hex fallbacks across component styles will drift stale and are addressed in subsequent commits of this PR.
+
+- 9591b01: Library-wide semantic token rebinding. 36 components, ~190 token swaps, 9 commits.
+  - Adds three new semantic tokens to `@helixui/tokens`: `--hx-color-text-strong`, `--hx-color-text-placeholder`, `--hx-color-surface-inverse`. All three ship with Light, Dark, and High-Contrast mode values.
+  - Rebinds surfaces, text, and borders across 36 components from primitive `--hx-color-neutral-*` references to semantic `--hx-color-surface-*` / `--hx-color-text-*` / `--hx-color-border-*` tokens. Components now flip correctly in Dark and High-Contrast modes — previously only focus rings responded to mode changes.
+  - Eliminates the `hx-tooltip` and `hx-side-nav` "intentional primitive" carve-outs; both now bind to `--hx-color-surface-inverse` + `--hx-color-text-inverse`.
+  - Form-input borders strengthen by one shade in Light mode (`neutral-300` → `border-strong` which resolves to `neutral-400`). This is the only visual diff in Light mode and it is WCAG-positive — form affordance contrast increases.
+  - Adds the Component Token Binding Rule to `design-tokens/tiers` docs and a regression test that fails if a rebinding regresses back to a primitive.
+  - Brand ramps, spacing/sizing/typography tokens, and `box-shadow` rgba literals are intentionally untouched. A shadow-semantics follow-up will cover the dark-mode shadow tinting gap.
+
+### Patch Changes
+
+- b029ef5: Fix WCAG AA contrast failures across `--hx-color-text-on-{role}` and the muted/secondary body-text hierarchy surfaced by the new contrast regression matrix.
+
+  The 3.2.0 precision-cool palette refresh (commit 2) silently dropped six pairs below the WCAG AA 4.5:1 floor for body text. The new contrast regression test in `packages/hx-tokens/src/__tests__/contrast.test.ts` is the gate that caught these — exactly the bug class it was built to prevent.
+
+  **Light-mode `text.on-{role}` rebindings (neutral-0 → neutral-900):**
+  - `text.on-primary` on `primary-500` (#429797): 3.44:1 → 5.20:1 (AA pass)
+  - `text.on-secondary` on `secondary-500` (#40969F): 3.45:1 → 5.18:1 (AA pass)
+  - `text.on-error` on `error-500` (#E5493E): 3.92:1 → 4.56:1 (AA pass)
+  - `text.on-info` on `info-500` (#0C8BEB): 3.55:1 → 5.03:1 (AA pass)
+
+  These join `on-success` (fixed in commit 1) and `on-warning` in the dark-text-on-brand-surface pattern. The four precision-cool brand-500 hues (primary/secondary/error/info) are too light to carry white text at AA — dark text is the only AA-safe option without darkening the brand ramps.
+
+  **Light-mode body-text hierarchy adjustment (caught unexpectedly by the matrix):**
+  - `text.muted`: `neutral-500` (#66787B) → `neutral-600` (#4A5362). Muted on `surface.raised` (#F5F8F3) was 4.32:1 — pre-existing AA fail from commit 2's neutral ramp. Now 7.36:1.
+  - `text.secondary`: `neutral-600` → `neutral-700` (#313E4B). Bumped to preserve the primary > strong > secondary > muted hierarchy now that muted occupies the slot secondary used to live in. neutral-700 on every light surface is 9.01:1 or better (AAA).
+
+  **Dark-mode `text.disabled` rebinding (`neutral-600` → `neutral-500`):**
+
+  `neutral-600` (#4A5362) on dark `surface.default` (#0D1825) = 2.30:1, fails the 3:1 UI floor. `neutral-500` (#66787B) = 3.86:1, AA UI pass. Disabled is WCAG-exempt under 1.4.3 but we still gate at 3:1 so it stays visibly distinct rather than invisible.
+
+  No dark or high-contrast `on-{role}` changes — those modes already passed.
+
+  Components painting text on primary/secondary/error/info surfaces (badges, buttons, alerts, toasts, status pills) will flip from white text to dark text in light mode. Every prior render at the AA failure was a defect.
+
+- adf953d: Fix WCAG AA contrast failure on `--hx-color-text-on-success`.
+
+  The token resolved to `var(--hx-color-neutral-0)` (white) on `--hx-color-success-500` (#16A34A) — a contrast ratio of ~2.8:1, which fails WCAG AA for body text (4.5:1) and large text (3:1). Rebound to `var(--hx-color-neutral-900)` (dark), giving 11.2:1 on the same green — AAA pass. Matches the existing on-warning pattern, which paints dark text on amber for the same reason.
+
+  Dark mode and high-contrast overrides are unchanged: HC still emits `#000000` on bright HC success, dark mode now inherits the dark-on-light pattern via the cascade.
+
+  Components painting text against a success surface (e.g., success badges, toasts, inline alerts) will flip from white text to dark text. This is the intended visual change — every prior render at the AA failure was technically a defect.
+
 ## 3.0.0
 
 ### Major Changes
