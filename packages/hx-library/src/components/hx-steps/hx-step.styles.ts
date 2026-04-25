@@ -137,11 +137,15 @@ export const helixStepStyles = css`
 
   /* ─── Status: complete ─── */
 
-  /* Complete: filled indicator with darker shade — visually distinct from active */
+  /* Complete: filled indicator with darker shade — visually distinct from active.
+     on-primary tokens are tuned for primary-500. primary-700 + on-primary
+     (= neutral-900) drops to 2.54:1 — fails AA for the check icon / step
+     number. Pin fg at neutral-0 (7.03:1 on primary-700). Mirrors
+     hx-toggle-button pressed treatment. */
   :host([status='complete']) .step__indicator {
     border-color: var(--hx-steps-complete-border-color, var(--hx-color-primary-700, #0f6363));
     background-color: var(--hx-steps-complete-bg, var(--hx-color-primary-700, #0f6363));
-    color: var(--hx-steps-complete-color, var(--hx-color-text-on-primary, #ffffff));
+    color: var(--hx-steps-complete-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   :host([status='complete']) .step__connector {

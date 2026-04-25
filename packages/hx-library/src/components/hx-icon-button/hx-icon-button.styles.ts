@@ -84,8 +84,12 @@ export const helixIconButtonStyles = css`
     --hx-icon-button-border-color: transparent;
   }
 
+  /* on-primary tokens are tuned for primary-500. primary-600 + on-primary
+     drops icon contrast to 3.07:1 — fails the 4.5:1 floor for meaningful
+     icons. Pin fg at neutral-0 (5.82:1 on primary-600). Mirrors hx-button. */
   .button--primary:hover {
     --hx-icon-button-bg: var(--hx-color-primary-600, #0f7078);
+    --hx-icon-button-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .button--secondary {
@@ -114,8 +118,12 @@ export const helixIconButtonStyles = css`
     --hx-icon-button-border-color: transparent;
   }
 
+  /* on-error tokens are tuned for error-500. error-600 + on-error drops
+     icon contrast to 2.25:1 — fails AA. Pin fg at neutral-0
+     (6.47:1 on error-600). Mirrors hx-button danger:hover. */
   .button--danger:hover {
     --hx-icon-button-bg: var(--hx-color-error-600, #c92a2a);
+    --hx-icon-button-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .button--ghost {
