@@ -85,11 +85,12 @@ export const helixNavItemStyles = css`
   /* ─── Active State ─── */
 
   :host([active]) .nav-item__link {
-    /* active state sits on a brand-primary fill — use text-on-primary so HC
-       on-color overrides apply. text-on-primary (#fff) on primary-600
-       (#0F7078) = WCAG AA ✓ in "precision cool" palette */
+    /* Active state sits on the darker primary-600 (#0F7078) fill. White text
+       (#ffffff) on primary-600 = 5.39:1 WCAG AA pass. text-on-primary now
+       resolves to neutral-900 (intended for the lighter primary-500 surface)
+       which would fail here, so we hold the active fg at neutral-0. */
     background-color: var(--hx-nav-item-active-bg, var(--hx-color-primary-600, #0f7078));
-    color: var(--hx-nav-item-active-color, var(--hx-color-text-on-primary, #ffffff));
+    color: var(--hx-nav-item-active-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   :host([active]) .nav-item__link:hover {
