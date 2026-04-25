@@ -448,6 +448,13 @@ jobs:
     needs: [changes, secret-scan]
     if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
     runs-on: ubuntu-latest
+    # vitest --coverage.enabled + browser-mode + chromium deadlocks at this
+    # surface size regardless of how the work is partitioned. Tracked at
+    # https://github.com/bookedsolidtech/helix/issues/1556. Until the infra
+    # bug is resolved, this job runs informationally — it posts the partial
+    # coverage report comment but does NOT block Quality Gates. The 8-shard
+    # uninstrumented test matrix is the real correctness signal.
+    continue-on-error: true
     # Full instrumented suite is materially slower than uninstrumented
     # browser-mode runs. 45m gives generous headroom over the projected
     # 15–30m wall time without re-introducing the 600s watchdog kill that
@@ -1156,15 +1163,13 @@ jobs:
             fi
           done
 
-          # Test, Coverage, VRT, changeset, and bundle-size are allowed to be skipped
+          # Test, VRT, changeset, and bundle-size are allowed to be skipped
           # (non-PR / no source changes) or cancelled (concurrency group replaced a
-          # running job). Coverage joins this set because it shares the same
-          # source-change predicate as Test (see needs.changes.outputs.source).
-          for gate in test coverage vrt changeset bundle-size; do
+          # running job).
+          for gate in test vrt changeset bundle-size; do
             result="${{ needs.test.result }}"
             case "$gate" in
               test)        result="${{ needs.test.result }}" ;;
-              coverage)    result="${{ needs.coverage.result }}" ;;
               vrt)         result="${{ needs.vrt.result }}" ;;
               changeset)   result="${{ needs.changeset.result }}" ;;
               bundle-size) result="${{ needs.bundle-size.result }}" ;;
@@ -1174,6 +1179,15 @@ jobs:
               FAIL=1
             fi
           done
+
+          # Coverage is informational-only while issue #1556 is open. The
+          # vitest --coverage.enabled + browser-mode + chromium combination
+          # deadlocks at this surface size regardless of how the work is
+          # partitioned. continue-on-error on the job stops it from failing
+          # the workflow; here we explicitly accept any result so a future
+          # change to that flag does not silently re-block. The 8-shard
+          # uninstrumented test matrix is the real correctness signal.
+          echo "Coverage (informational, #1556): ${{ needs.coverage.result }}"
 
           # A11y audit is a blocking gate — healthcare WCAG 2.1 AA mandate
           if [[ "${{ needs.a11y-audit.result }}" != "success" && "${{ needs.a11y-audit.result }}" != "skipped" ]]; then
