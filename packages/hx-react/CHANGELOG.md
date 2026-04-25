@@ -1,5 +1,68 @@
 # @helixui/react
 
+## 3.2.0
+
+### Minor Changes
+
+- c1c93f5: Component-tier token build-out, forced-colors mixin, and contrast regression gate.
+
+  Three structural additions land alongside the Precision Cool palette refresh:
+
+  **Forced-colors mixin (`packages/hx-library/src/styles/forced-colors.ts`):**
+  Four reusable Lit `css` mixins — `forcedColorsInteractive`, `forcedColorsSurface`, `forcedColorsField`, `forcedColorsLink` — composed into every visual component's `static styles` array. Components now defer to OS-level Windows High Contrast / `forced-colors: active` system colors (`ButtonText`, `CanvasText`, `Highlight`, `LinkText`) at the same time as the in-app `data-hx-contrast="high"` overrides. Belt-and-suspenders: the existing rich per-component HC blocks remain; the mixin layers OS-deference on top. Layout-only primitives (stack, grid, prose, form, visually-hidden, style-scope, theme, format-date) skip the mixin since they paint no surfaces.
+
+  **Component-tier token completeness:**
+  Every component in `packages/hx-library/src/components/` now exposes a complete component-tier token surface following the canonical `var(--hx-{component}-{property}, var(--hx-{semantic}, #hex))` two-level fallback pattern. Five architecture violations fixed (hx-avatar, hx-steps, hx-text, hx-icon-button, hx-image — were emitting bare primitives without `var()` fallback). Coverage gaps closed across padding, border, focus-ring families. hx-text-input gains a full token surface (was 280 lines of styled CSS with zero override surface). Inline hex fallbacks across all `.styles.ts` files resynced to the Precision Cool palette so `var()` chains resolve to matching values when the outer token is undefined.
+
+  **`tokens.json` `component:` manifest block:**
+  Adds an 834-token, 72-component manifest documenting every component-tier token surface. **Manifest-only — not CSS-emitted.** `scripts/generate-css.ts` skips the `component:` key alongside `dark:` and `high-contrast:`, preserving the cascade-driven "undefined unless overridden" runtime model where component tokens stay authored inline in `.styles.ts`. The manifest exists as the source of truth for the Figma kit (`/Volumes/Development/booked/figma-tokens/`), audit tooling, and external integrators. A new vitest (`component-manifest-sync.test.ts`) asserts set equality between the manifest and live extraction from `.styles.ts` — drift fails CI.
+
+  **Contrast regression matrix (`contrast.test.ts`):**
+  A new vitest iterates every `text.* × surface.*` semantic pair across light / dark / high-contrast modes against WCAG 2.1 AA (4.5:1 body, 3:1 large/UI). 76 contrast assertions plus meta-tests. Permanent CI gate against the class of bugs that produced the original `text.on-success` and `text.on-{primary,secondary,error,info}` regressions caught earlier in this release. Authoring this gate surfaced one additional pre-existing palette bug — `text.muted` on `surface.raised` light at 4.32:1 — fixed in the same release by rebinding muted to `neutral-600` and bumping `text.secondary` to `neutral-700` to preserve the muted < secondary visual hierarchy.
+
+  **`@helixui/react` peer bump:**
+  React wrappers regenerated from CEM via `scripts/generate-react-wrappers.ts`. No public API surface change — wrappers were already in sync; the regen artifact (`figma-inventory.json`) re-emits two `literalFallback` hexes against the new neutral-900 (`#0f172a` → `#0D1825`).
+
+- ef049df: "Precision Cool" palette refresh — every primitive color ramp regenerated from OKLCH math.
+
+  The previous primitive ramps were effectively Tailwind defaults (`blue-600` primary, slate neutrals, violet accent, amber warning). The 3.2.0 refresh replaces all seven chromatic families — `primary`, `secondary`, `accent`, `neutral`, `success`, `warning`, `error`, `info` — with hand-tuned OKLCH ramps anchored on the brand teal `#0F7078`. No Tailwind-derivative values remain.
+
+  **Anchor colors (stop 600):**
+  - `primary` `#0F7078` — brand teal, 5.82:1 on white (AA pass)
+  - `secondary` `#0F6B7E` — deeper sea-teal, coordinated cousin of primary (6.13:1)
+  - `accent` `#3A4BC9` — cool steel-indigo, replaces Tailwind violet (6.93:1)
+  - `neutral` `#4A5362` — hand-tuned cool gray; blue cast at the dark end, warm drift at the bright end
+  - `success` `#0E8A4A` — deeper than Tailwind green-500, pairs with dark-on-green text
+  - `warning` `#B8650E` — burnt amber, warmer than Tailwind amber and less yellow than gold
+  - `error` `#C92A2A` — powerful red, 5.46:1 (AA pass)
+  - `info` `#1B6FD4` — clear medium-blue, differentiable from teal primary (4.92:1)
+
+  **Semantic token changes:**
+  - `--hx-color-success-text` rebound from `success-600` to `success-700`. The new precision-cool `success-600` (`#0E8A4A`) sits at 4.42:1 on white — just under WCAG AA body-text threshold. `success-700` (`#146831`) restores 6.88:1 AA headroom. Matches the `error-text` / `warning-text` pattern at the same stop.
+  - Dark-mode `text.placeholder` bumped from `neutral-500` to `neutral-400`. The new precision-cool `neutral-500` (`#66787B`) is 3.86:1 on dark surface.default — fails AA for placeholder text. `neutral-400` (`#8E9C98`) = 6.27:1.
+  - Overlay RGB fallback values (`overlay.primary.25`, `overlay.error.25`, `overlay.neutral.12`) resynced against the new -500 / -900 hexes so color-mix()-less browsers match the CSS custom property values.
+
+  **Reproducibility:**
+  All ramps generated by `scripts/generate-palette.ts` — a deterministic OKLCH→sRGB generator (hand-rolled, zero runtime deps) that takes anchor hex + stop + curve params and emits all 11 stops. Run `pnpm tsx scripts/generate-palette.ts` to reproduce the JSON exactly. Same inputs always emit the same hexes; the math lives in the repo alongside the tokens.
+
+  **Expected visual impact:**
+  Largest single-commit visual change in the repo's history. Every surface that paints primary/accent/status color flips tone. Dark-mode surfaces shift from cool-slate to slightly blue-tinted cool gray (chromatic elevation). HC mode overrides (Windows High Contrast fidelity) are unaffected — they remain system-color-deferent.
+
+  No token names renamed. No stops removed or added. Existing component-level `var(--hx-button-bg, var(--hx-color-primary-500, #...))` two-level fallback chains continue to resolve — the inner hex fallbacks across component styles will drift stale and are addressed in subsequent commits of this PR.
+
+### Patch Changes
+
+- Updated dependencies [c1c93f5]
+- Updated dependencies [ef049df]
+- Updated dependencies [56eec71]
+- Updated dependencies [6327024]
+- Updated dependencies [6577704]
+- Updated dependencies [55d4523]
+- Updated dependencies [8c7b41f]
+- Updated dependencies [1439f83]
+- Updated dependencies [9591b01]
+  - @helixui/library@3.2.0
+
 ## 3.1.0
 
 ### Patch Changes
