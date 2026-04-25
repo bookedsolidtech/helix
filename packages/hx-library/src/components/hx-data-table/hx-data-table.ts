@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement } from '../../base/index.js';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -99,7 +100,7 @@ export interface HxDataTableRowClickDetail {
  */
 @customElement('hx-data-table')
 export class HelixDataTable extends HelixElement {
-  static override styles = [helixDataTableStyles];
+  static override styles = [helixDataTableStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

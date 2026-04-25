@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixAccordionStyles } from './hx-accordion.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import './hx-accordion-item.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -35,7 +36,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-accordion')
 export class HelixAccordion extends HelixElement {
-  static override styles = [helixAccordionStyles];
+  static override styles = [helixAccordionStyles, forcedColorsInteractive];
 
   /**
    * Expansion mode: 'single' collapses all other items when one expands.

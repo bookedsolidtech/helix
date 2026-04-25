@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -66,7 +67,7 @@ export interface HxCheckboxGroupChangeDetail {
  */
 @customElement('hx-checkbox-group')
 export class HelixCheckboxGroup extends FormMixin(HelixElement) {
-  static override styles = [helixCheckboxGroupStyles];
+  static override styles = [helixCheckboxGroupStyles, forcedColorsField];
 
   // ─── Form Association ───
 

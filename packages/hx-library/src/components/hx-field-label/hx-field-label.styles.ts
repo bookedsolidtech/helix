@@ -11,20 +11,20 @@ export const helixFieldLabelStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-label-size, var(--hx-font-size-sm, 0.875rem));
     font-weight: var(--hx-font-label-weight, var(--hx-font-weight-medium, 500));
-    color: var(--hx-field-label-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-field-label-color, var(--hx-color-text-strong, #313E4B));
     line-height: var(--hx-font-label-line-height, var(--hx-line-height-normal, 1.5));
     font-family: var(--hx-font-label-family, var(--hx-font-family-sans, sans-serif));
   }
 
   .required-indicator {
-    color: var(--hx-field-label-required-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-field-label-required-color, var(--hx-color-error-text, #C92A2A));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
   .optional-indicator {
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-weight: var(--hx-font-weight-normal, 400);
-    color: var(--hx-color-text-muted, #64748b);
+    color: var(--hx-color-text-muted, #66787B);
   }
 
   /* ─── High Contrast Mode (forced-colors) ─── */

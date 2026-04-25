@@ -4,6 +4,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -72,7 +73,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-phi-field')
 export class HelixPhiField extends HelixElement {
-  static override styles = [helixPhiFieldStyles];
+  static override styles = [helixPhiFieldStyles, forcedColorsField];
 
   // ─── Public Properties ───
 

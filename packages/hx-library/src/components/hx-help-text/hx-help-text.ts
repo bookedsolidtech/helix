@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixHelpTextStyles } from './hx-help-text.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Icon SVG for error variant (circle with exclamation mark). */
 const errorIcon = html`<svg viewBox="0 0 16 16" aria-hidden="true" width="1em" height="1em">
@@ -98,7 +99,7 @@ const variantIcons = {
  */
 @customElement('hx-help-text')
 export class HelixHelpText extends HelixElement {
-  static override styles = [helixHelpTextStyles];
+  static override styles = [helixHelpTextStyles, forcedColorsSurface];
 
   /**
    * Visual variant that determines the text color and icon.

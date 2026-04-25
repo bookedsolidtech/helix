@@ -5,6 +5,7 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { helixColorPickerStyles } from './hx-color-picker.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import {
   type ColorFormat,
   type HSV,
@@ -110,7 +111,7 @@ export interface HxColorPickerDetail {
  */
 @customElement('hx-color-picker')
 export class HelixColorPicker extends FormMixin(HelixElement) {
-  static override styles = [helixColorPickerStyles];
+  static override styles = [helixColorPickerStyles, forcedColorsField];
 
   /**
    * Declares this element as form-associated so it participates in native form submission.

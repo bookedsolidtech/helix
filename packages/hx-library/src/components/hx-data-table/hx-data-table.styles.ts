@@ -27,14 +27,14 @@ export const helixDataTableStyles = css`
   /* ─── Head ─── */
 
   thead {
-    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #f8fafc));
+    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #F5F8F3));
   }
 
   :host([sticky-header]) thead th {
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #f8fafc));
+    background-color: var(--hx-data-table-header-bg, var(--hx-color-surface-raised, #F5F8F3));
   }
 
   /* ─── Cells ─── */
@@ -44,18 +44,18 @@ export const helixDataTableStyles = css`
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
     text-align: start;
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-data-table-border-color, var(--hx-color-border-default, #e2e8f0));
+      var(--hx-data-table-border-color, var(--hx-color-border-default, #D6DBD5));
     vertical-align: middle;
   }
 
   th {
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-data-table-header-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-data-table-header-color, var(--hx-color-text-strong, #313E4B));
     white-space: nowrap;
   }
 
   td {
-    color: var(--hx-data-table-cell-color, var(--hx-color-text-primary, #0f172a));
+    color: var(--hx-data-table-cell-color, var(--hx-color-text-primary, #0D1825));
   }
 
   /* ─── Checkbox Column ─── */
@@ -94,7 +94,10 @@ export const helixDataTableStyles = css`
 
   .sort-btn:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+      var(
+        --hx-data-table-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 2px);
   }
@@ -115,7 +118,7 @@ export const helixDataTableStyles = css`
 
   .sort-icon--active {
     opacity: var(--hx-opacity-100, 1);
-    color: var(--hx-color-primary-500, #2563eb);
+    color: var(--hx-data-table-sort-icon-active-color, var(--hx-color-primary-500, #429797));
   }
 
   .sort-icon--desc {
@@ -129,11 +132,11 @@ export const helixDataTableStyles = css`
   }
 
   tbody tr:hover {
-    background-color: var(--hx-data-table-row-hover-bg, var(--hx-color-surface-raised, #f8fafc));
+    background-color: var(--hx-data-table-row-hover-bg, var(--hx-color-surface-raised, #F5F8F3));
   }
 
   tbody tr[aria-selected='true'] {
-    background-color: var(--hx-data-table-row-selected-bg, var(--hx-color-primary-50, #eff6ff));
+    background-color: var(--hx-data-table-row-selected-bg, var(--hx-color-primary-50, #EBF8F8));
   }
 
   /* ─── Checkbox Input ─── */
@@ -142,7 +145,7 @@ export const helixDataTableStyles = css`
     width: var(--hx-size-4, 1rem);
     height: var(--hx-size-4, 1rem);
     cursor: pointer;
-    accent-color: var(--hx-color-primary-500, #2563eb);
+    accent-color: var(--hx-data-table-checkbox-accent-color, var(--hx-color-primary-500, #429797));
   }
 
   /* ─── Loading Skeleton ─── */
@@ -154,9 +157,9 @@ export const helixDataTableStyles = css`
     /* Skeleton shimmer: intentionally primitive so the animation reads the same across all modes. */
     background: linear-gradient(
       90deg,
-      var(--hx-color-neutral-200, #e2e8f0) 25%,
-      var(--hx-color-neutral-100, #f1f5f9) 50%,
-      var(--hx-color-neutral-200, #e2e8f0) 75%
+      var(--hx-color-neutral-200, #D6DBD5) 25%,
+      var(--hx-color-neutral-100, #EBEEE9) 50%,
+      var(--hx-color-neutral-200, #D6DBD5) 75%
     );
     background-size: 200% 100%;
     animation: hx-shimmer var(--hx-data-table-shimmer-duration, 1.5s) infinite;
@@ -196,7 +199,10 @@ export const helixDataTableStyles = css`
   [part~='td']:focus-visible,
   [part~='th']:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+      var(
+        --hx-data-table-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, -2px);
     border-radius: var(--hx-border-radius-sm, 2px);
   }
@@ -205,7 +211,7 @@ export const helixDataTableStyles = css`
 
   .empty-cell {
     text-align: center;
-    color: var(--hx-data-table-empty-color, var(--hx-color-text-secondary, #475569));
+    color: var(--hx-data-table-empty-color, var(--hx-color-text-secondary, #4A5362));
     padding: var(--hx-space-8, 2rem) var(--hx-space-4, 1rem);
   }
 

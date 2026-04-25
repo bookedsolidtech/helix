@@ -18,7 +18,7 @@ export const helixCopyButtonStyles = css`
     border: var(--hx-border-width-thin) solid var(--hx-copy-button-border-color, transparent);
     border-radius: var(--hx-copy-button-border-radius, var(--hx-border-radius-md));
     background-color: var(--hx-copy-button-bg, transparent);
-    color: var(--hx-copy-button-color, var(--hx-color-primary-500));
+    color: var(--hx-copy-button-color, var(--hx-color-primary-500, #429797));
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast),
@@ -74,10 +74,16 @@ export const helixCopyButtonStyles = css`
   /* ─── Copied / Success State ─── */
 
   .button--copied {
-    color: var(--hx-color-success-text, var(--hx-color-primary-500));
+    color: var(
+      --hx-copy-button-copied-color,
+      var(--hx-color-success-text, var(--hx-color-success-700, #146831))
+    );
     /* Secondary non-color indicator required per WCAG 1.4.1 (use of color).
        A border provides visual differentiation for users with color blindness. */
-    border-color: var(--hx-color-success-500, var(--hx-color-primary-500));
+    border-color: var(
+      --hx-copy-button-copied-border-color,
+      var(--hx-color-success-500, #3B9E58)
+    );
   }
 
   /* ─── Icon Container ─── */

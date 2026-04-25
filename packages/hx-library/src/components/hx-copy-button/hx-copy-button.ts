@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 
 /** Minimum allowed value for feedbackDuration (ms). */
 const MIN_FEEDBACK_DURATION = 300;
@@ -73,7 +74,7 @@ const VALID_SIZES = new Set(['sm', 'md', 'lg']);
  */
 @customElement('hx-copy-button')
 export class HelixCopyButton extends HelixElement {
-  static override styles = [helixCopyButtonStyles];
+  static override styles = [helixCopyButtonStyles, forcedColorsInteractive];
 
   // ─── Public Properties ───
 

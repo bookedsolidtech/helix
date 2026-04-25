@@ -7,13 +7,13 @@ export const helixAccordionItemStyles = css`
 
   .item {
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #D6DBD5));
     font-family: var(--hx-accordion-item-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
   :host(:first-child) .item {
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-accordion-border-color, var(--hx-color-neutral-200, #D6DBD5));
   }
 
   /* Remove native details marker */
@@ -27,7 +27,7 @@ export const helixAccordionItemStyles = css`
     list-style: none;
     font-size: var(--hx-font-size-md, 1rem);
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-accordion-trigger-color, var(--hx-color-neutral-800, #1e293b));
+    color: var(--hx-accordion-trigger-color, var(--hx-color-neutral-800, #202B39));
     background-color: var(--hx-accordion-trigger-bg, transparent);
     user-select: none;
     transition: background-color var(--hx-transition-fast, 150ms ease);
@@ -47,12 +47,12 @@ export const helixAccordionItemStyles = css`
   }
 
   :host(:not([disabled])) .trigger:hover {
-    background-color: var(--hx-accordion-trigger-hover-bg, var(--hx-color-neutral-50, #f8fafc));
+    background-color: var(--hx-accordion-trigger-hover-bg, var(--hx-color-neutral-50, #F5F8F3));
   }
 
   .trigger:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+      var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797));
     outline-offset: var(--hx-focus-ring-offset, -2px);
   }
 
@@ -65,7 +65,7 @@ export const helixAccordionItemStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--hx-accordion-icon-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-accordion-icon-color, var(--hx-color-neutral-500, #66787B));
     transition: transform var(--hx-transition-normal, 250ms ease);
   }
 
@@ -95,7 +95,7 @@ export const helixAccordionItemStyles = css`
     padding: var(--hx-accordion-content-padding, 0 var(--hx-space-4, 1rem) var(--hx-space-4, 1rem));
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-accordion-content-color, var(--hx-color-neutral-600, #475569));
+    color: var(--hx-accordion-content-color, var(--hx-color-neutral-600, #4A5362));
   }
 
   /* ─── Disabled host ─── */

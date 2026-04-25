@@ -4,8 +4,11 @@ export const helixSplitPanelStyles = css`
   :host {
     display: flex;
     --_divider-size: var(--hx-split-panel-divider-size, 4px);
-    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-border-default, #e2e8f0));
-    --_divider-hover-color: var(--hx-split-panel-divider-hover-color, var(--hx-color-primary-500));
+    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-border-default, #D6DBD5));
+    --_divider-hover-color: var(
+      --hx-split-panel-divider-hover-color,
+      var(--hx-color-primary-500, #429797)
+    );
     overflow: hidden;
   }
 
@@ -93,7 +96,7 @@ export const helixSplitPanelStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-split-panel-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--_divider-hover-color) 30%, transparent);
@@ -158,7 +161,7 @@ export const helixSplitPanelStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-split-panel-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }

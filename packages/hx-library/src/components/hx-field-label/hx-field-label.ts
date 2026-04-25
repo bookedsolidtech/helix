@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixFieldLabelStyles } from './hx-field-label.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * Standardized label for form fields. Used as a consistent sub-component
@@ -58,7 +59,7 @@ import { helixFieldLabelStyles } from './hx-field-label.styles.js';
  */
 @customElement('hx-field-label')
 export class HelixFieldLabel extends HelixElement {
-  static override styles = [helixFieldLabelStyles];
+  static override styles = [helixFieldLabelStyles, forcedColorsSurface];
 
   /**
    * The ID of the associated form control. When set, renders a native
