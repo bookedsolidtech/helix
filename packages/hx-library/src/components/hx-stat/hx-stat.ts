@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import { helixStatStyles } from './hx-stat.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 export type StatSize = 'sm' | 'md' | 'lg';
 export type StatTrend = 'up' | 'down' | 'neutral';
@@ -70,7 +71,7 @@ export type StatTrend = 'up' | 'down' | 'neutral';
  */
 @customElement('hx-stat')
 export class HelixStat extends HelixElement {
-  static override styles = [helixStatStyles];
+  static override styles = [helixStatStyles, forcedColorsSurface];
 
   /**
    * The metric label displayed below the value.

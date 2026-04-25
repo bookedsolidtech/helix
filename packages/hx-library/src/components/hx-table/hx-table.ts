@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTableStyles } from './hx-table.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -42,7 +43,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-table')
 export class HelixTable extends HelixElement {
-  static override styles = [helixTableStyles];
+  static override styles = [helixTableStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

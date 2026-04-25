@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTreeViewStyles } from './hx-tree-view.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import type { HelixTreeItem, HxTreeItemSelectDetail } from './hx-tree-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -55,7 +56,7 @@ export interface HxSelectDetail {
  */
 @customElement('hx-tree-view')
 export class HelixTreeView extends HelixElement {
-  static override styles = [helixTreeViewStyles];
+  static override styles = [helixTreeViewStyles, forcedColorsSurface];
 
   // ─── Properties ───
 

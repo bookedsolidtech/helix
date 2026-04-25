@@ -38,13 +38,13 @@ export class HelixTableHeader extends HelixElement {
         padding: var(--_hx-table-cell-padding, var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem));
         text-align: left;
         font-weight: var(--hx-font-weight-semibold, 600);
-        color: var(--hx-table-header-color, var(--hx-color-neutral-700, #334155));
+        color: var(--hx-table-header-color, var(--hx-color-neutral-700, #313E4B));
         background-color: var(
           --_hx-table-cell-bg,
-          var(--hx-table-header-bg, var(--hx-color-neutral-50, #f8fafc))
+          var(--hx-table-header-bg, var(--hx-color-neutral-50, #F5F8F3))
         );
         border-bottom: var(--hx-border-width-thin, 1px) solid
-          var(--hx-table-border-color, var(--hx-color-neutral-200, #e2e8f0));
+          var(--hx-table-border-color, var(--hx-color-neutral-200, #D6DBD5));
         white-space: nowrap;
         vertical-align: middle;
         position: var(--_hx-table-th-position, static);
@@ -75,7 +75,7 @@ export class HelixTableHeader extends HelixElement {
 
       .sort-btn:focus-visible {
         outline: var(--hx-focus-ring-width, 2px) solid
-          var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+          var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797));
         outline-offset: var(--hx-focus-ring-offset, 2px);
         border-radius: var(--hx-border-radius-sm, 2px);
       }
@@ -96,7 +96,7 @@ export class HelixTableHeader extends HelixElement {
 
       .sort-icon--active {
         opacity: 1;
-        color: var(--hx-color-primary-500, #2563eb);
+        color: var(--hx-color-primary-500, #429797);
       }
 
       .sort-icon--desc {

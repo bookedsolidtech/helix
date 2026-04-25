@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixProgressRingStyles } from './hx-progress-ring.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -41,7 +42,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-progress-ring')
 export class HelixProgressRing extends HelixElement {
-  static override styles = [helixProgressRingStyles];
+  static override styles = [helixProgressRingStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

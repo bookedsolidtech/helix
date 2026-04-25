@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextProgressBarId = createIdCounter('hx-progress-bar');
@@ -54,7 +55,7 @@ const _nextProgressBarId = createIdCounter('hx-progress-bar');
  */
 @customElement('hx-progress-bar')
 export class HelixProgressBar extends HelixElement {
-  static override styles = [helixProgressBarStyles];
+  static override styles = [helixProgressBarStyles, forcedColorsSurface];
 
   /**
    * Current progress value (min–max). Set to null for indeterminate state.
