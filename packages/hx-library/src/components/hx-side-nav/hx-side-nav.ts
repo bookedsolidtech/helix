@@ -2,7 +2,6 @@ import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
-import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixSideNavStyles } from './hx-side-nav.styles.js';
 
 /**
@@ -56,7 +55,10 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends HelixElement {
-  static override styles = [helixSideNavStyles, forcedColorsInteractive];
+  // 3.2.1: forced-colors deference is owned by the bespoke @media block in
+  // hx-side-nav.styles.ts (toggle button, header/footer borders). Do NOT also
+  // compose forcedColorsInteractive — XOR rule per the mixin docstring.
+  static override styles = [helixSideNavStyles];
 
   // ─── Properties ───
 

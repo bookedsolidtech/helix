@@ -61,33 +61,38 @@ export const helixToastStyles = css`
    * error-600) because the lighter -500 fills can't pass AA against white
    * text in the precision-cool palette. The neutral-900 on-{role} tokens
    * are tuned for the lighter -500 surfaces and would fail here (e.g.
-   * neutral-900 on primary-600 = 3.07:1), so we hold fg at neutral-0
-   * directly for primary/success/danger.
-   * - neutral-0 on primary-600 (#0F7078) = 5.39:1 — AA pass
-   * - neutral-0 on success-700 (#146831) = 6.88:1 — AA pass
+   * neutral-900 on primary-600 = 3.07:1), so the on-{role}-strong tokens
+   * (neutral-0, no dark-mode flip) keep fg legible on the darker fills.
+   * - text.on-primary-strong on info.bg-strong (primary-600, #0F7078) = 5.39:1
+   * - text.on-success-strong on success.bg-strong (success-700, #146831) = 6.88:1
    *   (success-600 #0E8A4A on white = 4.41:1 — drifts under AA at 14px)
-   * - neutral-0 on error-600   (#C92A2A) = 5.92:1 — AA pass
-   * - neutral-900 on warning-500 (#C2711C) = 4.83:1 — AA pass
+   * - text.on-error-strong   on danger.bg-strong  (error-600, #C92A2A) = 5.92:1
+   * - text.on-warning        on warning.bg-strong (warning-500, #C2711C) = 4.83:1
    *   (warning stays on the lighter -500 surface so on-warning works)
+   *
+   * 3.2.1 token-cascade: bg variants now route through surface.{role}-strong
+   * semantics; fg variants route through text.on-{role}-strong (or on-warning
+   * for the warning variant). Component-tier tokens are NOT bypassed — the
+   * --hx-toast-bg / --hx-toast-color slots remain the single override point.
    */
   .toast--success {
-    --hx-toast-bg: var(--hx-color-success-700, #146831);
-    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-toast-bg: var(--hx-color-surface-success-strong, #146831);
+    --hx-toast-color: var(--hx-color-text-on-success-strong, #ffffff);
   }
 
   .toast--warning {
-    --hx-toast-bg: var(--hx-color-warning-500, #c2711c);
+    --hx-toast-bg: var(--hx-color-surface-warning-strong, #c2711c);
     --hx-toast-color: var(--hx-color-text-on-warning, #0d1825);
   }
 
   .toast--danger {
-    --hx-toast-bg: var(--hx-color-error-600, #c92a2a);
-    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-toast-bg: var(--hx-color-surface-danger-strong, #c92a2a);
+    --hx-toast-color: var(--hx-color-text-on-error-strong, #ffffff);
   }
 
   .toast--info {
-    --hx-toast-bg: var(--hx-color-primary-600, #0f7078);
-    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-toast-bg: var(--hx-color-surface-info-strong, #0f7078);
+    --hx-toast-color: var(--hx-color-text-on-primary-strong, #ffffff);
   }
 
   /* ─── Severity Label (WCAG 1.4.1) ─── */

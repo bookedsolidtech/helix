@@ -10,7 +10,7 @@ export const helixSideNavStyles = css`
        and evaluates their text against the page white background, producing
        false-positive color-contrast violations (WCAG 2.1 AA). */
     background-color: var(--hx-side-nav-bg, var(--hx-color-surface-inverse, #0d1825));
-    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #ebeee9));
+    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #ffffff));
   }
 
   * {
@@ -25,11 +25,11 @@ export const helixSideNavStyles = css`
     height: 100%;
     width: var(--hx-side-nav-width, 16rem);
     background-color: var(--hx-side-nav-bg, var(--hx-color-surface-inverse, #0d1825));
-    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #ebeee9));
+    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #ffffff));
     transition: width var(--hx-transition-normal, 300ms) ease;
     overflow: hidden;
     border-inline-end: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #313e4b));
+      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #8e9c98));
   }
 
   /* ─── Collapsed State ─── */
@@ -47,7 +47,7 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #313e4b));
+      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #8e9c98));
     overflow: hidden;
   }
 
@@ -74,7 +74,7 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #313e4b));
+      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #8e9c98));
     overflow: hidden;
   }
 
@@ -97,7 +97,7 @@ export const helixSideNavStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-side-nav-toggle-color, var(--hx-color-text-inverse, #b6bfb9));
+    color: var(--hx-side-nav-toggle-color, var(--hx-color-text-inverse, #ffffff));
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms) ease,
@@ -106,10 +106,10 @@ export const helixSideNavStyles = css`
 
   .side-nav__toggle:hover {
     background-color: var(
-      --hx-overlay-white-10,
+      --hx-color-border-on-dark-subtle,
       rgba(255, 255, 255, 0.1)
     ); /* fallback for browsers without color-mix() */
-    color: var(--hx-color-text-inverse, #ebeee9);
+    color: var(--hx-side-nav-toggle-hover-color, var(--hx-color-text-inverse, #ffffff));
   }
 
   @supports (color: color-mix(in srgb, red 50%, blue)) {
@@ -120,10 +120,7 @@ export const helixSideNavStyles = css`
 
   .side-nav__toggle:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-side-nav-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      );
+      var(--hx-side-nav-focus-ring-color, var(--hx-focus-ring-color, #6ab1b1));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
