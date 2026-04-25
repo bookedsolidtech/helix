@@ -398,7 +398,6 @@ jobs:
           run_vitest_with_watchdog "ci-shard-${VITEST_SHARD}" "$LOGFILE" \
             pnpm exec vitest run $PATHS \
               "${SHARD_ARGS[@]}" \
-              --coverage.enabled \
               --reporter=verbose \
               --reporter=json || rc=$?
           # On failure, surface only failed test lines + tail of log.
@@ -421,20 +420,6 @@ jobs:
           echo "tests_ran=true" >> "$GITHUB_OUTPUT"
           exit $rc
         working-directory: packages/hx-library
-      - name: Enforce coverage thresholds for changed components
-        # Run on every shard. The shard-aware check-coverage logic intersects
-        # HX_COVERAGE_COMPONENTS with the components whose tests actually ran
-        # on this shard (read from .cache/test-results.json), so each shard
-        # enforces its own slice. Restricting to shard 1 would let any
-        # component whose test landed on shards 2–8 regress unchecked.
-        # Skipped on shared-test/unscoped runs: the gate is per-component
-        # scope enforcement and an empty HX_COVERAGE_COMPONENTS makes the
-        # script fall back to "check all components", which fails every shard
-        # by definition (each shard only runs ~1/8 of test files).
-        if: steps.run-tests.outputs.tests_ran == 'true' && steps.changed.outputs.shared_tests_changed != 'true'
-        env:
-          HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
-        run: node scripts/check-coverage.mjs
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -443,8 +428,137 @@ jobs:
           path: packages/hx-library/.cache/test-results.json
           retention-days: 30
           if-no-files-found: warn
+
+  # ── Coverage (decoupled from per-shard runs) ────────────────────────────
+  # Runs the full test surface in a single instrumented vitest pass and
+  # enforces per-component thresholds via scripts/check-coverage.mjs.
+  #
+  # Why a dedicated job (cycles 5 + 6 of PR #1554, 3.2.0 palette refresh):
+  # the original design ran coverage on every shard. Under v8 instrumentation
+  # in browser-mode, two of eight shards consistently deadlocked — ~12s of
+  # collection output, then 600s of total silence, then watchdog kill. The
+  # 4→8 rebalance only moved which shards were affected; it didn't eliminate
+  # the deadlock. Running coverage in a single instrumented pass restores a
+  # working signal: per-shard runs verify behavior (uninstrumented, fast),
+  # this job verifies coverage (instrumented, slow, isolated). If this job
+  # hangs we know it's the coverage path; if a shard hangs we know it's not.
+
+  coverage:
+    name: Coverage
+    needs: [changes, secret-scan]
+    if: needs.changes.outputs.source == 'true' && needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    # Full instrumented suite is materially slower than uninstrumented
+    # browser-mode runs. 45m gives generous headroom over the projected
+    # 15–30m wall time without re-introducing the 600s watchdog kill that
+    # took out the per-shard coverage path.
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='!docs'
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Resolve changed components
+        id: changed
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH="${{ github.head_ref }}"
+            BASE="${{ github.base_ref }}"
+            if [[ "$BRANCH" == "staging" && "$BASE" == "main" ]]; then
+              echo "Promotion PR (staging → main) — coverage already verified on staging."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if [[ "$BRANCH" =~ feature/audit-fix-(hx-[a-z-]+) ]]; then
+              COMPONENT="${BASH_REMATCH[1]}"
+              echo "components_csv=$COMPONENT" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            DIFF_RANGE="origin/$BASE...HEAD"
+          else
+            DIFF_RANGE="HEAD~1...HEAD"
+          fi
+
+          CHANGED=$(git diff --name-only "$DIFF_RANGE" \
+            | grep 'src/components/hx-' \
+            | grep -v '\.stories\.ts$' \
+            | grep -v '\.test\.ts$' \
+            | grep -v '/index\.ts$' \
+            | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
+            | sort -u || true)
+          SHARED_TESTS=$(git diff --name-only "$DIFF_RANGE" \
+            | grep 'src/components/__tests__/' \
+            | grep '\.test\.ts$' || true)
+          if [ -n "$SHARED_TESTS" ]; then
+            echo "Shared test changed — running coverage with no scope filter"
+            echo "shared_tests_changed=true" >> "$GITHUB_OUTPUT"
+            echo "components_csv=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "$CHANGED" ]; then
+            echo "No component changes — skipping coverage"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          COMPONENTS_CSV=$(echo "$CHANGED" | tr '\n' ',' | sed 's/,$//')
+          echo "components_csv=$COMPONENTS_CSV" >> "$GITHUB_OUTPUT"
+      - name: Run full suite with coverage
+        id: run-coverage
+        if: steps.changed.outputs.skip != 'true'
+        env:
+          AGENT_RUN: '1'
+          HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
+          # Same watchdog threshold as per-shard (600s silent = unambiguously
+          # stuck), but applied to a single un-sharded run. The full suite
+          # under instrumentation has longer legitimate silent stretches than
+          # any individual shard, but 10 minutes of zero output is still a
+          # hang, not slow progress.
+          STALE_TIMEOUT: '600'
+        run: |
+          # shellcheck disable=SC1091
+          source "$GITHUB_WORKSPACE/scripts/lib/vitest-watchdog.sh"
+          LOGFILE=$(mktemp /tmp/helix-ci-coverage.XXXXXX)
+          rc=0
+          run_vitest_with_watchdog "ci-coverage" "$LOGFILE" \
+            pnpm exec vitest run \
+              --coverage.enabled \
+              --reporter=verbose \
+              --reporter=json || rc=$?
+          if [[ $rc -ne 0 ]]; then
+            echo "FAILED TESTS:"
+            grep "^[[:space:]]*×" "$LOGFILE" 2>/dev/null | head -60 || true
+            echo ""
+            if grep -q "Coverage report from" "$LOGFILE" 2>/dev/null; then
+              echo "--- vitest error output (everything before Coverage report) ---"
+              awk '/Coverage report from/{exit} {print}' "$LOGFILE" || true
+              echo ""
+            fi
+            echo "--- last 50 lines of full log ---"
+            tail -50 "$LOGFILE" || true
+          fi
+          echo "ran=true" >> "$GITHUB_OUTPUT"
+          exit $rc
+        working-directory: packages/hx-library
+      - name: Enforce coverage thresholds for changed components
+        # Single-run coverage means no shard intersection logic is needed —
+        # the full suite executed, so HX_COVERAGE_COMPONENTS is the
+        # authoritative scope. Skipped on shared-test/unscoped runs (the
+        # check-coverage script handles unscoped fall-through, but for
+        # shared-test PRs we want the whole library checked, which is the
+        # default behavior with HX_COVERAGE_COMPONENTS unset).
+        if: steps.run-coverage.outputs.ran == 'true'
+        env:
+          HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
+        run: node scripts/check-coverage.mjs
       - name: Upload coverage report
-        if: always() && matrix.shard == '1/8'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -452,14 +566,13 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
       - name: Post coverage summary as PR comment
-        if: github.event_name == 'pull_request' && matrix.shard == '1/8' && steps.changed.outputs.shared_tests_changed != 'true' && always()
+        if: github.event_name == 'pull_request' && steps.changed.outputs.shared_tests_changed != 'true' && always()
         env:
           GH_TOKEN: ${{ github.token }}
+          HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
         run: |
-          # Generate markdown summary (exits 0 regardless of gate — comment is informational)
           BODY=$(node scripts/check-coverage.mjs --markdown 2>/dev/null || echo "## Coverage Report\n\nCoverage data unavailable for this PR.")
 
-          # Delete any previous coverage comment before posting a new one
           PREV=$(gh pr view ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
             --json comments \
@@ -987,6 +1100,7 @@ jobs:
         react-generator-drift,
         type-check,
         test,
+        coverage,
         build,
         a11y-audit,
         bundle-size,
@@ -1009,6 +1123,7 @@ jobs:
           echo "Generator Drift:    ${{ needs.react-generator-drift.result }}"
           echo "Type Check:         ${{ needs.type-check.result }}"
           echo "Test:               ${{ needs.test.result }}"
+          echo "Coverage:           ${{ needs.coverage.result }}"
           echo "Build:              ${{ needs.build.result }}"
           echo "A11y Audit:         ${{ needs.a11y-audit.result }}"
           echo "Bundle Size:        ${{ needs.bundle-size.result }}"
@@ -1041,12 +1156,15 @@ jobs:
             fi
           done
 
-          # Test, VRT, changeset, and bundle-size are allowed to be skipped (non-PR / no
-          # source changes) or cancelled (concurrency group replaced a running job)
-          for gate in test vrt changeset bundle-size; do
+          # Test, Coverage, VRT, changeset, and bundle-size are allowed to be skipped
+          # (non-PR / no source changes) or cancelled (concurrency group replaced a
+          # running job). Coverage joins this set because it shares the same
+          # source-change predicate as Test (see needs.changes.outputs.source).
+          for gate in test coverage vrt changeset bundle-size; do
             result="${{ needs.test.result }}"
             case "$gate" in
               test)        result="${{ needs.test.result }}" ;;
+              coverage)    result="${{ needs.coverage.result }}" ;;
               vrt)         result="${{ needs.vrt.result }}" ;;
               changeset)   result="${{ needs.changeset.result }}" ;;
               bundle-size) result="${{ needs.bundle-size.result }}" ;;
