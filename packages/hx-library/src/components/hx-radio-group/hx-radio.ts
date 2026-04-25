@@ -21,12 +21,12 @@ const _nextRadioId = createIdCounter('hx-radio');
  * @csspart label - The label text.
  *
  * @cssprop [--hx-radio-size=var(--hx-size-5, 1.25rem)] - Radio circle size.
- * @cssprop [--hx-radio-border-color=var(--hx-color-neutral-300, #ced4da)] - Radio border color.
- * @cssprop [--hx-radio-checked-bg=var(--hx-color-primary-500, #2563EB)] - Checked background color.
- * @cssprop [--hx-radio-checked-border-color=var(--hx-color-primary-500, #2563EB)] - Checked border color.
+ * @cssprop [--hx-radio-border-color=var(--hx-color-neutral-300, #B6BFB9)] - Radio border color.
+ * @cssprop [--hx-radio-checked-bg=var(--hx-color-primary-500, #429797)] - Checked background color.
+ * @cssprop [--hx-radio-checked-border-color=var(--hx-color-primary-500, #429797)] - Checked border color.
  * @cssprop [--hx-radio-dot-color=var(--hx-color-neutral-0, #ffffff)] - Inner dot color when checked.
- * @cssprop [--hx-radio-focus-ring-color=var(--hx-focus-ring-color, #2563EB)] - Focus ring color.
- * @cssprop [--hx-radio-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
+ * @cssprop [--hx-radio-focus-ring-color=var(--hx-focus-ring-color, #6AB1B1)] - Focus ring color.
+ * @cssprop [--hx-radio-label-color=var(--hx-color-neutral-700, #313E4B)] - Label text color.
  */
 @customElement('hx-radio')
 export class HelixRadio extends HelixElement {

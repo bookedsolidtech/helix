@@ -33,24 +33,24 @@ export interface HxTabChangeDetail {
  * @csspart tablist - The tablist container element.
  * @csspart panels - The panel content container element.
  *
- * @cssprop [--hx-tabs-border-color=var(--hx-color-neutral-200, #e9ecef)] - Tablist border color.
+ * @cssprop [--hx-tabs-border-color=var(--hx-color-neutral-200, #D6DBD5)] - Tablist border color.
  * @cssprop [--hx-tabs-border-width=1px] - Tablist border width.
  * @cssprop [--hx-tabs-vertical-width=12rem] - Width of the tablist in vertical orientation.
  * @cssprop [--hx-tabs-gap=0] - Gap between the tablist and panels container.
- * @cssprop [--hx-tabs-tab-color=var(--hx-color-neutral-600, #495057)] - Inactive tab text color.
- * @cssprop [--hx-tabs-tab-active-color=var(--hx-color-primary-600, #1d4ed8)] - Active tab text color.
- * @cssprop [--hx-tabs-tab-hover-color=var(--hx-color-neutral-800, #212529)] - Tab hover text color.
- * @cssprop [--hx-tabs-tab-hover-bg=var(--hx-color-neutral-50, #f8f9fa)] - Tab hover background.
+ * @cssprop [--hx-tabs-tab-color=var(--hx-color-neutral-600, #4A5362)] - Inactive tab text color.
+ * @cssprop [--hx-tabs-tab-active-color=var(--hx-color-primary-600, #0F7078)] - Active tab text color.
+ * @cssprop [--hx-tabs-tab-hover-color=var(--hx-color-neutral-800, #202B39)] - Tab hover text color.
+ * @cssprop [--hx-tabs-tab-hover-bg=var(--hx-color-neutral-50, #F5F8F3)] - Tab hover background.
  * @cssprop [--hx-tabs-tab-font-size=var(--hx-font-size-md, 1rem)] - Tab font size.
  * @cssprop [--hx-tabs-tab-font-weight=var(--hx-font-weight-medium, 500)] - Tab font weight.
  * @cssprop [--hx-tabs-tab-active-font-weight=var(--hx-font-weight-semibold, 600)] - Active tab font weight.
  * @cssprop [--hx-tabs-tab-padding-x=var(--hx-space-4, 1rem)] - Horizontal tab padding.
  * @cssprop [--hx-tabs-tab-padding-y=var(--hx-space-2, 0.5rem)] - Vertical tab padding.
- * @cssprop [--hx-tabs-indicator-color=var(--hx-color-primary-500, #2563eb)] - Active indicator color.
+ * @cssprop [--hx-tabs-indicator-color=var(--hx-color-primary-500, #429797)] - Active indicator color.
  * @cssprop [--hx-tabs-indicator-size=2px] - Active indicator thickness.
- * @cssprop [--hx-tabs-focus-ring-color=var(--hx-focus-ring-color, #2563eb)] - Focus ring color for tabs and panels.
+ * @cssprop [--hx-tabs-focus-ring-color=var(--hx-focus-ring-color, #6AB1B1)] - Focus ring color for tabs and panels.
  * @cssprop [--hx-tabs-panel-padding=var(--hx-space-4, 1rem)] - Panel inner padding.
- * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #343a40)] - Panel text color.
+ * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #313E4B)] - Panel text color.
  * @cssprop [--hx-tabs-font-family=var(--hx-font-family-sans)] - CSS custom property.
  * @cssprop [--hx-font-family-sans] - Font family.
  * @cssprop [--hx-color-neutral-200] - Color.

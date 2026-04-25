@@ -17,8 +17,8 @@ import { helixTabPanelStyles } from './hx-tab-panel.styles.js';
  * @csspart panel - The panel content wrapper.
  *
  * @cssprop [--hx-tabs-panel-padding=var(--hx-space-4, 1rem)] - Panel inner padding.
- * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #343a40)] - Panel text color.
- * @cssprop [--hx-tabs-focus-ring-color=var(--hx-focus-ring-color, #2563eb)] - Focus ring color.
+ * @cssprop [--hx-tabs-panel-color=var(--hx-color-neutral-700, #313E4B)] - Panel text color.
+ * @cssprop [--hx-tabs-focus-ring-color=var(--hx-focus-ring-color, #6AB1B1)] - Focus ring color.
  */
 @customElement('hx-tab-panel')
 export class HelixTabPanel extends HelixElement {

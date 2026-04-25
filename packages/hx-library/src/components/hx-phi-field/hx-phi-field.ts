@@ -50,12 +50,12 @@ import { devWarn } from '../../utils/dev-warn.js';
  *   boundaries for application-level audit listeners.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
- * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#111827)] - Value text color.
- * @cssprop [--hx-phi-field-masked-color=var(--hx-color-neutral-500,#6b7280)] - Masked value text color.
- * @cssprop [--hx-phi-field-toggle-color=var(--hx-color-primary-500,#2563eb)] - Toggle button color.
- * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#2563eb))] - Focus ring color.
+ * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#0D1825)] - Value text color.
+ * @cssprop [--hx-phi-field-masked-color=var(--hx-color-neutral-500,#66787B)] - Masked value text color.
+ * @cssprop [--hx-phi-field-toggle-color=var(--hx-color-primary-500,#429797)] - Toggle button color.
+ * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#429797))] - Focus ring color.
  * @cssprop [--hx-phi-field-disabled-opacity=var(--hx-opacity-50,0.5)] - Opacity applied when the field is disabled.
- * @cssprop [--hx-phi-field-auto-hide-warning-color=var(--hx-color-warning-500,#f59e0b)] - Color for auto-hide countdown warning (future use).
+ * @cssprop [--hx-phi-field-auto-hide-warning-color=var(--hx-color-warning-500,#C2711C)] - Color for auto-hide countdown warning (future use).
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-font-family-mono] - Font family.
  * @cssprop [--hx-color-neutral-500] - Color.

@@ -42,16 +42,16 @@ export interface HxCheckboxChangeDetail {
  *
  * @cssprop [--hx-checkbox-size=var(--hx-size-5, 1.25rem)] - Checkbox dimensions.
  * @cssprop [--hx-checkbox-bg=var(--hx-color-neutral-0, #ffffff)] - Unchecked background color.
- * @cssprop [--hx-checkbox-border-color=var(--hx-color-neutral-300, #ced4da)] - Checkbox border color.
+ * @cssprop [--hx-checkbox-border-color=var(--hx-color-neutral-300, #B6BFB9)] - Checkbox border color.
  * @cssprop [--hx-checkbox-border-radius=var(--hx-border-radius-sm, 0.25rem)] - Checkbox border radius.
- * @cssprop [--hx-checkbox-checked-bg=var(--hx-color-primary-500, #2563EB)] - Checked background color.
- * @cssprop [--hx-checkbox-checked-border-color=var(--hx-color-primary-500, #2563EB)] - Checked border color.
+ * @cssprop [--hx-checkbox-checked-bg=var(--hx-color-primary-500, #429797)] - Checked background color.
+ * @cssprop [--hx-checkbox-checked-border-color=var(--hx-color-primary-500, #429797)] - Checked border color.
  * @cssprop [--hx-checkbox-checkmark-color=var(--hx-color-neutral-0, #ffffff)] - Checkmark color.
- * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #2563EB)] - Focus ring color.
- * @cssprop [--hx-checkbox-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
- * @cssprop [--hx-checkbox-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
+ * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #6AB1B1)] - Focus ring color.
+ * @cssprop [--hx-checkbox-label-color=var(--hx-color-neutral-700, #313E4B)] - Label text color.
+ * @cssprop [--hx-checkbox-help-text-color=var(--hx-color-neutral-500, #66787B)] - Help text color.
  * @cssprop [--hx-checkbox-hover-border-color=var(--hx-checkbox-border-color)] - Border color on hover.
- * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
+ * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #E5493E)] - Error state color.
  * @cssprop [--hx-opacity-disabled] - Opacity.
  * @cssprop [--hx-space-1] - Spacing token.
  * @cssprop [--hx-checkbox-font-family=var(--hx-font-family-sans)] - Font family for checkbox label and help text.
