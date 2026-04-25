@@ -6,6 +6,7 @@ import {
   helixStructuredListStyles,
   helixStructuredListRowStyles,
 } from './hx-structured-list.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * Container for structured key-value data display. Renders as a list with
@@ -38,7 +39,7 @@ import {
  */
 @customElement('hx-structured-list')
 export class HelixStructuredList extends HelixElement {
-  static override styles = [helixStructuredListStyles];
+  static override styles = [helixStructuredListStyles, forcedColorsSurface];
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -109,7 +110,7 @@ export class HelixStructuredList extends HelixElement {
  */
 @customElement('hx-structured-list-row')
 export class HelixStructuredListRow extends HelixElement {
-  static override styles = [helixStructuredListRowStyles];
+  static override styles = [helixStructuredListRowStyles, forcedColorsSurface];
 
   override connectedCallback(): void {
     super.connectedCallback();

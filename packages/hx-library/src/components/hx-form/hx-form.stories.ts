@@ -807,7 +807,7 @@ export const EmptyForm: Story = {
   render: () => html`
     <hx-form>
       <form>
-        <p style="color: var(--hx-color-neutral-500, #6c757d); font-style: italic;">
+        <p style="color: var(--hx-color-neutral-500, #66787B); font-style: italic;">
           No form fields have been configured for this form.
         </p>
         <div class="form-actions">

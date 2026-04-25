@@ -35,14 +35,14 @@ export const helixSliderStyles = css`
   .slider__label {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-slider-label-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-slider-label-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .slider__value-display {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-slider-value-color, var(--hx-color-text-secondary, #475569));
+    color: var(--hx-slider-value-color, var(--hx-color-text-secondary, #313e4b));
     line-height: var(--hx-line-height-normal, 1.5);
     font-variant-numeric: tabular-nums;
     min-width: var(--hx-size-8, 2rem);
@@ -60,7 +60,7 @@ export const helixSliderStyles = css`
     position: relative;
     width: 100%;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-slider-track-bg, var(--hx-color-border-default, #e2e8f0));
+    background-color: var(--hx-slider-track-bg, var(--hx-color-border-default, #d6dbd5));
     overflow: visible;
   }
 
@@ -103,7 +103,7 @@ export const helixSliderStyles = css`
     height: 100%;
     width: 100%;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-slider-fill-bg, var(--hx-color-primary-500, #2563eb));
+    background-color: var(--hx-slider-fill-bg, var(--hx-color-primary-500, #429797));
     pointer-events: none;
     transform-origin: left center;
     transform: scaleX(var(--_fill-ratio, 0));
@@ -184,7 +184,7 @@ export const helixSliderStyles = css`
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-slider-thumb-bg, var(--hx-color-surface-default, #ffffff));
     border: var(--hx-slider-thumb-border-width, 2px) solid
-      var(--hx-slider-thumb-border-color, var(--hx-color-primary-500, #2563eb));
+      var(--hx-slider-thumb-border-color, var(--hx-color-primary-500, #429797));
     box-shadow: var(--hx-slider-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
     pointer-events: none;
     transition:
@@ -203,7 +203,7 @@ export const helixSliderStyles = css`
       0 0 0 var(--hx-focus-ring-width, 2px)
         var(
           --hx-slider-focus-ring-color,
-          var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+          var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
         ),
       var(--hx-slider-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
   }
@@ -260,7 +260,7 @@ export const helixSliderStyles = css`
     top: 0;
     width: var(--hx-border-width-thin, 1px);
     height: 100%;
-    background-color: var(--hx-slider-tick-color, var(--hx-color-border-strong, #94a3b8));
+    background-color: var(--hx-slider-tick-color, var(--hx-color-border-strong, #8e9c98));
     transform: translateX(-50%);
   }
 
@@ -270,7 +270,7 @@ export const helixSliderStyles = css`
     display: flex;
     justify-content: space-between;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-range-label-color, var(--hx-color-text-muted, #64748b));
+    color: var(--hx-slider-range-label-color, var(--hx-color-text-muted, #4a5362));
     line-height: var(--hx-line-height-normal, 1.5);
     margin-top: var(--hx-space-0-5, 0.125rem);
   }
@@ -279,17 +279,20 @@ export const helixSliderStyles = css`
 
   .slider__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-help-text-color, var(--hx-color-text-muted, #64748b));
+    color: var(--hx-slider-help-text-color, var(--hx-color-text-muted, #4a5362));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   /* ─── Disabled state ─── */
 
   .slider--disabled .slider__fill {
-    background-color: var(--hx-color-border-strong, #94a3b8);
+    background-color: var(--hx-slider-disabled-fill-bg, var(--hx-color-border-strong, #8e9c98));
   }
 
   .slider--disabled .slider__thumb-visual {
-    border-color: var(--hx-color-border-strong, #94a3b8);
+    border-color: var(
+      --hx-slider-disabled-thumb-border-color,
+      var(--hx-color-border-strong, #8e9c98)
+    );
   }
 `;

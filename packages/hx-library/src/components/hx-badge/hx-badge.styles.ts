@@ -11,8 +11,8 @@ export const helixBadgeStyles = css`
     justify-content: center;
     gap: var(--hx-space-1, 0.25rem);
     border-radius: var(--hx-badge-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-badge-bg, var(--hx-color-primary-500, #2563eb));
-    color: var(--hx-badge-color, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-badge-bg, var(--hx-color-primary-500, #429797));
+    color: var(--hx-badge-color, var(--hx-color-text-on-primary, #0d1825));
     font-family: var(--hx-badge-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-badge-font-weight, var(--hx-font-weight-semibold, 600));
     line-height: var(--hx-line-height-tight, 1.25);
@@ -44,65 +44,65 @@ export const helixBadgeStyles = css`
   /* ─── Style Variants ─── */
 
   .badge--primary {
-    --hx-badge-bg: var(--hx-color-primary-500, #2563eb);
-    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-badge-bg: var(--hx-badge-primary-bg, var(--hx-color-primary-500, #429797));
+    --hx-badge-color: var(--hx-badge-primary-color, var(--hx-color-text-on-primary, #0d1825));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-primary-500, #2563eb)
+      var(--hx-badge-primary-bg, var(--hx-color-primary-500, #429797))
     );
   }
 
   .badge--secondary {
-    --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f1f5f9));
-    --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #334155));
+    --hx-badge-bg: var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #ebeee9));
+    --hx-badge-color: var(--hx-badge-secondary-color, var(--hx-color-neutral-700, #313e4b));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #f1f5f9))
+      var(--hx-badge-secondary-bg, var(--hx-color-neutral-100, #ebeee9))
     );
   }
 
   .badge--success {
-    --hx-badge-bg: var(--hx-color-success-700, #166534);
-    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-badge-bg: var(--hx-badge-success-bg, var(--hx-color-success-700, #146831));
+    --hx-badge-color: var(--hx-badge-success-color, var(--hx-color-neutral-0, #ffffff));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-success-700, #166534)
+      var(--hx-badge-success-bg, var(--hx-color-success-700, #146831))
     );
   }
 
   .badge--warning {
-    --hx-badge-bg: var(--hx-color-warning-500, #d97706);
-    --hx-badge-color: var(--hx-color-neutral-900, #0f172a);
+    --hx-badge-bg: var(--hx-badge-warning-bg, var(--hx-color-warning-500, #c2711c));
+    --hx-badge-color: var(--hx-badge-warning-color, var(--hx-color-neutral-900, #0d1825));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-warning-500, #d97706)
+      var(--hx-badge-warning-bg, var(--hx-color-warning-500, #c2711c))
     );
   }
 
   .badge--error {
-    --hx-badge-bg: var(--hx-color-error-500, #dc2626);
-    --hx-badge-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-badge-bg: var(--hx-badge-error-bg, var(--hx-color-error-500, #e5493e));
+    --hx-badge-color: var(--hx-badge-error-color, var(--hx-color-text-on-error, #0d1825));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-error-500, #dc2626)
+      var(--hx-badge-error-bg, var(--hx-color-error-500, #e5493e))
     );
   }
 
   .badge--neutral {
-    --hx-badge-bg: var(--hx-color-neutral-200, #e2e8f0);
-    --hx-badge-color: var(--hx-color-neutral-700, #334155);
+    --hx-badge-bg: var(--hx-badge-neutral-bg, var(--hx-color-neutral-200, #d6dbd5));
+    --hx-badge-color: var(--hx-badge-neutral-color, var(--hx-color-neutral-700, #313e4b));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-color-neutral-200, #e2e8f0)
+      var(--hx-badge-neutral-bg, var(--hx-color-neutral-200, #d6dbd5))
     );
   }
 
   .badge--info {
-    --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #075985));
+    --hx-badge-bg: var(--hx-badge-info-bg, var(--hx-color-info-700, #0e5997));
     --hx-badge-color: var(--hx-badge-info-color, var(--hx-color-neutral-0, #ffffff));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-info-bg, var(--hx-color-info-700, #075985))
+      var(--hx-badge-info-bg, var(--hx-color-info-700, #0e5997))
     );
   }
 

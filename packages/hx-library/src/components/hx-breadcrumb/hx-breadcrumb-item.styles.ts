@@ -18,7 +18,7 @@ export const helixBreadcrumbItemStyles = css`
   }
 
   [part='link'] {
-    color: var(--hx-breadcrumb-link-color, var(--hx-color-primary-600));
+    color: var(--hx-breadcrumb-link-color, var(--hx-color-primary-600, #0f7078));
     text-decoration: none;
     cursor: pointer;
     font-family: inherit;
@@ -30,7 +30,7 @@ export const helixBreadcrumbItemStyles = css`
   }
 
   [part='link']:hover {
-    color: var(--hx-breadcrumb-link-hover-color, var(--hx-color-primary-700));
+    color: var(--hx-breadcrumb-link-hover-color, var(--hx-color-primary-700, #0f6363));
     text-decoration: underline;
   }
 
@@ -38,14 +38,14 @@ export const helixBreadcrumbItemStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-breadcrumb-link-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 
   [part='text'] {
-    color: var(--hx-breadcrumb-text-color, var(--hx-color-text-strong));
+    color: var(--hx-breadcrumb-text-color, var(--hx-color-text-strong, #202b39));
     font-family: inherit;
     font-size: inherit;
     max-width: var(--hx-breadcrumb-item-max-width);
@@ -56,7 +56,7 @@ export const helixBreadcrumbItemStyles = css`
 
   .separator {
     margin-inline: var(--hx-breadcrumb-separator-gap, var(--hx-space-1, 0.25rem));
-    color: var(--hx-breadcrumb-separator-color, var(--hx-color-text-muted));
+    color: var(--hx-breadcrumb-separator-color, var(--hx-color-text-muted, #4a5362));
     user-select: none;
   }
 

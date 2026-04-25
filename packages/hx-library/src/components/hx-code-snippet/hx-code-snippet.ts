@@ -4,6 +4,7 @@ import { HelixElement } from '../../base/index.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * A styled code block with optional copy button and max-lines truncation.
@@ -70,7 +71,7 @@ import { helixCodeSnippetStyles } from './hx-code-snippet.styles.js';
  */
 @customElement('hx-code-snippet')
 export class HelixCodeSnippet extends HelixElement {
-  static override styles = [helixCodeSnippetStyles];
+  static override styles = [helixCodeSnippetStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

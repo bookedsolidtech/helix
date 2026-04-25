@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-24T13:14:13.353Z",
+  "generatedAt": "2026-04-25T16:30:29.862Z",
   "sourceCem": "custom-elements.json",
-  "helixVersion": "3.1.0",
-  "tokensVersion": "3.0.0",
+  "helixVersion": "3.2.0",
+  "tokensVersion": "3.2.0",
   "components": [
     {
       "tag": "hx-accordion",
@@ -4080,13 +4080,13 @@
         {
           "description": "Checkbox border color.",
           "name": "--hx-checkbox-border-color",
-          "default": "var(--hx-color-neutral-300, #ced4da)",
+          "default": "var(--hx-color-neutral-300, #B6BFB9)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/300",
-            "literalFallback": "#ced4da"
+            "literalFallback": "#B6BFB9"
           }
         },
         {
@@ -4104,25 +4104,25 @@
         {
           "description": "Checked background color.",
           "name": "--hx-checkbox-checked-bg",
-          "default": "var(--hx-color-primary-500, #2563EB)",
+          "default": "var(--hx-color-primary-500, #429797)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/500",
-            "literalFallback": "#2563EB"
+            "literalFallback": "#429797"
           }
         },
         {
           "description": "Checked border color.",
           "name": "--hx-checkbox-checked-border-color",
-          "default": "var(--hx-color-primary-500, #2563EB)",
+          "default": "var(--hx-color-primary-500, #429797)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/500",
-            "literalFallback": "#2563EB"
+            "literalFallback": "#429797"
           }
         },
         {
@@ -4140,37 +4140,37 @@
         {
           "description": "Focus ring color.",
           "name": "--hx-checkbox-focus-ring-color",
-          "default": "var(--hx-focus-ring-color, #2563EB)",
+          "default": "var(--hx-focus-ring-color, #6AB1B1)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "focus/ring/color",
             "fallbackPrimitive": null,
-            "literalFallback": "#2563EB"
+            "literalFallback": "#6AB1B1"
           }
         },
         {
           "description": "Label text color.",
           "name": "--hx-checkbox-label-color",
-          "default": "var(--hx-color-neutral-700, #343a40)",
+          "default": "var(--hx-color-neutral-700, #313E4B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(label)",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/700",
-            "literalFallback": "#343a40"
+            "literalFallback": "#313E4B"
           }
         },
         {
           "description": "Help text color.",
           "name": "--hx-checkbox-help-text-color",
-          "default": "var(--hx-color-neutral-500, #6c757d)",
+          "default": "var(--hx-color-neutral-500, #66787B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(help-text)",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/500",
-            "literalFallback": "#6c757d"
+            "literalFallback": "#66787B"
           }
         },
         {
@@ -4188,13 +4188,13 @@
         {
           "description": "Error state color.",
           "name": "--hx-checkbox-error-color",
-          "default": "var(--hx-color-error-500, #dc3545)",
+          "default": "var(--hx-color-error-500, #E5493E)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(error)",
             "semanticToken": "color/error",
             "fallbackPrimitive": "color/error/500",
-            "literalFallback": "#dc3545"
+            "literalFallback": "#E5493E"
           }
         },
         {
@@ -4506,25 +4506,25 @@
         {
           "description": "Label text color.",
           "name": "--hx-checkbox-group-label-color",
-          "default": "var(--hx-color-neutral-700, #343a40)",
+          "default": "var(--hx-color-neutral-700, #313E4B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(label)",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/700",
-            "literalFallback": "#343a40"
+            "literalFallback": "#313E4B"
           }
         },
         {
           "description": "Error message color.",
           "name": "--hx-checkbox-group-error-color",
-          "default": "var(--hx-color-error-500, #dc3545)",
+          "default": "var(--hx-color-error-500, #E5493E)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(error)",
             "semanticToken": "color/error",
             "fallbackPrimitive": "color/error/500",
-            "literalFallback": "#dc3545"
+            "literalFallback": "#E5493E"
           }
         },
         {
@@ -16339,37 +16339,37 @@
         {
           "description": "Radio border color.",
           "name": "--hx-radio-border-color",
-          "default": "var(--hx-color-neutral-300, #ced4da)",
+          "default": "var(--hx-color-neutral-300, #B6BFB9)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/300",
-            "literalFallback": "#ced4da"
+            "literalFallback": "#B6BFB9"
           }
         },
         {
           "description": "Checked background color.",
           "name": "--hx-radio-checked-bg",
-          "default": "var(--hx-color-primary-500, #2563EB)",
+          "default": "var(--hx-color-primary-500, #429797)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/500",
-            "literalFallback": "#2563EB"
+            "literalFallback": "#429797"
           }
         },
         {
           "description": "Checked border color.",
           "name": "--hx-radio-checked-border-color",
-          "default": "var(--hx-color-primary-500, #2563EB)",
+          "default": "var(--hx-color-primary-500, #429797)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/500",
-            "literalFallback": "#2563EB"
+            "literalFallback": "#429797"
           }
         },
         {
@@ -16387,25 +16387,25 @@
         {
           "description": "Focus ring color.",
           "name": "--hx-radio-focus-ring-color",
-          "default": "var(--hx-focus-ring-color, #2563EB)",
+          "default": "var(--hx-focus-ring-color, #6AB1B1)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "focus/ring/color",
             "fallbackPrimitive": null,
-            "literalFallback": "#2563EB"
+            "literalFallback": "#6AB1B1"
           }
         },
         {
           "description": "Label text color.",
           "name": "--hx-radio-label-color",
-          "default": "var(--hx-color-neutral-700, #343a40)",
+          "default": "var(--hx-color-neutral-700, #313E4B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(label)",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/700",
-            "literalFallback": "#343a40"
+            "literalFallback": "#313E4B"
           }
         }
       ],
@@ -16565,37 +16565,37 @@
         {
           "description": "Label text color.",
           "name": "--hx-radio-group-label-color",
-          "default": "var(--hx-color-neutral-700, #343a40)",
+          "default": "var(--hx-color-neutral-700, #313E4B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/700",
-            "literalFallback": "#343a40"
+            "literalFallback": "#313E4B"
           }
         },
         {
           "description": "Error message color.",
           "name": "--hx-radio-group-error-color",
-          "default": "var(--hx-color-error-500, #dc3545)",
+          "default": "var(--hx-color-error-500, #E5493E)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(error)",
             "semanticToken": "color/error",
             "fallbackPrimitive": "color/error/500",
-            "literalFallback": "#dc3545"
+            "literalFallback": "#E5493E"
           }
         },
         {
           "description": "Help text color.",
           "name": "--hx-radio-group-help-text-color",
-          "default": "var(--hx-color-neutral-500, #6c757d)",
+          "default": "var(--hx-color-neutral-500, #66787B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(help-text)",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/500",
-            "literalFallback": "#6c757d"
+            "literalFallback": "#66787B"
           }
         },
         {
@@ -21579,49 +21579,49 @@
         {
           "description": "Inactive tab text color.",
           "name": "--hx-tabs-tab-color",
-          "default": "var(--hx-color-neutral-600, #495057)",
+          "default": "var(--hx-color-neutral-600, #4A5362)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/600",
-            "literalFallback": "#495057"
+            "literalFallback": "#4A5362"
           }
         },
         {
           "description": "Active tab text color.",
           "name": "--hx-tabs-tab-active-color",
-          "default": "var(--hx-color-primary-600, #1d4ed8)",
+          "default": "var(--hx-color-primary-600, #0F7078)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/600",
-            "literalFallback": "#1d4ed8"
+            "literalFallback": "#0F7078"
           }
         },
         {
           "description": "Tab hover text color.",
           "name": "--hx-tabs-tab-hover-color",
-          "default": "var(--hx-color-neutral-800, #212529)",
+          "default": "var(--hx-color-neutral-800, #202B39)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/800",
-            "literalFallback": "#212529"
+            "literalFallback": "#202B39"
           }
         },
         {
           "description": "Tab hover background.",
           "name": "--hx-tabs-tab-hover-bg",
-          "default": "var(--hx-color-neutral-50, #f8f9fa)",
+          "default": "var(--hx-color-neutral-50, #F5F8F3)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/50",
-            "literalFallback": "#f8f9fa"
+            "literalFallback": "#F5F8F3"
           }
         },
         {
@@ -21687,13 +21687,13 @@
         {
           "description": "Active indicator color.",
           "name": "--hx-tabs-indicator-color",
-          "default": "var(--hx-color-primary-500, #2563eb)",
+          "default": "var(--hx-color-primary-500, #429797)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/500",
-            "literalFallback": "#2563eb"
+            "literalFallback": "#429797"
           }
         },
         {
@@ -21711,13 +21711,13 @@
         {
           "description": "Focus ring color.",
           "name": "--hx-tabs-focus-ring-color",
-          "default": "var(--hx-focus-ring-color, #2563eb)",
+          "default": "var(--hx-focus-ring-color, #6AB1B1)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "focus/ring/color",
             "fallbackPrimitive": null,
-            "literalFallback": "#2563eb"
+            "literalFallback": "#6AB1B1"
           }
         }
       ],
@@ -21774,25 +21774,25 @@
         {
           "description": "Panel text color.",
           "name": "--hx-tabs-panel-color",
-          "default": "var(--hx-color-neutral-700, #343a40)",
+          "default": "var(--hx-color-neutral-700, #313E4B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/700",
-            "literalFallback": "#343a40"
+            "literalFallback": "#313E4B"
           }
         },
         {
           "description": "Focus ring color.",
           "name": "--hx-tabs-focus-ring-color",
-          "default": "var(--hx-focus-ring-color, #2563eb)",
+          "default": "var(--hx-focus-ring-color, #6AB1B1)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "focus/ring/color",
             "fallbackPrimitive": null,
-            "literalFallback": "#2563eb"
+            "literalFallback": "#6AB1B1"
           }
         }
       ],
@@ -21890,73 +21890,73 @@
         {
           "description": "Cell border color.",
           "name": "--hx-table-border-color",
-          "default": "var(--hx-color-neutral-200, #e2e8f0)",
+          "default": "var(--hx-color-neutral-200, #D6DBD5)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/200",
-            "literalFallback": "#e2e8f0"
+            "literalFallback": "#D6DBD5"
           }
         },
         {
           "description": "Header row background.",
           "name": "--hx-table-header-bg",
-          "default": "var(--hx-color-neutral-50, #f8fafc)",
+          "default": "var(--hx-color-neutral-50, #F5F8F3)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/50",
-            "literalFallback": "#f8fafc"
+            "literalFallback": "#F5F8F3"
           }
         },
         {
           "description": "Header text color.",
           "name": "--hx-table-header-color",
-          "default": "var(--hx-color-neutral-700, #334155)",
+          "default": "var(--hx-color-neutral-700, #313E4B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/700",
-            "literalFallback": "#334155"
+            "literalFallback": "#313E4B"
           }
         },
         {
           "description": "Cell text color.",
           "name": "--hx-table-cell-color",
-          "default": "var(--hx-color-neutral-900, #0f172a)",
+          "default": "var(--hx-color-neutral-900, #0D1825)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/900",
-            "literalFallback": "#0f172a"
+            "literalFallback": "#0D1825"
           }
         },
         {
           "description": "Row hover background.",
           "name": "--hx-table-row-hover-bg",
-          "default": "var(--hx-color-neutral-50, #f8fafc)",
+          "default": "var(--hx-color-neutral-50, #F5F8F3)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/50",
-            "literalFallback": "#f8fafc"
+            "literalFallback": "#F5F8F3"
           }
         },
         {
           "description": "Striped row background.",
           "name": "--hx-table-stripe-bg",
-          "default": "var(--hx-color-neutral-50, #f8fafc)",
+          "default": "var(--hx-color-neutral-50, #F5F8F3)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/50",
-            "literalFallback": "#f8fafc"
+            "literalFallback": "#F5F8F3"
           }
         },
         {
@@ -22120,13 +22120,13 @@
         {
           "description": "Tablist border color.",
           "name": "--hx-tabs-border-color",
-          "default": "var(--hx-color-neutral-200, #e9ecef)",
+          "default": "var(--hx-color-neutral-200, #D6DBD5)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/200",
-            "literalFallback": "#e9ecef"
+            "literalFallback": "#D6DBD5"
           }
         },
         {
@@ -22168,49 +22168,49 @@
         {
           "description": "Inactive tab text color.",
           "name": "--hx-tabs-tab-color",
-          "default": "var(--hx-color-neutral-600, #495057)",
+          "default": "var(--hx-color-neutral-600, #4A5362)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/600",
-            "literalFallback": "#495057"
+            "literalFallback": "#4A5362"
           }
         },
         {
           "description": "Active tab text color.",
           "name": "--hx-tabs-tab-active-color",
-          "default": "var(--hx-color-primary-600, #1d4ed8)",
+          "default": "var(--hx-color-primary-600, #0F7078)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/600",
-            "literalFallback": "#1d4ed8"
+            "literalFallback": "#0F7078"
           }
         },
         {
           "description": "Tab hover text color.",
           "name": "--hx-tabs-tab-hover-color",
-          "default": "var(--hx-color-neutral-800, #212529)",
+          "default": "var(--hx-color-neutral-800, #202B39)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/800",
-            "literalFallback": "#212529"
+            "literalFallback": "#202B39"
           }
         },
         {
           "description": "Tab hover background.",
           "name": "--hx-tabs-tab-hover-bg",
-          "default": "var(--hx-color-neutral-50, #f8f9fa)",
+          "default": "var(--hx-color-neutral-50, #F5F8F3)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/50",
-            "literalFallback": "#f8f9fa"
+            "literalFallback": "#F5F8F3"
           }
         },
         {
@@ -22276,13 +22276,13 @@
         {
           "description": "Active indicator color.",
           "name": "--hx-tabs-indicator-color",
-          "default": "var(--hx-color-primary-500, #2563eb)",
+          "default": "var(--hx-color-primary-500, #429797)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
             "fallbackPrimitive": "color/primary/500",
-            "literalFallback": "#2563eb"
+            "literalFallback": "#429797"
           }
         },
         {
@@ -22300,13 +22300,13 @@
         {
           "description": "Focus ring color for tabs and panels.",
           "name": "--hx-tabs-focus-ring-color",
-          "default": "var(--hx-focus-ring-color, #2563eb)",
+          "default": "var(--hx-focus-ring-color, #6AB1B1)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "focus/ring/color",
             "fallbackPrimitive": null,
-            "literalFallback": "#2563eb"
+            "literalFallback": "#6AB1B1"
           }
         },
         {
@@ -22324,13 +22324,13 @@
         {
           "description": "Panel text color.",
           "name": "--hx-tabs-panel-color",
-          "default": "var(--hx-color-neutral-700, #343a40)",
+          "default": "var(--hx-color-neutral-700, #313E4B)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/700",
-            "literalFallback": "#343a40"
+            "literalFallback": "#313E4B"
           }
         },
         {
@@ -22869,13 +22869,13 @@
         {
           "description": "Cell text color.",
           "name": "--hx-table-cell-color",
-          "default": "var(--hx-color-neutral-900, #0f172a)",
+          "default": "var(--hx-color-neutral-900, #0D1825)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/neutral",
             "fallbackPrimitive": "color/neutral/900",
-            "literalFallback": "#0f172a"
+            "literalFallback": "#0D1825"
           }
         }
       ],

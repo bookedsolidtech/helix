@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixCounterStyles } from './hx-counter.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 export type CounterSize = 'sm' | 'md' | 'lg';
@@ -36,7 +37,7 @@ export type CounterFormat = 'integer' | 'decimal';
  */
 @customElement('hx-counter')
 export class HelixCounter extends HelixElement {
-  static override styles = [helixCounterStyles];
+  static override styles = [helixCounterStyles, forcedColorsSurface];
 
   /**
    * The target numeric value to count to.

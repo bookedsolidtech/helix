@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixAccordionItemStyles } from './hx-accordion-item.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const chevronIcon = svg`
@@ -64,7 +65,7 @@ export interface HxAccordionToggleDetail {
  */
 @customElement('hx-accordion-item')
 export class HelixAccordionItem extends HelixElement {
-  static override styles = [helixAccordionItemStyles];
+  static override styles = [helixAccordionItemStyles, forcedColorsInteractive];
 
   /** @internal */
   private _uid = _nextAccordionItemId();

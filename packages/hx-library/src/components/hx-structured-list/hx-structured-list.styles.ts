@@ -3,9 +3,9 @@ import { css } from 'lit';
 export const helixStructuredListStyles = css`
   :host {
     display: block;
-    --_border-color: var(--hx-structured-list-border-color, var(--hx-color-neutral-200, #e2e8f0));
+    --_border-color: var(--hx-structured-list-border-color, var(--hx-color-neutral-200, #d6dbd5));
     --_border-width: var(--hx-structured-list-border-width, var(--hx-border-width-thin, 1px));
-    --_bg-stripe: var(--hx-structured-list-stripe-bg, var(--hx-color-neutral-50, #f8fafc));
+    --_bg-stripe: var(--hx-structured-list-stripe-bg, var(--hx-color-neutral-50, #f5f8f3));
     --_padding-block: var(--hx-structured-list-padding-block, var(--hx-space-4, 1rem));
     --_padding-inline: var(--hx-structured-list-padding-inline, var(--hx-space-4, 1rem));
   }
@@ -60,17 +60,17 @@ export const helixStructuredListRowStyles = css`
 
   :host(:not(:last-of-type)) .row {
     border-bottom: var(--_border-width, var(--hx-border-width-thin, 1px)) solid
-      var(--_border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--_border-color, var(--hx-color-neutral-200, #d6dbd5));
   }
 
   .row__label {
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-structured-list-label-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-structured-list-label-color, var(--hx-color-neutral-700, #313e4b));
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 
   .row__value {
-    color: var(--hx-structured-list-value-color, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-structured-list-value-color, var(--hx-color-neutral-900, #0d1825));
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 

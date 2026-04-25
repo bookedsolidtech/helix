@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixImageStyles } from './hx-image.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -38,7 +39,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-image')
 export class HelixImage extends HelixElement {
-  static override styles = [helixImageStyles];
+  static override styles = [helixImageStyles, forcedColorsSurface];
 
   /**
    * The URL of the image to display.

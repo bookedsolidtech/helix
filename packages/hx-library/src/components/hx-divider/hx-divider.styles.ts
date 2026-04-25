@@ -3,9 +3,9 @@ import { css } from 'lit';
 export const helixDividerStyles = css`
   :host {
     display: block;
-    --_divider-color: var(--hx-divider-color, var(--hx-color-border-default, #e2e8f0));
+    --_divider-color: var(--hx-divider-color, var(--hx-color-border-default, #d6dbd5));
     --_divider-width: var(--hx-divider-width, var(--hx-border-width-thin, 1px));
-    --_divider-label-color: var(--hx-divider-label-color, var(--hx-color-text-muted, #64748b));
+    --_divider-label-color: var(--hx-divider-label-color, var(--hx-color-text-muted, #66787b));
     --_divider-label-size: var(--hx-divider-label-font-size, var(--hx-font-size-sm, 0.875rem));
     --_divider-label-gap: var(--hx-divider-label-gap, var(--hx-space-3, 0.75rem));
   }

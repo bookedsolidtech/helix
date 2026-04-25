@@ -35,7 +35,7 @@ export const helixRatingStyles = css`
     justify-content: center;
     position: relative;
     cursor: pointer;
-    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #cbd5e1));
+    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #8e9c98));
     line-height: 1;
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
@@ -44,14 +44,14 @@ export const helixRatingStyles = css`
 
   .symbol:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 
   .symbol--full,
   .symbol--half {
-    color: var(--hx-rating-color, var(--hx-color-warning-400, #fbbf24));
+    color: var(--hx-rating-color, var(--hx-color-warning-400, #da904f));
   }
 
   .symbol--disabled {
@@ -60,7 +60,7 @@ export const helixRatingStyles = css`
 
   .base:not(.base--readonly) .symbol:hover {
     transform: scale(1.15);
-    color: var(--hx-rating-hover-color, var(--hx-color-warning-300, #fcd34d));
+    color: var(--hx-rating-hover-color, var(--hx-color-warning-300, #eeb383));
   }
 
   /* ─── Half-Star Layout ─── */
@@ -86,7 +86,7 @@ export const helixRatingStyles = css`
     position: absolute;
     left: 0;
     top: 0;
-    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #cbd5e1));
+    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #8e9c98));
     /* Clip to right 50% for the empty half */
     clip-path: inset(0 0 0 50%);
   }

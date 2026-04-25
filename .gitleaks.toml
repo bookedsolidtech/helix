@@ -42,8 +42,11 @@ paths = [
     # Next.js build cache — auto-generated preview mode keys, not real secrets
     '''\.next/''',
     # Figma inventory — generated design token catalog, contains token names like
-    # "duration/slow" that trip generic-api-key rules; no secrets live here
-    '''^packages/hx-library/figma-inventory\.json$''',
+    # "duration/slow" that trip generic-api-key rules; no secrets live here.
+    # Pattern is unanchored so it matches both the in-repo path
+    # (packages/hx-library/figma-inventory.json) and the publish-time tarball
+    # extract path (/tmp/.../extract-helixui-library-X/package/figma-inventory.json).
+    '''figma-inventory\.json$''',
 ]
 
 regexes = [

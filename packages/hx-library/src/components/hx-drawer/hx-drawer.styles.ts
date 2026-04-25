@@ -1,5 +1,15 @@
 import { css } from 'lit';
 
+/**
+ * hx-drawer styles.
+ *
+ * Component-tier tokens with two-level var() fallback:
+ *   var(--hx-drawer-{prop}, var(--hx-color-{semantic}, #hex))
+ * Inner hex fallbacks track the "precision cool" palette (3.2.0):
+ *   neutral-0 = #FFFFFF, neutral-100 = #EBEEE9, neutral-200 = #D6DBD5,
+ *   neutral-500 = #66787B, neutral-800 = #202B39, neutral-900 = #0D1825,
+ *   primary-500 = #429797.
+ */
 export const helixDrawerStyles = css`
   /* P2-03: Explicit [hidden] rule to survive CSS resets that may override the UA stylesheet. */
   [hidden] {
@@ -66,8 +76,8 @@ export const helixDrawerStyles = css`
     display: flex;
     flex-direction: column;
     background-color: var(--hx-drawer-bg, var(--hx-color-surface-default, #ffffff));
-    color: var(--hx-drawer-color, var(--hx-color-text-primary, #0f172a));
-    box-shadow: var(--hx-drawer-shadow, var(--hx-shadow-xl));
+    color: var(--hx-drawer-color, var(--hx-color-text-primary, #0d1825));
+    box-shadow: var(--hx-drawer-shadow, var(--hx-shadow-xl, 0 20px 25px -5px rgb(0 0 0 / 0.1)));
     overflow: hidden;
     outline: none;
     z-index: 1; /* local stacking context: panel above backdrop within overlay container */
@@ -164,18 +174,18 @@ export const helixDrawerStyles = css`
     gap: var(--hx-space-4, 1rem);
     padding: var(--hx-drawer-header-padding, var(--hx-space-5, 1.25rem) var(--hx-space-6, 1.5rem));
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-drawer-header-border-color, var(--hx-color-border-default, #e2e8f0));
+      var(--hx-drawer-header-border-color, var(--hx-color-border-default, #d6dbd5));
     flex-shrink: 0;
   }
 
   .drawer-title {
     margin: 0;
     flex: 1 1 auto;
-    font-family: var(--hx-drawer-font-family, var(--hx-font-family-sans));
-    font-size: var(--hx-font-size-lg);
-    font-weight: var(--hx-font-weight-semibold);
-    line-height: var(--hx-line-height-tight);
-    color: var(--hx-drawer-title-color, var(--hx-color-text-primary, #0f172a));
+    font-family: var(--hx-drawer-font-family, var(--hx-font-family-sans, sans-serif));
+    font-size: var(--hx-font-size-lg, 1.125rem);
+    font-weight: var(--hx-font-weight-semibold, 600);
+    line-height: var(--hx-line-height-tight, 1.25);
+    color: var(--hx-drawer-title-color, var(--hx-color-text-primary, #0d1825));
   }
 
   .drawer-header-actions {
@@ -198,22 +208,22 @@ export const helixDrawerStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: transparent;
-    color: var(--hx-color-text-muted, #64748b);
+    color: var(--hx-drawer-close-btn-color, var(--hx-color-text-muted, #4a5362));
     cursor: pointer;
     flex-shrink: 0;
     transition: background-color var(--hx-duration-fast, 100ms) var(--hx-easing-default, ease);
   }
 
   .drawer-close-button:hover {
-    background-color: var(--hx-color-surface-sunken, #f1f5f9);
-    color: var(--hx-color-text-primary, #0f172a);
+    background-color: var(--hx-drawer-close-btn-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
+    color: var(--hx-drawer-close-btn-hover-color, var(--hx-color-text-primary, #0d1825));
   }
 
   .drawer-close-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-drawer-close-btn-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
@@ -262,7 +272,7 @@ export const helixDrawerStyles = css`
     gap: var(--hx-space-3, 0.75rem);
     padding: var(--hx-drawer-footer-padding, var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem));
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-drawer-footer-border-color, var(--hx-color-border-default, #e2e8f0));
+      var(--hx-drawer-footer-border-color, var(--hx-color-border-default, #d6dbd5));
     flex-shrink: 0;
   }
 

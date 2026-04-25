@@ -15,7 +15,7 @@ export const helixLinkStyles = css`
     display: inline-flex;
     align-items: center;
     gap: var(--hx-space-1, 0.25rem);
-    color: var(--hx-link-color, var(--hx-color-primary-500, #2563eb));
+    color: var(--hx-link-color, var(--hx-color-primary-600, #0f7078));
     font-family: var(--hx-link-font-family, var(--hx-font-family-sans, inherit));
     font-size: inherit;
     line-height: inherit;
@@ -29,19 +29,19 @@ export const helixLinkStyles = css`
   }
 
   .link:hover {
-    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #1e40af));
+    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #0f6363));
     text-decoration: var(--hx-link-text-decoration-hover, underline);
   }
 
   .link:active {
-    color: var(--hx-link-color-active, var(--hx-color-primary-800, #1e3a8a));
+    color: var(--hx-link-color-active, var(--hx-color-primary-800, #07494a));
   }
 
   .link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-link-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
@@ -50,29 +50,29 @@ export const helixLinkStyles = css`
   /* --- Variant: subtle --- */
 
   .link--subtle {
-    color: var(--hx-link-color-subtle, var(--hx-color-text-secondary, #475569));
+    color: var(--hx-link-color-subtle, var(--hx-color-text-secondary, #313e4b));
     text-decoration: none;
   }
 
   .link--subtle:hover {
-    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #1e40af));
+    color: var(--hx-link-color-hover, var(--hx-color-primary-700, #0f6363));
     text-decoration: underline;
   }
 
   /* --- Variant: danger --- */
 
   .link--danger {
-    color: var(--hx-link-color-danger, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-link-color-danger, var(--hx-color-error-text, #c92a2a));
   }
 
   .link--danger:hover {
-    color: var(--hx-link-color-danger-hover, var(--hx-color-error-700, #991b1b));
+    color: var(--hx-link-color-danger-hover, var(--hx-color-error-700, #a21312));
   }
 
   /* --- Disabled --- */
 
   .link--disabled {
-    color: var(--hx-link-color-disabled, var(--hx-color-text-disabled, #94a3b8));
+    color: var(--hx-link-color-disabled, var(--hx-color-text-disabled, #8e9c98));
     text-decoration: none;
     cursor: not-allowed;
   }

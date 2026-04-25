@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixListItemStyles } from './hx-list-item.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * A rich list item for use inside `hx-list`.
@@ -36,7 +37,7 @@ import { helixListItemStyles } from './hx-list-item.styles.js';
  */
 @customElement('hx-list-item')
 export class HelixListItem extends HelixElement {
-  static override styles = [helixListItemStyles];
+  static override styles = [helixListItemStyles, forcedColorsSurface];
 
   /**
    * Whether the item is disabled. Prevents interaction.

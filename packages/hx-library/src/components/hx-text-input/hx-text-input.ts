@@ -8,6 +8,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FocusMixin } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextInputStyles } from './hx-text-input.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // Module-level counter for stable, SSR-compatible IDs (avoids Math.random() hydration mismatch)
@@ -87,7 +88,7 @@ export interface HxTextInputDetail {
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
-  static override styles = [helixTextInputStyles];
+  static override styles = [helixTextInputStyles, forcedColorsField];
 
   // ─── Form Association ───
 

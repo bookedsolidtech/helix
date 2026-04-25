@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
@@ -44,7 +45,7 @@ const _nextBreadcrumbId = createIdCounter('hx-breadcrumb');
  */
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends HelixElement {
-  static override styles = [helixBreadcrumbStyles];
+  static override styles = [helixBreadcrumbStyles, forcedColorsInteractive];
 
   /**
    * The separator character displayed between breadcrumb items.

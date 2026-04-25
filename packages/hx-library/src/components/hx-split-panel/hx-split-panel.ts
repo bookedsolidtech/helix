@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 
 /**
  * A resizable two-pane layout with a draggable divider.
@@ -57,7 +58,7 @@ import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
  */
 @customElement('hx-split-panel')
 export class HelixSplitPanel extends HelixElement {
-  static override styles = [helixSplitPanelStyles];
+  static override styles = [helixSplitPanelStyles, forcedColorsInteractive];
 
   /**
    * Position of the divider as a percentage (0–100) of the start panel.

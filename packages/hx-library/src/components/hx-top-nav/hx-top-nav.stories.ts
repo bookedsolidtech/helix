@@ -125,7 +125,7 @@ export const WithLogoSlot: Story = {
             justify-content: center;
             width: 2rem;
             height: 2rem;
-            background: var(--hx-color-primary-600, #1d4ed8);
+            background: var(--hx-color-primary-600, #0F7078);
             color: #fff;
             border-radius: 0.375rem;
             font-weight: 700;
@@ -181,7 +181,7 @@ export const WithActionsSlot: Story = {
           aria-label="Search patients"
           style="
             padding: 0.375rem 0.75rem;
-            border: 1px solid var(--hx-color-neutral-300, #ced4da);
+            border: 1px solid var(--hx-color-neutral-300, #B6BFB9);
             border-radius: 0.375rem;
             font-size: 0.875rem;
             width: 14rem;
@@ -191,7 +191,7 @@ export const WithActionsSlot: Story = {
           type="button"
           style="
             padding: 0.375rem 0.875rem;
-            background: var(--hx-color-primary-600, #1d4ed8);
+            background: var(--hx-color-primary-600, #0F7078);
             color: #fff;
             border: none;
             border-radius: 0.375rem;
@@ -238,7 +238,7 @@ export const WithSearch: Story = {
           aria-label="Search"
           style="
             padding: 0.375rem 0.75rem;
-            border: 1px solid var(--hx-color-neutral-300, #ced4da);
+            border: 1px solid var(--hx-color-neutral-300, #B6BFB9);
             border-radius: 0.375rem;
             font-size: 0.875rem;
             width: 16rem;
@@ -560,7 +560,7 @@ export const HospitalPortal: Story = {
             justify-content: center;
             width: 2rem;
             height: 2rem;
-            background: var(--hx-color-primary-700, #1e40af);
+            background: var(--hx-color-primary-700, #0F6363);
             color: #fff;
             border-radius: 0.375rem;
             font-weight: 800;
@@ -608,7 +608,7 @@ export const HospitalPortal: Story = {
           aria-label="Search"
           style="
             padding: 0.375rem 0.75rem;
-            border: 1px solid var(--hx-color-neutral-300, #ced4da);
+            border: 1px solid var(--hx-color-neutral-300, #B6BFB9);
             border-radius: 0.375rem;
             font-size: 0.875rem;
             width: 16rem;
@@ -633,7 +633,7 @@ export const HospitalPortal: Story = {
               position: absolute;
               top: 0;
               right: 0;
-              background: var(--hx-color-error-500, #dc2626);
+              background: var(--hx-color-error-500, #E5493E);
               color: #fff;
               border-radius: 9999px;
               font-size: 0.625rem;

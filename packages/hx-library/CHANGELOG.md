@@ -1,5 +1,189 @@
 # @helixui/library
 
+## 3.2.0
+
+### Minor Changes
+
+- c1c93f5: Component-tier token build-out, forced-colors mixin, and contrast regression gate.
+
+  Three structural additions land alongside the Precision Cool palette refresh:
+
+  **Forced-colors mixin (`packages/hx-library/src/styles/forced-colors.ts`):**
+  Four reusable Lit `css` mixins — `forcedColorsInteractive`, `forcedColorsSurface`, `forcedColorsField`, `forcedColorsLink` — composed into every visual component's `static styles` array. Components now defer to OS-level Windows High Contrast / `forced-colors: active` system colors (`ButtonText`, `CanvasText`, `Highlight`, `LinkText`) at the same time as the in-app `data-hx-contrast="high"` overrides. Belt-and-suspenders: the existing rich per-component HC blocks remain; the mixin layers OS-deference on top. Layout-only primitives (stack, grid, prose, form, visually-hidden, style-scope, theme, format-date) skip the mixin since they paint no surfaces.
+
+  **Component-tier token completeness:**
+  Every component in `packages/hx-library/src/components/` now exposes a complete component-tier token surface following the canonical `var(--hx-{component}-{property}, var(--hx-{semantic}, #hex))` two-level fallback pattern. Five architecture violations fixed (hx-avatar, hx-steps, hx-text, hx-icon-button, hx-image — were emitting bare primitives without `var()` fallback). Coverage gaps closed across padding, border, focus-ring families. hx-text-input gains a full token surface (was 280 lines of styled CSS with zero override surface). Inline hex fallbacks across all `.styles.ts` files resynced to the Precision Cool palette so `var()` chains resolve to matching values when the outer token is undefined.
+
+  **`tokens.json` `component:` manifest block:**
+  Adds an 834-token, 72-component manifest documenting every component-tier token surface. **Manifest-only — not CSS-emitted.** `scripts/generate-css.ts` skips the `component:` key alongside `dark:` and `high-contrast:`, preserving the cascade-driven "undefined unless overridden" runtime model where component tokens stay authored inline in `.styles.ts`. The manifest exists as the source of truth for the Figma kit (`/Volumes/Development/booked/figma-tokens/`), audit tooling, and external integrators. A new vitest (`component-manifest-sync.test.ts`) asserts set equality between the manifest and live extraction from `.styles.ts` — drift fails CI.
+
+  **Contrast regression matrix (`contrast.test.ts`):**
+  A new vitest iterates every `text.* × surface.*` semantic pair across light / dark / high-contrast modes against WCAG 2.1 AA (4.5:1 body, 3:1 large/UI). 76 contrast assertions plus meta-tests. Permanent CI gate against the class of bugs that produced the original `text.on-success` and `text.on-{primary,secondary,error,info}` regressions caught earlier in this release. Authoring this gate surfaced one additional pre-existing palette bug — `text.muted` on `surface.raised` light at 4.32:1 — fixed in the same release by rebinding muted to `neutral-600` and bumping `text.secondary` to `neutral-700` to preserve the muted < secondary visual hierarchy.
+
+  **`@helixui/react` peer bump:**
+  React wrappers regenerated from CEM via `scripts/generate-react-wrappers.ts`. No public API surface change — wrappers were already in sync; the regen artifact (`figma-inventory.json`) re-emits two `literalFallback` hexes against the new neutral-900 (`#0f172a` → `#0D1825`).
+
+- ef049df: "Precision Cool" palette refresh — every primitive color ramp regenerated from OKLCH math.
+
+  The previous primitive ramps were effectively Tailwind defaults (`blue-600` primary, slate neutrals, violet accent, amber warning). The 3.2.0 refresh replaces all seven chromatic families — `primary`, `secondary`, `accent`, `neutral`, `success`, `warning`, `error`, `info` — with hand-tuned OKLCH ramps anchored on the brand teal `#0F7078`. No Tailwind-derivative values remain.
+
+  **Anchor colors (stop 600):**
+  - `primary` `#0F7078` — brand teal, 5.82:1 on white (AA pass)
+  - `secondary` `#0F6B7E` — deeper sea-teal, coordinated cousin of primary (6.13:1)
+  - `accent` `#3A4BC9` — cool steel-indigo, replaces Tailwind violet (6.93:1)
+  - `neutral` `#4A5362` — hand-tuned cool gray; blue cast at the dark end, warm drift at the bright end
+  - `success` `#0E8A4A` — deeper than Tailwind green-500, pairs with dark-on-green text
+  - `warning` `#B8650E` — burnt amber, warmer than Tailwind amber and less yellow than gold
+  - `error` `#C92A2A` — powerful red, 5.46:1 (AA pass)
+  - `info` `#1B6FD4` — clear medium-blue, differentiable from teal primary (4.92:1)
+
+  **Semantic token changes:**
+  - `--hx-color-success-text` rebound from `success-600` to `success-700`. The new precision-cool `success-600` (`#0E8A4A`) sits at 4.42:1 on white — just under WCAG AA body-text threshold. `success-700` (`#146831`) restores 6.88:1 AA headroom. Matches the `error-text` / `warning-text` pattern at the same stop.
+  - Dark-mode `text.placeholder` bumped from `neutral-500` to `neutral-400`. The new precision-cool `neutral-500` (`#66787B`) is 3.86:1 on dark surface.default — fails AA for placeholder text. `neutral-400` (`#8E9C98`) = 6.27:1.
+  - Overlay RGB fallback values (`overlay.primary.25`, `overlay.error.25`, `overlay.neutral.12`) resynced against the new -500 / -900 hexes so color-mix()-less browsers match the CSS custom property values.
+
+  **Reproducibility:**
+  All ramps generated by `scripts/generate-palette.ts` — a deterministic OKLCH→sRGB generator (hand-rolled, zero runtime deps) that takes anchor hex + stop + curve params and emits all 11 stops. Run `pnpm tsx scripts/generate-palette.ts` to reproduce the JSON exactly. Same inputs always emit the same hexes; the math lives in the repo alongside the tokens.
+
+  **Expected visual impact:**
+  Largest single-commit visual change in the repo's history. Every surface that paints primary/accent/status color flips tone. Dark-mode surfaces shift from cool-slate to slightly blue-tinted cool gray (chromatic elevation). HC mode overrides (Windows High Contrast fidelity) are unaffected — they remain system-color-deferent.
+
+  No token names renamed. No stops removed or added. Existing component-level `var(--hx-button-bg, var(--hx-color-primary-500, #...))` two-level fallback chains continue to resolve — the inner hex fallbacks across component styles will drift stale and are addressed in subsequent commits of this PR.
+
+- 9591b01: Library-wide semantic token rebinding. 36 components, ~190 token swaps, 9 commits.
+  - Adds three new semantic tokens to `@helixui/tokens`: `--hx-color-text-strong`, `--hx-color-text-placeholder`, `--hx-color-surface-inverse`. All three ship with Light, Dark, and High-Contrast mode values.
+  - Rebinds surfaces, text, and borders across 36 components from primitive `--hx-color-neutral-*` references to semantic `--hx-color-surface-*` / `--hx-color-text-*` / `--hx-color-border-*` tokens. Components now flip correctly in Dark and High-Contrast modes — previously only focus rings responded to mode changes.
+  - Eliminates the `hx-tooltip` and `hx-side-nav` "intentional primitive" carve-outs; both now bind to `--hx-color-surface-inverse` + `--hx-color-text-inverse`.
+  - Form-input borders strengthen by one shade in Light mode (`neutral-300` → `border-strong` which resolves to `neutral-400`). This is the only visual diff in Light mode and it is WCAG-positive — form affordance contrast increases.
+  - Adds the Component Token Binding Rule to `design-tokens/tiers` docs and a regression test that fails if a rebinding regresses back to a primitive.
+  - Brand ramps, spacing/sizing/typography tokens, and `box-shadow` rgba literals are intentionally untouched. A shadow-semantics follow-up will cover the dark-mode shadow tinting gap.
+
+### Patch Changes
+
+- 56eec71: Add @cssprop JSDoc entries for all consumed CSS custom properties across 77 components. CEM cssProperties coverage grows from ~685 to 2,224 entries.
+- 6327024: Close four Codex adversarial-review concerns surfaced in pass 3 of the 3.1.0
+  staging→main review loop.
+  - `.github/workflows/ci.yml`: remove the `matrix.shard == '1/4'` gate on the
+    coverage enforcement step. The shard-aware `check-coverage.mjs` intersects
+    `HX_COVERAGE_COMPONENTS` with the components whose tests actually executed
+    on the current shard (read from `.cache/test-results.json`), so each shard
+    enforces its own slice. Restricting to shard 1/4 let any component whose
+    test landed on shards 2-4 regress unchecked.
+  - `scripts/codex-campaigns/lib/run-campaign.sh`: emit a synthetic
+    `verdict: "error"` finding when `codex exec` exits non-zero and produces
+    zero parseable findings. Without this, a crashed Codex run left the
+    consolidator's pre-seeded `pass` verdict in place — so a target whose
+    Codex invocation actually crashed would be silently reported as clean.
+  - `scripts/codex-campaigns/lib/run-campaign.sh` +
+    `scripts/codex-campaigns/lib/consolidate-findings.ts`: write
+    `${REPORT_DIR}/targets-processed.txt` per run listing only the targets the
+    current invocation processed (honors `--limit` / `--targets` overrides).
+    The consolidator now prefers this file over the full campaign manifest, so
+    partial runs no longer pre-seed un-run targets as `verdict: "pass"` and
+    inflate scoreboard pass counts.
+  - `.github/workflows/publish.yml`: include `GITHUB_RUN_ATTEMPT` alongside
+    `GITHUB_RUN_ID` in the release-manifest branch name. `GITHUB_RUN_ID` is
+    stable across reruns of a single workflow run; only `GITHUB_RUN_ATTEMPT`
+    increments. Without it, a rerun of a failed publish would collide with the
+    pre-existing release-manifest branch and cause a non-fast-forward push that
+    orphans the manifest PR.
+
+- 6577704: Close five Codex adversarial-review findings surfaced in pass 4 of the 3.1.0
+  staging→main review loop. Two of these are regressions introduced by pass 3.
+  - `scripts/codex-campaigns/lib/run-campaign.sh`: change the synthetic
+    crashed-run finding's `category` from `"infra"` (not in the schema) to
+    `"other"`. Pass 3 added the synthetic finding to surface crashed Codex
+    runs in the scoreboard, but `validate-findings.ts` would have rejected the
+    invalid category and aborted the entire batch via the
+    `validate-after-5-targets` gate — silently hiding the failure the fix was
+    designed to expose.
+  - `scripts/check-coverage.mjs`: add a shard-level short-circuit when scoped
+    enforcement is active. The "few test files" branch in `ci.yml` legitimately
+    skips vitest on shards 2-4 when the changed-file set produces fewer test
+    files than shards. Pass 3 removed the `matrix.shard == '1/4'` gate so the
+    coverage step now runs on every shard — without this short-circuit, shards
+    that ran no tests would hit the missing-coverage hard fail and report a
+    misleading "vitest watchdog killed the run" error.
+  - `scripts/check-coverage.mjs`: harden `loadShardComponents()` null
+    handling. When `test-results.json` is missing entirely, fail loudly with a
+    named-file error instead of silently bypassing the shard intersection
+    (which would re-introduce the false-failure the shard-aware check exists
+    to fix).
+  - `scripts/codex-campaigns/lib/run-campaign.sh`: append the target name to
+    `targets-processed.txt` AFTER `run_target` returns, not before. If the
+    process is killed mid-target (OOM, CI timeout, watchdog), the target stays
+    absent from the processed list so the consolidator does not pre-seed it as
+    `verdict: "pass"` and silently convert a killed run into a clean pass.
+  - `scripts/codex-campaigns/lib/run-campaign.sh`: on `--resume`, preserve the
+    existing `targets-processed.txt` (append) instead of truncating. Pass 3
+    always truncated on every invocation, which broke the resume workflow by
+    rewriting the processed-target list with only the resumed subset and
+    losing every previously-completed target from scoreboard pre-seeding.
+
+- 55d4523: Close two Codex adversarial-review concerns surfaced in pass 5 of the 3.1.0
+  staging→main review loop.
+  - `scripts/hooks/token-registry.json`: regenerate from the current token
+    source. The 3.1.0 semantic-token rebinding sweep added
+    `--hx-color-text-strong`, `--hx-color-text-placeholder`, and
+    `--hx-color-surface-inverse` to `packages/hx-tokens/src/tokens.json` plus
+    components consuming them, but the registry that backs the
+    `design-token-enforcement` hook's `isSemanticToken()` and `isKnownToken()`
+    predicates was never regenerated — so the hook treated the new aliases as
+    unknown tokens. Regenerated via `pnpm run hooks:generate-token-registry`.
+  - `.github/workflows/ci.yml`: extend the changed-component resolver to
+    detect shared tests under `packages/hx-library/src/components/__tests__/`.
+    The resolver previously filtered to `src/components/hx-*` non-test files
+    only, so a PR that changed the new shared `dark-mode-resolution.test.ts`
+    (and nothing else) would resolve to zero components and skip the test
+    step entirely. When a shared test changes, fall back to the full test
+    suite so the regression actually executes.
+
+- 8c7b41f: Close two Codex adversarial-review concerns in the codex-campaigns tooling
+  before 3.1.0 ships.
+  - `scripts/codex-campaigns/lib/run-campaign.sh`: truncate
+    `$REPORT_DIR/transcripts/$slug.last.txt` before each `codex exec`
+    invocation so a retry against a target that has a stale last-message file
+    from a prior crashed run does not re-ingest the previous run's JSONL and
+    misreport the retry as a pass. Additionally, on non-zero Codex exit no
+    longer fall back to scraping the raw transcript — a failed invocation's
+    partial output is not a valid findings source.
+  - `scripts/codex-campaigns/lib/consolidate-findings.ts`: seed the scoreboard
+    target map from `campaign-<name>/targets.txt` so targets that produced zero
+    findings (clean passes) still appear with `verdict: "pass"`, making
+    `by_verdict.pass` accurate and letting operators distinguish "passed
+    cleanly" from "never ran."
+
+- 1439f83: Close Codex staging→main blocking findings before 3.1.0 release.
+  - Rebind `hx-status-indicator`, `hx-stat`, `hx-step`, `hx-toast`, `hx-rating`,
+    `hx-code-snippet`, and `hx-table` off `--hx-color-neutral-*` primitives onto
+    semantic tokens so Dark + HC mode flip correctly.
+  - Patch `hx-theme` HC override map to include `--hx-color-error-text` and
+    `--hx-color-success-text` (both already defined in tokens.json HC block; the
+    runtime map was missing them, so 32 consumers kept Light-palette red/green
+    under `theme="high-contrast"`).
+  - Expand `dark-mode-resolution` regression guard from 5 to 9 tests:
+    status-indicator, stat, step, and a direct HC override check for
+    error-text/success-text.
+  - Tighten coverage gate (`scripts/check-coverage.mjs`) — no longer silently
+    skips on missing scoped artifacts; a watchdog-killed vitest run now fails CI
+    so the shard owner diagnoses rather than ships blind. Added shard-aware
+    enforcement: when `HX_COVERAGE_COMPONENTS` is set, the gate intersects with
+    components whose test files actually ran on the current shard (read from
+    `.cache/test-results.json`), so components enforced on another shard do not
+    false-fail here.
+  - Exempt `hx-theme` at 77.55% branches (pre-existing SSR/matchMedia guards
+    surfaced by the new shard-aware check); remediation 2026-05-31.
+  - Harden release-manifest publish step: auto-merge failure is now a hard job
+    failure (not a warning), and the manifest branch name includes
+    `GITHUB_RUN_ID` so reruns don't collide with a stale branch.
+
+- Updated dependencies [c1c93f5]
+- Updated dependencies [b029ef5]
+- Updated dependencies [adf953d]
+- Updated dependencies [ef049df]
+- Updated dependencies [9591b01]
+  - @helixui/tokens@3.2.0
+
 ## 3.1.0
 
 ### Minor Changes

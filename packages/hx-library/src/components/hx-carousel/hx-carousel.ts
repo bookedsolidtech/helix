@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixCarouselStyles } from './hx-carousel.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import type { HelixCarouselItem } from './hx-carousel-item.js';
 
 // ─── Module-level SVG icon constants ───
@@ -137,7 +138,7 @@ const _svgPause = html`<svg
  */
 @customElement('hx-carousel')
 export class HelixCarousel extends HelixElement {
-  static override styles = [helixCarouselStyles];
+  static override styles = [helixCarouselStyles, forcedColorsInteractive];
 
   /**
    * Accessible label identifying this carousel to assistive technology.

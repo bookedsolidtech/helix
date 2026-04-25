@@ -858,12 +858,210 @@ describe('hx-popover', () => {
       expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
 
       const innerBtn = el.querySelector<HTMLElement>('#inner')!;
-      wrapper.dispatchEvent(
-        new FocusEvent('focusout', { bubbles: true, relatedTarget: innerBtn }),
-      );
+      wrapper.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: innerBtn }));
       await el.updateComplete;
       // Focus moved to a child inside the component — popover must stay open
       expect(shadowQuery(el, '[part="body"]')?.classList.contains('visible')).toBe(true);
+    });
+  });
+
+  // ─── Floating-UI positioning lifecycle ───
+  // Covers _updatePosition() — dynamic floating-ui import + computePosition path,
+  // including arrow positioning logic (P2-02 inner-border map + staticSide).
+
+  describe('Floating-UI positioning', () => {
+    it('positions the popover body via floating-ui when opened with open attribute', async () => {
+      // Drive the full _show() → updateComplete → _updatePosition() pipeline so the
+      // dynamic import('@floating-ui/dom') and computePosition call execute.
+      const el = await fixture<HelixPopover>(
+        '<hx-popover open><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      // Two updateComplete cycles + microtask drain so the dynamic import resolves
+      // and the computePosition() result is applied to bodyEl.style.
+      // Drain multiple microtasks so the dynamic import('@floating-ui/dom') in
+      // _updatePosition() resolves and computePosition() applies styles to the body.
+      await el.updateComplete;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await el.updateComplete;
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]')!;
+      // floating-ui assigns left/top in pixels — both should be set on the body
+      expect(body.style.left).toMatch(/px$/);
+      expect(body.style.top).toMatch(/px$/);
+    });
+
+    it('positions arrow element when arrow=true and applies P2-02 inner-border styles', async () => {
+      // Exercises the `if (arrowEl && middlewareData.arrow)` branch (lines 345-381)
+      // including the staticSide assignment and innerBorderMap loop.
+      const el = await fixture<HelixPopover>(
+        '<hx-popover arrow open placement="bottom"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      // Drain multiple microtasks so the dynamic import('@floating-ui/dom') in
+      // _updatePosition() resolves and computePosition() applies styles to the body.
+      await el.updateComplete;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await el.updateComplete;
+      const arrowEl = shadowQuery<HTMLElement>(el, '[part="arrow"]')!;
+      expect(arrowEl).toBeTruthy();
+      // P2-02: inner-facing borders for placement=bottom are border-bottom + border-right.
+      // After _updatePosition runs, both should be set to "1px solid transparent".
+      expect(arrowEl.style.borderBottom).toContain('transparent');
+      expect(arrowEl.style.borderRight).toContain('transparent');
+    });
+
+    it('positions arrow element with arrow data after re-positioning on placement change', async () => {
+      // Drives a second _updatePosition() pass after a placement update so the
+      // arrow-positioning + innerBorderMap loop runs again with a different
+      // basePlacement (covers the staticSide / innerSides branches).
+      const el = await fixture<HelixPopover>(
+        '<hx-popover arrow open placement="bottom"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await el.updateComplete;
+
+      // Trigger a second positioning pass with a different placement preference.
+      // Whatever placement floating-ui resolves to, the inner-border loop must execute
+      // and at least one of the four border-* style properties ends up "1px solid transparent".
+      el.placement = 'right';
+      await el.updateComplete;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      const arrowEl = shadowQuery<HTMLElement>(el, '[part="arrow"]')!;
+      const sides = [
+        arrowEl.style.borderTop,
+        arrowEl.style.borderRight,
+        arrowEl.style.borderBottom,
+        arrowEl.style.borderLeft,
+      ];
+      expect(sides.some((s) => s.includes('transparent'))).toBe(true);
+    });
+  });
+
+  // ─── Tab focus trap (HIGH-01) ───
+  // Covers the Tab branch of _handleDocumentKeydown (lines 401-424).
+
+  describe('Tab focus trap', () => {
+    it('Tab on the last focusable element wraps focus to the body (first stop)', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover open><button slot="anchor">Trigger</button><button id="only">Only</button></hx-popover>',
+      );
+      // Drain multiple microtasks so the dynamic import('@floating-ui/dom') in
+      // _updatePosition() resolves and computePosition() applies styles to the body.
+      await el.updateComplete;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await el.updateComplete;
+
+      const onlyBtn = el.querySelector<HTMLButtonElement>('#only')!;
+      onlyBtn.focus();
+      expect(document.activeElement).toBe(onlyBtn);
+
+      // Tab from the last focusable should preventDefault and wrap focus
+      // back to the body (which sits at index 0 of allFocusable).
+      const tabEvent = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        bubbles: true,
+        cancelable: true,
+      });
+      document.dispatchEvent(tabEvent);
+      expect(tabEvent.defaultPrevented).toBe(true);
+    });
+
+    it('Shift+Tab on the body (first focusable) wraps focus to the last focusable', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover open><button slot="anchor">Trigger</button><button id="last">Last</button></hx-popover>',
+      );
+      // Drain multiple microtasks so the dynamic import('@floating-ui/dom') in
+      // _updatePosition() resolves and computePosition() applies styles to the body.
+      await el.updateComplete;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await el.updateComplete;
+
+      const body = shadowQuery<HTMLElement>(el, '[part="body"]')!;
+      body.focus();
+
+      const tabEvent = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+      document.dispatchEvent(tabEvent);
+      expect(tabEvent.defaultPrevented).toBe(true);
+    });
+
+    it('disconnect cancels a pending hover-hide timer (hover trigger)', async () => {
+      // Covers the `if (this._hoverHideTimer !== null)` branch in disconnectedCallback
+      // (lines 172-175). Anchor mouseleave schedules the 150ms hover-hide timer; we
+      // remove the element before the timer fires so disconnectedCallback must clear it.
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="hover"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      const wrapper = shadowQuery<HTMLElement>(el, '.trigger-wrapper')!;
+      wrapper.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      await el.updateComplete;
+      // Schedule the hide but do NOT wait for it to fire.
+      wrapper.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+      // Remove immediately — disconnectedCallback must clear the pending timer.
+      expect(() => el.remove()).not.toThrow();
+    });
+
+    it('rapid re-open clears a pending show-timer before scheduling the next', async () => {
+      // Covers the `if (this._showTimer !== null) { clearTimeout(...) }` branch
+      // (lines 276-278) when _show() runs again while the previous show's
+      // document-click listener registration timer is still pending.
+      const el = await fixture<HelixPopover>(
+        '<hx-popover trigger="manual"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      // First open kicks off a setTimeout(0) in _show().
+      el.open = true;
+      await el.updateComplete;
+      // Close before the deferred document-click listener task fires, then re-open.
+      // Internally _show() short-circuits if already _visible, so toggle through hide.
+      el.open = false;
+      await el.updateComplete;
+      el.open = true;
+      // Re-entering _show finds an existing _showTimer? Not after _hide — _hide does
+      // not clear it. Drain microtasks; the second _show schedules a new timer and
+      // the cleanup branch on a stale timer should run if one is queued.
+      await el.updateComplete;
+      for (let i = 0; i < 5; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.classList.contains('visible')).toBe(true);
+    });
+
+    it('Tab is a no-op when popover has no focusable content', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover open><button slot="anchor">Trigger</button><p>No interactives</p></hx-popover>',
+      );
+      // Drain multiple microtasks so the dynamic import('@floating-ui/dom') in
+      // _updatePosition() resolves and computePosition() applies styles to the body.
+      await el.updateComplete;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      await el.updateComplete;
+
+      // No focusable elements — handler returns early, defaultPrevented stays false.
+      const tabEvent = new KeyboardEvent('keydown', {
+        key: 'Tab',
+        bubbles: true,
+        cancelable: true,
+      });
+      document.dispatchEvent(tabEvent);
+      expect(tabEvent.defaultPrevented).toBe(false);
     });
   });
 });

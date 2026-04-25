@@ -4,6 +4,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 
 /** Detail for the hx-toggle event dispatched by hx-toggle-button. */
 export interface HxToggleDetail {
@@ -79,7 +80,7 @@ export interface HxToggleDetail {
  */
 @customElement('hx-toggle-button')
 export class HelixToggleButton extends HelixElement {
-  static override styles = [helixToggleButtonStyles];
+  static override styles = [helixToggleButtonStyles, forcedColorsInteractive];
 
   // ─── Form Association ───
 

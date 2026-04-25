@@ -672,17 +672,17 @@ export const DynamicAddRemove: Story = {
         <div style="display: flex; gap: 0.5rem; align-items: center;">
           <button
             @click=${addItem}
-            style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+            style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
           >
             Add Item
           </button>
           <button
             @click=${removeItem}
-            style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+            style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
           >
             Remove Last
           </button>
-          <span style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280);">
+          <span style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);">
             Items: <strong id="dynamic-count">3</strong>
           </span>
         </div>

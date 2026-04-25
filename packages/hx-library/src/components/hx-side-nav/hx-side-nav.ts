@@ -2,6 +2,7 @@ import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixSideNavStyles } from './hx-side-nav.styles.js';
 
 /**
@@ -55,7 +56,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends HelixElement {
-  static override styles = [helixSideNavStyles];
+  static override styles = [helixSideNavStyles, forcedColorsInteractive];
 
   // ─── Properties ───
 

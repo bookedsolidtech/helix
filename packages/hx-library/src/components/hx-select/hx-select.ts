@@ -7,6 +7,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSelectStyles } from './hx-select.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // PERF: hx-select exceeds 5KB budget (6.31kb gzipped) -- custom listbox, keyboard navigation, grouped options
@@ -125,7 +126,7 @@ export interface HxSelectChangeDetail {
  */
 @customElement('hx-select')
 export class HelixSelect extends FormMixin(HelixElement) {
-  static override styles = [helixSelectStyles];
+  static override styles = [helixSelectStyles, forcedColorsField];
 
   // ─── Form Association ───
 

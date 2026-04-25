@@ -72,7 +72,7 @@ describe('hx-theme', () => {
       const el = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
       await el.updateComplete;
       const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
-      expect(value.toLowerCase()).toBe('#2563eb');
+      expect(value.toLowerCase()).toBe('#429797');
     });
 
     it('injects light --hx-shadow-sm in light mode', async () => {
@@ -179,7 +179,7 @@ describe('hx-theme', () => {
       await el.updateComplete;
       // Primitive tokens like --hx-color-primary-500 are still present in dark mode
       const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
-      expect(value.toLowerCase()).toBe('#2563eb');
+      expect(value.toLowerCase()).toBe('#429797');
     });
   });
 
@@ -446,7 +446,7 @@ describe('hx-theme', () => {
       await el.updateComplete;
       // Should still have the default primary token
       const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
-      expect(value.toLowerCase()).toBe('#2563eb');
+      expect(value.toLowerCase()).toBe('#429797');
       warnSpy.mockRestore();
     });
 

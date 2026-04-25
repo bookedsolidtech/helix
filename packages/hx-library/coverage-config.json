@@ -18,6 +18,11 @@
       "reason": "Pre-existing branches at ~77.55% from SSR/matchMedia guards (typeof window undefined) and motion='none' vs 'reduced' paths. Surfaced by shard-aware coverage enforcement in the 3.1.0 codex remediation PR; fix is a narrow test-addition task unrelated to the staging→main blocker.",
       "remediationDate": "2026-05-31",
       "issue": "https://github.com/bookedsolidtech/helix/issues/1553"
+    },
+    "hx-split-button": {
+      "reason": "Pre-existing branches at 73.33% surfaced by the 8-shard test matrix split landed in 3.2.0 PR #1554. Prior 4-shard placement masked the gap; 8-shard rebalance runs the component on shard 5 where the shard-aware gate flags it. The 3.2.0 diff to hx-split-button.ts is a single import addition (HC mixin) — no new logic branches added.",
+      "remediationDate": "2026-05-31",
+      "issue": "https://github.com/bookedsolidtech/helix/issues/1555"
     }
   }
 }

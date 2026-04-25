@@ -8,6 +8,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { helixTimePickerStyles } from './hx-time-picker.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 // ─── Time Slot ───────────────────────────────────────────────────────────────
 
@@ -211,7 +212,7 @@ export interface HxTimePickerChangeDetail {
  */
 @customElement('hx-time-picker')
 export class HelixTimePicker extends FormMixin(HelixElement) {
-  static override styles = [helixTimePickerStyles];
+  static override styles = [helixTimePickerStyles, forcedColorsField];
 
   // ─── Form Association ───
 

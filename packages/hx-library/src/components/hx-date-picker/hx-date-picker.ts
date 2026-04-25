@@ -6,6 +6,7 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 // PERF: hx-date-picker exceeds 5KB budget (7.98kb gzipped) -- calendar grid, date parsing, keyboard navigation, localization
 
@@ -104,7 +105,7 @@ export interface HxDatePickerChangeDetail {
  */
 @customElement('hx-date-picker')
 export class HelixDatePicker extends FormMixin(HelixElement) {
-  static override styles = [helixDatePickerStyles];
+  static override styles = [helixDatePickerStyles, forcedColorsField];
 
   // ─── Form Association ───
 

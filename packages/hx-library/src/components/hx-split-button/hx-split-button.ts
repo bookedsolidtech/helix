@@ -4,6 +4,7 @@ import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 
 const _nextSplitButtonId = createIdCounter('hx-split-button');
@@ -84,7 +85,7 @@ const _nextSplitButtonId = createIdCounter('hx-split-button');
  */
 @customElement('hx-split-button')
 export class HelixSplitButton extends HelixElement {
-  static override styles = [helixSplitButtonStyles];
+  static override styles = [helixSplitButtonStyles, forcedColorsInteractive];
 
   // ─── Internal References ───
 

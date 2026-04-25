@@ -34,14 +34,14 @@ export const helixRadioGroupStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-radio-group-label-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-radio-group-label-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
     padding: 0;
     margin-bottom: var(--hx-space-1, 0.25rem);
   }
 
   .fieldset__required-marker {
-    color: var(--hx-radio-group-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-radio-group-error-color, var(--hx-color-error-text, #c92a2a));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -61,20 +61,20 @@ export const helixRadioGroupStyles = css`
   /* ─── Error State ─── */
 
   .fieldset--error .fieldset__legend {
-    color: var(--hx-radio-group-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-radio-group-error-color, var(--hx-color-error-text, #c92a2a));
   }
 
   /* ─── Help Text & Error Messages ─── */
 
   .fieldset__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-radio-group-help-text-color, var(--hx-color-text-muted, #64748b));
+    color: var(--hx-radio-group-help-text-color, var(--hx-color-text-muted, #66787b));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .fieldset__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-radio-group-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-radio-group-error-color, var(--hx-color-error-text, #c92a2a));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

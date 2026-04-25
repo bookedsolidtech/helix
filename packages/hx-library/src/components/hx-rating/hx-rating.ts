@@ -16,6 +16,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixRatingStyles } from './hx-rating.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 
 // ─── Event Detail Interfaces ───
 
@@ -91,7 +92,7 @@ export interface HxRatingHoverDetail {
  */
 @customElement('hx-rating')
 export class HelixRating extends FormMixin(HelixElement) {
-  static override styles = [helixRatingStyles];
+  static override styles = [helixRatingStyles, forcedColorsInteractive];
 
   // ─── Form Association ───
 
