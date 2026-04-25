@@ -36,6 +36,11 @@
   - `hx-toast.styles.ts` inline contrast comments corrected (`5.39:1` → `5.82:1` for primary-600, `5.92:1` → `5.46:1` for error-600).
   - `hx-toast.ts` `@cssprop` JSDoc defaults aligned with runtime cascade (drop stale `--hx-color-neutral-900`/`--hx-color-neutral-0` claims; reference the actual `--hx-color-surface-inverse`/`--hx-color-text-inverse` semantics that resolve at paint time).
   - `contrast.test.ts` adds `action.ghost.fg × action.ghost.bg-hover` regression assertion (light/dark) — mirrors the existing secondary pair so a future theme split between secondary and ghost cannot silently regress ghost-hover contrast.
+- **Round-4 fixes (Codex re-review on PR #1568, third pass):**
+  - `tokens.json` description contrast ratios recomputed and corrected (round 4) for entries the round-3 sweep missed: `text.secondary` (neutral-700 on surface.default `10.84:1`/raised `10.10:1`/sunken `9.01:1` → `10.93:1`/`10.20:1`/`9.34:1`); `text.muted` (neutral-600 on surface.raised `7.36:1`/default `7.88:1`/sunken `6.55:1` → `7.25:1`/`7.76:1`/`6.63:1`); `action.secondary.fg` (primary-600 on surface.default `5.20:1` → `5.82:1`); dark `action.secondary.fg` (primary-400 `7.18:1` → `7.27:1`); dark `action.secondary.bg-hover` (primary-400 on primary-900 `5.97:1` → `5.63:1`).
+  - `hx-nav-item.styles.ts` inline active-state contrast comment corrected (`5.39:1` → `5.82:1` for white on primary-600) — sibling occurrence missed in round 3's `hx-toast.styles.ts` sweep.
+  - `hx-toast.ts` `@cssprop` block fully aligned with runtime cascade — replaced the stale primitive entries (`--hx-color-neutral-900`, `--hx-color-neutral-0`, `--hx-color-success-600`, `--hx-color-warning-500`, `--hx-color-error-600`, `--hx-color-primary-600`) with the semantic tokens the variant rules actually consume (`surface.{success,warning,danger,info}-strong`, `text.on-{success,warning,error-strong,primary-strong}`).
+  - `contrast.test.ts` adds two `action.secondary.border` × `surface.default` and `action.secondary.border` × `action.secondary.bg-hover` assertions (light/dark, threshold 3:1) — covers the outline button border affordance at WCAG 1.4.11 floor.
 
 **React (patch — peer bump):** No public API surface delta; wrapper regeneration confirms zero breakage.
 

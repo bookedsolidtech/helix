@@ -83,7 +83,7 @@ export const helixNavItemStyles = css`
 
   :host([active]) .nav-item__link {
     /* Active state sits on the darker primary-600 (#0F7078) fill. White text
-       (#ffffff) on primary-600 = 5.39:1 WCAG AA pass. text-on-primary now
+       (#ffffff) on primary-600 = 5.82:1 WCAG AA pass. text-on-primary now
        resolves to neutral-900 (intended for the lighter primary-500 surface)
        which would fail here. text.on-primary-strong holds at neutral-0 across
        modes (no dark flip) so the active fg stays AA. 3.2.1: routed through

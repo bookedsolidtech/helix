@@ -39,8 +39,8 @@ export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
  * @cssprop [--hx-space-3] - Spacing token.
  * @cssprop [--hx-space-4] - Spacing token.
  * @cssprop [--hx-border-radius-md] - CSS custom property.
- * @cssprop [--hx-color-neutral-900] - Color.
- * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-surface-inverse] - Default-variant background semantic (neutral-900 anchor; flipped per mode).
+ * @cssprop [--hx-color-text-inverse] - Default-variant foreground semantic (neutral-0 anchor; flipped per mode).
  * @cssprop [--hx-toast-font-family=var(--hx-font-family-sans)] - CSS custom property.
  * @cssprop [--hx-font-family-sans] - Font family.
  * @cssprop [--hx-font-size-sm] - Font size.
@@ -49,10 +49,14 @@ export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
  * @cssprop [--hx-toast-enter-translate=var(--hx-space-2)] - CSS custom property.
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-transition-normal] - Transition timing.
- * @cssprop [--hx-color-success-600] - Color.
- * @cssprop [--hx-color-warning-500] - Color.
- * @cssprop [--hx-color-error-600] - Color.
- * @cssprop [--hx-color-primary-600] - Color.
+ * @cssprop [--hx-color-surface-success-strong] - Success-variant background semantic (3.2.1 cascade).
+ * @cssprop [--hx-color-surface-warning-strong] - Warning-variant background semantic (3.2.1 cascade).
+ * @cssprop [--hx-color-surface-danger-strong] - Danger-variant background semantic (3.2.1 cascade).
+ * @cssprop [--hx-color-surface-info-strong] - Info-variant background semantic (3.2.1 cascade).
+ * @cssprop [--hx-color-text-on-success-strong] - Success-variant foreground semantic (neutral-0 across modes).
+ * @cssprop [--hx-color-text-on-warning] - Warning-variant foreground semantic (neutral-900; warning sits on lighter -500 fill).
+ * @cssprop [--hx-color-text-on-error-strong] - Danger-variant foreground semantic (neutral-0 across modes).
+ * @cssprop [--hx-color-text-on-primary-strong] - Info-variant foreground semantic (neutral-0 across modes).
  * @cssprop [--hx-touch-target-min] - Minimum touch target size.
  * @cssprop [--hx-space-1] - Spacing token.
  * @cssprop [--hx-border-radius-sm] - CSS custom property.
