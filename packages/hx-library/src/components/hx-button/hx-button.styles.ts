@@ -126,13 +126,25 @@ export const helixButtonStyles = css`
   }
 
   /* on-error tokens are tuned for error-500 (neutral-900 on #E5493E ≈ 4.59:1).
-     error-600 (#C92A2A) drops that to 2.25:1 — AA fail. text.on-error-strong
+     error-600 (#C92A2A) drops that to 3.28:1 — AA fail. text.on-error-strong
      resolves to neutral-0 across modes (no dark flip) so the darker hover fill
      stays legible. Mirrors hx-toast precedent (commit 300e21ab0); routed
      through the semantic tier in 3.2.1 token-cascade remediation. */
   .button--danger:hover {
     --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-action-danger-bg-hover, #c92a2a));
     --hx-button-color: var(--hx-color-text-on-error-strong, #ffffff);
+  }
+
+  /* Pressed state binds explicitly to action.danger.bg-active (error-700,
+     #A21312) + text.on-error-strong (neutral-0) = 7.96:1 AA. Base
+     .button:active filter:brightness(0.8) would compound on top of bg-hover
+     (#C92A2A) and produce ~3.3:1 sub-AA on the bound colors. Override the
+     filter to none. HC override on action.danger.bg-active flips to HC
+     error-500 so the on-error-strong (HC = #000) pair is AA in HC too. */
+  .button--danger:active {
+    --hx-button-bg: var(--hx-button-active-bg, var(--hx-color-action-danger-bg-active, #a21312));
+    --hx-button-color: var(--hx-color-text-on-error-strong, #ffffff);
+    filter: none;
   }
 
   .button--ghost {
@@ -165,6 +177,17 @@ export const helixButtonStyles = css`
   .button--primary:hover {
     --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-action-primary-bg-hover, #0f7078));
     --hx-button-color: var(--hx-color-text-on-primary-strong, #ffffff);
+  }
+
+  /* Pressed state binds explicitly to action.primary.bg-active (primary-700,
+     #0F6363) + text.on-primary-strong (neutral-0) = 7.03:1 AA. The base
+     .button:active filter:brightness(0.8) would compound on top of bg-hover
+     (#0F7078) and produce ~3.7:1 sub-AA on the bound colors. Override the
+     filter to none so the action.*.bg-active token is what actually paints. */
+  .button--primary:active {
+    --hx-button-bg: var(--hx-button-active-bg, var(--hx-color-action-primary-bg-active, #0f6363));
+    --hx-button-color: var(--hx-color-text-on-primary-strong, #ffffff);
+    filter: none;
   }
 
   /* ─── Disabled ─── */

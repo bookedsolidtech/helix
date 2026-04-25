@@ -185,10 +185,16 @@ export const helixToastStyles = css`
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */
-  /* Belt-and-suspenders: rich per-class HC overrides PLUS the forcedColorsSurface mixin. */
+  /* Sole owner: bespoke per-class HC overrides on .toast and .toast__close.
+     The shared forcedColorsSurface mixin was dropped in 3.2.1 (XOR rule);
+     this block now carries the surface contract the mixin used to provide
+     (background:Canvas + color:CanvasText + border:1px solid CanvasText)
+     plus the per-class affordances the mixin never touched. */
 
   @media (forced-colors: active) {
     .toast {
+      background: Canvas;
+      color: CanvasText;
       border: 1px solid CanvasText;
     }
 

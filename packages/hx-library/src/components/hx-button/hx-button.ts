@@ -44,8 +44,8 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-button-font-weight=var(--hx-font-weight-semibold)] - Button font weight.
  * @cssprop [--hx-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  *
- * @cssprop [--hx-button-inverted-color=var(--hx-color-text-on-dark)] - Text color when inverted (anchor #ffffff).
- * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-overlay-white-15)] - Ghost hover bg when inverted (overlay-white-15 primitive).
+ * @cssprop [--hx-button-inverted-color=var(--hx-color-text-inverse)] - Text color when inverted (resolves to neutral-0).
+ * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-border-on-dark-default)] - Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).
  * @cssprop [--hx-button-inverted-focus-ring-color=var(--hx-color-border-on-dark-strong)] - Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).
  *
  * @cssprop [--hx-color-action-primary-bg] - Primary variant resting fill (3.2.1 semantic action layer).

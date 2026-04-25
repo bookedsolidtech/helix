@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T21:56:35.933Z",
+  "generatedAt": "2026-04-25T22:33:58.197Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2779,26 +2779,26 @@
           }
         },
         {
-          "description": "Text color when inverted (anchor #ffffff).",
+          "description": "Text color when inverted (resolves to neutral-0).",
           "name": "--hx-button-inverted-color",
-          "default": "var(--hx-color-text-on-dark)",
+          "default": "var(--hx-color-text-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/text/on/dark",
+            "semanticToken": "color/text/inverse",
             "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
-          "description": "Ghost hover bg when inverted (overlay-white-15 primitive).",
+          "description": "Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).",
           "name": "--hx-button-inverted-ghost-hover-bg",
-          "default": "var(--hx-color-overlay-white-15)",
+          "default": "var(--hx-color-border-on-dark-default)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/overlay/white",
-            "fallbackPrimitive": "color/overlay/white/15",
+            "semanticToken": "color/border/on/dark/default",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },

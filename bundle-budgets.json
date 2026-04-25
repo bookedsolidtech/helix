@@ -3,6 +3,10 @@
   "standard": 5632,
   "bundle": 51200,
   "overrides": {
+    "hx-button": {
+      "budget": 6144,
+      "reason": "3.2.1 added explicit :active rules for primary/danger filled variants (action.{primary,danger}.bg-active + text.on-{role}-strong + filter:none) to close a high-severity AA gap caught by Codex round-6 review where filter:brightness(0.8) produced sub-AA pressed-state contrast (primary 3.70:1, danger 3.26:1). Pressed contrasts are now 7.03:1 / 7.96:1. +0.14 KB over the 5.5 KB standard; healthcare a11y compliance is the load-bearing constraint."
+    },
     "hx-color-picker": {
       "budget": 8192,
       "reason": "Full color math library (HSV/RGB/HSL conversions), pointer-drag, 4 output formats. JS-only baseline: ~4057 gz."
