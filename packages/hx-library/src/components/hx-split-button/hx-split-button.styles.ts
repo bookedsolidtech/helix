@@ -177,6 +177,16 @@ export const helixSplitButtonStyles = css`
     --hx-split-button-divider-color: var(--hx-color-primary-400, #6ab1b1);
   }
 
+  /* primary:hover — replace the universal brightness(0.9) filter (which would
+     drop primary-500 + on-primary contrast to ~4.4:1) with an explicit swap
+     to primary-600 and a neutral-0 foreground. Mirrors hx-button precedent. */
+  .split-button--primary .split-button__primary:hover,
+  .split-button--primary .split-button__trigger:hover {
+    --hx-split-button-bg: var(--hx-color-primary-600, #0f7078);
+    --hx-split-button-color: var(--hx-color-neutral-0, #ffffff);
+    filter: none;
+  }
+
   /* ─── Variant: secondary ─── */
 
   .split-button--secondary .split-button__primary,
@@ -219,9 +229,13 @@ export const helixSplitButtonStyles = css`
     --hx-split-button-divider-color: var(--hx-color-error-400, #fc7264);
   }
 
+  /* danger:hover — on-error tokens are tuned for error-500. error-600 drops
+     the pair to 2.25:1 (AA fail). Pin fg at neutral-0 to keep the darker
+     hover fill legible. Mirrors hx-toast precedent (commit 300e21ab0). */
   .split-button--danger .split-button__primary:hover,
   .split-button--danger .split-button__trigger:hover {
     --hx-split-button-bg: var(--hx-color-error-600, #c92a2a);
+    --hx-split-button-color: var(--hx-color-neutral-0, #ffffff);
     filter: none;
   }
 
