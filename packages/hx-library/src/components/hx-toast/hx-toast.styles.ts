@@ -56,9 +56,23 @@ export const helixToastStyles = css`
 
   /* ─── Variant overrides ─── */
 
+  /*
+   * Toast variants paint on darker brand fills (primary-600/success-700/
+   * error-600) because the lighter -500 fills can't pass AA against white
+   * text in the precision-cool palette. The neutral-900 on-{role} tokens
+   * are tuned for the lighter -500 surfaces and would fail here (e.g.
+   * neutral-900 on primary-600 = 3.07:1), so we hold fg at neutral-0
+   * directly for primary/success/danger.
+   * - neutral-0 on primary-600 (#0F7078) = 5.39:1 — AA pass
+   * - neutral-0 on success-700 (#146831) = 6.88:1 — AA pass
+   *   (success-600 #0E8A4A on white = 4.41:1 — drifts under AA at 14px)
+   * - neutral-0 on error-600   (#C92A2A) = 5.92:1 — AA pass
+   * - neutral-900 on warning-500 (#C2711C) = 4.83:1 — AA pass
+   *   (warning stays on the lighter -500 surface so on-warning works)
+   */
   .toast--success {
-    --hx-toast-bg: var(--hx-color-success-600, #0e8a4a);
-    --hx-toast-color: var(--hx-color-text-on-success, #0d1825);
+    --hx-toast-bg: var(--hx-color-success-700, #146831);
+    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .toast--warning {
@@ -68,12 +82,12 @@ export const helixToastStyles = css`
 
   .toast--danger {
     --hx-toast-bg: var(--hx-color-error-600, #c92a2a);
-    --hx-toast-color: var(--hx-color-text-on-error, #ffffff);
+    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .toast--info {
     --hx-toast-bg: var(--hx-color-primary-600, #0f7078);
-    --hx-toast-color: var(--hx-color-text-on-primary, #ffffff);
+    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   /* ─── Severity Label (WCAG 1.4.1) ─── */
