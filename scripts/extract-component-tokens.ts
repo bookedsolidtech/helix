@@ -114,10 +114,30 @@ function getSemanticTokenNames(): Set<string> {
 }
 
 /**
- * Extract every CSS custom property reference (`var(--hx-...)`) and
- * declaration (`--hx-...:`) from a string.
+ * Strip C-style block comments (`/* ... *​/`) and line comments (`// ...`)
+ * from a TypeScript / CSS-in-JS source. Used to prevent doc comments that
+ * happen to mention `var(--hx-...)` from leaking into the component-token
+ * manifest.
+ *
+ * Note: this is a coarse strip — it does not respect strings or template
+ * literals, so a `//` inside a string literal is also removed. That's fine
+ * for our use case: the result is fed into a `--hx-*` regex extractor that
+ * doesn't care about string boundaries; we just want to drop comment text.
  */
-function extractTokenNamesFromSource(source: string): Set<string> {
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/gm, '');
+}
+
+/**
+ * Extract every CSS custom property reference (`var(--hx-...)`) and
+ * declaration (`--hx-...:`) from a string. Comments are stripped first so
+ * tokens mentioned only in JSDoc / inline notes do not pollute the
+ * manifest.
+ */
+export function extractTokenNamesFromSource(source: string): Set<string> {
+  const cleaned = stripComments(source);
   const out = new Set<string>();
   // Tokens must start with `--hx-`, contain only [a-z0-9-], and end on
   // an alphanumeric character (no trailing dash). This excludes
@@ -127,12 +147,12 @@ function extractTokenNamesFromSource(source: string): Set<string> {
   // var(--hx-foo, ...)
   const varRe = new RegExp(`var\\(\\s*(${tokenBody})`, 'g');
   let m: RegExpExecArray | null;
-  while ((m = varRe.exec(source)) !== null) {
+  while ((m = varRe.exec(cleaned)) !== null) {
     out.add(m[1]);
   }
   // --hx-foo: <value>;  declarations
   const declRe = new RegExp(`(${tokenBody})\\s*:`, 'g');
-  while ((m = declRe.exec(source)) !== null) {
+  while ((m = declRe.exec(cleaned)) !== null) {
     out.add(m[1]);
   }
   return out;

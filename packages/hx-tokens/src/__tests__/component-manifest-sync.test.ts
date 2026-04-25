@@ -1,7 +1,10 @@
 /// <reference types="vitest/globals" />
 import { describe, it, expect } from 'vitest';
 import tokens from '../tokens.json';
-import { extractComponentTokens } from '../../../../scripts/extract-component-tokens.ts';
+import {
+  extractComponentTokens,
+  extractTokenNamesFromSource,
+} from '../../../../scripts/extract-component-tokens.ts';
 
 /**
  * Sync gate between the per-component design tokens authored inline in
@@ -127,5 +130,37 @@ describe('component token manifest sync', () => {
     expect(fromJson.size).toBeGreaterThan(50);
     const totalTokens = [...fromJson.values()].reduce((sum, s) => sum + s.size, 0);
     expect(totalTokens).toBeGreaterThan(500);
+  });
+});
+
+describe('extractTokenNamesFromSource — comment stripping', () => {
+  it('does not extract tokens that appear only inside block comments', () => {
+    const src = `
+      /* TODO: future spec mentions var(--hx-toast-future-prop, 0) */
+      .x { color: var(--hx-real-prop, red); }
+    `;
+    const found = extractTokenNamesFromSource(src);
+    expect(found.has('--hx-real-prop')).toBe(true);
+    expect(found.has('--hx-toast-future-prop')).toBe(false);
+  });
+
+  it('does not extract tokens that appear only inside line comments', () => {
+    const src = `
+      // legacy: var(--hx-old-prop, 0) — kept for archeology
+      .y { background: var(--hx-actual-prop, blue); }
+    `;
+    const found = extractTokenNamesFromSource(src);
+    expect(found.has('--hx-actual-prop')).toBe(true);
+    expect(found.has('--hx-old-prop')).toBe(false);
+  });
+
+  it('still extracts token declarations outside comments', () => {
+    const src = `
+      /* docs: --hx-doc-only: foo; */
+      :host { --hx-declared: 1px; }
+    `;
+    const found = extractTokenNamesFromSource(src);
+    expect(found.has('--hx-declared')).toBe(true);
+    expect(found.has('--hx-doc-only')).toBe(false);
   });
 });
