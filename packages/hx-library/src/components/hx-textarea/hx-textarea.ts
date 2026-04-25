@@ -7,6 +7,7 @@ import { live } from 'lit/directives/live.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextTextareaId = createIdCounter('hx-textarea');
 
@@ -82,7 +83,7 @@ export interface HxTextareaDetail {
  */
 @customElement('hx-textarea')
 export class HelixTextarea extends FormMixin(HelixElement) {
-  static override styles = [helixTextareaStyles];
+  static override styles = [helixTextareaStyles, forcedColorsField];
 
   // ─── Form Association ───
 

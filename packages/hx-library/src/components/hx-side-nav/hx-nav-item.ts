@@ -2,6 +2,7 @@ import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
 
 const _nextNavItemId = createIdCounter('hx-nav-item');
@@ -35,7 +36,7 @@ const _nextNavItemId = createIdCounter('hx-nav-item');
  */
 @customElement('hx-nav-item')
 export class HelixNavItem extends HelixElement {
-  static override styles = [helixNavItemStyles];
+  static override styles = [helixNavItemStyles, forcedColorsInteractive];
 
   /** @internal — per-instance tooltip ID */
   private _tooltipId = `${_nextNavItemId()}-tooltip`;

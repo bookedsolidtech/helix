@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixPaginationStyles } from './hx-pagination.styles.js';
 
 /** Detail for the hx-page-change event dispatched by hx-pagination. */
@@ -97,7 +98,7 @@ export interface HxPageSizeChangeDetail {
  */
 @customElement('hx-pagination')
 export class HelixPagination extends HelixElement {
-  static override styles = [helixPaginationStyles];
+  static override styles = [helixPaginationStyles, forcedColorsInteractive];
 
   /**
    * Total number of pages.

@@ -125,7 +125,7 @@ export const InvertedVariant: Story = {
   name: 'Variant: Inverted',
   render: () => html`
     <div
-      style="background: var(--hx-color-primary-500, #2563eb); padding: 1.5rem; border-radius: 0.5rem; display: inline-flex;"
+      style="background: var(--hx-color-primary-500, #429797); padding: 1.5rem; border-radius: 0.5rem; display: inline-flex;"
     >
       <hx-spinner variant="inverted" label="Loading"></hx-spinner>
     </div>
@@ -158,7 +158,7 @@ export const AllVariants: Story = {
         <small>primary</small>
       </div>
       <div
-        style="background: var(--hx-color-primary-500, #2563eb); padding: 0.75rem; border-radius: 0.375rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;"
+        style="background: var(--hx-color-primary-500, #429797); padding: 0.75rem; border-radius: 0.375rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;"
       >
         <hx-spinner variant="inverted" label="Loading"></hx-spinner>
         <small style="color: white;">inverted</small>

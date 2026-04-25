@@ -8,6 +8,7 @@ import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSliderStyles } from './hx-slider.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextSliderId = createIdCounter('hx-slider');
@@ -102,7 +103,7 @@ export interface HxSliderDetail {
  */
 @customElement('hx-slider')
 export class HelixSlider extends FormMixin(HelixElement) {
-  static override styles = [helixSliderStyles];
+  static override styles = [helixSliderStyles, forcedColorsInteractive];
 
   // ─── Form Association ───
 

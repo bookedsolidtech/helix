@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixLinkStyles } from './hx-link.styles.js';
+import { forcedColorsLink } from '../../styles/forced-colors.js';
 
 /**
  * Variant options for the link component.
@@ -62,7 +63,7 @@ export type LinkVariant = 'default' | 'subtle' | 'danger';
  */
 @customElement('hx-link')
 export class HelixLink extends HelixElement {
-  static override styles = [helixLinkStyles];
+  static override styles = [helixLinkStyles, forcedColorsLink];
 
   /**
    * The URL the link points to.

@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixMeterStyles } from './hx-meter.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
 
@@ -63,7 +64,7 @@ const _nextMeterId = createIdCounter('hx-meter');
  */
 @customElement('hx-meter')
 export class HelixMeter extends HelixElement {
-  static override styles = [helixMeterStyles];
+  static override styles = [helixMeterStyles, forcedColorsSurface];
 
   /** @internal */
   private _uid = _nextMeterId();

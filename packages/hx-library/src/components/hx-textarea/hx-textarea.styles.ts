@@ -3,6 +3,42 @@ import { css } from 'lit';
 export const helixTextareaStyles = css`
   :host {
     display: block;
+
+    /* ─── Component tokens (3.2.0) ──────────────────────────────────── */
+    --_textarea-bg: var(
+      --hx-textarea-bg,
+      var(--hx-input-bg, var(--hx-color-surface-default, #ffffff))
+    );
+    --_textarea-color: var(
+      --hx-textarea-color,
+      var(--hx-input-color, var(--hx-color-text-strong, #202b39))
+    );
+    --_textarea-border-color: var(
+      --hx-textarea-border-color,
+      var(--hx-input-border-color, var(--hx-color-border-strong, #8e9c98))
+    );
+    --_textarea-border-color-focus: var(
+      --hx-textarea-border-color-focus,
+      var(
+        --hx-input-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      )
+    );
+    --_textarea-border-color-invalid: var(
+      --hx-textarea-border-color-invalid,
+      var(--hx-input-error-color, var(--hx-color-error-600, #c92a2a))
+    );
+    --_textarea-border-radius: var(
+      --hx-textarea-border-radius,
+      var(--hx-input-border-radius, var(--hx-border-radius-md, 0.375rem))
+    );
+    --_textarea-padding-x: var(--hx-textarea-padding-x, var(--hx-space-3, 0.75rem));
+    --_textarea-padding-y: var(--hx-textarea-padding-y, var(--hx-space-2, 0.5rem));
+    --_textarea-font-size: var(--hx-textarea-font-size, var(--hx-font-size-md, 1rem));
+    --_textarea-placeholder-color: var(
+      --hx-textarea-placeholder-color,
+      var(--hx-color-text-placeholder, #66787b)
+    );
   }
 
   :host([disabled]) {
@@ -18,7 +54,10 @@ export const helixTextareaStyles = css`
     display: flex;
     flex-direction: column;
     gap: var(--hx-space-1, 0.25rem);
-    font-family: var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif));
+    font-family: var(
+      --hx-textarea-font-family,
+      var(--hx-input-font-family, var(--hx-font-family-sans, sans-serif))
+    );
   }
 
   /* --- Label --- */
@@ -33,12 +72,18 @@ export const helixTextareaStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-input-label-color, var(--hx-color-text-strong, #334155));
+    color: var(
+      --hx-textarea-label-color,
+      var(--hx-input-label-color, var(--hx-color-text-strong, #202b39))
+    );
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .field__required-marker {
-    color: var(--hx-input-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(
+      --hx-textarea-error-color,
+      var(--hx-input-error-color, var(--hx-color-error-text, #c92a2a))
+    );
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -47,10 +92,9 @@ export const helixTextareaStyles = css`
   .field__textarea-wrapper {
     display: flex;
     flex-direction: column;
-    border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-input-border-color, var(--hx-color-border-strong, #cbd5e1));
-    border-radius: var(--hx-input-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-input-bg, var(--hx-color-surface-default, #ffffff));
+    border: var(--hx-border-width-thin, 1px) solid var(--_textarea-border-color);
+    border-radius: var(--_textarea-border-radius);
+    background-color: var(--_textarea-bg);
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
@@ -58,18 +102,11 @@ export const helixTextareaStyles = css`
   }
 
   .field__textarea-wrapper:focus-within {
-    border-color: var(
-      --hx-input-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
-    );
+    border-color: var(--_textarea-border-color-focus);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(
-            --hx-input-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
-          )
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_textarea-border-color-focus) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -77,16 +114,15 @@ export const helixTextareaStyles = css`
   /* --- Error State --- */
 
   .field--error .field__textarea-wrapper {
-    border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc2626));
+    border-color: var(--_textarea-border-color-invalid);
   }
 
   .field--error .field__textarea-wrapper:focus-within {
-    border-color: var(--hx-input-error-color, var(--hx-color-error-500, #dc2626));
+    border-color: var(--_textarea-border-color-invalid);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-input-error-color, var(--hx-color-error-500, #dc2626))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
+        var(--_textarea-border-color-invalid) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -97,10 +133,10 @@ export const helixTextareaStyles = css`
     border: none;
     outline: none;
     background: transparent;
-    padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
+    padding: var(--_textarea-padding-y) var(--_textarea-padding-x);
     font-family: inherit;
-    font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-input-color, var(--hx-color-text-strong, #1e293b));
+    font-size: var(--_textarea-font-size);
+    color: var(--_textarea-color);
     line-height: var(--hx-line-height-normal, 1.5);
     min-height: var(--hx-textarea-min-height, var(--hx-size-20, 5rem));
     width: 100%;
@@ -108,7 +144,7 @@ export const helixTextareaStyles = css`
   }
 
   .field__textarea::placeholder {
-    color: var(--hx-color-text-placeholder, #94a3b8);
+    color: var(--_textarea-placeholder-color);
   }
 
   .field__textarea:focus-visible {
@@ -146,7 +182,7 @@ export const helixTextareaStyles = css`
 
   .field__counter {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-text-muted, #64748b);
+    color: var(--hx-textarea-counter-color, var(--hx-color-text-muted, #4a5362));
     line-height: var(--hx-line-height-normal, 1.5);
     text-align: end;
   }
@@ -169,13 +205,16 @@ export const helixTextareaStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-text-muted, #64748b);
+    color: var(--hx-textarea-help-text-color, var(--hx-color-text-muted, #4a5362));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-input-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(
+      --hx-textarea-error-color,
+      var(--hx-input-error-color, var(--hx-color-error-text, #c92a2a))
+    );
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

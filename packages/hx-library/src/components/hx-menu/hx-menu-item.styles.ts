@@ -18,7 +18,7 @@ export const helixMenuItemStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
-    color: var(--hx-menu-item-color, var(--hx-color-text-primary, #0f172a));
+    color: var(--hx-menu-item-color, var(--hx-color-text-primary, #0d1825));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-family: var(--hx-menu-item-font-family, var(--hx-font-family-sans, sans-serif));
     line-height: var(--hx-line-height-tight, 1.25);
@@ -33,12 +33,15 @@ export const helixMenuItemStyles = css`
 
   .menu-item:hover,
   .menu-item:focus-visible {
-    background-color: var(--hx-menu-item-hover-bg, var(--hx-color-surface-sunken, #f1f5f9));
+    background-color: var(--hx-menu-item-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
   }
 
   .menu-item:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-menu-item-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(
+        --hx-menu-item-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-menu-item-focus-ring-offset, 0px);
   }
 

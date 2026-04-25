@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTagStyles } from './hx-tag.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * A compact label for categorization, filtering, and selection.
@@ -80,7 +81,7 @@ import { helixTagStyles } from './hx-tag.styles.js';
  */
 @customElement('hx-tag')
 export class HelixTag extends HelixElement {
-  static override styles = [helixTagStyles];
+  static override styles = [helixTagStyles, forcedColorsSurface];
 
   /**
    * Visual style variant of the tag.

@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * Patient identification banner implementing Joint Commission NPSG.01.01.01 two-identifier rule.
@@ -98,7 +99,7 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  */
 @customElement('hx-patient-banner')
 export class HelixPatientBanner extends HelixElement {
-  static override styles = [helixPatientBannerStyles];
+  static override styles = [helixPatientBannerStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

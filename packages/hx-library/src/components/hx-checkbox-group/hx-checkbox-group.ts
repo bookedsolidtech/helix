@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -35,8 +36,8 @@ export interface HxCheckboxGroupChangeDetail {
  * @csspart error - The error message container.
  *
  * @cssprop [--hx-checkbox-group-gap=var(--hx-space-3, 0.75rem)] - Gap between checkbox items.
- * @cssprop [--hx-checkbox-group-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
- * @cssprop [--hx-checkbox-group-error-color=var(--hx-color-error-500, #dc3545)] - Error message color.
+ * @cssprop [--hx-checkbox-group-label-color=var(--hx-color-neutral-700, #313E4B)] - Label text color.
+ * @cssprop [--hx-checkbox-group-error-color=var(--hx-color-error-500, #E5493E)] - Error message color.
  * @cssprop [--hx-checkbox-group-help-text-color=var(--hx-color-neutral-500)] - Help text color.
  *
  * @drupal
@@ -66,7 +67,7 @@ export interface HxCheckboxGroupChangeDetail {
  */
 @customElement('hx-checkbox-group')
 export class HelixCheckboxGroup extends FormMixin(HelixElement) {
-  static override styles = [helixCheckboxGroupStyles];
+  static override styles = [helixCheckboxGroupStyles, forcedColorsField];
 
   // ─── Form Association ───
 

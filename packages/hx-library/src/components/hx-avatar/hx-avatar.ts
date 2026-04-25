@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixAvatarStyles } from './hx-avatar.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -48,7 +49,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-avatar')
 export class HelixAvatar extends HelixElement {
-  static override styles = [helixAvatarStyles];
+  static override styles = [helixAvatarStyles, forcedColorsSurface];
 
   /**
    * Image URL. When provided and successfully loaded, displays the image.

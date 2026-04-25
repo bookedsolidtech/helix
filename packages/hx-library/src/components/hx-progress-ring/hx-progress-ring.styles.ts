@@ -27,14 +27,14 @@ export const helixProgressRingStyles = css`
 
   .progress-ring__track {
     fill: none;
-    stroke: var(--hx-progress-ring-track-color, var(--hx-color-neutral-200, #e2e8f0));
+    stroke: var(--hx-progress-ring-track-color, var(--hx-color-neutral-200, #d6dbd5));
   }
 
   /* ─── Indicator ─── */
 
   .progress-ring__indicator {
     fill: none;
-    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-primary-500, #2563eb));
+    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-primary-500, #429797));
     stroke-linecap: round;
     transition: stroke-dashoffset var(--hx-transition-base, 300ms ease);
   }
@@ -42,15 +42,15 @@ export const helixProgressRingStyles = css`
   /* ─── Variant Colors ─── */
 
   :host([variant='success']) .progress-ring__indicator {
-    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-success-500, #16a34a));
+    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-success-500, #3b9e58));
   }
 
   :host([variant='warning']) .progress-ring__indicator {
-    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-warning-500, #d97706));
+    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-warning-500, #c2711c));
   }
 
   :host([variant='danger']) .progress-ring__indicator {
-    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-error-500, #dc2626));
+    stroke: var(--hx-progress-ring-indicator-color, var(--hx-color-error-500, #e5493e));
   }
 
   /* ─── Indeterminate Animation ─── */
@@ -139,7 +139,7 @@ export const helixProgressRingStyles = css`
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-family: var(--hx-progress-ring-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-progress-ring-label-color, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-progress-ring-label-color, var(--hx-color-neutral-900, #0d1825));
     pointer-events: none;
   }
 

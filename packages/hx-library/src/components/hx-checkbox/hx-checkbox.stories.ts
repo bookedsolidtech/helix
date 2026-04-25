@@ -302,10 +302,10 @@ export const AllStates: Story = {
 export const CheckboxGroup: Story = {
   render: () => html`
     <fieldset
-      style="border: 1px solid var(--hx-color-neutral-200, #dee2e6); border-radius: 0.5rem; padding: 1.5rem; max-width: 480px; font-family: sans-serif;"
+      style="border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem; padding: 1.5rem; max-width: 480px; font-family: sans-serif;"
     >
       <legend
-        style="font-weight: 600; font-size: 0.875rem; color: var(--hx-color-neutral-700, #343a40);"
+        style="font-weight: 600; font-size: 0.875rem; color: var(--hx-color-neutral-700, #313E4B);"
       >
         Notification Preferences
       </legend>
@@ -385,7 +385,7 @@ export const InAForm: Story = {
 
         <button
           type="submit"
-          style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #2563EB); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+          style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #429797); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
         >
           Submit Consent
         </button>
@@ -447,7 +447,7 @@ export const SelectAllPattern: Story = {
       ></hx-checkbox>
 
       <div
-        style="display: flex; flex-direction: column; gap: 0.5rem; padding-left: 1.5rem; border-left: 2px solid var(--hx-color-neutral-200, #dee2e6);"
+        style="display: flex; flex-direction: column; gap: 0.5rem; padding-left: 1.5rem; border-left: 2px solid var(--hx-color-neutral-200, #D6DBD5);"
       >
         ${['Cardiology', 'Radiology', 'Oncology', 'Neurology'].map(
           (dept) => html`
@@ -518,13 +518,13 @@ export const SelectAllPattern: Story = {
 export const ConsentForm: Story = {
   render: () => html`
     <form
-      style="display: flex; flex-direction: column; gap: 1.25rem; max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #dee2e6); border-radius: 0.5rem;"
+      style="display: flex; flex-direction: column; gap: 1.25rem; max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem;"
       @submit=${(e: Event) => e.preventDefault()}
     >
-      <h3 style="margin: 0; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);">
+      <h3 style="margin: 0; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);">
         Patient Consent Agreement
       </h3>
-      <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);">
+      <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);">
         Please review and acknowledge each consent item below before proceeding with your care plan.
       </p>
 
@@ -561,13 +561,13 @@ export const ConsentForm: Story = {
       <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
         <button
           type="submit"
-          style="padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #2563EB); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #429797); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
         >
           Confirm and Continue
         </button>
         <button
           type="reset"
-          style="padding: 0.5rem 1.5rem; background: transparent; color: var(--hx-color-neutral-600, #6c757d); border: 1px solid var(--hx-color-neutral-300, #ced4da); border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1.5rem; background: transparent; color: var(--hx-color-neutral-600, #4A5362); border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
         >
           Reset
         </button>
@@ -585,7 +585,7 @@ export const WithOtherFormFields: Story = {
       <div style="display: flex; flex-direction: column; gap: 0.25rem;">
         <label
           for="patient-name"
-          style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #343a40);"
+          style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
           >Patient Full Name</label
         >
         <input
@@ -593,20 +593,20 @@ export const WithOtherFormFields: Story = {
           type="text"
           name="patientName"
           placeholder="Jane Doe"
-          style="padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #ced4da); border-radius: 0.25rem; font-size: 0.875rem;"
+          style="padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.25rem; font-size: 0.875rem;"
         />
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 0.25rem;">
         <label
           for="department"
-          style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #343a40);"
+          style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
           >Department</label
         >
         <select
           id="department"
           name="department"
-          style="padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #ced4da); border-radius: 0.25rem; font-size: 0.875rem;"
+          style="padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.25rem; font-size: 0.875rem;"
         >
           <option value="">Select department</option>
           <option value="cardiology">Cardiology</option>
@@ -632,7 +632,7 @@ export const WithOtherFormFields: Story = {
 
       <button
         type="submit"
-        style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #2563EB); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+        style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #429797); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
       >
         Submit Referral
       </button>
@@ -693,10 +693,10 @@ export const ManyCheckboxes: Story = {
 
     return html`
       <fieldset
-        style="border: 1px solid var(--hx-color-neutral-200, #dee2e6); border-radius: 0.5rem; padding: 1.5rem; max-width: 480px; font-family: sans-serif;"
+        style="border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem; padding: 1.5rem; max-width: 480px; font-family: sans-serif;"
       >
         <legend
-          style="font-weight: 600; font-size: 0.875rem; color: var(--hx-color-neutral-700, #343a40);"
+          style="font-weight: 600; font-size: 0.875rem; color: var(--hx-color-neutral-700, #313E4B);"
         >
           Select Records to Include in Transfer
         </legend>
@@ -723,7 +723,7 @@ export const CSSCustomProperties: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Default Styling
         </h4>
@@ -732,7 +732,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-size (2rem)
         </h4>
@@ -745,7 +745,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-border-color (#9333ea)
         </h4>
@@ -757,7 +757,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-border-radius (50%)
         </h4>
@@ -770,7 +770,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-checked-bg / --hx-checkbox-checked-border-color (#059669)
         </h4>
@@ -783,7 +783,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-checkmark-color (#fbbf24)
         </h4>
@@ -796,7 +796,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-focus-ring-color (#f97316)
         </h4>
@@ -808,7 +808,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-label-color (#6d28d9)
         </h4>
@@ -820,7 +820,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-error-color (#b91c1c)
         </h4>
@@ -868,7 +868,7 @@ export const CSSParts: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           ::part(checkbox), ::part(label), ::part(control)
         </h4>
@@ -879,7 +879,7 @@ export const CSSParts: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           ::part(help-text)
         </h4>
@@ -893,7 +893,7 @@ export const CSSParts: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           ::part(error)
         </h4>
@@ -1052,7 +1052,7 @@ export const FormDataParticipation: Story = {
 
       <button
         type="submit"
-        style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #2563EB); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+        style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #429797); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
       >
         Generate Report
       </button>
@@ -1101,13 +1101,13 @@ export const FormDataParticipation: Story = {
 export const PatientConsentChecklist: Story = {
   render: () => html`
     <div
-      style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #dee2e6); border-radius: 0.5rem;"
+      style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem;"
     >
-      <h3 style="margin: 0; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);">
+      <h3 style="margin: 0; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);">
         Patient Consent Checklist
       </h3>
       <p
-        style="margin: 0 0 0.5rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 0.5rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         All items must be acknowledged before proceeding to discharge.
       </p>
@@ -1116,7 +1116,7 @@ export const PatientConsentChecklist: Story = {
         id="consent-select-all"
         label="Select All"
         .indeterminate=${false}
-        style="font-weight: 600; padding-bottom: 0.5rem; border-bottom: 1px solid var(--hx-color-neutral-200, #dee2e6);"
+        style="font-weight: 600; padding-bottom: 0.5rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         @hx-change=${(e: CustomEvent) => {
           const parent = e.target as HTMLElement & {
             checked: boolean;
@@ -1222,30 +1222,30 @@ export const PatientConsentChecklist: Story = {
 export const MedicationAcknowledgement: Story = {
   render: () => html`
     <div
-      style="max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #dee2e6); border-radius: 0.5rem; background: var(--hx-color-neutral-50, #f8f9fa);"
+      style="max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem; background: var(--hx-color-neutral-50, #F5F8F3);"
     >
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Medication Acknowledgement
       </h3>
       <p
-        style="margin: 0 0 1rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Please confirm that you understand the following medication information. This
         acknowledgement is required by your care team.
       </p>
 
       <div
-        style="padding: 1rem; margin-bottom: 1rem; border-radius: 0.375rem; background: white; border: 1px solid var(--hx-color-neutral-200, #dee2e6);"
+        style="padding: 1rem; margin-bottom: 1rem; border-radius: 0.375rem; background: white; border: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
       >
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem; color: var(--hx-color-neutral-800, #212529);"
+          style="margin: 0 0 0.5rem; font-weight: 600; font-size: 0.875rem; color: var(--hx-color-neutral-800, #202B39);"
         >
           Prescribed Medication: Metformin 500mg
         </p>
         <ul
-          style="margin: 0; padding-left: 1.25rem; font-size: 0.8125rem; color: var(--hx-color-neutral-600, #6c757d); line-height: 1.8;"
+          style="margin: 0; padding-left: 1.25rem; font-size: 0.8125rem; color: var(--hx-color-neutral-600, #4A5362); line-height: 1.8;"
         >
           <li>Take one tablet twice daily with meals</li>
           <li>Do not consume alcohol while taking this medication</li>
@@ -1270,7 +1270,7 @@ export const MedicationAcknowledgement: Story = {
         <button
           type="submit"
           id="med-ack-submit"
-          style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #2563EB); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+          style="align-self: flex-start; padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #429797); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
         >
           Confirm Acknowledgement
         </button>

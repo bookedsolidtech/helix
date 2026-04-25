@@ -8,7 +8,7 @@ export const helixStatusIndicatorStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     position: relative;
     flex-shrink: 0;
-    --_dot-color: var(--hx-status-indicator-color-default, var(--hx-color-neutral-300, #cbd5e1));
+    --_dot-color: var(--hx-status-indicator-color-default, var(--hx-color-neutral-300, #b6bfb9));
     /* Default size (md) — always defined so .indicator never collapses to 0x0 */
     --_indicator-size: var(--hx-status-indicator-size-md, var(--hx-space-3, 0.75rem));
   }
@@ -72,7 +72,7 @@ export const helixStatusIndicatorStyles = css`
       --hx-status-indicator-label-font-size,
       var(--hx-font-size-sm, var(--hx-text-sm, 0.875rem))
     );
-    color: var(--hx-status-indicator-label-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-status-indicator-label-color, var(--hx-color-text-strong, #202b39));
     line-height: 1;
     white-space: nowrap;
   }
@@ -108,23 +108,23 @@ export const helixStatusIndicatorStyles = css`
   /* ─── Status Colors ─── */
 
   :host([status='online']) {
-    --_dot-color: var(--hx-status-indicator-color-online, var(--hx-color-success-500));
+    --_dot-color: var(--hx-status-indicator-color-online, var(--hx-color-success-500, #3b9e58));
   }
 
   :host([status='offline']) {
-    --_dot-color: var(--hx-status-indicator-color-offline, var(--hx-color-neutral-400));
+    --_dot-color: var(--hx-status-indicator-color-offline, var(--hx-color-neutral-400, #8e9c98));
   }
 
   :host([status='away']) {
-    --_dot-color: var(--hx-status-indicator-color-away, var(--hx-color-warning-500));
+    --_dot-color: var(--hx-status-indicator-color-away, var(--hx-color-warning-500, #c2711c));
   }
 
   :host([status='busy']) {
-    --_dot-color: var(--hx-status-indicator-color-busy, var(--hx-color-error-500));
+    --_dot-color: var(--hx-status-indicator-color-busy, var(--hx-color-error-500, #e5493e));
   }
 
   :host([status='unknown']) {
-    --_dot-color: var(--hx-status-indicator-color-unknown, var(--hx-color-neutral-300));
+    --_dot-color: var(--hx-status-indicator-color-unknown, var(--hx-color-neutral-300, #b6bfb9));
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */

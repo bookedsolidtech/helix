@@ -89,7 +89,7 @@ export const AriaLabelledBy: Story = {
         type="email"
         placeholder="clinician@hospital.org"
         aria-labelledby="label-patient-email"
-        style="display: block; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
+        style="display: block; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
       />
     </div>
   `,
@@ -121,7 +121,7 @@ export const WithFor: Story = {
     <div>
       <hx-field-label for="demo-input">Patient Email</hx-field-label>
       <p
-        style="margin-top: var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6b7280);"
+        style="margin-top: var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #66787B);"
       >
         The <code>for</code> attribute renders a native
         <code>&lt;label&gt;</code> inside shadow DOM. This only creates a
@@ -203,7 +203,7 @@ export const CustomRequiredIndicator: Story = {
   render: () => html`
     <hx-field-label required>
       Insurance ID
-      <span slot="required-indicator" style="color: var(--hx-color-error-500, #ef4444);">
+      <span slot="required-indicator" style="color: var(--hx-color-error-500, #E5493E);">
         (required)
       </span>
     </hx-field-label>
@@ -222,16 +222,16 @@ export const CSSParts: Story = {
         font-size: var(--hx-font-size-xs, 0.6875rem);
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: var(--hx-color-primary-600, #0d6efd);
+        color: var(--hx-color-primary-600, #0F7078);
         font-weight: var(--hx-font-weight-bold, 700);
       }
       .parts-demo hx-field-label::part(required-indicator) {
         font-size: var(--hx-font-size-base, 1rem);
-        color: var(--hx-color-error-600, #dc3545);
+        color: var(--hx-color-error-600, #C92A2A);
       }
       .parts-demo hx-field-label::part(optional-indicator) {
         font-style: italic;
-        color: var(--hx-color-neutral-500, #6c757d);
+        color: var(--hx-color-neutral-500, #66787B);
       }
     </style>
     <div class="parts-demo" style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem);">
@@ -261,7 +261,7 @@ export const HealthcareFormLabels: Story = {
           placeholder="First Middle Last"
           required
           aria-labelledby="label-patient-name"
-          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
+          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
         />
       </div>
 
@@ -272,7 +272,7 @@ export const HealthcareFormLabels: Story = {
           type="date"
           required
           aria-labelledby="label-dob"
-          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
+          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
         />
       </div>
 
@@ -283,7 +283,7 @@ export const HealthcareFormLabels: Story = {
           type="text"
           placeholder="Dr. Eleanor Vance, MD"
           aria-labelledby="label-pcp"
-          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
+          style="display: block; width: 100%; margin-top: var(--hx-space-1, 0.25rem); padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem); border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem);"
         />
       </div>
     </form>
@@ -308,7 +308,7 @@ export const CSSCustomProperties: Story = {
     <div style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem);">
       <div>
         <p
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Default
         </p>
@@ -317,13 +317,13 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <p
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           --hx-field-label-color
         </p>
         <hx-field-label
           required
-          style="--hx-field-label-color: var(--hx-color-primary-600, #2563eb);"
+          style="--hx-field-label-color: var(--hx-color-primary-600, #0F7078);"
         >
           Custom brand label color
         </hx-field-label>
@@ -331,13 +331,13 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <p
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           --hx-field-label-required-color
         </p>
         <hx-field-label
           required
-          style="--hx-field-label-required-color: var(--hx-color-warning-600, #d97706);"
+          style="--hx-field-label-required-color: var(--hx-color-warning-600, #B8650E);"
         >
           Custom amber required indicator
         </hx-field-label>

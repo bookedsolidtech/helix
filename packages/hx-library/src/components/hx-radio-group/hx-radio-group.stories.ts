@@ -145,7 +145,7 @@ const meta = {
       description: 'Label text color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-700, #343a40)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-700, #313E4B)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -154,7 +154,7 @@ const meta = {
       description: 'Error message color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-error-500, #dc3545)' },
+        defaultValue: { summary: 'var(--hx-color-error-500, #E5493E)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -652,7 +652,7 @@ export const InACard: Story = {
       <div slot="header" style="font-weight: 600; font-size: 1.125rem;">Consent for Treatment</div>
       <div style="display: flex; flex-direction: column; gap: 1.5rem;">
         <p
-          style="margin: 0; color: var(--hx-color-neutral-600, #495057); font-size: 0.875rem; line-height: 1.6;"
+          style="margin: 0; color: var(--hx-color-neutral-600, #4A5362); font-size: 0.875rem; line-height: 1.6;"
         >
           Please review and acknowledge the following consent options before your appointment. Your
           responses will be recorded in your electronic health record.
@@ -1210,7 +1210,7 @@ export const PainScale: Story = {
       <hx-radio value="10" label="10"></hx-radio>
     </hx-radio-group>
     <div
-      style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+      style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
     >
       <span>No Pain</span>
       <span>Worst Possible Pain</span>

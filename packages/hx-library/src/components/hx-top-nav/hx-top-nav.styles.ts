@@ -28,9 +28,9 @@ export const helixTopNavStyles = css`
 
   .nav {
     background-color: var(--hx-top-nav-bg, var(--hx-color-surface-default, #ffffff));
-    color: var(--hx-top-nav-color, var(--hx-color-text-strong, #1e293b));
+    color: var(--hx-top-nav-color, var(--hx-color-text-strong, #202b39));
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-top-nav-border-color, var(--hx-color-border-default, #e2e8f0));
+      var(--hx-top-nav-border-color, var(--hx-color-border-default, #d6dbd5));
     font-family: var(--hx-top-nav-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
@@ -64,18 +64,21 @@ export const helixTopNavStyles = css`
     background: transparent;
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
-    color: var(--hx-top-nav-toggle-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-top-nav-toggle-color, var(--hx-color-text-strong, #202b39));
     cursor: pointer;
     line-height: 0;
   }
 
   .mobile-toggle:hover {
-    background: var(--hx-color-surface-sunken, #f1f5f9);
+    background: var(--hx-top-nav-toggle-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
   }
 
   .mobile-toggle:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+      var(
+        --hx-top-nav-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -92,7 +95,7 @@ export const helixTopNavStyles = css`
     width: 100%;
     padding-block: var(--hx-space-3, 0.75rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-top-nav-border-color, var(--hx-color-border-default, #e2e8f0));
+      var(--hx-top-nav-border-color, var(--hx-color-border-default, #d6dbd5));
   }
 
   .nav__collapsible--open {
@@ -114,7 +117,7 @@ export const helixTopNavStyles = css`
     margin-top: var(--hx-space-3, 0.75rem);
     padding-top: var(--hx-space-3, 0.75rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-top-nav-border-color, var(--hx-color-border-default, #e2e8f0));
+      var(--hx-top-nav-border-color, var(--hx-color-border-default, #d6dbd5));
   }
 
   /* ─── Desktop breakpoint ─── */

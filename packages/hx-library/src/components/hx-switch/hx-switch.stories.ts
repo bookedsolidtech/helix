@@ -339,7 +339,7 @@ export const InAForm: Story = {
           padding: 0.5rem 1rem;
           border: none;
           border-radius: 0.375rem;
-          background: var(--hx-color-primary-500, #2563EB);
+          background: var(--hx-color-primary-500, #429797);
           color: white;
           cursor: pointer;
           font-size: 0.875rem;
@@ -352,12 +352,12 @@ export const InAForm: Story = {
         <pre
           id=${outputId}
           style="
-            background: var(--hx-color-neutral-50, #f8f9fa);
+            background: var(--hx-color-neutral-50, #F5F8F3);
             padding: 1rem;
             border-radius: 0.375rem;
             font-size: 0.75rem;
             min-height: 2rem;
-            border: 1px solid var(--hx-color-neutral-200, #e9ecef);
+            border: 1px solid var(--hx-color-neutral-200, #D6DBD5);
           "
         ></pre>
       </form>
@@ -386,7 +386,7 @@ export const SettingsPanel: Story = {
   render: () => html`
     <div style="max-width: 520px; font-family: var(--hx-font-family-sans, sans-serif);">
       <!-- Notifications Section -->
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; color: var(--hx-color-neutral-800, #212529);">
+      <h3 style="margin: 0 0 1rem; font-size: 1rem; color: var(--hx-color-neutral-800, #202B39);">
         Notification Preferences
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
@@ -407,7 +407,7 @@ export const SettingsPanel: Story = {
       </div>
 
       <!-- Privacy Section -->
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; color: var(--hx-color-neutral-800, #212529);">
+      <h3 style="margin: 0 0 1rem; font-size: 1rem; color: var(--hx-color-neutral-800, #202B39);">
         Privacy Settings
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
@@ -423,7 +423,7 @@ export const SettingsPanel: Story = {
       </div>
 
       <!-- Accessibility Section -->
-      <h3 style="margin: 0 0 1rem; font-size: 1rem; color: var(--hx-color-neutral-800, #212529);">
+      <h3 style="margin: 0 0 1rem; font-size: 1rem; color: var(--hx-color-neutral-800, #202B39);">
         Accessibility Preferences
       </h3>
       <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -479,19 +479,19 @@ export const InACard: Story = {
       max-width: 420px;
       padding: 1.5rem;
       border-radius: 0.5rem;
-      border: 1px solid var(--hx-color-neutral-200, #e9ecef);
+      border: 1px solid var(--hx-color-neutral-200, #D6DBD5);
       background: var(--hx-color-neutral-0, #ffffff);
       box-shadow: var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
       font-family: var(--hx-font-family-sans, sans-serif);
     "
     >
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Communication Preferences
       </h3>
       <p
-        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Manage how and when you receive clinical communications.
       </p>
@@ -650,7 +650,7 @@ export const CSSParts: Story = {
     <style>
       .parts-demo hx-switch::part(switch) {
         padding: 0.75rem;
-        border: 1px dashed var(--hx-color-neutral-300, #ced4da);
+        border: 1px dashed var(--hx-color-neutral-300, #B6BFB9);
         border-radius: 0.5rem;
       }
 
@@ -816,7 +816,7 @@ export const FormDataParticipation: Story = {
           padding: 0.5rem 1rem;
           border: none;
           border-radius: 0.375rem;
-          background: var(--hx-color-primary-500, #2563EB);
+          background: var(--hx-color-primary-500, #429797);
           color: white;
           cursor: pointer;
           font-size: 0.875rem;
@@ -830,12 +830,12 @@ export const FormDataParticipation: Story = {
           id=${resultId}
           data-testid="formdata-output"
           style="
-            background: var(--hx-color-neutral-50, #f8f9fa);
+            background: var(--hx-color-neutral-50, #F5F8F3);
             padding: 1rem;
             border-radius: 0.375rem;
             font-size: 0.75rem;
             min-height: 2rem;
-            border: 1px solid var(--hx-color-neutral-200, #e9ecef);
+            border: 1px solid var(--hx-color-neutral-200, #D6DBD5);
           "
         ></pre>
       </form>
@@ -869,12 +869,12 @@ export const PatientPreferences: Story = {
   render: () => html`
     <div style="max-width: 520px; font-family: var(--hx-font-family-sans, sans-serif);">
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Patient Communication Preferences
       </h3>
       <p
-        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Choose how you would like to receive health updates and reminders.
       </p>
@@ -915,12 +915,12 @@ export const AccessibilitySettings: Story = {
   render: () => html`
     <div style="max-width: 520px; font-family: var(--hx-font-family-sans, sans-serif);">
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Accessibility Settings
       </h3>
       <p
-        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Customize the interface to meet your accessibility needs.
       </p>
@@ -966,12 +966,12 @@ export const ClinicalAlerts: Story = {
   render: () => html`
     <div style="max-width: 520px; font-family: var(--hx-font-family-sans, sans-serif);">
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Clinical Alert Configuration
       </h3>
       <p
-        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Configure which clinical alerts are active for your patient panel.
       </p>

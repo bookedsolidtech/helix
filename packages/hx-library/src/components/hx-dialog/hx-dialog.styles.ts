@@ -1,5 +1,15 @@
 import { css } from 'lit';
 
+/**
+ * hx-dialog styles.
+ *
+ * Component-tier tokens with two-level var() fallback:
+ *   var(--hx-dialog-{prop}, var(--hx-color-{semantic}, #hex))
+ * Inner hex fallbacks track the "precision cool" palette (3.2.0):
+ *   neutral-0 = #FFFFFF, neutral-100 = #EBEEE9, neutral-200 = #D6DBD5,
+ *   neutral-500 = #66787B, neutral-800 = #202B39, neutral-900 = #0D1825,
+ *   primary-500 = #429797.
+ */
 export const helixDialogStyles = css`
   :host {
     display: contents;
@@ -26,10 +36,10 @@ export const helixDialogStyles = css`
     display: flex;
     flex-direction: column;
     position: relative;
-    background-color: var(--hx-dialog-bg, var(--hx-color-surface-default));
-    color: var(--hx-dialog-color, var(--hx-color-text-primary));
-    border-radius: var(--hx-dialog-border-radius, var(--hx-border-radius-lg));
-    box-shadow: var(--hx-dialog-shadow, var(--hx-shadow-xl));
+    background-color: var(--hx-dialog-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-dialog-color, var(--hx-color-text-primary, #0d1825));
+    border-radius: var(--hx-dialog-border-radius, var(--hx-border-radius-lg, 0.5rem));
+    box-shadow: var(--hx-dialog-shadow, var(--hx-shadow-xl, 0 20px 25px -5px rgb(0 0 0 / 0.1)));
     width: var(--hx-dialog-width, var(--hx-container-narrow, 32rem));
     max-width: calc(100vw - var(--hx-space-8, 2rem));
     max-height: calc(100vh - var(--hx-space-8, 2rem));
@@ -62,7 +72,10 @@ export const helixDialogStyles = css`
   /* ─── Native backdrop (modal mode) ─── */
 
   dialog::backdrop {
-    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-surface-overlay));
+    background-color: var(
+      --hx-dialog-backdrop-color,
+      var(--hx-color-surface-overlay, rgba(0, 0, 0, 0.75))
+    );
     opacity: 0;
     transition: opacity var(--hx-duration-normal, 200ms) var(--hx-easing-out, ease-out);
   }
@@ -82,7 +95,10 @@ export const helixDialogStyles = css`
   .dialog-backdrop {
     position: fixed;
     inset: 0;
-    background-color: var(--hx-dialog-backdrop-color, var(--hx-color-surface-overlay));
+    background-color: var(
+      --hx-dialog-backdrop-color,
+      var(--hx-color-surface-overlay, rgba(0, 0, 0, 0.75))
+    );
     opacity: var(--hx-dialog-backdrop-opacity, 0.5);
     /* D5 — backdrop z-index must be lower than the dialog element's z-index */
     z-index: var(--hx-z-index-modal, 1400);
@@ -94,20 +110,20 @@ export const helixDialogStyles = css`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--hx-dialog-header-padding, var(--hx-space-5) var(--hx-space-6));
-    border-bottom: var(--hx-border-width-thin) solid
-      var(--hx-dialog-header-border-color, var(--hx-color-border-default));
-    gap: var(--hx-space-4);
+    padding: var(--hx-dialog-header-padding, var(--hx-space-5, 1.25rem) var(--hx-space-6, 1.5rem));
+    border-bottom: var(--hx-border-width-thin, 1px) solid
+      var(--hx-dialog-header-border-color, var(--hx-color-border-default, #d6dbd5));
+    gap: var(--hx-space-4, 1rem);
     flex-shrink: 0;
   }
 
   .dialog__heading {
     margin: 0;
-    font-family: var(--hx-dialog-font-family, var(--hx-font-family-sans));
-    font-size: var(--hx-font-size-lg);
-    font-weight: var(--hx-font-weight-semibold);
-    line-height: var(--hx-line-height-tight);
-    color: var(--hx-dialog-heading-color, var(--hx-color-text-primary));
+    font-family: var(--hx-dialog-font-family, var(--hx-font-family-sans, sans-serif));
+    font-size: var(--hx-font-size-lg, 1.125rem);
+    font-weight: var(--hx-font-weight-semibold, 600);
+    line-height: var(--hx-line-height-tight, 1.25);
+    color: var(--hx-dialog-heading-color, var(--hx-color-text-primary, #0d1825));
     flex: 1 1 auto;
   }
 
@@ -129,7 +145,7 @@ export const helixDialogStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
-    color: var(--hx-color-text-muted, #64748b);
+    color: var(--hx-dialog-close-btn-color, var(--hx-color-text-muted, #4a5362));
     font-size: var(--hx-font-size-xl, 1.25rem);
     line-height: 1; /* intentional literal: icon button needs line-height 1; no token maps to exactly 1 */
     transition:
@@ -142,15 +158,15 @@ export const helixDialogStyles = css`
   }
 
   .dialog__close-btn:hover {
-    color: var(--hx-color-text-primary);
-    background-color: var(--hx-color-surface-sunken);
+    color: var(--hx-dialog-close-btn-hover-color, var(--hx-color-text-primary, #0d1825));
+    background-color: var(--hx-dialog-close-btn-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
   }
 
   .dialog__close-btn:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-dialog-close-btn-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
@@ -159,7 +175,7 @@ export const helixDialogStyles = css`
 
   .dialog__body {
     flex: 1 1 auto;
-    padding: var(--hx-dialog-body-padding, var(--hx-space-6));
+    padding: var(--hx-dialog-body-padding, var(--hx-space-6, 1.5rem));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -170,10 +186,10 @@ export const helixDialogStyles = css`
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--hx-space-3);
-    padding: var(--hx-dialog-footer-padding, var(--hx-space-4) var(--hx-space-6));
-    border-top: var(--hx-border-width-thin) solid
-      var(--hx-dialog-footer-border-color, var(--hx-color-border-default));
+    gap: var(--hx-space-3, 0.75rem);
+    padding: var(--hx-dialog-footer-padding, var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem));
+    border-top: var(--hx-border-width-thin, 1px) solid
+      var(--hx-dialog-footer-border-color, var(--hx-color-border-default, #d6dbd5));
     flex-shrink: 0;
   }
 
@@ -192,6 +208,7 @@ export const helixDialogStyles = css`
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */
+  /* Belt-and-suspenders: rich per-class HC overrides PLUS the forcedColorsSurface mixin. */
 
   @media (forced-colors: active) {
     .dialog {

@@ -9,8 +9,8 @@ export const helixSideNavStyles = css`
        Without this, axe-core cannot resolve the background for slotted nodes
        and evaluates their text against the page white background, producing
        false-positive color-contrast violations (WCAG 2.1 AA). */
-    background-color: var(--hx-side-nav-bg, var(--hx-color-surface-inverse, #0f172a));
-    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #f1f5f9));
+    background-color: var(--hx-side-nav-bg, var(--hx-color-surface-inverse, #0d1825));
+    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #ebeee9));
   }
 
   * {
@@ -24,12 +24,12 @@ export const helixSideNavStyles = css`
     flex-direction: column;
     height: 100%;
     width: var(--hx-side-nav-width, 16rem);
-    background-color: var(--hx-side-nav-bg, var(--hx-color-surface-inverse, #0f172a));
-    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #f1f5f9));
+    background-color: var(--hx-side-nav-bg, var(--hx-color-surface-inverse, #0d1825));
+    color: var(--hx-side-nav-color, var(--hx-color-text-inverse, #ebeee9));
     transition: width var(--hx-transition-normal, 300ms) ease;
     overflow: hidden;
     border-inline-end: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #334155));
+      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #313e4b));
   }
 
   /* ─── Collapsed State ─── */
@@ -47,7 +47,7 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #334155));
+      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #313e4b));
     overflow: hidden;
   }
 
@@ -74,7 +74,7 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #334155));
+      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #313e4b));
     overflow: hidden;
   }
 
@@ -97,7 +97,7 @@ export const helixSideNavStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-side-nav-toggle-color, var(--hx-color-text-inverse, #94a3b8));
+    color: var(--hx-side-nav-toggle-color, var(--hx-color-text-inverse, #b6bfb9));
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms) ease,
@@ -109,7 +109,7 @@ export const helixSideNavStyles = css`
       --hx-overlay-white-10,
       rgba(255, 255, 255, 0.1)
     ); /* fallback for browsers without color-mix() */
-    color: var(--hx-color-text-inverse, #f1f5f9);
+    color: var(--hx-color-text-inverse, #ebeee9);
   }
 
   @supports (color: color-mix(in srgb, red 50%, blue)) {
@@ -120,7 +120,10 @@ export const helixSideNavStyles = css`
 
   .side-nav__toggle:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
+      var(
+        --hx-side-nav-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

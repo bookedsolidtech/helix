@@ -6,6 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import { helixSpinnerStyles } from './hx-spinner.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * Token size values for the spinner. Use these for standard sizing.
@@ -57,7 +58,7 @@ export type SpinnerSize = 'sm' | 'md' | 'lg';
  */
 @customElement('hx-spinner')
 export class HelixSpinner extends HelixElement {
-  static override styles = [helixSpinnerStyles];
+  static override styles = [helixSpinnerStyles, forcedColorsSurface];
 
   /**
    * Size of the spinner. Accepts `SpinnerSize` token values ('sm' | 'md' | 'lg'),

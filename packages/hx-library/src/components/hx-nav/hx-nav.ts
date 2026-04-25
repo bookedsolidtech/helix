@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixNavStyles } from './hx-nav.styles.js';
 
 /** A single navigation item, optionally with nested children. */
@@ -84,7 +85,7 @@ type NavOrientation = 'horizontal' | 'vertical';
  */
 @customElement('hx-nav')
 export class HelixNav extends HelixElement {
-  static override styles = [helixNavStyles];
+  static override styles = [helixNavStyles, forcedColorsInteractive];
 
   // ─── Properties ───
 

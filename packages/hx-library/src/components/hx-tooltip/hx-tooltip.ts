@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixTooltipStyles } from './hx-tooltip.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 const _nextTooltipId = createIdCounter('hx-tooltip');
 
@@ -63,7 +64,7 @@ const _nextTooltipId = createIdCounter('hx-tooltip');
 
 @customElement('hx-tooltip')
 export class HelixTooltip extends HelixElement {
-  static override styles = [helixTooltipStyles];
+  static override styles = [helixTooltipStyles, forcedColorsSurface];
 
   /**
    * Preferred placement of the tooltip relative to the trigger.

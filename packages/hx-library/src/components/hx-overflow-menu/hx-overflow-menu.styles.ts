@@ -20,7 +20,7 @@ export const helixOverflowMenuStyles = css`
     border: var(--hx-border-width-thin, 1px) solid transparent;
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background-color: transparent;
-    color: var(--hx-overflow-menu-button-color, var(--hx-color-text-secondary, #475569));
+    color: var(--hx-overflow-menu-button-color, var(--hx-color-text-secondary, #313e4b));
     cursor: pointer;
     transition:
       background-color var(--hx-transition-fast, 150ms ease),
@@ -34,17 +34,23 @@ export const helixOverflowMenuStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-overflow-menu-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .trigger:hover:not([disabled]) {
-    background-color: var(--hx-color-surface-sunken, #f1f5f9);
+    background-color: var(
+      --hx-overflow-menu-trigger-hover-bg,
+      var(--hx-color-surface-sunken, #ebeee9)
+    );
   }
 
   .trigger--open {
-    background-color: var(--hx-color-surface-sunken, #f1f5f9);
+    background-color: var(
+      --hx-overflow-menu-trigger-open-bg,
+      var(--hx-color-surface-sunken, #ebeee9)
+    );
   }
 
   /* ─── Size Variants ─── */
@@ -78,7 +84,7 @@ export const helixOverflowMenuStyles = css`
     z-index: var(--hx-overflow-menu-panel-z-index, 1000);
     min-width: var(--hx-overflow-menu-panel-min-width, 160px);
     background: var(--hx-overflow-menu-panel-bg, var(--hx-color-surface-default, #ffffff));
-    border: var(--hx-overflow-menu-panel-border, 1px solid var(--hx-color-border-default, #e2e8f0));
+    border: var(--hx-overflow-menu-panel-border, 1px solid var(--hx-color-border-default, #d6dbd5));
     border-radius: var(
       --hx-overflow-menu-panel-border-radius,
       var(--hx-border-radius-md, 0.375rem)
@@ -103,7 +109,7 @@ export const helixOverflowMenuStyles = css`
     border: none;
     text-align: start;
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-text-primary, #0f172a);
+    color: var(--hx-overflow-menu-item-color, var(--hx-color-text-primary, #0d1825));
     cursor: pointer;
     white-space: nowrap;
     box-sizing: border-box;
@@ -112,7 +118,10 @@ export const helixOverflowMenuStyles = css`
   ::slotted([role='menuitem']:hover),
   ::slotted([role='menuitemcheckbox']:hover),
   ::slotted([role='menuitemradio']:hover) {
-    background-color: var(--hx-color-surface-raised, #f8fafc);
+    background-color: var(
+      --hx-overflow-menu-item-hover-bg,
+      var(--hx-color-surface-raised, #f5f8f3)
+    );
   }
 
   ::slotted([role='menuitem']:focus-visible),
@@ -121,7 +130,7 @@ export const helixOverflowMenuStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-overflow-menu-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: 0;
   }

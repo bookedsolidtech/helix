@@ -5,6 +5,7 @@ import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import type { Placement as FloatingPlacement } from '@floating-ui/dom';
 import { createIdCounter } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 
 // P2-03: Export so TypeScript consumers can import this type for prop typing.
@@ -63,7 +64,7 @@ const _nextDropdownId = createIdCounter('hx-dropdown');
  */
 @customElement('hx-dropdown')
 export class HelixDropdown extends HelixElement {
-  static override styles = [helixDropdownStyles];
+  static override styles = [helixDropdownStyles, forcedColorsInteractive];
 
   // ─── Public Properties ───
 

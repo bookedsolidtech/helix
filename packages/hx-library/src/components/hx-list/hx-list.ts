@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixListStyles } from './hx-list.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { HelixListItem } from './hx-list-item.js'; // real import for instanceof check and property access
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -29,7 +30,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-list')
 export class HelixList extends HelixElement {
-  static override styles = [helixListStyles];
+  static override styles = [helixListStyles, forcedColorsSurface];
 
   /**
    * Visual variant of the list.

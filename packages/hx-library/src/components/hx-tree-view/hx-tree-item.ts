@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Detail type for the `hx-tree-item-select` event. */
 export interface HxTreeItemSelectDetail {
@@ -41,7 +42,7 @@ export interface HxTreeItemSelectDetail {
  */
 @customElement('hx-tree-item')
 export class HelixTreeItem extends HelixElement {
-  static override styles = [helixTreeItemStyles];
+  static override styles = [helixTreeItemStyles, forcedColorsSurface];
 
   // ─── Properties ───
 

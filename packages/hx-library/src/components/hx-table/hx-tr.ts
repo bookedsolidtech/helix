@@ -33,7 +33,7 @@ export class HelixTableRow extends HelixElement {
       }
 
       :host([selected]) tr {
-        background-color: var(--hx-table-row-selected-bg, var(--hx-color-primary-50, #eff6ff));
+        background-color: var(--hx-table-row-selected-bg, var(--hx-color-primary-50, #ebf8f8));
       }
 
       :host([disabled]) tr {

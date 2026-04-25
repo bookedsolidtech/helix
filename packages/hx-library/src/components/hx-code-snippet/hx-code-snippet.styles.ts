@@ -15,8 +15,8 @@ export const helixCodeSnippetStyles = css`
     display: inline;
     font-family: var(--hx-code-snippet-font-family, var(--hx-font-family-mono, monospace));
     font-size: var(--hx-code-snippet-font-size, var(--hx-font-size-sm, 0.875em));
-    background-color: var(--hx-code-snippet-inline-bg, var(--hx-color-surface-sunken, #f1f5f9));
-    color: var(--hx-code-snippet-inline-color, var(--hx-color-text-primary, #0f172a));
+    background-color: var(--hx-code-snippet-inline-bg, var(--hx-color-surface-sunken, #ebeee9));
+    color: var(--hx-code-snippet-inline-color, var(--hx-color-text-primary, #0d1825));
     padding: var(--hx-code-snippet-inline-padding-y, 0.125em)
       var(--hx-code-snippet-inline-padding-x, 0.375em);
     border-radius: var(--hx-code-snippet-border-radius, var(--hx-border-radius-sm, 0.25rem));
@@ -26,7 +26,7 @@ export const helixCodeSnippetStyles = css`
 
   .code-snippet {
     position: relative;
-    background-color: var(--hx-code-snippet-bg, var(--hx-color-surface-inverse, #0f172a));
+    background-color: var(--hx-code-snippet-bg, var(--hx-color-surface-inverse, #0d1825));
     border-radius: var(--hx-code-snippet-border-radius, var(--hx-border-radius-md, 0.375rem));
     overflow: hidden;
   }
@@ -80,10 +80,10 @@ export const helixCodeSnippetStyles = css`
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #94a3b8);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #8e9c98);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     /* Copy button sits on the always-dark block snippet surface; uses inverse family for contrast on the terminal background. */
-    background-color: var(--hx-color-surface-inverse, #0f172a);
+    background-color: var(--hx-color-surface-inverse, #0d1825);
     color: var(--hx-color-text-inverse, #ffffff);
     font-family: var(--hx-code-snippet-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-xs, 0.75rem);
@@ -100,13 +100,13 @@ export const helixCodeSnippetStyles = css`
 
   .code-snippet__copy-button:hover {
     /* Hover on inverse terminal surface — keep semantic inverse family; border lifts via border-default in inverse context. */
-    background-color: var(--hx-color-surface-inverse, #0f172a);
-    border-color: var(--hx-color-border-default, #e2e8f0);
+    background-color: var(--hx-color-surface-inverse, #0d1825);
+    border-color: var(--hx-color-border-default, #d6dbd5);
   }
 
   .code-snippet__copy-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -125,26 +125,29 @@ export const helixCodeSnippetStyles = css`
     min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     border: none;
-    border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #94a3b8);
+    border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #8e9c98);
     /* Expand button is attached to the always-dark block snippet — inverse family maintains the terminal aesthetic. */
-    background-color: var(--hx-color-surface-inverse, #0f172a);
+    background-color: var(--hx-color-surface-inverse, #0d1825);
     color: var(--hx-color-text-inverse, #ffffff);
     font-family: var(--hx-code-snippet-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
     text-align: center;
     cursor: pointer;
-    transition: background-color var(--hx-transition-fast, 150ms ease);
+    transition:
+      border-color var(--hx-transition-fast, 150ms ease),
+      filter var(--hx-transition-fast, 150ms ease);
   }
 
   .code-snippet__expand-button:hover {
-    background-color: var(--hx-color-surface-inverse, #0f172a);
-    color: var(--hx-color-text-inverse, #ffffff);
+    /* Hover on inverse terminal surface — lift the top border to border-default and brighten the background; matches the copy-button hover affordance pattern. */
+    border-top-color: var(--hx-color-border-default, #e2e8f0);
+    filter: brightness(var(--hx-filter-brightness-hover, 1.15));
   }
 
   .code-snippet__expand-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -154,7 +157,7 @@ export const helixCodeSnippetStyles = css`
     display: inline-block;
     min-width: var(--hx-space-8, 2rem);
     padding-inline-end: var(--hx-space-3, 0.75rem);
-    color: var(--hx-code-snippet-line-number-color, var(--hx-color-text-muted, #64748b));
+    color: var(--hx-code-snippet-line-number-color, var(--hx-color-text-muted, #4a5362));
     user-select: none;
     text-align: end;
   }

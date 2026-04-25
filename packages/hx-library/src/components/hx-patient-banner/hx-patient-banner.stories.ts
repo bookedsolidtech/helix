@@ -202,13 +202,13 @@ export const WithPhoto: Story = {
           width: 2.5rem;
           height: 2.5rem;
           border-radius: 50%;
-          background: var(--hx-color-neutral-300, #d1d5db);
+          background: var(--hx-color-neutral-300, #B6BFB9);
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 0.875rem;
           font-weight: 600;
-          color: var(--hx-color-neutral-700, #374151);
+          color: var(--hx-color-neutral-700, #313E4B);
           font-family: sans-serif;
         "
         aria-label="Patient photo placeholder — Margaret Kim"
@@ -251,7 +251,7 @@ export const AllFields: Story = {
           width: 2.5rem;
           height: 2.5rem;
           border-radius: 50%;
-          background: var(--hx-color-primary-100, #bfdbfe);
+          background: var(--hx-color-primary-100, #DBF0F0);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -278,7 +278,7 @@ export const AllFields: Story = {
         data="07/04/1965"
         field-id="all-fields-dob"
       ></hx-phi-field>
-      <span slot="allergies" style="color: var(--hx-color-error-600, #dc2626); font-weight: 600;" aria-label="Allergies: PCN, Sulfa — high alert">PCN, Sulfa</span>
+      <span slot="allergies" style="color: var(--hx-color-error-600, #C92A2A); font-weight: 600;" aria-label="Allergies: PCN, Sulfa — high alert">PCN, Sulfa</span>
       <span slot="code-status">Full code</span>
     </hx-patient-banner>
   `,

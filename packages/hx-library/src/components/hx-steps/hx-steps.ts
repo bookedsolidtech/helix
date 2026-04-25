@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixStepsStyles } from './hx-steps.styles.js';
 import type { HelixStep } from './hx-step.js';
 
@@ -46,7 +47,7 @@ import type { HelixStep } from './hx-step.js';
  */
 @customElement('hx-steps')
 export class HelixSteps extends HelixElement {
-  static override styles = [helixStepsStyles];
+  static override styles = [helixStepsStyles, forcedColorsInteractive];
 
   // ─── Public Properties ───
 

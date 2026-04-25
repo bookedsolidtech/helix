@@ -2,6 +2,7 @@ import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixMenuDividerStyles } from './hx-menu-divider.styles.js';
 
 /**
@@ -17,7 +18,7 @@ import { helixMenuDividerStyles } from './hx-menu-divider.styles.js';
  */
 @customElement('hx-menu-divider')
 export class HelixMenuDivider extends HelixElement {
-  static override styles = [helixMenuDividerStyles];
+  static override styles = [helixMenuDividerStyles, forcedColorsInteractive];
 
   override render() {
     return html`<div

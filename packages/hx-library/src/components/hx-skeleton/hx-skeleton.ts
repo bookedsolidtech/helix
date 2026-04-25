@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixSkeletonStyles } from './hx-skeleton.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * An animated placeholder used to indicate loading content.
@@ -36,7 +37,7 @@ import { helixSkeletonStyles } from './hx-skeleton.styles.js';
  */
 @customElement('hx-skeleton')
 export class HelixSkeleton extends HelixElement {
-  static override styles = [helixSkeletonStyles];
+  static override styles = [helixSkeletonStyles, forcedColorsSurface];
 
   /**
    * Shape variant of the skeleton placeholder.

@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTableStyles } from './hx-table.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -19,12 +20,12 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @csspart table - The `<table>` element.
  * @csspart caption - The `<caption>` element.
  *
- * @cssprop [--hx-table-border-color=var(--hx-color-neutral-200, #e2e8f0)] - Cell border color.
- * @cssprop [--hx-table-header-bg=var(--hx-color-neutral-50, #f8fafc)] - Header row background.
- * @cssprop [--hx-table-header-color=var(--hx-color-neutral-700, #334155)] - Header text color.
- * @cssprop [--hx-table-cell-color=var(--hx-color-neutral-900, #0f172a)] - Cell text color.
- * @cssprop [--hx-table-row-hover-bg=var(--hx-color-neutral-50, #f8fafc)] - Row hover background.
- * @cssprop [--hx-table-stripe-bg=var(--hx-color-neutral-50, #f8fafc)] - Striped row background.
+ * @cssprop [--hx-table-border-color=var(--hx-color-neutral-200, #D6DBD5)] - Cell border color.
+ * @cssprop [--hx-table-header-bg=var(--hx-color-neutral-50, #F5F8F3)] - Header row background.
+ * @cssprop [--hx-table-header-color=var(--hx-color-neutral-700, #313E4B)] - Header text color.
+ * @cssprop [--hx-table-cell-color=var(--hx-color-neutral-900, #0D1825)] - Cell text color.
+ * @cssprop [--hx-table-row-hover-bg=var(--hx-color-neutral-50, #F5F8F3)] - Row hover background.
+ * @cssprop [--hx-table-stripe-bg=var(--hx-color-neutral-50, #F5F8F3)] - Striped row background.
  * @cssprop [--hx-table-font-family=var(--hx-font-family-sans)] - CSS custom property.
  * @cssprop [--hx-font-family-sans] - Font family.
  * @cssprop [--hx-font-size-sm] - Font size.
@@ -42,7 +43,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-table')
 export class HelixTable extends HelixElement {
-  static override styles = [helixTableStyles];
+  static override styles = [helixTableStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

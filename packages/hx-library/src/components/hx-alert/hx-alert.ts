@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixAlertStyles } from './hx-alert.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Alert variant determines visual styling and ARIA semantics. */
 export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
@@ -89,7 +90,7 @@ export interface HxAlertCloseDetail {
  */
 @customElement('hx-alert')
 export class HelixAlert extends HelixElement {
-  static override styles = [helixAlertStyles];
+  static override styles = [helixAlertStyles, forcedColorsSurface];
 
   // ─── Properties ───
 

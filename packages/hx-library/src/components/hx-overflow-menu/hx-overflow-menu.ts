@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
 
 const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
@@ -71,7 +72,7 @@ const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
  */
 @customElement('hx-overflow-menu')
 export class HelixOverflowMenu extends HelixElement {
-  static override styles = [helixOverflowMenuStyles];
+  static override styles = [helixOverflowMenuStyles, forcedColorsInteractive];
 
   /**
    * Preferred placement of the floating panel relative to the trigger.

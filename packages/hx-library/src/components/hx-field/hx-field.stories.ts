@@ -138,7 +138,7 @@ const meta = {
       <input
         type="email"
         placeholder="user@example.com"
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
       />
     </hx-field>
   `,
@@ -246,7 +246,7 @@ export const Disabled: Story = {
         type="text"
         value="PAT-2026-00482"
         disabled
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; background: var(--hx-color-neutral-100, #f8f9fa);"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; background: var(--hx-color-neutral-100, #EBEEE9);"
       />
     </hx-field>
   `,
@@ -302,16 +302,16 @@ export const SlottedLabel: Story = {
       <label
         slot="label"
         for="known-allergies"
-        style="display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #343a40);"
+        style="display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
       >
         Known Allergies
         <span
-          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+          style="color: var(--hx-color-error-500, #E5493E); font-weight: 700;"
           aria-hidden="true"
           >*</span
         >
         <span
-          style="font-size: 0.75rem; font-weight: 400; color: var(--hx-color-neutral-500, #6c757d); padding: 0.125rem 0.375rem; background: var(--hx-color-neutral-100, #f8f9fa); border-radius: 0.25rem;"
+          style="font-size: 0.75rem; font-weight: 400; color: var(--hx-color-neutral-500, #66787B); padding: 0.125rem 0.375rem; background: var(--hx-color-neutral-100, #EBEEE9); border-radius: 0.25rem;"
           >Required for admission</span
         >
       </label>
@@ -320,7 +320,7 @@ export const SlottedLabel: Story = {
         type="text"
         placeholder="List known drug, food, or environmental allergies"
         required
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
       />
     </hx-field>
   `,
@@ -343,11 +343,11 @@ export const SlottedError: Story = {
       <input
         type="text"
         value="ABC"
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #dc3545); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #E5493E); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
       />
       <div
         slot="error"
-        style="display: flex; align-items: center; gap: 0.375rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
+        style="display: flex; align-items: center; gap: 0.375rem; color: var(--hx-color-error-500, #E5493E); font-size: 0.75rem;"
         role="alert"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -375,7 +375,7 @@ export const WrappingNativeSelect: Story = {
     >
       <select
         required
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; background: white; cursor: pointer;"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; background: white; cursor: pointer;"
       >
         <option value="">Select a department</option>
         <option value="cardiology">Cardiology</option>
@@ -404,7 +404,7 @@ export const WrappingTextarea: Story = {
       <textarea
         rows="4"
         placeholder="Enter clinical notes here..."
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; resize: vertical; font-family: inherit;"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; resize: vertical; font-family: inherit;"
       ></textarea>
     </hx-field>
   `,
@@ -429,7 +429,7 @@ export const WrappingCustomElement: Story = {
     >
       <div
         slot="description"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-600, #495057); padding: 0.5rem 0.75rem; background: var(--hx-color-neutral-50, #f8f9fa); border-left: 3px solid var(--hx-color-primary-400, #74c0fc); border-radius: 0 0.25rem 0.25rem 0; margin-bottom: 0.25rem;"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-600, #4A5362); padding: 0.5rem 0.75rem; background: var(--hx-color-neutral-50, #F5F8F3); border-left: 3px solid var(--hx-color-primary-400, #6AB1B1); border-radius: 0 0.25rem 0.25rem 0; margin-bottom: 0.25rem;"
       >
         <strong>Clinical guidance:</strong> Adult maximum single dose is 1000 mg. Pediatric dosing
         must be weight-based. Consult prescribing physician before exceeding 4000 mg/day total.
@@ -440,7 +440,7 @@ export const WrappingCustomElement: Story = {
         min="0"
         max="1000"
         step="50"
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
       />
     </hx-field>
   `,
@@ -458,18 +458,18 @@ export const InlineLayout: Story = {
         <input
           type="text"
           placeholder="First Last"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
       <hx-field label="Date of Birth" layout="inline" required>
         <input
           type="date"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
       <hx-field label="Department" layout="inline" help-text="Select the admitting department.">
         <select
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
         >
           <option value="">Select...</option>
           <option value="cardiology">Cardiology</option>
@@ -490,7 +490,7 @@ export const AllSizes: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           hx-size="sm"
         </p>
@@ -502,14 +502,14 @@ export const AllSizes: Story = {
           <input
             type="text"
             placeholder="Small input"
-            style="width: 100%; padding: 0.375rem 0.625rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.8125rem; line-height: 1.5;"
+            style="width: 100%; padding: 0.375rem 0.625rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.8125rem; line-height: 1.5;"
           />
         </hx-field>
       </div>
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           hx-size="md" (default)
         </p>
@@ -521,14 +521,14 @@ export const AllSizes: Story = {
           <input
             type="text"
             placeholder="Medium input"
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
           />
         </hx-field>
       </div>
 
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           hx-size="lg"
         </p>
@@ -540,7 +540,7 @@ export const AllSizes: Story = {
           <input
             type="text"
             placeholder="Large input"
-            style="width: 100%; padding: 0.625rem 1rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 1rem; line-height: 1.5;"
+            style="width: 100%; padding: 0.625rem 1rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 1rem; line-height: 1.5;"
           />
         </hx-field>
       </div>
@@ -560,7 +560,7 @@ export const AllStates: Story = {
         <input
           type="text"
           placeholder="No validation applied"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
 
@@ -571,7 +571,7 @@ export const AllStates: Story = {
         <input
           type="text"
           placeholder="Enter patient data"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
 
@@ -584,7 +584,7 @@ export const AllStates: Story = {
           type="text"
           placeholder="Enter MRN"
           required
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
 
@@ -595,7 +595,7 @@ export const AllStates: Story = {
         <input
           type="email"
           value="not-an-email"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #dc3545); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #E5493E); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
 
@@ -608,7 +608,7 @@ export const AllStates: Story = {
           type="text"
           value="PAT-2026-00482"
           disabled
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; background: var(--hx-color-neutral-100, #f8f9fa);"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; background: var(--hx-color-neutral-100, #EBEEE9);"
         />
       </hx-field>
     </div>
@@ -625,7 +625,7 @@ export const CSSCustomProperties: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
       <div>
         <h4
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Default (all tokens at defaults)
         </h4>
@@ -633,14 +633,14 @@ export const CSSCustomProperties: Story = {
           <input
             type="text"
             placeholder="Default field"
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
           />
         </hx-field>
       </div>
 
       <div>
         <h4
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           --hx-field-label-color
         </h4>
@@ -652,14 +652,14 @@ export const CSSCustomProperties: Story = {
           <input
             type="text"
             placeholder="Custom label color"
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
           />
         </hx-field>
       </div>
 
       <div>
         <h4
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           --hx-field-error-color
         </h4>
@@ -678,7 +678,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           --hx-field-font-family
         </h4>
@@ -690,14 +690,14 @@ export const CSSCustomProperties: Story = {
           <input
             type="text"
             value="PAT-2026-00482"
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; font-family: 'Courier New', Courier, monospace;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; font-family: 'Courier New', Courier, monospace;"
           />
         </hx-field>
       </div>
 
       <div>
         <h4
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           All properties combined (dark theme)
         </h4>
@@ -776,7 +776,7 @@ export const CSSParts: Story = {
     >
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #495057);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Styled via ::part() — field, label, control, help-text, required-indicator
         </h4>
@@ -795,7 +795,7 @@ export const CSSParts: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #495057);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Error state with ::part(error) left-border styling
         </h4>
@@ -832,7 +832,7 @@ export const PatientIntakeForm: Story = {
           name="fullName"
           placeholder="First Middle Last"
           required
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
 
@@ -841,14 +841,14 @@ export const PatientIntakeForm: Story = {
           type="date"
           name="dob"
           required
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
 
       <hx-field label="Primary Care Provider" help-text="Optional. Leave blank if not established.">
         <select
           name="pcp"
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
         >
           <option value="">Select a provider</option>
           <option value="dr-vance">Dr. Eleanor Vance, MD</option>
@@ -867,7 +867,7 @@ export const PatientIntakeForm: Story = {
           name="insuranceId"
           value="ABC"
           required
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #dc3545); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #E5493E); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
 
@@ -881,7 +881,7 @@ export const PatientIntakeForm: Story = {
           name="emergencyPhone"
           placeholder="(555) 123-4567"
           required
-          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+          style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
         />
       </hx-field>
     </form>
@@ -913,10 +913,10 @@ export const MedicationDosageField: Story = {
             max="1000"
             step="50"
             required
-            style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+            style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
           />
           <span
-            style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-600, #495057); white-space: nowrap;"
+            style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-600, #4A5362); white-space: nowrap;"
             >mg</span
           >
         </div>
@@ -935,7 +935,7 @@ export const DrupalIntegration: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 520px;">
       <div>
         <p
-          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Pattern 1: Native input from Drupal Form API
         </p>
@@ -945,14 +945,14 @@ export const DrupalIntegration: Story = {
             name="patient_name"
             placeholder="First Last"
             required
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
           />
         </hx-field>
       </div>
 
       <div>
         <p
-          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Pattern 2: Select field from Drupal Form API
         </p>
@@ -960,7 +960,7 @@ export const DrupalIntegration: Story = {
           <select
             name="department"
             required
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; background: white;"
           >
             <option value="">Select a department...</option>
             <option value="cardiology">Cardiology</option>
@@ -972,7 +972,7 @@ export const DrupalIntegration: Story = {
 
       <div>
         <p
-          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Pattern 3: Textarea for clinical notes
         </p>
@@ -983,14 +983,14 @@ export const DrupalIntegration: Story = {
           <textarea
             name="clinical_notes"
             rows="4"
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; resize: vertical; font-family: inherit;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5; resize: vertical; font-family: inherit;"
           ></textarea>
         </hx-field>
       </div>
 
       <div>
         <p
-          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #6c757d); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.75rem; font-size: 0.75rem; font-weight: 600; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Pattern 4: Error state from Drupal validation
         </p>
@@ -1003,7 +1003,7 @@ export const DrupalIntegration: Story = {
             type="text"
             name="insurance_id"
             value="ABC"
-            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #dc3545); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
+            style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-error-500, #E5493E); border-radius: 0.375rem; font-size: 0.875rem; line-height: 1.5;"
           />
         </hx-field>
       </div>
@@ -1140,7 +1140,7 @@ export const DisabledStateVerification: Story = {
         type="text"
         value="LOCKED-VALUE"
         disabled
-        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #dee2e6); border-radius: 0.375rem; font-size: 0.875rem;"
+        style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.375rem; font-size: 0.875rem;"
       />
     </hx-field>
   `,

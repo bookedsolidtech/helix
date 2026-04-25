@@ -36,12 +36,12 @@ export const helixClinicalStatusStyles = css`
     gap: var(--hx-clinical-status-gap, var(--hx-space-3, 0.75rem));
     padding: var(--hx-clinical-status-padding, var(--hx-space-4, 1rem));
     border: var(--hx-clinical-status-border-width, var(--hx-border-width-thin, 1px)) solid
-      var(--hx-clinical-status-border-color, var(--hx-color-info-200, #bae6fd));
+      var(--hx-clinical-status-border-color, var(--hx-color-info-200, #bedcfc));
     border-inline-start: var(--hx-clinical-status-accent-width, 4px) solid
-      var(--hx-clinical-status-accent-color, var(--hx-color-info-500, #0284c7));
+      var(--hx-clinical-status-accent-color, var(--hx-color-info-500, #0c8beb));
     border-radius: var(--hx-clinical-status-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-clinical-status-bg, var(--hx-color-info-50, #f0f9ff));
-    color: var(--hx-clinical-status-color, var(--hx-color-info-800, #0c4a6e));
+    background-color: var(--hx-clinical-status-bg, var(--hx-color-info-50, #eff6fe));
+    color: var(--hx-clinical-status-color, var(--hx-color-info-800, #064172));
     font-family: var(--hx-clinical-status-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     line-height: var(--hx-line-height-normal, 1.5);
@@ -62,41 +62,41 @@ export const helixClinicalStatusStyles = css`
 
   :host([severity='info']) .clinical-status,
   :host(:not([severity])) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-info-50, #f0f9ff);
-    --hx-clinical-status-border-color: var(--hx-color-info-200, #bae6fd);
-    --hx-clinical-status-accent-color: var(--hx-color-info-500, #0284c7);
-    --hx-clinical-status-color: var(--hx-color-info-800, #0c4a6e);
-    --hx-clinical-status-icon-color: var(--hx-color-info-500, #0284c7);
+    --hx-clinical-status-bg: var(--hx-color-info-50, #eff6fe);
+    --hx-clinical-status-border-color: var(--hx-color-info-200, #bedcfc);
+    --hx-clinical-status-accent-color: var(--hx-color-info-500, #0c8beb);
+    --hx-clinical-status-color: var(--hx-color-info-800, #064172);
+    --hx-clinical-status-icon-color: var(--hx-color-info-500, #0c8beb);
   }
 
   /* ─── Severity: warning ─── */
 
   :host([severity='warning']) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-warning-50, #fffbeb);
-    --hx-clinical-status-border-color: var(--hx-color-warning-200, #fde68a);
-    --hx-clinical-status-accent-color: var(--hx-color-warning-500, #d97706);
-    --hx-clinical-status-color: var(--hx-color-warning-800, #78350f);
-    --hx-clinical-status-icon-color: var(--hx-color-warning-500, #d97706);
+    --hx-clinical-status-bg: var(--hx-color-warning-50, #fff3ea);
+    --hx-clinical-status-border-color: var(--hx-color-warning-200, #facfae);
+    --hx-clinical-status-accent-color: var(--hx-color-warning-500, #c2711c);
+    --hx-clinical-status-color: var(--hx-color-warning-800, #603301);
+    --hx-clinical-status-icon-color: var(--hx-color-warning-500, #c2711c);
   }
 
   /* ─── Severity: critical ─── */
 
   :host([severity='critical']) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-error-50, #fef2f2);
-    --hx-clinical-status-border-color: var(--hx-color-error-200, #fecaca);
-    --hx-clinical-status-accent-color: var(--hx-color-error-500, #dc2626);
-    --hx-clinical-status-color: var(--hx-color-error-800, #7f1d1d);
-    --hx-clinical-status-icon-color: var(--hx-color-error-500, #dc2626);
+    --hx-clinical-status-bg: var(--hx-color-error-50, #fff2f0);
+    --hx-clinical-status-border-color: var(--hx-color-error-200, #fccbc4);
+    --hx-clinical-status-accent-color: var(--hx-color-error-500, #e5493e);
+    --hx-clinical-status-color: var(--hx-color-error-800, #7a090a);
+    --hx-clinical-status-icon-color: var(--hx-color-error-500, #e5493e);
   }
 
   /* ─── Severity: emergent ─── */
 
   :host([severity='emergent']) .clinical-status {
-    --hx-clinical-status-bg: var(--hx-color-error-50, #fef2f2);
-    --hx-clinical-status-border-color: var(--hx-color-error-300, #fca5a5);
-    --hx-clinical-status-accent-color: var(--hx-color-error-700, #991b1b);
-    --hx-clinical-status-color: var(--hx-color-error-900, #651a1a);
-    --hx-clinical-status-icon-color: var(--hx-color-error-700, #991b1b);
+    --hx-clinical-status-bg: var(--hx-color-error-50, #fff2f0);
+    --hx-clinical-status-border-color: var(--hx-color-error-300, #fda79c);
+    --hx-clinical-status-accent-color: var(--hx-color-error-700, #a21312);
+    --hx-clinical-status-color: var(--hx-color-error-900, #530d0a);
+    --hx-clinical-status-icon-color: var(--hx-color-error-700, #a21312);
     border-inline-start-width: var(--hx-clinical-status-emergent-accent-width, 6px);
     font-weight: var(--hx-font-weight-semibold, 600);
   }
@@ -107,7 +107,7 @@ export const helixClinicalStatusStyles = css`
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-clinical-status-icon-color, var(--hx-color-info-500, #0284c7));
+    color: var(--hx-clinical-status-icon-color, var(--hx-color-info-500, #0c8beb));
   }
 
   .clinical-status__icon svg {
@@ -170,7 +170,7 @@ export const helixClinicalStatusStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-clinical-status-color, var(--hx-color-info-800, #0c4a6e));
+    color: var(--hx-clinical-status-color, var(--hx-color-info-800, #064172));
     cursor: pointer;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: 1;
@@ -187,7 +187,7 @@ export const helixClinicalStatusStyles = css`
 
   .clinical-status__dismiss-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-focus, #60a5fa));
+      var(--hx-focus-ring-color, var(--hx-color-focus, #429797));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }
@@ -233,7 +233,7 @@ export const helixClinicalStatusStyles = css`
 
   .clinical-status__acknowledge-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-focus, #60a5fa));
+      var(--hx-focus-ring-color, var(--hx-color-focus, #429797));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

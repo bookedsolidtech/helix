@@ -8,6 +8,7 @@ import { live } from 'lit/directives/live.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextNumberInputId = createIdCounter('hx-number-input');
 
@@ -90,7 +91,7 @@ export interface HxNumberInputDetail {
  */
 @customElement('hx-number-input')
 export class HelixNumberInput extends FormMixin(HelixElement) {
-  static override styles = [helixNumberInputStyles];
+  static override styles = [helixNumberInputStyles, forcedColorsField];
 
   // ─── Form Association ───
 

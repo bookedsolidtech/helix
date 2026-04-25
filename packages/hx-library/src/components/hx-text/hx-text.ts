@@ -6,6 +6,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixTextStyles } from './hx-text.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * A semantic typography wrapper that applies consistent text styles using design tokens.
@@ -62,7 +63,7 @@ import { helixTextStyles } from './hx-text.styles.js';
  */
 @customElement('hx-text')
 export class HelixText extends HelixElement {
-  static override styles = [helixTextStyles];
+  static override styles = [helixTextStyles, forcedColorsSurface];
 
   /**
    * Typography variant controlling font size, line height, and letter spacing.

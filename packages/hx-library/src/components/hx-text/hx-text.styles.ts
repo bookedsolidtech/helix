@@ -82,31 +82,33 @@ export const helixTextStyles = css`
   /* ─── Colors ─── */
 
   .text--color-default {
-    --hx-text-color: var(--hx-color-neutral-900, #0f172a);
+    --hx-text-color: var(--hx-text-default-color, var(--hx-color-neutral-900, #0d1825));
   }
 
   .text--color-subtle {
-    --hx-text-color: var(--hx-color-neutral-500, #64748b);
+    --hx-text-color: var(--hx-text-subtle-color, var(--hx-color-neutral-500, #66787b));
   }
 
   .text--color-disabled {
-    --hx-text-color: var(--hx-color-neutral-400, #94a3b8);
+    --hx-text-color: var(--hx-text-disabled-color, var(--hx-color-neutral-400, #8e9c98));
   }
 
   .text--color-inverse {
-    --hx-text-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-text-color: var(--hx-text-inverse-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   .text--color-danger {
-    --hx-text-color: var(--hx-color-error-600, #b91c1c);
+    --hx-text-color: var(--hx-text-danger-color, var(--hx-color-error-600, #c92a2a));
   }
 
   .text--color-success {
-    --hx-text-color: var(--hx-color-success-600, #15803d);
+    --hx-text-color: var(--hx-text-success-color, var(--hx-color-success-700, #146831));
   }
 
   .text--color-warning {
-    --hx-text-color: var(--hx-color-warning-600, #b45309);
+    /* warning-600 (#B8650E) on white = 4.28:1 — fails AA body text in the
+       precision-cool palette. warning-700 (#804605) on white = 7.06:1 — AA pass. */
+    --hx-text-color: var(--hx-text-warning-color, var(--hx-color-warning-700, #804605));
   }
 
   /* ─── Weight Overrides ─── */

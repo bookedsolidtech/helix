@@ -169,7 +169,7 @@ export const MixedVariants: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           Primary + Secondary + Ghost
         </p>
@@ -181,7 +181,7 @@ export const MixedVariants: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           All Secondary (recommended for grouped actions)
         </p>
@@ -214,7 +214,7 @@ export const DisabledChildren: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           One disabled button in the group
         </p>
@@ -226,7 +226,7 @@ export const DisabledChildren: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           All disabled buttons
         </p>
@@ -256,7 +256,7 @@ export const AccessibilityLabel: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           Always provide <code>aria-label</code> for screen reader context:
         </p>
@@ -268,7 +268,7 @@ export const AccessibilityLabel: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           Or use the <code>label</code> property (sets via ElementInternals):
         </p>
@@ -296,12 +296,12 @@ export const DrupalUsage: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px;">
       <div>
         <p
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           Typical Drupal form action buttons rendered via Twig:
         </p>
         <pre
-          style="margin: 0 0 1rem; padding: 1rem; background: var(--hx-color-neutral-100, #f3f4f6); border-radius: var(--hx-border-radius-md, 0.375rem); font-size: 0.75rem; white-space: pre-wrap; overflow-x: auto;"
+          style="margin: 0 0 1rem; padding: 1rem; background: var(--hx-color-neutral-100, #EBEEE9); border-radius: var(--hx-border-radius-md, 0.375rem); font-size: 0.75rem; white-space: pre-wrap; overflow-x: auto;"
         ><code>{# button-group.html.twig #}
 &lt;hx-button-group orientation="horizontal" hx-size="md"&gt;
   &lt;hx-button variant="primary" type="submit"&gt;{{ 'Save'|t }}&lt;/hx-button&gt;
@@ -325,23 +325,23 @@ export const DrupalUsage: Story = {
 export const PatientRecord: Story = {
   render: () => html`
     <div
-      style="max-width: 640px; border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb); border-radius: var(--hx-border-radius-lg, 0.5rem); overflow: hidden;"
+      style="max-width: 640px; border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-lg, 0.5rem); overflow: hidden;"
     >
       <div
-        style="padding: 1.25rem 1.5rem; border-bottom: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e5e7eb); background: var(--hx-color-neutral-50, #f9fafb);"
+        style="padding: 1.25rem 1.5rem; border-bottom: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); background: var(--hx-color-neutral-50, #F5F8F3);"
       >
         <h3
-          style="margin: 0 0 0.25rem; font-size: 1rem; font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-900, #111827);"
+          style="margin: 0 0 0.25rem; font-size: 1rem; font-weight: var(--hx-font-weight-semibold, 600); color: var(--hx-color-neutral-900, #0D1825);"
         >
           Patient Record — Jane Doe (MRN: 00482917)
         </h3>
-        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6b7280);">
+        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);">
           Last updated: 2026-03-03 at 09:14 AM by Dr. R. Patel
         </p>
       </div>
 
       <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-700, #374151);">
+        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-700, #313E4B);">
           Admission diagnosis: Acute exacerbation of chronic obstructive pulmonary disease (COPD).
           Oxygen saturation 92% on room air. Patient stable, scheduled for pulmonology consult.
         </p>
@@ -386,7 +386,7 @@ export const AllSizes: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
         <span
-          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280); min-width: 3rem;"
+          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); min-width: 3rem;"
           >sm</span
         >
         <hx-button-group hx-size="sm">
@@ -397,7 +397,7 @@ export const AllSizes: Story = {
       </div>
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
         <span
-          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280); min-width: 3rem;"
+          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); min-width: 3rem;"
           >md</span
         >
         <hx-button-group hx-size="md">
@@ -408,7 +408,7 @@ export const AllSizes: Story = {
       </div>
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
         <span
-          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280); min-width: 3rem;"
+          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); min-width: 3rem;"
           >lg</span
         >
         <hx-button-group hx-size="lg">

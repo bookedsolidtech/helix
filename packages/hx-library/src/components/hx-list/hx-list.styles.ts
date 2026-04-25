@@ -46,7 +46,7 @@ export const helixListStyles = css`
 
   :host([divided]) .list > ::slotted(hx-list-item:not(:last-child)) {
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-list-divider-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-list-divider-color, var(--hx-color-neutral-200, #d6dbd5));
   }
 
   /* ─── High Contrast Mode (forced-colors) ─── */

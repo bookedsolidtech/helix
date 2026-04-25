@@ -4,6 +4,7 @@ import { devWarn } from '../../utils/dev-warn.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixDividerStyles } from './hx-divider.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * A visual separator element for dividing content sections. Supports
@@ -36,7 +37,7 @@ import { helixDividerStyles } from './hx-divider.styles.js';
  */
 @customElement('hx-divider')
 export class HelixDivider extends HelixElement {
-  static override styles = [helixDividerStyles];
+  static override styles = [helixDividerStyles, forcedColorsSurface];
 
   /**
    * Orientation of the divider.

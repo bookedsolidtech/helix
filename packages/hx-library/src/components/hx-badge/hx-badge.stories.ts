@@ -308,37 +308,37 @@ export const WithCount: Story = {
     >
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="error" pill count="3"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
           >count=3</span
         >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="warning" pill count="42"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
           >count=42</span
         >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="primary" pill count="99"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
           >count=99 (max)</span
         >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="error" pill count="150" max="99"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
           >count=150, max=99 → 99+</span
         >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="success" pill count="5" max="9"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
           >count=5, max=9</span
         >
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
         <hx-badge variant="info" pill count="10" max="9"></hx-badge>
-        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+        <span style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
           >count=10, max=9 → 9+</span
         >
       </div>
@@ -380,7 +380,7 @@ export const RemovableWithCount: Story = {
     <div
       style="display: flex; flex-direction: column; gap: 1rem; font-family: var(--hx-font-family-sans, sans-serif);"
     >
-      <p style="margin: 0; color: var(--hx-color-neutral-700, #374151); font-weight: 600;">
+      <p style="margin: 0; color: var(--hx-color-neutral-700, #313E4B); font-weight: 600;">
         Active Filters
       </p>
       <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
@@ -493,7 +493,7 @@ export const DotIndicator: Story = {
     <div style="display: flex; gap: 1.5rem; align-items: center;">
       <div style="position: relative; display: inline-block;">
         <span
-          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #374151);"
+          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #313E4B);"
           >Messages</span
         >
         <hx-badge
@@ -505,7 +505,7 @@ export const DotIndicator: Story = {
       </div>
       <div style="position: relative; display: inline-block;">
         <span
-          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #374151);"
+          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #313E4B);"
           >Lab Results</span
         >
         <hx-badge
@@ -517,7 +517,7 @@ export const DotIndicator: Story = {
       </div>
       <div style="position: relative; display: inline-block;">
         <span
-          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #374151);"
+          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #313E4B);"
           >Orders</span
         >
         <hx-badge
@@ -529,7 +529,7 @@ export const DotIndicator: Story = {
       </div>
       <div style="position: relative; display: inline-block;">
         <span
-          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #374151);"
+          style="font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #313E4B);"
           >Alerts</span
         >
         <hx-badge
@@ -611,24 +611,24 @@ export const AllCombinations: Story = {
       >
         <div></div>
         <div
-          style="font-weight: 600; color: var(--hx-color-neutral-500, #6b7280); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="font-weight: 600; color: var(--hx-color-neutral-500, #66787B); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Small
         </div>
         <div
-          style="font-weight: 600; color: var(--hx-color-neutral-500, #6b7280); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="font-weight: 600; color: var(--hx-color-neutral-500, #66787B); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Medium
         </div>
         <div
-          style="font-weight: 600; color: var(--hx-color-neutral-500, #6b7280); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;"
+          style="font-weight: 600; color: var(--hx-color-neutral-500, #66787B); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;"
         >
           Large
         </div>
         ${variants.map(
           (variant) => html`
             <div
-              style="font-weight: 600; color: var(--hx-color-neutral-700, #374151); text-transform: capitalize;"
+              style="font-weight: 600; color: var(--hx-color-neutral-700, #313E4B); text-transform: capitalize;"
             >
               ${variant}
             </div>
@@ -704,17 +704,17 @@ export const InCardHeader: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #313E4B);"
         >
           <strong>Name:</strong> Jane Doe
         </p>
         <p
-          style="margin: 0 0 0.5rem; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #313E4B);"
         >
           <strong>DOB:</strong> 1985-03-12
         </p>
         <p
-          style="margin: 0; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-700, #313E4B);"
         >
           <strong>MRN:</strong> MRN-0048210
         </p>
@@ -733,30 +733,30 @@ export const InCardHeader: Story = {
 export const PatientStatusBadges: Story = {
   render: () => html`
     <div style="font-family: var(--hx-font-family-sans, sans-serif);">
-      <h3 style="margin: 0 0 1rem; color: var(--hx-color-neutral-800, #1f2937);">Patient Census</h3>
+      <h3 style="margin: 0 0 1rem; color: var(--hx-color-neutral-800, #202B39);">Patient Census</h3>
       <div style="display: flex; flex-direction: column; gap: 0.75rem;">
         <div
-          style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);">Rm 204 - Thompson, R.</span>
+          <span style="color: var(--hx-color-neutral-700, #313E4B);">Rm 204 - Thompson, R.</span>
           <hx-badge variant="error" pulse>Critical</hx-badge>
         </div>
         <div
-          style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);">Rm 207 - Garcia, M.</span>
+          <span style="color: var(--hx-color-neutral-700, #313E4B);">Rm 207 - Garcia, M.</span>
           <hx-badge variant="success">Stable</hx-badge>
         </div>
         <div
-          style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);">Rm 210 - Patel, S.</span>
+          <span style="color: var(--hx-color-neutral-700, #313E4B);">Rm 210 - Patel, S.</span>
           <hx-badge variant="neutral">Discharged</hx-badge>
         </div>
         <div
           style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);">Rm 215 - Chen, L.</span>
+          <span style="color: var(--hx-color-neutral-700, #313E4B);">Rm 215 - Chen, L.</span>
           <hx-badge variant="warning">Pending Review</hx-badge>
         </div>
       </div>
@@ -780,7 +780,7 @@ export const WithOtherComponents: Story = {
       <!-- Badge in a heading -->
       <div style="display: flex; align-items: center; gap: 0.75rem;">
         <h2
-          style="margin: 0; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-800, #1f2937);"
+          style="margin: 0; font-family: var(--hx-font-family-sans, sans-serif); color: var(--hx-color-neutral-800, #202B39);"
         >
           Lab Results
         </h2>
@@ -863,11 +863,11 @@ export const EmptyBadge: Story = {
       style="display: flex; gap: 1.5rem; align-items: center; font-family: var(--hx-font-family-sans, sans-serif);"
     >
       <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="color: var(--hx-color-neutral-600, #4b5563);">With pulse (dot):</span>
+        <span style="color: var(--hx-color-neutral-600, #4A5362);">With pulse (dot):</span>
         <hx-badge variant="error" pulse></hx-badge>
       </div>
       <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <span style="color: var(--hx-color-neutral-600, #4b5563);">Without pulse (empty):</span>
+        <span style="color: var(--hx-color-neutral-600, #4A5362);">Without pulse (empty):</span>
         <hx-badge variant="primary"></hx-badge>
       </div>
     </div>
@@ -966,7 +966,7 @@ export const CSSCustomProperties: Story = {
       <!-- Custom background and text color -->
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           --hx-badge-bg / --hx-badge-color
         </p>
@@ -980,7 +980,7 @@ export const CSSCustomProperties: Story = {
           <hx-badge style="--hx-badge-bg: #1e1e1e; --hx-badge-color: #fbbf24;">Dark Gold</hx-badge>
         </div>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           style="--hx-badge-bg: #7c3aed; --hx-badge-color: #ffffff;"
         </code>
@@ -989,7 +989,7 @@ export const CSSCustomProperties: Story = {
       <!-- Custom font size -->
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           --hx-badge-font-size
         </p>
@@ -999,7 +999,7 @@ export const CSSCustomProperties: Story = {
           <hx-badge style="--hx-badge-font-size: 1.25rem;">1.25rem</hx-badge>
         </div>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           style="--hx-badge-font-size: 1rem;"
         </code>
@@ -1008,7 +1008,7 @@ export const CSSCustomProperties: Story = {
       <!-- Custom font weight and family -->
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           --hx-badge-font-weight / --hx-badge-font-family
         </p>
@@ -1021,7 +1021,7 @@ export const CSSCustomProperties: Story = {
           >
         </div>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           style="--hx-badge-font-family: 'Courier New', monospace;"
         </code>
@@ -1030,7 +1030,7 @@ export const CSSCustomProperties: Story = {
       <!-- Custom border radius -->
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           --hx-badge-border-radius
         </p>
@@ -1040,7 +1040,7 @@ export const CSSCustomProperties: Story = {
           <hx-badge style="--hx-badge-border-radius: 9999px;">Full Round</hx-badge>
         </div>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           style="--hx-badge-border-radius: 0;"
         </code>
@@ -1049,7 +1049,7 @@ export const CSSCustomProperties: Story = {
       <!-- Custom padding -->
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           --hx-badge-padding-x / --hx-badge-padding-y
         </p>
@@ -1063,7 +1063,7 @@ export const CSSCustomProperties: Story = {
           >
         </div>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           style="--hx-badge-padding-x: 1.5rem; --hx-badge-padding-y: 0.5rem;"
         </code>
@@ -1072,7 +1072,7 @@ export const CSSCustomProperties: Story = {
       <!-- Custom dot size -->
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           --hx-badge-dot-size
         </p>
@@ -1083,7 +1083,7 @@ export const CSSCustomProperties: Story = {
           <hx-badge variant="error" pulse style="--hx-badge-dot-size: 1.5rem;"></hx-badge>
         </div>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           style="--hx-badge-dot-size: 1rem;"
         </code>
@@ -1113,8 +1113,8 @@ export const CSSParts: Story = {
     <style>
       .css-parts-demo hx-badge.outlined::part(badge) {
         background: transparent;
-        border: 2px solid var(--hx-color-primary-500, #2563eb);
-        color: var(--hx-color-primary-500, #2563eb);
+        border: 2px solid var(--hx-color-primary-500, #429797);
+        color: var(--hx-color-primary-500, #429797);
       }
       .css-parts-demo hx-badge.gradient::part(badge) {
         background: linear-gradient(135deg, #6366f1, #ec4899);
@@ -1139,52 +1139,52 @@ export const CSSParts: Story = {
     >
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           Outlined (::part(badge) with border and transparent bg)
         </p>
         <hx-badge class="outlined">Outlined Badge</hx-badge>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           hx-badge::part(badge) { background: transparent; border: 2px solid ...; }
         </code>
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           Gradient (::part(badge) with background gradient)
         </p>
         <hx-badge class="gradient">Gradient Badge</hx-badge>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           hx-badge::part(badge) { background: linear-gradient(135deg, #6366f1, #ec4899); }
         </code>
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           Elevated (::part(badge) with box-shadow)
         </p>
         <hx-badge class="elevated">Elevated Badge</hx-badge>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           hx-badge::part(badge) { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         </code>
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #374151);"
+          style="margin: 0 0 0.5rem; font-weight: 600; color: var(--hx-color-neutral-700, #313E4B);"
         >
           Large text (::part(badge) with font overrides)
         </p>
         <hx-badge class="large-text">Uppercase Badge</hx-badge>
         <code
-          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6b7280);"
+          style="display: block; margin-top: 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           hx-badge::part(badge) { font-size: 1rem; text-transform: uppercase; }
         </code>
@@ -1261,46 +1261,46 @@ export const InteractionPulse: Story = {
 export const TriagePriority: Story = {
   render: () => html`
     <div style="font-family: var(--hx-font-family-sans, sans-serif);">
-      <h3 style="margin: 0 0 1rem; color: var(--hx-color-neutral-800, #1f2937);">
+      <h3 style="margin: 0 0 1rem; color: var(--hx-color-neutral-800, #202B39);">
         Emergency Triage Board
       </h3>
       <div style="display: flex; flex-direction: column; gap: 0;">
         <div
-          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #f9fafb); font-weight: 600; color: var(--hx-color-neutral-500, #6b7280); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #F5F8F3); font-weight: 600; color: var(--hx-color-neutral-500, #66787B); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
           <span>Time</span>
           <span>Patient</span>
           <span>Priority</span>
         </div>
         <div
-          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-500, #6b7280); font-size: 0.875rem;"
+          <span style="color: var(--hx-color-neutral-500, #66787B); font-size: 0.875rem;"
             >08:14</span
           >
-          <span style="color: var(--hx-color-neutral-700, #374151);"
+          <span style="color: var(--hx-color-neutral-700, #313E4B);"
             >Anderson, K. - Chest pain, diaphoresis</span
           >
           <hx-badge variant="error" pulse>Immediate</hx-badge>
         </div>
         <div
-          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-500, #6b7280); font-size: 0.875rem;"
+          <span style="color: var(--hx-color-neutral-500, #66787B); font-size: 0.875rem;"
             >08:32</span
           >
-          <span style="color: var(--hx-color-neutral-700, #374151);"
+          <span style="color: var(--hx-color-neutral-700, #313E4B);"
             >Brooks, T. - Open fracture, right tibia</span
           >
           <hx-badge variant="warning">Urgent</hx-badge>
         </div>
         <div
-          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-500, #6b7280); font-size: 0.875rem;"
+          <span style="color: var(--hx-color-neutral-500, #66787B); font-size: 0.875rem;"
             >09:05</span
           >
-          <span style="color: var(--hx-color-neutral-700, #374151);"
+          <span style="color: var(--hx-color-neutral-700, #313E4B);"
             >Davis, M. - Laceration, left forearm</span
           >
           <hx-badge variant="primary">Standard</hx-badge>
@@ -1308,10 +1308,10 @@ export const TriagePriority: Story = {
         <div
           style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem;"
         >
-          <span style="color: var(--hx-color-neutral-500, #6b7280); font-size: 0.875rem;"
+          <span style="color: var(--hx-color-neutral-500, #66787B); font-size: 0.875rem;"
             >09:41</span
           >
-          <span style="color: var(--hx-color-neutral-700, #374151);"
+          <span style="color: var(--hx-color-neutral-700, #313E4B);"
             >Evans, J. - Sore throat, 2 days</span
           >
           <hx-badge variant="success">Non-urgent</hx-badge>
@@ -1342,42 +1342,42 @@ export const TriagePriority: Story = {
 export const LabResultStatus: Story = {
   render: () => html`
     <div style="font-family: var(--hx-font-family-sans, sans-serif);">
-      <h3 style="margin: 0 0 1rem; color: var(--hx-color-neutral-800, #1f2937);">
+      <h3 style="margin: 0 0 1rem; color: var(--hx-color-neutral-800, #202B39);">
         Lab Results - Patient: Chen, L. (MRN-0092451)
       </h3>
       <div style="display: flex; flex-direction: column; gap: 0;">
         <div
-          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #f9fafb); font-weight: 600; color: var(--hx-color-neutral-500, #6b7280); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #F5F8F3); font-weight: 600; color: var(--hx-color-neutral-500, #66787B); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
           <span>Test</span>
           <span>Result</span>
           <span>Status</span>
         </div>
         <div
-          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);"
+          <span style="color: var(--hx-color-neutral-700, #313E4B);"
             >Complete Blood Count (CBC)</span
           >
-          <span style="color: var(--hx-color-neutral-500, #6b7280); font-size: 0.875rem;">--</span>
+          <span style="color: var(--hx-color-neutral-500, #66787B); font-size: 0.875rem;">--</span>
           <hx-badge variant="neutral">Pending</hx-badge>
         </div>
         <div
-          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);"
+          <span style="color: var(--hx-color-neutral-700, #313E4B);"
             >Basic Metabolic Panel (BMP)</span
           >
-          <span style="color: var(--hx-color-neutral-500, #6b7280); font-size: 0.875rem;"
+          <span style="color: var(--hx-color-neutral-500, #66787B); font-size: 0.875rem;"
             >Processing</span
           >
           <hx-badge variant="primary" pulse>In Progress</hx-badge>
         </div>
         <div
-          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #e5e7eb);"
+          style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);">Hemoglobin A1c</span>
-          <span style="color: var(--hx-color-neutral-500, #6b7280); font-size: 0.875rem;"
+          <span style="color: var(--hx-color-neutral-700, #313E4B);">Hemoglobin A1c</span>
+          <span style="color: var(--hx-color-neutral-500, #66787B); font-size: 0.875rem;"
             >5.4%</span
           >
           <hx-badge variant="success">Complete</hx-badge>
@@ -1385,9 +1385,9 @@ export const LabResultStatus: Story = {
         <div
           style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.75rem 1rem;"
         >
-          <span style="color: var(--hx-color-neutral-700, #374151);">Troponin I</span>
+          <span style="color: var(--hx-color-neutral-700, #313E4B);">Troponin I</span>
           <span
-            style="font-weight: 600; color: var(--hx-color-error-500, #dc2626); font-size: 0.875rem;"
+            style="font-weight: 600; color: var(--hx-color-error-500, #E5493E); font-size: 0.875rem;"
             >0.89 ng/mL</span
           >
           <hx-badge variant="error" pulse>Abnormal</hx-badge>

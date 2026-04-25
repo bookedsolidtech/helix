@@ -430,11 +430,11 @@ export const WithLabelSlot: Story = {
     <hx-date-picker name="dob" format="MM/DD/YYYY">
       <label
         slot="label"
-        style="display: flex; align-items: baseline; gap: 0.25rem; font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #343a40);"
+        style="display: flex; align-items: baseline; gap: 0.25rem; font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
       >
         Date of Birth
         <span
-          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+          style="color: var(--hx-color-error-500, #E5493E); font-weight: 700;"
           aria-hidden="true"
           >*</span
         >
@@ -453,7 +453,7 @@ export const WithHelpSlot: Story = {
     <hx-date-picker label="Consent Form Date" name="consentDate" format="MM/DD/YYYY">
       <span
         slot="help-text"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d); display: flex; align-items: center; gap: 0.25rem;"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); display: flex; align-items: center; gap: 0.25rem;"
       >
         <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path
@@ -476,7 +476,7 @@ export const WithErrorSlot: Story = {
     <hx-date-picker label="Surgery Date" name="surgeryDate" value="" required>
       <div
         slot="error"
-        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem; font-weight: 500;"
+        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #E5493E); font-size: 0.75rem; font-weight: 500;"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path

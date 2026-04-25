@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixBannerStyles } from './hx-banner.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Banner variant determines visual styling and ARIA semantics. */
 export type BannerVariant = 'info' | 'success' | 'warning' | 'error';
@@ -80,7 +81,7 @@ export type BannerPosition = 'sticky' | 'fixed';
  */
 @customElement('hx-banner')
 export class HelixBanner extends HelixElement {
-  static override styles = [helixBannerStyles];
+  static override styles = [helixBannerStyles, forcedColorsSurface];
 
   // ─── Properties ───
 

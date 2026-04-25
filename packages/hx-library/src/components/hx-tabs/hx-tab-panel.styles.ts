@@ -17,7 +17,7 @@ export const helixTabPanelStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-tabs-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
@@ -27,7 +27,7 @@ export const helixTabPanelStyles = css`
     padding: var(--hx-tabs-panel-padding, var(--hx-space-4, 1rem));
     font-family: var(--hx-tab-panel-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-tabs-panel-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-tabs-panel-color, var(--hx-color-neutral-700, #313e4b));
     line-height: var(--hx-line-height-normal, 1.5);
     outline: none;
   }

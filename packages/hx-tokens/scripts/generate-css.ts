@@ -32,8 +32,22 @@ function flatten(
 const jsonPath = resolve(__dirname, '../src/tokens.json');
 const tokens = JSON.parse(readFileSync(jsonPath, 'utf-8'));
 
-// Separate dark mode and high-contrast tokens from the rest
-const { dark: darkTokens, 'high-contrast': hcTokens, ...lightTokens } = tokens;
+// Separate dark mode, high-contrast, and the component manifest from the
+// light/baseline cascade. The `component:` block is intentionally NOT emitted
+// to CSS — per-component tokens are authored inline in each component's
+// `.styles.ts` file so the cascade-driven "undefined unless overridden"
+// semantics are preserved (consumers override at the semantic tier; component
+// tokens have no default and inherit from the semantics they reference).
+// The block exists in tokens.json purely as a manifest for the Figma kit and
+// audit tooling. Sync between this manifest and the inline-authored tokens is
+// gated by `src/__tests__/component-manifest-sync.test.ts`.
+const {
+  dark: darkTokens,
+  'high-contrast': hcTokens,
+  component: _componentManifest,
+  ...lightTokens
+} = tokens;
+void _componentManifest;
 
 // Generate light mode (all primitive + semantic tokens)
 const lightEntries = flatten(lightTokens);

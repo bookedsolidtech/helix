@@ -252,7 +252,7 @@ export const CustomDropzoneSlot: Story = {
           height="40"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="var(--hx-color-primary-500, #2563EB)"
+          stroke="var(--hx-color-primary-500, #429797)"
           stroke-width="1.5"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -267,7 +267,7 @@ export const CustomDropzoneSlot: Story = {
           style="
             font-size: 1rem;
             font-weight: 600;
-            color: var(--hx-color-neutral-700, #343a40);
+            color: var(--hx-color-neutral-700, #313E4B);
           "
         >
           Upload Referral PDF
@@ -275,7 +275,7 @@ export const CustomDropzoneSlot: Story = {
         <span
           style="
             font-size: 0.8125rem;
-            color: var(--hx-color-neutral-500, #6c757d);
+            color: var(--hx-color-neutral-500, #66787B);
             text-align: center;
           "
         >
@@ -331,7 +331,7 @@ export const HealthcareLabResults: Story = {
             height="44"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--hx-color-primary-500, #2563EB)"
+            stroke="var(--hx-color-primary-500, #429797)"
             stroke-width="1.5"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -345,7 +345,7 @@ export const HealthcareLabResults: Story = {
             style="
               font-size: 1rem;
               font-weight: 600;
-              color: var(--hx-color-neutral-800, #1a1d20);
+              color: var(--hx-color-neutral-800, #202B39);
             "
           >
             Drag lab results here or click to browse
@@ -353,7 +353,7 @@ export const HealthcareLabResults: Story = {
           <span
             style="
               font-size: 0.8125rem;
-              color: var(--hx-color-neutral-500, #6c757d);
+              color: var(--hx-color-neutral-500, #66787B);
               text-align: center;
               line-height: 1.5;
             "
@@ -367,7 +367,7 @@ export const HealthcareLabResults: Story = {
         style="
           margin-top: 0.75rem;
           font-size: 0.75rem;
-          color: var(--hx-color-neutral-500, #6c757d);
+          color: var(--hx-color-neutral-500, #66787B);
           line-height: 1.5;
         "
       >

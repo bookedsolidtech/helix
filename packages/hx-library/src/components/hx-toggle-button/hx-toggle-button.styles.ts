@@ -19,7 +19,7 @@ export const helixToggleButtonStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-toggle-button-border-color, transparent);
     border-radius: var(--hx-toggle-button-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-toggle-button-bg, var(--hx-color-primary-500, #2563eb));
+    background-color: var(--hx-toggle-button-bg, var(--hx-color-primary-500, #429797));
     color: var(--hx-toggle-button-color, var(--hx-color-text-on-primary, #ffffff));
     font-family: var(--hx-toggle-button-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-toggle-button-font-weight, var(--hx-font-weight-semibold, 600));
@@ -40,7 +40,7 @@ export const helixToggleButtonStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-toggle-button-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
@@ -79,49 +79,55 @@ export const helixToggleButtonStyles = css`
   /* ─── Style Variants ─── */
 
   .button--primary {
-    --hx-toggle-button-bg: var(--hx-color-primary-500, #2563eb);
+    --hx-toggle-button-bg: var(--hx-color-primary-500, #429797);
     --hx-toggle-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-toggle-button-border-color: transparent;
   }
 
+  /*
+   * secondary/ghost paint primary text on the surface (white). primary-500
+   * (#429797) on white = 3.43:1 — fails AA at body sizes. shift to
+   * primary-600 (#0F7078) = 6.06:1 — AA pass. border keeps primary-500
+   * for the brand affordance (3:1 non-text contrast still met).
+   */
   .button--secondary {
     --hx-toggle-button-bg: transparent;
-    --hx-toggle-button-color: var(--hx-color-primary-500, #2563eb);
-    --hx-toggle-button-border-color: var(--hx-color-primary-500, #2563eb);
+    --hx-toggle-button-color: var(--hx-color-primary-600, #0f7078);
+    --hx-toggle-button-border-color: var(--hx-color-primary-600, #0f7078);
   }
 
   .button--secondary:hover {
-    --hx-toggle-button-bg: var(--hx-color-primary-50, #eff6ff);
+    --hx-toggle-button-bg: var(--hx-color-primary-50, #ebf8f8);
   }
 
   .button--tertiary {
-    --hx-toggle-button-bg: var(--hx-color-surface-sunken, #f1f5f9);
-    --hx-toggle-button-color: var(--hx-color-text-primary, #0f172a);
+    --hx-toggle-button-bg: var(--hx-color-surface-sunken, #ebeee9);
+    --hx-toggle-button-color: var(--hx-color-text-primary, #0d1825);
     --hx-toggle-button-border-color: transparent;
   }
 
   .button--tertiary:hover {
-    --hx-toggle-button-bg: var(--hx-color-surface-raised, #e2e8f0);
+    --hx-toggle-button-bg: var(--hx-color-surface-raised, #f5f8f3);
   }
 
   .button--ghost {
     --hx-toggle-button-bg: transparent;
-    --hx-toggle-button-color: var(--hx-color-primary-500, #2563eb);
+    --hx-toggle-button-color: var(--hx-color-primary-600, #0f7078);
     --hx-toggle-button-border-color: transparent;
   }
 
   .button--ghost:hover {
-    --hx-toggle-button-bg: var(--hx-color-surface-raised, #f1f5f9);
+    --hx-toggle-button-bg: var(--hx-color-surface-raised, #f5f8f3);
   }
 
   .button--outline {
     --hx-toggle-button-bg: transparent;
-    --hx-toggle-button-color: var(--hx-color-text-primary, #0f172a);
-    --hx-toggle-button-border-color: var(--hx-color-border-strong, #cbd5e1);
+    --hx-toggle-button-color: var(--hx-color-text-primary, #0d1825);
+    --hx-toggle-button-border-color: var(--hx-color-border-strong, #8e9c98);
   }
 
   .button--outline:hover {
-    --hx-toggle-button-bg: var(--hx-color-surface-raised, #f8fafc);
+    --hx-toggle-button-bg: var(--hx-color-surface-raised, #f5f8f3);
   }
 
   /* ─── Pressed State ─── */
@@ -129,12 +135,19 @@ export const helixToggleButtonStyles = css`
   /*
    * Primary: already uses solid primary bg; pressed deepens to primary-700
    * to give clear visual feedback without introducing a new color.
+   *
+   * AA fix: text.on-primary (= neutral-900 #0D1825) on primary-700 (#0F6363)
+   * = 2.54:1 — fails AA. Pin fg at neutral-0 for the darker pressed fill
+   * (neutral-0 on primary-700 = 7.03:1, AAA pass). Mirrors hx-toast
+   * precedent (commit 300e21ab0) and hx-button hover treatment.
+   * Note: secondary.pressed below uses primary-500 and stays at 5.20:1 —
+   * leave it alone.
    */
   .button--primary.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-700, #1e40af));
+    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-700, #0f6363));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-text-on-primary, #ffffff)
+      var(--hx-color-neutral-0, #ffffff)
     );
     --hx-toggle-button-border-color: transparent;
   }
@@ -144,31 +157,31 @@ export const helixToggleButtonStyles = css`
    * so the state change is immediately legible.
    */
   .button--secondary.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-500, #2563eb));
+    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-500, #429797));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
       var(--hx-color-text-on-primary, #ffffff)
     );
-    --hx-toggle-button-border-color: var(--hx-color-primary-500, #2563eb);
+    --hx-toggle-button-border-color: var(--hx-color-primary-500, #429797);
   }
 
   /* Tertiary pressed: use primary-100 bg + primary-700 text + border for WCAG 3:1 non-text contrast. */
   .button--tertiary.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-100, #dbeafe));
+    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-100, #dbf0f0));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-primary-700, #1e40af)
+      var(--hx-color-primary-700, #0f6363)
     );
-    --hx-toggle-button-border-color: var(--hx-color-primary-400, #60a5fa);
-    box-shadow: inset 0 0 0 1px var(--hx-color-primary-400, #60a5fa);
+    --hx-toggle-button-border-color: var(--hx-color-primary-400, #6ab1b1);
+    box-shadow: inset 0 0 0 1px var(--hx-color-primary-400, #6ab1b1);
   }
 
   /* Ghost pressed: subtle neutral fill, matching hover behavior as a baseline. */
   .button--ghost.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-100, #dbeafe));
+    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-100, #dbf0f0));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-primary-700, #1e40af)
+      var(--hx-color-primary-700, #0f6363)
     );
     --hx-toggle-button-border-color: transparent;
   }
@@ -177,14 +190,14 @@ export const helixToggleButtonStyles = css`
   .button--outline.button--pressed {
     --hx-toggle-button-bg: var(
       --hx-toggle-button-pressed-bg,
-      var(--hx-color-surface-sunken, #f1f5f9)
+      var(--hx-color-surface-sunken, #ebeee9)
     );
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-text-primary, #0f172a)
+      var(--hx-color-text-primary, #0d1825)
     );
-    --hx-toggle-button-border-color: var(--hx-color-text-muted, #64748b);
-    box-shadow: inset 0 0 0 1px var(--hx-color-neutral-500, #64748b);
+    --hx-toggle-button-border-color: var(--hx-color-text-muted, #4a5362);
+    box-shadow: inset 0 0 0 1px var(--hx-color-neutral-500, #66787b);
   }
 
   /* ─── Disabled ─── */

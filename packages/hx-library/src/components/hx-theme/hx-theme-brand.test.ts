@@ -113,9 +113,9 @@ describe('hx-theme brand attribute', () => {
       el.brand = '';
       await el.updateComplete;
 
-      // Should now have the default light theme primary-500 (#2563EB)
+      // Should now have the default light theme primary-500 (precision-cool #429797)
       const value = getCssVar(el, '--hx-color-primary-500');
-      expect(value.toLowerCase()).toBe('#2563eb');
+      expect(value.toLowerCase()).toBe('#429797');
     });
   });
 
@@ -134,9 +134,9 @@ describe('hx-theme brand attribute', () => {
       );
       await el.updateComplete;
 
-      // Base light theme primary-500 should still be injected
+      // Base light theme primary-500 should still be injected (precision-cool palette)
       const value = getCssVar(el, '--hx-color-primary-500');
-      expect(value.toLowerCase()).toBe('#2563eb');
+      expect(value.toLowerCase()).toBe('#429797');
     });
 
     it('logs a console.warn when brand is set but not registered', async () => {
