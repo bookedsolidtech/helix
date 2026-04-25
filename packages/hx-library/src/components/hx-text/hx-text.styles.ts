@@ -106,7 +106,9 @@ export const helixTextStyles = css`
   }
 
   .text--color-warning {
-    --hx-text-color: var(--hx-text-warning-color, var(--hx-color-warning-600, #b8650e));
+    /* warning-600 (#B8650E) on white = 4.28:1 — fails AA body text in the
+       precision-cool palette. warning-700 (#804605) on white = 7.06:1 — AA pass. */
+    --hx-text-color: var(--hx-text-warning-color, var(--hx-color-warning-700, #804605));
   }
 
   /* ─── Weight Overrides ─── */
