@@ -31,8 +31,8 @@ export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info'
  * @csspart close-button - The dismiss button (only when closable).
  * @csspart action - The action slot wrapper.
  *
- * @cssprop [--hx-toast-bg=var(--hx-color-neutral-900)] - Toast background color.
- * @cssprop [--hx-toast-color=var(--hx-color-neutral-0)] - Toast text color.
+ * @cssprop [--hx-toast-bg=var(--hx-color-surface-inverse)] - Toast background color.
+ * @cssprop [--hx-toast-color=var(--hx-color-text-inverse)] - Toast text color.
  * @cssprop [--hx-toast-border-radius=var(--hx-border-radius-md)] - Toast border radius.
  * @cssprop [--hx-toast-shadow] - Toast box shadow.
  * @cssprop [--hx-toast-width=20rem] - Toast width.
