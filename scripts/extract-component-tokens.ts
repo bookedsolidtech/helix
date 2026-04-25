@@ -125,9 +125,7 @@ function getSemanticTokenNames(): Set<string> {
  * doesn't care about string boundaries; we just want to drop comment text.
  */
 function stripComments(source: string): string {
-  return source
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/\/\/.*$/gm, '');
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
 }
 
 /**
