@@ -330,11 +330,12 @@ jobs:
         if: steps.changed.outputs.skip != 'true'
         env:
           HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
-          # Unscoped/shared-test runs execute the full suite; individual files
-          # in browser mode take longer under full-suite resource pressure, so
-          # give the watchdog more headroom (4 min vs the 2 min default for
-          # tightly-scoped feature-PR runs).
-          STALE_TIMEOUT: ${{ steps.changed.outputs.shared_tests_changed == 'true' && '240' || '120' }}
+          # Browser-mode vitest with 73 components legitimately needs >120s of
+          # pre-output time on slow component startups, even on tightly-scoped
+          # feature-PR runs. Use a uniform 4 min stale timeout for all runs;
+          # the watchdog still kills genuinely stuck runs (no output for 240s
+          # means something is actually wrong, not just slow).
+          STALE_TIMEOUT: '240'
         run: |
           # shellcheck disable=SC1091
           source "$GITHUB_WORKSPACE/scripts/lib/vitest-watchdog.sh"
