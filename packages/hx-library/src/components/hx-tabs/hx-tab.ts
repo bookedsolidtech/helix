@@ -2,6 +2,7 @@ import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixTabStyles } from './hx-tab.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -36,7 +37,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-tab')
 export class HelixTab extends HelixElement {
-  static override styles = [helixTabStyles];
+  static override styles = [helixTabStyles, forcedColorsInteractive];
 
   // ─── Properties ───
 

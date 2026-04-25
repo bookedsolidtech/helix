@@ -2,6 +2,7 @@ import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
 
 /**
@@ -31,7 +32,7 @@ import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
  */
 @customElement('hx-breadcrumb-item')
 export class HelixBreadcrumbItem extends HelixElement {
-  static override styles = [helixBreadcrumbItemStyles];
+  static override styles = [helixBreadcrumbItemStyles, forcedColorsInteractive];
 
   override connectedCallback(): void {
     super.connectedCallback();

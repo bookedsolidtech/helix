@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixMenuItemStyles } from './hx-menu-item.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -36,7 +37,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-menu-item')
 export class HelixMenuItem extends HelixElement {
-  static override styles = [helixMenuItemStyles];
+  static override styles = [helixMenuItemStyles, forcedColorsInteractive];
 
   /**
    * @internal Managed by parent hx-menu for roving tabindex.

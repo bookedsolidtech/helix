@@ -2,6 +2,7 @@ import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixMenuStyles } from './hx-menu.styles.js';
 import type { HelixMenuItem } from './hx-menu-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -36,7 +37,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  */
 @customElement('hx-menu')
 export class HelixMenu extends HelixElement {
-  static override styles = [helixMenuStyles];
+  static override styles = [helixMenuStyles, forcedColorsInteractive];
 
   /**
    * Accessible label for the menu. Rendered as `aria-label` on the inner

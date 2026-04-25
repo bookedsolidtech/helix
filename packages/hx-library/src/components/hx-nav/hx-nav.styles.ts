@@ -15,8 +15,8 @@ export const helixNavStyles = css`
 
   [part='nav'] {
     position: relative;
-    background-color: var(--hx-nav-bg, var(--hx-color-neutral-900, #0f172a));
-    color: var(--hx-nav-color, var(--hx-color-neutral-100, #f1f5f9));
+    background-color: var(--hx-nav-bg, var(--hx-color-neutral-900, #0d1825));
+    color: var(--hx-nav-color, var(--hx-color-neutral-100, #ebeee9));
     padding: var(--hx-nav-padding, var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem));
   }
 
@@ -30,19 +30,22 @@ export const helixNavStyles = css`
     background: transparent;
     border: none;
     border-radius: var(--hx-nav-border-radius, var(--hx-border-radius-sm, 0.25rem));
-    color: var(--hx-nav-color, var(--hx-color-neutral-100, #f1f5f9));
+    color: var(--hx-nav-color, var(--hx-color-neutral-100, #ebeee9));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms) ease;
     line-height: 0;
   }
 
   [part='toggle']:hover {
-    background-color: var(--hx-nav-link-hover-bg, var(--hx-color-neutral-700, #334155));
+    background-color: var(--hx-nav-link-hover-bg, var(--hx-color-neutral-700, #313e4b));
   }
 
   [part='toggle']:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-nav-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(
+        --hx-nav-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -72,7 +75,7 @@ export const helixNavStyles = css`
     align-items: center;
     gap: var(--hx-space-1, 0.25rem);
     padding: var(--hx-nav-item-padding, var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem));
-    color: var(--hx-nav-link-color, var(--hx-color-neutral-100, #f1f5f9));
+    color: var(--hx-nav-link-color, var(--hx-color-neutral-100, #ebeee9));
     text-decoration: none;
     border-radius: var(--hx-nav-border-radius, var(--hx-border-radius-sm, 0.25rem));
     border: none;
@@ -89,18 +92,21 @@ export const helixNavStyles = css`
   }
 
   .nav__link:hover {
-    background-color: var(--hx-nav-link-hover-bg, var(--hx-color-neutral-700, #334155));
+    background-color: var(--hx-nav-link-hover-bg, var(--hx-color-neutral-700, #313e4b));
     color: var(--hx-nav-link-hover-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   .nav__link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-nav-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(
+        --hx-nav-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .nav__link--active {
-    background-color: var(--hx-nav-link-active-bg, var(--hx-color-primary-600, #1d4ed8));
+    background-color: var(--hx-nav-link-active-bg, var(--hx-color-primary-600, #0f7078));
     color: var(--hx-nav-link-active-color, var(--hx-color-neutral-0, #ffffff));
   }
 
@@ -125,7 +131,7 @@ export const helixNavStyles = css`
     list-style: none;
     margin: 0;
     padding: var(--hx-space-1, 0.25rem) 0;
-    background-color: var(--hx-nav-submenu-bg, var(--hx-color-neutral-800, #1e293b));
+    background-color: var(--hx-nav-submenu-bg, var(--hx-color-neutral-800, #202b39));
     border-radius: var(--hx-border-radius-md, 0.375rem);
     box-shadow: var(
       --hx-nav-shadow,
@@ -179,7 +185,7 @@ export const helixNavStyles = css`
   :host([orientation='vertical']) .nav__submenu .nav__link {
     padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem);
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-nav-link-color, var(--hx-color-neutral-300, #cbd5e1));
+    color: var(--hx-nav-link-color, var(--hx-color-neutral-300, #b6bfb9));
   }
 
   /* ─── Mobile Responsive ─── */

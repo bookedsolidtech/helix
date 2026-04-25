@@ -28,7 +28,7 @@ export const helixTabStyles = css`
     font-family: var(--hx-tabs-tab-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tabs-tab-font-size, var(--hx-font-size-md, 1rem));
     font-weight: var(--hx-tabs-tab-font-weight, var(--hx-font-weight-medium, 500));
-    color: var(--hx-tabs-tab-color, var(--hx-color-neutral-600, #475569));
+    color: var(--hx-tabs-tab-color, var(--hx-color-neutral-600, #4a5362));
     line-height: var(--hx-line-height-tight, 1.25);
     cursor: pointer;
     white-space: nowrap;
@@ -45,17 +45,17 @@ export const helixTabStyles = css`
   /* ─── Hover State ─── */
 
   .tab:not([aria-selected='true']):not([aria-disabled='true']):hover {
-    color: var(--hx-tabs-tab-hover-color, var(--hx-color-neutral-800, #1e293b));
-    background-color: var(--hx-tabs-tab-hover-bg, var(--hx-color-neutral-50, #f8fafc));
+    color: var(--hx-tabs-tab-hover-color, var(--hx-color-neutral-800, #202b39));
+    background-color: var(--hx-tabs-tab-hover-bg, var(--hx-color-neutral-50, #f5f8f3));
   }
 
   /* ─── Selected State ─── */
 
   .tab[aria-selected='true'] {
-    color: var(--hx-tabs-tab-active-color, var(--hx-color-primary-600, #1d4ed8));
+    color: var(--hx-tabs-tab-active-color, var(--hx-color-primary-600, #0f7078));
     border-bottom-color: var(
       --_tab-indicator-bottom-color,
-      var(--hx-tabs-indicator-color, var(--hx-color-primary-500, #2563eb))
+      var(--hx-tabs-indicator-color, var(--hx-color-primary-500, #429797))
     );
     border-inline-end-color: var(--_tab-indicator-end-color, transparent);
     font-weight: var(--hx-tabs-tab-active-font-weight, var(--hx-font-weight-semibold, 600));
@@ -67,7 +67,7 @@ export const helixTabStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-tabs-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
@@ -81,7 +81,7 @@ export const helixTabStyles = css`
 
   .tab[aria-disabled='true'] {
     pointer-events: none;
-    color: var(--hx-color-neutral-400, #94a3b8);
+    color: var(--hx-tabs-tab-disabled-color, var(--hx-color-neutral-400, #8e9c98));
   }
 
   /* ─── Prefix / Suffix Slots ─── */

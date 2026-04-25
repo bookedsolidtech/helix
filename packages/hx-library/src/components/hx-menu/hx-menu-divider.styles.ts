@@ -7,7 +7,7 @@ export const helixMenuDividerStyles = css`
 
   .menu-divider {
     height: var(--hx-border-width-thin, 1px);
-    background-color: var(--hx-menu-divider-color, var(--hx-color-border-default, #e2e8f0));
+    background-color: var(--hx-menu-divider-color, var(--hx-color-border-default, #d6dbd5));
     margin: var(--hx-space-1, 0.25rem) calc(-1 * var(--hx-space-1, 0.25rem));
   }
 

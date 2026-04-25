@@ -7,7 +7,7 @@ export const helixNavItemStyles = css`
        resolve text contrast ratios for shadow-DOM content correctly.
        surface-inverse + text-inverse flip per mode: dark-on-light in dark
        mode, light-on-dark in light mode. */
-    background-color: var(--hx-nav-item-host-bg, var(--hx-color-surface-inverse, #0f172a));
+    background-color: var(--hx-nav-item-host-bg, var(--hx-color-surface-inverse, #0d1825));
     color: var(--hx-nav-item-color, var(--hx-color-text-inverse, #ffffff));
   }
 
@@ -75,7 +75,10 @@ export const helixNavItemStyles = css`
 
   .nav-item__link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
+      var(
+        --hx-nav-item-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -84,14 +87,14 @@ export const helixNavItemStyles = css`
   :host([active]) .nav-item__link {
     /* active state sits on a brand-primary fill — use text-on-primary so HC
        on-color overrides apply. text-on-primary (#fff) on primary-600
-       (#1d4ed8) = 7.01:1 — WCAG AA ✓ */
-    background-color: var(--hx-nav-item-active-bg, var(--hx-color-primary-600, #1d4ed8));
+       (#0F7078) = WCAG AA ✓ in "precision cool" palette */
+    background-color: var(--hx-nav-item-active-bg, var(--hx-color-primary-600, #0f7078));
     color: var(--hx-nav-item-active-color, var(--hx-color-text-on-primary, #ffffff));
   }
 
   :host([active]) .nav-item__link:hover {
-    /* text-on-primary (#ffffff) on primary-700 (#1e40af) = 8.59:1 — WCAG AA ✓ */
-    background-color: var(--hx-nav-item-active-hover-bg, var(--hx-color-primary-700, #1e40af));
+    /* text-on-primary (#ffffff) on primary-700 (#0F6363) = WCAG AA ✓ */
+    background-color: var(--hx-nav-item-active-hover-bg, var(--hx-color-primary-700, #0f6363));
   }
 
   /* ─── Disabled State ─── */
@@ -183,8 +186,8 @@ export const helixNavItemStyles = css`
     transform: translateY(-50%);
     /* tooltip is an inverted surface — flips per mode via surface-inverse /
        text-inverse. */
-    background-color: var(--hx-color-surface-inverse, #1e293b);
-    color: var(--hx-color-text-inverse, #f1f5f9);
+    background-color: var(--hx-color-surface-inverse, #0d1825);
+    color: var(--hx-color-text-inverse, #ebeee9);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     font-size: var(--hx-font-size-xs, 0.75rem);

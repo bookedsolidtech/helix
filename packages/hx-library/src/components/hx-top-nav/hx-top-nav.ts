@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixTopNavStyles } from './hx-top-nav.styles.js';
 
 /**
@@ -61,7 +62,7 @@ import { helixTopNavStyles } from './hx-top-nav.styles.js';
  */
 @customElement('hx-top-nav')
 export class HelixTopNav extends HelixElement {
-  static override styles = [helixTopNavStyles];
+  static override styles = [helixTopNavStyles, forcedColorsInteractive];
 
   // ─── Public Properties ───
 
