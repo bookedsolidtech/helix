@@ -9,14 +9,14 @@ p {
   margin-bottom: var(--hx-space-4, 1rem);
   font-size: var(--hx-prose-font-size, var(--hx-font-size-md, 1rem));
   line-height: var(--hx-prose-line-height, var(--hx-line-height-relaxed, 1.75));
-  color: var(--hx-prose-color, var(--hx-color-neutral-700, #343a40));
+  color: var(--hx-prose-color, var(--hx-color-neutral-700, #313E4B));
 }
 
 /* Lead paragraph — first paragraph or explicit .lead class */
 p:first-child,
 p.lead {
   font-size: var(--hx-prose-lead-font-size, var(--hx-font-size-lg, 1.125rem));
-  color: var(--hx-prose-lead-color, var(--hx-color-neutral-600, #495057));
+  color: var(--hx-prose-lead-color, var(--hx-color-neutral-600, #4A5362));
 }
 
 /* ─── Blockquote ─── */
@@ -27,11 +27,11 @@ blockquote {
   margin-left: 0;
   margin-right: 0;
   padding: var(--hx-space-4, 1rem) var(--hx-space-6, 1.5rem);
-  border-left: var(--hx-border-width-thick, 3px) solid var(--hx-color-primary-500, #2563eb);
-  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #f8f9fa));
+  border-left: var(--hx-border-width-thick, 3px) solid var(--hx-color-primary-500, #429797);
+  background-color: var(--hx-color-surface-raised, var(--hx-color-neutral-50, #F5F8F3));
   border-radius: 0 var(--hx-border-radius-sm, 0.25rem) var(--hx-border-radius-sm, 0.25rem) 0;
   font-style: italic;
-  color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #495057));
+  color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #4A5362));
 }
 
 blockquote p {
@@ -48,7 +48,7 @@ blockquote cite {
   font-size: var(--hx-font-size-sm, 0.875rem);
   font-style: normal;
   font-weight: var(--hx-font-weight-medium, 500);
-  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
 }
 
 blockquote cite::before {
@@ -60,7 +60,7 @@ blockquote cite::before {
 hr {
   border: 0;
   border-top: var(--hx-divider-width, var(--hx-border-width-thin, 1px)) solid
-    var(--hx-divider-color, var(--hx-color-border-default, var(--hx-color-neutral-200, #dee2e6)));
+    var(--hx-divider-color, var(--hx-color-border-default, var(--hx-color-neutral-200, #D6DBD5)));
   margin-top: var(--hx-space-8, 2rem);
   margin-bottom: var(--hx-space-8, 2rem);
 }
@@ -70,7 +70,7 @@ hr {
 strong,
 b {
   font-weight: var(--hx-font-weight-semibold, 600);
-  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #111827));
+  color: var(--hx-prose-heading-color, var(--hx-color-neutral-900, #0D1825));
 }
 
 em,
@@ -80,12 +80,12 @@ i {
 
 small {
   font-size: var(--hx-font-size-sm, 0.875rem);
-  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
 }
 
 mark {
-  background-color: var(--hx-color-warning-100, #fff3cd);
-  color: var(--hx-color-neutral-900, #0d1117);
+  background-color: var(--hx-color-warning-100, #FEE6D4);
+  color: var(--hx-color-neutral-900, #0D1825);
   padding: var(--hx-space-0, 0) var(--hx-space-1, 0.25rem);
   border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
@@ -93,17 +93,17 @@ mark {
 del,
 s {
   text-decoration: line-through;
-  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
+  color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
 }
 
 ins {
   text-decoration: underline;
-  text-decoration-color: var(--hx-color-success-300, #75b798);
+  text-decoration-color: var(--hx-color-success-300, #94D3A1);
 }
 
 abbr[title] {
   text-decoration: underline dotted;
-  text-decoration-color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #6c757d));
+  text-decoration-color: var(--hx-color-text-muted, var(--hx-color-neutral-500, #66787B));
   cursor: help;
   text-underline-offset: 0.15em;
 }
@@ -129,10 +129,10 @@ sub {
 a {
   color: var(
     --hx-prose-link-color,
-    var(--hx-color-text-link, var(--hx-color-primary-600, #006868))
+    var(--hx-color-text-link, var(--hx-color-primary-600, #0F7078))
   );
   text-decoration: underline;
-  text-decoration-color: var(--hx-color-primary-200, #80c2c2);
+  text-decoration-color: var(--hx-color-primary-200, #BCE1E1);
   text-underline-offset: 0.15em;
   transition:
     color var(--hx-transition-fast, 150ms ease),
@@ -140,21 +140,21 @@ a {
 }
 
 a:hover {
-  color: var(--hx-color-text-link-hover, var(--hx-color-primary-700, #005252));
+  color: var(--hx-color-text-link-hover, var(--hx-color-primary-700, #0F6363));
   text-decoration-color: currentColor;
 }
 
 a:visited {
-  color: var(--hx-color-text-link-visited, var(--hx-color-secondary-600, #4f46e5));
+  color: var(--hx-color-text-link-visited, var(--hx-color-secondary-600, #0F6B7E));
 }
 
 a:active {
-  color: var(--hx-color-text-link-active, var(--hx-color-primary-800, #003c3c));
+  color: var(--hx-color-text-link-active, var(--hx-color-primary-800, #07494A));
 }
 
 a:focus-visible {
   outline: var(--hx-focus-ring-width, 2px) solid
-    var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+    var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797));
   outline-offset: var(--hx-focus-ring-offset, 2px);
   border-radius: var(--hx-border-radius-sm, 0.25rem);
 }
