@@ -14,7 +14,9 @@ export const helixPatientBannerStyles = css`
     );
     --_gap: var(--hx-patient-banner-gap, var(--hx-space-4, 1rem));
     --_font-family: var(--hx-patient-banner-font-family, var(--hx-font-family-sans, sans-serif));
-    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-500, #66787b));
+    /* neutral-500 (#66787B) on neutral-50 (#F5F8F3) = 4.32:1 — fails AA body text.
+       text-muted resolves to neutral-600 (#4A5362) = 7.36:1 — AA pass everywhere. */
+    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-text-muted, #4a5362));
     --_label-font-size: var(--hx-patient-banner-label-font-size, var(--hx-font-size-xs, 0.75rem));
     --_value-color: var(--hx-patient-banner-value-color, var(--hx-color-neutral-900, #0d1825));
     --_value-font-size: var(--hx-patient-banner-value-font-size, var(--hx-font-size-sm, 0.875rem));
