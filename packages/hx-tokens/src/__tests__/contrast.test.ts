@@ -578,6 +578,24 @@ const PAIRS: PairSpec[] = [
     label: 'action.ghost.fg on action.ghost.bg-hover',
     modes: ['light', 'dark'],
   },
+  // 3.2.1 round-4: action.secondary.border defines the resting outline of
+  // outline-style buttons. WCAG 1.4.11 requires 3:1 against the adjacent
+  // surface (resting body fill AND the hover fill) so the affordance does not
+  // visually disappear when the user hovers.
+  {
+    text: '--hx-color-action-secondary-border',
+    surface: '--hx-color-surface-default',
+    threshold: 3,
+    label: 'action.secondary.border on surface.default',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-action-secondary-border',
+    surface: '--hx-color-action-secondary-bg-hover',
+    threshold: 3,
+    label: 'action.secondary.border on action.secondary.bg-hover',
+    modes: ['light', 'dark'],
+  },
   // 3.2.1 token-cascade remediation: surface.{role}-strong tokens (the
   // emphasis-prominence sibling of surface.{role}, used by hx-toast variant
   // fills and any other "loud" status surface). Each pairs with the
