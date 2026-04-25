@@ -155,7 +155,17 @@ export const helixCardStyles = css`
     flex: 1;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-card-body-color, var(--hx-color-text-secondary, #4a5362));
+    /*
+     * Body color cascades: component-tier --hx-card-body-color overrides
+     * the host-tier --hx-card-color, which falls back to text-secondary.
+     * Preserves the propagation contract: setting --hx-card-color on the
+     * host flows into the body slot (and through to slotted light-DOM
+     * descendants via flat-tree inheritance).
+     */
+    color: var(
+      --hx-card-body-color,
+      var(--hx-card-color, var(--hx-color-text-secondary, #4a5362))
+    );
   }
 
   .card__footer {
