@@ -13,7 +13,7 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { join, relative, isAbsolute } from 'path';
 
 interface TokenRegistry {
   primitive: {
@@ -153,7 +153,12 @@ export function generateTokenRegistry(tokensFilePath: string): TokenRegistry {
       semanticCount: semantic.length,
       componentCount: component.length,
       generatedAt: new Date().toISOString(),
-      sourceFile: tokensFilePath,
+      // Stored as repo-relative so the committed registry doesn't leak the
+      // contributor's absolute filesystem path (and stays diff-stable across
+      // machines).
+      sourceFile: isAbsolute(tokensFilePath)
+        ? relative(process.cwd(), tokensFilePath)
+        : tokensFilePath,
     },
   };
 

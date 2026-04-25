@@ -46,12 +46,19 @@ if (!existsSync(jsonlPath)) {
 // this, the scoreboard only surfaces targets with at least one finding and
 // cannot distinguish "passed cleanly" from "never ran."
 function loadTargetManifest(): string[] {
-  const path = existsSync(processedManifestPath) ? processedManifestPath : fullManifestPath;
-  if (!existsSync(path)) return [];
-  return readFileSync(path, 'utf8')
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0 && !l.startsWith('#'));
+  // Prefer the per-run processed manifest. A zero-byte processed file (runner
+  // crashed before any target completed) must NOT short-circuit to an empty
+  // list — fall back to the full manifest so the scoreboard still pre-seeds.
+  const readEntries = (path: string): string[] =>
+    existsSync(path)
+      ? readFileSync(path, 'utf8')
+          .split('\n')
+          .map((l) => l.trim())
+          .filter((l) => l.length > 0 && !l.startsWith('#'))
+      : [];
+  const processed = readEntries(processedManifestPath);
+  if (processed.length > 0) return processed;
+  return readEntries(fullManifestPath);
 }
 
 const findings: Finding[] = [];
