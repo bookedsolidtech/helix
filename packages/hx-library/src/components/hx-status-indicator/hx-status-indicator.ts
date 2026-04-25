@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import { helixStatusIndicatorStyles } from './hx-status-indicator.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 export type StatusIndicatorStatus = 'online' | 'offline' | 'away' | 'busy' | 'unknown';
 export type StatusIndicatorSize = 'sm' | 'md' | 'lg';
@@ -73,7 +74,7 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  */
 @customElement('hx-status-indicator')
 export class HelixStatusIndicator extends HelixElement {
-  static override styles = [helixStatusIndicatorStyles];
+  static override styles = [helixStatusIndicatorStyles, forcedColorsSurface];
 
   /**
    * The status to display.

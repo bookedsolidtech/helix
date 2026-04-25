@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { createIdCounter } from '../../base/index.js';
 import { helixClinicalStatusStyles } from './hx-clinical-status.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Clinical severity level for alert fatigue prevention. */
 export type ClinicalSeverity = 'info' | 'warning' | 'critical' | 'emergent';
@@ -85,7 +86,7 @@ const nextId = createIdCounter('hx-clinical-status');
  */
 @customElement('hx-clinical-status')
 export class HelixClinicalStatus extends HelixElement {
-  static override styles = [helixClinicalStatusStyles];
+  static override styles = [helixClinicalStatusStyles, forcedColorsSurface];
 
   // ─── Properties ───
 

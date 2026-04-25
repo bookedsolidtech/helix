@@ -13,7 +13,7 @@ export const helixSkeletonStyles = css`
 
   .skeleton {
     display: block;
-    background-color: var(--hx-skeleton-bg, var(--hx-color-neutral-200, #e2e8f0));
+    background-color: var(--hx-skeleton-bg, var(--hx-color-neutral-200, #D6DBD5));
     overflow: hidden;
     position: relative;
     width: var(--_width, 100%);

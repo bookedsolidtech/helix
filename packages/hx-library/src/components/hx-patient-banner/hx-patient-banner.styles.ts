@@ -6,20 +6,20 @@ export const helixPatientBannerStyles = css`
     width: 100%;
 
     /* ─── Private token vars (3-tier cascade) ─── */
-    --_bg: var(--hx-patient-banner-bg, var(--hx-color-neutral-50, #f8fafc));
-    --_border-color: var(--hx-patient-banner-border-color, var(--hx-color-neutral-200, #e2e8f0));
+    --_bg: var(--hx-patient-banner-bg, var(--hx-color-neutral-50, #F5F8F3));
+    --_border-color: var(--hx-patient-banner-border-color, var(--hx-color-neutral-200, #D6DBD5));
     --_padding: var(
       --hx-patient-banner-padding,
       var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem)
     );
     --_gap: var(--hx-patient-banner-gap, var(--hx-space-4, 1rem));
     --_font-family: var(--hx-patient-banner-font-family, var(--hx-font-family-sans, sans-serif));
-    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-500, #64748b));
+    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-500, #66787B));
     --_label-font-size: var(--hx-patient-banner-label-font-size, var(--hx-font-size-xs, 0.75rem));
-    --_value-color: var(--hx-patient-banner-value-color, var(--hx-color-neutral-900, #0f172a));
+    --_value-color: var(--hx-patient-banner-value-color, var(--hx-color-neutral-900, #0D1825));
     --_value-font-size: var(--hx-patient-banner-value-font-size, var(--hx-font-size-sm, 0.875rem));
     --_photo-size: var(--hx-patient-banner-photo-size, var(--hx-space-10, 2.5rem));
-    --_photo-bg: var(--hx-patient-banner-photo-bg, var(--hx-color-neutral-200, #e2e8f0));
+    --_photo-bg: var(--hx-patient-banner-photo-bg, var(--hx-color-neutral-200, #D6DBD5));
   }
 
   * {
@@ -98,10 +98,13 @@ export const helixPatientBannerStyles = css`
   /* Visual indicator when Joint Commission two-identifier rule is not met. */
 
   :host([aria-invalid='true']) .banner {
-    border-bottom-color: var(--hx-color-error-400, #f87171);
-    background-color: var(--hx-color-error-50, #fef2f2);
+    border-bottom-color: var(
+      --hx-patient-banner-invalid-border-color,
+      var(--hx-color-error-400, #FC7264)
+    );
+    background-color: var(--hx-patient-banner-invalid-bg, var(--hx-color-error-50, #FFF2F0));
     /* Darken label color to maintain 4.5:1 contrast on error-50 background. */
-    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-700, #334155));
+    --_label-color: var(--hx-patient-banner-label-color, var(--hx-color-neutral-700, #313E4B));
   }
 
   :host([aria-invalid='true']) .banner::before {
@@ -112,7 +115,10 @@ export const helixPatientBannerStyles = css`
     top: 0;
     bottom: 0;
     width: var(--hx-border-width-thick, 4px);
-    background-color: var(--hx-color-error-500, #dc2626);
+    background-color: var(
+      --hx-patient-banner-invalid-accent-color,
+      var(--hx-color-error-500, #E5493E)
+    );
     border-radius: 0;
   }
 
