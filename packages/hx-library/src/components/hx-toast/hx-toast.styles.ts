@@ -63,10 +63,10 @@ export const helixToastStyles = css`
    * are tuned for the lighter -500 surfaces and would fail here (e.g.
    * neutral-900 on primary-600 = 3.07:1), so the on-{role}-strong tokens
    * (neutral-0, no dark-mode flip) keep fg legible on the darker fills.
-   * - text.on-primary-strong on info.bg-strong (primary-600, #0F7078) = 5.39:1
+   * - text.on-primary-strong on info.bg-strong (primary-600, #0F7078) = 5.82:1
    * - text.on-success-strong on success.bg-strong (success-700, #146831) = 6.88:1
-   *   (success-600 #0E8A4A on white = 4.41:1 — drifts under AA at 14px)
-   * - text.on-error-strong   on danger.bg-strong  (error-600, #C92A2A) = 5.92:1
+   *   (success-600 #0E8A4A on white = 4.42:1 — drifts under AA at 14px)
+   * - text.on-error-strong   on danger.bg-strong  (error-600, #C92A2A) = 5.46:1
    * - text.on-warning        on warning.bg-strong (warning-500, #C2711C) = 4.83:1
    *   (warning stays on the lighter -500 surface so on-warning works)
    *

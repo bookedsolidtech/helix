@@ -571,6 +571,13 @@ const PAIRS: PairSpec[] = [
     threshold: 4.5,
     label: 'action.ghost.fg on surface.default',
   },
+  {
+    text: '--hx-color-action-ghost-fg',
+    surface: '--hx-color-action-ghost-bg-hover',
+    threshold: 4.5,
+    label: 'action.ghost.fg on action.ghost.bg-hover',
+    modes: ['light', 'dark'],
+  },
   // 3.2.1 token-cascade remediation: surface.{role}-strong tokens (the
   // emphasis-prominence sibling of surface.{role}, used by hx-toast variant
   // fills and any other "loud" status surface). Each pairs with the

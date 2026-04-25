@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T20:02:01.523Z",
+  "generatedAt": "2026-04-25T20:44:50.116Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -25019,24 +25019,24 @@
         {
           "description": "Toast background color.",
           "name": "--hx-toast-bg",
-          "default": "var(--hx-color-neutral-900)",
+          "default": "var(--hx-color-surface-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/900",
+            "semanticToken": "color/surface/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Toast text color.",
           "name": "--hx-toast-color",
-          "default": "var(--hx-color-neutral-0)",
+          "default": "var(--hx-color-text-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/0",
+            "semanticToken": "color/text/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
