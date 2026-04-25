@@ -94,7 +94,7 @@ export const helixTimePickerStyles = css`
     border: none;
     background: transparent;
     padding: 0 var(--hx-space-3, 0.75rem);
-    color: var(--hx-time-picker-chevron-color, var(--hx-color-text-muted, #66787b));
+    color: var(--hx-time-picker-chevron-color, var(--hx-color-text-muted, #4A5362));
     cursor: pointer;
     height: 100%;
     min-height: var(--hx-size-10, 2.5rem);
@@ -185,7 +185,7 @@ export const helixTimePickerStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__help-text {
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
   }
   .field__error {
     color: var(--hx-time-picker-error-color, var(--hx-color-error-text, #c92a2a));

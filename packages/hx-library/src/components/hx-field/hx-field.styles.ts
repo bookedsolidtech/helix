@@ -48,13 +48,13 @@ export const helixFieldStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-field-label-color, var(--hx-color-text-strong, #334155));
+    color: var(--hx-field-label-color, var(--hx-color-text-strong, #202B39));
     line-height: var(--hx-line-height-normal, 1.5);
     cursor: pointer;
   }
 
   .field__required-marker {
-    color: var(--hx-field-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-field-error-color, var(--hx-color-error-text, #C92A2A));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -98,24 +98,24 @@ export const helixFieldStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-field-help-text-color, var(--hx-color-text-muted, #64748b));
+    color: var(--hx-field-help-text-color, var(--hx-color-text-muted, #4A5362));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   .field__error {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-field-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-field-error-color, var(--hx-color-error-text, #C92A2A));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
   /* ─── Error State ─── */
 
   .field--error .field__label {
-    color: var(--hx-field-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-field-error-color, var(--hx-color-error-text, #C92A2A));
   }
 
   .field--error .field__control {
-    outline: 2px solid var(--hx-field-error-color, var(--hx-color-error-500, #dc2626));
+    outline: 2px solid var(--hx-field-error-color, var(--hx-color-error-500, #E5493E));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }

@@ -196,7 +196,7 @@ export const helixToggleButtonStyles = css`
       --hx-toggle-button-pressed-color,
       var(--hx-color-text-primary, #0d1825)
     );
-    --hx-toggle-button-border-color: var(--hx-color-text-muted, #66787b);
+    --hx-toggle-button-border-color: var(--hx-color-text-muted, #4A5362);
     box-shadow: inset 0 0 0 1px var(--hx-color-neutral-500, #66787b);
   }
 

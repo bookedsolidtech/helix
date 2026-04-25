@@ -41,7 +41,7 @@ export const sharedFieldStyles = css`
 
   .field__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-500, #6c757d);
+    color: var(--hx-color-neutral-500, #66787B);
     line-height: var(--hx-line-height-normal, 1.5);
   }
 
@@ -118,7 +118,7 @@ export const sharedListboxStyles = css`
   .field__no-options {
     padding: var(--hx-space-3, 0.75rem);
     text-align: center;
-    color: var(--hx-color-neutral-400, #adb5bd);
+    color: var(--hx-color-neutral-400, #8E9C98);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 

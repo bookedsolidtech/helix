@@ -139,7 +139,7 @@ export const helixDatePickerStyles = css`
     border-left: var(--hx-border-width-thin, 1px) solid
       var(--hx-date-picker-border-color, var(--hx-color-border-strong, #8e9c98));
     background: transparent;
-    color: var(--hx-date-picker-trigger-color, var(--hx-color-text-muted, #66787b));
+    color: var(--hx-date-picker-trigger-color, var(--hx-color-text-muted, #4A5362));
     cursor: pointer;
     flex-shrink: 0;
     transition: color var(--hx-transition-fast, 150ms ease);
@@ -242,7 +242,7 @@ export const helixDatePickerStyles = css`
   }
 
   .calendar__nav-btn {
-    color: var(--hx-color-text-secondary, #4a5362);
+    color: var(--hx-color-text-secondary, #313E4B);
     font-size: var(--hx-font-size-lg, 1.125rem);
     line-height: 1;
   }
@@ -295,7 +295,7 @@ export const helixDatePickerStyles = css`
     height: var(--hx-size-8, 2rem);
     font-size: var(--hx-font-size-xs, 0.75rem);
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -376,7 +376,7 @@ export const helixDatePickerStyles = css`
   }
 
   .field__help-text {
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
   }
 
   .field__error {

@@ -77,7 +77,7 @@ export const helixComboboxStyles = css`
     display: flex;
     align-items: center;
     padding: 0 var(--hx-space-2, 0.5rem);
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
     flex-shrink: 0;
   }
   .field__input {
@@ -244,7 +244,7 @@ export const helixComboboxStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__help-text {
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
   }
   .field__error {
     color: var(--hx-combobox-error-color, var(--hx-color-error-text, #c92a2a));

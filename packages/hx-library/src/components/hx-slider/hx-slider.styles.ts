@@ -42,7 +42,7 @@ export const helixSliderStyles = css`
   .slider__value-display {
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-slider-value-color, var(--hx-color-text-secondary, #4a5362));
+    color: var(--hx-slider-value-color, var(--hx-color-text-secondary, #313E4B));
     line-height: var(--hx-line-height-normal, 1.5);
     font-variant-numeric: tabular-nums;
     min-width: var(--hx-size-8, 2rem);
@@ -270,7 +270,7 @@ export const helixSliderStyles = css`
     display: flex;
     justify-content: space-between;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-range-label-color, var(--hx-color-text-muted, #66787b));
+    color: var(--hx-slider-range-label-color, var(--hx-color-text-muted, #4A5362));
     line-height: var(--hx-line-height-normal, 1.5);
     margin-top: var(--hx-space-0-5, 0.125rem);
   }
@@ -279,7 +279,7 @@ export const helixSliderStyles = css`
 
   .slider__help-text {
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-slider-help-text-color, var(--hx-color-text-muted, #66787b));
+    color: var(--hx-slider-help-text-color, var(--hx-color-text-muted, #4A5362));
     line-height: var(--hx-line-height-normal, 1.5);
   }
 

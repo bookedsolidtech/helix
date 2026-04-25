@@ -54,7 +54,7 @@ export const helixFileUploadStyles = css`
       background-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
     user-select: none;
-    color: var(--hx-color-text-secondary, #4a5362);
+    color: var(--hx-color-text-secondary, #313E4B);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 
@@ -154,7 +154,7 @@ export const helixFileUploadStyles = css`
   .file-item__size {
     flex-shrink: 0;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
   }
 
   .file-item__remove {
@@ -168,7 +168,7 @@ export const helixFileUploadStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
     cursor: pointer;
     line-height: 1;
     transition:

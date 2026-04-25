@@ -30,7 +30,7 @@ export const helixSelectStyles = css`
     --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #e5493e));
 
     /* Chevron */
-    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-text-muted, #66787b));
+    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-text-muted, #4A5362));
     --_chevron-size: var(--hx-select-chevron-size, 0.5rem);
 
     /* Listbox */
@@ -282,7 +282,7 @@ export const helixSelectStyles = css`
   }
 
   .field__help-text {
-    color: var(--hx-color-text-muted, #66787b);
+    color: var(--hx-color-text-muted, #4A5362);
   }
 
   .field__error {
