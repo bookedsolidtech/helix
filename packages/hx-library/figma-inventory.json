@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T18:12:29.050Z",
+  "generatedAt": "2026-04-25T20:02:01.523Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -13658,12 +13658,12 @@
         {
           "description": "Item text color.",
           "name": "--hx-nav-item-color",
-          "default": "var(--hx-color-neutral-300)",
+          "default": "var(--hx-color-text-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/300",
+            "semanticToken": "color/text/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
@@ -13675,36 +13675,36 @@
         {
           "description": "Item hover text color.",
           "name": "--hx-nav-item-hover-color",
-          "default": "var(--hx-color-neutral-100)",
+          "default": "var(--hx-color-text-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/100",
+            "semanticToken": "color/text/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Active item background.",
           "name": "--hx-nav-item-active-bg",
-          "default": "var(--hx-color-primary-600)",
+          "default": "var(--hx-color-action-primary-bg-hover)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/primary",
-            "fallbackPrimitive": "color/primary/600",
+            "semanticToken": "color/action/primary/bg/hover",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Active item text color.",
           "name": "--hx-nav-item-active-color",
-          "default": "var(--hx-color-neutral-50)",
+          "default": "var(--hx-color-text-on-primary-strong)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/50",
+            "semanticToken": "color/text/on/primary/strong",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
@@ -13716,12 +13716,36 @@
         {
           "description": "Component host background color.",
           "name": "--hx-nav-item-host-bg",
-          "default": "var(--hx-color-neutral-900)",
+          "default": "var(--hx-color-surface-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/900",
+            "semanticToken": "color/surface/inverse",
+            "fallbackPrimitive": null,
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Tooltip background color (collapsed-rail tooltip).",
+          "name": "--hx-nav-item-tooltip-bg",
+          "default": "var(--hx-color-surface-inverse)",
+          "figmaBinding": {
+            "target": "Fill",
+            "layerSelector": "root",
+            "semanticToken": "color/surface/inverse",
+            "fallbackPrimitive": null,
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Tooltip text color (collapsed-rail tooltip).",
+          "name": "--hx-nav-item-tooltip-color",
+          "default": "var(--hx-color-text-inverse)",
+          "figmaBinding": {
+            "target": "Fill",
+            "layerSelector": "root",
+            "semanticToken": "color/text/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         }
@@ -17626,36 +17650,36 @@
         {
           "description": "Background color.",
           "name": "--hx-side-nav-bg",
-          "default": "var(--hx-color-neutral-900)",
+          "default": "var(--hx-color-surface-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/900",
+            "semanticToken": "color/surface/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Text color.",
           "name": "--hx-side-nav-color",
-          "default": "var(--hx-color-neutral-100)",
+          "default": "var(--hx-color-text-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/100",
+            "semanticToken": "color/text/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Border color.",
           "name": "--hx-side-nav-border-color",
-          "default": "var(--hx-color-neutral-700)",
+          "default": "var(--hx-color-border-strong)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/700",
+            "semanticToken": "color/border/strong",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
@@ -17684,14 +17708,26 @@
           }
         },
         {
-          "description": "Toggle button icon color.",
+          "description": "Toggle button icon color (resting).",
           "name": "--hx-side-nav-toggle-color",
-          "default": "var(--hx-color-neutral-400)",
+          "default": "var(--hx-color-text-inverse)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "::part(toggle)",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/400",
+            "semanticToken": "color/text/inverse",
+            "fallbackPrimitive": null,
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Toggle button icon color on hover.",
+          "name": "--hx-side-nav-toggle-hover-color",
+          "default": "var(--hx-color-text-inverse)",
+          "figmaBinding": {
+            "target": "Fill",
+            "layerSelector": "root",
+            "semanticToken": "color/text/inverse",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },

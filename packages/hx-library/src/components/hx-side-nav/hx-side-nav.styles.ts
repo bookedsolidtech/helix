@@ -166,8 +166,16 @@ export const helixSideNavStyles = css`
     }
 
     .side-nav__toggle {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
       color: ButtonText;
       border: 1px solid ButtonText;
+    }
+
+    .side-nav__toggle:hover {
+      background-color: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
     }
 
     .side-nav__toggle:focus-visible {
