@@ -20,8 +20,8 @@ export const helixToastStyles = css`
     gap: var(--hx-space-3, 0.75rem);
     padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem);
     border-radius: var(--hx-toast-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-toast-bg, var(--hx-color-neutral-900, #0f172a));
-    color: var(--hx-toast-color, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-toast-bg, var(--hx-color-surface-inverse, #0f172a));
+    color: var(--hx-toast-color, var(--hx-color-text-inverse, #ffffff));
     font-family: var(--hx-toast-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     line-height: var(--hx-line-height-normal, 1.5);
@@ -48,22 +48,22 @@ export const helixToastStyles = css`
 
   .toast--success {
     --hx-toast-bg: var(--hx-color-success-600, #15803d);
-    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-toast-color: var(--hx-color-text-on-success, #ffffff);
   }
 
   .toast--warning {
     --hx-toast-bg: var(--hx-color-warning-500, #d97706);
-    --hx-toast-color: var(--hx-color-neutral-900, #0f172a);
+    --hx-toast-color: var(--hx-color-text-on-warning, #0f172a);
   }
 
   .toast--danger {
     --hx-toast-bg: var(--hx-color-error-600, #b91c1c);
-    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-toast-color: var(--hx-color-text-on-error, #ffffff);
   }
 
   .toast--info {
     --hx-toast-bg: var(--hx-color-primary-600, #1d4ed8);
-    --hx-toast-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-toast-color: var(--hx-color-text-on-primary, #ffffff);
   }
 
   /* ─── Severity Label (WCAG 1.4.1) ─── */

@@ -35,7 +35,7 @@ export const helixRatingStyles = css`
     justify-content: center;
     position: relative;
     cursor: pointer;
-    color: var(--hx-rating-empty-color, var(--hx-color-neutral-300, #cbd5e1));
+    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #cbd5e1));
     line-height: 1;
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
@@ -86,7 +86,7 @@ export const helixRatingStyles = css`
     position: absolute;
     left: 0;
     top: 0;
-    color: var(--hx-rating-empty-color, var(--hx-color-neutral-300, #cbd5e1));
+    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #cbd5e1));
     /* Clip to right 50% for the empty half */
     clip-path: inset(0 0 0 50%);
   }

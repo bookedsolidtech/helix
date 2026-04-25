@@ -86,6 +86,22 @@ TOTAL="$(wc -l < "$TARGET_LIST" | tr -d ' ')"
 [[ -f "$FINDINGS" ]] || : > "$FINDINGS"
 START_COUNT="$(wc -l < "$FINDINGS" | tr -d ' ')"
 
+# Track the targets actually processed in this run. Without this, a partial
+# run (--limit / --targets override) would consolidate against the full
+# campaign manifest and pre-seed every un-run target as `verdict: "pass"`,
+# inflating scoreboard pass counts and hiding gaps. The consolidator prefers
+# this file when present.
+#
+# Resume semantics: on `--resume` we APPEND so a resumed run preserves the
+# prior invocations' processed-target list. On a fresh run we truncate. A
+# target is only appended AFTER `run_target` returns, so a killed-mid-target
+# invocation does not falsely register the target as a clean pass when the
+# consolidator pre-seeds the manifest (see consolidate-findings.ts).
+TARGETS_PROCESSED="$REPORT_DIR/targets-processed.txt"
+if (( RESUME == 0 )); then
+  : > "$TARGETS_PROCESSED"
+fi
+
 echo "campaign=$CAMPAIGN targets=$TOTAL head=$HEAD_SHA" | tee -a "$RUN_LOG"
 
 # ─── Per-target execution ─────────────────────────────────────────────────
@@ -110,18 +126,30 @@ run_target() {
 
   echo "[$idx/$TOTAL] $tag started=$target_started" | tee -a "$RUN_LOG"
 
+  # Truncate the last-message file before invocation. Without this, a retry
+  # against a target that already has a stale `$slug.last.txt` on disk (from a
+  # prior crashed or non-zero-exit run) would re-ingest the previous run's
+  # findings and misreport the retry as a pass.
+  : > "$last_msg"
+
   # Redirect codex stdin to /dev/null: the outer `while read < "$TARGET_LIST"`
   # loop shares its stdin with every child process by default, and `codex exec`
   # reads stdin to append as an `<stdin>` block — which silently drains the
   # target list file and causes the outer loop to exit after target 1.
+  local codex_rc=0
   if ! codex "${CODEX_ARGS[@]}" -o "$last_msg" "$rendered" </dev/null >"$transcript" 2>&1; then
+    codex_rc=1
     echo "[$idx/$TOTAL] $tag CODEX_EXIT_NONZERO (see $transcript)" | tee -a "$RUN_LOG"
   fi
 
-  # The final agent message is the authoritative JSONL block. Fall back to
-  # transcript-scraping only if --output-last-message produced nothing.
+  # The final agent message is the authoritative JSONL block. On non-zero exit
+  # we do NOT fall back to scraping the raw transcript — a failed invocation's
+  # partial transcript is not a valid findings source, and treating it as one
+  # would turn a crashed Codex run into a silent "clean" verdict.
   local source_file="$last_msg"
-  [[ -s "$source_file" ]] || source_file="$transcript"
+  if [[ $codex_rc -eq 0 ]]; then
+    [[ -s "$source_file" ]] || source_file="$transcript"
+  fi
 
   local parsed=0 rejected=0
   local tmpf; tmpf="$(mktemp)"
@@ -137,6 +165,38 @@ run_target() {
     fi
   done < "$source_file"
 
+  # Crashed Codex runs must register as `error` verdicts, not silent passes.
+  # Without this, a non-zero exit produces an empty $last_msg → zero parsed
+  # findings → the consolidator's pre-seeded `pass` verdict for the target
+  # stands. Emit a synthetic finding so scoreboard.json + audit logs surface
+  # the failure.
+  if (( codex_rc != 0 )) && (( parsed == 0 )); then
+    local now; now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    jq -nc \
+      --arg campaign "$CAMPAIGN" \
+      --arg target "$target" \
+      --arg tag "$tag" \
+      --arg ts "$now" \
+      --arg sha "$HEAD_SHA" \
+      --arg transcript "$transcript" \
+      '{
+        campaign: $campaign,
+        target: $target,
+        tag: $tag,
+        ts: $ts,
+        codex_run: $sha,
+        severity: "high",
+        category: "other",
+        file: $transcript,
+        line: 1,
+        issue: "codex exec exited non-zero — no findings parsed",
+        evidence: "see transcript",
+        fix: "rerun the target or inspect the transcript for the underlying failure",
+        verdict_for_target: "error"
+      }' >> "$tmpf"
+    parsed=1
+  fi
+
   # Sequential loop — no concurrent appenders, so no locking needed.
   # If we ever add `xargs -P`, reintroduce flock here.
   if (( parsed > 0 )); then
@@ -144,13 +204,17 @@ run_target() {
   fi
   rm -f "$tmpf"
 
-  echo "[$idx/$TOTAL] $tag parsed=$parsed rejected=$rejected" | tee -a "$RUN_LOG"
+  echo "[$idx/$TOTAL] $tag parsed=$parsed rejected=$rejected codex_rc=$codex_rc" | tee -a "$RUN_LOG"
 }
 
 IDX=0
 while IFS= read -r target; do
   IDX=$((IDX + 1))
   run_target "$target" "$IDX"
+  # Append AFTER run_target completes — if the process is killed mid-target
+  # (OOM, CI timeout, watchdog), the target stays absent from the processed
+  # list, so the consolidator does not pre-seed it as `verdict: "pass"`.
+  echo "$target" >> "$TARGETS_PROCESSED"
 
   if (( IDX % 5 == 0 )); then
     echo "validating after batch of 5…" | tee -a "$RUN_LOG"

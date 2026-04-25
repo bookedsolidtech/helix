@@ -302,6 +302,20 @@ jobs:
             | grep -v '/index\.ts$' \
             | sed 's|.*src/components/\(hx-[^/]*\)/.*|\1|' \
             | sort -u || true)
+          # Shared tests under src/components/__tests__/ (e.g. dark-mode-resolution)
+          # don't belong to a single component but exercise cross-cutting behavior.
+          # If the diff touches one, we cannot derive a component scope — fall back
+          # to the full test suite so the shared regression test actually runs.
+          SHARED_TESTS=$(git diff --name-only "$DIFF_RANGE" \
+            | grep 'src/components/__tests__/' \
+            | grep '\.test\.ts$' || true)
+          if [ -n "$SHARED_TESTS" ]; then
+            echo "Shared test changed — running full suite (no scope filter)"
+            echo "shared_tests_changed=true" >> "$GITHUB_OUTPUT"
+            echo "paths=" >> "$GITHUB_OUTPUT"
+            echo "components_csv=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           if [ -z "$CHANGED" ]; then
             echo "No component changes — skipping tests"
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -316,6 +330,11 @@ jobs:
         if: steps.changed.outputs.skip != 'true'
         env:
           HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
+          # Unscoped/shared-test runs execute the full suite; individual files
+          # in browser mode take longer under full-suite resource pressure, so
+          # give the watchdog more headroom (4 min vs the 2 min default for
+          # tightly-scoped feature-PR runs).
+          STALE_TIMEOUT: ${{ steps.changed.outputs.shared_tests_changed == 'true' && '240' || '120' }}
         run: |
           # shellcheck disable=SC1091
           source "$GITHUB_WORKSPACE/scripts/lib/vitest-watchdog.sh"
@@ -392,7 +411,16 @@ jobs:
           exit $rc
         working-directory: packages/hx-library
       - name: Enforce coverage thresholds for changed components
-        if: steps.run-tests.outputs.tests_ran == 'true' && matrix.shard == '1/4'
+        # Run on every shard. The shard-aware check-coverage logic intersects
+        # HX_COVERAGE_COMPONENTS with the components whose tests actually ran
+        # on this shard (read from .cache/test-results.json), so each shard
+        # enforces its own slice. Restricting to shard 1/4 would let any
+        # component whose test landed on shards 2-4 regress unchecked.
+        # Skipped on shared-test/unscoped runs: the gate is per-component
+        # scope enforcement and an empty HX_COVERAGE_COMPONENTS makes the
+        # script fall back to "check all components", which fails every shard
+        # by definition (each shard only runs ~1/4 of test files).
+        if: steps.run-tests.outputs.tests_ran == 'true' && steps.changed.outputs.shared_tests_changed != 'true'
         env:
           HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
         run: node scripts/check-coverage.mjs
@@ -413,7 +441,7 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
       - name: Post coverage summary as PR comment
-        if: github.event_name == 'pull_request' && matrix.shard == '1/4' && always()
+        if: github.event_name == 'pull_request' && matrix.shard == '1/4' && steps.changed.outputs.shared_tests_changed != 'true' && always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
