@@ -83,7 +83,7 @@ const meta = {
       description: 'Radio border color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-300, #ced4da)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-300, #B6BFB9)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -92,7 +92,7 @@ const meta = {
       description: 'Checked background color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-primary-500, #2563EB)' },
+        defaultValue: { summary: 'var(--hx-color-primary-500, #429797)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -101,7 +101,7 @@ const meta = {
       description: 'Checked border color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-primary-500, #2563EB)' },
+        defaultValue: { summary: 'var(--hx-color-primary-500, #429797)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -119,7 +119,7 @@ const meta = {
       description: 'Focus ring color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-focus-ring-color, #2563EB)' },
+        defaultValue: { summary: 'var(--hx-focus-ring-color, #6AB1B1)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -128,7 +128,7 @@ const meta = {
       description: 'Label text color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-700, #343a40)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-700, #313E4B)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -255,7 +255,7 @@ export const WithSlotContent: Story = {
     <hx-radio value="custom-label" checked>
       <span style="font-weight: 600;">Custom HTML label</span>
       <span
-        style="display: block; font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="display: block; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Slot content overrides the label property
       </span>
@@ -384,7 +384,7 @@ export const InARadioGroup: Story = {
   render: () => html`
     <div style="display: flex; flex-direction: column; gap: 1rem;">
       <p
-        style="margin: 0; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #f8f9fa); border-left: 3px solid var(--hx-color-primary-500, #2563EB); font-size: 0.875rem; color: var(--hx-color-neutral-700, #343a40); line-height: 1.5;"
+        style="margin: 0; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #F5F8F3); border-left: 3px solid var(--hx-color-primary-500, #429797); font-size: 0.875rem; color: var(--hx-color-neutral-700, #313E4B); line-height: 1.5;"
       >
         <strong>Recommended:</strong> Always use <code>&lt;hx-radio&gt;</code> inside an
         <code>&lt;hx-radio-group&gt;</code>. The group handles selection state, keyboard navigation

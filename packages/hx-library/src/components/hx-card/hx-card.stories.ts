@@ -231,7 +231,7 @@ export const WithFooter: Story = {
         blood cell count 7.8 x10^9/L.
       </p>
       <span slot="footer">
-        <small style="color: var(--hx-color-neutral-500, #6c757d);">
+        <small style="color: var(--hx-color-neutral-500, #66787B);">
           Collected: 2026-02-14 at 08:30 AM | Resulted: 2026-02-14 at 02:15 PM
         </small>
       </span>
@@ -270,7 +270,7 @@ export const WithAllSlots: Story = {
         installed throughout the facility.
       </p>
       <span slot="footer">
-        <small style="color: var(--hx-color-neutral-500, #6c757d);">
+        <small style="color: var(--hx-color-neutral-500, #66787B);">
           Posted by Facilities Management | Feb 10, 2026
         </small>
       </span>
@@ -360,7 +360,7 @@ export const AllVariants: Story = {
 export const AllElevations: Story = {
   render: () => html`
     <div
-      style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; padding: 1rem; background: var(--hx-color-neutral-50, #f8f9fa);"
+      style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; padding: 1rem; background: var(--hx-color-neutral-50, #F5F8F3);"
     >
       <hx-card elevation="flat" style="max-width: 260px; flex: 1 1 260px;">
         <span slot="heading">Flat</span>
@@ -387,7 +387,7 @@ export const AllCombinations: Story = {
 
     return html`
       <div
-        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; padding: 1rem; background: var(--hx-color-neutral-50, #f8f9fa);"
+        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; padding: 1rem; background: var(--hx-color-neutral-50, #F5F8F3);"
       >
         ${variants.map(
           (variant) => html`
@@ -499,7 +499,7 @@ export const CardWithBadge: Story = {
         specimen has been requested.
       </p>
       <span slot="footer">
-        <small style="color: var(--hx-color-neutral-500, #6c757d);">
+        <small style="color: var(--hx-color-neutral-500, #66787B);">
           Resulted: 2026-02-16 at 06:42 AM | Lab ID: L-2026-08417
         </small>
       </span>
@@ -1003,7 +1003,7 @@ export const PatientSummaryCard: Story = {
         </div>
       </div>
       <span slot="footer">
-        <small style="color: var(--hx-color-neutral-500, #6c757d);">
+        <small style="color: var(--hx-color-neutral-500, #66787B);">
           Last vitals: 2026-02-16 at 06:00 AM | BP 132/78, HR 72, Temp 98.4 F
         </small>
       </span>
@@ -1041,7 +1041,7 @@ export const PatientDashboard: Story = {
           </div>
         </div>
         <span slot="footer">
-          <small style="color: var(--hx-color-neutral-500, #6c757d);"
+          <small style="color: var(--hx-color-neutral-500, #66787B);"
             >BP 88/52, HR 112, SpO2 89%</small
           >
         </span>
@@ -1067,7 +1067,7 @@ export const PatientDashboard: Story = {
           </div>
         </div>
         <span slot="footer">
-          <small style="color: var(--hx-color-neutral-500, #6c757d);"
+          <small style="color: var(--hx-color-neutral-500, #66787B);"
             >BP 142/88, HR 84, SpO2 96%</small
           >
         </span>
@@ -1093,7 +1093,7 @@ export const PatientDashboard: Story = {
           </div>
         </div>
         <span slot="footer">
-          <small style="color: var(--hx-color-neutral-500, #6c757d);"
+          <small style="color: var(--hx-color-neutral-500, #66787B);"
             >BP 124/76, HR 68, SpO2 98%</small
           >
         </span>
@@ -1119,7 +1119,7 @@ export const PatientDashboard: Story = {
           </div>
         </div>
         <span slot="footer">
-          <small style="color: var(--hx-color-neutral-500, #6c757d);"
+          <small style="color: var(--hx-color-neutral-500, #66787B);"
             >BP 118/72, HR 74, SpO2 99%</small
           >
         </span>
@@ -1146,7 +1146,7 @@ export const PatientDashboard: Story = {
           </div>
         </div>
         <span slot="footer">
-          <small style="color: var(--hx-color-neutral-500, #6c757d);"
+          <small style="color: var(--hx-color-neutral-500, #66787B);"
             >BP 136/80, HR 76, SpO2 97%</small
           >
         </span>
@@ -1172,7 +1172,7 @@ export const PatientDashboard: Story = {
           </div>
         </div>
         <span slot="footer">
-          <small style="color: var(--hx-color-neutral-500, #6c757d);"
+          <small style="color: var(--hx-color-neutral-500, #66787B);"
             >BP 148/92, HR 80, SpO2 96%</small
           >
         </span>

@@ -425,7 +425,7 @@ export const WithPrefixSlot: Story = {
     <hx-text-input label="Copay Amount" placeholder="0.00" type="number">
       <span
         slot="prefix"
-        style="font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d); font-weight: 500;"
+        style="font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B); font-weight: 500;"
         >$</span
       >
     </hx-text-input>
@@ -435,7 +435,7 @@ export const WithPrefixSlot: Story = {
 export const WithSuffixSlot: Story = {
   render: () => html`
     <hx-text-input label="Patient Weight" placeholder="Enter weight" type="number">
-      <span slot="suffix" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+      <span slot="suffix" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >kg</span
       >
     </hx-text-input>
@@ -448,9 +448,9 @@ export const WithLabelSlot: Story = {
     <hx-text-input placeholder="Enter allergies" name="allergies">
       <label
         slot="label"
-        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #343a40);"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
       >
-        Known Allergies <span style="color: var(--hx-color-error-500, #dc3545);">*</span>
+        Known Allergies <span style="color: var(--hx-color-error-500, #E5493E);">*</span>
       </label>
     </hx-text-input>
   `,
@@ -462,7 +462,7 @@ export const WithErrorSlot: Story = {
     <hx-text-input label="Insurance ID" value="ABC" name="insuranceId">
       <div
         slot="error"
-        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
+        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #E5493E); font-size: 0.75rem;"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path
@@ -481,7 +481,7 @@ export const WithHelpTextSlot: Story = {
     <hx-text-input label="Emergency Contact" placeholder="Full name" name="emergencyContact">
       <div
         slot="help-text"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Provide the name of someone we can reach in case of a medical emergency.
       </div>
@@ -557,10 +557,10 @@ export const AllStates: Story = {
       <hx-text-input label="With Prefix and Suffix" placeholder="0.00" type="number">
         <span
           slot="prefix"
-          style="font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d);"
+          style="font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
           >$</span
         >
-        <span slot="suffix" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+        <span slot="suffix" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
           >USD</span
         >
       </hx-text-input>
@@ -592,7 +592,7 @@ export const ValidationStates: Story = {
           label="Success (via custom properties)"
           value="PAT-2026-00482"
           help-text="MRN format verified."
-          style="--hx-input-border-color: var(--hx-color-success-500, #198754);"
+          style="--hx-input-border-color: var(--hx-color-success-500, #3B9E58);"
         ></hx-text-input>
       </div>
     </div>
@@ -1201,7 +1201,7 @@ export const PatientSearch: Story = {
         width="16"
         height="16"
         viewBox="0 0 16 16"
-        fill="var(--hx-color-neutral-500, #6c757d)"
+        fill="var(--hx-color-neutral-500, #66787B)"
         aria-hidden="true"
       >
         <path
@@ -1268,7 +1268,7 @@ export const SSNMasked: Story = {
         width="16"
         height="16"
         viewBox="0 0 16 16"
-        fill="var(--hx-color-neutral-500, #6c757d)"
+        fill="var(--hx-color-neutral-500, #66787B)"
         aria-hidden="true"
       >
         <path
@@ -1312,7 +1312,7 @@ export const InteractionState: Story = {
 
     return html`
       <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;">
-        <p style="font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d); margin: 0;">
+        <p style="font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362); margin: 0;">
           Type in the field, then tab away. Check the browser console for dirty/touched state
           changes.
         </p>

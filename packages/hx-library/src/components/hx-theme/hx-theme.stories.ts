@@ -63,10 +63,10 @@ const meta = {
       <div
         style="
           padding: 1.5rem;
-          border: 1px solid var(--hx-color-border-default, var(--hx-color-neutral-200, #e2e8f0));
+          border: 1px solid var(--hx-color-border-default, var(--hx-color-neutral-200, #D6DBD5));
           border-radius: var(--hx-border-radius-md, 0.375rem);
-          background: var(--hx-color-surface-default, var(--hx-color-neutral-0, #fff));
-          color: var(--hx-color-text-primary, var(--hx-color-neutral-900, #0f172a));
+          background: var(--hx-color-surface-default, var(--hx-color-neutral-0, #FFFFFF));
+          color: var(--hx-color-text-primary, var(--hx-color-neutral-900, #0D1825));
           font-family: var(--hx-font-family-sans, sans-serif);
         "
       >
@@ -74,11 +74,11 @@ const meta = {
           Theme: <code>${args.theme}</code>
         </p>
         <p
-          style="margin: 0 0 0.75rem; color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #475569));"
+          style="margin: 0 0 0.75rem; color: var(--hx-color-text-secondary, var(--hx-color-neutral-600, #4A5362));"
         >
           This content inherits <code>--hx-*</code> design tokens from the theme provider.
         </p>
-        <p style="margin: 0; color: var(--hx-color-primary-500, #2563eb);">
+        <p style="margin: 0; color: var(--hx-color-primary-500, #429797);">
           Primary color: <code>var(--hx-color-primary-500)</code>
         </p>
       </div>
@@ -143,15 +143,15 @@ export const SystemDetection: Story = {
       <div
         style="
           padding: 1.5rem;
-          border: 1px solid var(--hx-color-neutral-200, #e2e8f0);
+          border: 1px solid var(--hx-color-neutral-200, #D6DBD5);
           border-radius: 0.375rem;
           background: var(--hx-color-surface-default, #fff);
-          color: var(--hx-color-text-primary, #0f172a);
+          color: var(--hx-color-text-primary, #0D1825);
           font-family: sans-serif;
         "
       >
         <p style="margin: 0 0 0.5rem; font-weight: 600;">System Theme Detection</p>
-        <p style="margin: 0; color: var(--hx-color-neutral-600, #475569); font-size: 0.875rem;">
+        <p style="margin: 0; color: var(--hx-color-neutral-600, #4A5362); font-size: 0.875rem;">
           This theme provider auto-detects your OS color scheme preference via
           <code>prefers-color-scheme</code> and applies the matching tokens.
         </p>

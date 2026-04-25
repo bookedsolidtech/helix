@@ -1197,7 +1197,7 @@ export const EmergencyAction: Story = {
     <hx-button
       variant="danger"
       hx-size="lg"
-      style="--hx-button-focus-ring-color: var(--hx-color-error-500, #dc2626);"
+      style="--hx-button-focus-ring-color: var(--hx-color-error-500, #E5493E);"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

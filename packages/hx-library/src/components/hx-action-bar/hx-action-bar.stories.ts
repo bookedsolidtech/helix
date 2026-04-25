@@ -66,27 +66,27 @@ const meta = {
       variant=${args.variant}
       position=${args.position}
       accessible-label=${args.accessibleLabel}
-      style="border: 1px dashed var(--hx-color-neutral-200, #e5e7eb);"
+      style="border: 1px dashed var(--hx-color-neutral-200, #D6DBD5);"
     >
       <button
         slot="start"
-        style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+        style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
       >
         Save
       </button>
       <button
         slot="start"
-        style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+        style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
       >
         Edit
       </button>
       <span
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280);"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);"
         >Patient Record</span
       >
       <button
         slot="end"
-        style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+        style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
       >
         Cancel
       </button>
@@ -132,19 +132,19 @@ export const Outlined: Story = {
       <hx-action-bar variant=${args.variant} aria-label="Toolbar" size=${args.size}>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           New
         </button>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Import
         </button>
         <button
           slot="end"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Export
         </button>
@@ -164,23 +164,23 @@ export const Filled: Story = {
       <hx-action-bar variant=${args.variant} aria-label="Toolbar" size=${args.size}>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Filter
         </button>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Sort
         </button>
         <span
-          style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280);"
+          style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);"
           >24 results</span
         >
         <button
           slot="end"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Clear
         </button>
@@ -215,13 +215,13 @@ export const StartSlotOnly: Story = {
       <hx-action-bar aria-label="Toolbar" variant="outlined">
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Save
         </button>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Save &amp; Close
         </button>
@@ -240,13 +240,13 @@ export const EndSlotOnly: Story = {
       <hx-action-bar aria-label="Toolbar" variant="outlined">
         <button
           slot="end"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Cancel
         </button>
         <button
           slot="end"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Confirm
         </button>
@@ -263,26 +263,26 @@ export const Sticky: Story = {
   args: { position: 'sticky', variant: 'filled' },
   render: (args) => html`
     <div
-      style="height: 200px; overflow-y: auto; border: 1px solid var(--hx-color-neutral-200, #e5e7eb); border-radius: 0.5rem;"
+      style="height: 200px; overflow-y: auto; border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem;"
     >
       <hx-action-bar position=${args.position} variant=${args.variant} aria-label="Toolbar">
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Action
         </button>
       </hx-action-bar>
       <div
-        style="padding: 1rem; height: 400px; background: linear-gradient(to bottom, var(--hx-color-neutral-50, #f9fafb), var(--hx-color-neutral-100, #e5e7eb));"
+        style="padding: 1rem; height: 400px; background: linear-gradient(to bottom, var(--hx-color-neutral-50, #F5F8F3), var(--hx-color-neutral-100, #EBEEE9));"
       >
         <p
-          style="color: var(--hx-color-neutral-500, #6b7280); font-size: var(--hx-text-sm, 0.875rem);"
+          style="color: var(--hx-color-neutral-500, #66787B); font-size: var(--hx-text-sm, 0.875rem);"
         >
           Scroll down to see the sticky action bar.
         </p>
         <p
-          style="color: var(--hx-color-neutral-400, #9ca3af); font-size: var(--hx-text-sm, 0.875rem); margin-top: 1rem;"
+          style="color: var(--hx-color-neutral-400, #8E9C98); font-size: var(--hx-text-sm, 0.875rem); margin-top: 1rem;"
         >
           Tip: add <code>scroll-padding-top</code> equal to the bar height on the scroll container
           so anchor targets are not hidden behind the bar.
@@ -302,24 +302,24 @@ export const PatientRecordToolbar: Story = {
       <hx-action-bar aria-label="Patient record actions" variant="outlined" size="md">
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3-5, 0.875rem); background: var(--hx-color-primary-600, #2563eb); color: var(--hx-color-neutral-0, #fff); border: none; border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-text-sm, 0.875rem);"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3-5, 0.875rem); background: var(--hx-color-primary-600, #0F7078); color: var(--hx-color-neutral-0, #FFFFFF); border: none; border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-text-sm, 0.875rem);"
         >
           Save Changes
         </button>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3-5, 0.875rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer; font-size: var(--hx-text-sm, 0.875rem);"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3-5, 0.875rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer; font-size: var(--hx-text-sm, 0.875rem);"
         >
           Print
         </button>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3-5, 0.875rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer; font-size: var(--hx-text-sm, 0.875rem);"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3-5, 0.875rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer; font-size: var(--hx-text-sm, 0.875rem);"
         >
           Share
         </button>
         <span
-          style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-700, #374151); font-weight: var(--hx-font-weight-medium, 500);"
+          style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-700, #313E4B); font-weight: var(--hx-font-weight-medium, 500);"
         >
           Jane Doe — MRN 12345678
         </span>
@@ -342,7 +342,7 @@ export const KeyboardNavigation: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280); margin-bottom: 0.5rem;"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B); margin-bottom: 0.5rem;"
       >
         Focus any button, then use Arrow Left/Right to navigate. Home moves to first, End to last.
       </p>
@@ -350,28 +350,28 @@ export const KeyboardNavigation: Story = {
         <button
           slot="start"
           id="kb-btn-bold"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Bold
         </button>
         <button
           slot="start"
           id="kb-btn-italic"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Italic
         </button>
         <button
           slot="start"
           id="kb-btn-underline"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Underline
         </button>
         <button
           slot="end"
           id="kb-btn-clear"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Clear
         </button>
@@ -426,7 +426,7 @@ export const EmptyActionBar: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280); margin-bottom: 0.5rem;"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B); margin-bottom: 0.5rem;"
       >
         An action bar with no slotted content. The bar renders but shows no items.
       </p>
@@ -459,7 +459,7 @@ export const WithOverflowSlot: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #6b7280); margin-bottom: 0.5rem;"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B); margin-bottom: 0.5rem;"
       >
         The <code>overflow</code> slot renders actions that appear when the bar has constrained
         space. Content in the overflow slot is only visible when assigned.
@@ -467,25 +467,25 @@ export const WithOverflowSlot: Story = {
       <hx-action-bar aria-label="Toolbar with overflow" variant="outlined">
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Primary Action
         </button>
         <button
           slot="start"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Secondary Action
         </button>
         <button
           slot="overflow"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Overflow Action 1
         </button>
         <button
           slot="overflow"
-          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d1d5db); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
+          style="padding: var(--hx-space-1-5, 0.375rem) var(--hx-space-3, 0.75rem); border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-neutral-0, white); cursor: pointer;"
         >
           Overflow Action 2
         </button>

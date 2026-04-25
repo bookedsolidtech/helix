@@ -427,9 +427,9 @@ export const ReturnFocusBehavior: Story = {
         id="focus-target"
         style="
           padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
-          border: 1px solid var(--hx-color-primary-500, #3b82f6);
+          border: 1px solid var(--hx-color-primary-500, #429797);
           border-radius: var(--hx-border-radius-sm, 0.25rem);
-          background: var(--hx-color-primary-500, #3b82f6);
+          background: var(--hx-color-primary-500, #429797);
           color: var(--hx-color-text-on-primary, #fff);
           cursor: pointer;
           font-size: var(--hx-font-size-sm, 0.875rem);
@@ -974,9 +974,9 @@ export const CSSParts: Story = {
             slot="actions"
             style="
               padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
-              border: var(--hx-border-width-thin, 1px) solid var(--hx-color-primary-500, #3b82f6);
+              border: var(--hx-border-width-thin, 1px) solid var(--hx-color-primary-500, #429797);
               border-radius: var(--hx-border-radius-sm, 0.25rem);
-              background: var(--hx-color-primary-500, #3b82f6);
+              background: var(--hx-color-primary-500, #429797);
               color: var(--hx-color-text-on-primary, #fff);
               cursor: pointer;
               font-size: var(--hx-font-size-xs, 0.8125rem);
@@ -988,7 +988,7 @@ export const CSSParts: Story = {
             slot="actions"
             style="
               padding: var(--hx-space-1, 0.25rem) var(--hx-space-3, 0.75rem);
-              border: var(--hx-border-width-thin, 1px) solid var(--hx-color-primary-300, #93c5fd);
+              border: var(--hx-border-width-thin, 1px) solid var(--hx-color-primary-300, #97CDCC);
               border-radius: var(--hx-border-radius-sm, 0.25rem);
               background: transparent;
               color: var(--hx-color-primary-800, #1e40af);
@@ -1414,7 +1414,7 @@ export const FocusReturn: Story = {
           id="submit-order-btn"
           style="
             padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
-            background: var(--hx-color-primary-500, #2563eb);
+            background: var(--hx-color-primary-500, #429797);
             color: var(--hx-color-text-on-primary, white);
             border: none;
             border-radius: var(--hx-border-radius-md, 0.375rem);
