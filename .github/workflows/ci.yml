@@ -330,12 +330,13 @@ jobs:
         if: steps.changed.outputs.skip != 'true'
         env:
           HX_COVERAGE_COMPONENTS: ${{ steps.changed.outputs.components_csv }}
-          # Browser-mode vitest with 73 components legitimately needs >120s of
-          # pre-output time on slow component startups, even on tightly-scoped
-          # feature-PR runs. Use a uniform 4 min stale timeout for all runs;
-          # the watchdog still kills genuinely stuck runs (no output for 240s
-          # means something is actually wrong, not just slow).
-          STALE_TIMEOUT: '240'
+          # Browser-mode vitest with 73 components legitimately needs long
+          # silent stretches during Playwright/Chromium bundle + setup phases.
+          # 240s was insufficient (shards 1+3 hit stale-output kill at exactly
+          # the 240s mark on full-tree feature-PR runs). 600s gives 5x headroom
+          # over the longest known passing shard (~120s) while still catching
+          # genuine hangs (10 minutes silent is unambiguously stuck).
+          STALE_TIMEOUT: '600'
         run: |
           # shellcheck disable=SC1091
           source "$GITHUB_WORKSPACE/scripts/lib/vitest-watchdog.sh"
