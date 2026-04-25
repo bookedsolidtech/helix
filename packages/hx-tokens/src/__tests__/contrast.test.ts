@@ -468,6 +468,102 @@ const PAIRS: PairSpec[] = [
     label: 'text.on-info on info-600 (HC bright fill)',
     modes: ['high-contrast'],
   },
+  // 3.2.1 token-cascade remediation: text.on-{role}-strong tokens (the
+  // semantic-tier siblings of text.on-{role} that pin to neutral-0 for
+  // surfaces darker than the AA-tuned -500 stop). These exist specifically to
+  // route the "white on -600/-700" pattern through the semantic tier instead
+  // of letting components reach to neutral-0 directly. We assert against the
+  // action.* surfaces consumers actually pair them with so any future palette
+  // tweak that drops one of these pairings below AA fails here. HC mode flips
+  // the on-{role}-strong tokens to #000 (the -600 ramp stops are bright
+  // fills); the HC pairs cover that contract.
+  {
+    text: '--hx-color-text-on-primary-strong',
+    surface: '--hx-color-action-primary-bg-hover',
+    threshold: 4.5,
+    label: 'text.on-primary-strong on action.primary.bg-hover',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-text-on-primary-strong',
+    surface: '--hx-color-action-primary-bg-active',
+    threshold: 4.5,
+    label: 'text.on-primary-strong on action.primary.bg-active',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-text-on-primary-strong',
+    surface: '--hx-color-action-primary-bg-hover',
+    threshold: 4.5,
+    label: 'text.on-primary-strong on action.primary.bg-hover (HC bright fill)',
+    modes: ['high-contrast'],
+  },
+  {
+    text: '--hx-color-text-on-primary-strong',
+    surface: '--hx-color-action-primary-bg-active',
+    threshold: 4.5,
+    label: 'text.on-primary-strong on action.primary.bg-active (HC bright fill)',
+    modes: ['high-contrast'],
+  },
+  {
+    text: '--hx-color-text-on-error-strong',
+    surface: '--hx-color-action-danger-bg-hover',
+    threshold: 4.5,
+    label: 'text.on-error-strong on action.danger.bg-hover',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-text-on-error-strong',
+    surface: '--hx-color-action-danger-bg-active',
+    threshold: 4.5,
+    label: 'text.on-error-strong on action.danger.bg-active',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-text-on-error-strong',
+    surface: '--hx-color-action-danger-bg-hover',
+    threshold: 4.5,
+    label: 'text.on-error-strong on action.danger.bg-hover (HC bright fill)',
+    modes: ['high-contrast'],
+  },
+  // Resting action surfaces pair with their AA-tuned on-{role} (neutral-900
+  // in light/dark, #000 in HC) — same as the bare brand-500 pairs above, but
+  // routed through the semantic action.* tier. Asserted to lock in the
+  // semantic-tier contract.
+  {
+    text: '--hx-color-text-on-primary',
+    surface: '--hx-color-action-primary-bg',
+    threshold: 4.5,
+    label: 'text.on-primary on action.primary.bg',
+  },
+  {
+    text: '--hx-color-text-on-error',
+    surface: '--hx-color-action-danger-bg',
+    threshold: 4.5,
+    label: 'text.on-error on action.danger.bg',
+  },
+  // Secondary/ghost outline treatments paint primary-600 fg on the body
+  // surface (resting) and on action.{role}.bg-hover (hovered). Both must be
+  // body-text AA.
+  {
+    text: '--hx-color-action-secondary-fg',
+    surface: '--hx-color-surface-default',
+    threshold: 4.5,
+    label: 'action.secondary.fg on surface.default',
+  },
+  {
+    text: '--hx-color-action-secondary-fg',
+    surface: '--hx-color-action-secondary-bg-hover',
+    threshold: 4.5,
+    label: 'action.secondary.fg on action.secondary.bg-hover',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-action-ghost-fg',
+    surface: '--hx-color-surface-default',
+    threshold: 4.5,
+    label: 'action.ghost.fg on surface.default',
+  },
   // Link text on body surface
   {
     text: '--hx-color-text-link',
