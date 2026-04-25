@@ -12,7 +12,7 @@ export const helixBadgeStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     border-radius: var(--hx-badge-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-badge-bg, var(--hx-color-primary-500, #429797));
-    color: var(--hx-badge-color, var(--hx-color-neutral-0, #ffffff));
+    color: var(--hx-badge-color, var(--hx-color-text-on-primary, #0d1825));
     font-family: var(--hx-badge-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-badge-font-weight, var(--hx-font-weight-semibold, 600));
     line-height: var(--hx-line-height-tight, 1.25);
@@ -45,7 +45,7 @@ export const helixBadgeStyles = css`
 
   .badge--primary {
     --hx-badge-bg: var(--hx-badge-primary-bg, var(--hx-color-primary-500, #429797));
-    --hx-badge-color: var(--hx-badge-primary-color, var(--hx-color-neutral-0, #ffffff));
+    --hx-badge-color: var(--hx-badge-primary-color, var(--hx-color-text-on-primary, #0d1825));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
       var(--hx-badge-primary-bg, var(--hx-color-primary-500, #429797))
@@ -81,7 +81,7 @@ export const helixBadgeStyles = css`
 
   .badge--error {
     --hx-badge-bg: var(--hx-badge-error-bg, var(--hx-color-error-500, #e5493e));
-    --hx-badge-color: var(--hx-badge-error-color, var(--hx-color-neutral-0, #ffffff));
+    --hx-badge-color: var(--hx-badge-error-color, var(--hx-color-text-on-error, #0d1825));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
       var(--hx-badge-error-bg, var(--hx-color-error-500, #e5493e))
