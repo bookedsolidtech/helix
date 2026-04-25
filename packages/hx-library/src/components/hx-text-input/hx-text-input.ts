@@ -45,14 +45,14 @@ export interface HxTextInputDetail {
  * @csspart help-text - The help text container.
  * @csspart error - The error message container.
  *
- * @cssprop [--hx-input-bg=var(--hx-color-neutral-0)] - Input background color.
- * @cssprop [--hx-input-color=var(--hx-color-neutral-800)] - Input text color.
- * @cssprop [--hx-input-border-color=var(--hx-color-neutral-300)] - Input border color.
+ * @cssprop [--hx-input-bg=var(--hx-color-surface-default)] - Input background color.
+ * @cssprop [--hx-input-color=var(--hx-color-text-strong)] - Input text color.
+ * @cssprop [--hx-input-border-color=var(--hx-color-border-strong)] - Input border color.
  * @cssprop [--hx-input-border-radius=var(--hx-border-radius-md)] - Input border radius.
  * @cssprop [--hx-input-font-family=var(--hx-font-family-sans)] - Input font family.
  * @cssprop [--hx-input-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
- * @cssprop [--hx-input-error-color=var(--hx-color-error-500)] - Error state color.
- * @cssprop [--hx-input-label-color=var(--hx-color-neutral-700)] - Label text color.
+ * @cssprop [--hx-input-error-color=var(--hx-color-error-text)] - Error state color.
+ * @cssprop [--hx-input-label-color=var(--hx-color-text-strong)] - Label text color.
  * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
  * @cssprop [--hx-opacity-disabled] - Opacity.

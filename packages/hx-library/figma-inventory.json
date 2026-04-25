@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T16:30:29.862Z",
+  "generatedAt": "2026-04-25T18:12:29.050Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -23368,36 +23368,36 @@
         {
           "description": "Input background color.",
           "name": "--hx-input-bg",
-          "default": "var(--hx-color-neutral-0)",
+          "default": "var(--hx-color-surface-default)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/0",
+            "semanticToken": "color/surface/default",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Input text color.",
           "name": "--hx-input-color",
-          "default": "var(--hx-color-neutral-800)",
+          "default": "var(--hx-color-text-strong)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/800",
+            "semanticToken": "color/text/strong",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Input border color.",
           "name": "--hx-input-border-color",
-          "default": "var(--hx-color-neutral-300)",
+          "default": "var(--hx-color-border-strong)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/300",
+            "semanticToken": "color/border/strong",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
@@ -23440,24 +23440,24 @@
         {
           "description": "Error state color.",
           "name": "--hx-input-error-color",
-          "default": "var(--hx-color-error-500)",
+          "default": "var(--hx-color-error-text)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/error",
-            "fallbackPrimitive": "color/error/500",
+            "semanticToken": "color/error/text",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
           "description": "Label text color.",
           "name": "--hx-input-label-color",
-          "default": "var(--hx-color-neutral-700)",
+          "default": "var(--hx-color-text-strong)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/neutral",
-            "fallbackPrimitive": "color/neutral/700",
+            "semanticToken": "color/text/strong",
+            "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
