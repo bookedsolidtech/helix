@@ -27,12 +27,13 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  *
  * @cssprop [--hx-side-nav-width=16rem] - Full expanded width.
  * @cssprop [--hx-side-nav-collapsed-width=3.5rem] - Collapsed icon-only width.
- * @cssprop [--hx-side-nav-bg=var(--hx-color-neutral-900)] - Background color.
- * @cssprop [--hx-side-nav-color=var(--hx-color-neutral-100)] - Text color.
- * @cssprop [--hx-side-nav-border-color=var(--hx-color-neutral-700)] - Border color.
+ * @cssprop [--hx-side-nav-bg=var(--hx-color-surface-inverse)] - Background color.
+ * @cssprop [--hx-side-nav-color=var(--hx-color-text-inverse)] - Text color.
+ * @cssprop [--hx-side-nav-border-color=var(--hx-color-border-strong)] - Border color.
  * @cssprop [--hx-side-nav-header-padding=var(--hx-space-4)] - Header padding.
  * @cssprop [--hx-side-nav-footer-padding=var(--hx-space-4)] - Footer padding.
- * @cssprop [--hx-side-nav-toggle-color=var(--hx-color-neutral-400)] - Toggle button icon color.
+ * @cssprop [--hx-side-nav-toggle-color=var(--hx-color-text-inverse)] - Toggle button icon color (resting).
+ * @cssprop [--hx-side-nav-toggle-hover-color=var(--hx-color-text-inverse)] - Toggle button icon color on hover.
  * @cssprop [--hx-color-neutral-900] - Color.
  * @cssprop [--hx-color-neutral-100] - Color.
  * @cssprop [--hx-transition-normal] - Transition timing.

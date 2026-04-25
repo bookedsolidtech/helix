@@ -925,6 +925,69 @@ describe('hx-button', () => {
     });
   });
 
+  // ─── Variant hover token binding (3.2.1 round-2 regression net) ───
+  //
+  // Codex round-2 caught that secondary/ghost hover rules still bound to
+  // --hx-color-surface-raised instead of the new action.* layer, leaving the
+  // dark-mode action.{secondary,ghost}.bg-hover overrides as dead code. These
+  // assertions pin the binding two ways:
+  //   1. The shadow-root CSS source contains the correct semantic in the
+  //      :hover rule (catches a regression in the styles.ts file).
+  //   2. The cited semantic actually resolves to primary-50 (#EBF8F8) in the
+  //      page context (catches a regression in tokens.json).
+  // Together they prove the cascade is wired end-to-end without depending on
+  // browser :hover simulation, which is unreliable in headless test runners.
+
+  describe('Variant hover token binding (3.2.1 regression net)', () => {
+    const cssSource = (el: HelixButton): string => {
+      const styles = (el.constructor as typeof HelixButton).styles;
+      const list = Array.isArray(styles) ? styles : [styles];
+      return list.map((s) => (s ? String((s as { cssText?: string }).cssText ?? s) : '')).join('\n');
+    };
+
+    const resolveSemantic = async (token: string): Promise<string> => {
+      const probe = document.createElement('div');
+      probe.style.backgroundColor = `var(${token})`;
+      document.body.appendChild(probe);
+      try {
+        return getComputedStyle(probe).backgroundColor;
+      } finally {
+        probe.remove();
+      }
+    };
+
+    it('secondary :hover rule references --hx-color-action-secondary-bg-hover', async () => {
+      const el = await fixture<HelixButton>('<hx-button variant="secondary">Click</hx-button>');
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /\.button--secondary:hover\s*\{[^}]*--hx-color-action-secondary-bg-hover/,
+      );
+      expect(css).not.toMatch(
+        /\.button--secondary:hover\s*\{[^}]*--hx-color-surface-raised/,
+      );
+    });
+
+    it('ghost :hover rule references --hx-color-action-ghost-bg-hover', async () => {
+      const el = await fixture<HelixButton>('<hx-button variant="ghost">Click</hx-button>');
+      const css = cssSource(el);
+      expect(css).toMatch(/\.button--ghost:hover\s*\{[^}]*--hx-color-action-ghost-bg-hover/);
+      expect(css).not.toMatch(/\.button--ghost:hover\s*\{[^}]*--hx-color-surface-raised/);
+    });
+
+    it('action.secondary.bg-hover resolves to primary-50 (#EBF8F8)', async () => {
+      // primary-50 = #EBF8F8 → rgb(235, 248, 248)
+      expect(await resolveSemantic('--hx-color-action-secondary-bg-hover')).toBe(
+        'rgb(235, 248, 248)',
+      );
+    });
+
+    it('action.ghost.bg-hover resolves to primary-50 (#EBF8F8)', async () => {
+      expect(await resolveSemantic('--hx-color-action-ghost-bg-hover')).toBe(
+        'rgb(235, 248, 248)',
+      );
+    });
+  });
+
   // ─── Property: type — form integration ───
 
   describe('Property: type — form integration', () => {

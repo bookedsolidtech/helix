@@ -258,8 +258,38 @@ export const helixNavItemStyles = css`
   /* ─── Forced Colors (Windows High Contrast) ─── */
 
   @media (forced-colors: active) {
+    /*
+     * Bespoke block — sole owner of forced-colors deference for hx-nav-item
+     * (the forcedColorsInteractive mixin is intentionally NOT composed; XOR
+     * rule in styles/forced-colors.ts). Mirrors the mixin's interactive
+     * contract (ButtonFace / ButtonText / Highlight on hover, GrayText on
+     * disabled) for the .nav-item__link interactive surface, then layers the
+     * component-specific active-state border and tooltip border on top.
+     */
+    .nav-item__link {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+
+    .nav-item__link:hover {
+      background-color: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .nav-item__link {
+      color: GrayText;
+      border-color: GrayText;
+    }
+
     :host([active]) .nav-item__link {
-      border: 1px solid Highlight;
+      border-color: Highlight;
     }
 
     .nav-item__link:focus-visible {

@@ -103,7 +103,7 @@ export const helixButtonStyles = css`
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-action-secondary-bg-hover, #ebf8f8));
   }
 
   .button--tertiary {
@@ -144,7 +144,7 @@ export const helixButtonStyles = css`
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-action-ghost-bg-hover, #ebf8f8));
   }
 
   .button--outline {
@@ -243,7 +243,7 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--secondary:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.15));
+    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
   }
 
   /* Tertiary inverted — resting at subtle (10%) lifts to default (30%) on hover
@@ -267,7 +267,7 @@ export const helixButtonStyles = css`
   :host([inverted]) .button--ghost:hover {
     --hx-button-bg: var(
       --hx-button-inverted-ghost-hover-bg,
-      var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.2))
+      var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3))
     );
   }
 
@@ -277,7 +277,7 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--outline:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.15));
+    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
   }
 
   /* ─── Prefix / Suffix / Label ─── */
