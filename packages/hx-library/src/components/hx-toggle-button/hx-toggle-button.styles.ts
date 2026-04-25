@@ -135,12 +135,19 @@ export const helixToggleButtonStyles = css`
   /*
    * Primary: already uses solid primary bg; pressed deepens to primary-700
    * to give clear visual feedback without introducing a new color.
+   *
+   * AA fix: text.on-primary (= neutral-900 #0D1825) on primary-700 (#0F6363)
+   * = 2.54:1 — fails AA. Pin fg at neutral-0 for the darker pressed fill
+   * (neutral-0 on primary-700 = 7.03:1, AAA pass). Mirrors hx-toast
+   * precedent (commit 300e21ab0) and hx-button hover treatment.
+   * Note: secondary.pressed below uses primary-500 and stays at 5.20:1 —
+   * leave it alone.
    */
   .button--primary.button--pressed {
     --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-700, #0f6363));
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
-      var(--hx-color-text-on-primary, #ffffff)
+      var(--hx-color-neutral-0, #ffffff)
     );
     --hx-toggle-button-border-color: transparent;
   }
