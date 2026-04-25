@@ -122,8 +122,13 @@ export const helixButtonStyles = css`
     --hx-button-border-color: transparent;
   }
 
+  /* on-error tokens are tuned for error-500 (neutral-900 on #E5493E ≈ 4.59:1).
+     error-600 (#C92A2A) drops that to 2.25:1 — AA fail. Hold fg at neutral-0
+     directly so darker hover fills stay legible. Mirrors hx-toast precedent
+     (commit 300e21ab0). */
   .button--danger:hover {
     --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-error-600, #c92a2a));
+    --hx-button-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .button--ghost {
@@ -148,8 +153,13 @@ export const helixButtonStyles = css`
     --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
+  /* on-primary token resolves to neutral-900 (#0D1825) — tuned for primary-500.
+     primary-600 (#0F7078) drops the pair to 3.07:1 — AA fail. Pin fg at
+     neutral-0 for the darker hover fill. Mirrors hx-toast precedent
+     (commit 300e21ab0). */
   .button--primary:hover {
     --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-600, #0f7078));
+    --hx-button-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   /* ─── Disabled ─── */
