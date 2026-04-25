@@ -223,9 +223,12 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button:focus-visible {
+    /* WCAG 1.4.11: focus indicator needs ≥3:1 against adjacent colors.
+       border-on-dark-default (overlay-white-30) ≈ 2.7:1 on neutral-900 — fails.
+       border-on-dark-strong (overlay-white-70) ≈ 5:1 — passes. */
     outline-color: var(
       --hx-button-inverted-focus-ring-color,
-      var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.5))
+      var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
     );
   }
 
@@ -243,14 +246,16 @@ export const helixButtonStyles = css`
     --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.15));
   }
 
-  /* Tertiary inverted */
+  /* Tertiary inverted — resting at subtle (10%) lifts to default (30%) on hover
+     so the runtime hover delta is visually distinct, not collapsed onto a
+     single token. */
   :host([inverted]) .button--tertiary {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.15));
+    --hx-button-bg: var(--hx-color-border-on-dark-subtle, rgba(255, 255, 255, 0.1));
     --hx-button-border-color: transparent;
   }
 
   :host([inverted]) .button--tertiary:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.25));
+    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
   }
 
   /* Ghost inverted — transparent base, translucent hover bg */
@@ -298,6 +303,16 @@ export const helixButtonStyles = css`
       background-color: ButtonFace;
       color: ButtonText;
       border: 2px solid ButtonText;
+    }
+
+    .button:hover {
+      /* Hover affordance must survive in HC. Highlight/HighlightText is the
+         OS-level "selected" pair, mirroring the forcedColorsInteractive mixin's
+         hover contract — kept inline since this component owns its bespoke HC
+         block (XOR rule). */
+      background-color: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
     }
 
     .button:focus-visible {

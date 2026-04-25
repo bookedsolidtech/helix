@@ -526,6 +526,13 @@ const PAIRS: PairSpec[] = [
     label: 'text.on-error-strong on action.danger.bg-hover (HC bright fill)',
     modes: ['high-contrast'],
   },
+  {
+    text: '--hx-color-text-on-error-strong',
+    surface: '--hx-color-action-danger-bg-active',
+    threshold: 4.5,
+    label: 'text.on-error-strong on action.danger.bg-active (HC bright fill)',
+    modes: ['high-contrast'],
+  },
   // Resting action surfaces pair with their AA-tuned on-{role} (neutral-900
   // in light/dark, #000 in HC) — same as the bare brand-500 pairs above, but
   // routed through the semantic action.* tier. Asserted to lock in the
