@@ -5,7 +5,7 @@
   "overrides": {
     "hx-button": {
       "budget": 6144,
-      "reason": "3.2.1 added explicit :active rules for primary/danger filled variants (action.{primary,danger}.bg-active + text.on-{role}-strong + filter:none) to close a high-severity AA gap caught by Codex round-6 review where filter:brightness(0.8) produced sub-AA pressed-state contrast (primary 3.70:1, danger 3.26:1). Pressed contrasts are now 7.03:1 / 7.96:1. +0.14 KB over the 5.5 KB standard; healthcare a11y compliance is the load-bearing constraint."
+      "reason": "3.2.1 added explicit :active rules for primary/danger filled variants (action.{primary,danger}.bg-active + text.on-{role}-strong + filter:none) to close a high-severity AA gap caught by Codex round-6 review where filter:brightness(0.8) produced sub-AA pressed-state contrast (primary 3.70:1, danger 3.26:1). Round-7 added the inverted-mode sister rules (action.{primary,danger}.bg-inverted-hover for inverted hover/pressed) closing the symmetric dark-surface UI-floor regression. Standard-mode pressed contrasts are now 7.03:1 / 7.96:1; inverted-mode hover/pressed are 7.27:1 / 6.27:1. Measured artifact growth ~0.14 KB; budget bumped one gating step from 5.5 KB to 6.0 KB to absorb this commit and any further AA pin growth in 3.2.x. Healthcare a11y compliance is the load-bearing constraint."
     },
     "hx-color-picker": {
       "budget": 8192,

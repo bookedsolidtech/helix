@@ -533,6 +533,29 @@ const PAIRS: PairSpec[] = [
     label: 'text.on-error-strong on action.danger.bg-active (HC bright fill)',
     modes: ['high-contrast'],
   },
+  // 3.2.1 round-7 — inverted-mode pressed/hover floors. action.{primary,danger}.
+  // bg-inverted-hover paint over surface.inverse (neutral-900) for inverted
+  // hx-button states. WCAG 1.4.11 floor for non-text UI components is 3:1; we
+  // assert that floor for the surface-against-surface adjacency check (the fill
+  // versus its container). The on-token foreground that paints over these
+  // fills (text.inverse / on-{role}-strong, both = neutral-0) is body-text
+  // territory and asserted via the existing hover/active pairs above (-400 is
+  // a lighter ramp stop than -500, so neutral-0 contrast on it is strictly
+  // higher than the already-AA primary-500/error-500 base pairs).
+  {
+    text: '--hx-color-action-primary-bg-inverted-hover',
+    surface: '--hx-color-surface-inverse',
+    threshold: 3.0,
+    label: 'action.primary.bg-inverted-hover on surface.inverse (UI floor)',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-action-danger-bg-inverted-hover',
+    surface: '--hx-color-surface-inverse',
+    threshold: 3.0,
+    label: 'action.danger.bg-inverted-hover on surface.inverse (UI floor)',
+    modes: ['light', 'dark'],
+  },
   // Resting action surfaces pair with their AA-tuned on-{role} (neutral-900
   // in light/dark, #000 in HC) — same as the bare brand-500 pairs above, but
   // routed through the semantic action.* tier. Asserted to lock in the

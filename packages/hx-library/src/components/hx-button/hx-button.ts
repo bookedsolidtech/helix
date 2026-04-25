@@ -37,6 +37,7 @@ export interface HxButtonClickDetail {
  *
  * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).
  * @cssprop [--hx-button-hover-bg] - Hover background override; when set, overrides the variant default hover background from outside the shadow DOM.
+ * @cssprop [--hx-button-active-bg] - Pressed/active background override; when set, overrides the variant default :active background. Primary/danger variants default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast; inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover for the same role on dark surfaces.
  * @cssprop [--hx-button-color=var(--hx-color-text-on-primary)] - Button text color (variants route through text.on-{role} / text.on-{role}-strong).
  * @cssprop [--hx-button-border-color=transparent] - Button border color (secondary/outline variants route through action.secondary.border).
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
@@ -59,6 +60,8 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-color-action-danger-bg] - Danger variant resting fill.
  * @cssprop [--hx-color-action-danger-bg-hover] - Danger variant hover fill.
  * @cssprop [--hx-color-action-danger-bg-active] - Danger variant active fill.
+ * @cssprop [--hx-color-action-primary-bg-inverted-hover] - Primary variant hover/pressed fill on dark/inverted surface (resolves to primary-400, 7.27:1 on neutral-900).
+ * @cssprop [--hx-color-action-danger-bg-inverted-hover] - Danger variant hover/pressed fill on dark/inverted surface (resolves to error-400, 6.27:1 on neutral-900).
  * @cssprop [--hx-color-text-on-primary] - Foreground for primary fill (resolves to neutral-900 — AA-tuned for primary-500).
  * @cssprop [--hx-color-text-on-primary-strong] - Foreground for primary-hover fill (resolves to neutral-0 across modes).
  * @cssprop [--hx-color-text-on-error] - Foreground for danger fill (resolves to neutral-900).

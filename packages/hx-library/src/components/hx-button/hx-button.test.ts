@@ -1018,6 +1018,94 @@ describe('hx-button', () => {
     it('action.danger.bg-active resolves to error-700 (#A21312)', async () => {
       expect(await resolveSemantic('--hx-color-action-danger-bg-active')).toBe('rgb(162, 19, 18)');
     });
+
+    // ─── Inverted-mode :active token binding (3.2.1 round-7 regression net) ───
+    //
+    // Codex round-7 caught that round-6's :active rules created a symmetric
+    // regression in inverted mode: action.{primary,danger}.bg-active resolves
+    // to primary-700 (#0F6363) and error-700 (#A21312) — both dark fills that
+    // collapse to ~2.5–3:1 against surface.inverse (neutral-900, #0D1825),
+    // failing WCAG 1.4.11's 3:1 UI floor. Round-7 added :host([inverted])
+    // overrides binding pressed (and danger hover) to action.{primary,danger}.
+    // bg-inverted-hover so the affordance reads against a dark surface
+    // (primary-400 = 7.27:1, error-400 = 6.27:1 on neutral-900).
+    //
+    // :active state is unreliable to drive in headless browser runners, so
+    // these tests pin two-deep: shadow-root CSS source + token resolution.
+
+    it('inverted primary :active rule references --hx-color-action-primary-bg-inverted-hover', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="primary" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--primary:active\s*\{[^}]*--hx-color-action-primary-bg-inverted-hover/,
+      );
+    });
+
+    it('inverted danger :hover rule references --hx-color-action-danger-bg-inverted-hover', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:hover\s*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
+      );
+    });
+
+    it('inverted danger :active rule references --hx-color-action-danger-bg-inverted-hover', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:active\s*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
+      );
+    });
+
+    it('action.primary.bg-inverted-hover resolves to primary-400 (#6AB1B1)', async () => {
+      expect(await resolveSemantic('--hx-color-action-primary-bg-inverted-hover')).toBe(
+        'rgb(106, 177, 177)',
+      );
+    });
+
+    it('action.danger.bg-inverted-hover resolves to error-400 (#FC7264)', async () => {
+      expect(await resolveSemantic('--hx-color-action-danger-bg-inverted-hover')).toBe(
+        'rgb(252, 114, 100)',
+      );
+    });
+
+    // Behavior-side anchor: drive the cascade by setting --hx-button-bg on a
+    // probe element and verify computed background matches the token value.
+    // This catches a regression where the inverted tokens still resolve but
+    // the styles.ts rule fails to bind --hx-button-bg through them (e.g. a
+    // typo in the var() chain). Since :active can't be reliably triggered in
+    // a headless runner, the probe targets the override mechanism rather than
+    // the pseudo-class itself.
+
+    it('inverted-hover token paints when --hx-button-bg binds to it (primary)', () => {
+      const probe = document.createElement('div');
+      probe.style.setProperty('--hx-button-bg', 'var(--hx-color-action-primary-bg-inverted-hover)');
+      probe.style.backgroundColor = 'var(--hx-button-bg)';
+      document.body.appendChild(probe);
+      try {
+        expect(getComputedStyle(probe).backgroundColor).toBe('rgb(106, 177, 177)');
+      } finally {
+        probe.remove();
+      }
+    });
+
+    it('inverted-hover token paints when --hx-button-bg binds to it (danger)', () => {
+      const probe = document.createElement('div');
+      probe.style.setProperty('--hx-button-bg', 'var(--hx-color-action-danger-bg-inverted-hover)');
+      probe.style.backgroundColor = 'var(--hx-button-bg)';
+      document.body.appendChild(probe);
+      try {
+        expect(getComputedStyle(probe).backgroundColor).toBe('rgb(252, 114, 100)');
+      } finally {
+        probe.remove();
+      }
+    });
   });
 
   // ─── Property: type — form integration ───
