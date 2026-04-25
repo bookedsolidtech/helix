@@ -262,7 +262,7 @@ export const SystemHealthDashboard: Story = {
   name: 'System Health Dashboard',
   render: () => html`
     <div
-      style="display: flex; flex-direction: column; gap: var(--hx-spacing-3, 0.75rem); padding: var(--hx-spacing-4, 1rem); border: 1px solid var(--hx-color-neutral-200, #e5e7eb); border-radius: var(--hx-radius-md, 0.5rem); max-width: 320px;"
+      style="display: flex; flex-direction: column; gap: var(--hx-spacing-3, 0.75rem); padding: var(--hx-spacing-4, 1rem); border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-radius-md, 0.5rem); max-width: 320px;"
     >
       <div style="display: flex; align-items: center; gap: var(--hx-spacing-2, 0.5rem);">
         <hx-status-indicator status="online" size="sm" pulse></hx-status-indicator>
@@ -333,7 +333,7 @@ export const DrupalBooleanProp: Story = {
           Correct: attribute present (pulse active)
         </p>
         <code
-          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4b5563);"
+          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4A5362);"
           >&lt;hx-status-indicator status="online" pulse&gt;&lt;/hx-status-indicator&gt;</code
         >
         <hx-status-indicator status="online" pulse></hx-status-indicator>
@@ -346,7 +346,7 @@ export const DrupalBooleanProp: Story = {
           Correct: attribute absent (pulse inactive)
         </p>
         <code
-          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4b5563);"
+          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4A5362);"
           >&lt;hx-status-indicator status="online"&gt;&lt;/hx-status-indicator&gt;</code
         >
         <hx-status-indicator status="online"></hx-status-indicator>
@@ -354,12 +354,12 @@ export const DrupalBooleanProp: Story = {
 
       <div>
         <p
-          style="margin: 0 0 var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); font-weight: 600; color: var(--hx-color-error-600, #dc2626);"
+          style="margin: 0 0 var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); font-weight: 600; color: var(--hx-color-error-600, #C92A2A);"
         >
           Incorrect: pulse="false" — attribute is still present, pulse IS active
         </p>
         <code
-          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4b5563);"
+          style="display: block; margin-bottom: var(--hx-spacing-2, 0.5rem); font-size: var(--hx-font-size-xs, 0.75rem); color: var(--hx-color-neutral-600, #4A5362);"
           >&lt;hx-status-indicator status="online"
           pulse="false"&gt;&lt;/hx-status-indicator&gt;</code
         >

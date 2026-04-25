@@ -1,6 +1,6 @@
 {
-  "comment": "Per-component bundle size budgets for @helixui/library (gzipped bytes). Changes require code review.",
-  "standard": 5120,
+  "comment": "Per-component bundle size budgets for @helixui/library (gzipped bytes). 3.2.0 raised standard 5120→5632 and complex 6144→6656 to absorb the WCAG 2.1 AA hover/active foreground-pinning CSS introduced by the palette refresh; healthcare a11y compliance is the load-bearing constraint, +0.5 KB the documented tradeoff. Changes require code review.",
+  "standard": 5632,
   "bundle": 51200,
   "overrides": {
     "hx-color-picker": {
@@ -16,28 +16,28 @@
       "reason": "Calendar grid rendering, full keyboard nav, focus trap, date utilities, ElementInternals form association. JS-only: ~4324 gz."
     },
     "hx-file-upload": {
-      "budget": 6144,
-      "reason": "Drag-and-drop file management with progress tracking, mixinDelegatesAria ARIA delegation, focus restoration after file removal, forced-colors support, and WCAG 2.5.5 touch targets. Baseline: ~4.64 KB gz; mandatory a11y fixes add ~1.1 KB."
+      "budget": 6656,
+      "reason": "Drag-and-drop file management with progress tracking, mixinDelegatesAria ARIA delegation, focus restoration after file removal, forced-colors support, and WCAG 2.5.5 touch targets. Baseline: ~4.64 KB gz; mandatory a11y fixes add ~1.1 KB; 3.2.0 AA hover/active pins add ~0.4 KB."
     },
     "hx-number-input": {
-      "budget": 6144,
+      "budget": 6656,
       "reason": "Stepper input with increment/decrement buttons, min/max/step validation, keyboard-repeating long-press, ElementInternals form association, forced-colors support. Baseline: ~5.2 KB gz."
     },
     "hx-select": {
-      "budget": 6144,
-      "reason": "ARIA listbox, keyboard nav, multiple selection, ElementInternals form association, floating-ui positioning. JS-only: ~5.18 KB gz."
+      "budget": 6656,
+      "reason": "ARIA listbox, keyboard nav, multiple selection, ElementInternals form association, floating-ui positioning. JS-only: ~5.18 KB gz; 3.2.0 AA hover/active pins add ~0.4 KB."
     },
     "hx-side-nav": {
-      "budget": 5632,
+      "budget": 6144,
       "reason": "Multi-level navigation with expand/collapse state management, keyboard nav, ARIA tree semantics, active-item tracking, and mobile-responsive behavior. Baseline: ~5.01 KB gz."
     },
     "hx-slider": {
-      "budget": 5632,
+      "budget": 6144,
       "reason": "Range input with value display, dual-handle range mode, ARIA slider semantics, keyboard nav, forced-colors support. Baseline: ~5.04 KB gz."
     },
     "hx-time-picker": {
-      "budget": 6144,
-      "reason": "Time parsing/validation, meridiem toggle, keyboard nav, ElementInternals form association. JS-only: ~5.01 KB gz."
+      "budget": 6656,
+      "reason": "Time parsing/validation, meridiem toggle, keyboard nav, ElementInternals form association. JS-only: ~5.01 KB gz; 3.2.0 AA hover/active pins add ~0.4 KB."
     }
   }
 }

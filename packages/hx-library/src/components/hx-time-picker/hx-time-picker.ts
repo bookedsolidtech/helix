@@ -8,6 +8,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { helixTimePickerStyles } from './hx-time-picker.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 // ─── Time Slot ───────────────────────────────────────────────────────────────
 
@@ -176,10 +177,42 @@ export interface HxTimePickerChangeDetail {
  * @cssprop [--hx-time-picker-option-hover-color=var(--hx-color-primary-700)] - Option hover text color.
  * @cssprop [--hx-time-picker-option-selected-bg=var(--hx-color-primary-100)] - Selected option background.
  * @cssprop [--hx-time-picker-option-selected-color=var(--hx-color-primary-800)] - Selected option text color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-opacity] - CSS custom property.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-z-index-dropdown] - Z-index layer.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-primary-50] - Color.
+ * @cssprop [--hx-color-primary-700] - Color.
+ * @cssprop [--hx-color-primary-100] - Color.
+ * @cssprop [--hx-color-primary-800] - Color.
+ * @cssprop [--hx-font-size-xs] - Font size.
  */
 @customElement('hx-time-picker')
 export class HelixTimePicker extends FormMixin(HelixElement) {
-  static override styles = [helixTimePickerStyles];
+  static override styles = [helixTimePickerStyles, forcedColorsField];
 
   // ─── Form Association ───
 

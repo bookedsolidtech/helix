@@ -8,6 +8,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextFileUploadId = createIdCounter('hx-file-upload');
 
@@ -61,10 +62,45 @@ export interface HxFileErrorDetail {
  * @cssprop [--hx-file-upload-dropzone-active-bg] - Dropzone background when a file is dragged over.
  * @cssprop [--hx-file-upload-progress-color=var(--hx-color-primary-500)] - Progress bar fill color.
  * @cssprop [--hx-file-upload-error-color=var(--hx-color-error-500)] - Error state and remove-button hover color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-file-upload-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-space-32] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-lg] - CSS custom property.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-file-upload-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-file-upload-progress-height=var(--hx-space-1)] - Height.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
  */
 @customElement('hx-file-upload')
 export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement)) {
-  static override styles = [helixFileUploadStyles];
+  static override styles = [helixFileUploadStyles, forcedColorsField];
 
   // ─── Form Association ───
 

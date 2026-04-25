@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTagStyles } from './hx-tag.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * A compact label for categorization, filtering, and selection.
@@ -41,10 +42,46 @@ import { helixTagStyles } from './hx-tag.styles.js';
  * @note aria-live removal announcements are the consuming application's responsibility.
  * When a tag is removed from the DOM, applications should announce the change via their
  * own aria-live region to inform screen reader users of clinical data filter changes.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-error-200] - Color.
+ * @cssprop [--hx-color-error-50] - Color.
+ * @cssprop [--hx-color-error-700] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-primary-200] - Color.
+ * @cssprop [--hx-color-primary-50] - Color.
+ * @cssprop [--hx-color-primary-700] - Color.
+ * @cssprop [--hx-color-success-200] - Color.
+ * @cssprop [--hx-color-success-50] - Color.
+ * @cssprop [--hx-color-success-700] - Color.
+ * @cssprop [--hx-color-warning-200] - Color.
+ * @cssprop [--hx-color-warning-50] - Color.
+ * @cssprop [--hx-color-warning-700] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-opacity-100] - Opacity.
+ * @cssprop [--hx-opacity-75] - Opacity.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-0-5] - Spacing token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-1-5] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
  */
 @customElement('hx-tag')
 export class HelixTag extends HelixElement {
-  static override styles = [helixTagStyles];
+  static override styles = [helixTagStyles, forcedColorsSurface];
 
   /**
    * Visual style variant of the tag.

@@ -10,7 +10,7 @@ export const helixStatStyles = css`
     flex-direction: column;
     gap: var(--hx-stat-gap, var(--hx-space-1, 0.25rem));
     font-family: var(--hx-stat-font-family, var(--hx-font-family-sans, sans-serif));
-    color: var(--hx-stat-color, var(--hx-color-neutral-800, #1e293b));
+    color: var(--hx-stat-color, var(--hx-color-text-strong, #202b39));
   }
 
   /* ─── Size Variants ─── */
@@ -54,13 +54,13 @@ export const helixStatStyles = css`
   }
 
   .stat__value {
-    color: var(--hx-stat-value-color, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-stat-value-color, var(--hx-color-text-primary, #0d1825));
   }
 
   /* ─── Label ─── */
 
   .stat__label {
-    color: var(--hx-stat-label-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-stat-label-color, var(--hx-color-text-muted, #4a5362));
     font-weight: var(--hx-font-weight-normal, 400);
   }
 
@@ -69,7 +69,7 @@ export const helixStatStyles = css`
   .stat__icon {
     display: flex;
     align-items: center;
-    color: var(--hx-stat-icon-color, var(--hx-color-primary-500, #2563eb));
+    color: var(--hx-stat-icon-color, var(--hx-color-primary-500, #429797));
     flex-shrink: 0;
   }
 
@@ -86,13 +86,13 @@ export const helixStatStyles = css`
   }
 
   .stat__trend--up {
-    color: var(--hx-stat-trend-up-color, var(--hx-color-success-700, #166534));
-    background-color: var(--hx-stat-trend-up-bg, var(--hx-color-success-50, #f0fdf4));
+    color: var(--hx-stat-trend-up-color, var(--hx-color-success-700, #146831));
+    background-color: var(--hx-stat-trend-up-bg, var(--hx-color-success-50, #eafaec));
   }
 
   .stat__trend--down {
-    color: var(--hx-stat-trend-down-color, var(--hx-color-error-700, #991b1b));
-    background-color: var(--hx-stat-trend-down-bg, var(--hx-color-error-50, #fef2f2));
+    color: var(--hx-stat-trend-down-color, var(--hx-color-error-700, #a21312));
+    background-color: var(--hx-stat-trend-down-bg, var(--hx-color-error-50, #fff2f0));
   }
 
   .stat__trend-arrow {

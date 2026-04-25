@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixBadgeStyles } from './hx-badge.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -35,10 +36,45 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-badge-secondary-color=var(--hx-color-neutral-700)] - Text color for the secondary variant.
  * @cssprop [--hx-badge-info-bg=var(--hx-color-info-700)] - Background for the info variant.
  * @cssprop [--hx-badge-info-color=var(--hx-color-neutral-0)] - Text color for the info variant.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-font-size-2xs] - Font size.
+ * @cssprop [--hx-space-0-5] - Spacing token.
+ * @cssprop [--hx-space-1-5] - Spacing token.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-badge-pulse-color-internal] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-success-700] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-info-700] - Color.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-opacity-75] - Opacity.
+ * @cssprop [--hx-badge-pulse-duration=var(--hx-duration-slow)] - CSS custom property.
+ * @cssprop [--hx-duration-slow] - Animation duration.
+ * @cssprop [--hx-badge-pulse-easing=var(--hx-easing-in-out)] - CSS custom property.
+ * @cssprop [--hx-easing-in-out] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-opacity-100] - Opacity.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
  */
 @customElement('hx-badge')
 export class HelixBadge extends HelixElement {
-  static override styles = [helixBadgeStyles];
+  static override styles = [helixBadgeStyles, forcedColorsSurface];
 
   /**
    * Visual style variant of the badge.

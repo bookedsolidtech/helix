@@ -40,10 +40,10 @@ export const helixPaginationStyles = css`
     min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-pagination-border-color, var(--hx-color-neutral-300, #cbd5e1));
+      var(--hx-pagination-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-pagination-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background: var(--hx-pagination-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-pagination-color, var(--hx-color-neutral-900, #0f172a));
+    background: var(--hx-pagination-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-pagination-color, var(--hx-color-text-primary, #0d1825));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-family: inherit;
     cursor: pointer;
@@ -56,23 +56,26 @@ export const helixPaginationStyles = css`
   }
 
   .button:hover:not(:disabled) {
-    background: var(--hx-pagination-hover-bg, var(--hx-color-neutral-100, #f1f5f9));
-    border-color: var(--hx-pagination-hover-border-color, var(--hx-color-primary-500, #2563eb));
+    background: var(--hx-pagination-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
+    border-color: var(--hx-pagination-hover-border-color, var(--hx-color-primary-500, #429797));
   }
 
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-pagination-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(
+        --hx-pagination-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
   .button[aria-current='page'] {
-    background: var(--hx-pagination-active-bg, var(--hx-color-primary-500, #2563eb));
+    background: var(--hx-pagination-active-bg, var(--hx-color-primary-500, #429797));
     border-color: var(
       --hx-pagination-active-border-color,
-      var(--hx-pagination-active-bg, var(--hx-color-primary-500, #2563eb))
+      var(--hx-pagination-active-bg, var(--hx-color-primary-500, #429797))
     );
-    color: var(--hx-pagination-active-color, var(--hx-color-neutral-0, #ffffff));
+    color: var(--hx-pagination-active-color, var(--hx-color-text-on-primary, #ffffff));
     font-weight: var(--hx-font-weight-semibold, 600);
     cursor: default;
     pointer-events: none;
@@ -89,7 +92,7 @@ export const helixPaginationStyles = css`
     justify-content: center;
     min-width: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
-    color: var(--hx-pagination-ellipsis-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-pagination-ellipsis-color, var(--hx-color-text-muted, #4a5362));
     font-size: var(--hx-font-size-sm, 0.875rem);
     user-select: none;
   }
@@ -110,7 +113,7 @@ export const helixPaginationStyles = css`
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-500, #64748b);
+    color: var(--hx-pagination-page-size-label-color, var(--hx-color-text-muted, #4a5362));
     white-space: nowrap;
   }
 
@@ -118,10 +121,10 @@ export const helixPaginationStyles = css`
     min-height: var(--hx-pagination-button-size, var(--hx-touch-target-min, 2.75rem));
     padding: 0 var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-pagination-border-color, var(--hx-color-neutral-300, #cbd5e1));
+      var(--hx-pagination-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-pagination-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background: var(--hx-pagination-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-pagination-color, var(--hx-color-neutral-900, #0f172a));
+    background: var(--hx-pagination-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-pagination-color, var(--hx-color-text-primary, #0d1825));
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-family: inherit;
     cursor: pointer;
@@ -129,7 +132,10 @@ export const helixPaginationStyles = css`
 
   .page-size-select:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-pagination-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(
+        --hx-pagination-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

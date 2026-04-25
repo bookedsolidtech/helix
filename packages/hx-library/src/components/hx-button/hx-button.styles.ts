@@ -29,7 +29,7 @@ export const helixButtonStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-button-border-color, transparent);
     border-radius: var(--hx-button-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-button-bg, var(--hx-color-primary-500, #2563eb));
+    background-color: var(--hx-button-bg, var(--hx-color-primary-500, #429797));
     color: var(--hx-button-color, var(--hx-color-neutral-0, #ffffff));
     font-family: var(--hx-button-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-button-font-weight, var(--hx-font-weight-semibold, 600));
@@ -48,7 +48,10 @@ export const helixButtonStyles = css`
 
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(
+        --hx-button-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -86,63 +89,77 @@ export const helixButtonStyles = css`
   /* ─── Style Variants ─── */
 
   .button--primary {
-    --hx-button-bg: var(--hx-color-primary-500);
-    --hx-button-color: var(--hx-color-neutral-0);
+    --hx-button-bg: var(--hx-color-primary-500, #429797);
+    --hx-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-button-border-color: transparent;
   }
 
   .button--secondary {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-primary-500);
-    --hx-button-border-color: var(--hx-color-primary-500);
+    /* primary-500 (#429797) text on white surface = 3.43:1 — fails AA.
+       primary-600 (#0F7078) on white = 6.06:1 — AA pass. */
+    --hx-button-color: var(--hx-color-primary-600, #0f7078);
+    --hx-button-border-color: var(--hx-color-primary-600, #0f7078);
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-50));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   .button--tertiary {
-    --hx-button-bg: var(--hx-color-neutral-100);
-    --hx-button-color: var(--hx-color-neutral-900);
+    --hx-button-bg: var(--hx-color-surface-sunken, #ebeee9);
+    --hx-button-color: var(--hx-color-text-primary, #0d1825);
     --hx-button-border-color: transparent;
   }
 
   .button--tertiary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-200));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   .button--danger {
-    --hx-button-bg: var(--hx-color-error-500);
-    --hx-button-color: var(--hx-color-neutral-0);
+    --hx-button-bg: var(--hx-color-error-500, #e5493e);
+    --hx-button-color: var(--hx-color-text-on-error, #ffffff);
     --hx-button-border-color: transparent;
   }
 
+  /* on-error tokens are tuned for error-500 (neutral-900 on #E5493E ≈ 4.59:1).
+     error-600 (#C92A2A) drops that to 2.25:1 — AA fail. Hold fg at neutral-0
+     directly so darker hover fills stay legible. Mirrors hx-toast precedent
+     (commit 300e21ab0). */
   .button--danger:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-error-600));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-error-600, #c92a2a));
+    --hx-button-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   .button--ghost {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-primary-500);
+    /* primary-500 (#429797) text on white surface = 3.43:1 — fails AA.
+       primary-600 (#0F7078) on white = 6.06:1 — AA pass. */
+    --hx-button-color: var(--hx-color-primary-600, #0f7078);
     --hx-button-border-color: transparent;
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-100));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   .button--outline {
     --hx-button-bg: transparent;
-    --hx-button-color: var(--hx-color-neutral-900);
-    --hx-button-border-color: var(--hx-color-neutral-300);
+    --hx-button-color: var(--hx-color-text-primary, #0d1825);
+    --hx-button-border-color: var(--hx-color-border-strong, #8e9c98);
   }
 
   .button--outline:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-neutral-50));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
+  /* on-primary token resolves to neutral-900 (#0D1825) — tuned for primary-500.
+     primary-600 (#0F7078) drops the pair to 3.07:1 — AA fail. Pin fg at
+     neutral-0 for the darker hover fill. Mirrors hx-toast precedent
+     (commit 300e21ab0). */
   .button--primary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-600));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-primary-600, #0f7078));
+    --hx-button-color: var(--hx-color-neutral-0, #ffffff);
   }
 
   /* ─── Disabled ─── */
@@ -188,7 +205,7 @@ export const helixButtonStyles = css`
 
   /* Override text color and filter-based hover/active for all variants */
   :host([inverted]) .button {
-    color: var(--hx-button-inverted-color, var(--hx-color-neutral-0));
+    color: var(--hx-button-inverted-color, var(--hx-color-neutral-0, #ffffff));
     filter: none;
   }
 
@@ -209,7 +226,7 @@ export const helixButtonStyles = css`
 
   /* Primary inverted — slight transparent white overlay on hover */
   :host([inverted]) .button--primary:hover {
-    --hx-button-bg: var(--hx-color-primary-400, #60a5fa);
+    --hx-button-bg: var(--hx-color-primary-400, #6ab1b1);
   }
 
   /* Secondary inverted — white border and text */

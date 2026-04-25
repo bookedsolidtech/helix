@@ -8,11 +8,11 @@ import './hx-grid.js';
 // ─────────────────────────────────────────────────
 
 const ITEM_COLORS = [
-  'var(--hx-color-primary-100, #dbeafe)',
+  'var(--hx-color-primary-100, #DBF0F0)',
   'var(--hx-color-warning-100, #fef9c3)',
   'var(--hx-color-success-100, #dcfce7)',
   'var(--hx-color-danger-100, #fce7f3)',
-  'var(--hx-color-neutral-100, #f1f5f9)',
+  'var(--hx-color-neutral-100, #EBEEE9)',
   'var(--hx-color-warning-50, #ffedd5)',
 ] as const;
 
@@ -317,7 +317,7 @@ export const AlignmentVariants: Story = {
         ([align, justify]) => html`
           <div>
             <p
-              style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #64748b); text-transform: uppercase; letter-spacing: 0.05em;"
+              style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
             >
               align="${align}" justify="${justify}"
             </p>
@@ -344,7 +344,7 @@ export const RowColumnGapOverrides: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; font-family: sans-serif;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #64748b); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           row-gap="xl" column-gap="xs"
         </p>
@@ -356,7 +356,7 @@ export const RowColumnGapOverrides: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #64748b); text-transform: uppercase; letter-spacing: 0.05em;"
+          style="margin: 0 0 0.5rem; font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); text-transform: uppercase; letter-spacing: 0.05em;"
         >
           row-gap="xs" column-gap="xl"
         </p>

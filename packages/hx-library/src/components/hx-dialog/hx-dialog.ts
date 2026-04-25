@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDialogStyles } from './hx-dialog.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextDialogId = createIdCounter('hx-dialog');
@@ -88,10 +89,41 @@ const FOCUSABLE_SELECTORS = [
  * };
  * ```
  * Focus restoration to the trigger element is handled automatically by the component.
+ * @cssprop [--hx-z-index-modal] - Z-index layer.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-border-radius-lg] - CSS custom property.
+ * @cssprop [--hx-shadow-xl] - Box shadow.
+ * @cssprop [--hx-container-narrow] - CSS custom property.
+ * @cssprop [--hx-space-8] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-duration-normal] - Animation duration.
+ * @cssprop [--hx-easing-out] - CSS custom property.
+ * @cssprop [--hx-space-5] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-dialog-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-font-size-xl] - Font size.
+ * @cssprop [--hx-duration-fast] - Animation duration.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-dialog-close-btn-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-space-3] - Spacing token.
  */
 @customElement('hx-dialog')
 export class HelixDialog extends HelixElement {
-  static override styles = [helixDialogStyles];
+  static override styles = [helixDialogStyles, forcedColorsSurface];
 
   // D10 — observe aria-label attribute without shadowing ARIAMixin.ariaLabel
   static override get observedAttributes(): string[] {

@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 
 /** Minimum allowed value for feedbackDuration (ms). */
 const MIN_FEEDBACK_DURATION = 300;
@@ -46,10 +47,34 @@ const VALID_SIZES = new Set(['sm', 'md', 'lg']);
  * @cssprop [--hx-copy-button-border-color=transparent] - Button border color.
  * @cssprop [--hx-copy-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
  * @cssprop [--hx-copy-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-success-500] - Color.
+ * @cssprop [--hx-color-success-text] - Color.
+ * @cssprop [--hx-copy-button-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-filter-brightness-active] - CSS filter.
+ * @cssprop [--hx-filter-brightness-hover] - CSS filter.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-transition-fast] - Transition timing.
  */
 @customElement('hx-copy-button')
 export class HelixCopyButton extends HelixElement {
-  static override styles = [helixCopyButtonStyles];
+  static override styles = [helixCopyButtonStyles, forcedColorsInteractive];
 
   // ─── Public Properties ───
 

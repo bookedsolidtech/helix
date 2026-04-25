@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { HelixElement } from '../../base/index.js';
 import { helixIconStyles } from './hx-icon.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * An icon component that supports inline SVG fetching and SVG sprite sheet references.
@@ -28,10 +29,15 @@ import { helixIconStyles } from './hx-icon.styles.js';
  *
  * @cssprop [--hx-icon-size=var(--hx-size-6,1.5rem)] - Width and height of the icon.
  * @cssprop [--hx-icon-color=currentColor] - Icon color.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-size-5] - Size token.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-size-10] - Size token.
  */
 @customElement('hx-icon')
 export class HelixIcon extends HelixElement {
-  static override styles = [helixIconStyles];
+  static override styles = [helixIconStyles, forcedColorsSurface];
 
   /**
    * Icon name used as the fragment identifier when referencing a sprite sheet.

@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import type { Placement, Middleware } from '@floating-ui/dom';
 import { helixPopupStyles } from './hx-popup.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 type PopupPlacement =
   | 'top'
@@ -123,10 +124,11 @@ type ArrowData = { x?: number; y?: number; centerOffset: number };
  * ```twig
  * <hx-popup anchor="#{{ element['#id'] }}" placement="bottom">...</hx-popup>
  * ```
+ * @cssprop [--hx-color-neutral-0] - Color.
  */
 @customElement('hx-popup')
 export class HelixPopup extends HelixElement {
-  static override styles = [helixPopupStyles];
+  static override styles = [helixPopupStyles, forcedColorsSurface];
 
   /** @internal */
   private _anchorSlotEl: Element | null = null;

@@ -6,6 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSwitchStyles } from './hx-switch.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextSwitchId = createIdCounter('hx-switch');
 
@@ -48,10 +49,52 @@ export interface HxSwitchChangeDetail {
  * @cssprop [--hx-switch-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-switch-error-color=var(--hx-color-error-500)] - Error message color.
  * @cssprop [--hx-switch-help-text-color=var(--hx-color-neutral-500)] - Help text color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-switch-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-shadow-sm] - Box shadow.
+ * @cssprop [--hx-switch-track-width-sm=var(--hx-size-8)] - Width.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-switch-track-height-sm=var(--hx-size-4-5)] - Height.
+ * @cssprop [--hx-size-4-5] - Size token.
+ * @cssprop [--hx-switch-thumb-size-sm=var(--hx-size-3-5)] - CSS custom property.
+ * @cssprop [--hx-size-3-5] - Size token.
+ * @cssprop [--hx-switch-thumb-offset=var(--hx-space-0-5)] - CSS custom property.
+ * @cssprop [--hx-space-0-5] - Spacing token.
+ * @cssprop [--hx-switch-track-width-md=var(--hx-size-10)] - Width.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-switch-track-height-md=var(--hx-size-5-5)] - Height.
+ * @cssprop [--hx-size-5-5] - Size token.
+ * @cssprop [--hx-switch-thumb-size-md=var(--hx-size-4-5)] - CSS custom property.
+ * @cssprop [--hx-switch-track-width-lg=var(--hx-size-12)] - Width.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-switch-track-height-lg=var(--hx-size-6-5)] - Height.
+ * @cssprop [--hx-size-6-5] - Size token.
+ * @cssprop [--hx-switch-thumb-size-lg=var(--hx-size-5-5)] - CSS custom property.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
  */
 @customElement('hx-switch')
 export class HelixSwitch extends FormMixin(HelixElement) {
-  static override styles = [helixSwitchStyles];
+  static override styles = [helixSwitchStyles, forcedColorsField];
 
   // ─── Form Association ───
 

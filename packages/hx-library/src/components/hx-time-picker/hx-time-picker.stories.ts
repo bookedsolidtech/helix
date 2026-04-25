@@ -418,10 +418,10 @@ export const WithLabelSlot: Story = {
     <hx-time-picker step="30" format="12h" min="08:00" max="17:00" name="appointment_time">
       <label
         slot="label"
-        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #343a40);"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
       >
         Appointment Time
-        <span style="color: var(--hx-color-error-500, #dc3545);">*</span>
+        <span style="color: var(--hx-color-error-500, #E5493E);">*</span>
       </label>
     </hx-time-picker>
   `,
@@ -433,7 +433,7 @@ export const WithHelpSlot: Story = {
     <hx-time-picker label="Procedure Start Time" step="15" format="12h" min="07:00" max="19:00">
       <div
         slot="help-text"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Select the scheduled start time for this procedure. Times are shown in 15-minute intervals.
       </div>
@@ -454,7 +454,7 @@ export const WithErrorSlot: Story = {
     >
       <div
         slot="error"
-        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
+        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #E5493E); font-size: 0.75rem;"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path

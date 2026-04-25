@@ -19,12 +19,12 @@ export const helixPhiFieldStyles = css`
   .phi-field__value--masked {
     user-select: none;
     -webkit-user-select: none;
-    color: var(--hx-phi-field-masked-color, var(--hx-color-neutral-500, #64748b));
+    color: var(--hx-phi-field-masked-color, var(--hx-color-text-muted, #4a5362));
     letter-spacing: var(--hx-phi-field-letter-spacing, 0.1em);
   }
 
   .phi-field__value--revealed {
-    color: var(--hx-phi-field-value-color, var(--hx-color-neutral-900, #0f172a));
+    color: var(--hx-phi-field-value-color, var(--hx-color-text-primary, #0d1825));
   }
 
   /* ─── Screen Reader Status ─── */
@@ -52,7 +52,7 @@ export const helixPhiFieldStyles = css`
     padding: var(--hx-space-1, 0.25rem);
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
-    color: var(--hx-phi-field-toggle-color, var(--hx-color-primary-500, #2563eb));
+    color: var(--hx-phi-field-toggle-color, var(--hx-color-primary-500, #429797));
     cursor: pointer;
     line-height: 1;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
@@ -62,7 +62,7 @@ export const helixPhiFieldStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-phi-field-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }

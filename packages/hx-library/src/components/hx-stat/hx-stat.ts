@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import { helixStatStyles } from './hx-stat.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 export type StatSize = 'sm' | 'md' | 'lg';
 export type StatTrend = 'up' | 'down' | 'neutral';
@@ -43,10 +44,34 @@ export type StatTrend = 'up' | 'down' | 'neutral';
  * @cssprop [--hx-stat-trend-up-bg=var(--hx-color-success-50)] - Trend up background color.
  * @cssprop [--hx-stat-trend-down-color=var(--hx-color-error-700)] - Trend down text color.
  * @cssprop [--hx-stat-trend-down-bg=var(--hx-color-error-50)] - Trend down background color.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-font-size-xl] - Font size.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-size-3xl] - Font size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-5xl] - Font size.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-font-weight-normal] - Font weight.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-space-0-5] - Spacing token.
+ * @cssprop [--hx-space-1-5] - Spacing token.
+ * @cssprop [--hx-color-success-700] - Color.
+ * @cssprop [--hx-color-success-50] - Color.
+ * @cssprop [--hx-color-error-700] - Color.
+ * @cssprop [--hx-color-error-50] - Color.
  */
 @customElement('hx-stat')
 export class HelixStat extends HelixElement {
-  static override styles = [helixStatStyles];
+  static override styles = [helixStatStyles, forcedColorsSurface];
 
   /**
    * The metric label displayed below the value.

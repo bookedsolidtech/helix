@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixLinkStyles } from './hx-link.styles.js';
+import { forcedColorsLink } from '../../styles/forced-colors.js';
 
 /**
  * Variant options for the link component.
@@ -44,10 +45,25 @@ export type LinkVariant = 'default' | 'subtle' | 'danger';
  *
  * @note The `:visited` pseudo-class does not work inside Shadow DOM due to
  *   browser privacy restrictions. This is a known platform limitation.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-color-primary-700] - Color.
+ * @cssprop [--hx-color-primary-800] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-color-error-700] - Color.
+ * @cssprop [--hx-color-neutral-400] - Color.
  */
 @customElement('hx-link')
 export class HelixLink extends HelixElement {
-  static override styles = [helixLinkStyles];
+  static override styles = [helixLinkStyles, forcedColorsLink];
 
   /**
    * The URL the link points to.

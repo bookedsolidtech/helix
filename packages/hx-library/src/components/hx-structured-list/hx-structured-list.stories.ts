@@ -312,10 +312,10 @@ export const WithHeaderComposition: Story = {
           padding: 0.5rem 1rem;
           font-size: 0.75rem;
           font-weight: 600;
-          color: var(--hx-color-neutral-500, #64748b);
+          color: var(--hx-color-neutral-500, #66787B);
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          border-bottom: 1px solid var(--hx-color-neutral-200, #e2e8f0);
+          border-bottom: 1px solid var(--hx-color-neutral-200, #D6DBD5);
         "
         role="row"
         aria-hidden="true"

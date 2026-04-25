@@ -16,18 +16,24 @@ export const helixColorPickerStyles = css`
     align-items: center;
     gap: var(--hx-space-2, 0.5rem);
     padding: var(--hx-space-1, 0.25rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #cbd5e1);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-md, 0.375rem);
     background: var(--hx-color-neutral-0, #ffffff);
     cursor: pointer;
     transition: border-color var(--hx-transition-fast, 150ms ease);
   }
   .trigger:hover:not([disabled]) {
-    border-color: var(--hx-color-primary-500, #2563eb);
+    border-color: var(
+      --hx-color-picker-trigger-hover-border-color,
+      var(--hx-color-primary-500, #429797)
+    );
   }
   :is(.trigger, .gradient-grid, .slider-track, .swatch-btn, .format-btn):focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500));
+      var(
+        --hx-color-picker-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
   .trigger-swatch {
@@ -42,7 +48,7 @@ export const helixColorPickerStyles = css`
   }
   .trigger-label {
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-700, #334155);
+    color: var(--hx-color-neutral-700, #313e4b);
     font-family: var(--hx-font-family-mono, monospace);
     white-space: nowrap;
   }
@@ -52,7 +58,7 @@ export const helixColorPickerStyles = css`
     top: calc(100% + 4px);
     left: 0;
     background: var(--hx-color-neutral-0, #ffffff);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e2e8f0);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d6dbd5);
     border-radius: var(--hx-border-radius-lg, 0.5rem);
     box-shadow: 0 8px 24px
       var(--hx-color-picker-panel-shadow, var(--hx-overlay-black-15, rgba(0, 0, 0, 0.15)));
@@ -66,7 +72,7 @@ export const helixColorPickerStyles = css`
   :host([inline]) .panel {
     position: static;
     box-shadow: none;
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #e2e8f0);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #d6dbd5);
     border-radius: var(--hx-border-radius-lg, 0.5rem);
   }
   .gradient-grid {
@@ -179,12 +185,12 @@ export const helixColorPickerStyles = css`
   .format-btn {
     flex-shrink: 0;
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    background: var(--hx-color-neutral-100, #f1f5f9);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #cbd5e1);
+    background: var(--hx-color-neutral-100, #ebeee9);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-600, #475569);
+    color: var(--hx-color-neutral-600, #4a5362);
     text-transform: uppercase;
     font-weight: var(--hx-font-weight-semibold, 600);
     letter-spacing: 0.05em;
@@ -193,18 +199,29 @@ export const helixColorPickerStyles = css`
     flex: 1;
     min-width: 0;
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #cbd5e1);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     font-family: var(--hx-font-family-mono, monospace);
     font-size: var(--hx-font-size-sm, 0.875rem);
-    color: var(--hx-color-neutral-900, #0f172a);
+    color: var(--hx-color-neutral-900, #0d1825);
     background: var(--hx-color-neutral-0, #ffffff);
     outline: none;
   }
   .color-input:focus-visible {
-    border-color: var(--hx-focus-ring-color, var(--hx-color-primary-500));
+    border-color: var(
+      --hx-color-picker-focus-ring-color,
+      var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+    );
     box-shadow: 0 0 0 2px
-      color-mix(in srgb, var(--hx-focus-ring-color, var(--hx-color-primary-500)) 20%, transparent);
+      color-mix(
+        in srgb,
+        var(
+            --hx-color-picker-focus-ring-color,
+            var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+          )
+          20%,
+        transparent
+      );
   }
   .input-preview {
     width: 24px;

@@ -6,6 +6,7 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 // PERF: hx-date-picker exceeds 5KB budget (7.98kb gzipped) -- calendar grid, date parsing, keyboard navigation, localization
 
@@ -57,10 +58,54 @@ export interface HxDatePickerChangeDetail {
  * @cssprop [--hx-date-picker-selected-color=var(--hx-color-neutral-0)] - Selected day text color.
  * @cssprop [--hx-date-picker-today-color=var(--hx-color-primary-600)] - Today indicator color.
  * @cssprop [--hx-date-picker-calendar-shadow=0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -2px rgba(0,0,0,0.1)] - Calendar popup box shadow.
+ * @cssprop [--hx-date-picker-calendar-border-radius=var(--hx-border-radius-lg)] - Border radius.
+ * @cssprop [--hx-date-picker-selected-hover-bg=var(--hx-color-primary-600)] - Background color.
+ * @cssprop [--hx-date-picker-trigger-hover-color=var(--hx-color-neutral-700)] - Color.
+ * @cssprop [--hx-border-radius-lg] - CSS custom property.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-primary-600] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-opacity] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-shadow-md] - Box shadow.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-z-index-dropdown] - Z-index layer.
  */
 @customElement('hx-date-picker')
 export class HelixDatePicker extends FormMixin(HelixElement) {
-  static override styles = [helixDatePickerStyles];
+  static override styles = [helixDatePickerStyles, forcedColorsField];
 
   // ─── Form Association ───
 

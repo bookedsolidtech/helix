@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixBannerStyles } from './hx-banner.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Banner variant determines visual styling and ARIA semantics. */
 export type BannerVariant = 'info' | 'success' | 'warning' | 'error';
@@ -43,10 +44,44 @@ export type BannerPosition = 'sticky' | 'fixed';
  * @cssprop [--hx-banner-position=sticky] - CSS position value (sticky or fixed).
  * @cssprop [--hx-banner-z-index=100] - Banner z-index for stacking context.
  * @cssprop [--hx-touch-target-size=44px] - Minimum touch target size for the close button.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-color-info-50] - Color.
+ * @cssprop [--hx-color-info-800] - Color.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-info-200] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-info-500] - Color.
+ * @cssprop [--hx-space-5] - Spacing token.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-opacity-90] - Opacity.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-opacity-75] - Opacity.
+ * @cssprop [--hx-opacity-100] - Opacity.
+ * @cssprop [--hx-color-success-50] - Color.
+ * @cssprop [--hx-color-success-200] - Color.
+ * @cssprop [--hx-color-success-800] - Color.
+ * @cssprop [--hx-color-success-500] - Color.
+ * @cssprop [--hx-color-warning-50] - Color.
+ * @cssprop [--hx-color-warning-200] - Color.
+ * @cssprop [--hx-color-warning-800] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-error-50] - Color.
+ * @cssprop [--hx-color-error-200] - Color.
+ * @cssprop [--hx-color-error-800] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
  */
 @customElement('hx-banner')
 export class HelixBanner extends HelixElement {
-  static override styles = [helixBannerStyles];
+  static override styles = [helixBannerStyles, forcedColorsSurface];
 
   // ─── Properties ───
 

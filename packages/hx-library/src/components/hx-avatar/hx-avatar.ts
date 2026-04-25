@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixAvatarStyles } from './hx-avatar.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -28,10 +29,27 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-avatar-bg=var(--hx-color-primary-100)] - Background color of the avatar container.
  * @cssprop [--hx-avatar-color=var(--hx-color-primary-700)] - Text and icon color inside the avatar.
  * @cssprop [--hx-avatar-font-size] - Font size for the initials text, set per size variant.
+ * @cssprop [--hx-color-primary-100] - Color.
+ * @cssprop [--hx-color-primary-700] - Color.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-font-size-2xs] - Font size.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-size-16] - Size token.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-avatar-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-letter-spacing-wide] - CSS custom property.
  */
 @customElement('hx-avatar')
 export class HelixAvatar extends HelixElement {
-  static override styles = [helixAvatarStyles];
+  static override styles = [helixAvatarStyles, forcedColorsSurface];
 
   /**
    * Image URL. When provided and successfully loaded, displays the image.

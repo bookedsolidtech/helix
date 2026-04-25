@@ -130,7 +130,7 @@ const meta = {
       description: 'Label text color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-700, #343a40)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-700, #313E4B)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -139,7 +139,7 @@ const meta = {
       description: 'Error message color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-error-500, #dc3545)' },
+        defaultValue: { summary: 'var(--hx-color-error-500, #E5493E)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -441,7 +441,7 @@ export const AllStates: Story = {
     <div style="display: flex; flex-direction: column; gap: 2.5rem; max-width: 560px;">
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Default (vertical)
         </h4>
@@ -454,7 +454,7 @@ export const AllStates: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Horizontal orientation
         </h4>
@@ -467,7 +467,7 @@ export const AllStates: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Required with help text
         </h4>
@@ -481,7 +481,7 @@ export const AllStates: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Error state
         </h4>
@@ -499,7 +499,7 @@ export const AllStates: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; font-weight: 600; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Disabled group
         </h4>
@@ -537,7 +537,7 @@ export const DrupalExample: Story = {
     return html`
       <div style="max-width: 560px;">
         <p
-          style="margin: 0 0 1rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #6c757d);"
+          style="margin: 0 0 1rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #66787B);"
         >
           Simulates Drupal Twig rendering: each taxonomy term maps to an
           <code>hx-checkbox</code> child element.
@@ -605,13 +605,13 @@ export const InAForm: Story = {
         <div style="display: flex; gap: 0.75rem;">
           <button
             type="submit"
-            style="padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #2563EB); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+            style="padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #429797); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
           >
             Submit Intake
           </button>
           <button
             type="reset"
-            style="padding: 0.5rem 1.5rem; background: transparent; color: var(--hx-color-neutral-600, #6c757d); border: 1px solid var(--hx-color-neutral-300, #ced4da); border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+            style="padding: 0.5rem 1.5rem; background: transparent; color: var(--hx-color-neutral-600, #4A5362); border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
           >
             Reset
           </button>
@@ -665,7 +665,7 @@ export const RichLabelSlot: Story = {
       <span slot="label" style="display: flex; align-items: center; gap: 0.5rem;">
         Current Symptoms
         <span
-          style="display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; background: var(--hx-color-warning-100, #fff3cd); color: var(--hx-color-warning-700, #856404); border-radius: 9999px; font-size: 0.75rem; font-weight: 600;"
+          style="display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; background: var(--hx-color-warning-100, #fff3cd); color: var(--hx-color-warning-700, #804605); border-radius: 9999px; font-size: 0.75rem; font-weight: 600;"
         >
           Report All
         </span>
@@ -694,7 +694,7 @@ export const RichErrorSlot: Story = {
       <hx-checkbox value="sulfa" label="Sulfa Drugs"></hx-checkbox>
       <hx-checkbox value="aspirin" label="Aspirin"></hx-checkbox>
       <hx-checkbox value="none" label="No known drug allergies"></hx-checkbox>
-      <span slot="error" style="color: var(--hx-color-error-500, #dc3545); font-size: 0.875rem;">
+      <span slot="error" style="color: var(--hx-color-error-500, #E5493E); font-size: 0.875rem;">
         Allergy information is required.
         <a
           href="#help"
@@ -720,15 +720,15 @@ export const RichErrorSlot: Story = {
 export const HealthcarePreExistingConditions: Story = {
   render: () => html`
     <div
-      style="max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #dee2e6); border-radius: 0.5rem;"
+      style="max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem;"
     >
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Patient Medical History
       </h3>
       <p
-        style="margin: 0 0 1.25rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1.25rem; font-size: 0.8125rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Accurate history helps your care team provide the best possible treatment.
       </p>
@@ -810,10 +810,10 @@ export const HealthcareSymptomsChecklist: Story = {
 export const HealthcareAllergySelection: Story = {
   render: () => html`
     <div
-      style="max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #dee2e6); border-radius: 0.5rem; background: var(--hx-color-neutral-50, #f8f9fa);"
+      style="max-width: 560px; padding: 1.5rem; border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem; background: var(--hx-color-neutral-50, #F5F8F3);"
     >
       <h3
-        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 1rem; font-size: 1rem; font-weight: 600; color: var(--hx-color-neutral-800, #202B39);"
       >
         Allergy Screening
       </h3>
@@ -914,13 +914,13 @@ export const FormReset: Story = {
       <div style="display: flex; gap: 0.75rem;">
         <button
           type="submit"
-          style="padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #2563EB); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1.5rem; background: var(--hx-color-primary-500, #429797); color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
         >
           Save Preferences
         </button>
         <button
           type="reset"
-          style="padding: 0.5rem 1.5rem; background: transparent; color: var(--hx-color-neutral-600, #6c757d); border: 1px solid var(--hx-color-neutral-300, #ced4da); border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
+          style="padding: 0.5rem 1.5rem; background: transparent; color: var(--hx-color-neutral-600, #4A5362); border: 1px solid var(--hx-color-neutral-300, #B6BFB9); border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;"
         >
           Reset
         </button>
@@ -962,7 +962,7 @@ export const CSSCustomProperties: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           Default Styling
         </h4>
@@ -974,7 +974,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-group-gap (1.5rem)
         </h4>
@@ -990,7 +990,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-group-label-color (#7c3aed)
         </h4>
@@ -1006,7 +1006,7 @@ export const CSSCustomProperties: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           --hx-checkbox-group-error-color (#b91c1c)
         </h4>
@@ -1055,7 +1055,7 @@ export const CSSParts: Story = {
     <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           ::part(group) + ::part(label)
         </h4>
@@ -1069,7 +1069,7 @@ export const CSSParts: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           ::part(help-text)
         </h4>
@@ -1084,7 +1084,7 @@ export const CSSParts: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #6c757d);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362);"
         >
           ::part(error)
         </h4>

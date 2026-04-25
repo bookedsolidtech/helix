@@ -6,6 +6,7 @@ import {
   helixStructuredListStyles,
   helixStructuredListRowStyles,
 } from './hx-structured-list.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * Container for structured key-value data display. Renders as a list with
@@ -28,10 +29,17 @@ import {
  * @cssprop [--hx-structured-list-padding-inline=var(--hx-space-4)] - Row inline padding.
  * @cssprop [--hx-structured-list-condensed-padding-block=var(--hx-space-2)] - Row block padding (condensed).
  * @cssprop [--hx-structured-list-condensed-padding-inline=var(--hx-space-3)] - Row inline padding (condensed).
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
  */
 @customElement('hx-structured-list')
 export class HelixStructuredList extends HelixElement {
-  static override styles = [helixStructuredListStyles];
+  static override styles = [helixStructuredListStyles, forcedColorsSurface];
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -102,7 +110,7 @@ export class HelixStructuredList extends HelixElement {
  */
 @customElement('hx-structured-list-row')
 export class HelixStructuredListRow extends HelixElement {
-  static override styles = [helixStructuredListRowStyles];
+  static override styles = [helixStructuredListRowStyles, forcedColorsSurface];
 
   override connectedCallback(): void {
     super.connectedCallback();

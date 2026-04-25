@@ -16,15 +16,15 @@ export const helixTagStyles = css`
     align-items: center;
     gap: var(--hx-space-1, 0.25rem);
     border-radius: var(--hx-tag-border-radius, var(--hx-border-radius-sm, 0.25rem));
-    background-color: var(--hx-tag-bg, var(--hx-color-neutral-100, #f1f5f9));
-    color: var(--hx-tag-color, var(--hx-color-neutral-700, #334155));
+    background-color: var(--hx-tag-bg, var(--hx-color-neutral-100, #ebeee9));
+    color: var(--hx-tag-color, var(--hx-color-neutral-700, #313e4b));
     font-family: var(--hx-tag-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-tag-font-weight, var(--hx-font-weight-medium, 500));
     line-height: var(--hx-line-height-tight, 1.25);
     white-space: nowrap;
     vertical-align: middle;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-tag-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-tag-border-color, var(--hx-color-neutral-200, #d6dbd5));
   }
 
   /* ─── Size Variants ─── */
@@ -50,33 +50,33 @@ export const helixTagStyles = css`
   /* ─── Color Variants ─── */
 
   .tag--default {
-    --hx-tag-bg: var(--hx-color-neutral-100, #f1f5f9);
-    --hx-tag-color: var(--hx-color-neutral-700, #334155);
-    --hx-tag-border-color: var(--hx-color-neutral-200, #e2e8f0);
+    --hx-tag-bg: var(--hx-tag-default-bg, var(--hx-color-neutral-100, #ebeee9));
+    --hx-tag-color: var(--hx-tag-default-color, var(--hx-color-neutral-700, #313e4b));
+    --hx-tag-border-color: var(--hx-tag-default-border-color, var(--hx-color-neutral-200, #d6dbd5));
   }
 
   .tag--primary {
-    --hx-tag-bg: var(--hx-color-primary-50, #eff6ff);
-    --hx-tag-color: var(--hx-color-primary-700, #1e40af);
-    --hx-tag-border-color: var(--hx-color-primary-200, #bfdbfe);
+    --hx-tag-bg: var(--hx-tag-primary-bg, var(--hx-color-primary-50, #ebf8f8));
+    --hx-tag-color: var(--hx-tag-primary-color, var(--hx-color-primary-700, #0f6363));
+    --hx-tag-border-color: var(--hx-tag-primary-border-color, var(--hx-color-primary-200, #bce1e1));
   }
 
   .tag--success {
-    --hx-tag-bg: var(--hx-color-success-50, #f0fdf4);
-    --hx-tag-color: var(--hx-color-success-700, #166534);
-    --hx-tag-border-color: var(--hx-color-success-200, #bbf7d0);
+    --hx-tag-bg: var(--hx-tag-success-bg, var(--hx-color-success-50, #eafaec));
+    --hx-tag-color: var(--hx-tag-success-color, var(--hx-color-success-700, #146831));
+    --hx-tag-border-color: var(--hx-tag-success-border-color, var(--hx-color-success-200, #bae6c2));
   }
 
   .tag--warning {
-    --hx-tag-bg: var(--hx-color-warning-50, #fffbeb);
-    --hx-tag-color: var(--hx-color-warning-700, #92400e);
-    --hx-tag-border-color: var(--hx-color-warning-200, #fde68a);
+    --hx-tag-bg: var(--hx-tag-warning-bg, var(--hx-color-warning-50, #fff3ea));
+    --hx-tag-color: var(--hx-tag-warning-color, var(--hx-color-warning-700, #804605));
+    --hx-tag-border-color: var(--hx-tag-warning-border-color, var(--hx-color-warning-200, #facfae));
   }
 
   .tag--danger {
-    --hx-tag-bg: var(--hx-color-error-50, #fef2f2);
-    --hx-tag-color: var(--hx-color-error-700, #991b1b);
-    --hx-tag-border-color: var(--hx-color-error-200, #fecaca);
+    --hx-tag-bg: var(--hx-tag-danger-bg, var(--hx-color-error-50, #fff2f0));
+    --hx-tag-color: var(--hx-tag-danger-color, var(--hx-color-error-700, #a21312));
+    --hx-tag-border-color: var(--hx-tag-danger-border-color, var(--hx-color-error-200, #fccbc4));
   }
 
   /* ─── Semantic Variant Label (WCAG 1.4.1) ─── */

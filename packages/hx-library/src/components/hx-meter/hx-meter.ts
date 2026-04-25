@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixMeterStyles } from './hx-meter.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
 
@@ -37,10 +38,33 @@ const _nextMeterId = createIdCounter('hx-meter');
  * @cssprop [--hx-meter-color-warning] - Color when value is in a warning zone.
  * @cssprop [--hx-meter-color-danger] - Color when value is in the danger zone.
  * @cssprop [--hx-meter-label-color] - Label text color.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-color-success-500] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-meter-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-color-success-700] - Color.
+ * @cssprop [--hx-color-warning-700] - Color.
+ * @cssprop [--hx-color-error-700] - Color.
  */
 @customElement('hx-meter')
 export class HelixMeter extends HelixElement {
-  static override styles = [helixMeterStyles];
+  static override styles = [helixMeterStyles, forcedColorsSurface];
 
   /** @internal */
   private _uid = _nextMeterId();

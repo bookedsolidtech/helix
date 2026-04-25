@@ -8,6 +8,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
@@ -41,20 +42,51 @@ export interface HxCheckboxChangeDetail {
  *
  * @cssprop [--hx-checkbox-size=var(--hx-size-5, 1.25rem)] - Checkbox dimensions.
  * @cssprop [--hx-checkbox-bg=var(--hx-color-neutral-0, #ffffff)] - Unchecked background color.
- * @cssprop [--hx-checkbox-border-color=var(--hx-color-neutral-300, #ced4da)] - Checkbox border color.
+ * @cssprop [--hx-checkbox-border-color=var(--hx-color-neutral-300, #B6BFB9)] - Checkbox border color.
  * @cssprop [--hx-checkbox-border-radius=var(--hx-border-radius-sm, 0.25rem)] - Checkbox border radius.
- * @cssprop [--hx-checkbox-checked-bg=var(--hx-color-primary-500, #2563EB)] - Checked background color.
- * @cssprop [--hx-checkbox-checked-border-color=var(--hx-color-primary-500, #2563EB)] - Checked border color.
+ * @cssprop [--hx-checkbox-checked-bg=var(--hx-color-primary-500, #429797)] - Checked background color.
+ * @cssprop [--hx-checkbox-checked-border-color=var(--hx-color-primary-500, #429797)] - Checked border color.
  * @cssprop [--hx-checkbox-checkmark-color=var(--hx-color-neutral-0, #ffffff)] - Checkmark color.
- * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #2563EB)] - Focus ring color.
- * @cssprop [--hx-checkbox-label-color=var(--hx-color-neutral-700, #343a40)] - Label text color.
- * @cssprop [--hx-checkbox-help-text-color=var(--hx-color-neutral-500, #6c757d)] - Help text color.
+ * @cssprop [--hx-checkbox-focus-ring-color=var(--hx-focus-ring-color, #6AB1B1)] - Focus ring color.
+ * @cssprop [--hx-checkbox-label-color=var(--hx-color-neutral-700, #313E4B)] - Label text color.
+ * @cssprop [--hx-checkbox-help-text-color=var(--hx-color-neutral-500, #66787B)] - Help text color.
  * @cssprop [--hx-checkbox-hover-border-color=var(--hx-checkbox-border-color)] - Border color on hover.
- * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #dc3545)] - Error state color.
+ * @cssprop [--hx-checkbox-error-color=var(--hx-color-error-500, #E5493E)] - Error state color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-checkbox-font-family=var(--hx-font-family-sans)] - Font family for checkbox label and help text.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-size-5] - Size token.
+ * @cssprop [--hx-border-width-medium] - Width.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-space-px] - Spacing token.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-filter-brightness-hover] - CSS filter.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-color-error-500] - Color.
  */
 @customElement('hx-checkbox')
 export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
-  static override styles = [helixCheckboxStyles];
+  static override styles = [helixCheckboxStyles, forcedColorsField];
 
   // ─── Form Association ───
 

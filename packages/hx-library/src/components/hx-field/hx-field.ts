@@ -51,6 +51,21 @@ function isFormControl(el: Element): el is HTMLElement {
  * @cssprop [--hx-field-font-family=var(--hx-font-family-sans)] - Font family.
  * @cssprop [--hx-field-gap=var(--hx-space-1, 0.25rem)] - Gap between field segments.
  * @cssprop [--hx-field-help-text-color=var(--hx-color-neutral-500)] - Help text color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
  */
 @customElement('hx-field')
 export class HelixField extends HelixElement {

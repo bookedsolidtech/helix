@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 
 /**
  * A resizable two-pane layout with a draggable divider.
@@ -42,10 +43,22 @@ import { helixSplitPanelStyles } from './hx-split-panel.styles.js';
  * JS-only (complex types): snap (use .snap=${[25, 50, 75]} in Lit templates,
  *   or snap="[25,50,75]" as JSON string in Twig)
  * ```
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-split-panel-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-size-5] - Size token.
+ * @cssprop [--hx-split-panel-btn-icon-size=0.5rem] - CSS custom property.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
  */
 @customElement('hx-split-panel')
 export class HelixSplitPanel extends HelixElement {
-  static override styles = [helixSplitPanelStyles];
+  static override styles = [helixSplitPanelStyles, forcedColorsInteractive];
 
   /**
    * Position of the divider as a percentage (0–100) of the start panel.

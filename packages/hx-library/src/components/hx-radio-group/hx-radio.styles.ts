@@ -52,9 +52,9 @@ export const helixRadioStyles = css`
     width: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
     height: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
     border: var(--hx-border-width-medium, 2px) solid
-      var(--hx-radio-border-color, var(--hx-color-neutral-300, #cbd5e1));
+      var(--hx-radio-border-color, var(--hx-color-border-strong, #8e9c98));
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-color-neutral-0, #ffffff);
+    background-color: var(--hx-radio-bg, var(--hx-color-surface-default, #ffffff));
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       background-color var(--hx-transition-fast, 150ms ease),
@@ -68,7 +68,7 @@ export const helixRadioStyles = css`
     width: calc(var(--hx-radio-size, var(--hx-size-5, 1.25rem)) * 0.4);
     height: calc(var(--hx-radio-size, var(--hx-size-5, 1.25rem)) * 0.4);
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-radio-dot-color, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-radio-dot-color, var(--hx-color-text-on-primary, #ffffff));
     transform: scale(0);
     transition: transform var(--hx-transition-fast, 150ms ease);
   }
@@ -76,8 +76,8 @@ export const helixRadioStyles = css`
   /* ─── Checked State ─── */
 
   .radio--checked .radio__control {
-    border-color: var(--hx-radio-checked-border-color, var(--hx-color-primary-500, #2563eb));
-    background-color: var(--hx-radio-checked-bg, var(--hx-color-primary-500, #2563eb));
+    border-color: var(--hx-radio-checked-border-color, var(--hx-color-primary-500, #429797));
+    background-color: var(--hx-radio-checked-bg, var(--hx-color-primary-500, #429797));
   }
 
   .radio--checked .radio__dot {
@@ -90,7 +90,7 @@ export const helixRadioStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-radio-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
@@ -98,14 +98,14 @@ export const helixRadioStyles = css`
   /* ─── Hover State ─── */
 
   .radio:not(.radio--disabled):not(.radio--checked):hover .radio__control {
-    border-color: var(--hx-color-neutral-400, #94a3b8);
+    border-color: var(--hx-radio-hover-border-color, var(--hx-color-border-strong, #8e9c98));
   }
 
   /* ─── Label ─── */
 
   .radio__label {
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-radio-label-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-radio-label-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
     user-select: none;
     -webkit-user-select: none;

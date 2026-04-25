@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixCardStyles } from './hx-card.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 const _nextCardId = createIdCounter('hx-card');
@@ -37,6 +38,34 @@ const _nextCardId = createIdCounter('hx-card');
  * @cssprop [--hx-card-padding=var(--hx-space-6)] - Internal padding for card sections.
  * @cssprop [--hx-card-gap=var(--hx-space-4)] - Gap between card sections.
  * @cssprop [--hx-card-image-aspect-ratio=16/9] - Aspect ratio for the image slot.
+ * @cssprop [--hx-border-radius-lg] - CSS custom property.
+ * @cssprop [--hx-border-width-medium] - Width.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-card-focus-ring-color=var(--hx-focus-ring-color)] - Color.
+ * @cssprop [--hx-card-font-family=var(--hx-font-family-sans)] - Font family for card text content.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-size-xl] - Font size.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-shadow-lg] - Box shadow.
+ * @cssprop [--hx-shadow-md] - Box shadow.
+ * @cssprop [--hx-shadow-xl] - Box shadow.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-transform-lift-md] - Transform applied on hover to lift the card.
+ * @cssprop [--hx-transition-normal] - Transition timing.
  */
 @customElement('hx-card')
 export class HelixCard extends HelixElement {
@@ -46,7 +75,7 @@ export class HelixCard extends HelixElement {
     delegatesFocus: true,
   };
 
-  static override styles = [helixCardStyles];
+  static override styles = [helixCardStyles, forcedColorsSurface];
 
   /**
    * Visual style variant of the card.

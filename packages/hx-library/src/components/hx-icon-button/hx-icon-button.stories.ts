@@ -492,7 +492,7 @@ export const HealthcareActions: Story = {
   name: 'Healthcare: Action Bar',
   render: () => html`
     <div
-      style="display: flex; gap: 0.5rem; align-items: center; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #f9fafb); border: 1px solid var(--hx-color-neutral-200, #e5e7eb); border-radius: 0.5rem;"
+      style="display: flex; gap: 0.5rem; align-items: center; padding: 0.75rem 1rem; background: var(--hx-color-neutral-50, #F5F8F3); border: 1px solid var(--hx-color-neutral-200, #D6DBD5); border-radius: 0.5rem;"
       role="toolbar"
       aria-label="Patient record actions"
     >

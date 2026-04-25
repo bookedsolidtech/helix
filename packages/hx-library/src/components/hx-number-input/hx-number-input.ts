@@ -8,6 +8,7 @@ import { live } from 'lit/directives/live.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 
 const _nextNumberInputId = createIdCounter('hx-number-input');
 
@@ -53,10 +54,44 @@ export interface HxNumberInputDetail {
  * @cssprop [--hx-number-input-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  * @cssprop [--hx-number-input-label-color=var(--hx-color-neutral-700)] - Label text color.
  * @cssprop [--hx-number-input-font-family=var(--hx-font-family-sans)] - Font family.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-opacity] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-number-input-icon-size=var(--hx-space-3)] - CSS custom property.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-size-6] - Size token.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-transition-fast] - Transition timing.
  */
 @customElement('hx-number-input')
 export class HelixNumberInput extends FormMixin(HelixElement) {
-  static override styles = [helixNumberInputStyles];
+  static override styles = [helixNumberInputStyles, forcedColorsField];
 
   // ─── Form Association ───
 

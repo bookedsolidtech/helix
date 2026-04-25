@@ -1,20 +1,29 @@
 import { css } from 'lit';
 
+/**
+ * hx-card styles.
+ *
+ * Component-tier tokens with two-level var() fallback:
+ *   var(--hx-card-{prop}, var(--hx-color-{semantic}, #hex))
+ * Inner hex fallbacks track the "precision cool" palette (3.2.0):
+ *   neutral-0 = #FFFFFF, neutral-200 = #D6DBD5, neutral-800 = #202B39,
+ *   neutral-600 = #4A5362, primary-500 = #429797.
+ */
 export const helixCardStyles = css`
   :host {
     display: block;
     color: var(--hx-card-color, inherit);
-    background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-card-bg, var(--hx-color-surface-default, #ffffff));
   }
 
   .card {
     display: flex;
     flex-direction: column;
     gap: var(--hx-card-gap, var(--hx-space-4, 1rem));
-    background-color: var(--hx-card-bg, var(--hx-color-neutral-0, #ffffff));
-    color: var(--hx-card-color, var(--hx-color-neutral-800, #1e293b));
+    background-color: var(--hx-card-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-card-color, var(--hx-color-text-strong, #202b39));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-card-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-card-border-color, var(--hx-color-border-default, #d6dbd5));
     border-radius: var(--hx-card-border-radius, var(--hx-border-radius-lg, 0.5rem));
     overflow: hidden;
     font-family: var(--hx-card-font-family, var(--hx-font-family-sans, sans-serif));
@@ -30,11 +39,14 @@ export const helixCardStyles = css`
   }
 
   .card--raised {
-    box-shadow: var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+    box-shadow: var(--hx-card-shadow, var(--hx-shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1)));
   }
 
   .card--floating {
-    box-shadow: var(--hx-shadow-xl, 0 20px 25px -5px rgb(0 0 0 / 0.1));
+    box-shadow: var(
+      --hx-card-shadow-floating,
+      var(--hx-shadow-xl, 0 20px 25px -5px rgb(0 0 0 / 0.1))
+    );
   }
 
   /* ─── Style Variants ─── */
@@ -44,8 +56,8 @@ export const helixCardStyles = css`
   }
 
   .card--featured {
-    border-color: var(--hx-color-primary-500, #2563eb);
-    border-width: var(--hx-border-width-medium, 2px);
+    border-color: var(--hx-card-featured-border-color, var(--hx-color-primary-500, #429797));
+    border-width: var(--hx-card-featured-border-width, var(--hx-border-width-medium, 2px));
   }
 
   .card--compact .card__body {
@@ -77,13 +89,16 @@ export const helixCardStyles = css`
   }
 
   .card--interactive:hover {
-    box-shadow: var(--hx-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+    box-shadow: var(--hx-card-shadow-hover, var(--hx-shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1)));
     transform: translateY(var(--hx-transform-lift-md, -2px));
   }
 
   .card--interactive:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-card-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(
+        --hx-card-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -140,7 +155,14 @@ export const helixCardStyles = css`
     flex: 1;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);
-    color: var(--hx-card-color, var(--hx-color-neutral-600, #475569));
+    /*
+     * Body color cascades: component-tier --hx-card-body-color overrides
+     * the host-tier --hx-card-color, which falls back to text-secondary.
+     * Preserves the propagation contract: setting --hx-card-color on the
+     * host flows into the body slot (and through to slotted light-DOM
+     * descendants via flat-tree inheritance).
+     */
+    color: var(--hx-card-body-color, var(--hx-card-color, var(--hx-color-text-secondary, #313e4b)));
   }
 
   .card__footer {
@@ -158,11 +180,12 @@ export const helixCardStyles = css`
     padding-bottom: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     padding-inline-start: var(--hx-card-padding, var(--hx-space-6, 1.5rem));
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-card-border-color, var(--hx-color-neutral-200, #e2e8f0));
+      var(--hx-card-border-color, var(--hx-color-border-default, #d6dbd5));
     margin-top: auto;
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */
+  /* Belt-and-suspenders: rich per-class HC overrides PLUS the forcedColorsSurface mixin. */
 
   @media (forced-colors: active) {
     .card {

@@ -7,6 +7,7 @@ import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.j
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 const _nextDrawerId = createIdCounter('hx-drawer');
 
@@ -102,10 +103,40 @@ const FOCUSABLE_SELECTORS = [
  * @cssprop [--hx-drawer-body-padding] - Padding inside the body.
  * @cssprop [--hx-drawer-footer-padding] - Padding inside the footer.
  * @cssprop [--hx-drawer-footer-border-color=var(--hx-color-neutral-200)] - Footer border color.
+ * @cssprop [--hx-z-index-modal] - Z-index layer.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-duration-slow] - Animation duration.
+ * @cssprop [--hx-easing-out] - CSS custom property.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-shadow-xl] - Box shadow.
+ * @cssprop [--hx-drawer-size-md=30rem] - CSS custom property.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-5] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-drawer-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-duration-fast] - Animation duration.
+ * @cssprop [--hx-easing-default] - CSS custom property.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-drawer-close-btn-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-space-3] - Spacing token.
  */
 @customElement('hx-drawer')
 export class HelixDrawer extends HelixElement {
-  static override styles = [helixDrawerStyles];
+  static override styles = [helixDrawerStyles, forcedColorsSurface];
 
   // ─── Queries ───
 

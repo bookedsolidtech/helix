@@ -33,7 +33,7 @@ export const helixTableStyles = css`
     text-align: start;
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     font-weight: var(--hx-font-weight-semibold, 600);
-    color: var(--hx-table-header-color, var(--hx-color-neutral-700, #334155));
+    color: var(--hx-table-header-color, var(--hx-color-text-strong, #202b39));
     font-size: var(--hx-font-size-md, 1rem);
   }
 
@@ -49,12 +49,12 @@ export const helixTableStyles = css`
 
   /* Header background via CSS vars that cascade through display:contents */
   ::slotted(hx-thead) {
-    --_hx-table-cell-bg: var(--hx-table-header-bg, var(--hx-color-neutral-50, #f8fafc));
+    --_hx-table-cell-bg: var(--hx-table-header-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   /* Striped variant: set stripe signal on hx-tbody (direct slotted child) so hx-tbody can apply to even rows */
   :host([variant='striped']) ::slotted(hx-tbody) {
-    --_hx-table-row-stripe-bg: var(--hx-table-stripe-bg, var(--hx-color-neutral-50, #f8fafc));
+    --_hx-table-row-stripe-bg: var(--hx-table-stripe-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   /* Hover variant: set hover bg variable on direct slotted section elements */
@@ -64,7 +64,7 @@ export const helixTableStyles = css`
   :host([variant='striped']) ::slotted(hx-thead),
   :host([variant='default']) ::slotted(hx-tbody),
   :host([variant='default']) ::slotted(hx-thead) {
-    --_hx-table-row-hover-bg: var(--hx-table-row-hover-bg, var(--hx-color-neutral-50, #f8fafc));
+    --_hx-table-row-hover-bg: var(--hx-table-row-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   /* Compact variant: reduced padding signal set on section elements that cascade to cells */
@@ -80,14 +80,14 @@ export const helixTableStyles = css`
     --_hx-table-th-position: sticky;
     --_hx-table-th-top: 0;
     --_hx-table-th-z-index: 1;
-    --_hx-table-th-bg: var(--hx-table-header-bg, var(--hx-color-neutral-50, #f8fafc));
+    --_hx-table-th-bg: var(--hx-table-header-bg, var(--hx-color-surface-raised, #f5f8f3));
   }
 
   /* ─── Focus ─── */
 
   ::slotted(:focus-visible) {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+      var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797));
     outline-offset: var(--hx-focus-ring-offset, -2px);
   }
 

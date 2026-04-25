@@ -170,6 +170,9 @@ coverage/
 # Readiness pipeline data (internal planning, never commit)
 data/readiness/
 
+# Codex hardening campaign output (internal planning, never commit)
+.reports/codex/
+
 # Claude Code agent worktree directories
 .claude/worktrees/
 

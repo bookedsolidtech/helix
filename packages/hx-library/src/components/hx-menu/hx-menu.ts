@@ -2,6 +2,7 @@ import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixMenuStyles } from './hx-menu.styles.js';
 import type { HelixMenuItem } from './hx-menu-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -27,10 +28,16 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-menu-shadow] - Menu box shadow.
  * @cssprop [--hx-menu-min-width=10rem] - Minimum menu width.
  * @cssprop [--hx-menu-max-height=20rem] - Maximum menu height before vertical scroll is activated.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-shadow-md] - Box shadow.
  */
 @customElement('hx-menu')
 export class HelixMenu extends HelixElement {
-  static override styles = [helixMenuStyles];
+  static override styles = [helixMenuStyles, forcedColorsInteractive];
 
   /**
    * Accessible label for the menu. Rendered as `aria-label` on the inner

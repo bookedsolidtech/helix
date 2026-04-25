@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
@@ -38,10 +39,13 @@ const _nextBreadcrumbId = createIdCounter('hx-breadcrumb');
  * @cssprop [--hx-breadcrumb-link-hover-color=var(--hx-color-primary-700)] - Link hover color.
  * @cssprop [--hx-breadcrumb-text-color=var(--hx-color-neutral-700)] - Current page text color.
  * @cssprop [--hx-breadcrumb-item-max-width] - Max-width for item text truncation (e.g. `12rem`).
+ * @cssprop [--hx-breadcrumb-font-family] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
  */
 @customElement('hx-breadcrumb')
 export class HelixBreadcrumb extends HelixElement {
-  static override styles = [helixBreadcrumbStyles];
+  static override styles = [helixBreadcrumbStyles, forcedColorsInteractive];
 
   /**
    * The separator character displayed between breadcrumb items.

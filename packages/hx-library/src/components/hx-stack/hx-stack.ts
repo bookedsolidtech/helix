@@ -14,6 +14,11 @@ import { helixStackStyles } from './hx-stack.styles.js';
  * @slot - Default slot for any child content.
  *
  * @csspart base - The inner flex container.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-6] - Spacing token.
+ * @cssprop [--hx-space-8] - Spacing token.
  */
 @customElement('hx-stack')
 export class HelixStack extends HelixElement {

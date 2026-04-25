@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { createIdCounter } from '../../base/index.js';
 import { helixClinicalStatusStyles } from './hx-clinical-status.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Clinical severity level for alert fatigue prevention. */
 export type ClinicalSeverity = 'info' | 'warning' | 'critical' | 'emergent';
@@ -45,10 +46,47 @@ const nextId = createIdCounter('hx-clinical-status');
  * @cssprop [--hx-clinical-status-font-family=var(--hx-font-family-sans)] - Font family.
  * @cssprop [--hx-clinical-status-compact-padding] - Padding in compact mode.
  * @cssprop [--hx-clinical-status-emergent-accent-width=6px] - Accent width for emergent severity.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-color-error-200] - Color.
+ * @cssprop [--hx-color-error-300] - Color.
+ * @cssprop [--hx-color-error-50] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-error-700] - Color.
+ * @cssprop [--hx-color-error-800] - Color.
+ * @cssprop [--hx-color-error-900] - Color.
+ * @cssprop [--hx-color-focus] - Color.
+ * @cssprop [--hx-color-info-200] - Color.
+ * @cssprop [--hx-color-info-50] - Color.
+ * @cssprop [--hx-color-info-500] - Color.
+ * @cssprop [--hx-color-info-800] - Color.
+ * @cssprop [--hx-color-warning-200] - Color.
+ * @cssprop [--hx-color-warning-50] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-warning-800] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-letter-spacing-wide] - CSS custom property.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-5] - Spacing token.
+ * @cssprop [--hx-space-8] - Spacing token.
+ * @cssprop [--hx-touch-target-size] - Minimum touch target size.
+ * @cssprop [--hx-transition-fast] - Transition timing.
  */
 @customElement('hx-clinical-status')
 export class HelixClinicalStatus extends HelixElement {
-  static override styles = [helixClinicalStatusStyles];
+  static override styles = [helixClinicalStatusStyles, forcedColorsSurface];
 
   // ─── Properties ───
 

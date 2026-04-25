@@ -15,7 +15,7 @@ import { HelixElement } from '../../base/index.js';
  *
  * @csspart cell - The `<td>` element.
  *
- * @cssprop [--hx-table-cell-color=var(--hx-color-neutral-900, #0f172a)] - Cell text color.
+ * @cssprop [--hx-table-cell-color=var(--hx-color-neutral-900, #0D1825)] - Cell text color.
  */
 @customElement('hx-td')
 export class HelixTableCell extends HelixElement {
@@ -28,9 +28,9 @@ export class HelixTableCell extends HelixElement {
       td {
         padding: var(--_hx-table-cell-padding, var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem));
         text-align: left;
-        color: var(--hx-table-cell-color, var(--hx-color-neutral-900, #0f172a));
+        color: var(--hx-table-cell-color, var(--hx-color-neutral-900, #0d1825));
         border-bottom: var(--hx-border-width-thin, 1px) solid
-          var(--hx-table-border-color, var(--hx-color-neutral-200, #e2e8f0));
+          var(--hx-table-border-color, var(--hx-color-neutral-200, #d6dbd5));
         vertical-align: middle;
       }
 
@@ -44,7 +44,7 @@ export class HelixTableCell extends HelixElement {
 
       td:focus-visible {
         outline: var(--hx-focus-ring-width, 2px) solid
-          var(--hx-focus-ring-color, var(--hx-color-primary-500, #2563eb));
+          var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797));
         outline-offset: var(--hx-focus-ring-offset, -2px);
         border-radius: var(--hx-border-radius-sm, 2px);
       }
@@ -68,7 +68,7 @@ export class HelixTableCell extends HelixElement {
           content: attr(data-label);
           font-weight: var(--hx-font-weight-semibold, 600);
           float: left;
-          color: var(--hx-table-header-color, var(--hx-color-neutral-700, #334155));
+          color: var(--hx-table-header-color, var(--hx-color-neutral-700, #313e4b));
         }
       }
     `,

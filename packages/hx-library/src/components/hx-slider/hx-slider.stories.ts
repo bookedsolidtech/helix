@@ -617,7 +617,7 @@ export const InAForm: Story = {
             padding: 0.5rem 1rem;
             border: none;
             border-radius: 0.375rem;
-            background: var(--hx-color-primary-500, #2563EB);
+            background: var(--hx-color-primary-500, #429797);
             color: white;
             cursor: pointer;
             font-size: 0.875rem;
@@ -630,12 +630,12 @@ export const InAForm: Story = {
         <pre
           id=${outputId}
           style="
-            background: var(--hx-color-neutral-50, #f8f9fa);
+            background: var(--hx-color-neutral-50, #F5F8F3);
             padding: 1rem;
             border-radius: 0.375rem;
             font-size: 0.75rem;
             min-height: 2rem;
-            border: 1px solid var(--hx-color-neutral-200, #e9ecef);
+            border: 1px solid var(--hx-color-neutral-200, #D6DBD5);
           "
         ></pre>
       </form>
@@ -772,7 +772,7 @@ export const CSSParts: Story = {
     <style>
       .parts-demo hx-slider::part(slider) {
         padding: 0.75rem;
-        border: 1px dashed var(--hx-color-neutral-300, #ced4da);
+        border: 1px dashed var(--hx-color-neutral-300, #B6BFB9);
         border-radius: 0.5rem;
       }
 
@@ -838,12 +838,12 @@ export const PatientSymptomAssessment: Story = {
   render: () => html`
     <div style="max-width: 520px; font-family: var(--hx-font-family-sans, sans-serif);">
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Daily Symptom Check-In
       </h3>
       <p
-        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Rate each symptom on a scale of 0 to 10.
       </p>
@@ -902,12 +902,12 @@ export const MedicationDosageSelector: Story = {
   render: () => html`
     <div style="max-width: 520px; font-family: var(--hx-font-family-sans, sans-serif);">
       <h3
-        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #212529);"
+        style="margin: 0 0 0.25rem; font-size: 1.125rem; color: var(--hx-color-neutral-800, #202B39);"
       >
         Medication Dosage Adjustment
       </h3>
       <p
-        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Adjust the dosage within the clinician-approved range.
       </p>

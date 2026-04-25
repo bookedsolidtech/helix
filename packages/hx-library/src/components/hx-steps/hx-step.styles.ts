@@ -35,7 +35,11 @@ export const helixStepStyles = css`
   /* ─── Focus ─── */
 
   :host(:focus-visible) .step__indicator {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-color-primary-500);
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(
+        --hx-steps-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -58,9 +62,10 @@ export const helixStepStyles = css`
     width: var(--hx-steps-indicator-size, 2rem);
     height: var(--hx-steps-indicator-size, 2rem);
     border-radius: var(--hx-border-radius-full, 9999px);
-    border: var(--hx-border-width-medium, 2px) solid var(--hx-color-neutral-300);
-    background-color: var(--hx-color-neutral-0);
-    color: var(--hx-color-neutral-500);
+    border: var(--hx-border-width-medium, 2px) solid
+      var(--hx-steps-indicator-border-color, var(--hx-color-border-strong, #66787b));
+    background-color: var(--hx-steps-indicator-bg, var(--hx-color-surface-default, #ffffff));
+    color: var(--hx-steps-indicator-color, var(--hx-color-text-muted, #4a5362));
     font-size: var(--hx-steps-indicator-font-size, var(--hx-font-size-sm));
     font-weight: var(--hx-font-weight-semibold);
     font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
@@ -83,7 +88,7 @@ export const helixStepStyles = css`
     flex: 1;
     height: var(--hx-steps-connector-thickness, var(--hx-border-width, 2px));
     min-width: 0;
-    background-color: var(--hx-steps-connector-color, var(--hx-color-neutral-200));
+    background-color: var(--hx-steps-connector-color, var(--hx-color-border-default, #d6dbd5));
     transition: background-color var(--hx-transition-fast, 150ms ease);
   }
 
@@ -104,14 +109,14 @@ export const helixStepStyles = css`
     font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-steps-label-font-size, var(--hx-font-size-sm));
     font-weight: var(--hx-font-weight-medium);
-    color: var(--hx-steps-label-color, var(--hx-color-neutral-600));
+    color: var(--hx-steps-label-color, var(--hx-color-text-secondary, #313e4b));
     line-height: var(--hx-line-height-tight, 1.25);
   }
 
   .step__description {
     font-family: var(--hx-steps-font-family, var(--hx-font-family-sans));
     font-size: var(--hx-steps-description-font-size, var(--hx-font-size-xs));
-    color: var(--hx-steps-description-color, var(--hx-color-neutral-500));
+    color: var(--hx-steps-description-color, var(--hx-color-text-muted, #4a5362));
     margin-top: var(--hx-space-1, 0.25rem);
     line-height: var(--hx-line-height-normal, 1.5);
   }
@@ -120,43 +125,50 @@ export const helixStepStyles = css`
 
   /* Active: outlined indicator (in-progress) — visually distinct from complete (filled) */
   :host([status='active']) .step__indicator {
-    border-color: var(--hx-color-primary-500);
-    background-color: var(--hx-color-primary-500);
-    color: var(--hx-color-neutral-0);
+    border-color: var(--hx-steps-active-border-color, var(--hx-color-primary-500, #429797));
+    background-color: var(--hx-steps-active-bg, var(--hx-color-primary-500, #429797));
+    color: var(--hx-steps-active-color, var(--hx-color-text-on-primary, #ffffff));
   }
 
   :host([status='active']) .step__label {
-    color: var(--hx-color-primary-700);
+    color: var(--hx-steps-active-label-color, var(--hx-color-primary-700, #0f6363));
     font-weight: var(--hx-font-weight-semibold);
   }
 
   /* ─── Status: complete ─── */
 
-  /* Complete: filled indicator with darker shade — visually distinct from active */
+  /* Complete: filled indicator with darker shade — visually distinct from active.
+     on-primary tokens are tuned for primary-500. primary-700 + on-primary
+     (= neutral-900) drops to 2.54:1 — fails AA for the check icon / step
+     number. Pin fg at neutral-0 (7.03:1 on primary-700). Mirrors
+     hx-toggle-button pressed treatment. */
   :host([status='complete']) .step__indicator {
-    border-color: var(--hx-color-primary-700);
-    background-color: var(--hx-color-primary-700);
-    color: var(--hx-color-neutral-0);
+    border-color: var(--hx-steps-complete-border-color, var(--hx-color-primary-700, #0f6363));
+    background-color: var(--hx-steps-complete-bg, var(--hx-color-primary-700, #0f6363));
+    color: var(--hx-steps-complete-color, var(--hx-color-neutral-0, #ffffff));
   }
 
   :host([status='complete']) .step__connector {
-    background-color: var(--hx-steps-connector-complete-color, var(--hx-color-primary-500));
+    background-color: var(
+      --hx-steps-connector-complete-color,
+      var(--hx-color-primary-500, #429797)
+    );
   }
 
   :host([status='complete']) .step__label {
-    color: var(--hx-color-neutral-700);
+    color: var(--hx-steps-complete-label-color, var(--hx-color-text-primary, #0d1825));
   }
 
   /* ─── Status: error ─── */
 
   :host([status='error']) .step__indicator {
-    border-color: var(--hx-color-error-500);
-    background-color: var(--hx-color-error-500);
-    color: var(--hx-color-neutral-0);
+    border-color: var(--hx-steps-error-border-color, var(--hx-color-error-500, #e5493e));
+    background-color: var(--hx-steps-error-bg, var(--hx-color-error-500, #e5493e));
+    color: var(--hx-steps-error-color, var(--hx-color-text-on-error, #ffffff));
   }
 
   :host([status='error']) .step__label {
-    color: var(--hx-color-error-700);
+    color: var(--hx-steps-error-label-color, var(--hx-color-error-700, #a21312));
   }
 
   /* ─── Status: disabled ─── */
@@ -168,9 +180,9 @@ export const helixStepStyles = css`
   }
 
   :host([disabled]) .step__indicator {
-    border-color: var(--hx-color-neutral-300);
-    background-color: var(--hx-color-neutral-100);
-    color: var(--hx-color-neutral-400);
+    border-color: var(--hx-steps-disabled-border-color, var(--hx-color-border-default, #d6dbd5));
+    background-color: var(--hx-steps-disabled-bg, var(--hx-color-surface-sunken, #ebeee9));
+    color: var(--hx-steps-disabled-color, var(--hx-color-text-placeholder, #8e9c98));
   }
 
   /* ─── Vertical Layout ─── */

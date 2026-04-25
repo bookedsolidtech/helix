@@ -1,5 +1,17 @@
 import { css } from 'lit';
 
+/**
+ * hx-alert styles.
+ *
+ * Component-tier tokens with two-level var() fallback:
+ *   var(--hx-alert-{prop}, var(--hx-color-{semantic}, #hex))
+ * Inner hex fallbacks track the "precision cool" palette (3.2.0):
+ *   info-50 = #EFF6FE, info-200 = #BEDCFC, info-500 = #0C8BEB, info-800 = #064172,
+ *   success-50 = #EAFAEC, success-200 = #BAE6C2, success-500 = #3B9E58, success-800 = #0B4D23,
+ *   warning-50 = #FFF3EA, warning-200 = #FACFAE, warning-500 = #C2711C, warning-800 = #603301,
+ *   error-50 = #FFF2F0, error-200 = #FCCBC4, error-500 = #E5493E, error-800 = #7A090A,
+ *   primary-400 = #6AB1B1.
+ */
 export const helixAlertStyles = css`
   :host {
     display: block;
@@ -38,10 +50,10 @@ export const helixAlertStyles = css`
     gap: var(--hx-alert-gap, var(--hx-space-3, 0.75rem));
     padding: var(--hx-alert-padding, var(--hx-space-4, 1rem));
     border: var(--hx-alert-border-width, var(--hx-border-width-thin, 1px)) solid
-      var(--hx-alert-border-color, var(--hx-color-info-200, #bae6fd));
+      var(--hx-alert-border-color, var(--hx-color-info-200, #bedcfc));
     border-radius: var(--hx-alert-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-alert-bg, var(--hx-color-info-50, #f0f9ff));
-    color: var(--hx-alert-color, var(--hx-color-info-800, #0c4a6e));
+    background-color: var(--hx-alert-bg, var(--hx-color-info-50, #eff6fe));
+    color: var(--hx-alert-color, var(--hx-color-info-800, #064172));
     font-family: var(--hx-alert-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-font-size-sm, 0.875rem);
     line-height: var(--hx-line-height-normal, 1.5);
@@ -54,7 +66,7 @@ export const helixAlertStyles = css`
   .alert--accent {
     border-width: 0;
     border-inline-start: var(--hx-alert-accent-width, 4px) solid
-      var(--hx-alert-border-color, var(--hx-color-info-200, #bae6fd));
+      var(--hx-alert-border-color, var(--hx-color-info-200, #bedcfc));
     border-radius: 0;
   }
 
@@ -81,7 +93,7 @@ export const helixAlertStyles = css`
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    color: var(--hx-alert-icon-color, var(--hx-color-info-500, #0284c7));
+    color: var(--hx-alert-icon-color, var(--hx-color-info-500, #0c8beb));
   }
 
   .alert__icon svg {
@@ -141,7 +153,7 @@ export const helixAlertStyles = css`
     border: none;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     background: transparent;
-    color: var(--hx-alert-color, var(--hx-color-info-800, #0c4a6e));
+    color: var(--hx-alert-color, var(--hx-color-info-800, #064172));
     cursor: pointer;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: 1;
@@ -160,7 +172,10 @@ export const helixAlertStyles = css`
 
   .alert__close-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa));
+      var(
+        --hx-alert-close-btn-focus-ring-color,
+        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }
@@ -181,40 +196,41 @@ export const helixAlertStyles = css`
 
   :host([variant='info']) .alert,
   :host(:not([variant])) .alert {
-    --hx-alert-bg: var(--hx-color-info-50, #f0f9ff);
-    --hx-alert-border-color: var(--hx-color-info-200, #bae6fd);
-    --hx-alert-color: var(--hx-color-info-800, #0c4a6e);
-    --hx-alert-icon-color: var(--hx-color-info-500, #0284c7);
+    --hx-alert-bg: var(--hx-color-info-50, #eff6fe);
+    --hx-alert-border-color: var(--hx-color-info-200, #bedcfc);
+    --hx-alert-color: var(--hx-color-info-800, #064172);
+    --hx-alert-icon-color: var(--hx-color-info-500, #0c8beb);
   }
 
   /* ─── Variant: success ─── */
 
   :host([variant='success']) .alert {
-    --hx-alert-bg: var(--hx-color-success-50, #f0fdf4);
-    --hx-alert-border-color: var(--hx-color-success-200, #bbf7d0);
-    --hx-alert-color: var(--hx-color-success-800, #14532d);
-    --hx-alert-icon-color: var(--hx-color-success-500, #16a34a);
+    --hx-alert-bg: var(--hx-color-success-50, #eafaec);
+    --hx-alert-border-color: var(--hx-color-success-200, #bae6c2);
+    --hx-alert-color: var(--hx-color-success-800, #0b4d23);
+    --hx-alert-icon-color: var(--hx-color-success-500, #3b9e58);
   }
 
   /* ─── Variant: warning ─── */
 
   :host([variant='warning']) .alert {
-    --hx-alert-bg: var(--hx-color-warning-50, #fffbeb);
-    --hx-alert-border-color: var(--hx-color-warning-200, #fde68a);
-    --hx-alert-color: var(--hx-color-warning-800, #78350f);
-    --hx-alert-icon-color: var(--hx-color-warning-500, #d97706);
+    --hx-alert-bg: var(--hx-color-warning-50, #fff3ea);
+    --hx-alert-border-color: var(--hx-color-warning-200, #facfae);
+    --hx-alert-color: var(--hx-color-warning-800, #603301);
+    --hx-alert-icon-color: var(--hx-color-warning-500, #c2711c);
   }
 
   /* ─── Variant: error ─── */
 
   :host([variant='error']) .alert {
-    --hx-alert-bg: var(--hx-color-error-50, #fef2f2);
-    --hx-alert-border-color: var(--hx-color-error-200, #fecaca);
-    --hx-alert-color: var(--hx-color-error-800, #7f1d1d);
-    --hx-alert-icon-color: var(--hx-color-error-500, #dc2626);
+    --hx-alert-bg: var(--hx-color-error-50, #fff2f0);
+    --hx-alert-border-color: var(--hx-color-error-200, #fccbc4);
+    --hx-alert-color: var(--hx-color-error-800, #7a090a);
+    --hx-alert-icon-color: var(--hx-color-error-500, #e5493e);
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */
+  /* Belt-and-suspenders: rich per-class HC overrides PLUS the forcedColorsSurface mixin. */
 
   @media (forced-colors: active) {
     .alert {

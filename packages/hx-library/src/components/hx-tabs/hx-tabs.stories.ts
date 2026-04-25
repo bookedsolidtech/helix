@@ -80,7 +80,7 @@ const meta = {
       description: 'Tablist border color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-200, #e9ecef)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-200, #D6DBD5)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -107,7 +107,7 @@ const meta = {
       description: 'Inactive tab text color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-600, #495057)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-600, #4A5362)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -116,7 +116,7 @@ const meta = {
       description: 'Active tab text color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-primary-600, #1d4ed8)' },
+        defaultValue: { summary: 'var(--hx-color-primary-600, #0F7078)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -125,7 +125,7 @@ const meta = {
       description: 'Tab hover text color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-800, #212529)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-800, #202B39)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -134,7 +134,7 @@ const meta = {
       description: 'Tab hover background.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-50, #f8f9fa)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-50, #F5F8F3)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -143,7 +143,7 @@ const meta = {
       description: 'Active tab indicator color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-primary-500, #2563eb)' },
+        defaultValue: { summary: 'var(--hx-color-primary-500, #429797)' },
         type: { summary: 'CSS color' },
       },
       control: false,
@@ -170,7 +170,7 @@ const meta = {
       description: 'Panel text color.',
       table: {
         category: 'CSS Custom Properties',
-        defaultValue: { summary: 'var(--hx-color-neutral-700, #343a40)' },
+        defaultValue: { summary: 'var(--hx-color-neutral-700, #313E4B)' },
         type: { summary: 'CSS color' },
       },
       control: false,

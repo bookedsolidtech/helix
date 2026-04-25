@@ -1,5 +1,13 @@
 import { css } from 'lit';
 
+/**
+ * hx-tooltip styles.
+ *
+ * Component-tier tokens with two-level var() fallback:
+ *   var(--hx-tooltip-{prop}, var(--hx-color-{semantic}, #hex))
+ * Inner hex fallbacks track the "precision cool" palette (3.2.0):
+ *   neutral-0 = #FFFFFF, neutral-900 = #0D1825 (surface-inverse anchor).
+ */
 export const helixTooltipStyles = css`
   :host {
     display: inline-block;
@@ -14,8 +22,8 @@ export const helixTooltipStyles = css`
     z-index: var(--hx-tooltip-z-index, var(--hx-z-index-tooltip, 1600));
     max-width: var(--hx-tooltip-max-width, 280px);
     padding: var(--hx-tooltip-padding, var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem));
-    background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #0f172a));
-    color: var(--hx-tooltip-color, var(--hx-color-neutral-50, #f8fafc));
+    background: var(--hx-tooltip-bg, var(--hx-color-surface-inverse, #0d1825));
+    color: var(--hx-tooltip-color, var(--hx-color-text-inverse, #ffffff));
     font-family: var(--hx-tooltip-font-family, var(--hx-font-family-sans, sans-serif));
     font-size: var(--hx-tooltip-font-size, var(--hx-font-size-xs, 0.75rem));
     line-height: var(--hx-line-height-normal, 1.5);
@@ -41,7 +49,7 @@ export const helixTooltipStyles = css`
     position: absolute;
     width: var(--hx-tooltip-arrow-size, 8px);
     height: var(--hx-tooltip-arrow-size, 8px);
-    background: var(--hx-tooltip-bg, var(--hx-color-neutral-900, #0f172a));
+    background: var(--hx-tooltip-bg, var(--hx-color-surface-inverse, #0d1825));
     transform: rotate(45deg);
     pointer-events: none;
   }
@@ -53,6 +61,7 @@ export const helixTooltipStyles = css`
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */
+  /* Belt-and-suspenders: rich per-class HC overrides PLUS the forcedColorsSurface mixin. */
 
   @media (forced-colors: active) {
     [part='tooltip'] {

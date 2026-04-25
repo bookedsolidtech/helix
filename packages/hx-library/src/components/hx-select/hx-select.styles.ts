@@ -6,36 +6,39 @@ export const helixSelectStyles = css`
     display: block;
 
     /* Background & foreground */
-    --_bg: var(--hx-select-bg, var(--hx-color-neutral-0, #ffffff));
-    --_color: var(--hx-select-color, var(--hx-color-neutral-800, #1e293b));
-    --_placeholder-color: var(--hx-select-placeholder-color, var(--hx-color-neutral-400, #94a3b8));
+    --_bg: var(--hx-select-bg, var(--hx-color-surface-default, #ffffff));
+    --_color: var(--hx-select-color, var(--hx-color-text-strong, #202b39));
+    --_placeholder-color: var(
+      --hx-select-placeholder-color,
+      var(--hx-color-text-placeholder, #66787b)
+    );
 
     /* Label */
-    --_label-color: var(--hx-select-label-color, var(--hx-color-neutral-700, #334155));
+    --_label-color: var(--hx-select-label-color, var(--hx-color-text-strong, #202b39));
 
     /* Border */
-    --_border-color: var(--hx-select-border-color, var(--hx-color-neutral-300, #cbd5e1));
+    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #8e9c98));
     --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
 
     /* Focus ring */
     --_focus-ring-color: var(
       --hx-select-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #60a5fa))
+      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
     );
 
     /* Error */
-    --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #dc2626));
+    --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #e5493e));
 
     /* Chevron */
-    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-neutral-500, #64748b));
+    --_chevron-color: var(--hx-select-chevron-color, var(--hx-color-text-muted, #4a5362));
     --_chevron-size: var(--hx-select-chevron-size, 0.5rem);
 
     /* Listbox */
-    --_listbox-bg: var(--hx-select-listbox-bg, var(--hx-color-neutral-0, #ffffff));
-    --_option-hover-bg: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #eff6ff));
+    --_listbox-bg: var(--hx-select-listbox-bg, var(--hx-color-surface-default, #ffffff));
+    --_option-hover-bg: var(--hx-select-option-hover-bg, var(--hx-color-primary-50, #ebf8f8));
     --_option-selected-bg: var(
       --hx-select-option-selected-bg,
-      var(--hx-color-primary-100, #dbeafe)
+      var(--hx-color-primary-100, #dbf0f0)
     );
 
     /* Typography */
@@ -70,7 +73,7 @@ export const helixSelectStyles = css`
   }
 
   .field__required-marker {
-    color: var(--hx-select-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-select-error-color, var(--hx-color-error-text, #c92a2a));
     font-weight: var(--hx-font-weight-bold, 700);
   }
 
@@ -279,11 +282,11 @@ export const helixSelectStyles = css`
   }
 
   .field__help-text {
-    color: var(--hx-color-neutral-500, #64748b);
+    color: var(--hx-color-text-muted, #4a5362);
   }
 
   .field__error {
-    color: var(--hx-select-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-select-error-color, var(--hx-color-error-text, #c92a2a));
   }
 
   @media (prefers-reduced-motion: reduce) {

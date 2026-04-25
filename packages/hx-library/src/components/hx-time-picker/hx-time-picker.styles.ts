@@ -24,11 +24,11 @@ export const helixTimePickerStyles = css`
     gap: var(--hx-space-1, 0.25rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
     font-weight: var(--hx-font-weight-medium, 500);
-    color: var(--hx-time-picker-label-color, var(--hx-color-neutral-700));
+    color: var(--hx-time-picker-label-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__required-marker {
-    color: var(--hx-time-picker-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-time-picker-error-color, var(--hx-color-error-text, #c92a2a));
     font-weight: var(--hx-font-weight-bold, 700);
   }
   .field__combobox {
@@ -36,9 +36,9 @@ export const helixTimePickerStyles = css`
     display: flex;
     align-items: center;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-time-picker-border-color, var(--hx-color-neutral-300));
+      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #8e9c98));
     border-radius: var(--hx-time-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-time-picker-bg, var(--hx-color-neutral-0));
+    background-color: var(--hx-time-picker-bg, var(--hx-color-surface-default, #ffffff));
     transition:
       border-color var(--hx-transition-fast, 150ms ease),
       box-shadow var(--hx-transition-fast, 150ms ease);
@@ -55,14 +55,14 @@ export const helixTimePickerStyles = css`
       );
   }
   .field--error .field__combobox {
-    border-color: var(--hx-time-picker-error-color, var(--hx-color-error-500));
+    border-color: var(--hx-time-picker-error-color, var(--hx-color-error-500, #e5493e));
   }
   .field--error .field__combobox:focus-within {
-    border-color: var(--hx-time-picker-error-color, var(--hx-color-error-500));
+    border-color: var(--hx-time-picker-error-color, var(--hx-color-error-500, #e5493e));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(--hx-time-picker-error-color, var(--hx-color-error-500))
+        var(--hx-time-picker-error-color, var(--hx-color-error-500, #e5493e))
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
@@ -75,14 +75,14 @@ export const helixTimePickerStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
-    color: var(--hx-time-picker-color, var(--hx-color-neutral-800));
+    color: var(--hx-time-picker-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
     min-height: var(--hx-size-10, 2.5rem);
     width: 100%;
     cursor: text;
   }
   .field__input::placeholder {
-    color: var(--hx-color-neutral-400);
+    color: var(--hx-color-text-placeholder, #66787b);
   }
   .field__input:disabled {
     cursor: not-allowed;
@@ -94,13 +94,13 @@ export const helixTimePickerStyles = css`
     border: none;
     background: transparent;
     padding: 0 var(--hx-space-3, 0.75rem);
-    color: var(--hx-time-picker-chevron-color, var(--hx-color-neutral-500));
+    color: var(--hx-time-picker-chevron-color, var(--hx-color-text-muted, #4a5362));
     cursor: pointer;
     height: 100%;
     min-height: var(--hx-size-10, 2.5rem);
     flex-shrink: 0;
     border-inline-start: var(--hx-border-width-thin, 1px) solid
-      var(--hx-time-picker-border-color, var(--hx-color-neutral-300));
+      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #8e9c98));
   }
   .field__toggle:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
@@ -114,9 +114,9 @@ export const helixTimePickerStyles = css`
     inset-inline-start: 0;
     inset-inline-end: 0;
     z-index: var(--hx-z-index-dropdown, 1000);
-    background-color: var(--hx-time-picker-listbox-bg, var(--hx-color-neutral-0));
+    background-color: var(--hx-time-picker-listbox-bg, var(--hx-color-surface-default, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-time-picker-border-color, var(--hx-color-neutral-300));
+      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #8e9c98));
     border-radius: var(--hx-time-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-time-picker-listbox-shadow,
@@ -149,23 +149,29 @@ export const helixTimePickerStyles = css`
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
     font-size: var(--hx-font-size-md, 1rem);
     font-family: inherit;
-    color: var(--hx-time-picker-option-color, var(--hx-color-neutral-800));
+    color: var(--hx-time-picker-option-color, var(--hx-color-text-strong, #202b39));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms ease);
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__option:hover,
   .field__option--active {
-    background-color: var(--hx-time-picker-option-hover-bg, var(--hx-color-primary-50));
-    color: var(--hx-time-picker-option-hover-color, var(--hx-color-primary-700));
+    background-color: var(--hx-time-picker-option-hover-bg, var(--hx-color-primary-50, #ebf8f8));
+    color: var(--hx-time-picker-option-hover-color, var(--hx-color-primary-700, #0f6363));
   }
   .field__option--selected {
-    background-color: var(--hx-time-picker-option-selected-bg, var(--hx-color-primary-100));
-    color: var(--hx-time-picker-option-selected-color, var(--hx-color-primary-800));
+    background-color: var(
+      --hx-time-picker-option-selected-bg,
+      var(--hx-color-primary-100, #dbf0f0)
+    );
+    color: var(--hx-time-picker-option-selected-color, var(--hx-color-primary-800, #07494a));
     font-weight: var(--hx-font-weight-medium, 500);
   }
   .field__option--selected.field__option--active {
-    background-color: var(--hx-time-picker-option-selected-bg, var(--hx-color-primary-100));
+    background-color: var(
+      --hx-time-picker-option-selected-bg,
+      var(--hx-color-primary-100, #dbf0f0)
+    );
   }
   @media (prefers-reduced-motion: reduce) {
     .field__combobox,
@@ -179,10 +185,10 @@ export const helixTimePickerStyles = css`
     line-height: var(--hx-line-height-normal, 1.5);
   }
   .field__help-text {
-    color: var(--hx-color-neutral-500);
+    color: var(--hx-color-text-muted, #4a5362);
   }
   .field__error {
-    color: var(--hx-time-picker-error-color, var(--hx-color-error-text, #b91c1c));
+    color: var(--hx-time-picker-error-color, var(--hx-color-error-text, #c92a2a));
   }
   @media (forced-colors: active) {
     .field__combobox {

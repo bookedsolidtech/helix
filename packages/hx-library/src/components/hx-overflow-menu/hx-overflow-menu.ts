@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
 
 const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
@@ -42,10 +43,36 @@ const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
  *   <button role="menuitem">Delete</button>
  * </hx-overflow-menu>
  * ```
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-overflow-menu-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-size-touch-target] - Size token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-overlay-black-12] - Overlay color.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-50] - Color.
  */
 @customElement('hx-overflow-menu')
 export class HelixOverflowMenu extends HelixElement {
-  static override styles = [helixOverflowMenuStyles];
+  static override styles = [helixOverflowMenuStyles, forcedColorsInteractive];
 
   /**
    * Preferred placement of the floating panel relative to the trigger.

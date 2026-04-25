@@ -135,7 +135,7 @@ export const SkipLink: Story = {
       <hx-visually-hidden focusable>
         <a
           href="#main-content"
-          style="display: inline-block; padding: 0.5rem 1rem; background: var(--hx-color-primary-500, #007878); color: white; text-decoration: none; border-radius: 0.25rem; font-weight: 600;"
+          style="display: inline-block; padding: 0.5rem 1rem; background: var(--hx-color-primary-500, #429797); color: white; text-decoration: none; border-radius: 0.25rem; font-weight: 600;"
         >
           Skip to main content
         </a>

@@ -1,0 +1,13 @@
+# CEM Accuracy Campaign — pilot target list (5 components)
+#
+# Mix of simple primitive, form-associated single, composite container,
+# overlay, and form-coordinator. If the campaign infrastructure produces
+# clean findings on these five, scale to targets-full.txt.
+#
+# One component path per line. Lines starting with `#` and blank lines ignored.
+
+packages/hx-library/src/components/hx-button
+packages/hx-library/src/components/hx-text-input
+packages/hx-library/src/components/hx-card
+packages/hx-library/src/components/hx-dialog
+packages/hx-library/src/components/hx-form

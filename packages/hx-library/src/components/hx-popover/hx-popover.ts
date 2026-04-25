@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixPopoverStyles } from './hx-popover.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 const _nextPopoverId = createIdCounter('hx-popover');
 
@@ -44,11 +45,26 @@ const _nextPopoverId = createIdCounter('hx-popover');
  *   <p>Rich popover content here.</p>
  * </hx-popover>
  * ```
+ * @cssprop [--hx-popover-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-shadow-md] - Box shadow.
+ * @cssprop [--hx-overlay-black-12] - Overlay color.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
  */
 
 @customElement('hx-popover')
 export class HelixPopover extends HelixElement {
-  static override styles = [helixPopoverStyles];
+  static override styles = [helixPopoverStyles, forcedColorsSurface];
 
   /**
    * Whether the popover is open.

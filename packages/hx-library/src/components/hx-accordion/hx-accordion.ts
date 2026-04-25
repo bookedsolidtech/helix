@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixAccordionStyles } from './hx-accordion.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import './hx-accordion-item.js';
 import type { HelixAccordionItem } from './hx-accordion-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -29,10 +30,13 @@ import { devWarn } from '../../utils/dev-warn.js';
  *   </hx-accordion-item>
  * </hx-accordion>
  * ```
+ * @cssprop [--hx-accordion-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
  */
 @customElement('hx-accordion')
 export class HelixAccordion extends HelixElement {
-  static override styles = [helixAccordionStyles];
+  static override styles = [helixAccordionStyles, forcedColorsInteractive];
 
   /**
    * Expansion mode: 'single' collapses all other items when one expands.

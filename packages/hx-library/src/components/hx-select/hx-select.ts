@@ -7,6 +7,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSelectStyles } from './hx-select.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 // PERF: hx-select exceeds 5KB budget (6.31kb gzipped) -- custom listbox, keyboard navigation, grouped options
@@ -79,10 +80,53 @@ export interface HxSelectChangeDetail {
  * @cssprop [--hx-select-option-hover-bg=var(--hx-color-primary-50)] - Option hover background color.
  * @cssprop [--hx-select-option-selected-bg=var(--hx-color-primary-100)] - Selected option background color.
  * @cssprop [--hx-select-placeholder-color=var(--hx-color-neutral-400)] - Placeholder text color.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-neutral-800] - Color.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-color-primary-400] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-primary-50] - Color.
+ * @cssprop [--hx-color-primary-100] - Color.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-text] - Color.
+ * @cssprop [--hx-font-weight-bold] - Font weight.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-input-height-md] - Height.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-opacity] - CSS custom property.
+ * @cssprop [--hx-input-height-sm] - Height.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-input-height-lg] - Height.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-space-px] - Spacing token.
+ * @cssprop [--hx-z-index-dropdown] - Z-index layer.
+ * @cssprop [--hx-select-listbox-shadow] - CSS custom property.
+ * @cssprop [--hx-overlay-neutral-12] - Overlay color.
+ * @cssprop [--hx-select-listbox-max-height=16rem] - Height.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-select-option-focus-ring-offset=-2px] - Focus ring styling.
+ * @cssprop [--hx-font-size-xs] - Font size.
  */
 @customElement('hx-select')
 export class HelixSelect extends FormMixin(HelixElement) {
-  static override styles = [helixSelectStyles];
+  static override styles = [helixSelectStyles, forcedColorsField];
 
   // ─── Form Association ───
 

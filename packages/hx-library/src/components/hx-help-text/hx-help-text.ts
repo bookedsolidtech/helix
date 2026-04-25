@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixHelpTextStyles } from './hx-help-text.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /** Icon SVG for error variant (circle with exclamation mark). */
 const errorIcon = html`<svg viewBox="0 0 16 16" aria-hidden="true" width="1em" height="1em">
@@ -87,10 +88,18 @@ const variantIcons = {
  * @cssprop [--hx-help-text-font-weight=var(--hx-font-weight-normal)] - Font weight.
  * @cssprop [--hx-help-text-line-height=var(--hx-line-height-normal)] - Line height.
  * @cssprop [--hx-help-text-icon-gap=0.375rem] - Gap between icon and text.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-font-weight-normal] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-color-error-600] - Color.
+ * @cssprop [--hx-color-warning-700] - Color.
+ * @cssprop [--hx-color-success-700] - Color.
  */
 @customElement('hx-help-text')
 export class HelixHelpText extends HelixElement {
-  static override styles = [helixHelpTextStyles];
+  static override styles = [helixHelpTextStyles, forcedColorsSurface];
 
   /**
    * Visual variant that determines the text color and icon.

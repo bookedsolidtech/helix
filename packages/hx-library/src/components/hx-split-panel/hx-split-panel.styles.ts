@@ -4,8 +4,11 @@ export const helixSplitPanelStyles = css`
   :host {
     display: flex;
     --_divider-size: var(--hx-split-panel-divider-size, 4px);
-    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-neutral-200));
-    --_divider-hover-color: var(--hx-split-panel-divider-hover-color, var(--hx-color-primary-500));
+    --_divider-color: var(--hx-split-panel-divider-color, var(--hx-color-border-default, #d6dbd5));
+    --_divider-hover-color: var(
+      --hx-split-panel-divider-hover-color,
+      var(--hx-color-primary-500, #429797)
+    );
     overflow: hidden;
   }
 
@@ -93,7 +96,7 @@ export const helixSplitPanelStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-split-panel-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--_divider-hover-color) 30%, transparent);
@@ -132,8 +135,8 @@ export const helixSplitPanelStyles = css`
 
   .collapse-btn {
     background: var(--_divider-hover-color);
-    border: 2px solid var(--hx-color-neutral-0);
-    color: var(--hx-color-neutral-0);
+    border: 2px solid var(--hx-color-surface-default);
+    color: var(--hx-color-surface-default);
     width: var(--hx-size-5, 1.25rem);
     height: var(--hx-size-5, 1.25rem);
     border-radius: 50%;
@@ -158,7 +161,7 @@ export const helixSplitPanelStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-split-panel-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
+        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }

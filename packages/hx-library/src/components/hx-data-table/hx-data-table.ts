@@ -4,6 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement } from '../../base/index.js';
 import { helixDataTableStyles } from './hx-data-table.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -67,10 +68,39 @@ export interface HxDataTableRowClickDetail {
  * @cssprop [--hx-data-table-row-selected-bg=var(--hx-color-primary-50)] - Selected row background.
  * @cssprop [--hx-data-table-empty-color=var(--hx-color-neutral-600)] - Empty state text color.
  * @cssprop [--hx-data-table-min-width=600px] - Minimum table width before horizontal scrolling.
+ * @cssprop [--hx-data-table-font-family=var(--hx-font-family-sans)] - CSS custom property.
+ * @cssprop [--hx-data-table-shimmer-duration=1.5s] - CSS custom property.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-font-weight-semibold] - Font weight.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-opacity-25] - Opacity.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-opacity-100] - Opacity.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-size-4] - Size token.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-color-neutral-600] - Color.
+ * @cssprop [--hx-color-primary-50] - Color.
+ * @cssprop [--hx-opacity-50] - Opacity.
+ * @cssprop [--hx-space-8] - Spacing token.
  */
 @customElement('hx-data-table')
 export class HelixDataTable extends HelixElement {
-  static override styles = [helixDataTableStyles];
+  static override styles = [helixDataTableStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

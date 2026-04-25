@@ -63,16 +63,23 @@ jobs:
 
       - name: Verify CEM matches committed manifest
         run: |
-          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+          # `git status --porcelain` catches both modified AND untracked changes;
+          # `git diff --exit-code` would silently pass if the committed file was
+          # deleted and regeneration re-created it as untracked.
+          STATUS=$(git status --porcelain -- packages/hx-library/custom-elements.json)
+          if [ -n "$STATUS" ]; then
             echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            echo "$STATUS"
             exit 1
           fi
           echo "CEM matches committed manifest."
 
       - name: Verify Figma inventory matches committed snapshot
         run: |
-          if ! git diff --exit-code packages/hx-library/figma-inventory.json; then
+          STATUS=$(git status --porcelain -- packages/hx-library/figma-inventory.json)
+          if [ -n "$STATUS" ]; then
             echo "::error::figma-inventory.json drifted after CEM regeneration. Run 'pnpm --filter=@helixui/library run figma:inventory' and commit before tagging."
+            echo "$STATUS"
             exit 1
           fi
           pnpm --filter=@helixui/library run figma:inventory:check
@@ -214,16 +221,20 @@ jobs:
       - name: Verify CEM matches committed manifest
         run: |
           pnpm --filter=@helixui/library run cem
-          if ! git diff --exit-code packages/hx-library/custom-elements.json; then
+          STATUS=$(git status --porcelain -- packages/hx-library/custom-elements.json)
+          if [ -n "$STATUS" ]; then
             echo "::error::custom-elements.json is out of date. Run 'pnpm run cem' and commit before tagging."
+            echo "$STATUS"
             exit 1
           fi
           echo "CEM matches committed manifest."
 
       - name: Verify Figma inventory matches committed snapshot
         run: |
-          if ! git diff --exit-code packages/hx-library/figma-inventory.json; then
+          STATUS=$(git status --porcelain -- packages/hx-library/figma-inventory.json)
+          if [ -n "$STATUS" ]; then
             echo "::error::figma-inventory.json drifted after CEM regeneration. Run 'pnpm --filter=@helixui/library run figma:inventory' and commit before tagging."
+            echo "$STATUS"
             exit 1
           fi
           pnpm --filter=@helixui/library run figma:inventory:check
@@ -264,10 +275,12 @@ jobs:
         # Runs only on an actual publish — when changesets/action bumps
         # versions without publishing (PR path), no manifest is generated.
 
-      - name: Commit release manifest
+      - name: Open release manifest PR
         if: steps.changesets.outputs.published == 'true'
         env:
           CHANGESET_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
+          GH_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
           HUSKY: '0'
         run: |
           set -euo pipefail
@@ -275,42 +288,62 @@ jobs:
             echo "No release manifest changes to commit."
             exit 0
           fi
+
+          VERSION=$(node -e '
+            try {
+              const a = JSON.parse(process.env.PUBLISHED_PACKAGES || "[]");
+              const p = a.find((x) => x.name === "@helixui/library");
+              console.log(p ? p.version : "");
+            } catch {
+              console.log("");
+            }
+          ')
+          if [ -z "${VERSION}" ]; then
+            VERSION="run-${GITHUB_RUN_ID}"
+          fi
+          # Include both GITHUB_RUN_ID and GITHUB_RUN_ATTEMPT so reruns of the
+          # same published version produce a unique branch name. GITHUB_RUN_ID
+          # is stable across reruns of a single workflow run; only RUN_ATTEMPT
+          # increments. Without RUN_ATTEMPT, a rerun would collide with the
+          # pre-existing release-manifest branch from the failed first attempt
+          # and cause a non-fast-forward push that orphans the PR.
+          BRANCH="release-manifest/${VERSION}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          # npm publish has already succeeded at this point, so the manifest
-          # MUST land on main. The workflow concurrency group only serialises
-          # runs of this workflow; unrelated merges can still advance main
-          # between actions/checkout and this step. Rebase the manifest on
-          # top of current origin/main to avoid a non-fast-forward rejection
-          # that would leave the npm release without its audit commit.
-          git stash push -u --message 'release-manifest' -- docs/releases/
+
+          # Stage the freshly-generated manifest, then rebuild the branch from
+          # origin/main so the PR contains only the manifest diff.
+          MANIFEST_STAGE=$(mktemp -d)
+          cp -R docs/releases/. "${MANIFEST_STAGE}/"
           git fetch origin main
-          git checkout -B publish-manifest origin/main
-          git stash pop
+          git checkout -B "${BRANCH}" origin/main
+          mkdir -p docs/releases
+          cp -R "${MANIFEST_STAGE}/." docs/releases/
           git add docs/releases/
-          git commit -m 'chore(release): add release manifest [skip ci]'
+          if git diff --cached --quiet; then
+            echo "Manifest already present on main — nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(release): add ${VERSION} release manifest"
 
-          # Bounded retry: if another merge lands on main between our fetch
-          # and push, rebase and retry up to 3 times. Any failure after that
-          # is fatal and requires operator intervention — npm publish has
-          # already succeeded, so the manifest commit MUST land.
           REMOTE="https://x-access-token:${CHANGESET_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          PUSH_OK=0
-          for attempt in 1 2 3; do
-            echo "Manifest push attempt $attempt/3..."
-            git fetch origin main
-            if git rebase origin/main; then
-              if git push "$REMOTE" HEAD:main; then
-                PUSH_OK=1
-                break
-              fi
-            else
-              git rebase --abort || true
-            fi
-            sleep 5
-          done
+          git push "${REMOTE}" "HEAD:${BRANCH}"
 
-          if [ "$PUSH_OK" -ne 1 ]; then
-            echo "::error::Failed to push release manifest after 3 attempts. npm publish already succeeded — manifest must be committed manually."
+          # CHANGESET_TOKEN must carry `contents: write` + `pull-requests: write`.
+          # The manifest is prettier-ignored (see .prettierignore) and path-only;
+          # required status checks complete quickly on doc-only diffs.
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "chore(release): add ${VERSION} release manifest" \
+            --body "Post-publish manifest for \`${VERSION}\`. Auto-opened by the publish workflow after npm publish succeeded. Documentation only — safe to auto-merge.")
+          echo "Opened: ${PR_URL}"
+          # Enabling auto-merge must succeed — otherwise the manifest PR is
+          # orphaned and main drifts from the published npm artifact with no
+          # alarm. Treat failure as a hard error so the release is visibly
+          # incomplete until an operator merges the PR.
+          if ! gh pr merge "${PR_URL}" --merge --auto; then
+            echo "::error title=Release manifest auto-merge failed::Could not enable auto-merge on ${PR_URL}. The release manifest PR is open but not queued; main is out of sync with the published npm artifact until this PR is merged manually."
             exit 1
           fi

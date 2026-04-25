@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -30,10 +31,37 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-icon-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
  * @cssprop [--hx-icon-button-size] - Explicit width and height override for the button.
  * @cssprop [--hx-icon-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
+ * @cssprop [--hx-opacity-disabled] - Opacity.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-transition-fast] - Transition timing.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-filter-brightness-active] - CSS filter.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-size-8] - Size token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-font-size-md] - Font size.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-size-12] - Size token.
+ * @cssprop [--hx-font-size-lg] - Font size.
+ * @cssprop [--hx-color-neutral-0] - Color.
+ * @cssprop [--hx-color-primary-600] - Color.
+ * @cssprop [--hx-color-primary-50] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-color-neutral-100] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
+ * @cssprop [--hx-color-error-600] - Color.
  */
 @customElement('hx-icon-button')
 export class HelixIconButton extends HelixElement {
-  static override styles = [helixIconButtonStyles];
+  static override styles = [helixIconButtonStyles, forcedColorsInteractive];
 
   /**
    * Accessible name for the button. Required. Rendered as `aria-label` and

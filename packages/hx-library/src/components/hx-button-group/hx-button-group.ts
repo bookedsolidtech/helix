@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixButtonGroupStyles } from './hx-button-group.styles.js';
+import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -23,10 +24,12 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @csspart group - The container div element wrapping all slotted buttons.
  *
  * @cssprop [--hx-button-group-size=md] - Size token forwarded to child buttons. Accepts 'sm', 'md', or 'lg'.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-border-radius-md] - CSS custom property.
  */
 @customElement('hx-button-group')
 export class HelixButtonGroup extends HelixElement {
-  static override styles = [helixButtonGroupStyles];
+  static override styles = [helixButtonGroupStyles, forcedColorsInteractive];
 
   /**
    * Layout orientation of the button group.

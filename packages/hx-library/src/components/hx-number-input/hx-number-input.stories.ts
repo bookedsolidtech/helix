@@ -461,7 +461,7 @@ export const WithPrefix: Story = {
     <hx-number-input label="Dosage" .value=${250} .min=${0} .step=${10}>
       <span
         slot="prefix"
-        style="font-size: 0.875rem; color: var(--hx-color-neutral-500, #6c757d); font-weight: 500;"
+        style="font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B); font-weight: 500;"
         >mg</span
       >
     </hx-number-input>
@@ -607,7 +607,7 @@ export const AllStates: Story = {
 export const WithSuffix: Story = {
   render: () => html`
     <hx-number-input label="Patient Weight" .value=${72} .min=${0} .step=${0.1}>
-      <span slot="suffix" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+      <span slot="suffix" style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
         >kg</span
       >
     </hx-number-input>
@@ -628,7 +628,7 @@ export const WithErrorSlot: Story = {
     <hx-number-input label="Dosage" .value=${null} name="dosage">
       <div
         slot="error"
-        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
+        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #E5493E); font-size: 0.75rem;"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path
@@ -655,7 +655,7 @@ export const WithHelpSlot: Story = {
     <hx-number-input label="Infusion Rate" .value=${125} name="infusionRate">
       <div
         slot="help-text"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Standard adult maintenance rate is 125 mL/hr. Adjust based on patient weight and clinical
         status.
@@ -677,12 +677,12 @@ export const WithLabelSlot: Story = {
     <hx-number-input .value=${250} .min=${0} .max=${1000} name="dosage">
       <label
         slot="label"
-        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
       >
         Dosage (mg)
         <span
           aria-hidden="true"
-          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+          style="color: var(--hx-color-error-500, #E5493E); font-weight: 700;"
         >
           *</span
         >
@@ -705,19 +705,19 @@ export const DrupalFormAPI: Story = {
     <hx-number-input .value=${null} name="dosage" required>
       <label
         slot="label"
-        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #374151);"
+        style="font-size: 0.875rem; font-weight: 500; color: var(--hx-color-neutral-700, #313E4B);"
       >
         Dosage (mg)
         <span
           aria-hidden="true"
-          style="color: var(--hx-color-error-500, #dc3545); font-weight: 700;"
+          style="color: var(--hx-color-error-500, #E5493E); font-weight: 700;"
         >
           *</span
         >
       </label>
       <div
         slot="error"
-        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #dc3545); font-size: 0.75rem;"
+        style="display: flex; align-items: center; gap: 0.25rem; color: var(--hx-color-error-500, #E5493E); font-size: 0.75rem;"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path
@@ -728,7 +728,7 @@ export const DrupalFormAPI: Story = {
       </div>
       <div
         slot="help-text"
-        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #6c757d);"
+        style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B);"
       >
         Enter prescribed dosage in milligrams (0–1000 mg).
       </div>
@@ -1234,13 +1234,13 @@ export const InAForm: Story = {
       <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
         <button
           type="submit"
-          style="padding: 0.5rem 1rem; background: var(--hx-color-primary-600, #2563eb); color: var(--hx-color-neutral-0, #fff); border: none; border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-font-size-sm, 0.875rem);"
+          style="padding: 0.5rem 1rem; background: var(--hx-color-primary-600, #0F7078); color: var(--hx-color-neutral-0, #FFFFFF); border: none; border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-font-size-sm, 0.875rem);"
         >
           Submit Order
         </button>
         <button
           type="reset"
-          style="padding: 0.5rem 1rem; background: transparent; border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #dee2e6); border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-font-size-sm, 0.875rem);"
+          style="padding: 0.5rem 1rem; background: transparent; border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-200, #D6DBD5); border-radius: var(--hx-border-radius-md, 0.375rem); cursor: pointer; font-size: var(--hx-font-size-sm, 0.875rem);"
         >
           Reset
         </button>

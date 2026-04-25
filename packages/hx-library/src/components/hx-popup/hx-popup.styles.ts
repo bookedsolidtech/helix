@@ -1,5 +1,14 @@
 import { css } from 'lit';
 
+/**
+ * hx-popup styles.
+ *
+ * Positioning primitive — does NOT paint a surface of its own. Per the 3.2.0
+ * surfaces & containers plan we apply restraint here: no coverage-gap fill,
+ * since there is no real surface. Forced-colors mixin is still applied so
+ * that any consumer that DOES style the popup body via tokens still meets
+ * the OS-level affordance contract.
+ */
 export const helixPopupStyles = css`
   :host {
     display: inline-block;

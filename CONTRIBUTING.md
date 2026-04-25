@@ -358,7 +358,7 @@ When creating a new component:
 
 - [ ] Component class with proper JSDoc
 - [ ] Reactive properties with decorators
-- [ ] Styles using design tokens
+- [ ] Styles using design tokens — see the [Component Token Binding Rule](./apps/docs/src/content/docs/design-tokens/tiers.md#component-token-binding-rule) before authoring CSS: bind surfaces, text, and borders to Semantic tokens (`--hx-color-surface-*`, `--hx-color-text-*`, `--hx-color-border-*`) so the component flips correctly in Dark and High-Contrast modes. Binding to primitives like `--hx-color-neutral-*` on a non-brand surface is a regression.
 - [ ] CSS parts for styling API
 - [ ] Shadow DOM encapsulation
 - [ ] Accessibility (ARIA, keyboard nav)

@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import { helixStatusIndicatorStyles } from './hx-status-indicator.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 export type StatusIndicatorStatus = 'online' | 'offline' | 'away' | 'busy' | 'unknown';
 export type StatusIndicatorSize = 'sm' | 'md' | 'lg';
@@ -57,10 +58,23 @@ const STATUS_LABELS: Record<StatusIndicatorStatus, string> = {
  * @cssprop [--hx-status-indicator-pulse-color] - Override pulse ring color independently from dot color.
  * @cssprop [--hx-status-indicator-label-color] - Override label text color.
  * @cssprop [--hx-status-indicator-label-font-size] - Override label font size.
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-status-indicator-color-default=var(--hx-color-neutral-300)] - Color.
+ * @cssprop [--hx-color-neutral-300] - Color.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-state-focus-opacity] - CSS custom property.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-text-sm] - CSS custom property.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-color-success-500] - Color.
+ * @cssprop [--hx-color-neutral-400] - Color.
+ * @cssprop [--hx-color-warning-500] - Color.
+ * @cssprop [--hx-color-error-500] - Color.
  */
 @customElement('hx-status-indicator')
 export class HelixStatusIndicator extends HelixElement {
-  static override styles = [helixStatusIndicatorStyles];
+  static override styles = [helixStatusIndicatorStyles, forcedColorsSurface];
 
   /**
    * The status to display.

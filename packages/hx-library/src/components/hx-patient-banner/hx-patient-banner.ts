@@ -3,6 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
+import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
 /**
  * Patient identification banner implementing Joint Commission NPSG.01.01.01 two-identifier rule.
@@ -72,10 +73,33 @@ import { helixPatientBannerStyles } from './hx-patient-banner.styles.js';
  * @cssprop [--hx-patient-banner-value-font-size=var(--hx-font-size-sm,0.875rem)] - Field value font size.
  * @cssprop [--hx-patient-banner-photo-size=var(--hx-space-10,2.5rem)] - Photo area size.
  * @cssprop [--hx-patient-banner-photo-bg=var(--hx-color-neutral-200,#e5e7eb)] - Photo area background color when empty.
+ * @cssprop [--hx-color-neutral-50] - Color.
+ * @cssprop [--hx-color-neutral-200] - Color.
+ * @cssprop [--hx-space-3] - Spacing token.
+ * @cssprop [--hx-space-4] - Spacing token.
+ * @cssprop [--hx-font-family-sans] - Font family.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-font-size-xs] - Font size.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-font-size-sm] - Font size.
+ * @cssprop [--hx-space-10] - Spacing token.
+ * @cssprop [--hx-border-width-thin] - Width.
+ * @cssprop [--hx-touch-target-size] - Minimum touch target size.
+ * @cssprop [--hx-border-radius-full] - CSS custom property.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-font-weight-medium] - Font weight.
+ * @cssprop [--hx-line-height-tight] - Line height.
+ * @cssprop [--hx-font-weight-normal] - Font weight.
+ * @cssprop [--hx-line-height-normal] - Line height.
+ * @cssprop [--hx-color-error-400] - Color.
+ * @cssprop [--hx-color-error-50] - Color.
+ * @cssprop [--hx-color-neutral-700] - Color.
+ * @cssprop [--hx-border-width-thick] - Width.
+ * @cssprop [--hx-color-error-500] - Color.
  */
 @customElement('hx-patient-banner')
 export class HelixPatientBanner extends HelixElement {
-  static override styles = [helixPatientBannerStyles];
+  static override styles = [helixPatientBannerStyles, forcedColorsSurface];
 
   // ─── Public Properties ───
 

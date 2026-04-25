@@ -4,6 +4,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
+import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
 /**
@@ -49,16 +50,30 @@ import { devWarn } from '../../utils/dev-warn.js';
  *   boundaries for application-level audit listeners.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
- * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#111827)] - Value text color.
- * @cssprop [--hx-phi-field-masked-color=var(--hx-color-neutral-500,#6b7280)] - Masked value text color.
- * @cssprop [--hx-phi-field-toggle-color=var(--hx-color-primary-500,#2563eb)] - Toggle button color.
- * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#2563eb))] - Focus ring color.
+ * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#0D1825)] - Value text color.
+ * @cssprop [--hx-phi-field-masked-color=var(--hx-color-neutral-500,#66787B)] - Masked value text color.
+ * @cssprop [--hx-phi-field-toggle-color=var(--hx-color-primary-500,#429797)] - Toggle button color.
+ * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#429797))] - Focus ring color.
  * @cssprop [--hx-phi-field-disabled-opacity=var(--hx-opacity-50,0.5)] - Opacity applied when the field is disabled.
- * @cssprop [--hx-phi-field-auto-hide-warning-color=var(--hx-color-warning-500,#f59e0b)] - Color for auto-hide countdown warning (future use).
+ * @cssprop [--hx-phi-field-auto-hide-warning-color=var(--hx-color-warning-500,#C2711C)] - Color for auto-hide countdown warning (future use).
+ * @cssprop [--hx-space-2] - Spacing token.
+ * @cssprop [--hx-font-family-mono] - Font family.
+ * @cssprop [--hx-color-neutral-500] - Color.
+ * @cssprop [--hx-phi-field-letter-spacing=0.1em] - CSS custom property.
+ * @cssprop [--hx-color-neutral-900] - Color.
+ * @cssprop [--hx-space-1] - Spacing token.
+ * @cssprop [--hx-touch-target-min] - Minimum touch target size.
+ * @cssprop [--hx-color-primary-500] - Color.
+ * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ * @cssprop [--hx-focus-ring-width] - Width.
+ * @cssprop [--hx-focus-ring-color] - Color.
+ * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @cssprop [--hx-opacity-90] - Opacity.
+ * @cssprop [--hx-opacity-50] - Opacity.
  */
 @customElement('hx-phi-field')
 export class HelixPhiField extends HelixElement {
-  static override styles = [helixPhiFieldStyles];
+  static override styles = [helixPhiFieldStyles, forcedColorsField];
 
   // ─── Public Properties ───
 
