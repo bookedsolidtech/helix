@@ -16,12 +16,12 @@ Round-11 added `border.on-dark-{default,subtle}` aliases at `:root` that resolve
 - Reverted the `:root` alias declarations: `border.on-dark-{default,subtle}` are no longer emitted in `tokens.css` (base, dark, HC tiers). The published CSS variable names remain *settable* by consumers — they're simply not declared at `:root` anymore, which avoids the computed-value-time freeze.
 - Every component rule that paints with `surface.on-dark-overlay-*` now reads both names via a deprecated-first fallback chain:
 
-  ```
+  ```css
   var(--hx-color-border-on-dark-default,
     var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3)))
   ```
 
-  Touched: `hx-button.styles.ts` (4 inverted-variant fills — secondary hover, tertiary rest [-subtle], tertiary hover, ghost hover, outline hover) and `hx-side-nav.styles.ts` (`.side-nav__toggle:hover` background).
+  Touched: `hx-button.styles.ts` (5 inverted-variant fills — secondary hover, tertiary rest [-subtle], tertiary hover, ghost hover, outline hover) and `hx-side-nav.styles.ts` (`.side-nav__toggle:hover` background).
 
 - Override semantics now (until 4.0.0 removal):
   - Consumer override on the deprecated `--hx-color-border-on-dark-{default,subtle}` (anywhere in the cascade) → wins.
