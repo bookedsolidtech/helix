@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import './hx-theme.js';
 import type { HelixTheme } from './hx-theme.js';
 
@@ -21,16 +21,6 @@ const meta = {
         category: 'Theme',
         defaultValue: { summary: 'light' },
         type: { summary: "'light' | 'dark' | 'high-contrast' | 'auto'" },
-      },
-    },
-    system: {
-      control: 'boolean',
-      description:
-        'When true, auto-detects theme from the OS prefers-color-scheme media query. Overrides the theme prop.',
-      table: {
-        category: 'Theme',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
       },
     },
     brand: {
@@ -56,10 +46,15 @@ const meta = {
   },
   args: {
     theme: 'light',
-    system: false,
+    brand: '',
+    motion: 'auto',
   },
   render: (args) => html`
-    <hx-theme theme=${args.theme} ?system=${args.system}>
+    <hx-theme
+      theme=${args.theme}
+      brand=${args.brand ? args.brand : nothing}
+      motion=${args.motion}
+    >
       <div
         style="
           padding: 1.5rem;
@@ -145,14 +140,14 @@ export const HighContrast: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 4. SYSTEM — Auto-detect from OS preference
+// 4. AUTO — Auto-detect from OS preference
 // ─────────────────────────────────────────────────
 
 export const SystemDetection: Story = {
-  name: 'System Detection',
-  args: { system: true },
+  name: 'Auto (OS preference)',
+  args: { theme: 'auto' },
   render: () => html`
-    <hx-theme system>
+    <hx-theme theme="auto">
       <div
         style="
           padding: 1.5rem;

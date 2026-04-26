@@ -50,7 +50,7 @@ the same token overrides are applied automatically. */
 - `"spacious"`: Increases `--hx-space-*` tokens ~25%. For touch-optimized bedside tablets. */
   density?: string;
   /** Returns the currently active theme name.
-When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
+When `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
 Otherwise returns the `theme` property value. */
   effectiveTheme?: 'light' | 'dark' | 'high-contrast';
   /** Returns the resolved motion level after considering the `motion` attribute and OS preference.

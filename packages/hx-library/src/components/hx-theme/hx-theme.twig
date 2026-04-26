@@ -28,10 +28,14 @@
                          the element renders; an unregistered name logs a console.warn
                          and falls back to the base theme. Suppressed on
                          theme="high-contrast" (logs console.info) to preserve the
-                         WCAG 7:1+ contrast contract — pair with
-                         hx-theme[data-brand]:not([theme='high-contrast']) selectors
-                         if you also use the CSS-pattern brand override (see
-                         BRAND_THEMING.md).
+                         WCAG 7:1+ contrast contract.
+
+                         When set, the template emits BOTH `brand="..."` (consumed by
+                         the JS registry) and `data-brand="..."` (consumed by
+                         CSS-pattern selectors of the form
+                         `hx-theme[data-brand='...']:not([theme='high-contrast'])`,
+                         see BRAND_THEMING.md). The HC suppression for the CSS pattern
+                         lives in the selector itself, not in this template.
     attributes (object)  Optional. Additional HTML attributes spread onto <hx-theme>.
 
   Usage — Full page theming:
@@ -86,7 +90,7 @@
 
 <hx-theme
   theme="{{ theme|default('light') }}"
-  {% if brand is defined and brand %}brand="{{ brand }}"{% endif %}
+  {% if brand is defined and brand %}brand="{{ brand }}" data-brand="{{ brand }}"{% endif %}
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
   {% block content %}{% endblock %}

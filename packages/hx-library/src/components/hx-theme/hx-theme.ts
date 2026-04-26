@@ -355,7 +355,7 @@ export class HelixTheme extends HelixElement {
 
   /**
    * Returns the currently active theme name.
-   * When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
+   * When `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
    * Otherwise returns the `theme` property value.
    */
   get effectiveTheme(): 'light' | 'dark' | 'high-contrast' {

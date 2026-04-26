@@ -161,8 +161,8 @@ cannot be assumed to meet that bar. To preserve the accessibility
 guarantee, registered brands are intentionally bypassed under HC and the
 base HC tokens are applied alone. A `console.info` is emitted at apply
 time so the suppression is observable in development. If a low-vision
-user needs branded HC, register a brand-specific HC token set as a
-follow-on (currently unsupported in 3.2.x).
+user needs a branded high-contrast variant, register a brand-specific HC
+token set as a follow-on (currently unsupported in 3.2.x).
 
 ---
 

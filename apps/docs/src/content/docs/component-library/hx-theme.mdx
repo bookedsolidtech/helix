@@ -162,11 +162,10 @@ provider.theme = 'dark';
 | `brand`   | `brand`   | `string`                                         | `''`            | Registered brand name applied on top of the base theme. The brand must first be registered via `HelixBrandRegistry.register()`; an unregistered name logs a `console.warn` and is otherwise ignored. **Suppressed when `theme="high-contrast"`** — see callout below. Reflects to the `brand` attribute. |
 | `motion`  | `motion`  | `'full' \| 'reduced' \| 'none'`                  | `'full'`        | Motion preference for the scoped subtree. `'reduced'` applies minimal animations; `'none'` disables all transitions and animations. Overrides `prefers-reduced-motion` within the theme scope. Reflects to attribute.                                                                                    |
 | `density` | `density` | `'comfortable' \| 'compact' \| 'spacious'`       | `'comfortable'` | Layout density for the scoped subtree. `'compact'` reduces padding and spacing tokens; `'spacious'` increases them. Useful for data-dense clinical dashboards vs. patient-facing portals. Reflects to attribute.                                                                                         |
-| `system`  | `system`  | `boolean`                                        | `false`         | **Deprecated.** Use `theme="auto"` instead. When `true`, auto-detects the preferred color scheme via `prefers-color-scheme`, overriding the `theme` prop. Reflects to attribute.                                                                                                                         |
 
 **`effectiveTheme` (read-only getter)**
 
-Returns the currently active theme name as a string. When `system=true` or `theme="auto"`, reflects the OS preference (`'light'` or `'dark'`). Otherwise returns the `theme` property value.
+Returns the currently active theme name as a string. When `theme="auto"`, reflects the OS preference (`'light'` or `'dark'`). Otherwise returns the `theme` property value.
 
 ```javascript
 const provider = document.querySelector('hx-theme');

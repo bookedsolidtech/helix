@@ -32,7 +32,7 @@ hx-theme[data-brand='harbor-health']:not([theme='high-contrast']) {
 
 Without this guard, the brand primitive overrides leak into the HC token cascade and components consuming those primitives directly (`hx-checkbox`, `hx-tag`, `hx-list-item`, `hx-date-picker`, etc.) silently break the 7:1+ contract.
 
-**Canonical placement.** This guide places `data-brand` on `<hx-theme>` so the HC guard above works as a single attribute selector. If you need to scope brands at `<body>` (as some Drupal multisite layouts do) the guard cannot be expressed as a single attribute selector — `theme` and `data-brand` live on different elements — and you must either (a) mirror the active theme onto `<body>` so `body[data-brand='...'][data-theme!='high-contrast']` works, or (b) use the JS registry path.
+**Canonical placement.** This guide places `data-brand` on `<hx-theme>` so the HC guard above works as a single attribute selector. If you need to scope brands at `<body>` (as some Drupal multisite layouts do) the guard cannot be expressed as a single attribute selector — `theme` and `data-brand` live on different elements — and you must either (a) mirror the active theme onto `<body>` so `body[data-brand='...']:not([data-theme='high-contrast'])` works (CSS has no `!=` attribute operator; use `:not(...)` for negation), or (b) use the JS registry path.
 
 The `[data-brand]` attribute is purely a CSS scoping primitive. It does **not** reach into `<hx-theme>`'s JS-registry-driven `brand` attribute. The two override mechanisms compose; both must be HC-aware.
 :::
