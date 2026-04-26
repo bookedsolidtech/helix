@@ -174,4 +174,5 @@ describe('dark-mode token resolution', () => {
     expect(dark.backgroundColor).toBe('rgb(15, 112, 120)');
     expect(dark.backgroundColor).not.toBe(light.backgroundColor);
   });
+
 });

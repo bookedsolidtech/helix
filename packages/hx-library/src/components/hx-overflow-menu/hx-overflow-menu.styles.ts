@@ -32,10 +32,7 @@ export const helixOverflowMenuStyles = css`
 
   .trigger:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-overflow-menu-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-overflow-menu-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -128,10 +125,7 @@ export const helixOverflowMenuStyles = css`
   ::slotted([role='menuitemcheckbox']:focus-visible),
   ::slotted([role='menuitemradio']:focus-visible) {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-overflow-menu-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-overflow-menu-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: 0;
   }
 
