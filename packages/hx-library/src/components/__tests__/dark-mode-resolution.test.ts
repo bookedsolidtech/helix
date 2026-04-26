@@ -175,4 +175,17 @@ describe('dark-mode token resolution', () => {
     expect(dark.backgroundColor).not.toBe(light.backgroundColor);
   });
 
+  /**
+   * Pins the documented consumer-override path: the inverted-primary resting
+   * rule reads from --hx-color-action-primary-bg-inverted-rest, so consumers
+   * override THAT semantic (not --hx-button-bg, which is shadowed at the
+   * .button--primary descendant scope). If a future change relocated the
+   * inverted-rest paint off this semantic, this assertion would fail.
+   */
+  it('inverted primary honors semantic override on --hx-color-action-primary-bg-inverted-rest', async () => {
+    const markup =
+      '<hx-button variant="primary" inverted style="--hx-color-action-primary-bg-inverted-rest: rgb(1, 2, 3)">Action</hx-button>';
+    const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
+    expect(dark.backgroundColor).toBe('rgb(1, 2, 3)');
+  });
 });
