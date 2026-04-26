@@ -802,14 +802,12 @@ describe('hx-theme', () => {
       expect(el.getAttribute('data-brand')).toBe('manual-cascade-only');
     });
 
-    it('only removes data-brand it authored — manual attribute survives brand transitions', async () => {
-      // R27 HIGH companion — when a registered brand is set then cleared,
-      // the runtime removes its own reflected attribute. But if a manual
-      // data-brand was present BEFORE brand was set, the runtime must
-      // restore (not strip) on clear. With ownership tracking, setting
-      // brand overwrites the attribute and takes ownership; clearing
-      // brand removes the runtime-owned value. The manual-only path
-      // (no `brand` prop ever set) is covered by the test above.
+    it('runtime-owned data-brand round-trips across HC suppression', async () => {
+      // Documented contract (multi-brand-theming.md §Auto-reflection): when
+      // a registered `brand` is set, the runtime owns `data-brand` —
+      // reflects on light/dark, suppresses on HC, restores on the way
+      // back. The manual cascade-only path (no `brand` prop) is covered
+      // separately by `preserves manually-authored data-brand…` above.
       registerHarborHealth();
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = await fixture<HelixTheme>(
@@ -828,6 +826,49 @@ describe('hx-theme', () => {
       await el.updateComplete;
       expect(el.getAttribute('data-brand')).toBe('harbor-health');
 
+      warnSpy.mockRestore();
+    });
+
+    it('ownership is value-equality based — setting `brand` to a registered name claims any pre-existing matching data-brand and strips it on clear', async () => {
+      // R29 MEDIUM (api-design) — codex flagged that the SSR adoption
+      // heuristic (`data-brand === brand` ⇒ runtime-managed) cannot
+      // distinguish twig-emitted markup from author-emitted markup. The
+      // documented contract per multi-brand-theming.md is: setting a
+      // registered `brand` opts the matching `data-brand` into runtime
+      // management (this is the SSR symmetry path). Authors who want a
+      // pure cascade-only `data-brand` must omit the `brand` prop. This
+      // test pins that contract.
+      registerHarborHealth();
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="harbor-health" data-brand="harbor-health" theme="light">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      // Reflection is a no-op (already matches); ownership is claimed.
+      expect(el.getAttribute('data-brand')).toBe('harbor-health');
+
+      // Clearing the prop strips the now-runtime-owned attribute.
+      el.brand = '';
+      await el.updateComplete;
+      expect(el.hasAttribute('data-brand')).toBe(false);
+
+      warnSpy.mockRestore();
+    });
+
+    it('manual data-brand under a different value than `brand` is overwritten by reflection', async () => {
+      // R29 MEDIUM (api-design) companion — the contract: setting `brand`
+      // is the runtime's authorization to manage `data-brand`. If an
+      // author mixes `brand="X"` with `data-brand="Y"`, the runtime
+      // overwrites Y with X. There is no "preserve a different manual
+      // value while the brand prop is also set" mode; that combination
+      // is not supported.
+      registerHarborHealth();
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="harbor-health" data-brand="completely-different" theme="light">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('data-brand')).toBe('harbor-health');
       warnSpy.mockRestore();
     });
 

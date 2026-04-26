@@ -477,20 +477,33 @@ export class HelixTheme extends HelixElement {
       }
       this._ownsDataBrand = true;
     } else {
-      // Cleanup fires in two cases — both indicate runtime-managed state:
+      // Cleanup fires in two cases — both indicate runtime-managed state.
+      // The supported contract (multi-brand-theming.md §Auto-reflection):
+      //
+      //   • Setting a registered `brand` opts the matching `data-brand`
+      //     into runtime management. The runtime reflects on light/dark,
+      //     suppresses on HC, strips on `brand=''`. SSR shape from
+      //     hx-theme.twig (`brand="X" data-brand="X"`) is the same shape
+      //     authors would write by hand; the runtime cannot distinguish
+      //     them, so it treats both identically — value-equality is the
+      //     ownership signal, not provenance.
+      //   • Authors who need a pure cascade-only `data-brand` (no JS
+      //     registry membership) must OMIT the `brand` prop. The runtime
+      //     never touches `data-brand` when `brand === ''` or when the
+      //     existing attribute value differs from `brand` (that combo is
+      //     unsupported and a registered-brand reflection will overwrite
+      //     it on the next update).
+      //
+      // The two cleanup branches:
       //   1. We previously reflected (`_ownsDataBrand`).
-      //   2. SSR (Drupal twig at hx-theme.twig:99) emitted
-      //      `data-brand="{{ brand }}"` for the same `brand` prop. After
-      //      hydration we treat that orphan as runtime-authored so an
-      //      unregistered-brand SSR payload (typo) doesn't leave a stale
-      //      `[data-brand='typo']` cascade override active when the JS
-      //      registry is simultaneously rejecting the merge. The ownership
-      //      handoff is gated on `data-brand === this.brand` so a manually
-      //      authored attribute under a different value (the documented
-      //      cascade-only path) stays untouched.
-      const ssrMirroredOrphan =
+      //   2. The pre-existing attribute matches the current `brand` prop
+      //      — same-value adoption. Closes the SSR typo path: a Drupal
+      //      page rendering `<hx-theme brand="typo" data-brand="typo">`
+      //      gets cleaned up on hydration so the cascade override does
+      //      not leak when the JS registry rejects the merge.
+      const sameValueAdoption =
         this.brand !== '' && this.getAttribute('data-brand') === this.brand;
-      if (this._ownsDataBrand || ssrMirroredOrphan) {
+      if (this._ownsDataBrand || sameValueAdoption) {
         this.removeAttribute('data-brand');
         this._ownsDataBrand = false;
       }

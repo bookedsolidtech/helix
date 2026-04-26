@@ -36,7 +36,14 @@ Without this guard, the brand primitive overrides leak into the HC token cascade
 
 The `[data-brand]` attribute is purely a CSS scoping primitive. It does **not** reach into `<hx-theme>`'s JS-registry-driven token merge — those are still gated by `HelixBrandRegistry.register()`.
 
-**Auto-reflection.** When you set `brand="..."` to a brand **registered via `HelixBrandRegistry.register()`**, `<hx-theme>` automatically reflects the same value to `data-brand` so the CSS-pattern selectors above match in every framework consumer (React, Angular, Vue, plain HTML) without writing `data-brand` manually. On `theme="high-contrast"` the runtime removes the reflected `data-brand` attribute entirely — defense-in-depth that neutralizes external CSS rules authored without the `:not([theme='high-contrast'])` guard. Unregistered brand names (e.g. typos) do **not** reflect: the registry rejects the merge, so reflecting the attribute would activate cascade overrides the JS path is simultaneously refusing — they stay inert until the brand is registered. If you want CSS-pattern scoping without registering JS tokens, write `data-brand="..."` directly without a `brand` attribute and add the HC guard yourself; the runtime only manages attributes it authored, so your manually-set `data-brand` is preserved across theme changes.
+**Auto-reflection.** When you set `brand="..."` to a brand **registered via `HelixBrandRegistry.register()`**, `<hx-theme>` automatically reflects the same value to `data-brand` so the CSS-pattern selectors above match in every framework consumer (React, Angular, Vue, plain HTML) without writing `data-brand` manually. On `theme="high-contrast"` the runtime removes the reflected `data-brand` attribute entirely — defense-in-depth that neutralizes external CSS rules authored without the `:not([theme='high-contrast'])` guard. Unregistered brand names (e.g. typos) do **not** reflect: the registry rejects the merge, so reflecting the attribute would activate cascade overrides the JS path is simultaneously refusing — they stay inert until the brand is registered.
+
+**Ownership contract.** Setting `brand` is the runtime's authorization to manage `data-brand`. The two supported authoring shapes are:
+
+- **`<hx-theme brand="X">`** (no `data-brand`) — runtime reflects `data-brand="X"` on light/dark, suppresses on HC, strips on `brand=""`. This is the everyday path.
+- **`<hx-theme data-brand="X">`** (no `brand`) — runtime never touches `data-brand`. Use this for cascade-only theming when you don't want JS registry membership; you own the HC guard via `:not([theme='high-contrast'])`.
+
+The mixed shape **`<hx-theme brand="X" data-brand="X">`** (matching values) is the SSR symmetry case — Drupal's `hx-theme.twig` emits this. The runtime treats it as runtime-managed (value-equality adoption) so an unregistered-brand SSR payload (typo) gets cleaned up on hydration. The mixed shape **`<hx-theme brand="X" data-brand="Y">`** (mismatched values) is **not supported**: the runtime overwrites `Y` with `X` on first update.
 :::
 
 ---
