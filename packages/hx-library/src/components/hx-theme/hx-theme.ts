@@ -248,6 +248,13 @@ export class HelixTheme extends HelixElement {
    * If the brand name is non-empty but not registered, a warning is logged
    * and the base theme is applied without brand overrides.
    *
+   * **High-contrast suppression:** When `theme="high-contrast"`, the brand
+   * merge is intentionally skipped to preserve the WCAG 1.4.6 Enhanced
+   * Contrast (7:1+) guarantee that the HC token set is tuned for. A
+   * registered brand applied under HC emits a `console.info` to surface
+   * the suppression in development. Brand merging on `light` and `dark`
+   * is unaffected. See `BRAND_THEMING.md`.
+   *
    * @attr brand
    * @example
    * ```html
@@ -461,13 +468,21 @@ export class HelixTheme extends HelixElement {
     } else if (this.brand !== '' && this.effectiveTheme === 'high-contrast') {
       // Surface the contract — consumer asked for brand + HC; brand was
       // intentionally suppressed to preserve a11y. Validates the registration
-      // path so unregistered brands still produce the standard warning.
+      // path so unregistered brands still produce the standard warning, and
+      // emits an info-level signal when a registered brand is suppressed so
+      // the behavior is observable in development.
       const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens === undefined) {
         console.warn(
           `[hx-theme] Brand "${this.brand}" is not registered. ` +
             `Register it via HelixBrandRegistry.register() before use. ` +
             `Applying base theme only.`,
+        );
+      } else {
+        console.info(
+          `[hx-theme] Brand "${this.brand}" is suppressed on theme="high-contrast" ` +
+            `to preserve the WCAG 7:1+ contrast contract. ` +
+            `Applying base high-contrast tokens only. See BRAND_THEMING.md.`,
         );
       }
     }

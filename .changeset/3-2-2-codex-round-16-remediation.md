@@ -2,9 +2,9 @@
 '@helixui/library': patch
 ---
 
-3.2.2 codex round-16 remediation — `hx-theme` HC injection sourced from tokens.json (no more hand-written drift)
+3.2.2 codex round-16..round-22 remediation — `hx-theme` HC injection sourced from tokens.json (no more hand-written drift) and brand merge suppressed on high-contrast to preserve the WCAG 7:1+ contract.
 
-Closes 3 codex round-15..round-21 findings (1 high correctness, 1 medium test-gap, 1 high api-design) on the staging→main candidate. Rolls into the same 3.2.2 patch.
+Closes 3 codex round-15..round-22 findings (1 high correctness, 1 medium test-gap, 1 high api-design) plus R22 doc/test hardening on the staging→main candidate. Rolls into the same 3.2.2 patch.
 
 **Finding 1 [correctness high] — `hx-theme` `_hcOverrides` array drifted from `tokens.json` `high-contrast` block.**
 
@@ -35,7 +35,7 @@ The new HC contrast assertions in `packages/hx-tokens/src/__tests__/contrast.tes
 
 **Finding 3 [api-design high, codex round-20..round-21] — brand merge silently shadowed HC accessibility tokens.**
 
-`_applyEffectiveTheme()` ran `mergeBrandTokens(css, brandTokens)` unconditionally, appending a later `:host` block that won via cascade. On `<hx-theme theme="high-contrast" brand="...">`, any name a brand redeclared (the full 22-stop primary/secondary ramps required by `HelixBrandRegistry.REQUIRED_SEMANTIC_TOKENS`) shadowed the HC overlay. A consumer registering a low-contrast brand silently broke the WCAG 7:1+ guarantee `BRAND_THEMING.md` advertises for HC mode.
+`_applyEffectiveTheme()` ran `mergeBrandTokens(css, brandTokens)` unconditionally, appending a later `:host` block that won via cascade. On `<hx-theme theme="high-contrast" brand="...">`, any name a brand redeclared (the full 22-stop primary/secondary ramps required by `HelixBrandRegistry.REQUIRED_SEMANTIC_TOKENS`) shadowed the HC overlay. A consumer registering a low-contrast brand silently broke the WCAG 1.4.6 Enhanced Contrast (7:1+) guarantee `apps/docs/src/content/docs/component-library/hx-theme.mdx` advertises for HC mode (the documented "WCAG 7:1+ contrast token overrides for low-vision users" behavior).
 
 Round-20 attempted a re-overlay fix: re-emit the HC overlay as a third `:host` block AFTER the brand merge. Round-21 codex review caught that this only re-asserted the names present in `highContrastTokenEntries` (~5 of the 22 brand-required stops) — the other 17 stops (primary 50/100/200/300/400/800/900/950, secondary 50/100/200/300/400/700/800/900/950) still leaked through. Components consuming those stops directly (`hx-checkbox`, `hx-tag`, `hx-list-item`, `hx-date-picker`) would silently break the contract, defeating the round-20 fix.
 
@@ -50,11 +50,13 @@ if (this.brand !== '' && this.effectiveTheme !== 'high-contrast') {
     console.warn(`[hx-theme] Brand "${this.brand}" is not registered. ...`);
   }
 } else if (this.brand !== '' && this.effectiveTheme === 'high-contrast') {
-  // Validate registration even though brand is suppressed — preserves the
-  // unregistered-brand warning so consumers still see misconfigurations.
+  // Validate registration even though brand is suppressed; emit info so the
+  // suppression is observable in development.
   const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
   if (brandTokens === undefined) {
     console.warn(`[hx-theme] Brand "${this.brand}" is not registered. ...`);
+  } else {
+    console.info(`[hx-theme] Brand "${this.brand}" is suppressed on theme="high-contrast" ...`);
   }
 }
 ```
@@ -63,10 +65,16 @@ Brands continue to apply on light/dark themes unchanged. The R20 re-overlay bloc
 
 Regression tests:
 - `HC overlay wins over brand overrides on high-contrast theme` — registers a brand whose `--hx-color-primary-500` is sub-AA on `#000` and asserts the HC value (`#3B82F6`) wins, plus four HC a11y sentinels survive (focus-ring-width=3px, border-width-thin=2px, text.on-error-strong=#000000, action.danger.bg-active=#F87171).
-- `HC suppresses brand merge across non-HC-overlaid stops too (primary-50/100/800)` — registers a brand with `#FFFFFF` on every required stop and asserts (a) HC stops still win, (b) non-HC-overlaid stops (primary-50/100/800, secondary-700) do NOT match the brand value. Codifies that ALL 22 stops are suppressed, not just the HC-overlaid subset.
-- `HC + brand + reduced motion triple stack — HC a11y survives, motion override applies` — exercises the full overlay stack and confirms motion overrides compose cleanly with HC suppression.
+- `HC suppresses brand merge across non-HC-overlaid stops too (primary-50/100/800)` — registers a brand with `#FFFFFF` on every required stop and asserts (a) HC stops still win, (b) non-HC-overlaid stops (primary-50=`#EBF8F8`, primary-100=`#DBF0F0`, primary-800=`#07494A`, secondary-700=`#0B626A`) match `tokens.json` light primitives byte-for-byte. Codifies that ALL 22 stops are suppressed, not just the HC-overlaid subset.
+- `HC + brand + reduced motion triple stack — HC a11y survives, motion override applies` — exercises the full overlay stack and asserts the reduced-motion overlay actually applied (`--hx-duration-fast=0ms`, `--hx-transition-fast=0ms linear`, `--hx-easing-default=linear`).
 - `brand on light theme overrides primary color (brand-merge-skip is gated on HC only)` — confirms brands still apply on light/dark, no regression.
 
+**Documentation alignment:**
+- `packages/hx-tokens/docs/BRAND_THEMING.md` — replaced "theme and brand are independent" claim with explicit HC-suppression rule.
+- `packages/hx-library/src/components/hx-theme/hx-theme.ts` — `brand` JSDoc documents HC suppression and links to `BRAND_THEMING.md`.
+- `apps/docs/src/content/docs/component-library/hx-theme.mdx` — added `:::caution` callout under brand override section.
+- Runtime emits `console.info` when a registered brand is suppressed under HC, so the behavior change is observable in development.
+
 **Additional R21 hardening:**
-- `effectiveTheme` return type narrowed from `'light' | 'dark' | 'high-contrast' | 'auto'` to `'light' | 'dark' | 'high-contrast'`. The runtime body never returns `'auto'` (it resolves auto via `matchMedia`), so the prior type signature was a documentation lie.
+- `effectiveTheme` return type narrowed from `'light' | 'dark' | 'high-contrast' | 'auto'` to `'light' | 'dark' | 'high-contrast'`. The runtime body never returns `'auto'` (it resolves auto via `matchMedia`), so the prior type signature was a documentation lie. React wrapper `packages/hx-react/src/components/HxTheme/types.ts` regenerated to match.
 - `CSSStyleSheet.replace()` (async) replaced with `replaceSync()` for both `_themeSheet` and `_densitySheet`. The async variant returned an unawaited promise resolved immediately by browsers, but exposed a race window where computed styles could read stale CSS during reflow. The sync variant has no such window and matches the synchronous-update contract `_applyEffectiveTheme()` already implies.

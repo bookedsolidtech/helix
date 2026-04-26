@@ -726,18 +726,20 @@ describe('hx-theme', () => {
       expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
         '#3b82f6',
       );
-      // Stops that HC does NOT overlay — must stay at light primitives, NOT brand `#FFFFFF`.
-      expect(styles.getPropertyValue('--hx-color-primary-50').trim().toLowerCase()).not.toBe(
-        '#ffffff',
+      // R22 finding 4 — assert byte-equality against tokens.json light primitives,
+      // not just "not brand white". Negative assertions would pass on empty strings
+      // or any drift, which would silently mask future regressions in the skip path.
+      expect(styles.getPropertyValue('--hx-color-primary-50').trim().toLowerCase()).toBe(
+        '#ebf8f8',
       );
-      expect(styles.getPropertyValue('--hx-color-primary-100').trim().toLowerCase()).not.toBe(
-        '#ffffff',
+      expect(styles.getPropertyValue('--hx-color-primary-100').trim().toLowerCase()).toBe(
+        '#dbf0f0',
       );
-      expect(styles.getPropertyValue('--hx-color-primary-800').trim().toLowerCase()).not.toBe(
-        '#ffffff',
+      expect(styles.getPropertyValue('--hx-color-primary-800').trim().toLowerCase()).toBe(
+        '#07494a',
       );
-      expect(styles.getPropertyValue('--hx-color-secondary-700').trim().toLowerCase()).not.toBe(
-        '#ffffff',
+      expect(styles.getPropertyValue('--hx-color-secondary-700').trim().toLowerCase()).toBe(
+        '#0b626a',
       );
     });
 
@@ -780,6 +782,11 @@ describe('hx-theme', () => {
         '#3b82f6',
       );
       expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      // R22 finding 3 — assert the reduced-motion overlay actually applied.
+      // Without these, the test "passed" without exercising the motion layer.
+      expect(styles.getPropertyValue('--hx-duration-fast').trim()).toBe('0ms');
+      expect(styles.getPropertyValue('--hx-transition-fast').trim()).toBe('0ms linear');
+      expect(styles.getPropertyValue('--hx-easing-default').trim()).toBe('linear');
     });
 
     it('brand on light theme overrides primary color (brand-merge-skip is gated on HC only)', async () => {

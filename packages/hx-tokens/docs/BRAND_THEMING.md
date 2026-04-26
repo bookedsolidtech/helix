@@ -150,9 +150,19 @@ component-level fallback chains.
 **When brand is not registered:** A `console.warn` is emitted and the base
 theme is applied without brand overrides. The component does not throw.
 
-**Theme + brand co-existence:** The `theme` and `brand` attributes are
-independent. Setting `theme="dark" brand="mercy-health"` applies dark-mode
-semantic overrides first, then brand primary/secondary overrides on top.
+**Theme + brand co-existence:** On `theme="light"` and `theme="dark"`, brand
+overrides merge on top of the base theme — setting `theme="dark" brand="mercy-health"`
+applies dark-mode semantic overrides first, then brand primary/secondary overrides on top.
+
+**Theme + brand on `high-contrast`:** Brand merging is **suppressed** on
+`theme="high-contrast"`. The high-contrast token set is hand-tuned for
+WCAG 1.4.6 Enhanced Contrast (7:1+) compliance, and a brand color ramp
+cannot be assumed to meet that bar. To preserve the accessibility
+guarantee, registered brands are intentionally bypassed under HC and the
+base HC tokens are applied alone. A `console.info` is emitted at apply
+time so the suppression is observable in development. If a low-vision
+user needs branded HC, register a brand-specific HC token set as a
+follow-on (currently unsupported in 3.2.x).
 
 ---
 
