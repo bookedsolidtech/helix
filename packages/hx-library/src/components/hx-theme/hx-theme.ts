@@ -346,7 +346,7 @@ export class HelixTheme extends HelixElement {
    * When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
    * Otherwise returns the `theme` property value.
    */
-  get effectiveTheme(): 'light' | 'dark' | 'high-contrast' | 'auto' {
+  get effectiveTheme(): 'light' | 'dark' | 'high-contrast' {
     if (this.theme === 'auto') {
       if (typeof window === 'undefined') return 'light';
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -438,7 +438,16 @@ export class HelixTheme extends HelixElement {
 
     let css = _buildThemeCss(this.effectiveTheme);
 
-    if (this.brand !== '') {
+    // Brand merge is skipped on high-contrast mode. Brands declare 22 color
+    // stops (primary + secondary 50..950) but the HC `tokens.json` block
+    // overlays only the AAA-tuned subset (primary 500/600/700, secondary
+    // 500/600). Merging brand tokens then re-overlaying HC would still leak
+    // the 17+ brand-supplied stops HC does not redefine — components that
+    // consume those stops directly (hx-checkbox, hx-tag, hx-list-item, etc.)
+    // would silently break the BRAND_THEMING.md "WCAG 7:1+" contract.
+    // Skipping the merge entirely on HC delivers the contract; brands
+    // continue to apply on light/dark.
+    if (this.brand !== '' && this.effectiveTheme !== 'high-contrast') {
       const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens !== undefined) {
         css = mergeBrandTokens(css, brandTokens);
@@ -449,26 +458,25 @@ export class HelixTheme extends HelixElement {
             `Applying base theme only.`,
         );
       }
-    }
-
-    // HC a11y tokens must always win on high-contrast mode — re-emit the HC
-    // overlay AFTER the brand merge so brand color ramps cannot silently
-    // shadow HC accessibility tokens (focus-ring-width, border-width-thin,
-    // text.on-{role}-strong, action.danger.bg-active, primary/error/success
-    // ramps tuned for AAA contrast against #000). Without this re-overlay,
-    // a brand registered via HelixBrandRegistry overrides HC values, which
-    // contradicts the BRAND_THEMING.md "WCAG 7:1+" contract.
-    if (this.effectiveTheme === 'high-contrast') {
-      const hcMap = new Map<string, string>();
-      for (const t of highContrastTokenEntries) hcMap.set(t.name, t.value);
-      css += `\n:host {\n${_buildProps(hcMap)}\n}`;
+    } else if (this.brand !== '' && this.effectiveTheme === 'high-contrast') {
+      // Surface the contract — consumer asked for brand + HC; brand was
+      // intentionally suppressed to preserve a11y. Validates the registration
+      // path so unregistered brands still produce the standard warning.
+      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
+      if (brandTokens === undefined) {
+        console.warn(
+          `[hx-theme] Brand "${this.brand}" is not registered. ` +
+            `Register it via HelixBrandRegistry.register() before use. ` +
+            `Applying base theme only.`,
+        );
+      }
     }
 
     if (this.effectiveMotion === 'reduced') {
       css += `\n:host {\n${_buildProps(_reducedMotionOverrides)}\n}`;
     }
 
-    void this._themeSheet.replace(css);
+    this._themeSheet.replaceSync(css);
   }
 
   /** @internal */
@@ -483,7 +491,7 @@ export class HelixTheme extends HelixElement {
     }
     // comfortable = no overrides needed (defaults from theme sheet)
 
-    void this._densitySheet.replace(css);
+    this._densitySheet.replaceSync(css);
   }
 
   override render() {

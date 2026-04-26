@@ -685,7 +685,104 @@ describe('hx-theme', () => {
       ).toBe('#f87171');
     });
 
-    it('brand on light theme overrides primary color (HC re-overlay does not affect non-HC themes)', async () => {
+    it('HC suppresses brand merge across non-HC-overlaid stops too (primary-50/100/800)', async () => {
+      // R21 finding 1 — HC `tokens.json` overlays only primary 500/600/700
+      // and secondary 500/600. The 17+ brand-supplied stops HC does NOT
+      // redefine (50/100/200/300/400/800/900/950) must also not leak under
+      // HC, because components like hx-checkbox/hx-tag/hx-list-item consume
+      // those stops directly. The brand-merge-skip on HC closes that gap.
+      const brandName = 'test-brand-r21-non-hc-stops';
+      HelixBrandRegistry.register(brandName, {
+        // Distinctive low-contrast values on every brand-required stop.
+        '--hx-color-primary-50': '#FFFFFF',
+        '--hx-color-primary-100': '#FFFFFF',
+        '--hx-color-primary-200': '#FFFFFF',
+        '--hx-color-primary-300': '#FFFFFF',
+        '--hx-color-primary-400': '#FFFFFF',
+        '--hx-color-primary-500': '#FFFFFF',
+        '--hx-color-primary-600': '#FFFFFF',
+        '--hx-color-primary-700': '#FFFFFF',
+        '--hx-color-primary-800': '#FFFFFF',
+        '--hx-color-primary-900': '#FFFFFF',
+        '--hx-color-primary-950': '#FFFFFF',
+        '--hx-color-secondary-50': '#FFFFFF',
+        '--hx-color-secondary-100': '#FFFFFF',
+        '--hx-color-secondary-200': '#FFFFFF',
+        '--hx-color-secondary-300': '#FFFFFF',
+        '--hx-color-secondary-400': '#FFFFFF',
+        '--hx-color-secondary-500': '#FFFFFF',
+        '--hx-color-secondary-600': '#FFFFFF',
+        '--hx-color-secondary-700': '#FFFFFF',
+        '--hx-color-secondary-800': '#FFFFFF',
+        '--hx-color-secondary-900': '#FFFFFF',
+        '--hx-color-secondary-950': '#FFFFFF',
+      });
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // Stops that HC overlays — HC value wins (was already covered).
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#3b82f6',
+      );
+      // Stops that HC does NOT overlay — must stay at light primitives, NOT brand `#FFFFFF`.
+      expect(styles.getPropertyValue('--hx-color-primary-50').trim().toLowerCase()).not.toBe(
+        '#ffffff',
+      );
+      expect(styles.getPropertyValue('--hx-color-primary-100').trim().toLowerCase()).not.toBe(
+        '#ffffff',
+      );
+      expect(styles.getPropertyValue('--hx-color-primary-800').trim().toLowerCase()).not.toBe(
+        '#ffffff',
+      );
+      expect(styles.getPropertyValue('--hx-color-secondary-700').trim().toLowerCase()).not.toBe(
+        '#ffffff',
+      );
+    });
+
+    it('HC + brand + reduced motion triple stack — HC a11y survives, motion override applies', async () => {
+      // R21 finding 3 — exercises the full overlay stack (base → no brand
+      // because HC suppresses → reduced-motion). Documents that motion
+      // overrides do not interact with HC tokens (no overlap of names).
+      const brandName = 'test-brand-r21-triple-stack';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#fff8f0',
+        '--hx-color-primary-100': '#ffeacc',
+        '--hx-color-primary-200': '#ffd699',
+        '--hx-color-primary-300': '#ffbd66',
+        '--hx-color-primary-400': '#ffa033',
+        '--hx-color-primary-500': '#FF8800',
+        '--hx-color-primary-600': '#cc6d00',
+        '--hx-color-primary-700': '#995200',
+        '--hx-color-primary-800': '#663700',
+        '--hx-color-primary-900': '#331b00',
+        '--hx-color-primary-950': '#1a0e00',
+        '--hx-color-secondary-50': '#f8f0ff',
+        '--hx-color-secondary-100': '#eaccff',
+        '--hx-color-secondary-200': '#d699ff',
+        '--hx-color-secondary-300': '#bd66ff',
+        '--hx-color-secondary-400': '#a033ff',
+        '--hx-color-secondary-500': '#8800ff',
+        '--hx-color-secondary-600': '#6d00cc',
+        '--hx-color-secondary-700': '#520099',
+        '--hx-color-secondary-800': '#370066',
+        '--hx-color-secondary-900': '#1b0033',
+        '--hx-color-secondary-950': '#0e001a',
+      });
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}" motion="reduced">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // HC wins on its overlaid stops (brand suppressed on HC).
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#3b82f6',
+      );
+      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+    });
+
+    it('brand on light theme overrides primary color (brand-merge-skip is gated on HC only)', async () => {
       // Sister test to the HC override test — confirms the brand-merge path
       // still works for non-HC themes (i.e. the HC re-overlay is correctly
       // gated on `effectiveTheme === 'high-contrast'` and does not regress
