@@ -58,20 +58,17 @@ non-text floor in the precision-cool palette (3.2.0/3.2.1):
   paint `background-color` directly (option A) but was shadowed by the base
   `.button--primary` rule writing `--hx-button-bg` unconditionally, so the
   inverted-rest semantic never reached the pixel and dark-mode inverted
-  primary stayed at 2.94:1. The rebind preserves consumer-override
-  propagation through `--hx-button-bg`.
+  primary stayed at 2.94:1. Note: rebinding `--hx-button-bg` at a descendant
+  scope means consumer-tier overrides of that property at the host level
+  are shadowed inside the inverted-primary variant — consumers must override
+  the upstream semantic (`--hx-color-action-primary-bg-inverted-rest`)
+  instead.
 
-Three regression tests gate the fixes:
+Two regression tests gate the fixes:
 
 - contrast matrix gains three pairs (`border.strong` × `surface.default`,
   `bg-inverted-rest` × `surface.inverse` light/dark);
 - `dark-mode-resolution.test.ts` asserts `<hx-button variant="primary"
   inverted>` resolves to `primary-500` in light and `primary-600` in dark
   (catches the CSS-cycle regression at the painted-pixel layer, not just the
-  token tier);
-- a third assertion pins the binding form: a consumer-tier override of
-  `--hx-button-bg` on the inverted primary button must reach the painted
-  pixel — proving the resting rule rebinds the custom property rather than
-  painting `background-color` directly. Reverting to the earlier
-  background-color shape would silently regress consumer override
-  propagation; this test catches it.
+  token tier).

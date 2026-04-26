@@ -175,25 +175,4 @@ describe('dark-mode token resolution', () => {
     expect(dark.backgroundColor).not.toBe(light.backgroundColor);
   });
 
-  /**
-   * Pins the binding form of the round-2 cascade fix: the resting inverted
-   * primary rule MUST rebind --hx-button-bg (not paint background-color
-   * directly), so consumer-tier overrides of --hx-button-bg still reach the
-   * pixel. Without this assertion, a future revert to the
-   * `background-color: var(...)` shape would silently regress consumer
-   * override propagation while still passing the color-flip assertions.
-   */
-  it('inverted primary consumes --hx-button-bg at the resting rule (consumer-override propagation)', async () => {
-    const wrapper = await fixture<HelixTheme>(
-      '<hx-theme theme="light"><hx-button variant="primary" inverted style="--hx-button-bg: rgb(1, 2, 3)">Action</hx-button></hx-theme>',
-    );
-    await wrapper.updateComplete;
-    const button = wrapper.querySelector('hx-button') as HTMLElement & {
-      updateComplete?: Promise<unknown>;
-    };
-    if (button.updateComplete) await button.updateComplete;
-    const inner = shadowQuery(button, '.button')!;
-    const bg = getComputedStyle(inner).backgroundColor.trim();
-    expect(bg).toBe('rgb(1, 2, 3)');
-  });
 });
