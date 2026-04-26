@@ -44,4 +44,14 @@ Fixed:
 - `hx-button.ts:38` `@cssprop` description rewritten to flag variant-shadowing explicitly and direct consumers to the upstream semantic (`--hx-color-action-{variant}-bg{,-inverted-rest}`) for variant fills. Notes that `--hx-button-bg` still works for unstyled base buttons and participates in the internal hover/active rebinding chain.
 - `hx-button.stories.ts` CSS-properties demo: replaced the broken `--hx-button-bg` example with `--hx-color-action-primary-bg` (the actually-working override path); updated the trailing `<pre>` Usage block to scope to `[variant='primary']` and use the semantic token.
 
-Out of scope for `hx-library`: `apps/docs/src/content/docs/guides/theming.mdx:33` and `apps/docs/src/content/docs/extending/theming-quick-start.md:111-133` carry the same misleading example. Tracked as a follow-up; per-CLAUDE.md scope rules, `apps/` changes don't ride this PR.
+Out of scope for `hx-library`: the misleading `--hx-button-bg` example surface in `apps/docs/` is wider than initially scoped. Full follow-up list (per round-13 codex audit):
+
+- `apps/docs/src/content/docs/components/documentation/storybook.md:834`
+- `apps/docs/src/content/docs/extending/theming-quick-start.md:112`
+- `apps/docs/src/content/docs/guides/theming.mdx:208` (per-component override block)
+- `apps/docs/src/content/docs/guides/theming-recipes.md:491`
+- `apps/docs/src/content/docs/components/documentation/jsdoc.md:506`
+- `apps/docs/src/content/docs/design-tokens/customization.md:40,54,87,92`
+- `apps/docs/src/content/docs/design-tokens/tiers.md:74`
+
+Tracked as a follow-up docs PR; per-CLAUDE.md scope rules, `apps/` changes don't ride this `hx-library`/`hx-tokens` PR. Release notes for 3.2.2 will direct consumers to the canonical `--hx-color-action-{variant}-bg` override path so the docs surface drift doesn't materially mislead until the docs PR lands.

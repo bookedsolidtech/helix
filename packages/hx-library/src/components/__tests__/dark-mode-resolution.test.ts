@@ -226,4 +226,16 @@ describe('dark-mode token resolution', () => {
     expect(light.backgroundColor).toBe('rgb(10, 11, 12)');
   });
 
+  /**
+   * `default` chain coverage note: the four `:hover` consume sites (inverted
+   * secondary/tertiary/ghost/outline) reuse the identical token-fallback shape
+   * that the subtle-chain rest-state tests above exercise. Synthesizing :hover
+   * paint in vitest browser mode is unreliable here (variant rest state has no
+   * --hx-button-bg binding, so a hover-only rebind doesn't surface as a stable
+   * backgroundColor delta we can assert without coupling to hover internals).
+   * Coverage falls back to the `contrast.test.ts` structural-shape lock plus
+   * file-level grep that every rule reads both names — the same safety the
+   * side-nav consume site relies on.
+   */
+
 });
