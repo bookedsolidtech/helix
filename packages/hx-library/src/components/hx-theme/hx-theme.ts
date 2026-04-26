@@ -476,9 +476,24 @@ export class HelixTheme extends HelixElement {
         this.setAttribute('data-brand', this.brand);
       }
       this._ownsDataBrand = true;
-    } else if (this._ownsDataBrand) {
-      this.removeAttribute('data-brand');
-      this._ownsDataBrand = false;
+    } else {
+      // Cleanup fires in two cases — both indicate runtime-managed state:
+      //   1. We previously reflected (`_ownsDataBrand`).
+      //   2. SSR (Drupal twig at hx-theme.twig:99) emitted
+      //      `data-brand="{{ brand }}"` for the same `brand` prop. After
+      //      hydration we treat that orphan as runtime-authored so an
+      //      unregistered-brand SSR payload (typo) doesn't leave a stale
+      //      `[data-brand='typo']` cascade override active when the JS
+      //      registry is simultaneously rejecting the merge. The ownership
+      //      handoff is gated on `data-brand === this.brand` so a manually
+      //      authored attribute under a different value (the documented
+      //      cascade-only path) stays untouched.
+      const ssrMirroredOrphan =
+        this.brand !== '' && this.getAttribute('data-brand') === this.brand;
+      if (this._ownsDataBrand || ssrMirroredOrphan) {
+        this.removeAttribute('data-brand');
+        this._ownsDataBrand = false;
+      }
     }
 
     let css = _buildThemeCss(this.effectiveTheme);

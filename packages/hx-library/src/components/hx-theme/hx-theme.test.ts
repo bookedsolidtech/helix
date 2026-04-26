@@ -723,6 +723,41 @@ describe('hx-theme', () => {
       warnSpy.mockRestore();
     });
 
+    it('strips SSR-emitted data-brand for unregistered brand on hydration', async () => {
+      // R28 HIGH — hx-theme.twig:99 emits `data-brand="{{ brand }}"` for
+      // any truthy `brand` on non-HC themes, including unregistered
+      // typos. Without an SSR-adoption step the runtime's ownership flag
+      // starts false on hydration, so the orphan attribute would survive
+      // and activate `[data-brand='typo']` cascade overrides the JS
+      // registry is simultaneously rejecting. The hydration adopt+remove
+      // gate (data-brand === brand) closes the SSR path of F2.
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="typo-brand-xyz" data-brand="typo-brand-xyz" theme="light">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(el.hasAttribute('data-brand')).toBe(false);
+      warnSpy.mockRestore();
+    });
+
+    it('preserves SSR-emitted data-brand for registered brand on hydration', async () => {
+      // R28 HIGH companion — registered brand SSR shape must round-trip:
+      // twig emits `brand="x" data-brand="x"`, runtime accepts the
+      // registry, reflection is a no-op (attribute already matches),
+      // ownership is claimed.
+      registerHarborHealth();
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="harbor-health" data-brand="harbor-health" theme="light">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('data-brand')).toBe('harbor-health');
+
+      // And subsequent HC switch removes the runtime-owned attribute.
+      el.theme = 'high-contrast';
+      await el.updateComplete;
+      expect(el.hasAttribute('data-brand')).toBe(false);
+    });
+
     it('does NOT reflect data-brand for unregistered (typo) brand names', async () => {
       // R27 MEDIUM — reflection must mirror the registry's accept/reject
       // verdict. If the registry rejects "acmee" (typo), reflecting
