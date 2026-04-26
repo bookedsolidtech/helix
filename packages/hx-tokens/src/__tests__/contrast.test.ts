@@ -534,26 +534,49 @@ const PAIRS: PairSpec[] = [
     modes: ['high-contrast'],
   },
   // 3.2.1 round-7 — inverted-mode pressed/hover floors. action.{primary,danger}.
-  // bg-inverted-hover paint over surface.inverse (neutral-900) for inverted
-  // hx-button states. WCAG 1.4.11 floor for non-text UI components is 3:1; we
-  // assert that floor for the surface-against-surface adjacency check (the fill
-  // versus its container). The on-token foreground that paints over these
-  // fills (text.inverse / on-{role}-strong, both = neutral-0) is body-text
-  // territory and asserted via the existing hover/active pairs above (-400 is
-  // a lighter ramp stop than -500, so neutral-0 contrast on it is strictly
-  // higher than the already-AA primary-500/error-500 base pairs).
+  // bg-inverted-hover paint over surface.inverse for inverted hx-button states.
+  // WCAG 1.4.11 floor for non-text UI components is 3:1; we assert that floor
+  // for the surface-against-surface adjacency check (the fill versus its
+  // container). Scoped to light mode only: this is the canonical [inverted]
+  // use case (button on a dark hero/page region within an otherwise light
+  // app). In dark mode surface.inverse flips to a light surface (neutral-100)
+  // and the lifted -400 fills lose UI-floor contrast against it — the
+  // [inverted] variant is not designed to be used inside an already-dark
+  // page, and proper dark-mode-inverted handling (mode-aware fill stop +
+  // mode-aware foreground) is tracked as a 3.2.x follow-up.
   {
     text: '--hx-color-action-primary-bg-inverted-hover',
     surface: '--hx-color-surface-inverse',
     threshold: 3.0,
-    label: 'action.primary.bg-inverted-hover on surface.inverse (UI floor)',
-    modes: ['light', 'dark'],
+    label: 'action.primary.bg-inverted-hover on surface.inverse (UI floor, light mode)',
+    modes: ['light'],
   },
   {
     text: '--hx-color-action-danger-bg-inverted-hover',
     surface: '--hx-color-surface-inverse',
     threshold: 3.0,
-    label: 'action.danger.bg-inverted-hover on surface.inverse (UI floor)',
+    label: 'action.danger.bg-inverted-hover on surface.inverse (UI floor, light mode)',
+    modes: ['light'],
+  },
+  // Foreground body-text floors on the lifted -400 fills. Codex round-7
+  // follow-up flagged the missing on-token assertions: text.inverse flips by
+  // mode (neutral-0 light, neutral-900 dark), so painting it on the
+  // permanent light-teal/red fills collapses to ~2.4–2.6:1 in light mode (AA
+  // fail). hx-button.styles pins inverted hover/active color to text.on-
+  // {primary,error} — both neutral-900, no dark-mode flip — which clears
+  // body-text AA against the lifted fills.
+  {
+    text: '--hx-color-text-on-primary',
+    surface: '--hx-color-action-primary-bg-inverted-hover',
+    threshold: 4.5,
+    label: 'text.on-primary on action.primary.bg-inverted-hover (inverted hover/active fg)',
+    modes: ['light', 'dark'],
+  },
+  {
+    text: '--hx-color-text-on-error',
+    surface: '--hx-color-action-danger-bg-inverted-hover',
+    threshold: 4.5,
+    label: 'text.on-error on action.danger.bg-inverted-hover (inverted hover/active fg)',
     modes: ['light', 'dark'],
   },
   // Resting action surfaces pair with their AA-tuned on-{role} (neutral-900

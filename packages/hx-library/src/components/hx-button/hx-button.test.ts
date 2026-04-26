@@ -1039,7 +1039,7 @@ describe('hx-button', () => {
       );
       const css = cssSource(el);
       expect(css).toMatch(
-        /:host\(\[inverted\]\)\s+\.button--primary:active\s*\{[^}]*--hx-color-action-primary-bg-inverted-hover/,
+        /:host\(\[inverted\]\)\s+\.button--primary:active\s*[,{][^}]*--hx-color-action-primary-bg-inverted-hover/,
       );
     });
 
@@ -1049,7 +1049,7 @@ describe('hx-button', () => {
       );
       const css = cssSource(el);
       expect(css).toMatch(
-        /:host\(\[inverted\]\)\s+\.button--danger:hover\s*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
+        /:host\(\[inverted\]\)\s+\.button--danger:hover\s*[,{][^}]*--hx-color-action-danger-bg-inverted-hover/,
       );
     });
 
@@ -1059,7 +1059,32 @@ describe('hx-button', () => {
       );
       const css = cssSource(el);
       expect(css).toMatch(
-        /:host\(\[inverted\]\)\s+\.button--danger:active\s*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
+        /:host\(\[inverted\]\)\s+\.button--danger:active\s*[,{][^}]*--hx-color-action-danger-bg-inverted-hover/,
+      );
+    });
+
+    // Foreground pin: the inverted hover/active rules also override `color`
+    // to text.on-{role} (neutral-900, no dark-mode flip). Without this pin,
+    // text.inverse stays in effect on the lifted -400 fill — white text on
+    // light-teal/red collapses to ~2.4–2.6:1 in light mode, AA fail. Codex
+    // round-7 follow-up flagged the missing foreground assertions.
+    it('inverted primary hover/active pins color to text.on-primary', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="primary" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--primary:hover[^{]*\{[^}]*color:\s*var\(\s*--hx-button-inverted-primary-interactive-color,\s*var\(\s*--hx-color-text-on-primary/,
+      );
+    });
+
+    it('inverted danger hover/active pins color to text.on-error', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:hover[^{]*\{[^}]*color:\s*var\(\s*--hx-button-inverted-danger-interactive-color,\s*var\(\s*--hx-color-text-on-error/,
       );
     });
 
@@ -1073,38 +1098,6 @@ describe('hx-button', () => {
       expect(await resolveSemantic('--hx-color-action-danger-bg-inverted-hover')).toBe(
         'rgb(252, 114, 100)',
       );
-    });
-
-    // Behavior-side anchor: drive the cascade by setting --hx-button-bg on a
-    // probe element and verify computed background matches the token value.
-    // This catches a regression where the inverted tokens still resolve but
-    // the styles.ts rule fails to bind --hx-button-bg through them (e.g. a
-    // typo in the var() chain). Since :active can't be reliably triggered in
-    // a headless runner, the probe targets the override mechanism rather than
-    // the pseudo-class itself.
-
-    it('inverted-hover token paints when --hx-button-bg binds to it (primary)', () => {
-      const probe = document.createElement('div');
-      probe.style.setProperty('--hx-button-bg', 'var(--hx-color-action-primary-bg-inverted-hover)');
-      probe.style.backgroundColor = 'var(--hx-button-bg)';
-      document.body.appendChild(probe);
-      try {
-        expect(getComputedStyle(probe).backgroundColor).toBe('rgb(106, 177, 177)');
-      } finally {
-        probe.remove();
-      }
-    });
-
-    it('inverted-hover token paints when --hx-button-bg binds to it (danger)', () => {
-      const probe = document.createElement('div');
-      probe.style.setProperty('--hx-button-bg', 'var(--hx-color-action-danger-bg-inverted-hover)');
-      probe.style.backgroundColor = 'var(--hx-button-bg)';
-      document.body.appendChild(probe);
-      try {
-        expect(getComputedStyle(probe).backgroundColor).toBe('rgb(252, 114, 100)');
-      } finally {
-        probe.remove();
-      }
     });
   });
 

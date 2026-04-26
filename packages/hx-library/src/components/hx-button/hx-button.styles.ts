@@ -255,34 +255,45 @@ export const helixButtonStyles = css`
     );
   }
 
-  /* Primary inverted — slight transparent white overlay on hover */
-  :host([inverted]) .button--primary:hover {
-    --hx-button-bg: var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1);
-  }
-
-  /* Pressed state on dark/inverted surface. Round-6 added the standard-mode
-     :active rule (binding to action.primary.bg-active = primary-700, #0F6363)
-     which on a dark surface (neutral-900, #0D1825) drops to ~2.5:1, failing
-     the WCAG 1.4.11 3:1 UI floor. Reuse action.primary.bg-inverted-hover
-     (primary-400, #6AB1B1 = 7.27:1 on neutral-900) for the pressed fill —
-     pressed === hover visually in inverted mode is acceptable UX (the
-     transient absence of pointer over the button signals release). */
+  /* Primary inverted — hover/pressed lift to action.primary.bg-inverted-hover
+     (primary-400, light teal). The base :host([inverted]) .button rule binds
+     color to text.inverse, which flips by mode (neutral-0 in light, neutral-900
+     in dark). On a permanent light-teal fill, white text drops to 2.4:1 in
+     light mode (AA fail). Pin color to text.on-primary (neutral-900, no
+     dark-mode flip) for both hover and active so the foreground is dark in
+     both modes — neutral-900 on primary-400 = ~6.7:1 (AA pass).
+     Pressed === hover visually in inverted mode is acceptable UX (the
+     transient absence of pointer over the button signals release).
+     The inner --hx-button-active-bg fallback preserves the documented
+     contract that this prop overrides any pressed-state fill, including
+     under :host([inverted]). */
+  :host([inverted]) .button--primary:hover,
   :host([inverted]) .button--primary:active {
-    --hx-button-bg: var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1);
+    --hx-button-bg: var(
+      --hx-button-active-bg,
+      var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1)
+    );
+    color: var(
+      --hx-button-inverted-primary-interactive-color,
+      var(--hx-color-text-on-primary, #0d1825)
+    );
   }
 
-  /* Danger inverted hover and pressed — same dark-surface contract as
-     primary. Base .button--danger:hover (error-600, #C92A2A) and
-     :active (error-700, #A21312) on neutral-900 sit at sub-AA / borderline
-     ratios. action.danger.bg-inverted-hover = error-400, #FC7264 = 6.27:1
-     on neutral-900, clears the 3:1 UI floor with headroom. Sister rule
-     to the primary block above. */
-  :host([inverted]) .button--danger:hover {
-    --hx-button-bg: var(--hx-color-action-danger-bg-inverted-hover, #fc7264);
-  }
-
+  /* Danger inverted — sister to primary. Hover/pressed lift to
+     action.danger.bg-inverted-hover (error-400, #FC7264). Same foreground
+     contract: text.inverse fails in light mode (white on light red ≈ 2.6:1);
+     pin to text.on-error (neutral-900, no dark-mode flip) for ~5.3:1 in both
+     modes. */
+  :host([inverted]) .button--danger:hover,
   :host([inverted]) .button--danger:active {
-    --hx-button-bg: var(--hx-color-action-danger-bg-inverted-hover, #fc7264);
+    --hx-button-bg: var(
+      --hx-button-active-bg,
+      var(--hx-color-action-danger-bg-inverted-hover, #fc7264)
+    );
+    color: var(
+      --hx-button-inverted-danger-interactive-color,
+      var(--hx-color-text-on-error, #0d1825)
+    );
   }
 
   /* Secondary inverted — white border and translucent hover fill */
