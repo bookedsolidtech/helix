@@ -231,6 +231,16 @@ export const helixButtonStyles = css`
 
   /* ─── Inverted Mode ─── */
 
+  /* Inline-fallback contract for --hx-color-border-on-dark-* in this section:
+     the literal rgba(255, 255, 255, 0.X) arms are a LIGHT-MODE-only last
+     resort (cold-start, CSS-not-loaded). At runtime, hx-theme injects
+     dark.color.border.on-dark-* as overlay-black-* so dark-mode inverted
+     buttons stay visible on the now-light surface.inverse (#EBEEE9). The
+     inline white overlays would render invisible (≈1.1:1) on a light surface,
+     but they never paint when the theme is mounted. If a future change moves
+     these into a context where hx-theme is not guaranteed, replace with
+     mode-aware tokens. */
+
   /* Override text color and filter-based hover/active for all variants */
   :host([inverted]) .button {
     color: var(--hx-button-inverted-color, var(--hx-color-text-inverse, #ffffff));

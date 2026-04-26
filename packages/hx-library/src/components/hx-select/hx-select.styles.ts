@@ -236,8 +236,7 @@ export const helixSelectStyles = css`
 
   .field__option--focused {
     background-color: var(--_option-hover-bg);
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--_focus-ring-color, var(--hx-color-primary-500));
+    outline: var(--hx-focus-ring-width, 2px) solid var(--_focus-ring-color);
     outline-offset: var(--hx-select-option-focus-ring-offset, -2px);
   }
 
