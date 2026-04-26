@@ -13,6 +13,23 @@ HELiX is designed for this. A single `@helixui/library` instance serves every br
 
 This guide is the production architecture reference for multi-brand deployments.
 
+:::caution[High-contrast mode disables brand overrides]
+The brand selectors in this guide (`[data-brand="..."]`) are CSS-scoped tier-2 primitive overrides. Under `<hx-theme theme="high-contrast">`, these CSS overrides **continue to apply** at the cascade level — but the `<hx-theme>` JS-registry path (`HelixBrandRegistry.register()` + `<hx-theme brand="...">`) is **intentionally suppressed** to preserve the WCAG 1.4.6 Enhanced Contrast (7:1+) guarantee that the HC token set is tuned for. A brand color ramp cannot be assumed to meet that bar.
+
+If you serve low-vision users on `theme="high-contrast"`:
+
+1. **Recommended (HC-safe):** Use the JS registry path described in [`BRAND_THEMING.md`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/docs/BRAND_THEMING.md) — `HelixBrandRegistry.register('your-brand', tokens)` + `<hx-theme brand="your-brand">`. Brand tokens are suppressed under HC and the runtime emits `console.info('[hx-theme] Brand "..." is suppressed on theme="high-contrast"...')` so the behavior is observable in development.
+2. **CSS-pattern (this guide):** Scope brand selectors so they do **not** apply under HC. Example:
+   ```css
+   :root[data-brand='harbor-health']:not([theme='high-contrast']) {
+     --hx-color-primary-500: #006e8a;
+   }
+   ```
+   Without this guard, the brand primitive overrides leak into the HC token cascade and components consuming those primitives directly (`hx-checkbox`, `hx-tag`, `hx-list-item`, `hx-date-picker`, etc.) silently break the 7:1+ contract.
+
+The `[data-brand]` attribute set by `ThemeProvider` / Drupal Twig is purely a CSS scoping primitive — it does not reach into `hx-theme`'s JS-registry-driven `brand` attribute. The two override mechanisms compose; both must be HC-aware.
+:::
+
 ---
 
 ## The 3-Tier Override Architecture {#architecture}

@@ -2,7 +2,12 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTheme } from './hx-theme.js';
-import { HelixBrandRegistry } from '@helixui/tokens';
+import {
+  HelixBrandRegistry,
+  REQUIRED_SEMANTIC_TOKENS,
+  highContrastTokenEntries,
+  tokenMap,
+} from '@helixui/tokens';
 import './index.js';
 
 afterEach(cleanup);
@@ -685,62 +690,104 @@ describe('hx-theme', () => {
       ).toBe('#f87171');
     });
 
-    it('HC suppresses brand merge across non-HC-overlaid stops too (primary-50/100/800)', async () => {
-      // R21 finding 1 — HC `tokens.json` overlays only primary 500/600/700
-      // and secondary 500/600. The 17+ brand-supplied stops HC does NOT
-      // redefine (50/100/200/300/400/800/900/950) must also not leak under
-      // HC, because components like hx-checkbox/hx-tag/hx-list-item consume
-      // those stops directly. The brand-merge-skip on HC closes that gap.
-      const brandName = 'test-brand-r21-non-hc-stops';
-      HelixBrandRegistry.register(brandName, {
-        // Distinctive low-contrast values on every brand-required stop.
-        '--hx-color-primary-50': '#FFFFFF',
-        '--hx-color-primary-100': '#FFFFFF',
-        '--hx-color-primary-200': '#FFFFFF',
-        '--hx-color-primary-300': '#FFFFFF',
-        '--hx-color-primary-400': '#FFFFFF',
-        '--hx-color-primary-500': '#FFFFFF',
-        '--hx-color-primary-600': '#FFFFFF',
-        '--hx-color-primary-700': '#FFFFFF',
-        '--hx-color-primary-800': '#FFFFFF',
-        '--hx-color-primary-900': '#FFFFFF',
-        '--hx-color-primary-950': '#FFFFFF',
-        '--hx-color-secondary-50': '#FFFFFF',
-        '--hx-color-secondary-100': '#FFFFFF',
-        '--hx-color-secondary-200': '#FFFFFF',
-        '--hx-color-secondary-300': '#FFFFFF',
-        '--hx-color-secondary-400': '#FFFFFF',
-        '--hx-color-secondary-500': '#FFFFFF',
-        '--hx-color-secondary-600': '#FFFFFF',
-        '--hx-color-secondary-700': '#FFFFFF',
-        '--hx-color-secondary-800': '#FFFFFF',
-        '--hx-color-secondary-900': '#FFFFFF',
-        '--hx-color-secondary-950': '#FFFFFF',
-      });
+    it('HC suppresses brand merge across ALL 22 REQUIRED_SEMANTIC_TOKENS stops (data-driven)', async () => {
+      // R23 finding 3 — sampling-based coverage was the original gap. Drive
+      // the assertion loop from REQUIRED_SEMANTIC_TOKENS so every brand-
+      // required stop is asserted against either its HC overlay (when HC
+      // overlays it) or its light-primitive value (when HC does not), and
+      // never against the brand-supplied value. New required tokens added
+      // to the registry are auto-covered without test edits.
+      const brandName = 'test-brand-r23-data-driven';
+      const brandWhite: Record<string, string> = {};
+      for (const name of REQUIRED_SEMANTIC_TOKENS) brandWhite[name] = '#FFFFFF';
+      HelixBrandRegistry.register(brandName, brandWhite);
+
+      const hcOverlayMap = new Map(highContrastTokenEntries.map((t) => [t.name, t.value]));
+
       const el = await fixture<HelixTheme>(
         `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
       );
       await el.updateComplete;
       const styles = getComputedStyle(el);
-      // Stops that HC overlays — HC value wins (was already covered).
-      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
-        '#3b82f6',
+
+      // Sanity: confirm REQUIRED_SEMANTIC_TOKENS is populated and includes
+      // the canonical 22 stops — guards against the loop trivially passing
+      // if the export ever drifts to an empty array.
+      expect(REQUIRED_SEMANTIC_TOKENS.length).toBeGreaterThanOrEqual(22);
+
+      for (const tokenName of REQUIRED_SEMANTIC_TOKENS) {
+        const actual = styles.getPropertyValue(tokenName).trim().toLowerCase();
+        const expected = (hcOverlayMap.get(tokenName) ?? tokenMap[tokenName] ?? '').toLowerCase();
+        // Brand value (#ffffff) must NEVER win on HC.
+        expect(actual, `${tokenName} should not match brand white`).not.toBe('#ffffff');
+        // Must match either the HC overlay (if defined for this token) or
+        // the base light primitive — never anything else.
+        expect(actual, `${tokenName} should resolve to HC overlay or light primitive`).toBe(
+          expected,
+        );
+      }
+    });
+
+    it('emits console.info when a registered brand is suppressed under HC, warn for unregistered', async () => {
+      // R23 finding 4 — the console.info is the entire "behavior change
+      // observable in development" deliverable. Without test coverage a
+      // future refactor or console-level filter can silently delete the
+      // signal. Asserts (a) registered + HC fires info (not warn),
+      // (b) unregistered + HC fires warn (not info).
+      const brandName = 'test-brand-r23-info-spy';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#000000',
+        '--hx-color-primary-100': '#000000',
+        '--hx-color-primary-200': '#000000',
+        '--hx-color-primary-300': '#000000',
+        '--hx-color-primary-400': '#000000',
+        '--hx-color-primary-500': '#000000',
+        '--hx-color-primary-600': '#000000',
+        '--hx-color-primary-700': '#000000',
+        '--hx-color-primary-800': '#000000',
+        '--hx-color-primary-900': '#000000',
+        '--hx-color-primary-950': '#000000',
+        '--hx-color-secondary-50': '#000000',
+        '--hx-color-secondary-100': '#000000',
+        '--hx-color-secondary-200': '#000000',
+        '--hx-color-secondary-300': '#000000',
+        '--hx-color-secondary-400': '#000000',
+        '--hx-color-secondary-500': '#000000',
+        '--hx-color-secondary-600': '#000000',
+        '--hx-color-secondary-700': '#000000',
+        '--hx-color-secondary-800': '#000000',
+        '--hx-color-secondary-900': '#000000',
+        '--hx-color-secondary-950': '#000000',
+      });
+
+      const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const registered = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
       );
-      // R22 finding 4 — assert byte-equality against tokens.json light primitives,
-      // not just "not brand white". Negative assertions would pass on empty strings
-      // or any drift, which would silently mask future regressions in the skip path.
-      expect(styles.getPropertyValue('--hx-color-primary-50').trim().toLowerCase()).toBe(
-        '#ebf8f8',
+      await registered.updateComplete;
+
+      const infoCalls = infoSpy.mock.calls.flat().filter((arg) => typeof arg === 'string');
+      expect(infoCalls.some((m) => m.includes('suppressed on theme="high-contrast"'))).toBe(true);
+      expect(infoCalls.some((m) => m.includes(brandName))).toBe(true);
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      infoSpy.mockClear();
+      warnSpy.mockClear();
+
+      const unregistered = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="not-registered-r23">Content</hx-theme>`,
       );
-      expect(styles.getPropertyValue('--hx-color-primary-100').trim().toLowerCase()).toBe(
-        '#dbf0f0',
-      );
-      expect(styles.getPropertyValue('--hx-color-primary-800').trim().toLowerCase()).toBe(
-        '#07494a',
-      );
-      expect(styles.getPropertyValue('--hx-color-secondary-700').trim().toLowerCase()).toBe(
-        '#0b626a',
-      );
+      await unregistered.updateComplete;
+
+      const warnCalls = warnSpy.mock.calls.flat().filter((arg) => typeof arg === 'string');
+      expect(warnCalls.some((m) => m.includes('not-registered-r23'))).toBe(true);
+      expect(warnCalls.some((m) => m.includes('not registered'))).toBe(true);
+      expect(infoSpy).not.toHaveBeenCalled();
+
+      infoSpy.mockRestore();
+      warnSpy.mockRestore();
     });
 
     it('HC + brand + reduced motion triple stack — HC a11y survives, motion override applies', async () => {
