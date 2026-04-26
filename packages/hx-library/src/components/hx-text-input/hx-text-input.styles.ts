@@ -43,10 +43,7 @@ export const helixTextInputStyles = css`
     );
     --_text-input-border-color-focus: var(
       --hx-text-input-border-color-focus,
-      var(
-        --hx-input-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      )
+      var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #0f7078))
     );
     --_text-input-border-color-invalid: var(
       --hx-text-input-border-color-invalid,
@@ -72,10 +69,7 @@ export const helixTextInputStyles = css`
     /* Focus ring */
     --_text-input-focus-ring-color: var(
       --hx-text-input-focus-ring-color,
-      var(
-        --hx-input-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      )
+      var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #0f7078))
     );
     --_text-input-focus-ring-width: var(
       --hx-text-input-focus-ring-width,

@@ -48,8 +48,8 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-button-inverted-color=var(--hx-color-text-inverse)] - Text color when inverted (resolves to neutral-0).
  * @cssprop [--hx-button-inverted-primary-interactive-color=var(--hx-color-text-on-primary)] - Foreground override for inverted primary hover and pressed (combined :hover, :active rule). Defaults to text.on-primary (neutral-900, no dark-mode flip) so dark text rides the lifted primary-400 fill — text.inverse on light teal collapses to ~2.4:1 in light mode.
  * @cssprop [--hx-button-inverted-danger-interactive-color=var(--hx-color-text-on-error)] - Foreground override for inverted danger hover and pressed (combined :hover, :active rule). Defaults to text.on-error (neutral-900); same rationale as the primary override.
- * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-border-on-dark-default)] - Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).
- * @cssprop [--hx-button-inverted-focus-ring-color=var(--hx-color-border-on-dark-strong)] - Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).
+ * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-surface-on-dark-overlay-default)] - Ghost hover bg when inverted (overlay-white-30 — translucent fill, not a border; contrast not applicable).
+ * @cssprop [--hx-button-inverted-focus-ring-color=var(--hx-color-border-on-dark-strong)] - Focus ring color when inverted (overlay-white-70 ≈ 5:1 vs neutral-900 — clears WCAG 1.4.11 3:1 floor for non-text UI).
  *
  * @cssprop [--hx-color-action-primary-bg] - Primary variant resting fill (3.2.1 semantic action layer).
  * @cssprop [--hx-color-action-primary-bg-hover] - Primary variant hover fill.
@@ -71,9 +71,9 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-color-text-primary] - Foreground for tertiary variant on surface.sunken.
  * @cssprop [--hx-color-surface-sunken] - Tertiary variant resting fill.
  * @cssprop [--hx-color-surface-raised] - Tertiary variant hover fill.
- * @cssprop [--hx-color-border-on-dark-subtle] - Inverted-tertiary resting border (overlay-white-10).
- * @cssprop [--hx-color-border-on-dark-default] - Inverted-tertiary hover border + inverted-secondary/ghost hover border (overlay-white-30).
- * @cssprop [--hx-color-border-on-dark-strong] - Inverted focus-visible outline (overlay-white-70).
+ * @cssprop [--hx-color-surface-on-dark-overlay-subtle] - Inverted-tertiary resting fill (overlay-white-10 — translucent fill, not a border).
+ * @cssprop [--hx-color-surface-on-dark-overlay-default] - Inverted-tertiary hover fill + inverted-secondary/ghost/outline hover fill (overlay-white-30 — translucent fill, not a border).
+ * @cssprop [--hx-color-border-on-dark-strong] - Inverted-secondary/outline border + inverted focus-visible outline (overlay-white-70 ≈ 5:1 — clears WCAG 1.4.11 3:1 floor).
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {

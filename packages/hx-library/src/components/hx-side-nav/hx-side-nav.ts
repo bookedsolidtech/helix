@@ -37,7 +37,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-color-surface-inverse] - Side-nav surface fill (resolves to neutral-900 light, near-black dark).
  * @cssprop [--hx-color-text-inverse] - Side-nav text color (resolves to neutral-0).
  * @cssprop [--hx-color-border-on-dark-strong] - Container/header/footer divider border (overlay-white-70 light, overlay-black-50 dark — sized for visibility on the mode-flipped surface-inverse).
- * @cssprop [--hx-color-border-on-dark-subtle] - Toggle button hover surface (overlay-white-10 primitive — semantic layer for inverted affordances).
+ * @cssprop [--hx-color-surface-on-dark-overlay-subtle] - Toggle button hover surface (overlay-white-10 primitive — translucent fill, not a border).
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends HelixElement {

@@ -53,10 +53,7 @@ export const helixSwitchStyles = css`
 
   .switch__track:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-switch-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

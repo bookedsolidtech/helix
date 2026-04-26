@@ -21,10 +21,7 @@ export const helixSelectStyles = css`
     --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
 
     /* Focus ring */
-    --_focus-ring-color: var(
-      --hx-select-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-    );
+    --_focus-ring-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
 
     /* Error */
     --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #e5493e));

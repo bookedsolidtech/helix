@@ -50,10 +50,7 @@ export const helixSplitButtonStyles = css`
 
   .split-button__primary:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-split-button-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-split-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     z-index: 1;
     position: relative;
@@ -95,10 +92,7 @@ export const helixSplitButtonStyles = css`
 
   .split-button__trigger:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-split-button-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-split-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     z-index: 1;
     position: relative;
