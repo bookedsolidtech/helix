@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-26T04:57:16.568Z",
+  "generatedAt": "2026-04-26T11:16:10.504Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -17606,13 +17606,13 @@
           }
         },
         {
-          "description": "Border color.",
+          "description": "Border color (against the dark surface-inverse host bg).",
           "name": "--hx-side-nav-border-color",
-          "default": "var(--hx-color-border-strong)",
+          "default": "var(--hx-color-border-on-dark-strong)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
-            "semanticToken": "color/border/strong",
+            "semanticToken": "color/border/on/dark/strong",
             "fallbackPrimitive": null,
             "literalFallback": null
           }
@@ -17676,8 +17676,8 @@
           "figmaBinding": null
         },
         {
-          "description": "Header/footer divider border.",
-          "name": "--hx-color-border-strong",
+          "description": "Container/header/footer divider border (overlay-white-70 light, overlay-black-50 dark — sized for visibility on the mode-flipped surface-inverse).",
+          "name": "--hx-color-border-on-dark-strong",
           "figmaBinding": null
         },
         {

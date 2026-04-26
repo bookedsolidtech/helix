@@ -29,7 +29,10 @@ export const helixSideNavStyles = css`
     transition: width var(--hx-transition-normal, 300ms) ease;
     overflow: hidden;
     border-inline-end: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #66787b));
+      var(
+        --hx-side-nav-border-color,
+        var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
+      );
   }
 
   /* ─── Collapsed State ─── */
@@ -47,7 +50,10 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #66787b));
+      var(
+        --hx-side-nav-border-color,
+        var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
+      );
     overflow: hidden;
   }
 
@@ -74,7 +80,10 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #66787b));
+      var(
+        --hx-side-nav-border-color,
+        var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
+      );
     overflow: hidden;
   }
 
