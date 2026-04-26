@@ -1028,7 +1028,7 @@ describe('hx-button', () => {
     // failing WCAG 1.4.11's 3:1 UI floor. Round-7 added :host([inverted])
     // overrides binding pressed (and danger hover) to action.{primary,danger}.
     // bg-inverted-hover so the affordance reads against a dark surface
-    // (primary-400 = 7.27:1, error-400 = 6.27:1 on neutral-900).
+    // (primary-400 = 7.27:1, error-400 = 6.58:1 on neutral-900).
     //
     // :active state is unreliable to drive in headless browser runners, so
     // these tests pin two-deep: shadow-root CSS source + token resolution.
@@ -1039,7 +1039,7 @@ describe('hx-button', () => {
       );
       const css = cssSource(el);
       expect(css).toMatch(
-        /:host\(\[inverted\]\)\s+\.button--primary:active\s*[,{][^}]*--hx-color-action-primary-bg-inverted-hover/,
+        /:host\(\[inverted\]\)\s+\.button--primary:active[^{]*\{[^}]*--hx-color-action-primary-bg-inverted-hover/,
       );
     });
 
@@ -1049,7 +1049,7 @@ describe('hx-button', () => {
       );
       const css = cssSource(el);
       expect(css).toMatch(
-        /:host\(\[inverted\]\)\s+\.button--danger:hover\s*[,{][^}]*--hx-color-action-danger-bg-inverted-hover/,
+        /:host\(\[inverted\]\)\s+\.button--danger:hover[^{]*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
       );
     });
 
@@ -1059,7 +1059,7 @@ describe('hx-button', () => {
       );
       const css = cssSource(el);
       expect(css).toMatch(
-        /:host\(\[inverted\]\)\s+\.button--danger:active\s*[,{][^}]*--hx-color-action-danger-bg-inverted-hover/,
+        /:host\(\[inverted\]\)\s+\.button--danger:active[^{]*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
       );
     });
 

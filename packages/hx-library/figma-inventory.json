@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T23:59:50.802Z",
+  "generatedAt": "2026-04-26T00:15:25.862Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2702,12 +2702,12 @@
           }
         },
         {
-          "description": "Hover background override; when set, overrides the variant default hover background from outside the shadow DOM.",
+          "description": "Hover background override; when set, overrides the variant default hover background from outside the shadow DOM. Under [inverted] for primary/danger, hover and active share a paint (combined :hover, :active rule), so this override applies to both states unless --hx-button-active-bg also takes precedence.",
           "name": "--hx-button-hover-bg",
           "figmaBinding": null
         },
         {
-          "description": "Pressed/active background override; when set, overrides the variant default :active background in both standard and inverted modes. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode.",
+          "description": "Pressed/active background override; when set, overrides the variant default :active background in both standard and inverted modes. Takes precedence over --hx-button-hover-bg in the fallback chain. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode.",
           "name": "--hx-button-active-bg",
           "figmaBinding": null
         },

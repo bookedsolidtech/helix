@@ -42,8 +42,8 @@ within a light-mode-active page (hero banners, gradient sections, dark
 cards). It is NOT validated for use within a dark-mode-active root
 context: in dark mode, `surface.inverse` flips to a light surface
 (neutral-100), and the lifted `-400` hover/active fills lose UI-floor
-contrast against it (primary ≈ 2.20:1, danger ≈ 2.43:1 vs WCAG 1.4.11's
-3:1 floor). Mode-aware fill stops + foreground for the dark-mode-inverted
+contrast against it (primary 2.10:1, danger 2.32:1 vs WCAG 1.4.11's 3:1
+floor). Mode-aware fill stops + foreground for the dark-mode-inverted
 combination are tracked as a 3.2.x follow-up. */
   inverted?: boolean;
   /** Accessible label for icon-only or text-less buttons.

@@ -36,8 +36,8 @@ export interface HxButtonClickDetail {
  * @csspart spinner - The loading spinner SVG element.
  *
  * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).
- * @cssprop [--hx-button-hover-bg] - Hover background override; when set, overrides the variant default hover background from outside the shadow DOM.
- * @cssprop [--hx-button-active-bg] - Pressed/active background override; when set, overrides the variant default :active background in both standard and inverted modes. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode.
+ * @cssprop [--hx-button-hover-bg] - Hover background override; when set, overrides the variant default hover background from outside the shadow DOM. Under [inverted] for primary/danger, hover and active share a paint (combined :hover, :active rule), so this override applies to both states unless --hx-button-active-bg also takes precedence.
+ * @cssprop [--hx-button-active-bg] - Pressed/active background override; when set, overrides the variant default :active background in both standard and inverted modes. Takes precedence over --hx-button-hover-bg in the fallback chain. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode.
  * @cssprop [--hx-button-color=var(--hx-color-text-on-primary)] - Button text color (variants route through text.on-{role} / text.on-{role}-strong).
  * @cssprop [--hx-button-border-color=transparent] - Button border color (secondary/outline variants route through action.secondary.border).
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
@@ -172,8 +172,8 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
    * cards). It is NOT validated for use within a dark-mode-active root
    * context: in dark mode, `surface.inverse` flips to a light surface
    * (neutral-100), and the lifted `-400` hover/active fills lose UI-floor
-   * contrast against it (primary ≈ 2.20:1, danger ≈ 2.43:1 vs WCAG 1.4.11's
-   * 3:1 floor). Mode-aware fill stops + foreground for the dark-mode-inverted
+   * contrast against it (primary 2.10:1, danger 2.32:1 vs WCAG 1.4.11's 3:1
+   * floor). Mode-aware fill stops + foreground for the dark-mode-inverted
    * combination are tracked as a 3.2.x follow-up.
    *
    * @attr inverted

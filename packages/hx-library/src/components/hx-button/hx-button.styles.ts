@@ -261,17 +261,18 @@ export const helixButtonStyles = css`
      in dark). On a permanent light-teal fill, white text drops to 2.4:1 in
      light mode (AA fail). Pin color to text.on-primary (neutral-900, no
      dark-mode flip) for both hover and active so the foreground is dark in
-     both modes — neutral-900 on primary-400 = ~6.7:1 (AA pass).
+     both modes — neutral-900 on primary-400 = 7.27:1 (AA pass).
      Pressed === hover visually in inverted mode is acceptable UX (the
      transient absence of pointer over the button signals release).
-     The inner --hx-button-active-bg fallback preserves the documented
-     contract that this prop overrides any pressed-state fill, including
-     under :host([inverted]). */
+     The fallback chain wraps --hx-button-active-bg (highest precedence) and
+     --hx-button-hover-bg so consumer overrides on either prop apply under
+     :host([inverted]) — the two share a paint here, so either knob is
+     honored, with active-bg winning when both are set. */
   :host([inverted]) .button--primary:hover,
   :host([inverted]) .button--primary:active {
     --hx-button-bg: var(
       --hx-button-active-bg,
-      var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1)
+      var(--hx-button-hover-bg, var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1))
     );
     color: var(
       --hx-button-inverted-primary-interactive-color,
@@ -282,13 +283,13 @@ export const helixButtonStyles = css`
   /* Danger inverted — sister to primary. Hover/pressed lift to
      action.danger.bg-inverted-hover (error-400, #FC7264). Same foreground
      contract: text.inverse fails in light mode (white on light red ≈ 2.6:1);
-     pin to text.on-error (neutral-900, no dark-mode flip) for ~5.3:1 in both
-     modes. */
+     pin to text.on-error (neutral-900, no dark-mode flip) for 6.58:1 in both
+     modes. Same active-bg → hover-bg → semantic fallback chain as primary. */
   :host([inverted]) .button--danger:hover,
   :host([inverted]) .button--danger:active {
     --hx-button-bg: var(
       --hx-button-active-bg,
-      var(--hx-color-action-danger-bg-inverted-hover, #fc7264)
+      var(--hx-button-hover-bg, var(--hx-color-action-danger-bg-inverted-hover, #fc7264))
     );
     color: var(
       --hx-button-inverted-danger-interactive-color,
