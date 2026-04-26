@@ -8,7 +8,7 @@ Closes 3 codex round-14 findings (1 high, 2 medium) on the staging→main candid
 
 **Finding 1 [correctness high] — `hx-side-nav` `@supports color-mix()` block shadowed the round-12 deprecated-first chain.**
 
-Round-12 added a deprecated-first fallback chain on `.side-nav__toggle:hover` so consumer overrides on either `--hx-color-border-on-dark-subtle` (3.2.0/3.2.1 published name) or `--hx-color-surface-on-dark-overlay-subtle` (canonical 3.2.2 name) reach paint. But the immediately-following `@supports (color: color-mix(...))` block unconditionally overwrote `background-color` with `color-mix(in srgb, currentColor 15%, transparent)` — making the round-12 fix dead code in any browser supporting `color-mix()` (~96% of the modern web).
+Round-12 added a deprecated-first fallback chain on `.side-nav__toggle:hover` so consumer overrides on either `--hx-color-border-on-dark-subtle` (3.2.0/3.2.1 published name) or `--hx-color-surface-on-dark-overlay-subtle` (canonical 3.2.2 name) reach paint. But the immediately-following `@supports (color: color-mix(...))` block unconditionally overwrote `background-color` with `color-mix(in srgb, currentColor 15%, transparent)` — making the round-12 fix dead code in any browser supporting `color-mix()` (Chrome/Edge 111+, Firefox 113+, Safari 16.2+ — ≈98–99% of global users as of April 2026).
 
 **Fix:** Folded `color-mix()` into the variable chain as the final fallback arm so consumer overrides win on the modern path too:
 
