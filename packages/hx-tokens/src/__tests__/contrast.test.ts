@@ -810,4 +810,74 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
     }
     expect(true).toBe(true);
   });
+
+  // -------------------------------------------------------------------------
+  // Description-ratio drift gate.
+  //
+  // Token descriptions cite WCAG ratios as prose (e.g. "neutral-700 (#313E4B)
+  // on surface.default (#FFFFFF) = 10.93:1"). Those strings ship to consumers
+  // (Figma plugin, design tooling, contrast auditors that read tokens.json
+  // directly) and drift silently when a palette stop or pairing changes. The
+  // round-7 → round-8 codex loop caught five rounds of this exact bug class.
+  //
+  // This gate parses every "(#FG_HEX) ... (#BG_HEX) ... = N.NN:1" triple in
+  // every description, computes the actual contrast, and asserts the cited
+  // ratio matches within ±0.05 (one decimal of WCAG rounding tolerance).
+  //
+  // Triples are extracted only when both hexes appear in parens close to the
+  // ratio — descriptions citing token names without explicit hex pairs are
+  // skipped (no ground truth to check). The tolerance accounts for the fact
+  // that descriptions are hand-rounded; anything off by more than 0.05 is
+  // either a typo or a stale value from a prior palette generation.
+  // -------------------------------------------------------------------------
+  it('description ratios match computed contrast', () => {
+    const tokensJson = JSON.stringify(tokens);
+    type Cite = { fg: string; bg: string; cited: number; path: string };
+    const cites: Cite[] = [];
+    // Descriptions live as JSON-escaped strings in the stringified blob; walk
+    // each "description": "..." entry to keep error messages tied to a path.
+    const descRe = /"description":\s*"((?:\\"|[^"])*)"/g;
+    let descMatch: RegExpExecArray | null;
+    while ((descMatch = descRe.exec(tokensJson)) !== null) {
+      const desc = descMatch[1];
+      // Canonical citation form: "(#FG) on TOKEN (#BG) = N.NN:1" or
+      // "(#FG) on TOKEN (TOKEN-NAME, #BG) = N.NN:1". Tightly anchored to
+      // avoid matching prose like "(#FG-A) drops to N:1 and on (#FG-B) to N:1.
+      // text on TOKEN = N.NN:1" where the regex would otherwise capture
+      // FG-B as fg and the unrelated `= N.NN:1` as the ratio.
+      //
+      // The middle disallows parens and equals, so the BG hex must be the
+      // first parenthesized hex after " on TOKEN " and the ratio must be the
+      // first "= N.NN:1" after that. Prose mixing token-name and explicit-hex
+      // citations (e.g. "neutral-0 on primary-600 = 5.82:1" without parens
+      // around the FG) is correctly skipped — no parenthesized FG, no triple.
+      const tripleRe =
+        /\(#([0-9A-Fa-f]{6})\)\s+on\s+[^()=]+\([^()=]*?#([0-9A-Fa-f]{6})\s*\)\s*=\s*(\d+\.\d{1,2}):1/g;
+      let tMatch: RegExpExecArray | null;
+      while ((tMatch = tripleRe.exec(desc)) !== null) {
+        cites.push({
+          fg: '#' + tMatch[1].toUpperCase(),
+          bg: '#' + tMatch[2].toUpperCase(),
+          cited: parseFloat(tMatch[3]),
+          path: desc.slice(0, 60).replace(/\s+/g, ' ') + '…',
+        });
+      }
+    }
+
+    expect(
+      cites.length,
+      'no description ratio triples extracted — regex broke or descriptions removed',
+    ).toBeGreaterThan(0);
+
+    const drift: string[] = [];
+    for (const c of cites) {
+      const actual = contrastRatio(c.fg, c.bg);
+      if (Math.abs(actual - c.cited) > 0.05) {
+        drift.push(
+          `${c.fg} on ${c.bg}: cited ${c.cited.toFixed(2)}:1, actual ${actual.toFixed(2)}:1 (description: "${c.path}")`,
+        );
+      }
+    }
+    expect(drift, `description ratio drift:\n  ${drift.join('\n  ')}`).toEqual([]);
+  });
 });
