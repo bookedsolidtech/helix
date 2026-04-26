@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-26T15:26:25.292Z",
+  "generatedAt": "2026-04-26T18:21:13.364Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2956,6 +2956,16 @@
         {
           "description": "Inverted-secondary/outline border + inverted focus-visible outline (overlay-white-70 ≈ 5:1 — clears WCAG 1.4.11 3:1 floor).",
           "name": "--hx-color-border-on-dark-strong",
+          "figmaBinding": null
+        },
+        {
+          "description": "DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.",
+          "name": "--hx-color-border-on-dark-subtle",
+          "figmaBinding": null
+        },
+        {
+          "description": "DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-default (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.",
+          "name": "--hx-color-border-on-dark-default",
           "figmaBinding": null
         }
       ],
@@ -17683,6 +17693,11 @@
         {
           "description": "Toggle button hover surface (overlay-white-10 primitive — translucent fill, not a border).",
           "name": "--hx-color-surface-on-dark-overlay-subtle",
+          "figmaBinding": null
+        },
+        {
+          "description": "DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Toggle-hover rule reads both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.",
+          "name": "--hx-color-border-on-dark-subtle",
           "figmaBinding": null
         }
       ],
