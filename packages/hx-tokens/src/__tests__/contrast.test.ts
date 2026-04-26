@@ -952,12 +952,40 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
   // re-introduces a non-strong member under border.on-dark-* fails here.
   // -------------------------------------------------------------------------
   it('border.on-dark-* contains only the strong tier (round-8 lock)', () => {
-    const baseBorder = (tokens as { color: { border: Record<string, unknown> } }).color.border;
-    const onDarkKeys = Object.keys(baseBorder).filter((k) => k.startsWith('on-dark-'));
-    expect(onDarkKeys).toEqual(['on-dark-strong']);
+    type TierShape = {
+      border?: Record<string, unknown>;
+      surface?: Record<string, unknown>;
+    };
+    const tiers: Array<{ name: string; tier: TierShape }> = [
+      { name: 'base', tier: (tokens as { color: TierShape }).color },
+      { name: 'dark', tier: (tokens as { dark: { color: TierShape } }).dark.color },
+      {
+        name: 'high-contrast',
+        tier: (tokens as { 'high-contrast': { color: TierShape } })['high-contrast'].color,
+      },
+    ];
 
-    const surface = (tokens as { color: { surface: Record<string, unknown> } }).color.surface;
-    const overlayKeys = Object.keys(surface).filter((k) => k.startsWith('on-dark-overlay-'));
-    expect(overlayKeys.sort()).toEqual(['on-dark-overlay-default', 'on-dark-overlay-subtle']);
+    for (const { name, tier } of tiers) {
+      // border.on-dark-*: only the strong tier survives. Any future override
+      // that re-introduces a default/subtle (or any other suffix) under
+      // border.on-dark-* in any of the three tiers fails here.
+      const onDarkBorderKeys = Object.keys(tier.border ?? {}).filter((k) =>
+        k.startsWith('on-dark-'),
+      );
+      expect(onDarkBorderKeys, `${name}.color.border.on-dark-* shape`).toEqual(['on-dark-strong']);
+
+      // surface.on-dark-overlay-{default,subtle}: both must exist in every
+      // tier, since runtime mode-flip depends on the dark + HC overrides
+      // being present (the base values resolve to overlay-white-* which
+      // disappears against the now-light surface.inverse in dark mode and
+      // collapses to invisible on the HC #000 canvas).
+      const onDarkOverlayKeys = Object.keys(tier.surface ?? {})
+        .filter((k) => k.startsWith('on-dark-overlay-'))
+        .sort();
+      expect(onDarkOverlayKeys, `${name}.color.surface.on-dark-overlay-* shape`).toEqual([
+        'on-dark-overlay-default',
+        'on-dark-overlay-subtle',
+      ]);
+    }
   });
 });

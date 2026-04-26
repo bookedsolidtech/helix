@@ -259,9 +259,11 @@ export const helixButtonStyles = css`
   :host([inverted]) .button:focus-visible {
     /* WCAG 1.4.11: focus indicator needs ≥3:1 against adjacent colors.
        border-on-dark-strong (overlay-white-70) ≈ 5:1 on neutral-900 — passes.
-       The lower-alpha siblings used to live in border.* but were 2.7:1 / 1.4:1
-       and could not honour a border contract; they're now surface.on-dark-overlay-*
-       (fills, not borders) and used elsewhere in this file. */
+       The lower-alpha siblings used to live in border.* but were sub-3:1
+       against any plausible surface and could not honour a border contract;
+       they're now surface.on-dark-overlay-{default,subtle} (translucent
+       fills, not borders) and used elsewhere in this file. See
+       tokens.json color.surface.on-dark-overlay-* for canonical ratios. */
     outline-color: var(
       --hx-button-inverted-focus-ring-color,
       var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
