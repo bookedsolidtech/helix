@@ -761,7 +761,7 @@ const PAIRS: PairSpec[] = [
   // dropzone, side-nav header/footer, etc.). Pre-3.2.2 this was neutral-400
   // (#8E9C98, 2.85:1 on white) — a sub-3:1 fail systemic to every form-control
   // border across the library. Light flips to neutral-500 (#66787B, 4.63:1),
-  // dark keeps neutral-500 (#66787B on #0D1825 = 3.86:1), HC inherits #FFFFFF
+  // dark flips to neutral-400 (#8E9C98 on #0D1825 = 6.27:1), HC inherits #FFFFFF
   // (21:1 on #000). Locking the pair here prevents future palette tweaks from
   // sliding the resting form-control border below 3:1 again.
   {
