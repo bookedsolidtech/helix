@@ -115,7 +115,7 @@ export const helixSideNavStyles = css`
 
   .side-nav__toggle:hover {
     background-color: var(
-      --hx-color-border-on-dark-subtle,
+      --hx-color-surface-on-dark-overlay-subtle,
       rgba(255, 255, 255, 0.1)
     ); /* fallback for browsers without color-mix() */
     color: var(--hx-side-nav-toggle-hover-color, var(--hx-color-text-inverse, #ffffff));

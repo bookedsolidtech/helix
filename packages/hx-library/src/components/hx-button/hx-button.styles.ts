@@ -231,15 +231,16 @@ export const helixButtonStyles = css`
 
   /* ─── Inverted Mode ─── */
 
-  /* Inline-fallback contract for --hx-color-border-on-dark-* in this section:
+  /* Inline-fallback contract for the on-dark-* tokens in this section:
      the literal rgba(255, 255, 255, 0.X) arms are a LIGHT-MODE-only last
      resort (cold-start, CSS-not-loaded). At runtime, hx-theme injects
-     dark.color.border.on-dark-* as overlay-black-* so dark-mode inverted
-     buttons stay visible on the now-light surface.inverse (#EBEEE9). The
-     inline white overlays would render invisible (≈1.1:1) on a light surface,
-     but they never paint when the theme is mounted. If a future change moves
-     these into a context where hx-theme is not guaranteed, replace with
-     mode-aware tokens. */
+     the dark.* override (overlay-black-* for the strong border and the
+     surface.on-dark-overlay-* fills) so dark-mode inverted buttons stay
+     visible on the now-light surface.inverse (#EBEEE9). The inline white
+     overlays would render invisible (≈1.1:1) on a light surface, but
+     they never paint when the theme is mounted. If a future change
+     moves these into a context where hx-theme is not guaranteed,
+     replace with mode-aware tokens. */
 
   /* Override text color and filter-based hover/active for all variants */
   :host([inverted]) .button {
@@ -257,8 +258,12 @@ export const helixButtonStyles = css`
 
   :host([inverted]) .button:focus-visible {
     /* WCAG 1.4.11: focus indicator needs ≥3:1 against adjacent colors.
-       border-on-dark-default (overlay-white-30) ≈ 2.7:1 on neutral-900 — fails.
-       border-on-dark-strong (overlay-white-70) ≈ 5:1 — passes. */
+       border-on-dark-strong (overlay-white-70) ≈ 5:1 on neutral-900 — passes.
+       The lower-alpha siblings used to live in border.* but were sub-3:1
+       against any plausible surface and could not honour a border contract;
+       they're now surface.on-dark-overlay-{default,subtle} (translucent
+       fills, not borders) and used elsewhere in this file. See
+       tokens.json color.surface.on-dark-overlay-* for canonical ratios. */
     outline-color: var(
       --hx-button-inverted-focus-ring-color,
       var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
@@ -323,19 +328,19 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--secondary:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
+    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3));
   }
 
-  /* Tertiary inverted — resting at subtle (10%) lifts to default (30%) on hover
-     so the runtime hover delta is visually distinct, not collapsed onto a
-     single token. */
+  /* Tertiary inverted — resting at the subtle overlay (10%) lifts to the default
+     overlay (30%) on hover so the runtime hover delta is visually distinct, not
+     collapsed onto a single token. */
   :host([inverted]) .button--tertiary {
-    --hx-button-bg: var(--hx-color-border-on-dark-subtle, rgba(255, 255, 255, 0.1));
+    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-subtle, rgba(255, 255, 255, 0.1));
     --hx-button-border-color: transparent;
   }
 
   :host([inverted]) .button--tertiary:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
+    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3));
   }
 
   /* Ghost inverted — transparent base, translucent hover bg */
@@ -347,7 +352,7 @@ export const helixButtonStyles = css`
   :host([inverted]) .button--ghost:hover {
     --hx-button-bg: var(
       --hx-button-inverted-ghost-hover-bg,
-      var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3))
+      var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3))
     );
   }
 
@@ -357,7 +362,7 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--outline:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
+    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3));
   }
 
   /* ─── Prefix / Suffix / Label ─── */

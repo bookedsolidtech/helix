@@ -19,10 +19,7 @@ export const helixTextareaStyles = css`
     );
     --_textarea-border-color-focus: var(
       --hx-textarea-border-color-focus,
-      var(
-        --hx-input-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      )
+      var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #0f7078))
     );
     --_textarea-border-color-invalid: var(
       --hx-textarea-border-color-invalid,

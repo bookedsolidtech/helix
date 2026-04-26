@@ -44,17 +44,11 @@ export const helixComboboxStyles = css`
       box-shadow var(--hx-transition-fast, 150ms ease);
   }
   .field__input-wrapper:focus-within {
-    border-color: var(
-      --hx-combobox-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-    );
+    border-color: var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(
-            --hx-combobox-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-          )
+        var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #0f7078))
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );

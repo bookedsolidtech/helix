@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-26T11:16:10.504Z",
+  "generatedAt": "2026-04-26T13:10:25.669Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2820,19 +2820,19 @@
           }
         },
         {
-          "description": "Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).",
+          "description": "Ghost hover bg when inverted (overlay-white-30 — translucent fill, not a border; contrast not applicable).",
           "name": "--hx-button-inverted-ghost-hover-bg",
-          "default": "var(--hx-color-border-on-dark-default)",
+          "default": "var(--hx-color-surface-on-dark-overlay-default)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/border/on/dark/default",
+            "semanticToken": "color/surface/on/dark/overlay/default",
             "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
-          "description": "Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).",
+          "description": "Focus ring color when inverted (overlay-white-70 ≈ 5:1 vs neutral-900 — clears WCAG 1.4.11 3:1 floor for non-text UI).",
           "name": "--hx-button-inverted-focus-ring-color",
           "default": "var(--hx-color-border-on-dark-strong)",
           "figmaBinding": {
@@ -2944,17 +2944,17 @@
           "figmaBinding": null
         },
         {
-          "description": "Inverted-tertiary resting border (overlay-white-10).",
-          "name": "--hx-color-border-on-dark-subtle",
+          "description": "Inverted-tertiary resting fill (overlay-white-10 — translucent fill, not a border).",
+          "name": "--hx-color-surface-on-dark-overlay-subtle",
           "figmaBinding": null
         },
         {
-          "description": "Inverted-tertiary hover border + inverted-secondary/ghost hover border (overlay-white-30).",
-          "name": "--hx-color-border-on-dark-default",
+          "description": "Inverted-tertiary hover fill + inverted-secondary/ghost/outline hover fill (overlay-white-30 — translucent fill, not a border).",
+          "name": "--hx-color-surface-on-dark-overlay-default",
           "figmaBinding": null
         },
         {
-          "description": "Inverted focus-visible outline (overlay-white-70).",
+          "description": "Inverted-secondary/outline border + inverted focus-visible outline (overlay-white-70 ≈ 5:1 — clears WCAG 1.4.11 3:1 floor).",
           "name": "--hx-color-border-on-dark-strong",
           "figmaBinding": null
         }
@@ -17681,8 +17681,8 @@
           "figmaBinding": null
         },
         {
-          "description": "Toggle button hover surface (overlay-white-10 primitive — semantic layer for inverted affordances).",
-          "name": "--hx-color-border-on-dark-subtle",
+          "description": "Toggle button hover surface (overlay-white-10 primitive — translucent fill, not a border).",
+          "name": "--hx-color-surface-on-dark-overlay-subtle",
           "figmaBinding": null
         }
       ],

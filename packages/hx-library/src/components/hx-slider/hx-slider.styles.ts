@@ -201,10 +201,7 @@ export const helixSliderStyles = css`
   .slider__input:focus-visible ~ .slider__thumb-visual {
     box-shadow:
       0 0 0 var(--hx-focus-ring-width, 2px)
-        var(
-          --hx-slider-focus-ring-color,
-          var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-        ),
+        var(--hx-slider-focus-ring-color, var(--hx-focus-ring-color, #0f7078)),
       var(--hx-slider-thumb-shadow, var(--hx-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05)));
   }
 

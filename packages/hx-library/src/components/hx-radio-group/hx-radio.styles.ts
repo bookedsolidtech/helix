@@ -88,10 +88,7 @@ export const helixRadioStyles = css`
 
   :host(:focus-visible) .radio__control {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-radio-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-radio-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
