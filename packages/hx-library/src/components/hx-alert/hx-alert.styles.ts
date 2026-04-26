@@ -174,7 +174,7 @@ export const helixAlertStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-alert-close-btn-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
