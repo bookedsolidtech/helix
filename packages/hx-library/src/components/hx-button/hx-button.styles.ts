@@ -262,10 +262,7 @@ export const helixButtonStyles = css`
      (AA pass). Light mode tracks action.primary.bg (primary-500, 5.20:1 on
      dark surface.inverse). */
   :host([inverted]) .button--primary {
-    background-color: var(
-      --hx-button-bg,
-      var(--hx-color-action-primary-bg-inverted-rest, #429797)
-    );
+    --hx-button-bg: var(--hx-color-action-primary-bg-inverted-rest, #429797);
   }
 
   /* Primary inverted — hover/pressed lift to action.primary.bg-inverted-hover
