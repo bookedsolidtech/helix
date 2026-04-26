@@ -36,7 +36,7 @@ export const helixComboboxStyles = css`
     display: flex;
     align-items: center;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-combobox-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-combobox-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-combobox-bg, var(--hx-color-surface-default, #ffffff));
     transition:
@@ -46,14 +46,14 @@ export const helixComboboxStyles = css`
   .field__input-wrapper:focus-within {
     border-color: var(
       --hx-combobox-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
     );
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
         var(
             --hx-combobox-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+            var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
           )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
@@ -163,7 +163,7 @@ export const helixComboboxStyles = css`
     z-index: var(--hx-z-index-dropdown, 1000);
     background-color: var(--hx-combobox-listbox-bg, var(--hx-color-surface-default, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-combobox-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-combobox-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-combobox-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-combobox-listbox-shadow,

@@ -154,4 +154,24 @@ describe('dark-mode token resolution', () => {
     expect(dark.backgroundColor).not.toBe(light.backgroundColor);
     expect(dark.color).not.toBe(light.color);
   });
+
+  /**
+   * Inverted-primary resting bg routes through action.primary.bg-inverted-rest
+   * so the dark override can flip the fill to primary-600 — keeping the boundary
+   * against light surface.inverse (#EBEEE9) at 4.97:1 instead of primary-500's
+   * 2.94:1. Regression guard for the CSS cycle that previously broke
+   * --hx-button-bg consumption on :host([inverted]) .button--primary.
+   */
+  it('inverted primary button flips resting bg between light and dark (bg-inverted-rest contract)', async () => {
+    const markup = '<hx-button variant="primary" inverted>Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
+
+    // Light: action.primary.bg-inverted-rest defaults to primary-500 (#429797).
+    expect(light.backgroundColor).toBe('rgb(66, 151, 151)');
+    // Dark: dark.action.primary.bg-inverted-rest pins to primary-600 (#0f7078).
+    expect(dark.backgroundColor).toBe('rgb(15, 112, 120)');
+    expect(dark.backgroundColor).not.toBe(light.backgroundColor);
+  });
 });

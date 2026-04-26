@@ -75,7 +75,7 @@ export const helixNavItemStyles = css`
 
   .nav-item__link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-nav-item-focus-ring-color, var(--hx-focus-ring-color, #6ab1b1));
+      var(--hx-nav-item-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

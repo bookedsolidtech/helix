@@ -80,7 +80,7 @@ export const helixCodeSnippetStyles = css`
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #8e9c98);
+    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #66787b);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     /* Copy button sits on the always-dark block snippet surface; uses inverse family for contrast on the terminal background. */
     background-color: var(--hx-color-surface-inverse, #0d1825);
@@ -106,7 +106,7 @@ export const helixCodeSnippetStyles = css`
 
   .code-snippet__copy-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -125,7 +125,7 @@ export const helixCodeSnippetStyles = css`
     min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     border: none;
-    border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #8e9c98);
+    border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #66787b);
     /* Expand button is attached to the always-dark block snippet — inverse family maintains the terminal aesthetic. */
     background-color: var(--hx-color-surface-inverse, #0d1825);
     color: var(--hx-color-text-inverse, #ffffff);
@@ -147,7 +147,7 @@ export const helixCodeSnippetStyles = css`
 
   .code-snippet__expand-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

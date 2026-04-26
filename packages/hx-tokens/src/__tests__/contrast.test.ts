@@ -725,6 +725,51 @@ const PAIRS: PairSpec[] = [
     threshold: 4.5,
     label: 'success-text on surface.default',
   },
+  // 3.2.2 color-contrast campaign: focus-ring must clear the WCAG 1.4.11 3:1
+  // floor for non-text UI components against the resting body surface — every
+  // keyboard-focus indicator drawn at full opacity (outline-style focus on
+  // hx-link, border-flip on hx-text-input wrapper, button focus rings, etc.)
+  // resolves through this token. Pre-3.2.2 it was primary-400 (2.45:1 on white,
+  // sub-3:1) — the most common keyboard-focus affordance in the library was
+  // failing. Light flips to primary-600, dark keeps primary-400 (7.27:1 on
+  // dark surface), HC inherits the explicit yellow override (#FFFF00, ~19.5:1
+  // on #000). Asserting the pair across all three modes locks the floor in
+  // permanently; any future palette tweak that drops the focus-ring below 3:1
+  // fails CI here.
+  {
+    text: '--hx-color-focus-ring',
+    surface: '--hx-color-surface-default',
+    threshold: 3.0,
+    label: 'focus-ring on surface.default (UI floor — keyboard focus)',
+  },
+  // 3.2.2 color-contrast campaign: action.primary.bg-inverted-rest paints
+  // the resting fill of inverted-mode primary buttons against surface.inverse.
+  // surface.inverse flips by mode (dark in light theme, light in dark theme),
+  // so the resting fill must clear 3:1 in both directions. Light: primary-500
+  // on #0D1825 = 5.20:1. Dark: primary-600 on #EBEEE9 = 4.97:1 (the dark-mode
+  // override). Pre-3.2.2 dark inverted primary resolved to primary-500 on
+  // #EBEEE9 = 2.94:1 — sub-3:1 UI-component floor fail.
+  {
+    text: '--hx-color-action-primary-bg-inverted-rest',
+    surface: '--hx-color-surface-inverse',
+    threshold: 3.0,
+    label: 'action.primary.bg-inverted-rest on surface.inverse (UI floor — inverted button)',
+  },
+  // 3.2.2 color-contrast campaign: border.strong must clear the WCAG 1.4.11
+  // 3:1 floor against surface.default — it is the resting border on every form
+  // control (text input, select, checkbox, radio, switch track, file upload
+  // dropzone, side-nav header/footer, etc.). Pre-3.2.2 this was neutral-400
+  // (#8E9C98, 2.85:1 on white) — a sub-3:1 fail systemic to every form-control
+  // border across the library. Light flips to neutral-500 (#66787B, 4.63:1),
+  // dark flips to neutral-400 (#8E9C98 on #0D1825 = 6.27:1), HC inherits #FFFFFF
+  // (21:1 on #000). Locking the pair here prevents future palette tweaks from
+  // sliding the resting form-control border below 3:1 again.
+  {
+    text: '--hx-color-border-strong',
+    surface: '--hx-color-surface-default',
+    threshold: 3.0,
+    label: 'border.strong on surface.default (UI floor — form-control borders)',
+  },
 ];
 
 const ALL_MODES: Array<'light' | 'dark' | 'high-contrast'> = ['light', 'dark', 'high-contrast'];
