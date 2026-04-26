@@ -631,15 +631,66 @@ describe('hx-theme', () => {
       warnSpy.mockRestore();
     });
 
-    it('brand on HC theme overrides primary color but does not silently override HC a11y tokens', async () => {
-      // R19 finding 3 — brand merge appends a later :host block, so any name
-      // a brand redeclares wins. This test documents the contract: brands
-      // override color tokens (--hx-color-primary-500 here) while leaving
-      // HC accessibility tokens (focus-ring-width, border-width-thin,
-      // text.on-error-strong) intact, because a well-authored brand should
-      // not redeclare HC a11y tokens. If a future brand or merger refactor
-      // breaks this contract, the assertions below catch it.
-      const brandName = 'test-brand-r19-hc';
+    it('HC overlay wins over brand overrides on high-contrast theme', async () => {
+      // R20 BLOCKING (api-design high) — brand merge previously appended a
+      // later :host block that silently shadowed HC accessibility tokens
+      // (focus-ring-width, primary ramps tuned for AAA on #000, etc.),
+      // contradicting the BRAND_THEMING.md "WCAG 7:1+" contract. The fix
+      // re-emits the HC overlay AFTER the brand merge when
+      // effectiveTheme === 'high-contrast', so HC always wins on HC mode.
+      // This test registers a brand that explicitly redeclares HC-defined
+      // names with sub-AA values and asserts HC tokens survive intact.
+      const brandName = 'test-brand-r20-hc-low-contrast';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#fff8f0',
+        '--hx-color-primary-100': '#ffeacc',
+        '--hx-color-primary-200': '#ffd699',
+        '--hx-color-primary-300': '#ffbd66',
+        '--hx-color-primary-400': '#ffa033',
+        // Sub-AA on #000 (2.21:1) — would silently break HC a11y if it won.
+        '--hx-color-primary-500': '#003DA5',
+        '--hx-color-primary-600': '#002D8A',
+        '--hx-color-primary-700': '#002270',
+        '--hx-color-primary-800': '#001a55',
+        '--hx-color-primary-900': '#00103a',
+        '--hx-color-primary-950': '#00081d',
+        '--hx-color-secondary-50': '#f8f0ff',
+        '--hx-color-secondary-100': '#eaccff',
+        '--hx-color-secondary-200': '#d699ff',
+        '--hx-color-secondary-300': '#bd66ff',
+        '--hx-color-secondary-400': '#a033ff',
+        '--hx-color-secondary-500': '#8800ff',
+        '--hx-color-secondary-600': '#6d00cc',
+        '--hx-color-secondary-700': '#520099',
+        '--hx-color-secondary-800': '#370066',
+        '--hx-color-secondary-900': '#1b0033',
+        '--hx-color-secondary-950': '#0e001a',
+      });
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // HC values survive on a11y-critical tokens — brand cannot poison them.
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#3b82f6',
+      );
+      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      expect(styles.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
+      expect(
+        styles.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
+      ).toBe('#000000');
+      expect(
+        styles.getPropertyValue('--hx-color-action-danger-bg-active').trim().toLowerCase(),
+      ).toBe('#f87171');
+    });
+
+    it('brand on light theme overrides primary color (HC re-overlay does not affect non-HC themes)', async () => {
+      // Sister test to the HC override test — confirms the brand-merge path
+      // still works for non-HC themes (i.e. the HC re-overlay is correctly
+      // gated on `effectiveTheme === 'high-contrast'` and does not regress
+      // brand support for light/dark consumers).
+      const brandName = 'test-brand-r20-light';
       HelixBrandRegistry.register(brandName, {
         '--hx-color-primary-50': '#fff8f0',
         '--hx-color-primary-100': '#ffeacc',
@@ -665,20 +716,14 @@ describe('hx-theme', () => {
         '--hx-color-secondary-950': '#0e001a',
       });
       const el = await fixture<HelixTheme>(
-        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
+        `<hx-theme theme="light" brand="${brandName}">Content</hx-theme>`,
       );
       await el.updateComplete;
       const styles = getComputedStyle(el);
-      // Brand wins on color tokens it redeclares.
+      // Brand wins on light (no HC re-overlay applied).
       expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
         '#ff8800',
       );
-      // HC a11y tokens survive — brand does not redeclare them.
-      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
-      expect(styles.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
-      expect(
-        styles.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
-      ).toBe('#000000');
     });
   });
 

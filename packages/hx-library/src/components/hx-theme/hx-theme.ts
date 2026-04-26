@@ -451,6 +451,19 @@ export class HelixTheme extends HelixElement {
       }
     }
 
+    // HC a11y tokens must always win on high-contrast mode — re-emit the HC
+    // overlay AFTER the brand merge so brand color ramps cannot silently
+    // shadow HC accessibility tokens (focus-ring-width, border-width-thin,
+    // text.on-{role}-strong, action.danger.bg-active, primary/error/success
+    // ramps tuned for AAA contrast against #000). Without this re-overlay,
+    // a brand registered via HelixBrandRegistry overrides HC values, which
+    // contradicts the BRAND_THEMING.md "WCAG 7:1+" contract.
+    if (this.effectiveTheme === 'high-contrast') {
+      const hcMap = new Map<string, string>();
+      for (const t of highContrastTokenEntries) hcMap.set(t.name, t.value);
+      css += `\n:host {\n${_buildProps(hcMap)}\n}`;
+    }
+
     if (this.effectiveMotion === 'reduced') {
       css += `\n:host {\n${_buildProps(_reducedMotionOverrides)}\n}`;
     }
