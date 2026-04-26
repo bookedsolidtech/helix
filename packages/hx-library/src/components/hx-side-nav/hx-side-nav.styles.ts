@@ -114,10 +114,14 @@ export const helixSideNavStyles = css`
   }
 
   .side-nav__toggle:hover {
+    /* Read both deprecated --hx-color-border-on-dark-subtle (3.2.0/3.2.1 API)
+       and canonical --hx-color-surface-on-dark-overlay-subtle so consumer
+       overrides on either name reach paint. Deprecated removal: 4.0.0.
+       Hex fallback for browsers without color-mix(). */
     background-color: var(
-      --hx-color-surface-on-dark-overlay-subtle,
-      rgba(255, 255, 255, 0.1)
-    ); /* fallback for browsers without color-mix() */
+      --hx-color-border-on-dark-subtle,
+      var(--hx-color-surface-on-dark-overlay-subtle, rgba(255, 255, 255, 0.1))
+    );
     color: var(--hx-side-nav-toggle-hover-color, var(--hx-color-text-inverse, #ffffff));
   }
 

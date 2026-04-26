@@ -884,8 +884,10 @@ export const CSSCustomProperties: Story = {
     </style>
     <div class="css-prop-grid">
       <div class="css-prop-cell">
-        <code>--hx-button-bg: #059669</code>
-        <hx-button style="--hx-button-bg: #059669;">Custom Background</hx-button>
+        <code>--hx-color-action-primary-bg: #059669</code>
+        <hx-button style="--hx-color-action-primary-bg: #059669;"
+          >Custom Primary Fill</hx-button
+        >
       </div>
 
       <div class="css-prop-cell">
@@ -929,9 +931,10 @@ export const CSSCustomProperties: Story = {
       <strong>Usage</strong>
       <pre
         style="margin: 0.5rem 0 0; font-size: 0.8125rem; white-space: pre-wrap;"
-      ><code>/* Override via host selector or inline style */
-hx-button {
-  --hx-button-bg: var(--hx-color-success-500);
+      ><code>/* Variant fills route through semantic action.* tokens — override those.
+   --hx-button-bg is variant-shadowed and only paints when no variant rule matches. */
+hx-button[variant='primary'] {
+  --hx-color-action-primary-bg: var(--hx-color-success-500);
   --hx-button-border-radius: 9999px;
 }</code></pre>
     </div>
