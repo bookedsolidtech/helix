@@ -63,7 +63,7 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-color-action-danger-bg-hover] - Danger variant hover fill.
  * @cssprop [--hx-color-action-danger-bg-active] - Danger variant active fill.
  * @cssprop [--hx-color-action-primary-bg-inverted-hover] - Primary variant hover/pressed fill on dark/inverted surface (resolves to primary-400, 7.27:1 on neutral-900).
- * @cssprop [--hx-color-action-danger-bg-inverted-hover] - Danger variant hover/pressed fill on dark/inverted surface (resolves to error-400, 6.27:1 on neutral-900).
+ * @cssprop [--hx-color-action-danger-bg-inverted-hover] - Danger variant hover/pressed fill on dark/inverted surface (resolves to error-400, 6.58:1 on neutral-900).
  * @cssprop [--hx-color-text-on-primary] - Foreground for primary fill (resolves to neutral-900 — AA-tuned for primary-500).
  * @cssprop [--hx-color-text-on-primary-strong] - Foreground for primary-hover fill (resolves to neutral-0 across modes).
  * @cssprop [--hx-color-text-on-error] - Foreground for danger fill (resolves to neutral-900).

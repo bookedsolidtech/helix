@@ -1099,6 +1099,31 @@ describe('hx-button', () => {
         'rgb(252, 114, 100)',
       );
     });
+
+    // F3 fallback-chain regression net (codex round-7-followup-2): under
+    // [inverted] the combined hover/active rule must consult --hx-button-
+    // active-bg first, then --hx-button-hover-bg, then the semantic. A
+    // future agent collapsing the chain back to a single level would silently
+    // make --hx-button-hover-bg a no-op under inverted again.
+    it('inverted primary hover/active fallback chain pins active-bg → hover-bg → semantic', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="primary" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--primary:hover[^{]*\{[^}]*--hx-button-bg:\s*var\(\s*--hx-button-active-bg,\s*var\(\s*--hx-button-hover-bg,\s*var\(\s*--hx-color-action-primary-bg-inverted-hover/,
+      );
+    });
+
+    it('inverted danger hover/active fallback chain pins active-bg → hover-bg → semantic', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:hover[^{]*\{[^}]*--hx-button-bg:\s*var\(\s*--hx-button-active-bg,\s*var\(\s*--hx-button-hover-bg,\s*var\(\s*--hx-color-action-danger-bg-inverted-hover/,
+      );
+    });
   });
 
   // ─── Property: type — form integration ───

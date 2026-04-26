@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-26T00:15:25.862Z",
+  "generatedAt": "2026-04-26T00:28:06.810Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2904,7 +2904,7 @@
           "figmaBinding": null
         },
         {
-          "description": "Danger variant hover/pressed fill on dark/inverted surface (resolves to error-400, 6.27:1 on neutral-900).",
+          "description": "Danger variant hover/pressed fill on dark/inverted surface (resolves to error-400, 6.58:1 on neutral-900).",
           "name": "--hx-color-action-danger-bg-inverted-hover",
           "figmaBinding": null
         },
