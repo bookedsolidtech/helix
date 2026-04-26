@@ -309,6 +309,14 @@ export class HelixTheme extends HelixElement {
    * fires once per `update()` tick rather than once per applied state. */
   private _lastBrandAdvisoryKey: string | null = null;
 
+  /** @internal — tracks whether the runtime authored the current `data-brand`
+   * attribute. The reflection path (`brand` registered + non-HC) sets this to
+   * `true` when it writes; transitions out of that state remove the attribute
+   * only when we wrote it. Consumers using the documented manual cascade
+   * path (`<hx-theme data-brand="x">` without a `brand` prop) keep their
+   * attribute untouched. */
+  private _ownsDataBrand = false;
+
   override firstUpdated(changed: PropertyValues<this>): void {
     super.firstUpdated(changed);
     this._initThemeSheet();
@@ -448,19 +456,29 @@ export class HelixTheme extends HelixElement {
   private _applyEffectiveTheme(): void {
     if (!this._themeSheet) return;
 
-    // Reflect `brand` → `data-brand` attribute so CSS-pattern selectors of
-    // the form `hx-theme[data-brand='foo']:not([theme='high-contrast'])`
-    // match in every framework consumer (React, Angular, Vue, plain HTML)
-    // without each consumer authoring `data-brand` manually. On
-    // `high-contrast`, the attribute is removed entirely — defense-in-depth
-    // against external CSS that lacks the `:not(...)` guard, mirroring the
-    // JS-registry suppression below at the attribute layer.
-    if (this.brand !== '' && this.effectiveTheme !== 'high-contrast') {
+    // Hoist the registry lookup so reflection and merge share one result.
+    // Reflection only fires for registered brands on non-HC themes — an
+    // unregistered (typo) brand must not activate `[data-brand]` CSS the
+    // registry simultaneously rejects, and HC suppresses the attribute as
+    // defense-in-depth against external CSS missing the `:not(...)` guard.
+    // The manual cascade path (`<hx-theme data-brand="x">` without a `brand`
+    // prop, documented in multi-brand-theming.md) is preserved by gating
+    // removal on `_ownsDataBrand` — we only strip what we authored.
+    const brandTokens =
+      this.brand !== '' ? HelixBrandRegistry.getBrandTokens(this.brand) : undefined;
+    const shouldReflectBrand =
+      this.brand !== '' &&
+      this.effectiveTheme !== 'high-contrast' &&
+      brandTokens !== undefined;
+
+    if (shouldReflectBrand) {
       if (this.getAttribute('data-brand') !== this.brand) {
         this.setAttribute('data-brand', this.brand);
       }
-    } else if (this.hasAttribute('data-brand')) {
+      this._ownsDataBrand = true;
+    } else if (this._ownsDataBrand) {
       this.removeAttribute('data-brand');
+      this._ownsDataBrand = false;
     }
 
     let css = _buildThemeCss(this.effectiveTheme);
@@ -475,7 +493,6 @@ export class HelixTheme extends HelixElement {
     // Skipping the merge entirely on HC delivers the contract; brands
     // continue to apply on light/dark.
     if (this.brand !== '' && this.effectiveTheme !== 'high-contrast') {
-      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens !== undefined) {
         css = mergeBrandTokens(css, brandTokens);
         this._lastBrandAdvisoryKey = `${this.brand}|${this.effectiveTheme}|applied`;
@@ -491,7 +508,6 @@ export class HelixTheme extends HelixElement {
         }
       }
     } else if (this.brand !== '' && this.effectiveTheme === 'high-contrast') {
-      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens === undefined) {
         const advisoryKey = `${this.brand}|high-contrast|unregistered`;
         if (this._lastBrandAdvisoryKey !== advisoryKey) {

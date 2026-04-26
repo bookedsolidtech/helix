@@ -97,7 +97,7 @@
 <hx-theme
   theme="{{ _hx_theme }}"
   {% if brand is defined and brand %}brand="{{ brand }}"{% if _hx_theme != 'high-contrast' %} data-brand="{{ brand }}"{% endif %}{% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {% for key, val in attributes|default({}) %}{% if _hx_theme == 'high-contrast' and (key == 'data-brand' or key == 'brand') %}{# suppressed on high-contrast — defense-in-depth against external CSS missing the :not([theme='high-contrast']) guard. See multi-brand-theming.md and BRAND_THEMING.md. #}{% else %}{{ key }}="{{ val }}" {% endif %}{% endfor %}
 >
   {% block content %}{% endblock %}
 </hx-theme>
