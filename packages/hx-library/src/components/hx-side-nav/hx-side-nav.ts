@@ -38,6 +38,7 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-color-text-inverse] - Side-nav text color (resolves to neutral-0).
  * @cssprop [--hx-color-border-on-dark-strong] - Container/header/footer divider border (overlay-white-70 light, overlay-black-50 dark — sized for visibility on the mode-flipped surface-inverse).
  * @cssprop [--hx-color-surface-on-dark-overlay-subtle] - Toggle button hover surface (overlay-white-10 primitive — translucent fill, not a border).
+ * @cssprop [--hx-color-border-on-dark-subtle] - DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Toggle-hover rule reads both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends HelixElement {

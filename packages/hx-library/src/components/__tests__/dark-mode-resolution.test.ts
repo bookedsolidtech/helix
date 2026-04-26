@@ -227,15 +227,17 @@ describe('dark-mode token resolution', () => {
   });
 
   /**
-   * `default` chain coverage note: the four `:hover` consume sites (inverted
-   * secondary/tertiary/ghost/outline) reuse the identical token-fallback shape
+   * `default` chain coverage note: the four `:hover` consume sites in
+   * hx-button.styles.ts (inverted secondary/tertiary/ghost/outline) and the
+   * .side-nav__toggle:hover rule in hx-side-nav.styles.ts (incl. the round-15
+   * @supports color-mix fold) all reuse the identical token-fallback shape
    * that the subtle-chain rest-state tests above exercise. Synthesizing :hover
-   * paint in vitest browser mode is unreliable here (variant rest state has no
+   * paint in vitest browser mode is unreliable (variant rest state has no
    * --hx-button-bg binding, so a hover-only rebind doesn't surface as a stable
    * backgroundColor delta we can assert without coupling to hover internals).
    * Coverage falls back to the `contrast.test.ts` structural-shape lock plus
-   * file-level grep that every rule reads both names — the same safety the
-   * side-nav consume site relies on.
+   * file-level grep — every rule (rest-state path AND `@supports`-gated
+   * override path on side-nav) reads BOTH the deprecated and canonical names.
    */
 
 });
