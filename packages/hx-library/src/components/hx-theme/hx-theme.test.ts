@@ -100,28 +100,46 @@ describe('hx-theme', () => {
       expect(textPrimary.toLowerCase()).toBe('#ffffff');
     });
 
-    it('injects HC palette overrides (primary/error/success ramps) sourced from tokens.json', async () => {
-      // Regression net for the round-15 cascade-shadow finding: the HC tier in
-      // tokens.json must reach the DOM via `highContrastTokenEntries`. If
-      // hx-theme reverts to a hand-written override array, any HC token added
-      // to tokens.json that the array does not mirror would silently fail.
+    it('injects every HC token from tokens.json onto the host', async () => {
+      // Structural sweep — iterates every entry in highContrastTokenEntries
+      // and asserts each one reaches the DOM. Closes the round-15 cascade-
+      // shadow finding at full surface coverage: any HC token added to
+      // tokens.json is automatically protected, not just the sentinels below.
+      const { highContrastTokenEntries } = await import('@helixui/tokens');
+      expect(highContrastTokenEntries.length).toBeGreaterThan(0);
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       await el.updateComplete;
       const styles = getComputedStyle(el);
-      // HC primary-500 — bright blue (#3B82F6) replaces light teal
+      for (const entry of highContrastTokenEntries) {
+        const resolved = styles.getPropertyValue(entry.name).trim();
+        expect(resolved, `HC token ${entry.name} did not reach the DOM`).not.toBe('');
+      }
+    });
+
+    it('injects HC sentinel values for branch-specific override paths', async () => {
+      // Sentinel checks for tokens whose value drift would silently break
+      // consumer-facing surfaces (action.danger.bg-active pairs with
+      // text.on-error-strong; focus-ring/border-width tier sized for HC
+      // visibility; on-primary-strong text flips black on bright HC fills).
+      const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // HC primary-500 — bright blue replaces light teal
       expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
         '#3b82f6',
       );
-      // HC error-500 — bright red (#F87171) for visibility on #000 canvas
-      expect(styles.getPropertyValue('--hx-color-error-500').trim().toLowerCase()).toBe('#f87171');
-      // HC success-500 — bright green (#4ADE80)
-      expect(styles.getPropertyValue('--hx-color-success-500').trim().toLowerCase()).toBe(
-        '#4ade80',
-      );
-      // HC border.on-dark-strong — solid white so inverted button outlines remain visible
+      // HC text.on-primary-strong — black on bright HC primary fills (AAA)
+      expect(
+        styles.getPropertyValue('--hx-color-text-on-primary-strong').trim().toLowerCase(),
+      ).toBe('#000000');
+      // HC border.on-dark-strong — solid white so inverted outlines remain visible
       expect(
         styles.getPropertyValue('--hx-color-border-on-dark-strong').trim().toLowerCase(),
       ).toBe('#ffffff');
+      // HC focus-ring-width — thicker ring for HC visibility (3px vs 2px default)
+      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      // HC border-width-thin — thicker minimum border for HC visibility
+      expect(styles.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
     });
   });
 
