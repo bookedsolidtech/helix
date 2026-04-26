@@ -60,15 +60,9 @@ export const helixFileUploadStyles = css`
 
   .dropzone:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-file-upload-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
-      );
+      var(--hx-file-upload-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
-    border-color: var(
-      --hx-file-upload-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-500))
-    );
+    border-color: var(--hx-file-upload-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
   }
 
   .dropzone--drag-over {
@@ -183,10 +177,7 @@ export const helixFileUploadStyles = css`
 
   .file-item__remove:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-file-upload-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500))
-      );
+      var(--hx-file-upload-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
