@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-26T13:10:25.669Z",
+  "generatedAt": "2026-04-26T15:26:25.292Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2690,7 +2690,7 @@
       ],
       "cssProperties": [
         {
-          "description": "Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).",
+          "description": "Button background color. **Variant-shadowed**: every `.button--{variant}` rule rebinds this property at descendant scope, so a host-level override (`style=\"--hx-button-bg: …\"` or `:host`-targeting CSS) does not reach paint for primary/secondary/tertiary/danger/ghost/outline buttons. To recolor a variant fill, override the upstream semantic instead — e.g. `--hx-color-action-primary-bg` (light primary), `--hx-color-action-primary-bg-inverted-rest` (inverted primary), `--hx-color-action-danger-bg` (danger), or the inverted overlay tokens for tertiary/secondary/ghost/outline. The `--hx-button-bg` hook still works for the rare case of an unstyled base button without a `variant` class, and is internally rebound by the variant rules to participate in the active/hover override chain.",
           "name": "--hx-button-bg",
           "default": "var(--hx-color-action-primary-bg)",
           "figmaBinding": {

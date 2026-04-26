@@ -939,7 +939,7 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
   });
 
   // -------------------------------------------------------------------------
-  // 3.2.2 round-8 structural lock for the on-dark border family.
+  // 3.2.2 round-8/12 structural lock for the on-dark border + overlay family.
   //
   // Codex round-8 finding #2: border.on-dark-default (overlay-white-30) and
   // border.on-dark-subtle (overlay-white-10) lived in the border.* namespace
@@ -950,20 +950,26 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
   // subtle}; only the strong tier (overlay-white-70 ≈ 5:1) survived as a
   // genuine border that can stand on its own.
   //
-  // Round-11 finding #2 added back deprecated *aliases* under border.on-dark-
-  // {default,subtle} that resolve through the new surface.on-dark-overlay-*
-  // tokens — restores the published CSS variable names for any consumer who
-  // set them as theme overrides in 3.2.0 / 3.2.1. Aliases are deprecated and
-  // scheduled for removal in 4.0.0.
+  // Round-11 attempted to add deprecated *aliases* under border.on-dark-
+  // {default,subtle} at the token tier so consumer overrides on the published
+  // CSS variable names from 3.2.0/3.2.1 would still reach paint. Round-12
+  // proved that approach broken: a :root-level alias `:root { --A: var(--B) }`
+  // freezes --A to :root's --B at computed-value time per CSS Custom
+  // Properties §3, so a host-scoped override on the canonical name (--B) is
+  // shadowed by the :root-resolved value of --A. Backwards compatibility is
+  // therefore preserved at the *consume sites* instead — every component rule
+  // that paints with surface.on-dark-overlay-* reads
+  //   var(--hx-color-border-on-dark-*, var(--hx-color-surface-on-dark-overlay-*, …))
+  // so consumer overrides on either name reach paint.
   //
-  // The structural lock therefore allows:
-  //   border.on-dark-strong   — canonical strong border
-  //   border.on-dark-default  — DEPRECATED alias → surface.on-dark-overlay-default
-  //   border.on-dark-subtle   — DEPRECATED alias → surface.on-dark-overlay-subtle
-  // and asserts each alias resolves through the surface.* namespace (i.e. is
-  // a real alias and not a regressed independent value with sub-3:1 alpha).
+  // The structural lock therefore asserts:
+  //   border.on-dark-* contains ONLY 'on-dark-strong' (the surviving genuine
+  //     border with WCAG 1.4.11 headroom). The deprecated default/subtle
+  //     names are NOT emitted at :root.
+  //   surface.on-dark-overlay-* contains exactly the renamed translucent-
+  //     fill pair across every tier.
   // -------------------------------------------------------------------------
-  it('border.on-dark-* shape: strong + deprecated aliases (round-8/11 lock)', () => {
+  it('border.on-dark-* shape: strong-only (round-8/12 lock)', () => {
     type TokenLike = { value?: string };
     type TierShape = {
       border?: Record<string, TokenLike>;
@@ -983,22 +989,8 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
         .filter((k) => k.startsWith('on-dark-'))
         .sort();
       expect(onDarkBorderKeys, `${name}.color.border.on-dark-* shape`).toEqual([
-        'on-dark-default',
         'on-dark-strong',
-        'on-dark-subtle',
       ]);
-
-      // The deprecated default/subtle aliases must resolve through the
-      // renamed surface.* tokens — never through a raw overlay-* primitive
-      // that would re-introduce sub-3:1 alpha as an apparent border value.
-      expect(
-        tier.border?.['on-dark-default']?.value,
-        `${name}.color.border.on-dark-default must alias surface.on-dark-overlay-default`,
-      ).toBe('var(--hx-color-surface-on-dark-overlay-default)');
-      expect(
-        tier.border?.['on-dark-subtle']?.value,
-        `${name}.color.border.on-dark-subtle must alias surface.on-dark-overlay-subtle`,
-      ).toBe('var(--hx-color-surface-on-dark-overlay-subtle)');
 
       // surface.on-dark-overlay-{default,subtle}: both must exist in every
       // tier, since runtime mode-flip depends on the dark + HC overrides

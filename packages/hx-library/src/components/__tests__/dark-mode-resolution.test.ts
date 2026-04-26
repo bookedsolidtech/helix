@@ -195,4 +195,47 @@ describe('dark-mode token resolution', () => {
     const light = await resolveStyles('light', markup, 'hx-button', '.button');
     expect(light.backgroundColor).toBe('rgb(4, 5, 6)');
   });
+
+  /**
+   * Round-12 backwards-compat guard: --hx-color-border-on-dark-{default,subtle}
+   * shipped as public API in 3.2.0/3.2.1 and was renamed to surface.on-dark-overlay-*
+   * in round-8 of 3.2.2. The round-11 alias in tokens.json kept the names live but
+   * only one-way (border alias resolves to surface); components still read only the
+   * canonical surface name, so consumer overrides on the deprecated border name
+   * never reached paint. Round-12 fix: every consume site reads BOTH names with
+   * deprecated-first priority. These tests pin that consumer overrides on the
+   * deprecated names continue to work until 4.0.0 removal.
+   */
+  it('inverted tertiary honors consumer override on deprecated --hx-color-border-on-dark-subtle', async () => {
+    const markup =
+      '<hx-button variant="tertiary" inverted style="--hx-color-border-on-dark-subtle: rgb(7, 8, 9)">Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
+    expect(light.backgroundColor).toBe('rgb(7, 8, 9)');
+    expect(dark.backgroundColor).toBe('rgb(7, 8, 9)');
+  });
+
+  it('inverted tertiary honors consumer override on canonical --hx-color-surface-on-dark-overlay-subtle', async () => {
+    // When the deprecated name is unset, the both-name fallback must still
+    // route through the canonical surface token so the documented override
+    // path keeps working for new consumers.
+    const markup =
+      '<hx-button variant="tertiary" inverted style="--hx-color-surface-on-dark-overlay-subtle: rgb(10, 11, 12)">Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    expect(light.backgroundColor).toBe('rgb(10, 11, 12)');
+  });
+
+  /**
+   * `default` chain coverage note: the four `:hover` consume sites (inverted
+   * secondary/tertiary/ghost/outline) reuse the identical token-fallback shape
+   * that the subtle-chain rest-state tests above exercise. Synthesizing :hover
+   * paint in vitest browser mode is unreliable here (variant rest state has no
+   * --hx-button-bg binding, so a hover-only rebind doesn't surface as a stable
+   * backgroundColor delta we can assert without coupling to hover internals).
+   * Coverage falls back to the `contrast.test.ts` structural-shape lock plus
+   * file-level grep that every rule reads both names — the same safety the
+   * side-nav consume site relies on.
+   */
+
 });
