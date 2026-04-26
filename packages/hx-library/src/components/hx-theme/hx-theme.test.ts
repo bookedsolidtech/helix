@@ -717,7 +717,17 @@ describe('hx-theme', () => {
 
       for (const tokenName of REQUIRED_SEMANTIC_TOKENS) {
         const actual = styles.getPropertyValue(tokenName).trim().toLowerCase();
-        const expected = (hcOverlayMap.get(tokenName) ?? tokenMap[tokenName] ?? '').toLowerCase();
+        // R24 finding 4 — never silently fall back to '' when a token is
+        // missing from BOTH the HC overlay and the base tokenMap. Such a
+        // gap is REQUIRED_SEMANTIC_TOKENS drift (registry says required,
+        // tokens.json no longer ships it) and the test must fail loudly,
+        // not assert `actual === ''`.
+        const raw = hcOverlayMap.get(tokenName) ?? tokenMap[tokenName];
+        expect(
+          raw,
+          `${tokenName} missing from both HC overlay and tokenMap — REQUIRED_SEMANTIC_TOKENS drift`,
+        ).toBeDefined();
+        const expected = raw!.toLowerCase();
         // Brand value (#ffffff) must NEVER win on HC.
         expect(actual, `${tokenName} should not match brand white`).not.toBe('#ffffff');
         // Must match either the HC overlay (if defined for this token) or
@@ -768,6 +778,11 @@ describe('hx-theme', () => {
       );
       await registered.updateComplete;
 
+      // R24 finding 5 — lock the call count so a regression that fires the
+      // info on every render (e.g. moved out of `_applyEffectiveTheme()`'s
+      // single-shot guard into `update()`) fails loudly instead of being
+      // hidden behind the substring check.
+      expect(infoSpy).toHaveBeenCalledTimes(1);
       const infoCalls = infoSpy.mock.calls.flat().filter((arg) => typeof arg === 'string');
       expect(infoCalls.some((m) => m.includes('suppressed on theme="high-contrast"'))).toBe(true);
       expect(infoCalls.some((m) => m.includes(brandName))).toBe(true);
@@ -781,6 +796,7 @@ describe('hx-theme', () => {
       );
       await unregistered.updateComplete;
 
+      expect(warnSpy).toHaveBeenCalledTimes(1);
       const warnCalls = warnSpy.mock.calls.flat().filter((arg) => typeof arg === 'string');
       expect(warnCalls.some((m) => m.includes('not-registered-r23'))).toBe(true);
       expect(warnCalls.some((m) => m.includes('not registered'))).toBe(true);

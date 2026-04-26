@@ -2,9 +2,9 @@
 '@helixui/library': patch
 ---
 
-3.2.2 codex round-16..round-22 remediation — `hx-theme` HC injection sourced from tokens.json (no more hand-written drift) and brand merge suppressed on high-contrast to preserve the WCAG 7:1+ contract.
+3.2.2 codex round-16..round-25 remediation — `hx-theme` HC injection sourced from tokens.json (no more hand-written drift), brand merge suppressed on high-contrast to preserve the WCAG 7:1+ contract, and the suppression advisory deduped to fire once per applied state.
 
-Closes 3 codex round-15..round-22 findings (1 high correctness, 1 medium test-gap, 1 high api-design) plus R22 doc/test hardening on the staging→main candidate. Rolls into the same 3.2.2 patch.
+Closes codex round-15..round-25 findings (correctness, test-gap, api-design, doc-drift) on the staging→main candidate. Rolls into the same 3.2.2 patch.
 
 **Finding 1 [correctness high] — `hx-theme` `_hcOverrides` array drifted from `tokens.json` `high-contrast` block.**
 
@@ -65,15 +65,25 @@ Brands continue to apply on light/dark themes unchanged. The R20 re-overlay bloc
 
 Regression tests:
 - `HC overlay wins over brand overrides on high-contrast theme` — registers a brand whose `--hx-color-primary-500` is sub-AA on `#000` and asserts the HC value (`#3B82F6`) wins, plus four HC a11y sentinels survive (focus-ring-width=3px, border-width-thin=2px, text.on-error-strong=#000000, action.danger.bg-active=#F87171).
-- `HC suppresses brand merge across non-HC-overlaid stops too (primary-50/100/800)` — registers a brand with `#FFFFFF` on every required stop and asserts (a) HC stops still win, (b) non-HC-overlaid stops (primary-50=`#EBF8F8`, primary-100=`#DBF0F0`, primary-800=`#07494A`, secondary-700=`#0B626A`) match `tokens.json` light primitives byte-for-byte. Codifies that ALL 22 stops are suppressed, not just the HC-overlaid subset.
+- `HC suppresses brand merge across ALL 22 REQUIRED_SEMANTIC_TOKENS stops (data-driven)` — R24 replacement of the prior 4-stop sample. Registers a brand with `#FFFFFF` on every required stop and asserts every stop resolves to either the HC overlay value or the light primitive (never the brand white). R25 hardened the loop to fail loudly on `REQUIRED_SEMANTIC_TOKENS` drift instead of silently asserting `actual === ''`.
 - `HC + brand + reduced motion triple stack — HC a11y survives, motion override applies` — exercises the full overlay stack and asserts the reduced-motion overlay actually applied (`--hx-duration-fast=0ms`, `--hx-transition-fast=0ms linear`, `--hx-easing-default=linear`).
 - `brand on light theme overrides primary color (brand-merge-skip is gated on HC only)` — confirms brands still apply on light/dark, no regression.
+- `emits console.info when a registered brand is suppressed under HC, warn for unregistered` — R24 lock-down with `expect(infoSpy).toHaveBeenCalledTimes(1)` / `expect(warnSpy).toHaveBeenCalledTimes(1)` to surface multi-emission regressions.
+
+**R25 fix [correctness medium] — brand suppression advisory was firing 4× per HC+brand application.**
+
+The `console.info` (and parallel "is not registered" `console.warn`) were emitted directly from `_applyEffectiveTheme()`. That method runs once per relevant property change (`theme`, `motion`, `brand`) plus on init, so a single `<hx-theme theme="high-contrast" brand="...">` mount fired the advisory four times. Surfaced by the new `toHaveBeenCalledTimes(1)` lock-down.
+
+**Fix:** Added `_lastBrandAdvisoryKey: string | null` field. Each branch (light/dark unregistered warn, HC unregistered warn, HC suppressed info) computes a `${brand}|${effectiveTheme}|${kind}` key and emits only when the key changes. The no-brand `else` clears the key so a brand→unset→brand transition re-emits as expected. Emissions now fire exactly once per applied state transition.
 
 **Documentation alignment:**
 - `packages/hx-tokens/docs/BRAND_THEMING.md` — replaced "theme and brand are independent" claim with explicit HC-suppression rule.
 - `packages/hx-library/src/components/hx-theme/hx-theme.ts` — `brand` JSDoc documents HC suppression and links to `BRAND_THEMING.md`.
-- `apps/docs/src/content/docs/component-library/hx-theme.mdx` — added `:::caution` callout under brand override section.
-- Runtime emits `console.info` when a registered brand is suppressed under HC, so the behavior change is observable in development.
+- `packages/hx-library/src/components/hx-theme/hx-theme.twig` — `brand` parameter documented in the docblock with HC-suppression note plus the missing `{% if brand %}brand="..."{% endif %}` template binding (R24 finding 6).
+- `packages/hx-library/src/components/hx-theme/hx-theme.stories.ts` — `brand` argType description rewritten to describe registry requirement, unregistered warn, and HC suppression info (R24 finding 3).
+- `apps/docs/src/content/docs/component-library/hx-theme.mdx` — properties row + `:::caution` callout describe the registry path and HC suppression.
+- `apps/docs/src/content/docs/extending/multi-brand-theming.md` — R24/R25: callout distinguishes the JS registry path (HC-safe via suppression) from the CSS-pattern (composes via cascade, must be HC-guarded). Tier-2 example, tier-3 diagram, and all three brand definitions (Harbor Health, St. Mary's, Northwell) updated to canonical `hx-theme[data-brand='...']:not([theme='high-contrast'])` selectors. Drupal `<body>` placement called out as requiring either JS registry or theme mirroring.
+- Runtime emits `console.info` (deduped) when a registered brand is suppressed under HC; `console.warn` (deduped) when an unregistered brand name is supplied. Both are observable in development without spamming on every property tick.
 
 **Additional R21 hardening:**
 - `effectiveTheme` return type narrowed from `'light' | 'dark' | 'high-contrast' | 'auto'` to `'light' | 'dark' | 'high-contrast'`. The runtime body never returns `'auto'` (it resolves auto via `matchMedia`), so the prior type signature was a documentation lie. React wrapper `packages/hx-react/src/components/HxTheme/types.ts` regenerated to match.

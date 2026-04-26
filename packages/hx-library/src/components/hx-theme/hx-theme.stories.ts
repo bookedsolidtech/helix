@@ -36,7 +36,7 @@ const meta = {
     brand: {
       control: 'text',
       description:
-        'Brand identifier used to scope theme tokens. Allows multiple brands to coexist on the same page.',
+        'Registered brand name applied on top of the base theme. Must be registered via HelixBrandRegistry.register() first; an unregistered name logs a console.warn. Suppressed on theme="high-contrast" (logs console.info) to preserve the WCAG 7:1+ contrast guarantee. See BRAND_THEMING.md.',
       table: {
         category: 'Theme',
         type: { summary: 'string' },

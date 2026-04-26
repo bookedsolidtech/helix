@@ -303,6 +303,11 @@ export class HelixTheme extends HelixElement {
   private _motionQuery: MediaQueryList | null = null;
   /** @internal */
   private _motionHandler: (() => void) | null = null;
+  /** @internal — last `${brand}|${effectiveTheme}|${kind}` for which a brand
+   * suppression info / unregistered warn was emitted. `_applyEffectiveTheme()`
+   * runs on every relevant property change, so without this guard the message
+   * fires once per `update()` tick rather than once per applied state. */
+  private _lastBrandAdvisoryKey: string | null = null;
 
   override firstUpdated(changed: PropertyValues<this>): void {
     super.firstUpdated(changed);
@@ -458,33 +463,43 @@ export class HelixTheme extends HelixElement {
       const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens !== undefined) {
         css = mergeBrandTokens(css, brandTokens);
+        this._lastBrandAdvisoryKey = `${this.brand}|${this.effectiveTheme}|applied`;
       } else {
-        console.warn(
-          `[hx-theme] Brand "${this.brand}" is not registered. ` +
-            `Register it via HelixBrandRegistry.register() before use. ` +
-            `Applying base theme only.`,
-        );
+        const advisoryKey = `${this.brand}|${this.effectiveTheme}|unregistered`;
+        if (this._lastBrandAdvisoryKey !== advisoryKey) {
+          console.warn(
+            `[hx-theme] Brand "${this.brand}" is not registered. ` +
+              `Register it via HelixBrandRegistry.register() before use. ` +
+              `Applying base theme only.`,
+          );
+          this._lastBrandAdvisoryKey = advisoryKey;
+        }
       }
     } else if (this.brand !== '' && this.effectiveTheme === 'high-contrast') {
-      // Surface the contract — consumer asked for brand + HC; brand was
-      // intentionally suppressed to preserve a11y. Validates the registration
-      // path so unregistered brands still produce the standard warning, and
-      // emits an info-level signal when a registered brand is suppressed so
-      // the behavior is observable in development.
       const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens === undefined) {
-        console.warn(
-          `[hx-theme] Brand "${this.brand}" is not registered. ` +
-            `Register it via HelixBrandRegistry.register() before use. ` +
-            `Applying base theme only.`,
-        );
+        const advisoryKey = `${this.brand}|high-contrast|unregistered`;
+        if (this._lastBrandAdvisoryKey !== advisoryKey) {
+          console.warn(
+            `[hx-theme] Brand "${this.brand}" is not registered. ` +
+              `Register it via HelixBrandRegistry.register() before use. ` +
+              `Applying base theme only.`,
+          );
+          this._lastBrandAdvisoryKey = advisoryKey;
+        }
       } else {
-        console.info(
-          `[hx-theme] Brand "${this.brand}" is suppressed on theme="high-contrast" ` +
-            `to preserve the WCAG 7:1+ contrast contract. ` +
-            `Applying base high-contrast tokens only. See BRAND_THEMING.md.`,
-        );
+        const advisoryKey = `${this.brand}|high-contrast|suppressed`;
+        if (this._lastBrandAdvisoryKey !== advisoryKey) {
+          console.info(
+            `[hx-theme] Brand "${this.brand}" is suppressed on theme="high-contrast" ` +
+              `to preserve the WCAG 7:1+ contrast contract. ` +
+              `Applying base high-contrast tokens only. See BRAND_THEMING.md.`,
+          );
+          this._lastBrandAdvisoryKey = advisoryKey;
+        }
       }
+    } else {
+      this._lastBrandAdvisoryKey = null;
     }
 
     if (this.effectiveMotion === 'reduced') {

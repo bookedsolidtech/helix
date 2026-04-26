@@ -22,6 +22,16 @@
                                              users with low vision or HC display modes.
                          - 'auto'          — Reads OS color-scheme preference after hydration.
                                              Renders as 'light' until JavaScript runs.
+    brand      (string)  Optional. Registered brand name applied on top of the base
+                         theme (e.g. 'harbor-health'). The name MUST be registered via
+                         HelixBrandRegistry.register() in client-side JavaScript before
+                         the element renders; an unregistered name logs a console.warn
+                         and falls back to the base theme. Suppressed on
+                         theme="high-contrast" (logs console.info) to preserve the
+                         WCAG 7:1+ contrast contract — pair with
+                         hx-theme[data-brand]:not([theme='high-contrast']) selectors
+                         if you also use the CSS-pattern brand override (see
+                         BRAND_THEMING.md).
     attributes (object)  Optional. Additional HTML attributes spread onto <hx-theme>.
 
   Usage — Full page theming:
@@ -76,6 +86,7 @@
 
 <hx-theme
   theme="{{ theme|default('light') }}"
+  {% if brand is defined and brand %}brand="{{ brand }}"{% endif %}
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
   {% block content %}{% endblock %}
