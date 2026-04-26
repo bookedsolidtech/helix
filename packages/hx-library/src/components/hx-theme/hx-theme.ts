@@ -2,7 +2,12 @@ import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
-import { tokenEntries, darkTokenEntries, HelixBrandRegistry } from '@helixui/tokens';
+import {
+  tokenEntries,
+  darkTokenEntries,
+  highContrastTokenEntries,
+  HelixBrandRegistry,
+} from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
 import { mergeBrandTokens } from '../../utils/token-merger.js';
 
@@ -37,62 +42,6 @@ export type MotionMode = 'full' | 'reduced' | 'none';
  * Consumers should override at the semantic tier to respect theme scoping.
  */
 export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'auto';
-
-/**
- * High-contrast token overrides. Targets WCAG 7:1+ contrast ratios for low-vision users.
- * These are injected on top of the light primitives when theme="high-contrast".
- * Values here mirror the `high-contrast` section of tokens.json; kept in sync manually
- * until HC tokens are promoted to the published @helixui/tokens package.
- */
-const _hcOverrides: Array<[string, string]> = [
-  ['--hx-color-text-primary', '#FFFFFF'],
-  ['--hx-color-text-secondary', '#FFFFFF'],
-  ['--hx-color-text-muted', '#E0E0E0'],
-  ['--hx-color-text-strong', '#FFFFFF'],
-  ['--hx-color-text-placeholder', '#B0B0B0'],
-  ['--hx-color-text-disabled', '#767676'],
-  ['--hx-color-text-inverse', '#000000'],
-  ['--hx-color-text-on-primary', '#000000'],
-  ['--hx-color-text-on-secondary', '#000000'],
-  ['--hx-color-text-on-error', '#000000'],
-  ['--hx-color-text-on-success', '#000000'],
-  ['--hx-color-text-on-warning', '#000000'],
-  ['--hx-color-text-on-info', '#000000'],
-  ['--hx-color-error-text', '#FCA5A5'],
-  ['--hx-color-success-text', '#86EFAC'],
-  ['--hx-color-text-link', '#FFFF00'],
-  ['--hx-color-text-link-hover', '#FFFF99'],
-  ['--hx-color-text-link-visited', '#FF80FF'],
-  ['--hx-color-text-link-active', '#FFFFFF'],
-  ['--hx-color-surface-default', '#000000'],
-  ['--hx-color-surface-raised', '#1A1A1A'],
-  ['--hx-color-surface-sunken', '#000000'],
-  ['--hx-color-surface-inverse', '#FFFFFF'],
-  ['--hx-color-surface-overlay', 'rgba(0, 0, 0, 0.95)'],
-  ['--hx-color-border-default', '#FFFFFF'],
-  ['--hx-color-border-subtle', '#C0C0C0'],
-  ['--hx-color-border-strong', '#FFFFFF'],
-  ['--hx-color-border-focus', '#FFFF00'],
-  ['--hx-color-focus-ring', '#FFFF00'],
-  ['--hx-color-selection-bg', '#1AEBFF'],
-  ['--hx-color-selection-color', '#000000'],
-  ['--hx-body-bg', '#000000'],
-  ['--hx-body-color', '#FFFFFF'],
-  ['--hx-shadow-sm', '0 1px 2px 0 rgb(255 255 255 / 0.2)'],
-  [
-    '--hx-shadow-md',
-    '0 4px 6px -1px rgb(255 255 255 / 0.3), 0 2px 4px -2px rgb(255 255 255 / 0.2)',
-  ],
-  [
-    '--hx-shadow-lg',
-    '0 10px 15px -3px rgb(255 255 255 / 0.3), 0 4px 6px -4px rgb(255 255 255 / 0.2)',
-  ],
-  [
-    '--hx-shadow-xl',
-    '0 20px 25px -5px rgb(255 255 255 / 0.3), 0 8px 10px -6px rgb(255 255 255 / 0.2)',
-  ],
-  ['--hx-shadow-2xl', '0 25px 50px -12px rgb(255 255 255 / 0.4)'],
-];
 
 /**
  * Compact density overrides: ~75% of original --hx-space-* values.
@@ -203,9 +152,11 @@ function _buildThemeCss(theme: ThemeName): string {
     css = `:host {\n${_buildProps(merged)}\n  color-scheme: dark;\n}`;
   } else if (theme === 'high-contrast') {
     // Apply HC overrides on top of light primitives — distinct WCAG 7:1+ token set
+    // sourced from tokens.json `high-contrast` block via highContrastTokenEntries.
+    // Mirrors the dark-mode injection path so source/runtime drift is structurally impossible.
     const merged = new Map(lightMap);
-    for (const [name, value] of _hcOverrides) {
-      merged.set(name, value);
+    for (const t of highContrastTokenEntries) {
+      merged.set(t.name, t.value);
     }
     css = `:host {\n${_buildProps(merged)}\n  color-scheme: dark;\n}`;
   } else {
