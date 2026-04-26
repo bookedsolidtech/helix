@@ -35,27 +35,43 @@ non-text floor in the precision-cool palette (3.2.0/3.2.1):
   Flipped to overlay-black-* (3.84:1 strong / proportional alphas for
   default/subtle).
 
-- Inline fallback hex values updated across 24 component `.styles.ts` files
+- Inline fallback hex values updated across 45 component `.styles.ts` files
   to track the new primitive resolutions (`#6ab1b1`→`#0f7078` for focus,
   `#8e9c98`→`#66787b` for border-strong) — keeps the inline-fallback parity
-  invariant intact.
+  invariant intact. Initial sweep covered 24 form-field/action components;
+  the parity sweep then aligned 21 additional focus-ring consumers
+  (hx-card, hx-popover, hx-icon-button, hx-pagination, hx-table,
+  hx-color-picker, hx-data-table, hx-overflow-menu, hx-phi-field, hx-drawer,
+  hx-accordion-item, hx-menu-item, hx-nav, hx-step, hx-tree-item, hx-dialog,
+  hx-meter, hx-top-nav, hx-breadcrumb-item, hx-split-panel,
+  hx-clinical-status) so cold-start (CSS-not-loaded) painting matches the
+  semantic's resolved primary-600 instead of stale primary-500.
 
 - `hx-split-button` primary divider rebound from `primary-400` (1.40:1 on
   primary-500 — invisible divider) to `primary-900` (4.03:1 on primary-500 —
   AA-pass divider). `@cssprop` JSDoc updated; outline-variant divider
   unchanged.
 
-- `hx-button` `:host([inverted]) .button--primary` resting rule paints
-  directly on `background-color` (not via a self-referential `--hx-button-bg`
-  cycle) so the new `action.primary.bg-inverted-rest` semantic actually
-  reaches the pixel. Cycle would have silently fallen through to
-  `primary-500` and reintroduced the 2.94:1 dark-mode fail.
+- `hx-button` `:host([inverted]) .button--primary` resting rule rebinds
+  `--hx-button-bg` to the new `action.primary.bg-inverted-rest` semantic at
+  higher specificity (cascade-aware option B). The earlier draft tried to
+  paint `background-color` directly (option A) but was shadowed by the base
+  `.button--primary` rule writing `--hx-button-bg` unconditionally, so the
+  inverted-rest semantic never reached the pixel and dark-mode inverted
+  primary stayed at 2.94:1. The rebind preserves consumer-override
+  propagation through `--hx-button-bg`.
 
-Two new regression tests gate the fixes:
+Three regression tests gate the fixes:
 
 - contrast matrix gains three pairs (`border.strong` × `surface.default`,
   `bg-inverted-rest` × `surface.inverse` light/dark);
 - `dark-mode-resolution.test.ts` asserts `<hx-button variant="primary"
   inverted>` resolves to `primary-500` in light and `primary-600` in dark
   (catches the CSS-cycle regression at the painted-pixel layer, not just the
-  token tier).
+  token tier);
+- a third assertion pins the binding form: a consumer-tier override of
+  `--hx-button-bg` on the inverted primary button must reach the painted
+  pixel — proving the resting rule rebinds the custom property rather than
+  painting `background-color` directly. Reverting to the earlier
+  background-color shape would silently regress consumer override
+  propagation; this test catches it.

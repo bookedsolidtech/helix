@@ -94,10 +94,7 @@ export const helixDataTableStyles = css`
 
   .sort-btn:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-data-table-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-data-table-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 2px);
   }
@@ -199,10 +196,7 @@ export const helixDataTableStyles = css`
   [part~='td']:focus-visible,
   [part~='th']:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-data-table-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-data-table-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, -2px);
     border-radius: var(--hx-border-radius-sm, 2px);
   }
