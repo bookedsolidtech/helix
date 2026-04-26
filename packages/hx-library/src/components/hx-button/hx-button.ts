@@ -74,6 +74,8 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-color-surface-on-dark-overlay-subtle] - Inverted-tertiary resting fill (overlay-white-10 — translucent fill, not a border).
  * @cssprop [--hx-color-surface-on-dark-overlay-default] - Inverted-tertiary hover fill + inverted-secondary/ghost/outline hover fill (overlay-white-30 — translucent fill, not a border).
  * @cssprop [--hx-color-border-on-dark-strong] - Inverted-secondary/outline border + inverted focus-visible outline (overlay-white-70 ≈ 5:1 — clears WCAG 1.4.11 3:1 floor).
+ * @cssprop [--hx-color-border-on-dark-subtle] - DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.
+ * @cssprop [--hx-color-border-on-dark-default] - DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-default (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {

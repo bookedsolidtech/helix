@@ -126,8 +126,16 @@ export const helixSideNavStyles = css`
   }
 
   @supports (color: color-mix(in srgb, red 50%, blue)) {
+    /* Fold color-mix() into the same deprecated-first chain so consumer
+       overrides on either token reach paint on the modern path too. */
     .side-nav__toggle:hover {
-      background-color: color-mix(in srgb, currentColor 15%, transparent);
+      background-color: var(
+        --hx-color-border-on-dark-subtle,
+        var(
+          --hx-color-surface-on-dark-overlay-subtle,
+          color-mix(in srgb, currentColor 15%, transparent)
+        )
+      );
     }
   }
 
