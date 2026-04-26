@@ -305,10 +305,10 @@ export const helixTextInputStyles = css`
 
   /* ─── High Contrast Mode (forced-colors) ───
    *
-   * Component-specific overrides that complement the shared forcedColorsField
-   * mixin (composed in static styles). The mixin handles the input/wrapper
-   * core; the rules below extend it to the label / error / help-text /
-   * disabled-host surfaces unique to hx-text-input.
+   * Bespoke block — sole owner of forced-colors deference for hx-text-input.
+   * Covers wrapper/input/placeholder/focus/disabled/error/label/help-text;
+   * strictly more than forcedColorsField. The mixin is intentionally NOT
+   * composed (XOR rule — see styles/forced-colors.ts COMPOSITION RULES).
    */
 
   @media (forced-colors: active) {
