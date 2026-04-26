@@ -288,7 +288,7 @@ export const helixNavItemStyles = css`
       border-color: GrayText;
     }
 
-    :host([active]) .nav-item__link {
+    :host([active]:not([disabled])) .nav-item__link {
       border-color: Highlight;
     }
 

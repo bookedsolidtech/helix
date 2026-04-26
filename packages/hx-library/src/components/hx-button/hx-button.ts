@@ -36,8 +36,8 @@ export interface HxButtonClickDetail {
  * @csspart spinner - The loading spinner SVG element.
  *
  * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).
- * @cssprop [--hx-button-hover-bg] - Hover background override; when set, overrides the variant default hover background from outside the shadow DOM. Under [inverted] for primary/danger, hover and active share a paint (combined :hover, :active rule), so this override applies to both states unless --hx-button-active-bg also takes precedence.
- * @cssprop [--hx-button-active-bg] - Pressed/active background override; when set, overrides the variant default :active background in both standard and inverted modes. Takes precedence over --hx-button-hover-bg in the fallback chain. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode.
+ * @cssprop [--hx-button-hover-bg] - Hover background override (primary and danger variants only). Other variants (secondary/outline, ghost) keep their hover fills routed through their semantic action.* tokens and do not consume this hook. Under [inverted] for primary/danger, hover and active share a paint (combined :hover, :active rule), so this override applies to both states unless --hx-button-active-bg also takes precedence.
+ * @cssprop [--hx-button-active-bg] - Pressed/active background override (primary and danger variants only, including their inverted modes). Takes precedence over --hx-button-hover-bg in the fallback chain. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode. Other variants do not consume this hook.
  * @cssprop [--hx-button-color=var(--hx-color-text-on-primary)] - Button text color (variants route through text.on-{role} / text.on-{role}-strong).
  * @cssprop [--hx-button-border-color=transparent] - Button border color (secondary/outline variants route through action.secondary.border).
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
@@ -54,9 +54,9 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-color-action-primary-bg] - Primary variant resting fill (3.2.1 semantic action layer).
  * @cssprop [--hx-color-action-primary-bg-hover] - Primary variant hover fill.
  * @cssprop [--hx-color-action-primary-bg-active] - Primary variant active/pressed fill.
- * @cssprop [--hx-color-action-secondary-fg] - Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark).
- * @cssprop [--hx-color-action-secondary-border] - Secondary/outline variant border.
- * @cssprop [--hx-color-action-secondary-bg-hover] - Secondary/outline variant hover fill.
+ * @cssprop [--hx-color-action-secondary-fg] - Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark). Consumed only by .button--secondary; the actual border/surface paint for outline currently routes through --hx-color-border-strong / --hx-color-surface-raised in styles, with this token reserved for the foreground.
+ * @cssprop [--hx-color-action-secondary-border] - Secondary/outline variant border (3.2.1 semantic; outline still routes through --hx-color-border-strong by default).
+ * @cssprop [--hx-color-action-secondary-bg-hover] - Secondary/outline variant hover fill (3.2.1 semantic; outline still routes through --hx-color-surface-raised by default).
  * @cssprop [--hx-color-action-ghost-fg] - Ghost variant fg.
  * @cssprop [--hx-color-action-ghost-bg-hover] - Ghost variant hover fill.
  * @cssprop [--hx-color-action-danger-bg] - Danger variant resting fill.

@@ -66,7 +66,7 @@ export interface HxTextInputDetail {
  * @cssprop [--hx-color-text-strong] - Resting input text + label color (semantic).
  * @cssprop [--hx-color-border-strong] - Resting border color (semantic).
  * @cssprop [--hx-color-error-text] - Error state text + border color (semantic).
- * @cssprop [--hx-color-error-600] - Error border primitive fallback inside the focus-state cascade.
+ * @cssprop [--hx-color-error-600] - Error border primitive fallback inside the invalid-state cascade.
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
