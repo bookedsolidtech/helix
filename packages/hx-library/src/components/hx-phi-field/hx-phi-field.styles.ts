@@ -60,10 +60,7 @@ export const helixPhiFieldStyles = css`
 
   .phi-field__toggle:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-phi-field-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-phi-field-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
