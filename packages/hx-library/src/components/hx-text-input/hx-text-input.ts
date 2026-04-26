@@ -54,36 +54,19 @@ export interface HxTextInputDetail {
  * @cssprop [--hx-input-label-color=var(--hx-color-text-strong)] - Label text color.
  * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.
  * @cssprop [--hx-input-lg-font-size=1.125rem] - Font size for the lg size variant.
- * @cssprop [--hx-opacity-disabled] - Opacity.
- * @cssprop [--hx-focus-ring-color] - Color.
- * @cssprop [--hx-color-primary-400] - Color.
- * @cssprop [--hx-focus-ring-width] - Width.
- * @cssprop [--hx-focus-ring-opacity] - CSS custom property.
- * @cssprop [--hx-space-1] - Spacing token.
- * @cssprop [--hx-font-family-sans] - Font family.
- * @cssprop [--hx-font-size-sm] - Font size.
- * @cssprop [--hx-font-weight-medium] - Font weight.
- * @cssprop [--hx-color-neutral-700] - Color.
- * @cssprop [--hx-line-height-normal] - Line height.
- * @cssprop [--hx-color-error-text] - Color.
- * @cssprop [--hx-font-weight-bold] - Font weight.
- * @cssprop [--hx-border-width-thin] - Width.
- * @cssprop [--hx-color-neutral-300] - Color.
- * @cssprop [--hx-border-radius-md] - CSS custom property.
- * @cssprop [--hx-color-neutral-0] - Color.
- * @cssprop [--hx-transition-fast] - Transition timing.
- * @cssprop [--hx-color-error-500] - Color.
- * @cssprop [--hx-color-neutral-500] - Color.
- * @cssprop [--hx-space-3] - Spacing token.
- * @cssprop [--hx-space-2] - Spacing token.
- * @cssprop [--hx-font-size-md] - Font size.
- * @cssprop [--hx-color-neutral-800] - Color.
- * @cssprop [--hx-size-10] - Size token.
- * @cssprop [--hx-color-neutral-400] - Color.
- * @cssprop [--hx-size-8] - Size token.
- * @cssprop [--hx-space-4] - Spacing token.
- * @cssprop [--hx-size-12] - Size token.
- * @cssprop [--hx-font-size-xs] - Font size.
+ *
+ * @cssprop [--hx-text-input-border-width=var(--hx-border-width-thin)] - Outer border-width override (canonical hx-{tag}-* prefix; sits above --hx-input-* aliases in the cascade).
+ * @cssprop [--hx-text-input-padding-x=var(--hx-space-3)] - Outer horizontal padding override.
+ * @cssprop [--hx-text-input-padding-y=var(--hx-space-2)] - Outer vertical padding override.
+ * @cssprop [--hx-text-input-font-size=var(--hx-font-size-md)] - Outer font-size override.
+ * @cssprop [--hx-text-input-sm-font-size] - Outer sm-variant font-size override (falls through to --hx-input-sm-font-size).
+ * @cssprop [--hx-text-input-lg-font-size] - Outer lg-variant font-size override (falls through to --hx-input-lg-font-size).
+ *
+ * @cssprop [--hx-color-surface-default] - Resting field surface (semantic).
+ * @cssprop [--hx-color-text-strong] - Resting input text + label color (semantic).
+ * @cssprop [--hx-color-border-strong] - Resting border color (semantic).
+ * @cssprop [--hx-color-error-text] - Error state text + border color (semantic).
+ * @cssprop [--hx-color-error-600] - Error border primitive fallback inside the invalid-state cascade.
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {

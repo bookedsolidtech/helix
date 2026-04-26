@@ -25,13 +25,15 @@ const _nextNavItemId = createIdCounter('hx-nav-item');
  * @csspart badge - The badge container.
  * @csspart children - The children container.
  *
- * @cssprop [--hx-nav-item-color=var(--hx-color-neutral-300)] - Item text color.
+ * @cssprop [--hx-nav-item-color=var(--hx-color-text-inverse)] - Item text color.
  * @cssprop [--hx-nav-item-hover-bg] - Item hover background.
- * @cssprop [--hx-nav-item-hover-color=var(--hx-color-neutral-100)] - Item hover text color.
- * @cssprop [--hx-nav-item-active-bg=var(--hx-color-primary-600)] - Active item background.
- * @cssprop [--hx-nav-item-active-color=var(--hx-color-neutral-50)] - Active item text color.
+ * @cssprop [--hx-nav-item-hover-color=var(--hx-color-text-inverse)] - Item hover text color.
+ * @cssprop [--hx-nav-item-active-bg=var(--hx-color-action-primary-bg-hover)] - Active item background.
+ * @cssprop [--hx-nav-item-active-color=var(--hx-color-text-on-primary-strong)] - Active item text color.
  * @cssprop [--hx-nav-item-padding] - Item padding.
- * @cssprop [--hx-nav-item-host-bg=var(--hx-color-neutral-900)] - Component host background color.
+ * @cssprop [--hx-nav-item-host-bg=var(--hx-color-surface-inverse)] - Component host background color.
+ * @cssprop [--hx-nav-item-tooltip-bg=var(--hx-color-surface-inverse)] - Tooltip background color (collapsed-rail tooltip).
+ * @cssprop [--hx-nav-item-tooltip-color=var(--hx-color-text-inverse)] - Tooltip text color (collapsed-rail tooltip).
  */
 @customElement('hx-nav-item')
 export class HelixNavItem extends HelixElement {

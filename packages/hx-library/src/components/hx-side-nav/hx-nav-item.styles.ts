@@ -83,7 +83,7 @@ export const helixNavItemStyles = css`
 
   :host([active]) .nav-item__link {
     /* Active state sits on the darker primary-600 (#0F7078) fill. White text
-       (#ffffff) on primary-600 = 5.39:1 WCAG AA pass. text-on-primary now
+       (#ffffff) on primary-600 = 5.82:1 WCAG AA pass. text-on-primary now
        resolves to neutral-900 (intended for the lighter primary-500 surface)
        which would fail here. text.on-primary-strong holds at neutral-0 across
        modes (no dark flip) so the active fg stays AA. 3.2.1: routed through
@@ -258,8 +258,38 @@ export const helixNavItemStyles = css`
   /* ─── Forced Colors (Windows High Contrast) ─── */
 
   @media (forced-colors: active) {
-    :host([active]) .nav-item__link {
-      border: 1px solid Highlight;
+    /*
+     * Bespoke block — sole owner of forced-colors deference for hx-nav-item
+     * (the forcedColorsInteractive mixin is intentionally NOT composed; XOR
+     * rule in styles/forced-colors.ts). Mirrors the mixin's interactive
+     * contract (ButtonFace / ButtonText / Highlight on hover, GrayText on
+     * disabled) for the .nav-item__link interactive surface, then layers the
+     * component-specific active-state border and tooltip border on top.
+     */
+    .nav-item__link {
+      forced-color-adjust: none;
+      background-color: ButtonFace;
+      color: ButtonText;
+      border: 1px solid ButtonText;
+    }
+
+    .nav-item__link:hover {
+      background-color: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
+    }
+
+    :host([disabled]) {
+      opacity: 1;
+    }
+
+    :host([disabled]) .nav-item__link {
+      color: GrayText;
+      border-color: GrayText;
+    }
+
+    :host([active]:not([disabled])) .nav-item__link {
+      border-color: Highlight;
     }
 
     .nav-item__link:focus-visible {

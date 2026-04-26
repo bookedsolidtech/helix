@@ -96,14 +96,14 @@ export const helixButtonStyles = css`
 
   .button--secondary {
     --hx-button-bg: transparent;
-    /* primary-500 (#429797) text on white surface = 3.43:1 — fails AA.
-       primary-600 (#0F7078) on white = 6.06:1 — AA pass. */
+    /* primary-500 (#429797) text on white surface = 3.44:1 — fails AA.
+       primary-600 (#0F7078) on white = 5.82:1 — AA pass. */
     --hx-button-color: var(--hx-color-action-secondary-fg, #0f7078);
     --hx-button-border-color: var(--hx-color-action-secondary-border, #0f7078);
   }
 
   .button--secondary:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-action-secondary-bg-hover, #ebf8f8));
   }
 
   .button--tertiary {
@@ -126,7 +126,7 @@ export const helixButtonStyles = css`
   }
 
   /* on-error tokens are tuned for error-500 (neutral-900 on #E5493E ≈ 4.59:1).
-     error-600 (#C92A2A) drops that to 2.25:1 — AA fail. text.on-error-strong
+     error-600 (#C92A2A) drops that to 3.28:1 — AA fail. text.on-error-strong
      resolves to neutral-0 across modes (no dark flip) so the darker hover fill
      stays legible. Mirrors hx-toast precedent (commit 300e21ab0); routed
      through the semantic tier in 3.2.1 token-cascade remediation. */
@@ -135,16 +135,28 @@ export const helixButtonStyles = css`
     --hx-button-color: var(--hx-color-text-on-error-strong, #ffffff);
   }
 
+  /* Pressed state binds explicitly to action.danger.bg-active (error-700,
+     #A21312) + text.on-error-strong (neutral-0) = 7.96:1 AA. Base
+     .button:active filter:brightness(0.8) would compound on top of bg-hover
+     (#C92A2A) and produce ~3.3:1 sub-AA on the bound colors. Override the
+     filter to none. HC override on action.danger.bg-active flips to HC
+     error-500 so the on-error-strong (HC = #000) pair is AA in HC too. */
+  .button--danger:active {
+    --hx-button-bg: var(--hx-button-active-bg, var(--hx-color-action-danger-bg-active, #a21312));
+    --hx-button-color: var(--hx-color-text-on-error-strong, #ffffff);
+    filter: none;
+  }
+
   .button--ghost {
     --hx-button-bg: transparent;
-    /* primary-500 (#429797) text on white surface = 3.43:1 — fails AA.
-       primary-600 (#0F7078) on white = 6.06:1 — AA pass. */
+    /* primary-500 (#429797) text on white surface = 3.44:1 — fails AA.
+       primary-600 (#0F7078) on white = 5.82:1 — AA pass. */
     --hx-button-color: var(--hx-color-action-ghost-fg, #0f7078);
     --hx-button-border-color: transparent;
   }
 
   .button--ghost:hover {
-    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-surface-raised, #f5f8f3));
+    --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-action-ghost-bg-hover, #ebf8f8));
   }
 
   .button--outline {
@@ -165,6 +177,17 @@ export const helixButtonStyles = css`
   .button--primary:hover {
     --hx-button-bg: var(--hx-button-hover-bg, var(--hx-color-action-primary-bg-hover, #0f7078));
     --hx-button-color: var(--hx-color-text-on-primary-strong, #ffffff);
+  }
+
+  /* Pressed state binds explicitly to action.primary.bg-active (primary-700,
+     #0F6363) + text.on-primary-strong (neutral-0) = 7.03:1 AA. The base
+     .button:active filter:brightness(0.8) would compound on top of bg-hover
+     (#0F7078) and produce ~3.7:1 sub-AA on the bound colors. Override the
+     filter to none so the action.*.bg-active token is what actually paints. */
+  .button--primary:active {
+    --hx-button-bg: var(--hx-button-active-bg, var(--hx-color-action-primary-bg-active, #0f6363));
+    --hx-button-color: var(--hx-color-text-on-primary-strong, #ffffff);
+    filter: none;
   }
 
   /* ─── Disabled ─── */
@@ -232,9 +255,46 @@ export const helixButtonStyles = css`
     );
   }
 
-  /* Primary inverted — slight transparent white overlay on hover */
-  :host([inverted]) .button--primary:hover {
-    --hx-button-bg: var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1);
+  /* Primary inverted — hover/pressed lift to action.primary.bg-inverted-hover
+     (primary-400, light teal). The base :host([inverted]) .button rule binds
+     color to text.inverse, which flips by mode (neutral-0 in light, neutral-900
+     in dark). On a permanent light-teal fill, white text drops to 2.4:1 in
+     light mode (AA fail). Pin color to text.on-primary (neutral-900, no
+     dark-mode flip) for both hover and active so the foreground is dark in
+     both modes — neutral-900 on primary-400 = 7.27:1 (AA pass).
+     Pressed === hover visually in inverted mode is acceptable UX (the
+     transient absence of pointer over the button signals release).
+     The fallback chain wraps --hx-button-active-bg (highest precedence) and
+     --hx-button-hover-bg so consumer overrides on either prop apply under
+     :host([inverted]) — the two share a paint here, so either knob is
+     honored, with active-bg winning when both are set. */
+  :host([inverted]) .button--primary:hover,
+  :host([inverted]) .button--primary:active {
+    --hx-button-bg: var(
+      --hx-button-active-bg,
+      var(--hx-button-hover-bg, var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1))
+    );
+    color: var(
+      --hx-button-inverted-primary-interactive-color,
+      var(--hx-color-text-on-primary, #0d1825)
+    );
+  }
+
+  /* Danger inverted — sister to primary. Hover/pressed lift to
+     action.danger.bg-inverted-hover (error-400, #FC7264). Same foreground
+     contract: text.inverse fails in light mode (white on light red ≈ 2.6:1);
+     pin to text.on-error (neutral-900, no dark-mode flip) for 6.58:1 in both
+     modes. Same active-bg → hover-bg → semantic fallback chain as primary. */
+  :host([inverted]) .button--danger:hover,
+  :host([inverted]) .button--danger:active {
+    --hx-button-bg: var(
+      --hx-button-active-bg,
+      var(--hx-button-hover-bg, var(--hx-color-action-danger-bg-inverted-hover, #fc7264))
+    );
+    color: var(
+      --hx-button-inverted-danger-interactive-color,
+      var(--hx-color-text-on-error, #0d1825)
+    );
   }
 
   /* Secondary inverted — white border and translucent hover fill */
@@ -243,7 +303,7 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--secondary:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.15));
+    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
   }
 
   /* Tertiary inverted — resting at subtle (10%) lifts to default (30%) on hover
@@ -267,7 +327,7 @@ export const helixButtonStyles = css`
   :host([inverted]) .button--ghost:hover {
     --hx-button-bg: var(
       --hx-button-inverted-ghost-hover-bg,
-      var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.2))
+      var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3))
     );
   }
 
@@ -277,7 +337,7 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--outline:hover {
-    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.15));
+    --hx-button-bg: var(--hx-color-border-on-dark-default, rgba(255, 255, 255, 0.3));
   }
 
   /* ─── Prefix / Suffix / Label ─── */
