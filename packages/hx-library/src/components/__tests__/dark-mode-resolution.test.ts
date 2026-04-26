@@ -188,4 +188,11 @@ describe('dark-mode token resolution', () => {
     const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
     expect(dark.backgroundColor).toBe('rgb(1, 2, 3)');
   });
+
+  it('inverted primary honors semantic override in light mode too (override path is mode-agnostic)', async () => {
+    const markup =
+      '<hx-button variant="primary" inverted style="--hx-color-action-primary-bg-inverted-rest: rgb(4, 5, 6)">Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    expect(light.backgroundColor).toBe('rgb(4, 5, 6)');
+  });
 });

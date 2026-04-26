@@ -64,7 +64,7 @@ export const helixCarouselStyles = css`
 
   .nav-btn:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -106,7 +106,7 @@ export const helixCarouselStyles = css`
 
   .play-pause-btn:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -178,7 +178,7 @@ export const helixCarouselStyles = css`
 
   .pagination-item:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, var(--hx-color-primary-500)));
+      var(--hx-carousel-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-full, 9999px);
   }
