@@ -139,18 +139,37 @@ describe('hx-theme', () => {
         expected.size,
       );
 
+      // Resolve a var() chain through the expected map until we land on a
+      // literal. Returns null if the chain leaves the HC layer (i.e. the
+      // ref is a primitive that lives only in lightMap).
+      const resolveChain = (raw: string, depth = 0): string | null => {
+        if (depth > 10) return null;
+        const m = raw.match(/^var\(\s*(--[\w-]+)\s*\)\s*$/);
+        if (!m) return raw;
+        const target = expected.get(m[1] ?? '');
+        if (target === undefined) return null;
+        return resolveChain(target, depth + 1);
+      };
+
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       await el.updateComplete;
       const styles = getComputedStyle(el);
       for (const [name, sourceValue] of expected) {
         const resolved = styles.getPropertyValue(name).trim();
-        if (sourceValue.startsWith('var(')) {
-          // var() references resolve through the cascade — assert non-empty.
-          expect(resolved, `HC token ${name} (var-ref) did not reach the DOM`).not.toBe('');
+        const expectedLiteral = resolveChain(sourceValue);
+        if (expectedLiteral === null) {
+          // Chain terminates outside the HC layer (primitive that lives in
+          // lightMap only). Browser cascade resolves it; assert non-empty.
+          expect(resolved, `HC token ${name} (cross-layer var-ref) did not reach the DOM`).not.toBe(
+            '',
+          );
         } else {
-          // Literal values must match source-of-truth byte-for-byte.
+          // Either a literal or a var() chain whose endpoint is HC-defined.
+          // Either way, the resolved DOM value must match the literal endpoint
+          // byte-for-byte — closes the round-18 cascade-shadow finding for
+          // var-refs that previously got only existence-only coverage.
           expect(resolved.toLowerCase(), `HC token ${name} value drift`).toBe(
-            sourceValue.toLowerCase(),
+            expectedLiteral.toLowerCase(),
           );
         }
       }
