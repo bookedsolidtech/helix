@@ -34,7 +34,9 @@ Without this guard, the brand primitive overrides leak into the HC token cascade
 
 **Canonical placement.** This guide places `data-brand` on `<hx-theme>` so the HC guard above works as a single attribute selector. If you need to scope brands at `<body>` (as some Drupal multisite layouts do) the guard cannot be expressed as a single attribute selector — `theme` and `data-brand` live on different elements — and you must either (a) mirror the active theme onto `<body>` so `body[data-brand='...']:not([data-theme='high-contrast'])` works (CSS has no `!=` attribute operator; use `:not(...)` for negation), or (b) use the JS registry path.
 
-The `[data-brand]` attribute is purely a CSS scoping primitive. It does **not** reach into `<hx-theme>`'s JS-registry-driven `brand` attribute. The two override mechanisms compose; both must be HC-aware.
+The `[data-brand]` attribute is purely a CSS scoping primitive. It does **not** reach into `<hx-theme>`'s JS-registry-driven token merge — those are still gated by `HelixBrandRegistry.register()`.
+
+**Auto-reflection.** When you set `brand="..."` (the JS registry path), `<hx-theme>` automatically reflects the same value to `data-brand` so the CSS-pattern selectors above match in every framework consumer (React, Angular, Vue, plain HTML) without writing `data-brand` manually. On `theme="high-contrast"` the runtime removes the `data-brand` attribute entirely — defense-in-depth that neutralizes external CSS rules authored without the `:not([theme='high-contrast'])` guard. If you want CSS-pattern scoping without registering JS tokens, write `data-brand="..."` directly without a `brand` attribute and add the HC guard yourself.
 :::
 
 ---

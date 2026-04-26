@@ -448,6 +448,21 @@ export class HelixTheme extends HelixElement {
   private _applyEffectiveTheme(): void {
     if (!this._themeSheet) return;
 
+    // Reflect `brand` → `data-brand` attribute so CSS-pattern selectors of
+    // the form `hx-theme[data-brand='foo']:not([theme='high-contrast'])`
+    // match in every framework consumer (React, Angular, Vue, plain HTML)
+    // without each consumer authoring `data-brand` manually. On
+    // `high-contrast`, the attribute is removed entirely — defense-in-depth
+    // against external CSS that lacks the `:not(...)` guard, mirroring the
+    // JS-registry suppression below at the attribute layer.
+    if (this.brand !== '' && this.effectiveTheme !== 'high-contrast') {
+      if (this.getAttribute('data-brand') !== this.brand) {
+        this.setAttribute('data-brand', this.brand);
+      }
+    } else if (this.hasAttribute('data-brand')) {
+      this.removeAttribute('data-brand');
+    }
+
     let css = _buildThemeCss(this.effectiveTheme);
 
     // Brand merge is skipped on high-contrast mode. Brands declare 22 color

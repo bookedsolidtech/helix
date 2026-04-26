@@ -329,54 +329,36 @@ describe('hx-theme', () => {
     });
   });
 
-  // ─── System detection ───
+  // ─── Auto-mode detection ───
 
-  describe('System detection', () => {
-    it('effectiveTheme returns light or dark when system=true', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+  describe('Auto-mode detection', () => {
+    it('effectiveTheme returns light or dark when theme="auto"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
 
       const effective = el.effectiveTheme;
       expect(effective === 'light' || effective === 'dark').toBe(true);
     });
 
-    it('effectiveTheme ignores theme prop when system=true', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system theme="dark">Content</hx-theme>');
-      await el.updateComplete;
-
-      // system=true should use OS preference, not the explicit theme prop
-      const effective = el.effectiveTheme;
-      expect(effective === 'light' || effective === 'dark').toBe(true);
-    });
-
-    it('effectiveTheme uses theme prop when system=false', async () => {
+    it('effectiveTheme uses explicit theme prop when not "auto"', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="dark">Content</hx-theme>');
       expect(el.effectiveTheme).toBe('dark');
     });
 
-    it('switching system off restores theme prop', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system theme="dark">Content</hx-theme>');
+    it('switching from "auto" to an explicit theme uses that theme', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
 
-      el.system = false;
+      el.theme = 'dark';
       await el.updateComplete;
 
       expect(el.effectiveTheme).toBe('dark');
     });
   });
 
-  // ─── System mode token injection ───
+  // ─── Auto-mode token injection ───
 
-  describe('System mode token injection', () => {
-    it('injects tokens (not just effectiveTheme string) when system=true', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
-      await el.updateComplete;
-      // The token must be injected regardless of which OS preference resolves
-      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
-      expect(value).toBeTruthy();
-      expect(value.length).toBeGreaterThan(0);
-    });
-
+  describe('Auto-mode token injection', () => {
     it('injects tokens when theme="auto"', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
@@ -425,7 +407,7 @@ describe('hx-theme', () => {
 
   describe('Lifecycle', () => {
     it('cleans up media query listener on disconnect', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
 
       // Capture the internal handler reference before removal
@@ -633,6 +615,73 @@ describe('hx-theme', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = await fixture<HelixTheme>('<hx-theme brand="mercy">Content</hx-theme>');
       expect(el.getAttribute('brand')).toBe('mercy');
+      warnSpy.mockRestore();
+    });
+
+    it('reflects brand to data-brand on light/dark for CSS-pattern selectors', async () => {
+      // R26 BLOCKING (api-design high) — multi-brand-theming.md documents
+      // `hx-theme[data-brand='foo']:not([theme='high-contrast'])` as the
+      // canonical CSS-pattern selector, but only the Drupal Twig helper
+      // emitted data-brand. Plain HTML / React / Angular / Vue consumers
+      // got zero brand styling. Fix mirrors brand → data-brand in
+      // _applyEffectiveTheme so the documented selectors match in every
+      // framework without manual authoring.
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="harbor-health" theme="light">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('data-brand')).toBe('harbor-health');
+
+      el.theme = 'dark';
+      await el.updateComplete;
+      expect(el.getAttribute('data-brand')).toBe('harbor-health');
+
+      warnSpy.mockRestore();
+    });
+
+    it('removes data-brand on theme="high-contrast" (defense-in-depth for unguarded CSS)', async () => {
+      // R26 BLOCKING (security/api-design high) — CSS-pattern brand rules
+      // authored without `:not([theme='high-contrast'])` would still match
+      // an HC page if data-brand stayed on the host, breaking the WCAG
+      // 7:1+ contract that brand-on-HC suppression is supposed to defend.
+      // Removing data-brand on HC neutralizes external CSS that lacks the
+      // `:not(...)` guard, mirroring the JS-registry suppression at the
+      // attribute layer.
+      const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="harbor-health" theme="high-contrast">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(el.hasAttribute('data-brand')).toBe(false);
+
+      // Switching off HC restores data-brand.
+      el.theme = 'light';
+      await el.updateComplete;
+      expect(el.getAttribute('data-brand')).toBe('harbor-health');
+
+      // Switching back to HC removes it again.
+      el.theme = 'high-contrast';
+      await el.updateComplete;
+      expect(el.hasAttribute('data-brand')).toBe(false);
+
+      infoSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
+
+    it('clears data-brand when brand is unset', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = await fixture<HelixTheme>(
+        '<hx-theme brand="harbor-health" theme="light">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(el.getAttribute('data-brand')).toBe('harbor-health');
+
+      el.brand = '';
+      await el.updateComplete;
+      expect(el.hasAttribute('data-brand')).toBe(false);
+
       warnSpy.mockRestore();
     });
 
@@ -898,7 +947,7 @@ describe('hx-theme', () => {
 
   describe('Announcer live region', () => {
     it('renders a visually-hidden [role="status"] span for AT announcements', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
       const announcer = shadowQuery(el, '[role="status"]');
       expect(announcer).toBeTruthy();
