@@ -36,7 +36,8 @@ export interface HxButtonClickDetail {
  * @csspart spinner - The loading spinner SVG element.
  *
  * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).
- * @cssprop [--hx-button-hover-bg] - Hover background override; when set, overrides the variant default hover background from outside the shadow DOM.
+ * @cssprop [--hx-button-hover-bg] - Hover background override (primary and danger variants only). Other variants (secondary/outline, ghost) keep their hover fills routed through their semantic action.* tokens and do not consume this hook. Under [inverted] for primary/danger, hover and active share a paint (combined :hover, :active rule), so this override applies to both states unless --hx-button-active-bg also takes precedence.
+ * @cssprop [--hx-button-active-bg] - Pressed/active background override (primary and danger variants only, including their inverted modes). Takes precedence over --hx-button-hover-bg in the fallback chain. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode. Other variants do not consume this hook.
  * @cssprop [--hx-button-color=var(--hx-color-text-on-primary)] - Button text color (variants route through text.on-{role} / text.on-{role}-strong).
  * @cssprop [--hx-button-border-color=transparent] - Button border color (secondary/outline variants route through action.secondary.border).
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button border radius.
@@ -45,20 +46,24 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
  *
  * @cssprop [--hx-button-inverted-color=var(--hx-color-text-inverse)] - Text color when inverted (resolves to neutral-0).
+ * @cssprop [--hx-button-inverted-primary-interactive-color=var(--hx-color-text-on-primary)] - Foreground override for inverted primary hover and pressed (combined :hover, :active rule). Defaults to text.on-primary (neutral-900, no dark-mode flip) so dark text rides the lifted primary-400 fill — text.inverse on light teal collapses to ~2.4:1 in light mode.
+ * @cssprop [--hx-button-inverted-danger-interactive-color=var(--hx-color-text-on-error)] - Foreground override for inverted danger hover and pressed (combined :hover, :active rule). Defaults to text.on-error (neutral-900); same rationale as the primary override.
  * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-border-on-dark-default)] - Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).
  * @cssprop [--hx-button-inverted-focus-ring-color=var(--hx-color-border-on-dark-strong)] - Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).
  *
  * @cssprop [--hx-color-action-primary-bg] - Primary variant resting fill (3.2.1 semantic action layer).
  * @cssprop [--hx-color-action-primary-bg-hover] - Primary variant hover fill.
  * @cssprop [--hx-color-action-primary-bg-active] - Primary variant active/pressed fill.
- * @cssprop [--hx-color-action-secondary-fg] - Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark).
- * @cssprop [--hx-color-action-secondary-border] - Secondary/outline variant border.
- * @cssprop [--hx-color-action-secondary-bg-hover] - Secondary/outline variant hover fill.
+ * @cssprop [--hx-color-action-secondary-fg] - Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark). Consumed only by .button--secondary; the actual border/surface paint for outline currently routes through --hx-color-border-strong / --hx-color-surface-raised in styles, with this token reserved for the foreground.
+ * @cssprop [--hx-color-action-secondary-border] - Secondary/outline variant border (3.2.1 semantic; outline still routes through --hx-color-border-strong by default).
+ * @cssprop [--hx-color-action-secondary-bg-hover] - Secondary/outline variant hover fill (3.2.1 semantic; outline still routes through --hx-color-surface-raised by default).
  * @cssprop [--hx-color-action-ghost-fg] - Ghost variant fg.
  * @cssprop [--hx-color-action-ghost-bg-hover] - Ghost variant hover fill.
  * @cssprop [--hx-color-action-danger-bg] - Danger variant resting fill.
  * @cssprop [--hx-color-action-danger-bg-hover] - Danger variant hover fill.
  * @cssprop [--hx-color-action-danger-bg-active] - Danger variant active fill.
+ * @cssprop [--hx-color-action-primary-bg-inverted-hover] - Primary variant hover/pressed fill on dark/inverted surface (resolves to primary-400, 7.27:1 on neutral-900).
+ * @cssprop [--hx-color-action-danger-bg-inverted-hover] - Danger variant hover/pressed fill on dark/inverted surface (resolves to error-400, 6.58:1 on neutral-900).
  * @cssprop [--hx-color-text-on-primary] - Foreground for primary fill (resolves to neutral-900 — AA-tuned for primary-500).
  * @cssprop [--hx-color-text-on-primary-strong] - Foreground for primary-hover fill (resolves to neutral-0 across modes).
  * @cssprop [--hx-color-text-on-error] - Foreground for danger fill (resolves to neutral-900).
@@ -161,6 +166,16 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
   /**
    * When true, flips button colors for placement on dark or gradient backgrounds.
    * Forces text to white and adjusts hover/focus ring colors across all variants.
+   *
+   * **Mode scope:** `[inverted]` is validated for placement on a dark *region*
+   * within a light-mode-active page (hero banners, gradient sections, dark
+   * cards). It is NOT validated for use within a dark-mode-active root
+   * context: in dark mode, `surface.inverse` flips to a light surface
+   * (neutral-100), and the lifted `-400` hover/active fills lose UI-floor
+   * contrast against it (primary 2.10:1, danger 2.32:1 vs WCAG 1.4.11's 3:1
+   * floor). Mode-aware fill stops + foreground for the dark-mode-inverted
+   * combination are tracked as a 3.2.x follow-up.
+   *
    * @attr inverted
    */
   @property({ type: Boolean, reflect: true })

@@ -255,9 +255,46 @@ export const helixButtonStyles = css`
     );
   }
 
-  /* Primary inverted — slight transparent white overlay on hover */
-  :host([inverted]) .button--primary:hover {
-    --hx-button-bg: var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1);
+  /* Primary inverted — hover/pressed lift to action.primary.bg-inverted-hover
+     (primary-400, light teal). The base :host([inverted]) .button rule binds
+     color to text.inverse, which flips by mode (neutral-0 in light, neutral-900
+     in dark). On a permanent light-teal fill, white text drops to 2.4:1 in
+     light mode (AA fail). Pin color to text.on-primary (neutral-900, no
+     dark-mode flip) for both hover and active so the foreground is dark in
+     both modes — neutral-900 on primary-400 = 7.27:1 (AA pass).
+     Pressed === hover visually in inverted mode is acceptable UX (the
+     transient absence of pointer over the button signals release).
+     The fallback chain wraps --hx-button-active-bg (highest precedence) and
+     --hx-button-hover-bg so consumer overrides on either prop apply under
+     :host([inverted]) — the two share a paint here, so either knob is
+     honored, with active-bg winning when both are set. */
+  :host([inverted]) .button--primary:hover,
+  :host([inverted]) .button--primary:active {
+    --hx-button-bg: var(
+      --hx-button-active-bg,
+      var(--hx-button-hover-bg, var(--hx-color-action-primary-bg-inverted-hover, #6ab1b1))
+    );
+    color: var(
+      --hx-button-inverted-primary-interactive-color,
+      var(--hx-color-text-on-primary, #0d1825)
+    );
+  }
+
+  /* Danger inverted — sister to primary. Hover/pressed lift to
+     action.danger.bg-inverted-hover (error-400, #FC7264). Same foreground
+     contract: text.inverse fails in light mode (white on light red ≈ 2.6:1);
+     pin to text.on-error (neutral-900, no dark-mode flip) for 6.58:1 in both
+     modes. Same active-bg → hover-bg → semantic fallback chain as primary. */
+  :host([inverted]) .button--danger:hover,
+  :host([inverted]) .button--danger:active {
+    --hx-button-bg: var(
+      --hx-button-active-bg,
+      var(--hx-button-hover-bg, var(--hx-color-action-danger-bg-inverted-hover, #fc7264))
+    );
+    color: var(
+      --hx-button-inverted-danger-interactive-color,
+      var(--hx-color-text-on-error, #0d1825)
+    );
   }
 
   /* Secondary inverted — white border and translucent hover fill */

@@ -1018,6 +1018,112 @@ describe('hx-button', () => {
     it('action.danger.bg-active resolves to error-700 (#A21312)', async () => {
       expect(await resolveSemantic('--hx-color-action-danger-bg-active')).toBe('rgb(162, 19, 18)');
     });
+
+    // ─── Inverted-mode :active token binding (3.2.1 round-7 regression net) ───
+    //
+    // Codex round-7 caught that round-6's :active rules created a symmetric
+    // regression in inverted mode: action.{primary,danger}.bg-active resolves
+    // to primary-700 (#0F6363) and error-700 (#A21312) — both dark fills that
+    // collapse to ~2.5–3:1 against surface.inverse (neutral-900, #0D1825),
+    // failing WCAG 1.4.11's 3:1 UI floor. Round-7 added :host([inverted])
+    // overrides binding pressed (and danger hover) to action.{primary,danger}.
+    // bg-inverted-hover so the affordance reads against a dark surface
+    // (primary-400 = 7.27:1, error-400 = 6.58:1 on neutral-900).
+    //
+    // :active state is unreliable to drive in headless browser runners, so
+    // these tests pin two-deep: shadow-root CSS source + token resolution.
+
+    it('inverted primary :active rule references --hx-color-action-primary-bg-inverted-hover', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="primary" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--primary:active[^{]*\{[^}]*--hx-color-action-primary-bg-inverted-hover/,
+      );
+    });
+
+    it('inverted danger :hover rule references --hx-color-action-danger-bg-inverted-hover', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:hover[^{]*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
+      );
+    });
+
+    it('inverted danger :active rule references --hx-color-action-danger-bg-inverted-hover', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:active[^{]*\{[^}]*--hx-color-action-danger-bg-inverted-hover/,
+      );
+    });
+
+    // Foreground pin: the inverted hover/active rules also override `color`
+    // to text.on-{role} (neutral-900, no dark-mode flip). Without this pin,
+    // text.inverse stays in effect on the lifted -400 fill — white text on
+    // light-teal/red collapses to ~2.4–2.6:1 in light mode, AA fail. Codex
+    // round-7 follow-up flagged the missing foreground assertions.
+    it('inverted primary hover/active pins color to text.on-primary', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="primary" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--primary:hover[^{]*\{[^}]*color:\s*var\(\s*--hx-button-inverted-primary-interactive-color,\s*var\(\s*--hx-color-text-on-primary/,
+      );
+    });
+
+    it('inverted danger hover/active pins color to text.on-error', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:hover[^{]*\{[^}]*color:\s*var\(\s*--hx-button-inverted-danger-interactive-color,\s*var\(\s*--hx-color-text-on-error/,
+      );
+    });
+
+    it('action.primary.bg-inverted-hover resolves to primary-400 (#6AB1B1)', async () => {
+      expect(await resolveSemantic('--hx-color-action-primary-bg-inverted-hover')).toBe(
+        'rgb(106, 177, 177)',
+      );
+    });
+
+    it('action.danger.bg-inverted-hover resolves to error-400 (#FC7264)', async () => {
+      expect(await resolveSemantic('--hx-color-action-danger-bg-inverted-hover')).toBe(
+        'rgb(252, 114, 100)',
+      );
+    });
+
+    // F3 fallback-chain regression net (codex round-7-followup-2): under
+    // [inverted] the combined hover/active rule must consult --hx-button-
+    // active-bg first, then --hx-button-hover-bg, then the semantic. A
+    // future agent collapsing the chain back to a single level would silently
+    // make --hx-button-hover-bg a no-op under inverted again.
+    it('inverted primary hover/active fallback chain pins active-bg → hover-bg → semantic', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="primary" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--primary:hover[^{]*\{[^}]*--hx-button-bg:\s*var\(\s*--hx-button-active-bg,\s*var\(\s*--hx-button-hover-bg,\s*var\(\s*--hx-color-action-primary-bg-inverted-hover/,
+      );
+    });
+
+    it('inverted danger hover/active fallback chain pins active-bg → hover-bg → semantic', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button variant="danger" inverted>Click</hx-button>',
+      );
+      const css = cssSource(el);
+      expect(css).toMatch(
+        /:host\(\[inverted\]\)\s+\.button--danger:hover[^{]*\{[^}]*--hx-button-bg:\s*var\(\s*--hx-button-active-bg,\s*var\(\s*--hx-button-hover-bg,\s*var\(\s*--hx-color-action-danger-bg-inverted-hover/,
+      );
+    });
   });
 
   // ─── Property: type — form integration ───

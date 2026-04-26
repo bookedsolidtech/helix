@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-25T22:33:58.197Z",
+  "generatedAt": "2026-04-26T01:48:15.557Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2702,8 +2702,13 @@
           }
         },
         {
-          "description": "Hover background override; when set, overrides the variant default hover background from outside the shadow DOM.",
+          "description": "Hover background override (primary and danger variants only). Other variants (secondary/outline, ghost) keep their hover fills routed through their semantic action.* tokens and do not consume this hook. Under [inverted] for primary/danger, hover and active share a paint (combined :hover, :active rule), so this override applies to both states unless --hx-button-active-bg also takes precedence.",
           "name": "--hx-button-hover-bg",
+          "figmaBinding": null
+        },
+        {
+          "description": "Pressed/active background override (primary and danger variants only, including their inverted modes). Takes precedence over --hx-button-hover-bg in the fallback chain. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode. Other variants do not consume this hook.",
+          "name": "--hx-button-active-bg",
           "figmaBinding": null
         },
         {
@@ -2791,6 +2796,30 @@
           }
         },
         {
+          "description": "Foreground override for inverted primary hover and pressed (combined :hover, :active rule). Defaults to text.on-primary (neutral-900, no dark-mode flip) so dark text rides the lifted primary-400 fill — text.inverse on light teal collapses to ~2.4:1 in light mode.",
+          "name": "--hx-button-inverted-primary-interactive-color",
+          "default": "var(--hx-color-text-on-primary)",
+          "figmaBinding": {
+            "target": "Fill",
+            "layerSelector": "root",
+            "semanticToken": "color/text/on/primary",
+            "fallbackPrimitive": null,
+            "literalFallback": null
+          }
+        },
+        {
+          "description": "Foreground override for inverted danger hover and pressed (combined :hover, :active rule). Defaults to text.on-error (neutral-900); same rationale as the primary override.",
+          "name": "--hx-button-inverted-danger-interactive-color",
+          "default": "var(--hx-color-text-on-error)",
+          "figmaBinding": {
+            "target": "Fill",
+            "layerSelector": "root",
+            "semanticToken": "color/text/on/error",
+            "fallbackPrimitive": null,
+            "literalFallback": null
+          }
+        },
+        {
           "description": "Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).",
           "name": "--hx-button-inverted-ghost-hover-bg",
           "default": "var(--hx-color-border-on-dark-default)",
@@ -2830,17 +2859,17 @@
           "figmaBinding": null
         },
         {
-          "description": "Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark).",
+          "description": "Secondary/outline variant fg (resolves to primary-600 light, primary-400 dark). Consumed only by .button--secondary; the actual border/surface paint for outline currently routes through --hx-color-border-strong / --hx-color-surface-raised in styles, with this token reserved for the foreground.",
           "name": "--hx-color-action-secondary-fg",
           "figmaBinding": null
         },
         {
-          "description": "Secondary/outline variant border.",
+          "description": "Secondary/outline variant border (3.2.1 semantic; outline still routes through --hx-color-border-strong by default).",
           "name": "--hx-color-action-secondary-border",
           "figmaBinding": null
         },
         {
-          "description": "Secondary/outline variant hover fill.",
+          "description": "Secondary/outline variant hover fill (3.2.1 semantic; outline still routes through --hx-color-surface-raised by default).",
           "name": "--hx-color-action-secondary-bg-hover",
           "figmaBinding": null
         },
@@ -2867,6 +2896,16 @@
         {
           "description": "Danger variant active fill.",
           "name": "--hx-color-action-danger-bg-active",
+          "figmaBinding": null
+        },
+        {
+          "description": "Primary variant hover/pressed fill on dark/inverted surface (resolves to primary-400, 7.27:1 on neutral-900).",
+          "name": "--hx-color-action-primary-bg-inverted-hover",
+          "figmaBinding": null
+        },
+        {
+          "description": "Danger variant hover/pressed fill on dark/inverted surface (resolves to error-400, 6.58:1 on neutral-900).",
+          "name": "--hx-color-action-danger-bg-inverted-hover",
           "figmaBinding": null
         },
         {
@@ -23420,7 +23459,7 @@
           "figmaBinding": null
         },
         {
-          "description": "Error border primitive fallback inside the focus-state cascade.",
+          "description": "Error border primitive fallback inside the invalid-state cascade.",
           "name": "--hx-color-error-600",
           "figmaBinding": null
         }
