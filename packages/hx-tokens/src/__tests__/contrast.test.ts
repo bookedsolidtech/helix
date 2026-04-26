@@ -948,13 +948,26 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
   // translucent FILLS (inverted-secondary/ghost/tertiary hover bg), never
   // as borders. They were renamed to surface.on-dark-overlay-{default,
   // subtle}; only the strong tier (overlay-white-70 ≈ 5:1) survived as a
-  // genuine border. This gate locks the rename: any future change that
-  // re-introduces a non-strong member under border.on-dark-* fails here.
+  // genuine border that can stand on its own.
+  //
+  // Round-11 finding #2 added back deprecated *aliases* under border.on-dark-
+  // {default,subtle} that resolve through the new surface.on-dark-overlay-*
+  // tokens — restores the published CSS variable names for any consumer who
+  // set them as theme overrides in 3.2.0 / 3.2.1. Aliases are deprecated and
+  // scheduled for removal in 4.0.0.
+  //
+  // The structural lock therefore allows:
+  //   border.on-dark-strong   — canonical strong border
+  //   border.on-dark-default  — DEPRECATED alias → surface.on-dark-overlay-default
+  //   border.on-dark-subtle   — DEPRECATED alias → surface.on-dark-overlay-subtle
+  // and asserts each alias resolves through the surface.* namespace (i.e. is
+  // a real alias and not a regressed independent value with sub-3:1 alpha).
   // -------------------------------------------------------------------------
-  it('border.on-dark-* contains only the strong tier (round-8 lock)', () => {
+  it('border.on-dark-* shape: strong + deprecated aliases (round-8/11 lock)', () => {
+    type TokenLike = { value?: string };
     type TierShape = {
-      border?: Record<string, unknown>;
-      surface?: Record<string, unknown>;
+      border?: Record<string, TokenLike>;
+      surface?: Record<string, TokenLike>;
     };
     const tiers: Array<{ name: string; tier: TierShape }> = [
       { name: 'base', tier: (tokens as { color: TierShape }).color },
@@ -966,13 +979,26 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
     ];
 
     for (const { name, tier } of tiers) {
-      // border.on-dark-*: only the strong tier survives. Any future override
-      // that re-introduces a default/subtle (or any other suffix) under
-      // border.on-dark-* in any of the three tiers fails here.
-      const onDarkBorderKeys = Object.keys(tier.border ?? {}).filter((k) =>
-        k.startsWith('on-dark-'),
-      );
-      expect(onDarkBorderKeys, `${name}.color.border.on-dark-* shape`).toEqual(['on-dark-strong']);
+      const onDarkBorderKeys = Object.keys(tier.border ?? {})
+        .filter((k) => k.startsWith('on-dark-'))
+        .sort();
+      expect(onDarkBorderKeys, `${name}.color.border.on-dark-* shape`).toEqual([
+        'on-dark-default',
+        'on-dark-strong',
+        'on-dark-subtle',
+      ]);
+
+      // The deprecated default/subtle aliases must resolve through the
+      // renamed surface.* tokens — never through a raw overlay-* primitive
+      // that would re-introduce sub-3:1 alpha as an apparent border value.
+      expect(
+        tier.border?.['on-dark-default']?.value,
+        `${name}.color.border.on-dark-default must alias surface.on-dark-overlay-default`,
+      ).toBe('var(--hx-color-surface-on-dark-overlay-default)');
+      expect(
+        tier.border?.['on-dark-subtle']?.value,
+        `${name}.color.border.on-dark-subtle must alias surface.on-dark-overlay-subtle`,
+      ).toBe('var(--hx-color-surface-on-dark-overlay-subtle)');
 
       // surface.on-dark-overlay-{default,subtle}: both must exist in every
       // tier, since runtime mode-flip depends on the dark + HC overrides

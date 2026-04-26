@@ -274,8 +274,16 @@ export const helixButtonStyles = css`
      so dark mode can flip the fill to primary-600. surface.inverse becomes light
      (#EBEEE9) in dark mode; primary-500 on #EBEEE9 = 2.94:1 (sub-3:1 UI floor
      fail for the inverted-button boundary). primary-600 on #EBEEE9 = 4.97:1
-     (AA pass). Light mode tracks action.primary.bg (primary-500, 5.20:1 on
-     dark surface.inverse). */
+     (AA pass). Light mode tracks action.primary.bg-inverted-rest's base value
+     (primary-500, 5.20:1 on dark surface.inverse).
+
+     Override path note (codex round-11): this binds --hx-button-bg directly,
+     matching the cascade convention every other .button--{variant} rule uses
+     (light primary at line 89, danger at 120, secondary, tertiary, ghost). The
+     consumer override path for inverted-primary rest is
+     --hx-color-action-primary-bg-inverted-rest, NOT --hx-button-bg — the same
+     pattern as light primary (consumers override --hx-color-action-primary-bg).
+     Pinned by dark-mode-resolution.test.ts:185-197 across both modes. */
   :host([inverted]) .button--primary {
     --hx-button-bg: var(--hx-color-action-primary-bg-inverted-rest, #429797);
   }
