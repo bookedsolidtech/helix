@@ -40,5 +40,22 @@ non-text floor in the precision-cool palette (3.2.0/3.2.1):
   `#8e9c98`→`#66787b` for border-strong) — keeps the inline-fallback parity
   invariant intact.
 
-Three new entries on the contrast regression matrix gate the fixes
-permanently in CI.
+- `hx-split-button` primary divider rebound from `primary-400` (1.40:1 on
+  primary-500 — invisible divider) to `primary-900` (4.03:1 on primary-500 —
+  AA-pass divider). `@cssprop` JSDoc updated; outline-variant divider
+  unchanged.
+
+- `hx-button` `:host([inverted]) .button--primary` resting rule paints
+  directly on `background-color` (not via a self-referential `--hx-button-bg`
+  cycle) so the new `action.primary.bg-inverted-rest` semantic actually
+  reaches the pixel. Cycle would have silently fallen through to
+  `primary-500` and reintroduced the 2.94:1 dark-mode fail.
+
+Two new regression tests gate the fixes:
+
+- contrast matrix gains three pairs (`border.strong` × `surface.default`,
+  `bg-inverted-rest` × `surface.inverse` light/dark);
+- `dark-mode-resolution.test.ts` asserts `<hx-button variant="primary"
+  inverted>` resolves to `primary-500` in light and `primary-600` in dark
+  (catches the CSS-cycle regression at the painted-pixel layer, not just the
+  token tier).

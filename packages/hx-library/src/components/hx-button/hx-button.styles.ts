@@ -48,7 +48,7 @@ export const helixButtonStyles = css`
 
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, #6ab1b1));
+      var(--hx-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -262,7 +262,7 @@ export const helixButtonStyles = css`
      (AA pass). Light mode tracks action.primary.bg (primary-500, 5.20:1 on
      dark surface.inverse). */
   :host([inverted]) .button--primary {
-    --hx-button-bg: var(
+    background-color: var(
       --hx-button-bg,
       var(--hx-color-action-primary-bg-inverted-rest, #429797)
     );

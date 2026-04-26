@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-26T01:48:15.557Z",
+  "generatedAt": "2026-04-26T04:57:16.568Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -18790,12 +18790,12 @@
         {
           "description": "Color of the divider between primary and trigger.",
           "name": "--hx-split-button-divider-color",
-          "default": "var(--hx-color-primary-400)",
+          "default": "var(--hx-color-primary-900)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
-            "fallbackPrimitive": "color/primary/400",
+            "fallbackPrimitive": "color/primary/900",
             "literalFallback": null
           }
         },
