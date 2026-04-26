@@ -35,7 +35,7 @@ export const helixRatingStyles = css`
     justify-content: center;
     position: relative;
     cursor: pointer;
-    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #8e9c98));
+    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #66787b));
     line-height: 1;
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
@@ -44,7 +44,7 @@ export const helixRatingStyles = css`
 
   .symbol:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
@@ -86,7 +86,7 @@ export const helixRatingStyles = css`
     position: absolute;
     left: 0;
     top: 0;
-    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #8e9c98));
+    color: var(--hx-rating-empty-color, var(--hx-color-border-strong, #66787b));
     /* Clip to right 50% for the empty half */
     clip-path: inset(0 0 0 50%);
   }

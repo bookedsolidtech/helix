@@ -58,7 +58,7 @@ export const helixDatePickerStyles = css`
     display: flex;
     align-items: stretch;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-date-picker-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-date-picker-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-date-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-date-picker-bg, var(--hx-color-surface-default, #ffffff));
     transition:
@@ -70,14 +70,14 @@ export const helixDatePickerStyles = css`
   .field__input-wrapper:focus-within {
     border-color: var(
       --hx-date-picker-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
     );
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
         var(
             --hx-date-picker-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+            var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
           )
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
@@ -137,7 +137,7 @@ export const helixDatePickerStyles = css`
     padding: 0 var(--hx-space-3, 0.75rem);
     border: none;
     border-left: var(--hx-border-width-thin, 1px) solid
-      var(--hx-date-picker-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-date-picker-border-color, var(--hx-color-border-strong, #66787b));
     background: transparent;
     color: var(--hx-date-picker-trigger-color, var(--hx-color-text-muted, #4a5362));
     cursor: pointer;
@@ -149,13 +149,13 @@ export const helixDatePickerStyles = css`
   .field__trigger:focus-visible {
     color: var(
       --hx-date-picker-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
     );
     background-color: color-mix(
       in srgb,
       var(
           --hx-date-picker-focus-ring-color,
-          var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+          var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
         )
         8%,
       transparent
@@ -256,7 +256,7 @@ export const helixDatePickerStyles = css`
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       var(
         --hx-date-picker-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
       );
     z-index: 1;
   }

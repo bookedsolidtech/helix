@@ -60,7 +60,7 @@ export const helixCheckboxStyles = css`
     width: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
     height: var(--hx-checkbox-size, var(--hx-size-5, 1.25rem));
     border: var(--hx-border-width-medium, 2px) solid
-      var(--hx-checkbox-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-checkbox-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-checkbox-border-radius, var(--hx-border-radius-sm, 0.25rem));
     background-color: var(--hx-checkbox-bg, var(--hx-color-surface-default, #ffffff));
     transition:
@@ -76,7 +76,7 @@ export const helixCheckboxStyles = css`
     outline: var(--hx-checkbox-focus-ring-width, var(--hx-focus-ring-width, 2px)) solid
       var(
         --hx-checkbox-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
       );
     outline-offset: var(--hx-checkbox-focus-ring-offset, var(--hx-focus-ring-offset, 2px));
   }

@@ -105,7 +105,7 @@ export const helixIconButtonStyles = css`
   .button--tertiary {
     --hx-icon-button-bg: transparent;
     --hx-icon-button-color: var(--hx-color-text-strong, #202b39);
-    --hx-icon-button-border-color: var(--hx-color-border-strong, #8e9c98);
+    --hx-icon-button-border-color: var(--hx-color-border-strong, #66787b);
   }
 
   .button--tertiary:hover {

@@ -44,7 +44,7 @@ export const helixFileUploadStyles = css`
     min-height: var(--hx-space-32, 8rem);
     padding: var(--hx-space-6, 1.5rem) var(--hx-space-4, 1rem);
     border: var(--hx-border-width-thin, 1px) dashed
-      var(--hx-file-upload-dropzone-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-file-upload-dropzone-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-file-upload-dropzone-border-radius, var(--hx-border-radius-lg, 0.5rem));
     background-color: var(--hx-file-upload-dropzone-bg, var(--hx-color-surface-raised, #f5f8f3));
     cursor: pointer;

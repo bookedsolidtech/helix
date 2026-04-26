@@ -162,7 +162,7 @@ export const helixButtonStyles = css`
   .button--outline {
     --hx-button-bg: transparent;
     --hx-button-color: var(--hx-color-text-primary, #0d1825);
-    --hx-button-border-color: var(--hx-color-border-strong, #8e9c98);
+    --hx-button-border-color: var(--hx-color-border-strong, #66787b);
   }
 
   .button--outline:hover {
@@ -252,6 +252,19 @@ export const helixButtonStyles = css`
     outline-color: var(
       --hx-button-inverted-focus-ring-color,
       var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
+    );
+  }
+
+  /* Primary inverted — resting bg routes through action.primary.bg-inverted-rest
+     so dark mode can flip the fill to primary-600. surface.inverse becomes light
+     (#EBEEE9) in dark mode; primary-500 on #EBEEE9 = 2.94:1 (sub-3:1 UI floor
+     fail for the inverted-button boundary). primary-600 on #EBEEE9 = 4.97:1
+     (AA pass). Light mode tracks action.primary.bg (primary-500, 5.20:1 on
+     dark surface.inverse). */
+  :host([inverted]) .button--primary {
+    --hx-button-bg: var(
+      --hx-button-bg,
+      var(--hx-color-action-primary-bg-inverted-rest, #429797)
     );
   }
 

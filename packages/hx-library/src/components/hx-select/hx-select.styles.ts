@@ -17,13 +17,13 @@ export const helixSelectStyles = css`
     --_label-color: var(--hx-select-label-color, var(--hx-color-text-strong, #202b39));
 
     /* Border */
-    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #8e9c98));
+    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #66787b));
     --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
 
     /* Focus ring */
     --_focus-ring-color: var(
       --hx-select-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
     );
 
     /* Error */

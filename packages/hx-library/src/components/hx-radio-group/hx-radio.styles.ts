@@ -52,7 +52,7 @@ export const helixRadioStyles = css`
     width: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
     height: var(--hx-radio-size, var(--hx-size-5, 1.25rem));
     border: var(--hx-border-width-medium, 2px) solid
-      var(--hx-radio-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-radio-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-border-radius-full, 9999px);
     background-color: var(--hx-radio-bg, var(--hx-color-surface-default, #ffffff));
     transition:
@@ -90,7 +90,7 @@ export const helixRadioStyles = css`
     outline: var(--hx-focus-ring-width, 2px) solid
       var(
         --hx-radio-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
+        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
       );
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
@@ -98,7 +98,7 @@ export const helixRadioStyles = css`
   /* ─── Hover State ─── */
 
   .radio:not(.radio--disabled):not(.radio--checked):hover .radio__control {
-    border-color: var(--hx-radio-hover-border-color, var(--hx-color-border-strong, #8e9c98));
+    border-color: var(--hx-radio-hover-border-color, var(--hx-color-border-strong, #66787b));
   }
 
   /* ─── Label ─── */
