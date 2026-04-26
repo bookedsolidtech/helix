@@ -99,6 +99,30 @@ describe('hx-theme', () => {
       const textPrimary = getComputedStyle(el).getPropertyValue('--hx-color-text-primary').trim();
       expect(textPrimary.toLowerCase()).toBe('#ffffff');
     });
+
+    it('injects HC palette overrides (primary/error/success ramps) sourced from tokens.json', async () => {
+      // Regression net for the round-15 cascade-shadow finding: the HC tier in
+      // tokens.json must reach the DOM via `highContrastTokenEntries`. If
+      // hx-theme reverts to a hand-written override array, any HC token added
+      // to tokens.json that the array does not mirror would silently fail.
+      const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // HC primary-500 — bright blue (#3B82F6) replaces light teal
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#3b82f6',
+      );
+      // HC error-500 — bright red (#F87171) for visibility on #000 canvas
+      expect(styles.getPropertyValue('--hx-color-error-500').trim().toLowerCase()).toBe('#f87171');
+      // HC success-500 — bright green (#4ADE80)
+      expect(styles.getPropertyValue('--hx-color-success-500').trim().toLowerCase()).toBe(
+        '#4ade80',
+      );
+      // HC border.on-dark-strong — solid white so inverted button outlines remain visible
+      expect(
+        styles.getPropertyValue('--hx-color-border-on-dark-strong').trim().toLowerCase(),
+      ).toBe('#ffffff');
+    });
   });
 
   // ─── effectiveTheme ───
