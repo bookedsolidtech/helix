@@ -68,17 +68,11 @@ export const helixDatePickerStyles = css`
   }
 
   .field__input-wrapper:focus-within {
-    border-color: var(
-      --hx-date-picker-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-    );
+    border-color: var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
-        var(
-            --hx-date-picker-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-          )
+        var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078))
           calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
@@ -147,17 +141,10 @@ export const helixDatePickerStyles = css`
   }
 
   .field__trigger:focus-visible {
-    color: var(
-      --hx-date-picker-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-    );
+    color: var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     background-color: color-mix(
       in srgb,
-      var(
-          --hx-date-picker-focus-ring-color,
-          var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-        )
-        8%,
+      var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078)) 8%,
       transparent
     );
   }
@@ -254,10 +241,7 @@ export const helixDatePickerStyles = css`
 
   :is(.calendar__nav-btn, .calendar__day):focus-visible {
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      var(
-        --hx-date-picker-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-date-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     z-index: 1;
   }
 

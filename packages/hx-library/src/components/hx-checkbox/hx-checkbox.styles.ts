@@ -74,10 +74,7 @@ export const helixCheckboxStyles = css`
 
   .checkbox__input:focus-visible ~ .checkbox__box {
     outline: var(--hx-checkbox-focus-ring-width, var(--hx-focus-ring-width, 2px)) solid
-      var(
-        --hx-checkbox-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-checkbox-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-checkbox-focus-ring-offset, var(--hx-focus-ring-offset, 2px));
   }
 

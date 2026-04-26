@@ -770,6 +770,18 @@ const PAIRS: PairSpec[] = [
     threshold: 3.0,
     label: 'border.strong on surface.default (UI floor — form-control borders)',
   },
+  // 3.2.2 round-8: the on-dark border family is intentionally NOT in the
+  // contrast matrix. border.on-dark-strong resolves to overlay-white-70
+  // (light) / overlay-black-50 (dark) — translucent primitives that need
+  // alpha-compositing onto surface.inverse before a contrast ratio is even
+  // meaningful, and resolveToHex deliberately does not walk into
+  // alpha-blended primitives because the matrix is structured around flat
+  // foreground/background pairs. The structural-shape gate below is the
+  // round-8 lock for this family: it asserts that the only token remaining
+  // under border.on-dark-* is the strong tier (the lower-alpha siblings
+  // were renamed to surface.on-dark-overlay-{default,subtle} because they
+  // were always fills, never borders). HC is a no-op here — forced-colors
+  // overrides every paint via the forced-colors mixin.
 ];
 
 const ALL_MODES: Array<'light' | 'dark' | 'high-contrast'> = ['light', 'dark', 'high-contrast'];
@@ -924,5 +936,28 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
       }
     }
     expect(drift, `description ratio drift:\n  ${drift.join('\n  ')}`).toEqual([]);
+  });
+
+  // -------------------------------------------------------------------------
+  // 3.2.2 round-8 structural lock for the on-dark border family.
+  //
+  // Codex round-8 finding #2: border.on-dark-default (overlay-white-30) and
+  // border.on-dark-subtle (overlay-white-10) lived in the border.* namespace
+  // but their alpha (≤30%) cannot honour the WCAG 1.4.11 3:1 floor against
+  // either surface.default or surface.inverse — they were always used as
+  // translucent FILLS (inverted-secondary/ghost/tertiary hover bg), never
+  // as borders. They were renamed to surface.on-dark-overlay-{default,
+  // subtle}; only the strong tier (overlay-white-70 ≈ 5:1) survived as a
+  // genuine border. This gate locks the rename: any future change that
+  // re-introduces a non-strong member under border.on-dark-* fails here.
+  // -------------------------------------------------------------------------
+  it('border.on-dark-* contains only the strong tier (round-8 lock)', () => {
+    const baseBorder = (tokens as { color: { border: Record<string, unknown> } }).color.border;
+    const onDarkKeys = Object.keys(baseBorder).filter((k) => k.startsWith('on-dark-'));
+    expect(onDarkKeys).toEqual(['on-dark-strong']);
+
+    const surface = (tokens as { color: { surface: Record<string, unknown> } }).color.surface;
+    const overlayKeys = Object.keys(surface).filter((k) => k.startsWith('on-dark-overlay-'));
+    expect(overlayKeys.sort()).toEqual(['on-dark-overlay-default', 'on-dark-overlay-subtle']);
   });
 });

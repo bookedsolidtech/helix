@@ -110,10 +110,7 @@ export const helixBannerStyles = css`
 
   .banner__action:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-banner-action-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-banner-action-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
@@ -154,10 +151,7 @@ export const helixBannerStyles = css`
 
   .banner__close-button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-banner-close-btn-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-600, #0f7078))
-      );
+      var(--hx-banner-close-btn-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }
