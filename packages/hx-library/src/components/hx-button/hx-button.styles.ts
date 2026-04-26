@@ -335,20 +335,34 @@ export const helixButtonStyles = css`
     --hx-button-border-color: var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7));
   }
 
+  /* Inverted overlay fills read both names so consumer overrides reach paint
+     regardless of which token they target: the deprecated --hx-color-border-on-dark-*
+     names (3.2.0/3.2.1 public API, scheduled for removal in 4.0.0) and the canonical
+     --hx-color-surface-on-dark-overlay-* names (round-8 rename). Deprecated name
+     wins when set; otherwise resolves through the canonical alias chain. */
   :host([inverted]) .button--secondary:hover {
-    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3));
+    --hx-button-bg: var(
+      --hx-color-border-on-dark-default,
+      var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3))
+    );
   }
 
   /* Tertiary inverted — resting at the subtle overlay (10%) lifts to the default
      overlay (30%) on hover so the runtime hover delta is visually distinct, not
      collapsed onto a single token. */
   :host([inverted]) .button--tertiary {
-    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-subtle, rgba(255, 255, 255, 0.1));
+    --hx-button-bg: var(
+      --hx-color-border-on-dark-subtle,
+      var(--hx-color-surface-on-dark-overlay-subtle, rgba(255, 255, 255, 0.1))
+    );
     --hx-button-border-color: transparent;
   }
 
   :host([inverted]) .button--tertiary:hover {
-    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3));
+    --hx-button-bg: var(
+      --hx-color-border-on-dark-default,
+      var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3))
+    );
   }
 
   /* Ghost inverted — transparent base, translucent hover bg */
@@ -360,7 +374,10 @@ export const helixButtonStyles = css`
   :host([inverted]) .button--ghost:hover {
     --hx-button-bg: var(
       --hx-button-inverted-ghost-hover-bg,
-      var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3))
+      var(
+        --hx-color-border-on-dark-default,
+        var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3))
+      )
     );
   }
 
@@ -370,7 +387,10 @@ export const helixButtonStyles = css`
   }
 
   :host([inverted]) .button--outline:hover {
-    --hx-button-bg: var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3));
+    --hx-button-bg: var(
+      --hx-color-border-on-dark-default,
+      var(--hx-color-surface-on-dark-overlay-default, rgba(255, 255, 255, 0.3))
+    );
   }
 
   /* ─── Prefix / Suffix / Label ─── */
