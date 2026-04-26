@@ -104,14 +104,15 @@ describe('hx-theme', () => {
       // Value-aware sweep — walks tokens['high-contrast'] independently of
       // the published `highContrastTokenEntries` array and asserts:
       //   1. count parity (independent walk vs public export)
-      //   2. for every literal-valued HC token, the resolved DOM value
-      //      matches the source-of-truth value byte-for-byte
-      //   3. for every var()-referencing HC token, the resolved value is
-      //      non-empty (browser cascade handles the chain)
-      // Closes the round-17 cascade-shadow finding: an existence-only sweep
-      // would still pass if `highContrastTokenEntries` were silently
-      // truncated, because the lightMap base provides a fallback value for
-      // every name. Independent re-flatten + value comparison catches both.
+      //   2. for every HC token, the resolved DOM value matches the
+      //      source-of-truth literal endpoint byte-for-byte. var() chains
+      //      are resolved through a merged light+HC expected map so cross-
+      //      layer references (HC token → light primitive) resolve to the
+      //      light literal — closes the round-19 cascade-shadow finding
+      //      that an HC-only resolver dropped cross-layer chains into the
+      //      existence-only fallback.
+      //   3. cycle / depth-limit failures fail loudly (kind === 'cycle')
+      //      so a pathological tokens.json chain does not silently slip.
       const { tokens, highContrastTokenEntries } = await import('@helixui/tokens');
 
       type RawToken = { value: string };
@@ -131,48 +132,75 @@ describe('hx-theme', () => {
           }
         }
       };
-      const expected = new Map<string, string>();
-      walk((tokens as Record<string, unknown>)['high-contrast'] as Record<string, unknown>, [], expected);
+      const root = tokens as Record<string, unknown>;
+      const lightRoot: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(root)) {
+        if (k !== 'dark' && k !== 'high-contrast') lightRoot[k] = v;
+      }
+      const expectedLight = new Map<string, string>();
+      walk(lightRoot, [], expectedLight);
+      const expectedHc = new Map<string, string>();
+      walk(root['high-contrast'] as Record<string, unknown>, [], expectedHc);
+      // Merged map: light is the base, HC overlays selected names. Brand
+      // overrides are not in scope here (no brand applied on the fixture).
+      const expectedMerged = new Map(expectedLight);
+      for (const [k, v] of expectedHc) expectedMerged.set(k, v);
 
       // Independent count must match the published export — silent truncation guard.
       expect(highContrastTokenEntries.length, 'highContrastTokenEntries truncated vs tokens.json').toBe(
-        expected.size,
+        expectedHc.size,
       );
 
-      // Resolve a var() chain through the expected map until we land on a
-      // literal. Returns null if the chain leaves the HC layer (i.e. the
-      // ref is a primitive that lives only in lightMap).
-      const resolveChain = (raw: string, depth = 0): string | null => {
-        if (depth > 10) return null;
+      // Resolve a var() chain through the merged map. Distinguishes:
+      //   - { kind: 'literal', value }: chain terminates on a literal
+      //   - { kind: 'cycle' }: depth limit / cycle / orphan (must fail loudly)
+      type Resolution = { kind: 'literal'; value: string } | { kind: 'cycle' };
+      const resolveChain = (raw: string, depth = 0): Resolution => {
+        if (depth > 10) return { kind: 'cycle' };
         const m = raw.match(/^var\(\s*(--[\w-]+)\s*\)\s*$/);
-        if (!m) return raw;
-        const target = expected.get(m[1] ?? '');
-        if (target === undefined) return null;
+        if (!m) return { kind: 'literal', value: raw };
+        const target = expectedMerged.get(m[1] ?? '');
+        if (target === undefined) return { kind: 'cycle' };
         return resolveChain(target, depth + 1);
       };
 
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       await el.updateComplete;
       const styles = getComputedStyle(el);
-      for (const [name, sourceValue] of expected) {
+      for (const [name, sourceValue] of expectedHc) {
         const resolved = styles.getPropertyValue(name).trim();
-        const expectedLiteral = resolveChain(sourceValue);
-        if (expectedLiteral === null) {
-          // Chain terminates outside the HC layer (primitive that lives in
-          // lightMap only). Browser cascade resolves it; assert non-empty.
-          expect(resolved, `HC token ${name} (cross-layer var-ref) did not reach the DOM`).not.toBe(
-            '',
-          );
-        } else {
-          // Either a literal or a var() chain whose endpoint is HC-defined.
-          // Either way, the resolved DOM value must match the literal endpoint
-          // byte-for-byte — closes the round-18 cascade-shadow finding for
-          // var-refs that previously got only existence-only coverage.
-          expect(resolved.toLowerCase(), `HC token ${name} value drift`).toBe(
-            expectedLiteral.toLowerCase(),
+        const result = resolveChain(sourceValue);
+        if (result.kind === 'cycle') {
+          throw new Error(
+            `HC token ${name} resolved to a cycle/orphan via tokens.json (raw value: ${sourceValue}). ` +
+              `Either the chain depth exceeds 10 or a var() target is missing from the merged map.`,
           );
         }
+        // Literal endpoint — resolved DOM value must match byte-for-byte.
+        expect(resolved.toLowerCase(), `HC token ${name} value drift`).toBe(
+          result.value.toLowerCase(),
+        );
       }
+    });
+
+    it('switches to HC sentinels when theme transitions light → high-contrast', async () => {
+      // R19 finding 3 — HC value-aware sweep above only runs on first mount.
+      // Theme-switch path was not exercised for HC. Sentinel: focus-ring-width
+      // (2px in light, 3px in HC) and border-width-thin (1px in light, 2px in HC).
+      const el = await fixture<HelixTheme>('<hx-theme theme="light">Content</hx-theme>');
+      await el.updateComplete;
+      const before = getComputedStyle(el);
+      expect(before.getPropertyValue('--hx-focus-ring-width').trim()).toBe('2px');
+      expect(before.getPropertyValue('--hx-border-width-thin').trim()).toBe('1px');
+
+      el.theme = 'high-contrast';
+      await el.updateComplete;
+      const after = getComputedStyle(el);
+      expect(after.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      expect(after.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
+      expect(
+        after.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
+      ).toBe('#000000');
     });
 
     it('injects HC sentinel values for branch-specific override paths', async () => {
@@ -601,6 +629,56 @@ describe('hx-theme', () => {
       const el = await fixture<HelixTheme>('<hx-theme brand="mercy">Content</hx-theme>');
       expect(el.getAttribute('brand')).toBe('mercy');
       warnSpy.mockRestore();
+    });
+
+    it('brand on HC theme overrides primary color but does not silently override HC a11y tokens', async () => {
+      // R19 finding 3 — brand merge appends a later :host block, so any name
+      // a brand redeclares wins. This test documents the contract: brands
+      // override color tokens (--hx-color-primary-500 here) while leaving
+      // HC accessibility tokens (focus-ring-width, border-width-thin,
+      // text.on-error-strong) intact, because a well-authored brand should
+      // not redeclare HC a11y tokens. If a future brand or merger refactor
+      // breaks this contract, the assertions below catch it.
+      const brandName = 'test-brand-r19-hc';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#fff8f0',
+        '--hx-color-primary-100': '#ffeacc',
+        '--hx-color-primary-200': '#ffd699',
+        '--hx-color-primary-300': '#ffbd66',
+        '--hx-color-primary-400': '#ffa033',
+        '--hx-color-primary-500': '#FF8800',
+        '--hx-color-primary-600': '#cc6d00',
+        '--hx-color-primary-700': '#995200',
+        '--hx-color-primary-800': '#663700',
+        '--hx-color-primary-900': '#331b00',
+        '--hx-color-primary-950': '#1a0e00',
+        '--hx-color-secondary-50': '#f8f0ff',
+        '--hx-color-secondary-100': '#eaccff',
+        '--hx-color-secondary-200': '#d699ff',
+        '--hx-color-secondary-300': '#bd66ff',
+        '--hx-color-secondary-400': '#a033ff',
+        '--hx-color-secondary-500': '#8800ff',
+        '--hx-color-secondary-600': '#6d00cc',
+        '--hx-color-secondary-700': '#520099',
+        '--hx-color-secondary-800': '#370066',
+        '--hx-color-secondary-900': '#1b0033',
+        '--hx-color-secondary-950': '#0e001a',
+      });
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // Brand wins on color tokens it redeclares.
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#ff8800',
+      );
+      // HC a11y tokens survive — brand does not redeclare them.
+      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      expect(styles.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
+      expect(
+        styles.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
+      ).toBe('#000000');
     });
   });
 
