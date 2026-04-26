@@ -100,27 +100,68 @@ describe('hx-theme', () => {
       expect(textPrimary.toLowerCase()).toBe('#ffffff');
     });
 
-    it('injects every HC token from tokens.json onto the host', async () => {
-      // Structural sweep — iterates every entry in highContrastTokenEntries
-      // and asserts each one reaches the DOM. Closes the round-15 cascade-
-      // shadow finding at full surface coverage: any HC token added to
-      // tokens.json is automatically protected, not just the sentinels below.
-      const { highContrastTokenEntries } = await import('@helixui/tokens');
-      expect(highContrastTokenEntries.length).toBeGreaterThan(0);
+    it('injects every HC token from tokens.json onto the host with the correct value', async () => {
+      // Value-aware sweep — walks tokens['high-contrast'] independently of
+      // the published `highContrastTokenEntries` array and asserts:
+      //   1. count parity (independent walk vs public export)
+      //   2. for every literal-valued HC token, the resolved DOM value
+      //      matches the source-of-truth value byte-for-byte
+      //   3. for every var()-referencing HC token, the resolved value is
+      //      non-empty (browser cascade handles the chain)
+      // Closes the round-17 cascade-shadow finding: an existence-only sweep
+      // would still pass if `highContrastTokenEntries` were silently
+      // truncated, because the lightMap base provides a fallback value for
+      // every name. Independent re-flatten + value comparison catches both.
+      const { tokens, highContrastTokenEntries } = await import('@helixui/tokens');
+
+      type RawToken = { value: string };
+      const isToken = (v: unknown): v is RawToken =>
+        typeof v === 'object' && v !== null && 'value' in (v as Record<string, unknown>);
+      const walk = (
+        node: Record<string, unknown>,
+        path: string[],
+        out: Map<string, string>,
+      ): void => {
+        for (const [key, val] of Object.entries(node)) {
+          const next = [...path, key];
+          if (isToken(val)) {
+            out.set(`--hx-${next.join('-')}`, val.value);
+          } else if (typeof val === 'object' && val !== null) {
+            walk(val as Record<string, unknown>, next, out);
+          }
+        }
+      };
+      const expected = new Map<string, string>();
+      walk((tokens as Record<string, unknown>)['high-contrast'] as Record<string, unknown>, [], expected);
+
+      // Independent count must match the published export — silent truncation guard.
+      expect(highContrastTokenEntries.length, 'highContrastTokenEntries truncated vs tokens.json').toBe(
+        expected.size,
+      );
+
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       await el.updateComplete;
       const styles = getComputedStyle(el);
-      for (const entry of highContrastTokenEntries) {
-        const resolved = styles.getPropertyValue(entry.name).trim();
-        expect(resolved, `HC token ${entry.name} did not reach the DOM`).not.toBe('');
+      for (const [name, sourceValue] of expected) {
+        const resolved = styles.getPropertyValue(name).trim();
+        if (sourceValue.startsWith('var(')) {
+          // var() references resolve through the cascade — assert non-empty.
+          expect(resolved, `HC token ${name} (var-ref) did not reach the DOM`).not.toBe('');
+        } else {
+          // Literal values must match source-of-truth byte-for-byte.
+          expect(resolved.toLowerCase(), `HC token ${name} value drift`).toBe(
+            sourceValue.toLowerCase(),
+          );
+        }
       }
     });
 
     it('injects HC sentinel values for branch-specific override paths', async () => {
-      // Sentinel checks for tokens whose value drift would silently break
-      // consumer-facing surfaces (action.danger.bg-active pairs with
-      // text.on-error-strong; focus-ring/border-width tier sized for HC
-      // visibility; on-primary-strong text flips black on bright HC fills).
+      // Branch-specific override paths the structural sweep can pass
+      // even with logic regressions (e.g. var() chains that resolve via
+      // light fallbacks instead of the HC-specific override). Each sentinel
+      // is a token whose drift would silently break a consumer-facing
+      // a11y pairing.
       const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
       await el.updateComplete;
       const styles = getComputedStyle(el);
@@ -132,6 +173,17 @@ describe('hx-theme', () => {
       expect(
         styles.getPropertyValue('--hx-color-text-on-primary-strong').trim().toLowerCase(),
       ).toBe('#000000');
+      // HC text.on-error-strong — black on bright HC error fills (AAA, paired
+      // with action.danger.bg-active below). Base value white fails AA on HC red.
+      expect(
+        styles.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
+      ).toBe('#000000');
+      // HC action.danger.bg-active — flips to HC error-500 (#F87171) so the
+      // pressed-state danger pairing with on-error-strong (#000000) clears AA.
+      // Base error-700 (#A21312) has no HC override → 2.64:1 fail without this.
+      expect(
+        styles.getPropertyValue('--hx-color-action-danger-bg-active').trim().toLowerCase(),
+      ).toBe('#f87171');
       // HC border.on-dark-strong — solid white so inverted outlines remain visible
       expect(
         styles.getPropertyValue('--hx-color-border-on-dark-strong').trim().toLowerCase(),
