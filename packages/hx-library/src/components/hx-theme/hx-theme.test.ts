@@ -329,36 +329,54 @@ describe('hx-theme', () => {
     });
   });
 
-  // ─── Auto-mode detection ───
+  // ─── System detection ───
 
-  describe('Auto-mode detection', () => {
-    it('effectiveTheme returns light or dark when theme="auto"', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
+  describe('System detection', () => {
+    it('effectiveTheme returns light or dark when system=true', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
       await el.updateComplete;
 
       const effective = el.effectiveTheme;
       expect(effective === 'light' || effective === 'dark').toBe(true);
     });
 
-    it('effectiveTheme uses explicit theme prop when not "auto"', async () => {
+    it('effectiveTheme ignores theme prop when system=true', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme system theme="dark">Content</hx-theme>');
+      await el.updateComplete;
+
+      // system=true should use OS preference, not the explicit theme prop
+      const effective = el.effectiveTheme;
+      expect(effective === 'light' || effective === 'dark').toBe(true);
+    });
+
+    it('effectiveTheme uses theme prop when system=false', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="dark">Content</hx-theme>');
       expect(el.effectiveTheme).toBe('dark');
     });
 
-    it('switching from "auto" to an explicit theme uses that theme', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
+    it('switching system off restores theme prop', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme system theme="dark">Content</hx-theme>');
       await el.updateComplete;
 
-      el.theme = 'dark';
+      el.system = false;
       await el.updateComplete;
 
       expect(el.effectiveTheme).toBe('dark');
     });
   });
 
-  // ─── Auto-mode token injection ───
+  // ─── System mode token injection ───
 
-  describe('Auto-mode token injection', () => {
+  describe('System mode token injection', () => {
+    it('injects tokens (not just effectiveTheme string) when system=true', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+      await el.updateComplete;
+      // The token must be injected regardless of which OS preference resolves
+      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
+      expect(value).toBeTruthy();
+      expect(value.length).toBeGreaterThan(0);
+    });
+
     it('injects tokens when theme="auto"', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
@@ -407,7 +425,7 @@ describe('hx-theme', () => {
 
   describe('Lifecycle', () => {
     it('cleans up media query listener on disconnect', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
+      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
       await el.updateComplete;
 
       // Capture the internal handler reference before removal
@@ -549,39 +567,6 @@ describe('hx-theme', () => {
   // ─── brand property ───
 
   describe('Property: brand', () => {
-    /** Register a minimal-but-complete brand for tests that need registry
-     * acceptance. R27 gates `data-brand` reflection on
-     * `HelixBrandRegistry.getBrandTokens(...) !== undefined` so an
-     * unregistered name no longer activates cascade overrides the JS path
-     * is simultaneously refusing. Tests that previously assumed
-     * `harbor-health` reflected unconditionally now register it. */
-    const registerHarborHealth = (): void => {
-      HelixBrandRegistry.register('harbor-health', {
-        '--hx-color-primary-50': '#f0fafa',
-        '--hx-color-primary-100': '#d6f0f0',
-        '--hx-color-primary-200': '#a8dede',
-        '--hx-color-primary-300': '#7accca',
-        '--hx-color-primary-400': '#4cbab6',
-        '--hx-color-primary-500': '#1ea8a2',
-        '--hx-color-primary-600': '#188983',
-        '--hx-color-primary-700': '#136a64',
-        '--hx-color-primary-800': '#0e4b46',
-        '--hx-color-primary-900': '#082c28',
-        '--hx-color-primary-950': '#041614',
-        '--hx-color-secondary-50': '#f0f4fa',
-        '--hx-color-secondary-100': '#d6e1f0',
-        '--hx-color-secondary-200': '#a8c0de',
-        '--hx-color-secondary-300': '#7aa0cc',
-        '--hx-color-secondary-400': '#4c80ba',
-        '--hx-color-secondary-500': '#1e60a8',
-        '--hx-color-secondary-600': '#184d89',
-        '--hx-color-secondary-700': '#133a6a',
-        '--hx-color-secondary-800': '#0e274b',
-        '--hx-color-secondary-900': '#08142c',
-        '--hx-color-secondary-950': '#040a16',
-      });
-    };
-
     it('defaults brand to empty string', async () => {
       const el = await fixture<HelixTheme>('<hx-theme>Content</hx-theme>');
       expect(el.brand).toBe('');
@@ -648,227 +633,6 @@ describe('hx-theme', () => {
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const el = await fixture<HelixTheme>('<hx-theme brand="mercy">Content</hx-theme>');
       expect(el.getAttribute('brand')).toBe('mercy');
-      warnSpy.mockRestore();
-    });
-
-    it('reflects brand to data-brand on light/dark for CSS-pattern selectors', async () => {
-      // R26 BLOCKING (api-design high) — multi-brand-theming.md documents
-      // `hx-theme[data-brand='foo']:not([theme='high-contrast'])` as the
-      // canonical CSS-pattern selector, but only the Drupal Twig helper
-      // emitted data-brand. Plain HTML / React / Angular / Vue consumers
-      // got zero brand styling. Fix mirrors brand → data-brand in
-      // _applyEffectiveTheme so the documented selectors match in every
-      // framework without manual authoring. R27 narrowed reflection to
-      // brands the registry accepts — so this test must register the
-      // brand it asserts on.
-      registerHarborHealth();
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="harbor-health" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      el.theme = 'dark';
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      warnSpy.mockRestore();
-    });
-
-    it('removes data-brand on theme="high-contrast" (defense-in-depth for unguarded CSS)', async () => {
-      // R26 BLOCKING (security/api-design high) — CSS-pattern brand rules
-      // authored without `:not([theme='high-contrast'])` would still match
-      // an HC page if data-brand stayed on the host, breaking the WCAG
-      // 7:1+ contract that brand-on-HC suppression is supposed to defend.
-      // Removing data-brand on HC neutralizes external CSS that lacks the
-      // `:not(...)` guard, mirroring the JS-registry suppression at the
-      // attribute layer.
-      registerHarborHealth();
-      const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="harbor-health" theme="high-contrast">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-
-      // Switching off HC restores data-brand.
-      el.theme = 'light';
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      // Switching back to HC removes it again.
-      el.theme = 'high-contrast';
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-
-      infoSpy.mockRestore();
-      warnSpy.mockRestore();
-    });
-
-    it('clears data-brand when brand is unset', async () => {
-      registerHarborHealth();
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="harbor-health" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      el.brand = '';
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-
-      warnSpy.mockRestore();
-    });
-
-    it('strips SSR-emitted data-brand for unregistered brand on hydration', async () => {
-      // R28 HIGH — hx-theme.twig:99 emits `data-brand="{{ brand }}"` for
-      // any truthy `brand` on non-HC themes, including unregistered
-      // typos. Without an SSR-adoption step the runtime's ownership flag
-      // starts false on hydration, so the orphan attribute would survive
-      // and activate `[data-brand='typo']` cascade overrides the JS
-      // registry is simultaneously rejecting. The hydration adopt+remove
-      // gate (data-brand === brand) closes the SSR path of F2.
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="typo-brand-xyz" data-brand="typo-brand-xyz" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-      warnSpy.mockRestore();
-    });
-
-    it('preserves SSR-emitted data-brand for registered brand on hydration', async () => {
-      // R28 HIGH companion — registered brand SSR shape must round-trip:
-      // twig emits `brand="x" data-brand="x"`, runtime accepts the
-      // registry, reflection is a no-op (attribute already matches),
-      // ownership is claimed.
-      registerHarborHealth();
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="harbor-health" data-brand="harbor-health" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      // And subsequent HC switch removes the runtime-owned attribute.
-      el.theme = 'high-contrast';
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-    });
-
-    it('does NOT reflect data-brand for unregistered (typo) brand names', async () => {
-      // R27 MEDIUM — reflection must mirror the registry's accept/reject
-      // verdict. If the registry rejects "acmee" (typo), reflecting
-      // data-brand="acmee" would activate cascade overrides the JS path
-      // is simultaneously refusing — half the brand applies, half does
-      // not. Reflection is gated on `getBrandTokens(brand) !== undefined`.
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="totally-not-registered-typo" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"totally-not-registered-typo" is not registered'),
-      );
-      warnSpy.mockRestore();
-    });
-
-    it('preserves manually-authored data-brand when no brand prop is set', async () => {
-      // R27 HIGH — multi-brand-theming.md blesses a manual cascade path:
-      // `<hx-theme data-brand="x">` without `brand=`. R26 stripped that
-      // attribute on first update because the removal branch fired
-      // unconditionally on `brand === ''`. Fix tracks ownership via
-      // `_ownsDataBrand`; the runtime only manages attributes it authored.
-      const el = await fixture<HelixTheme>(
-        '<hx-theme data-brand="manual-cascade-only" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('manual-cascade-only');
-
-      // Theme changes must not strip the user's attribute either.
-      el.theme = 'dark';
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('manual-cascade-only');
-
-      // Even on HC the manual attribute survives — the docs assign HC
-      // guarding to the consumer (the `:not([theme='high-contrast'])`
-      // selector). Touching attributes the runtime didn't author would
-      // surprise consumers using the documented manual path.
-      el.theme = 'high-contrast';
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('manual-cascade-only');
-    });
-
-    it('runtime-owned data-brand round-trips across HC suppression', async () => {
-      // Documented contract (multi-brand-theming.md §Auto-reflection): when
-      // a registered `brand` is set, the runtime owns `data-brand` —
-      // reflects on light/dark, suppresses on HC, restores on the way
-      // back. The manual cascade-only path (no `brand` prop) is covered
-      // separately by `preserves manually-authored data-brand…` above.
-      registerHarborHealth();
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="harbor-health" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      // HC suppresses reflected (runtime-owned) data-brand.
-      el.theme = 'high-contrast';
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-
-      // Returning to light restores reflection.
-      el.theme = 'light';
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      warnSpy.mockRestore();
-    });
-
-    it('ownership is value-equality based — setting `brand` to a registered name claims any pre-existing matching data-brand and strips it on clear', async () => {
-      // R29 MEDIUM (api-design) — codex flagged that the SSR adoption
-      // heuristic (`data-brand === brand` ⇒ runtime-managed) cannot
-      // distinguish twig-emitted markup from author-emitted markup. The
-      // documented contract per multi-brand-theming.md is: setting a
-      // registered `brand` opts the matching `data-brand` into runtime
-      // management (this is the SSR symmetry path). Authors who want a
-      // pure cascade-only `data-brand` must omit the `brand` prop. This
-      // test pins that contract.
-      registerHarborHealth();
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="harbor-health" data-brand="harbor-health" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      // Reflection is a no-op (already matches); ownership is claimed.
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
-
-      // Clearing the prop strips the now-runtime-owned attribute.
-      el.brand = '';
-      await el.updateComplete;
-      expect(el.hasAttribute('data-brand')).toBe(false);
-
-      warnSpy.mockRestore();
-    });
-
-    it('manual data-brand under a different value than `brand` is overwritten by reflection', async () => {
-      // R29 MEDIUM (api-design) companion — the contract: setting `brand`
-      // is the runtime's authorization to manage `data-brand`. If an
-      // author mixes `brand="X"` with `data-brand="Y"`, the runtime
-      // overwrites Y with X. There is no "preserve a different manual
-      // value while the brand prop is also set" mode; that combination
-      // is not supported.
-      registerHarborHealth();
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      const el = await fixture<HelixTheme>(
-        '<hx-theme brand="harbor-health" data-brand="completely-different" theme="light">Content</hx-theme>',
-      );
-      await el.updateComplete;
-      expect(el.getAttribute('data-brand')).toBe('harbor-health');
       warnSpy.mockRestore();
     });
 
@@ -1134,7 +898,7 @@ describe('hx-theme', () => {
 
   describe('Announcer live region', () => {
     it('renders a visually-hidden [role="status"] span for AT announcements', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
+      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
       await el.updateComplete;
       const announcer = shadowQuery(el, '[role="status"]');
       expect(announcer).toBeTruthy();

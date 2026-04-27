@@ -34,20 +34,20 @@ const meta = {
     },
     motion: {
       control: { type: 'select' },
-      options: ['full', 'reduced', 'none'],
+      options: ['auto', 'reduced', 'full'],
       description:
-        'Motion preference. "full" (default) respects OS prefers-reduced-motion; "reduced" or "none" force motion off regardless of OS preference.',
+        'Motion preference override. "reduced" disables animations; "auto" follows the OS prefers-reduced-motion setting.',
       table: {
         category: 'Theme',
-        defaultValue: { summary: 'full' },
-        type: { summary: "'full' | 'reduced' | 'none'" },
+        defaultValue: { summary: 'auto' },
+        type: { summary: "'auto' | 'reduced' | 'full'" },
       },
     },
   },
   args: {
     theme: 'light',
     brand: '',
-    motion: 'full',
+    motion: 'auto',
   },
   render: (args) => html`
     <hx-theme

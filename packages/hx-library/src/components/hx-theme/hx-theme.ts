@@ -309,14 +309,6 @@ export class HelixTheme extends HelixElement {
    * fires once per `update()` tick rather than once per applied state. */
   private _lastBrandAdvisoryKey: string | null = null;
 
-  /** @internal — tracks whether the runtime authored the current `data-brand`
-   * attribute. The reflection path (`brand` registered + non-HC) sets this to
-   * `true` when it writes; transitions out of that state remove the attribute
-   * only when we wrote it. Consumers using the documented manual cascade
-   * path (`<hx-theme data-brand="x">` without a `brand` prop) keep their
-   * attribute untouched. */
-  private _ownsDataBrand = false;
-
   override firstUpdated(changed: PropertyValues<this>): void {
     super.firstUpdated(changed);
     this._initThemeSheet();
@@ -456,59 +448,6 @@ export class HelixTheme extends HelixElement {
   private _applyEffectiveTheme(): void {
     if (!this._themeSheet) return;
 
-    // Hoist the registry lookup so reflection and merge share one result.
-    // Reflection only fires for registered brands on non-HC themes — an
-    // unregistered (typo) brand must not activate `[data-brand]` CSS the
-    // registry simultaneously rejects, and HC suppresses the attribute as
-    // defense-in-depth against external CSS missing the `:not(...)` guard.
-    // The manual cascade path (`<hx-theme data-brand="x">` without a `brand`
-    // prop, documented in multi-brand-theming.md) is preserved by gating
-    // removal on `_ownsDataBrand` — we only strip what we authored.
-    const brandTokens =
-      this.brand !== '' ? HelixBrandRegistry.getBrandTokens(this.brand) : undefined;
-    const shouldReflectBrand =
-      this.brand !== '' &&
-      this.effectiveTheme !== 'high-contrast' &&
-      brandTokens !== undefined;
-
-    if (shouldReflectBrand) {
-      if (this.getAttribute('data-brand') !== this.brand) {
-        this.setAttribute('data-brand', this.brand);
-      }
-      this._ownsDataBrand = true;
-    } else {
-      // Cleanup fires in two cases — both indicate runtime-managed state.
-      // The supported contract (multi-brand-theming.md §Auto-reflection):
-      //
-      //   • Setting a registered `brand` opts the matching `data-brand`
-      //     into runtime management. The runtime reflects on light/dark,
-      //     suppresses on HC, strips on `brand=''`. SSR shape from
-      //     hx-theme.twig (`brand="X" data-brand="X"`) is the same shape
-      //     authors would write by hand; the runtime cannot distinguish
-      //     them, so it treats both identically — value-equality is the
-      //     ownership signal, not provenance.
-      //   • Authors who need a pure cascade-only `data-brand` (no JS
-      //     registry membership) must OMIT the `brand` prop. The runtime
-      //     never touches `data-brand` when `brand === ''` or when the
-      //     existing attribute value differs from `brand` (that combo is
-      //     unsupported and a registered-brand reflection will overwrite
-      //     it on the next update).
-      //
-      // The two cleanup branches:
-      //   1. We previously reflected (`_ownsDataBrand`).
-      //   2. The pre-existing attribute matches the current `brand` prop
-      //      — same-value adoption. Closes the SSR typo path: a Drupal
-      //      page rendering `<hx-theme brand="typo" data-brand="typo">`
-      //      gets cleaned up on hydration so the cascade override does
-      //      not leak when the JS registry rejects the merge.
-      const sameValueAdoption =
-        this.brand !== '' && this.getAttribute('data-brand') === this.brand;
-      if (this._ownsDataBrand || sameValueAdoption) {
-        this.removeAttribute('data-brand');
-        this._ownsDataBrand = false;
-      }
-    }
-
     let css = _buildThemeCss(this.effectiveTheme);
 
     // Brand merge is skipped on high-contrast mode. Brands declare 22 color
@@ -521,6 +460,7 @@ export class HelixTheme extends HelixElement {
     // Skipping the merge entirely on HC delivers the contract; brands
     // continue to apply on light/dark.
     if (this.brand !== '' && this.effectiveTheme !== 'high-contrast') {
+      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens !== undefined) {
         css = mergeBrandTokens(css, brandTokens);
         this._lastBrandAdvisoryKey = `${this.brand}|${this.effectiveTheme}|applied`;
@@ -536,6 +476,7 @@ export class HelixTheme extends HelixElement {
         }
       }
     } else if (this.brand !== '' && this.effectiveTheme === 'high-contrast') {
+      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens === undefined) {
         const advisoryKey = `${this.brand}|high-contrast|unregistered`;
         if (this._lastBrandAdvisoryKey !== advisoryKey) {

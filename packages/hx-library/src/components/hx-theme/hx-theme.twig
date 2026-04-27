@@ -30,17 +30,12 @@
                          theme="high-contrast" (logs console.info) to preserve the
                          WCAG 7:1+ contrast contract.
 
-                         When set, the template emits `brand="..."` (consumed by the
-                         JS registry) and, when `theme != 'high-contrast'`, also
-                         `data-brand="..."` (consumed by CSS-pattern selectors of the
-                         form `hx-theme[data-brand='...']`). The runtime mirrors the
-                         same data-brand attribute via `updated()` once hydration
-                         runs, so framework consumers (React, Angular, Vue) get the
-                         same selector match without authoring `data-brand` manually.
-                         The HC server-side gate is defense-in-depth: it prevents a
-                         flash-of-branded-HC during pre-hydration paint when an
-                         external stylesheet lacks the `:not([theme='high-contrast'])`
-                         guard. See BRAND_THEMING.md.
+                         When set, the template emits BOTH `brand="..."` (consumed by
+                         the JS registry) and `data-brand="..."` (consumed by
+                         CSS-pattern selectors of the form
+                         `hx-theme[data-brand='...']:not([theme='high-contrast'])`,
+                         see BRAND_THEMING.md). The HC suppression for the CSS pattern
+                         lives in the selector itself, not in this template.
     attributes (object)  Optional. Additional HTML attributes spread onto <hx-theme>.
 
   Usage — Full page theming:
@@ -93,11 +88,10 @@
       {{ attach_library('mytheme/hx-theme') }}
 #}
 
-{% set _hx_theme = theme|default('light') %}
 <hx-theme
-  theme="{{ _hx_theme }}"
-  {% if brand is defined and brand %}brand="{{ brand }}"{% if _hx_theme != 'high-contrast' %} data-brand="{{ brand }}"{% endif %}{% endif %}
-  {% for key, val in attributes|default({}) %}{% if _hx_theme == 'high-contrast' and (key == 'data-brand' or key == 'brand') %}{# suppressed on high-contrast — defense-in-depth against external CSS missing the :not([theme='high-contrast']) guard. See multi-brand-theming.md and BRAND_THEMING.md. #}{% else %}{{ key }}="{{ val }}" {% endif %}{% endfor %}
+  theme="{{ theme|default('light') }}"
+  {% if brand is defined and brand %}brand="{{ brand }}" data-brand="{{ brand }}"{% endif %}
+  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
   {% block content %}{% endblock %}
 </hx-theme>
