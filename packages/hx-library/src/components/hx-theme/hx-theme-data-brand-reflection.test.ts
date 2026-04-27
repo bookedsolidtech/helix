@@ -63,19 +63,19 @@ describe('hx-theme brand → data-brand reflection contract (3.3.0)', () => {
       'Case 13 — light + registered: keeps data-brand="acme" (no setAttribute call when current === target)',
     );
     it.todo(
-      'Case 14 — light + unregistered: removes data-brand, warns about unregistered brand',
+      'Case 14 — light + unregistered: leaves data-brand="acme" untouched (registry inactive), warns about unregistered brand',
     );
     it.todo(
       'Case 15 — dark + registered: keeps data-brand="acme" (no setAttribute call)',
     );
     it.todo(
-      'Case 16 — dark + unregistered: removes data-brand, warns about unregistered brand',
+      'Case 16 — dark + unregistered: leaves data-brand="acme" untouched (registry inactive), warns about unregistered brand',
     );
     it.todo(
       'Case 17 — high-contrast + registered: removes data-brand, info-logs HC suppression',
     );
     it.todo(
-      'Case 18 — high-contrast + unregistered: removes data-brand, warns about unregistered brand',
+      'Case 18 — high-contrast + unregistered: leaves data-brand="acme" untouched (registry inactive, author HC guard), warns about unregistered brand',
     );
   });
 
@@ -85,35 +85,35 @@ describe('hx-theme brand → data-brand reflection contract (3.3.0)', () => {
       'Case 19 — light + brand-registered: overwrites data-brand "other" → "acme", no console output',
     );
     it.todo(
-      'Case 20 — light + brand-unregistered: removes data-brand "other", warns about unregistered brand',
+      'Case 20 — light + brand-unregistered: leaves data-brand="other" untouched (registry inactive), warns about unregistered brand',
     );
     it.todo(
       'Case 21 — dark + brand-registered: overwrites data-brand "other" → "acme", no console output',
     );
     it.todo(
-      'Case 22 — dark + brand-unregistered: removes data-brand "other", warns about unregistered brand',
+      'Case 22 — dark + brand-unregistered: leaves data-brand="other" untouched (registry inactive), warns about unregistered brand',
     );
     it.todo(
       'Case 23 — high-contrast + brand-registered: removes data-brand entirely (strips both), info-logs HC suppression',
     );
     it.todo(
-      'Case 24 — high-contrast + brand-unregistered: removes data-brand entirely, warns about unregistered brand',
+      'Case 24 — high-contrast + brand-unregistered: leaves data-brand="other" untouched (registry inactive), warns about unregistered brand',
     );
   });
 
   // ─── State transitions ───────────────────────────────────────────────────
   describe('State transitions', () => {
     it.todo(
-      'brand="acme" → brand="other" (both registered, light theme): data-brand updates acme → other',
+      'brand="acme" → brand="other" (both registered, light theme): data-brand updates acme → other; lastApplied.value updates acme → other',
     );
     it.todo(
-      'brand="acme" → brand="" while runtime owns data-brand: removes data-brand, _managedDataBrand resets to null',
+      'brand="acme" (registered, light) → brand="": lastApplied.kind === "set" and current matches → REMOVE data-brand, lastApplied resets to "unmanaged"',
     );
     it.todo(
-      'theme="light" → theme="high-contrast" while brand="acme" registered: data-brand removed (HC suppression)',
+      'theme="light" → theme="high-contrast" while brand="acme" registered: data-brand removed (HC suppression); lastApplied.kind === "cleared"',
     );
     it.todo(
-      'theme="high-contrast" → theme="light" while brand="acme" registered: data-brand re-set to "acme"',
+      'theme="high-contrast" → theme="light" while brand="acme" registered: data-brand re-set to "acme"; lastApplied = { kind: "set", value: "acme" }',
     );
     it.todo(
       'theme="auto" with brand="acme" registered, OS prefers-color-scheme flips light → dark: data-brand="acme" unchanged (both light/dark set the same value)',
@@ -121,19 +121,34 @@ describe('hx-theme brand → data-brand reflection contract (3.3.0)', () => {
   });
 
   // ─── Mutation guard ──────────────────────────────────────────────────────
-  describe('External mutation guard', () => {
+  // Authoritative AT reconcile boundaries — external writes between reconciles
+  // persist; the next reconcile event reasserts the runtime's intended state.
+  describe('External mutation guard (reconcile-boundary semantics)', () => {
     it.todo(
-      'External setAttribute("data-brand", "x") while brand="y" survives until next reconcile, then reverts to "y"',
+      'External setAttribute("data-brand", "x") while brand="y" registered: survives until next reconcile, then reverts to "y"',
     );
     it.todo(
-      'External removeAttribute("data-brand") while brand="acme" registered survives until next reconcile, then re-sets to "acme"',
+      'External removeAttribute("data-brand") while brand="acme" registered: survives until next reconcile, then re-sets to "acme"',
+    );
+  });
+
+  // ─── R1 edge cases (codex finding 6 — test gap closures) ─────────────────
+  describe('R1 edge cases', () => {
+    it.todo(
+      'Late registration: brand="acme" mounts before HelixBrandRegistry.register("acme", ...) — data-brand stays unset (case 2 path); subsequent register() triggers subscription-driven reconcile; data-brand="acme" set without manual property toggle',
+    );
+    it.todo(
+      'Ownership relinquish under external override: brand="acme" registered → runtime sets data-brand="acme" → external setAttribute("data-brand","x") → brand="" — data-brand="x" survives the relinquish (lastApplied.kind === "set" but current !== value → NOOP)',
+    );
+    it.todo(
+      'Advisory dedupe: brand="acme" unregistered, theme reconcile fires twice (theme prop change + auto media-query event) — console.warn emits exactly once (pins _lastBrandAdvisoryKey deduplication)',
     );
   });
 
   // ─── disconnectedCallback ────────────────────────────────────────────────
   describe('disconnectedCallback', () => {
     it.todo(
-      'Element disconnected while owning data-brand: attribute is left in place (no flash for moved-not-removed nodes)',
+      'Element disconnected while owning data-brand: attribute is left in place (no flash for moved-not-removed nodes); registry subscription unsubscribes',
     );
   });
 });
