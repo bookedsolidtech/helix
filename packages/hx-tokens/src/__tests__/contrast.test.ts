@@ -543,7 +543,7 @@ const PAIRS: PairSpec[] = [
   // and the lifted -400 fills lose UI-floor contrast against it — the
   // [inverted] variant is not designed to be used inside an already-dark
   // page, and proper dark-mode-inverted handling (mode-aware fill stop +
-  // mode-aware foreground) is tracked as a 3.2.x follow-up.
+  // mode-aware foreground) is tracked as a 3.3.x follow-up.
   {
     text: '--hx-color-action-primary-bg-inverted-hover',
     surface: '--hx-color-surface-inverse',
@@ -725,6 +725,63 @@ const PAIRS: PairSpec[] = [
     threshold: 4.5,
     label: 'success-text on surface.default',
   },
+  // 3.2.2 color-contrast campaign: focus-ring must clear the WCAG 1.4.11 3:1
+  // floor for non-text UI components against the resting body surface — every
+  // keyboard-focus indicator drawn at full opacity (outline-style focus on
+  // hx-link, border-flip on hx-text-input wrapper, button focus rings, etc.)
+  // resolves through this token. Pre-3.2.2 it was primary-400 (2.45:1 on white,
+  // sub-3:1) — the most common keyboard-focus affordance in the library was
+  // failing. Light flips to primary-600, dark keeps primary-400 (7.27:1 on
+  // dark surface), HC inherits the explicit yellow override (#FFFF00, ~19.5:1
+  // on #000). Asserting the pair across all three modes locks the floor in
+  // permanently; any future palette tweak that drops the focus-ring below 3:1
+  // fails CI here.
+  {
+    text: '--hx-color-focus-ring',
+    surface: '--hx-color-surface-default',
+    threshold: 3.0,
+    label: 'focus-ring on surface.default (UI floor — keyboard focus)',
+  },
+  // 3.2.2 color-contrast campaign: action.primary.bg-inverted-rest paints
+  // the resting fill of inverted-mode primary buttons against surface.inverse.
+  // surface.inverse flips by mode (dark in light theme, light in dark theme),
+  // so the resting fill must clear 3:1 in both directions. Light: primary-500
+  // on #0D1825 = 5.20:1. Dark: primary-600 on #EBEEE9 = 4.97:1 (the dark-mode
+  // override). Pre-3.2.2 dark inverted primary resolved to primary-500 on
+  // #EBEEE9 = 2.94:1 — sub-3:1 UI-component floor fail.
+  {
+    text: '--hx-color-action-primary-bg-inverted-rest',
+    surface: '--hx-color-surface-inverse',
+    threshold: 3.0,
+    label: 'action.primary.bg-inverted-rest on surface.inverse (UI floor — inverted button)',
+  },
+  // 3.2.2 color-contrast campaign: border.strong must clear the WCAG 1.4.11
+  // 3:1 floor against surface.default — it is the resting border on every form
+  // control (text input, select, checkbox, radio, switch track, file upload
+  // dropzone, side-nav header/footer, etc.). Pre-3.2.2 this was neutral-400
+  // (#8E9C98, 2.85:1 on white) — a sub-3:1 fail systemic to every form-control
+  // border across the library. Light flips to neutral-500 (#66787B, 4.63:1),
+  // dark flips to neutral-400 (#8E9C98 on #0D1825 = 6.27:1), HC inherits #FFFFFF
+  // (21:1 on #000). Locking the pair here prevents future palette tweaks from
+  // sliding the resting form-control border below 3:1 again.
+  {
+    text: '--hx-color-border-strong',
+    surface: '--hx-color-surface-default',
+    threshold: 3.0,
+    label: 'border.strong on surface.default (UI floor — form-control borders)',
+  },
+  // 3.2.2 round-8: the on-dark border family is intentionally NOT in the
+  // contrast matrix. border.on-dark-strong resolves to overlay-white-70
+  // (light) / overlay-black-50 (dark) — translucent primitives that need
+  // alpha-compositing onto surface.inverse before a contrast ratio is even
+  // meaningful, and resolveToHex deliberately does not walk into
+  // alpha-blended primitives because the matrix is structured around flat
+  // foreground/background pairs. The structural-shape gate below is the
+  // round-8 lock for this family: it asserts that the only token remaining
+  // under border.on-dark-* is the strong tier (the lower-alpha siblings
+  // were renamed to surface.on-dark-overlay-{default,subtle} because they
+  // were always fills, never borders). HC is a no-op here — forced-colors
+  // overrides every paint via the forced-colors mixin.
 ];
 
 const ALL_MODES: Array<'light' | 'dark' | 'high-contrast'> = ['light', 'dark', 'high-contrast'];
@@ -879,5 +936,74 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
       }
     }
     expect(drift, `description ratio drift:\n  ${drift.join('\n  ')}`).toEqual([]);
+  });
+
+  // -------------------------------------------------------------------------
+  // 3.2.2 round-8/12 structural lock for the on-dark border + overlay family.
+  //
+  // Codex round-8 finding #2: border.on-dark-default (overlay-white-30) and
+  // border.on-dark-subtle (overlay-white-10) lived in the border.* namespace
+  // but their alpha (≤30%) cannot honour the WCAG 1.4.11 3:1 floor against
+  // either surface.default or surface.inverse — they were always used as
+  // translucent FILLS (inverted-secondary/ghost/tertiary hover bg), never
+  // as borders. They were renamed to surface.on-dark-overlay-{default,
+  // subtle}; only the strong tier (overlay-white-70 ≈ 5:1) survived as a
+  // genuine border that can stand on its own.
+  //
+  // Round-11 attempted to add deprecated *aliases* under border.on-dark-
+  // {default,subtle} at the token tier so consumer overrides on the published
+  // CSS variable names from 3.2.0/3.2.1 would still reach paint. Round-12
+  // proved that approach broken: a :root-level alias `:root { --A: var(--B) }`
+  // freezes --A to :root's --B at computed-value time per CSS Custom
+  // Properties §3, so a host-scoped override on the canonical name (--B) is
+  // shadowed by the :root-resolved value of --A. Backwards compatibility is
+  // therefore preserved at the *consume sites* instead — every component rule
+  // that paints with surface.on-dark-overlay-* reads
+  //   var(--hx-color-border-on-dark-*, var(--hx-color-surface-on-dark-overlay-*, …))
+  // so consumer overrides on either name reach paint.
+  //
+  // The structural lock therefore asserts:
+  //   border.on-dark-* contains ONLY 'on-dark-strong' (the surviving genuine
+  //     border with WCAG 1.4.11 headroom). The deprecated default/subtle
+  //     names are NOT emitted at :root.
+  //   surface.on-dark-overlay-* contains exactly the renamed translucent-
+  //     fill pair across every tier.
+  // -------------------------------------------------------------------------
+  it('border.on-dark-* shape: strong-only (round-8/12 lock)', () => {
+    type TokenLike = { value?: string };
+    type TierShape = {
+      border?: Record<string, TokenLike>;
+      surface?: Record<string, TokenLike>;
+    };
+    const tiers: Array<{ name: string; tier: TierShape }> = [
+      { name: 'base', tier: (tokens as { color: TierShape }).color },
+      { name: 'dark', tier: (tokens as { dark: { color: TierShape } }).dark.color },
+      {
+        name: 'high-contrast',
+        tier: (tokens as { 'high-contrast': { color: TierShape } })['high-contrast'].color,
+      },
+    ];
+
+    for (const { name, tier } of tiers) {
+      const onDarkBorderKeys = Object.keys(tier.border ?? {})
+        .filter((k) => k.startsWith('on-dark-'))
+        .sort();
+      expect(onDarkBorderKeys, `${name}.color.border.on-dark-* shape`).toEqual([
+        'on-dark-strong',
+      ]);
+
+      // surface.on-dark-overlay-{default,subtle}: both must exist in every
+      // tier, since runtime mode-flip depends on the dark + HC overrides
+      // being present (the base values resolve to overlay-white-* which
+      // disappears against the now-light surface.inverse in dark mode and
+      // collapses to invisible on the HC #000 canvas).
+      const onDarkOverlayKeys = Object.keys(tier.surface ?? {})
+        .filter((k) => k.startsWith('on-dark-overlay-'))
+        .sort();
+      expect(onDarkOverlayKeys, `${name}.color.surface.on-dark-overlay-* shape`).toEqual([
+        'on-dark-overlay-default',
+        'on-dark-overlay-subtle',
+      ]);
+    }
   });
 });

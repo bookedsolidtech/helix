@@ -29,7 +29,10 @@ export const helixSideNavStyles = css`
     transition: width var(--hx-transition-normal, 300ms) ease;
     overflow: hidden;
     border-inline-end: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(
+        --hx-side-nav-border-color,
+        var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
+      );
   }
 
   /* ─── Collapsed State ─── */
@@ -47,7 +50,10 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-bottom: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(
+        --hx-side-nav-border-color,
+        var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
+      );
     overflow: hidden;
   }
 
@@ -74,7 +80,10 @@ export const helixSideNavStyles = css`
     flex-shrink: 0;
     min-height: var(--hx-space-14, 3.5rem);
     border-top: var(--hx-border-width-thin, 1px) solid
-      var(--hx-side-nav-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(
+        --hx-side-nav-border-color,
+        var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7))
+      );
     overflow: hidden;
   }
 
@@ -105,22 +114,34 @@ export const helixSideNavStyles = css`
   }
 
   .side-nav__toggle:hover {
+    /* Read both deprecated --hx-color-border-on-dark-subtle (3.2.0/3.2.1 API)
+       and canonical --hx-color-surface-on-dark-overlay-subtle so consumer
+       overrides on either name reach paint. Deprecated removal: 4.0.0.
+       Hex fallback for browsers without color-mix(). */
     background-color: var(
       --hx-color-border-on-dark-subtle,
-      rgba(255, 255, 255, 0.1)
-    ); /* fallback for browsers without color-mix() */
+      var(--hx-color-surface-on-dark-overlay-subtle, rgba(255, 255, 255, 0.1))
+    );
     color: var(--hx-side-nav-toggle-hover-color, var(--hx-color-text-inverse, #ffffff));
   }
 
   @supports (color: color-mix(in srgb, red 50%, blue)) {
+    /* Fold color-mix() into the same deprecated-first chain so consumer
+       overrides on either token reach paint on the modern path too. */
     .side-nav__toggle:hover {
-      background-color: color-mix(in srgb, currentColor 15%, transparent);
+      background-color: var(
+        --hx-color-border-on-dark-subtle,
+        var(
+          --hx-color-surface-on-dark-overlay-subtle,
+          color-mix(in srgb, currentColor 15%, transparent)
+        )
+      );
     }
   }
 
   .side-nav__toggle:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-side-nav-focus-ring-color, var(--hx-focus-ring-color, #6ab1b1));
+      var(--hx-side-nav-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

@@ -36,10 +36,7 @@ export const helixBreadcrumbItemStyles = css`
 
   [part='link']:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-breadcrumb-link-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-breadcrumb-link-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }

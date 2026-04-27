@@ -43,7 +43,7 @@ export const helixSwitchStyles = css`
     border: none;
     padding: 0;
     border-radius: var(--hx-border-radius-full, 9999px);
-    background-color: var(--hx-switch-track-bg, var(--hx-color-border-strong, #8e9c98));
+    background-color: var(--hx-switch-track-bg, var(--hx-color-border-strong, #66787b));
     cursor: pointer;
     transition: background-color var(--hx-transition-fast, 150ms ease);
     outline: none;
@@ -53,10 +53,7 @@ export const helixSwitchStyles = css`
 
   .switch__track:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-switch-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      );
+      var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -65,7 +62,7 @@ export const helixSwitchStyles = css`
   }
 
   .switch:not(.switch--checked) .switch__track:hover {
-    background-color: var(--hx-switch-track-hover-bg, var(--hx-color-border-strong, #8e9c98));
+    background-color: var(--hx-switch-track-hover-bg, var(--hx-color-border-strong, #66787b));
   }
 
   .switch--checked .switch__track:hover {

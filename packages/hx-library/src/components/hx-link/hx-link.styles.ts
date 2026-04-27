@@ -39,10 +39,7 @@ export const helixLinkStyles = css`
 
   .link:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-link-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      );
+      var(--hx-link-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }

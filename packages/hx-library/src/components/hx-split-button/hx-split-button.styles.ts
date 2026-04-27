@@ -50,10 +50,7 @@ export const helixSplitButtonStyles = css`
 
   .split-button__primary:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-split-button-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      );
+      var(--hx-split-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     z-index: 1;
     position: relative;
@@ -80,7 +77,7 @@ export const helixSplitButtonStyles = css`
     flex-shrink: 0;
     border: var(--hx-border-width-thin, 1px) solid var(--hx-split-button-border-color, transparent);
     border-inline-start: var(--hx-border-width-thin, 1px) solid
-      var(--hx-split-button-divider-color, var(--hx-color-primary-400, #6ab1b1));
+      var(--hx-split-button-divider-color, var(--hx-color-primary-900, #0b3232));
     border-radius: 0 var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem))
       var(--hx-split-button-border-radius, var(--hx-border-radius-md, 0.375rem)) 0;
     background-color: var(--hx-split-button-bg, var(--hx-color-primary-500, #429797));
@@ -95,10 +92,7 @@ export const helixSplitButtonStyles = css`
 
   .split-button__trigger:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-split-button-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      );
+      var(--hx-split-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     z-index: 1;
     position: relative;
@@ -174,7 +168,7 @@ export const helixSplitButtonStyles = css`
     --hx-split-button-bg: var(--hx-color-primary-500, #429797);
     --hx-split-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-split-button-border-color: transparent;
-    --hx-split-button-divider-color: var(--hx-color-primary-400, #6ab1b1);
+    --hx-split-button-divider-color: var(--hx-color-primary-900, #0b3232);
   }
 
   /* primary:hover — replace the universal brightness(0.9) filter (which would
@@ -261,7 +255,7 @@ export const helixSplitButtonStyles = css`
   .split-button--outline .split-button__trigger {
     --hx-split-button-bg: transparent;
     --hx-split-button-color: var(--hx-color-text-primary, #0d1825);
-    --hx-split-button-border-color: var(--hx-color-border-strong, #8e9c98);
+    --hx-split-button-border-color: var(--hx-color-border-strong, #66787b);
     --hx-split-button-divider-color: var(--hx-color-border-default, #d6dbd5);
   }
 

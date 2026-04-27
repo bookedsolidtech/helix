@@ -36,7 +36,7 @@ export const helixTimePickerStyles = css`
     display: flex;
     align-items: center;
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-time-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     background-color: var(--hx-time-picker-bg, var(--hx-color-surface-default, #ffffff));
     transition:
@@ -100,7 +100,7 @@ export const helixTimePickerStyles = css`
     min-height: var(--hx-size-10, 2.5rem);
     flex-shrink: 0;
     border-inline-start: var(--hx-border-width-thin, 1px) solid
-      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #66787b));
   }
   .field__toggle:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
@@ -116,7 +116,7 @@ export const helixTimePickerStyles = css`
     z-index: var(--hx-z-index-dropdown, 1000);
     background-color: var(--hx-time-picker-listbox-bg, var(--hx-color-surface-default, #ffffff));
     border: var(--hx-border-width-thin, 1px) solid
-      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #8e9c98));
+      var(--hx-time-picker-border-color, var(--hx-color-border-strong, #66787b));
     border-radius: var(--hx-time-picker-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(
       --hx-time-picker-listbox-shadow,

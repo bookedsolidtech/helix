@@ -15,14 +15,11 @@ export const helixTextareaStyles = css`
     );
     --_textarea-border-color: var(
       --hx-textarea-border-color,
-      var(--hx-input-border-color, var(--hx-color-border-strong, #8e9c98))
+      var(--hx-input-border-color, var(--hx-color-border-strong, #66787b))
     );
     --_textarea-border-color-focus: var(
       --hx-textarea-border-color-focus,
-      var(
-        --hx-input-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      )
+      var(--hx-input-focus-ring-color, var(--hx-focus-ring-color, #0f7078))
     );
     --_textarea-border-color-invalid: var(
       --hx-textarea-border-color-invalid,

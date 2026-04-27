@@ -30,10 +30,7 @@ export const helixColorPickerStyles = css`
   }
   :is(.trigger, .gradient-grid, .slider-track, .swatch-btn, .format-btn):focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-color-picker-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-color-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
   .trigger-swatch {
@@ -208,18 +205,11 @@ export const helixColorPickerStyles = css`
     outline: none;
   }
   .color-input:focus-visible {
-    border-color: var(
-      --hx-color-picker-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-    );
+    border-color: var(--hx-color-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     box-shadow: 0 0 0 2px
       color-mix(
         in srgb,
-        var(
-            --hx-color-picker-focus-ring-color,
-            var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-          )
-          20%,
+        var(--hx-color-picker-focus-ring-color, var(--hx-focus-ring-color, #0f7078)) 20%,
         transparent
       );
   }

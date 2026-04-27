@@ -17,8 +17,7 @@ export const helixTreeViewStyles = css`
   }
 
   .tree:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #0f7078);
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }

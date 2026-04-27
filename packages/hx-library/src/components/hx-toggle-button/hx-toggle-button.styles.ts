@@ -38,10 +38,7 @@ export const helixToggleButtonStyles = css`
 
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-toggle-button-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-      );
+      var(--hx-toggle-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -123,7 +120,7 @@ export const helixToggleButtonStyles = css`
   .button--outline {
     --hx-toggle-button-bg: transparent;
     --hx-toggle-button-color: var(--hx-color-text-primary, #0d1825);
-    --hx-toggle-button-border-color: var(--hx-color-border-strong, #8e9c98);
+    --hx-toggle-button-border-color: var(--hx-color-border-strong, #66787b);
   }
 
   .button--outline:hover {
@@ -172,8 +169,8 @@ export const helixToggleButtonStyles = css`
       --hx-toggle-button-pressed-color,
       var(--hx-color-primary-700, #0f6363)
     );
-    --hx-toggle-button-border-color: var(--hx-color-primary-400, #6ab1b1);
-    box-shadow: inset 0 0 0 1px var(--hx-color-primary-400, #6ab1b1);
+    --hx-toggle-button-border-color: var(--hx-color-primary-600, #0f7078);
+    box-shadow: inset 0 0 0 1px var(--hx-color-primary-600, #0f7078);
   }
 
   /* Ghost pressed: subtle neutral fill, matching hover behavior as a baseline. */

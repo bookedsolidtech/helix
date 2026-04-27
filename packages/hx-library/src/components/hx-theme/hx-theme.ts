@@ -2,7 +2,12 @@ import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
-import { tokenEntries, darkTokenEntries, HelixBrandRegistry } from '@helixui/tokens';
+import {
+  tokenEntries,
+  darkTokenEntries,
+  highContrastTokenEntries,
+  HelixBrandRegistry,
+} from '@helixui/tokens';
 import { helixThemeStyles } from './hx-theme.styles.js';
 import { mergeBrandTokens } from '../../utils/token-merger.js';
 
@@ -37,62 +42,6 @@ export type MotionMode = 'full' | 'reduced' | 'none';
  * Consumers should override at the semantic tier to respect theme scoping.
  */
 export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'auto';
-
-/**
- * High-contrast token overrides. Targets WCAG 7:1+ contrast ratios for low-vision users.
- * These are injected on top of the light primitives when theme="high-contrast".
- * Values here mirror the `high-contrast` section of tokens.json; kept in sync manually
- * until HC tokens are promoted to the published @helixui/tokens package.
- */
-const _hcOverrides: Array<[string, string]> = [
-  ['--hx-color-text-primary', '#FFFFFF'],
-  ['--hx-color-text-secondary', '#FFFFFF'],
-  ['--hx-color-text-muted', '#E0E0E0'],
-  ['--hx-color-text-strong', '#FFFFFF'],
-  ['--hx-color-text-placeholder', '#B0B0B0'],
-  ['--hx-color-text-disabled', '#767676'],
-  ['--hx-color-text-inverse', '#000000'],
-  ['--hx-color-text-on-primary', '#000000'],
-  ['--hx-color-text-on-secondary', '#000000'],
-  ['--hx-color-text-on-error', '#000000'],
-  ['--hx-color-text-on-success', '#000000'],
-  ['--hx-color-text-on-warning', '#000000'],
-  ['--hx-color-text-on-info', '#000000'],
-  ['--hx-color-error-text', '#FCA5A5'],
-  ['--hx-color-success-text', '#86EFAC'],
-  ['--hx-color-text-link', '#FFFF00'],
-  ['--hx-color-text-link-hover', '#FFFF99'],
-  ['--hx-color-text-link-visited', '#FF80FF'],
-  ['--hx-color-text-link-active', '#FFFFFF'],
-  ['--hx-color-surface-default', '#000000'],
-  ['--hx-color-surface-raised', '#1A1A1A'],
-  ['--hx-color-surface-sunken', '#000000'],
-  ['--hx-color-surface-inverse', '#FFFFFF'],
-  ['--hx-color-surface-overlay', 'rgba(0, 0, 0, 0.95)'],
-  ['--hx-color-border-default', '#FFFFFF'],
-  ['--hx-color-border-subtle', '#C0C0C0'],
-  ['--hx-color-border-strong', '#FFFFFF'],
-  ['--hx-color-border-focus', '#FFFF00'],
-  ['--hx-color-focus-ring', '#FFFF00'],
-  ['--hx-color-selection-bg', '#1AEBFF'],
-  ['--hx-color-selection-color', '#000000'],
-  ['--hx-body-bg', '#000000'],
-  ['--hx-body-color', '#FFFFFF'],
-  ['--hx-shadow-sm', '0 1px 2px 0 rgb(255 255 255 / 0.2)'],
-  [
-    '--hx-shadow-md',
-    '0 4px 6px -1px rgb(255 255 255 / 0.3), 0 2px 4px -2px rgb(255 255 255 / 0.2)',
-  ],
-  [
-    '--hx-shadow-lg',
-    '0 10px 15px -3px rgb(255 255 255 / 0.3), 0 4px 6px -4px rgb(255 255 255 / 0.2)',
-  ],
-  [
-    '--hx-shadow-xl',
-    '0 20px 25px -5px rgb(255 255 255 / 0.3), 0 8px 10px -6px rgb(255 255 255 / 0.2)',
-  ],
-  ['--hx-shadow-2xl', '0 25px 50px -12px rgb(255 255 255 / 0.4)'],
-];
 
 /**
  * Compact density overrides: ~75% of original --hx-space-* values.
@@ -203,9 +152,11 @@ function _buildThemeCss(theme: ThemeName): string {
     css = `:host {\n${_buildProps(merged)}\n  color-scheme: dark;\n}`;
   } else if (theme === 'high-contrast') {
     // Apply HC overrides on top of light primitives — distinct WCAG 7:1+ token set
+    // sourced from tokens.json `high-contrast` block via highContrastTokenEntries.
+    // Mirrors the dark-mode injection path so source/runtime drift is structurally impossible.
     const merged = new Map(lightMap);
-    for (const [name, value] of _hcOverrides) {
-      merged.set(name, value);
+    for (const t of highContrastTokenEntries) {
+      merged.set(t.name, t.value);
     }
     css = `:host {\n${_buildProps(merged)}\n  color-scheme: dark;\n}`;
   } else {
@@ -297,6 +248,13 @@ export class HelixTheme extends HelixElement {
    * If the brand name is non-empty but not registered, a warning is logged
    * and the base theme is applied without brand overrides.
    *
+   * **High-contrast suppression:** When `theme="high-contrast"`, the brand
+   * merge is intentionally skipped to preserve the WCAG 1.4.6 Enhanced
+   * Contrast (7:1+) guarantee that the HC token set is tuned for. A
+   * registered brand applied under HC emits a `console.info` to surface
+   * the suppression in development. Brand merging on `light` and `dark`
+   * is unaffected. See `BRAND_THEMING.md`.
+   *
    * @attr brand
    * @example
    * ```html
@@ -345,6 +303,11 @@ export class HelixTheme extends HelixElement {
   private _motionQuery: MediaQueryList | null = null;
   /** @internal */
   private _motionHandler: (() => void) | null = null;
+  /** @internal — last `${brand}|${effectiveTheme}|${kind}` for which a brand
+   * suppression info / unregistered warn was emitted. `_applyEffectiveTheme()`
+   * runs on every relevant property change, so without this guard the message
+   * fires once per `update()` tick rather than once per applied state. */
+  private _lastBrandAdvisoryKey: string | null = null;
 
   override firstUpdated(changed: PropertyValues<this>): void {
     super.firstUpdated(changed);
@@ -392,10 +355,10 @@ export class HelixTheme extends HelixElement {
 
   /**
    * Returns the currently active theme name.
-   * When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
+   * When `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
    * Otherwise returns the `theme` property value.
    */
-  get effectiveTheme(): 'light' | 'dark' | 'high-contrast' | 'auto' {
+  get effectiveTheme(): 'light' | 'dark' | 'high-contrast' {
     if (this.theme === 'auto') {
       if (typeof window === 'undefined') return 'light';
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -487,24 +450,63 @@ export class HelixTheme extends HelixElement {
 
     let css = _buildThemeCss(this.effectiveTheme);
 
-    if (this.brand !== '') {
+    // Brand merge is skipped on high-contrast mode. Brands declare 22 color
+    // stops (primary + secondary 50..950) but the HC `tokens.json` block
+    // overlays only the AAA-tuned subset (primary 500/600/700, secondary
+    // 500/600). Merging brand tokens then re-overlaying HC would still leak
+    // the 17+ brand-supplied stops HC does not redefine — components that
+    // consume those stops directly (hx-checkbox, hx-tag, hx-list-item, etc.)
+    // would silently break the BRAND_THEMING.md "WCAG 7:1+" contract.
+    // Skipping the merge entirely on HC delivers the contract; brands
+    // continue to apply on light/dark.
+    if (this.brand !== '' && this.effectiveTheme !== 'high-contrast') {
       const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
       if (brandTokens !== undefined) {
         css = mergeBrandTokens(css, brandTokens);
+        this._lastBrandAdvisoryKey = `${this.brand}|${this.effectiveTheme}|applied`;
       } else {
-        console.warn(
-          `[hx-theme] Brand "${this.brand}" is not registered. ` +
-            `Register it via HelixBrandRegistry.register() before use. ` +
-            `Applying base theme only.`,
-        );
+        const advisoryKey = `${this.brand}|${this.effectiveTheme}|unregistered`;
+        if (this._lastBrandAdvisoryKey !== advisoryKey) {
+          console.warn(
+            `[hx-theme] Brand "${this.brand}" is not registered. ` +
+              `Register it via HelixBrandRegistry.register() before use. ` +
+              `Applying base theme only.`,
+          );
+          this._lastBrandAdvisoryKey = advisoryKey;
+        }
       }
+    } else if (this.brand !== '' && this.effectiveTheme === 'high-contrast') {
+      const brandTokens = HelixBrandRegistry.getBrandTokens(this.brand);
+      if (brandTokens === undefined) {
+        const advisoryKey = `${this.brand}|high-contrast|unregistered`;
+        if (this._lastBrandAdvisoryKey !== advisoryKey) {
+          console.warn(
+            `[hx-theme] Brand "${this.brand}" is not registered. ` +
+              `Register it via HelixBrandRegistry.register() before use. ` +
+              `Applying base theme only.`,
+          );
+          this._lastBrandAdvisoryKey = advisoryKey;
+        }
+      } else {
+        const advisoryKey = `${this.brand}|high-contrast|suppressed`;
+        if (this._lastBrandAdvisoryKey !== advisoryKey) {
+          console.info(
+            `[hx-theme] Brand "${this.brand}" is suppressed on theme="high-contrast" ` +
+              `to preserve the WCAG 7:1+ contrast contract. ` +
+              `Applying base high-contrast tokens only. See BRAND_THEMING.md.`,
+          );
+          this._lastBrandAdvisoryKey = advisoryKey;
+        }
+      }
+    } else {
+      this._lastBrandAdvisoryKey = null;
     }
 
     if (this.effectiveMotion === 'reduced') {
       css += `\n:host {\n${_buildProps(_reducedMotionOverrides)}\n}`;
     }
 
-    void this._themeSheet.replace(css);
+    this._themeSheet.replaceSync(css);
   }
 
   /** @internal */
@@ -519,7 +521,7 @@ export class HelixTheme extends HelixElement {
     }
     // comfortable = no overrides needed (defaults from theme sheet)
 
-    void this._densitySheet.replace(css);
+    this._densitySheet.replaceSync(css);
   }
 
   override render() {

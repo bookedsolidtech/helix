@@ -80,7 +80,8 @@ export const helixCodeSnippetStyles = css`
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
-    border: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #8e9c98);
+    border: var(--hx-border-width-thin, 1px) solid
+      var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7));
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     /* Copy button sits on the always-dark block snippet surface; uses inverse family for contrast on the terminal background. */
     background-color: var(--hx-color-surface-inverse, #0d1825);
@@ -105,8 +106,14 @@ export const helixCodeSnippetStyles = css`
   }
 
   .code-snippet__copy-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
+    /* Always-dark terminal surface — uses primary-400 (#6AB1B1, 7.27:1 on #0d1825)
+       instead of the light-mode --hx-focus-ring-color (primary-600, 3.07:1 — razor
+       above the 3:1 UI floor with no headroom). Deliberate primitive-tier consumption:
+       there is no semantic focus-ring-on-dark alias today — the dark.color.focus-ring
+       override at tokens.json only fires under theme=dark, but this surface is dark in
+       every theme. Tracked for promotion to a semantic alias in a future token-cascade
+       follow-up. */
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-color-primary-400, #6ab1b1);
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -125,7 +132,8 @@ export const helixCodeSnippetStyles = css`
     min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     border: none;
-    border-top: var(--hx-border-width-thin, 1px) solid var(--hx-color-border-strong, #8e9c98);
+    border-top: var(--hx-border-width-thin, 1px) solid
+      var(--hx-color-border-on-dark-strong, rgba(255, 255, 255, 0.7));
     /* Expand button is attached to the always-dark block snippet — inverse family maintains the terminal aesthetic. */
     background-color: var(--hx-color-surface-inverse, #0d1825);
     color: var(--hx-color-text-inverse, #ffffff);
@@ -146,8 +154,14 @@ export const helixCodeSnippetStyles = css`
   }
 
   .code-snippet__expand-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1));
+    /* Always-dark terminal surface — uses primary-400 (#6AB1B1, 7.27:1 on #0d1825)
+       instead of the light-mode --hx-focus-ring-color (primary-600, 3.07:1 — razor
+       above the 3:1 UI floor with no headroom). Deliberate primitive-tier consumption:
+       there is no semantic focus-ring-on-dark alias today — the dark.color.focus-ring
+       override at tokens.json only fires under theme=dark, but this surface is dark in
+       every theme. Tracked for promotion to a semantic alias in a future token-cascade
+       follow-up. */
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-color-primary-400, #6ab1b1);
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

@@ -29,15 +29,16 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-side-nav-collapsed-width=3.5rem] - Collapsed icon-only width.
  * @cssprop [--hx-side-nav-bg=var(--hx-color-surface-inverse)] - Background color.
  * @cssprop [--hx-side-nav-color=var(--hx-color-text-inverse)] - Text color.
- * @cssprop [--hx-side-nav-border-color=var(--hx-color-border-strong)] - Border color.
+ * @cssprop [--hx-side-nav-border-color=var(--hx-color-border-on-dark-strong)] - Border color (against the dark surface-inverse host bg).
  * @cssprop [--hx-side-nav-header-padding=var(--hx-space-4)] - Header padding.
  * @cssprop [--hx-side-nav-footer-padding=var(--hx-space-4)] - Footer padding.
  * @cssprop [--hx-side-nav-toggle-color=var(--hx-color-text-inverse)] - Toggle button icon color (resting).
  * @cssprop [--hx-side-nav-toggle-hover-color=var(--hx-color-text-inverse)] - Toggle button icon color on hover.
  * @cssprop [--hx-color-surface-inverse] - Side-nav surface fill (resolves to neutral-900 light, near-black dark).
  * @cssprop [--hx-color-text-inverse] - Side-nav text color (resolves to neutral-0).
- * @cssprop [--hx-color-border-strong] - Header/footer divider border.
- * @cssprop [--hx-color-border-on-dark-subtle] - Toggle button hover surface (overlay-white-10 primitive — semantic layer for inverted affordances).
+ * @cssprop [--hx-color-border-on-dark-strong] - Container/header/footer divider border (overlay-white-70 light, overlay-black-50 dark — sized for visibility on the mode-flipped surface-inverse).
+ * @cssprop [--hx-color-surface-on-dark-overlay-subtle] - Toggle button hover surface (overlay-white-10 primitive — translucent fill, not a border).
+ * @cssprop [--hx-color-border-on-dark-subtle] - DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Toggle-hover rule reads both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends HelixElement {

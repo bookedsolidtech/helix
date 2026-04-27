@@ -22,6 +22,22 @@
                                              users with low vision or HC display modes.
                          - 'auto'          — Reads OS color-scheme preference after hydration.
                                              Renders as 'light' until JavaScript runs.
+    brand      (string)  Optional. Registered brand name applied on top of the base
+                         theme (e.g. 'harbor-health'). The name MUST be registered via
+                         HelixBrandRegistry.register() in client-side JavaScript before
+                         the element renders; an unregistered name logs a console.warn
+                         and falls back to the base theme. Suppressed on
+                         theme="high-contrast" (logs console.info) to preserve the
+                         WCAG 7:1+ contrast contract.
+
+                         The template emits ONLY `brand="..."` (consumed by the JS
+                         registry). It does NOT emit `data-brand="..."`: the runtime
+                         does not reflect `brand` to `data-brand`, so a Twig-emitted
+                         `data-brand` would go stale on client-side brand swaps and
+                         leak across HC. If you also want the CSS-pattern path
+                         (`hx-theme[data-brand='...']:not([theme='high-contrast'])`,
+                         see BRAND_THEMING.md), set `data-brand` explicitly via the
+                         `attributes` object — and accept that you own its lifecycle.
     attributes (object)  Optional. Additional HTML attributes spread onto <hx-theme>.
 
   Usage — Full page theming:
@@ -76,6 +92,7 @@
 
 <hx-theme
   theme="{{ theme|default('light') }}"
+  {% if brand is defined and brand %}brand="{{ brand }}"{% endif %}
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
   {% block content %}{% endblock %}

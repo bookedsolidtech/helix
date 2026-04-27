@@ -17,14 +17,11 @@ export const helixSelectStyles = css`
     --_label-color: var(--hx-select-label-color, var(--hx-color-text-strong, #202b39));
 
     /* Border */
-    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #8e9c98));
+    --_border-color: var(--hx-select-border-color, var(--hx-color-border-strong, #66787b));
     --_border-radius: var(--hx-select-border-radius, var(--hx-border-radius-md, 0.375rem));
 
     /* Focus ring */
-    --_focus-ring-color: var(
-      --hx-select-focus-ring-color,
-      var(--hx-focus-ring-color, var(--hx-color-primary-400, #6ab1b1))
-    );
+    --_focus-ring-color: var(--hx-select-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
 
     /* Error */
     --_error-color: var(--hx-select-error-color, var(--hx-color-error-500, #e5493e));
@@ -236,8 +233,7 @@ export const helixSelectStyles = css`
 
   .field__option--focused {
     background-color: var(--_option-hover-bg);
-    outline: var(--hx-focus-ring-width, 2px) solid
-      var(--_focus-ring-color, var(--hx-color-primary-500));
+    outline: var(--hx-focus-ring-width, 2px) solid var(--_focus-ring-color);
     outline-offset: var(--hx-select-option-focus-ring-offset, -2px);
   }
 

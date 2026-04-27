@@ -35,7 +35,7 @@ export interface HxButtonClickDetail {
  * @csspart suffix - The suffix slot container span.
  * @csspart spinner - The loading spinner SVG element.
  *
- * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).
+ * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color. **Variant-shadowed**: every `.button--{variant}` rule rebinds this property at descendant scope, so a host-level override (`style="--hx-button-bg: …"` or `:host`-targeting CSS) does not reach paint for primary/secondary/tertiary/danger/ghost/outline buttons. To recolor a variant fill, override the upstream semantic instead — e.g. `--hx-color-action-primary-bg` (light primary), `--hx-color-action-primary-bg-inverted-rest` (inverted primary), `--hx-color-action-danger-bg` (danger), or the inverted overlay tokens for tertiary/secondary/ghost/outline. The `--hx-button-bg` hook still works for the rare case of an unstyled base button without a `variant` class, and is internally rebound by the variant rules to participate in the active/hover override chain.
  * @cssprop [--hx-button-hover-bg] - Hover background override (primary and danger variants only). Other variants (secondary/outline, ghost) keep their hover fills routed through their semantic action.* tokens and do not consume this hook. Under [inverted] for primary/danger, hover and active share a paint (combined :hover, :active rule), so this override applies to both states unless --hx-button-active-bg also takes precedence.
  * @cssprop [--hx-button-active-bg] - Pressed/active background override (primary and danger variants only, including their inverted modes). Takes precedence over --hx-button-hover-bg in the fallback chain. Standard-mode primary/danger default to action.{primary,danger}.bg-active (with filter:none) for AA-pinned pressed contrast. Inverted-mode primary/danger reuse action.{primary,danger}.bg-inverted-hover (combined :hover, :active rule); setting --hx-button-active-bg under [inverted] therefore overrides the lifted hover fill as well as the pressed fill — the two share a paint in inverted mode. Other variants do not consume this hook.
  * @cssprop [--hx-button-color=var(--hx-color-text-on-primary)] - Button text color (variants route through text.on-{role} / text.on-{role}-strong).
@@ -48,8 +48,8 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-button-inverted-color=var(--hx-color-text-inverse)] - Text color when inverted (resolves to neutral-0).
  * @cssprop [--hx-button-inverted-primary-interactive-color=var(--hx-color-text-on-primary)] - Foreground override for inverted primary hover and pressed (combined :hover, :active rule). Defaults to text.on-primary (neutral-900, no dark-mode flip) so dark text rides the lifted primary-400 fill — text.inverse on light teal collapses to ~2.4:1 in light mode.
  * @cssprop [--hx-button-inverted-danger-interactive-color=var(--hx-color-text-on-error)] - Foreground override for inverted danger hover and pressed (combined :hover, :active rule). Defaults to text.on-error (neutral-900); same rationale as the primary override.
- * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-border-on-dark-default)] - Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).
- * @cssprop [--hx-button-inverted-focus-ring-color=var(--hx-color-border-on-dark-strong)] - Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).
+ * @cssprop [--hx-button-inverted-ghost-hover-bg=var(--hx-color-surface-on-dark-overlay-default)] - Ghost hover bg when inverted (overlay-white-30 — translucent fill, not a border; contrast not applicable).
+ * @cssprop [--hx-button-inverted-focus-ring-color=var(--hx-color-border-on-dark-strong)] - Focus ring color when inverted (overlay-white-70 ≈ 5:1 vs neutral-900 — clears WCAG 1.4.11 3:1 floor for non-text UI).
  *
  * @cssprop [--hx-color-action-primary-bg] - Primary variant resting fill (3.2.1 semantic action layer).
  * @cssprop [--hx-color-action-primary-bg-hover] - Primary variant hover fill.
@@ -71,9 +71,11 @@ export interface HxButtonClickDetail {
  * @cssprop [--hx-color-text-primary] - Foreground for tertiary variant on surface.sunken.
  * @cssprop [--hx-color-surface-sunken] - Tertiary variant resting fill.
  * @cssprop [--hx-color-surface-raised] - Tertiary variant hover fill.
- * @cssprop [--hx-color-border-on-dark-subtle] - Inverted-tertiary resting border (overlay-white-10).
- * @cssprop [--hx-color-border-on-dark-default] - Inverted-tertiary hover border + inverted-secondary/ghost hover border (overlay-white-30).
- * @cssprop [--hx-color-border-on-dark-strong] - Inverted focus-visible outline (overlay-white-70).
+ * @cssprop [--hx-color-surface-on-dark-overlay-subtle] - Inverted-tertiary resting fill (overlay-white-10 — translucent fill, not a border).
+ * @cssprop [--hx-color-surface-on-dark-overlay-default] - Inverted-tertiary hover fill + inverted-secondary/ghost/outline hover fill (overlay-white-30 — translucent fill, not a border).
+ * @cssprop [--hx-color-border-on-dark-strong] - Inverted-secondary/outline border + inverted focus-visible outline (overlay-white-70 ≈ 5:1 — clears WCAG 1.4.11 3:1 floor).
+ * @cssprop [--hx-color-border-on-dark-subtle] - DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.
+ * @cssprop [--hx-color-border-on-dark-default] - DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-default (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.
  */
 @customElement('hx-button')
 export class HelixButton extends mixinDelegatesAria(HelixElement) {

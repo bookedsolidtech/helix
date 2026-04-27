@@ -32,10 +32,7 @@ export const helixIconButtonStyles = css`
 
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-icon-button-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-icon-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -105,7 +102,7 @@ export const helixIconButtonStyles = css`
   .button--tertiary {
     --hx-icon-button-bg: transparent;
     --hx-icon-button-color: var(--hx-color-text-strong, #202b39);
-    --hx-icon-button-border-color: var(--hx-color-border-strong, #8e9c98);
+    --hx-icon-button-border-color: var(--hx-color-border-strong, #66787b);
   }
 
   .button--tertiary:hover {

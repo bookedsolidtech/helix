@@ -94,10 +94,7 @@ export const helixSplitPanelStyles = css`
 
   .divider:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-split-panel-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-split-panel-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--_divider-hover-color) 30%, transparent);
   }
@@ -159,10 +156,7 @@ export const helixSplitPanelStyles = css`
 
   .collapse-btn:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
-      var(
-        --hx-split-panel-focus-ring-color,
-        var(--hx-focus-ring-color, var(--hx-color-primary-500, #429797))
-      );
+      var(--hx-split-panel-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

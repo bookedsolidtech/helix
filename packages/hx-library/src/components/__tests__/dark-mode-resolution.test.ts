@@ -154,4 +154,84 @@ describe('dark-mode token resolution', () => {
     expect(dark.backgroundColor).not.toBe(light.backgroundColor);
     expect(dark.color).not.toBe(light.color);
   });
+
+  /**
+   * Inverted-primary resting bg routes through action.primary.bg-inverted-rest
+   * so the dark override can flip the fill to primary-600 — keeping the boundary
+   * against light surface.inverse (#EBEEE9) at 4.97:1 instead of primary-500's
+   * 2.94:1. Regression guard for the CSS cycle that previously broke
+   * --hx-button-bg consumption on :host([inverted]) .button--primary.
+   */
+  it('inverted primary button flips resting bg between light and dark (bg-inverted-rest contract)', async () => {
+    const markup = '<hx-button variant="primary" inverted>Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
+
+    // Light: action.primary.bg-inverted-rest defaults to primary-500 (#429797).
+    expect(light.backgroundColor).toBe('rgb(66, 151, 151)');
+    // Dark: dark.action.primary.bg-inverted-rest pins to primary-600 (#0f7078).
+    expect(dark.backgroundColor).toBe('rgb(15, 112, 120)');
+    expect(dark.backgroundColor).not.toBe(light.backgroundColor);
+  });
+
+  /**
+   * Pins the documented consumer-override path: the inverted-primary resting
+   * rule reads from --hx-color-action-primary-bg-inverted-rest, so consumers
+   * override THAT semantic (not --hx-button-bg, which is shadowed at the
+   * .button--primary descendant scope). If a future change relocated the
+   * inverted-rest paint off this semantic, this assertion would fail.
+   */
+  it('inverted primary honors semantic override on --hx-color-action-primary-bg-inverted-rest', async () => {
+    const markup =
+      '<hx-button variant="primary" inverted style="--hx-color-action-primary-bg-inverted-rest: rgb(1, 2, 3)">Action</hx-button>';
+    const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
+    expect(dark.backgroundColor).toBe('rgb(1, 2, 3)');
+  });
+
+  it('inverted primary honors semantic override in light mode too (override path is mode-agnostic)', async () => {
+    const markup =
+      '<hx-button variant="primary" inverted style="--hx-color-action-primary-bg-inverted-rest: rgb(4, 5, 6)">Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    expect(light.backgroundColor).toBe('rgb(4, 5, 6)');
+  });
+
+  /**
+   * Round-12 backwards-compat guard: --hx-color-border-on-dark-{default,subtle}
+   * shipped as public API in 3.2.0/3.2.1 and was renamed to surface.on-dark-overlay-*
+   * in round-8 of 3.2.2. The round-11 alias in tokens.json kept the names live but
+   * only one-way (border alias resolves to surface); components still read only the
+   * canonical surface name, so consumer overrides on the deprecated border name
+   * never reached paint. Round-12 fix: every consume site reads BOTH names with
+   * deprecated-first priority. These tests pin that consumer overrides on the
+   * deprecated names continue to work until 4.0.0 removal.
+   */
+  it('inverted tertiary honors consumer override on deprecated --hx-color-border-on-dark-subtle', async () => {
+    const markup =
+      '<hx-button variant="tertiary" inverted style="--hx-color-border-on-dark-subtle: rgb(7, 8, 9)">Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    cleanup();
+    const dark = await resolveStyles('dark', markup, 'hx-button', '.button');
+    expect(light.backgroundColor).toBe('rgb(7, 8, 9)');
+    expect(dark.backgroundColor).toBe('rgb(7, 8, 9)');
+  });
+
+  it('inverted tertiary honors consumer override on canonical --hx-color-surface-on-dark-overlay-subtle', async () => {
+    // When the deprecated name is unset, the both-name fallback must still
+    // route through the canonical surface token so the documented override
+    // path keeps working for new consumers.
+    const markup =
+      '<hx-button variant="tertiary" inverted style="--hx-color-surface-on-dark-overlay-subtle: rgb(10, 11, 12)">Action</hx-button>';
+    const light = await resolveStyles('light', markup, 'hx-button', '.button');
+    expect(light.backgroundColor).toBe('rgb(10, 11, 12)');
+  });
+
+  // Hover paint cannot be synthesized reliably in vitest browser mode (variant
+  // rest state has no --hx-button-bg binding, so a hover-only rebind doesn't
+  // surface as a stable backgroundColor delta). The .side-nav__toggle:hover
+  // deprecated→canonical chain — both the plain rule and the @supports
+  // color-mix branch — is covered by runtime adopted-stylesheet inspection in
+  // forced-colors-runtime.test.ts. The hx-button inverted hover rules reuse
+  // the identical fallback shape exercised by the subtle-chain rest-state
+  // tests above.
 });

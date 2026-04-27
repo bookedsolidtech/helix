@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-26T01:48:15.557Z",
+  "generatedAt": "2026-04-26T18:21:13.364Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.2.0",
   "tokensVersion": "3.2.0",
@@ -2690,7 +2690,7 @@
       ],
       "cssProperties": [
         {
-          "description": "Button background color (3.2.1 cascade — variant rules route through action.{primary,secondary,ghost,danger}.bg).",
+          "description": "Button background color. **Variant-shadowed**: every `.button--{variant}` rule rebinds this property at descendant scope, so a host-level override (`style=\"--hx-button-bg: …\"` or `:host`-targeting CSS) does not reach paint for primary/secondary/tertiary/danger/ghost/outline buttons. To recolor a variant fill, override the upstream semantic instead — e.g. `--hx-color-action-primary-bg` (light primary), `--hx-color-action-primary-bg-inverted-rest` (inverted primary), `--hx-color-action-danger-bg` (danger), or the inverted overlay tokens for tertiary/secondary/ghost/outline. The `--hx-button-bg` hook still works for the rare case of an unstyled base button without a `variant` class, and is internally rebound by the variant rules to participate in the active/hover override chain.",
           "name": "--hx-button-bg",
           "default": "var(--hx-color-action-primary-bg)",
           "figmaBinding": {
@@ -2820,19 +2820,19 @@
           }
         },
         {
-          "description": "Ghost hover bg when inverted (overlay-white-30 ≈ 5:1 vs neutral-900).",
+          "description": "Ghost hover bg when inverted (overlay-white-30 — translucent fill, not a border; contrast not applicable).",
           "name": "--hx-button-inverted-ghost-hover-bg",
-          "default": "var(--hx-color-border-on-dark-default)",
+          "default": "var(--hx-color-surface-on-dark-overlay-default)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
-            "semanticToken": "color/border/on/dark/default",
+            "semanticToken": "color/surface/on/dark/overlay/default",
             "fallbackPrimitive": null,
             "literalFallback": null
           }
         },
         {
-          "description": "Focus ring color when inverted (overlay-white-70 = ~5:1 vs neutral-900).",
+          "description": "Focus ring color when inverted (overlay-white-70 ≈ 5:1 vs neutral-900 — clears WCAG 1.4.11 3:1 floor for non-text UI).",
           "name": "--hx-button-inverted-focus-ring-color",
           "default": "var(--hx-color-border-on-dark-strong)",
           "figmaBinding": {
@@ -2944,18 +2944,28 @@
           "figmaBinding": null
         },
         {
-          "description": "Inverted-tertiary resting border (overlay-white-10).",
+          "description": "Inverted-tertiary resting fill (overlay-white-10 — translucent fill, not a border).",
+          "name": "--hx-color-surface-on-dark-overlay-subtle",
+          "figmaBinding": null
+        },
+        {
+          "description": "Inverted-tertiary hover fill + inverted-secondary/ghost/outline hover fill (overlay-white-30 — translucent fill, not a border).",
+          "name": "--hx-color-surface-on-dark-overlay-default",
+          "figmaBinding": null
+        },
+        {
+          "description": "Inverted-secondary/outline border + inverted focus-visible outline (overlay-white-70 ≈ 5:1 — clears WCAG 1.4.11 3:1 floor).",
+          "name": "--hx-color-border-on-dark-strong",
+          "figmaBinding": null
+        },
+        {
+          "description": "DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.",
           "name": "--hx-color-border-on-dark-subtle",
           "figmaBinding": null
         },
         {
-          "description": "Inverted-tertiary hover border + inverted-secondary/ghost hover border (overlay-white-30).",
+          "description": "DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-default (the value paints a translucent fill, not a border). Consume sites read both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.",
           "name": "--hx-color-border-on-dark-default",
-          "figmaBinding": null
-        },
-        {
-          "description": "Inverted focus-visible outline (overlay-white-70).",
-          "name": "--hx-color-border-on-dark-strong",
           "figmaBinding": null
         }
       ],
@@ -17606,13 +17616,13 @@
           }
         },
         {
-          "description": "Border color.",
+          "description": "Border color (against the dark surface-inverse host bg).",
           "name": "--hx-side-nav-border-color",
-          "default": "var(--hx-color-border-strong)",
+          "default": "var(--hx-color-border-on-dark-strong)",
           "figmaBinding": {
             "target": "Stroke",
             "layerSelector": "root",
-            "semanticToken": "color/border/strong",
+            "semanticToken": "color/border/on/dark/strong",
             "fallbackPrimitive": null,
             "literalFallback": null
           }
@@ -17676,12 +17686,17 @@
           "figmaBinding": null
         },
         {
-          "description": "Header/footer divider border.",
-          "name": "--hx-color-border-strong",
+          "description": "Container/header/footer divider border (overlay-white-70 light, overlay-black-50 dark — sized for visibility on the mode-flipped surface-inverse).",
+          "name": "--hx-color-border-on-dark-strong",
           "figmaBinding": null
         },
         {
-          "description": "Toggle button hover surface (overlay-white-10 primitive — semantic layer for inverted affordances).",
+          "description": "Toggle button hover surface (overlay-white-10 primitive — translucent fill, not a border).",
+          "name": "--hx-color-surface-on-dark-overlay-subtle",
+          "figmaBinding": null
+        },
+        {
+          "description": "DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Toggle-hover rule reads both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.",
           "name": "--hx-color-border-on-dark-subtle",
           "figmaBinding": null
         }
@@ -18790,12 +18805,12 @@
         {
           "description": "Color of the divider between primary and trigger.",
           "name": "--hx-split-button-divider-color",
-          "default": "var(--hx-color-primary-400)",
+          "default": "var(--hx-color-primary-900)",
           "figmaBinding": {
             "target": "Fill",
             "layerSelector": "root",
             "semanticToken": "color/primary",
-            "fallbackPrimitive": "color/primary/400",
+            "fallbackPrimitive": "color/primary/900",
             "literalFallback": null
           }
         },
