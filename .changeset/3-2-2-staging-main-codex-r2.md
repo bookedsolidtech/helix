@@ -31,7 +31,30 @@ getComputedStyle(document.documentElement).getPropertyValue(
 );
 ```
 
-**Why we did not emit the deprecated names at :root as aliases.** A `:root { --hx-color-border-on-dark-default: var(--hx-color-surface-on-dark-overlay-default); }` declaration would resolve the inner `var()` at `:root`'s computed-value time (CSS Custom Properties §3). The result inherits down to descendants as an opaque computed value — host-scoped overrides on the canonical name (`:host { --hx-color-surface-on-dark-overlay-default: red; }`) would be silently shadowed at every consume site, because the var() chain reads the deprecated name first and finds it set (with the frozen :root value) rather than falling through. That is a worse outcome than the direct-reader break: it silently breaks an actively-used override path, instead of explicitly breaking an undocumented one. The dark-mode-resolution.test.ts canonical-override test (line 219-227) would fail under any :root-alias variant.
+**Why we did not emit the deprecated names at `:root` as aliases.** Two `:root`-alias variants were considered. Both fail at the same consume-site read order, for the same reason — and both would silently break the documented host-scoped canonical-override path.
+
+**Variant A — `var()` alias:**
+
+```css
+:root {
+  --hx-color-border-on-dark-default: var(--hx-color-surface-on-dark-overlay-default);
+}
+```
+
+The inner `var()` resolves at `:root`'s computed-value time (CSS Custom Properties §3) and inherits down to every descendant as an opaque resolved value. Host-scoped overrides on the canonical name (`:host { --hx-color-surface-on-dark-overlay-default: red; }`) are not consulted, because the deprecated name is already set on the host (via inheritance from `:root`) at the moment the consume site reads `var(--hx-color-border-on-dark-default, var(--hx-color-surface-on-dark-overlay-default, …))`.
+
+**Variant B — concrete-value alias (light + dark):**
+
+```css
+:root { --hx-color-border-on-dark-default: rgba(255, 255, 255, 0.30); }
+.dark { --hx-color-border-on-dark-default: rgba(255, 255, 255, 0.30); /* or dark-mode value */ }
+```
+
+No inner `var()` to substitute — but inheritance still delivers a non-empty value to every descendant. Same failure mode: the consume site reads the deprecated name first, finds it set (via inheritance), and never falls through to the canonical override on the host. Variant B has additional cost: a literal value at `:root` breaks the primitive chain. A consumer who overrides `--hx-overlay-white-30` at `:root` would see that change reflected in the canonical token but NOT in the deprecated alias, silently desynchronizing the two names.
+
+**Both variants would fail the canonical-override test** at `dark-mode-resolution.test.ts:219-227` (which mounts `<hx-button variant="tertiary" inverted>` with a host-style override on `--hx-color-surface-on-dark-overlay-subtle` and asserts that paint resolves to the override). The test exists precisely to pin this contract.
+
+The chosen design — no `:root` emission, both-name fallback at consume sites — breaks an undocumented direct-reader path explicitly, rather than breaking a documented host-override path silently.
 
 **Migration for direct readers.** If your downstream code reads `--hx-color-border-on-dark-{default,subtle}` directly (not via an hx-\* component), update to the canonical names:
 
@@ -42,4 +65,4 @@ getComputedStyle(document.documentElement).getPropertyValue(
 
 Both names continue to be honored when set as consumer overrides on hx-\* components (via the both-name fallback chain at the consume site). The deprecated names are scheduled for hard removal in 4.0.0; until then, component-internal usage is safe in either direction.
 
-**No runtime change in this changeset.** The deprecation rationale at `tokens.json:218` was strengthened to call out the direct-reader trade-off explicitly. No CSS, no test, no component logic moved.
+**No runtime change in this changeset.** The deprecation rationale at `tokens.json:218` was strengthened to call out the direct-reader trade-off and enumerate both rejected alias variants. No CSS, no test, no component logic moved.
