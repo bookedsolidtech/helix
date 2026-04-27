@@ -118,6 +118,12 @@ describe('hx-theme brand → data-brand reflection contract (3.3.0)', () => {
     it.todo(
       'theme="auto" with brand="acme" registered, OS prefers-color-scheme flips light → dark: data-brand="acme" unchanged (both light/dark set the same value)',
     );
+    it.todo(
+      'theme="auto" with brand="acme" registered: HC suppression branch is never entered via auto resolution (auto→HC transition is non-existent by design — pins the contract guarantee against a hypothetical future prefers-contrast: more mapping)',
+    );
+    it.todo(
+      'brand="acme" data-brand="other" (registered) → theme="high-contrast" → theme="light": HC enter strips data-brand (case 23 path); HC exit re-applies "acme", not "other" — round-trip is lossy by design',
+    );
   });
 
   // ─── Mutation guard ──────────────────────────────────────────────────────
@@ -141,7 +147,10 @@ describe('hx-theme brand → data-brand reflection contract (3.3.0)', () => {
       'Ownership relinquish under external override: brand="acme" registered → runtime sets data-brand="acme" → external setAttribute("data-brand","x") → brand="" — data-brand="x" survives the relinquish (lastApplied.kind === "set" but current !== value → NOOP)',
     );
     it.todo(
-      'Advisory dedupe: brand="acme" unregistered, theme reconcile fires twice (theme prop change + auto media-query event) — console.warn emits exactly once (pins _lastBrandAdvisoryKey deduplication)',
+      'Advisory dedupe (warn channel): brand="acme" unregistered, theme reconcile fires twice (theme prop change + auto media-query event) — console.warn emits exactly once (pins _lastBrandAdvisoryKey deduplication)',
+    );
+    it.todo(
+      'Advisory dedupe (info channel): brand="acme" registered, theme="high-contrast", reconcile fires twice in same tick — console.info HC-suppression message emits exactly once (same _lastBrandAdvisoryKey channel covers info)',
     );
   });
 

@@ -142,6 +142,10 @@ The runtime cannot enforce the guard — the cascade rules live in author styles
 
 The 3.3.0 docs delta clarifies this asymmetry rather than papering over it. Shape B remains supported because cascade-only authoring is a legitimate use case for design teams who do not own the JS bootstrap path; HC safety in that mode is a documented ownership transfer.
 
+### Note — HC suppression info dedupe
+
+The HC-suppression `info` log (cases 5, 17, 23) is deduped via the same `_lastBrandAdvisoryKey` channel as the unregistered-brand `warn`. Two consecutive reconciles in the same `(brand, theme="high-contrast")` tuple — for example a `theme` prop change followed by an `auto` media-query event firing in the same tick — emit the info log exactly once. The advisory key resets when `(brand, theme)` changes; re-entering HC after an exit re-emits.
+
 ### Note — case 18 vs. case 17: registered vs. unregistered + HC
 
 Both cases mount with matching `brand="acme" data-brand="acme"`. The runtime branches on registration:
@@ -165,8 +169,9 @@ The initial-mount matrix is necessary but not sufficient. Runtime swaps must rem
 | `brand="acme"` (unregistered at mount) → `HelixBrandRegistry.register('acme', …)` later | Registry-subscribed reconcile fires automatically — see "Late registration" below. `data-brand="acme"` set after registration. |
 | `brand="acme"` registered, then `HelixBrandRegistry._clear()` (test path) | Registry-subscribed reconcile fires. `acme` no longer registered → leave `data-brand` untouched per case 14/16/18 path. |
 | `theme="auto"` resolves `light` → `dark` via OS query while `brand="acme"` registered | `data-brand="acme"` unchanged (light and dark both set the same value); `lastApplied` value unchanged. |
+| `brand="acme" data-brand="other"` (registered) → `theme="high-contrast"` → `theme="light"` | Round-trip is lossy by design: HC enter strips `data-brand` (case 23 path); HC exit re-applies the runtime's owned value `acme`, not the author's pre-HC `other`. The `LastApplied` union does not retain a pre-HC `prior` slot — adding one would be a contract-surface change. |
 
-`theme="auto"` cannot resolve to `high-contrast` (the OS query is `prefers-color-scheme`, which has no HC value); the `auto` → HC transition does not exist as a runtime path.
+`theme="auto"` cannot resolve to `high-contrast` (the OS query is `prefers-color-scheme`, which has no HC value); the `auto` → HC transition does not exist as a runtime path. The test stub pins this negative guarantee with an explicit `it.todo` so a future hypothetical `prefers-contrast: more` mapping into `auto` cannot silently introduce HC-via-auto without breaking a test.
 
 ## Late registration — the registry subscription API
 
@@ -182,7 +187,11 @@ subscribe(brandName: string, callback: () => void): () => void {
 }
 ```
 
-`register()` and `_clear()` invoke `_notify(brandName)` after mutating `_brands`. The notification is synchronous and idempotent across re-registrations.
+`register()` and `_clear()` invoke `_notify(brandName)` after mutating `_brands`. Notification semantics:
+
+- `_notify(brandName)` fires synchronously after every successful `register(brandName, ...)` and every `_clear(brandName)`. Re-registration with a different token body fires `_notify` again (the token diff is a state transition the subscriber should observe).
+- A `register()` call that fails `validateTokens()` does **not** fire `_notify` — the registry was not mutated, so there is no state change to notify.
+- Subscriber callbacks that throw do not propagate to other subscribers; `_notify()` catches and surfaces via `console.error` so a single faulty subscriber cannot break the notification fan-out.
 
 `hx-theme` lifecycle:
 
@@ -258,15 +267,16 @@ The `BRAND_THEMING.md` registry-path doc gains a "Reflection to `data-brand`" su
 `packages/hx-library/src/components/hx-theme/hx-theme-data-brand-reflection.test.ts` enumerates the 24 cases plus state transitions and the structural edges codex flagged as test gaps:
 
 - 24 row cases (one `it.todo` per row of the matrix).
-- 5 state-transition cases.
+- 7 state-transition cases (5 R0 + 2 R1-clarification: `auto` → HC non-existence, Shape D registered HC round-trip lossy-by-design).
 - 2 reconcile-boundary mutation guard cases (preserved from R0): external `setAttribute('data-brand', 'x')` and external `removeAttribute('data-brand')` while `brand` is active — both survive until the next reconcile, then revert to the runtime's intended state.
-- 3 edge cases added in R1 per codex finding 6:
+- 4 edge cases added in R1 per codex finding 6 + R1-clarification:
   - **Late registration**: `brand="acme"` mounts before register; `data-brand` stays unset (case 2 path); subsequent `register('acme', …)` triggers subscription-driven reconcile; `data-brand="acme"` set without a manual property toggle.
   - **Ownership relinquish under external override**: `brand="acme"` set + runtime sets `data-brand="acme"` → author externally `setAttribute('data-brand','x')` → `brand=""` set; `data-brand="x"` survives the relinquish.
-  - **Advisory dedupe**: `brand="acme"` unregistered, theme reconcile fires twice (e.g. theme prop change + auto media-query event); `console.warn` emits once. Pins the existing `_lastBrandAdvisoryKey` deduplication.
-- 1 disconnect case (`disconnectedCallback` does not strip — moved-not-removed nodes do not flash).
+  - **Advisory dedupe (warn channel)**: `brand="acme"` unregistered, theme reconcile fires twice; `console.warn` emits once. Pins `_lastBrandAdvisoryKey` deduplication on the warn channel.
+  - **Advisory dedupe (info channel)**: `brand="acme"` registered, `theme="high-contrast"`, reconcile fires twice; `console.info` HC-suppression emits once. Pins the same deduplication channel for info.
+- 1 disconnect case (`disconnectedCallback` does not strip — moved-not-removed nodes do not flash; registry subscription unsubscribes).
 
-Total: 35 `it.todo()` cases on the test stub. When the contract flips to implementation, every `it.todo` becomes a real assertion. Codex review on the implementation diff is the standard merge-gate codex pass; iteration on the contract surface is explicitly out of scope per the planning rule.
+Total: 38 `it.todo()` cases on the test stub. When the contract flips to implementation, every `it.todo` becomes a real assertion. Codex review on the implementation diff is the standard merge-gate codex pass; iteration on the contract surface is explicitly out of scope per the planning rule.
 
 ## Out-of-scope (intentionally)
 
