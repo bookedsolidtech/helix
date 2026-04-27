@@ -116,6 +116,8 @@ mcpwc.config.json
 .rea/audit-*.jsonl
 .rea/review-cache.jsonl
 .rea/HALT
+.rea/codex-findings/
+.rea/codex-runs/
 
 # rea gateway dev smoke harness (not production code)
 .helix-gateway-smoke.mjs
