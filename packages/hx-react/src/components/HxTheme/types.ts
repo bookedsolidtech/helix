@@ -25,7 +25,14 @@ hospital system white-label implementations.
 
 The brand must first be registered via `HelixBrandRegistry.register()`.
 If the brand name is non-empty but not registered, a warning is logged
-and the base theme is applied without brand overrides. */
+and the base theme is applied without brand overrides.
+
+**High-contrast suppression:** When `theme="high-contrast"`, the brand
+merge is intentionally skipped to preserve the WCAG 1.4.6 Enhanced
+Contrast (7:1+) guarantee that the HC token set is tuned for. A
+registered brand applied under HC emits a `console.info` to surface
+the suppression in development. Brand merging on `light` and `dark`
+is unaffected. See `BRAND_THEMING.md`. */
   brand?: string;
   /** Controls motion behavior for all descendant `hx-*` components.
 - `"full"` (default): Full animations. Respects OS `prefers-reduced-motion`.
@@ -43,9 +50,9 @@ the same token overrides are applied automatically. */
 - `"spacious"`: Increases `--hx-space-*` tokens ~25%. For touch-optimized bedside tablets. */
   density?: string;
   /** Returns the currently active theme name.
-When `system=true` or `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
+When `theme="auto"`, reflects the OS preference (`"light"` or `"dark"`).
 Otherwise returns the `theme` property value. */
-  effectiveTheme?: 'light' | 'dark' | 'high-contrast' | 'auto';
+  effectiveTheme?: 'light' | 'dark' | 'high-contrast';
   /** Returns the resolved motion level after considering the `motion` attribute and OS preference.
 When `motion="full"` and the OS reports `prefers-reduced-motion: reduce`, returns `"reduced"`.
 Otherwise returns `"full"` or `"reduced"` based on the `motion` attribute. */

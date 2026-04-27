@@ -13,6 +13,32 @@ HELiX is designed for this. A single `@helixui/library` instance serves every br
 
 This guide is the production architecture reference for multi-brand deployments.
 
+:::caution[High-contrast mode and brand overrides]
+HELiX has **two independent brand override mechanisms**:
+
+1. **JS registry path** (`HelixBrandRegistry.register()` + `<hx-theme brand="your-brand">`) — runtime token injection that is **intentionally suppressed** under `theme="high-contrast"` to preserve the WCAG 1.4.6 Enhanced Contrast (7:1+) guarantee. The runtime emits `console.info('[hx-theme] Brand "..." is suppressed on theme="high-contrast"...')` so the suppression is observable in development. See [`BRAND_THEMING.md`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/docs/BRAND_THEMING.md).
+
+2. **CSS-pattern** (`[data-brand="..."]` selectors, this guide) — cascade-level primitive overrides. These **continue to apply** under HC because the cascade does not know about HC accessibility intent. If you serve low-vision users on `theme="high-contrast"`, you **must** guard the selectors so they do not apply when HC is active.
+
+**HC-safe recommendation:** Use the JS registry path. It is suppressed automatically; no extra guard is needed.
+
+**HC guard for the CSS pattern.** The `<hx-theme>` element carries both `theme` and (in this guide) `data-brand`. Place the `data-brand` attribute on the same `<hx-theme>` element that carries `theme` so a single selector can guard both:
+
+```css
+hx-theme[data-brand='harbor-health']:not([theme='high-contrast']) {
+  --hx-color-primary-500: #006e8a;
+}
+```
+
+Without this guard, the brand primitive overrides leak into the HC token cascade and components consuming those primitives directly (`hx-checkbox`, `hx-tag`, `hx-list-item`, `hx-date-picker`, etc.) silently break the 7:1+ contract.
+
+**Canonical placement.** This guide places `data-brand` on `<hx-theme>` so the HC guard above works as a single attribute selector. If you need to scope brands at `<body>` (as some Drupal multisite layouts do) the guard cannot be expressed as a single attribute selector — `theme` and `data-brand` live on different elements — and you must either (a) mirror the active theme onto `<body>` so `body[data-brand='...']:not([data-theme='high-contrast'])` works (CSS has no `!=` attribute operator; use `:not(...)` for negation), or (b) use the JS registry path.
+
+The `[data-brand]` attribute is purely a CSS scoping primitive. It does **not** reach into `<hx-theme>`'s JS-registry-driven `brand` attribute. The two override mechanisms compose; both must be HC-aware.
+
+**The runtime does not reflect `brand` to `data-brand`.** Setting `<hx-theme brand="harbor-health">` activates only the JS registry path. To also activate the CSS-pattern path on the same element, you must set `data-brand="harbor-health"` explicitly — `<hx-theme brand="harbor-health" data-brand="harbor-health" theme="light">`. Author-set `data-brand` is yours to manage across client-side brand changes; the component will not update it.
+:::
+
 ---
 
 ## The 3-Tier Override Architecture {#architecture}
@@ -28,8 +54,8 @@ Tier 1: Base @helixui/tokens
         ↓
 
 Tier 2: Brand-specific CSS custom property overrides
-  (loaded per brand, override tier 1 within a scope)
-  [data-brand="harbor-health"] {
+  (loaded per brand, override tier 1 within a scope; HC-guarded)
+  hx-theme[data-brand="harbor-health"]:not([theme="high-contrast"]) {
     --hx-color-primary-500: #006e8a;
     --hx-font-family-sans: 'Harbor Sans', 'Inter', sans-serif;
   }
@@ -37,7 +63,9 @@ Tier 2: Brand-specific CSS custom property overrides
         ↓
 
 Tier 3: Runtime theme provider injection
-  (hx-theme or ThemeProvider applies the active brand to the DOM)
+  (hx-theme applies the active brand + theme to the DOM; placing
+   data-brand on the same element that carries theme keeps the
+   HC guard above as a single-attribute selector)
   <hx-theme data-brand="harbor-health" theme="light">
     <!-- all components in this subtree use Harbor Health tokens -->
   </hx-theme>
@@ -91,11 +119,13 @@ Harbor Health's identity: deep teal primary, rounded corners, Inter typeface.
 
 ```css
 /* Harbor Health brand token overrides
- * Scope: [data-brand="harbor-health"]
+ * Scope: hx-theme[data-brand="harbor-health"]:not([theme="high-contrast"])
  * Override tier: primitive + semantic
+ * The :not([theme="high-contrast"]) guard preserves the HC contrast contract
+ * (see the callout at the top of this guide).
  */
 
-[data-brand='harbor-health'] {
+hx-theme[data-brand='harbor-health']:not([theme='high-contrast']) {
   /* ── Primary color ramp ─────────────────────────────────────── */
   --hx-color-primary-50:  #eff6f8;
   --hx-color-primary-100: #d0e9ef;
@@ -138,7 +168,7 @@ St. Mary's identity: warm maroon primary, rectangular corners for clinical densi
 ```css
 /* St. Mary's Hospital brand token overrides */
 
-[data-brand='st-marys-hospital'] {
+hx-theme[data-brand='st-marys-hospital']:not([theme='high-contrast']) {
   /* ── Primary color ramp ─────────────────────────────────────── */
   --hx-color-primary-50:  #fdf2f4;
   --hx-color-primary-100: #fad5db;
@@ -181,7 +211,7 @@ Northwell's identity: deep navy primary, generous spacing, Lato typeface.
 ```css
 /* Northwell Health brand token overrides */
 
-[data-brand='northwell-health'] {
+hx-theme[data-brand='northwell-health']:not([theme='high-contrast']) {
   /* ── Primary color ramp ─────────────────────────────────────── */
   --hx-color-primary-50:  #eef2f9;
   --hx-color-primary-100: #d0dcee;
@@ -538,6 +568,10 @@ Some brands require structural differences beyond color swaps — a different si
 ### Using CSS `::part()` for structural variation
 
 CSS `::part()` selectors style component internals from outside the shadow boundary. Use them with brand-scoped selectors to apply brand-specific structural styles.
+
+:::caution[HC guard reminder]
+The snippets in this section and below use the **abbreviated** `[data-brand='...']` form for clarity. In production you must add the HC guard described in the top-of-page callout — `:not([theme='high-contrast'])` if `data-brand` lives on `<hx-theme>`, or a `body[data-theme]` mirror if `data-brand` lives on `<body>`. Unguarded brand styling leaks into HC and breaks the WCAG 7:1+ contract.
+:::
 
 ```css
 /* Harbor Health: uppercase tracking for clinical authority */
