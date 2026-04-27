@@ -35,6 +35,8 @@ Without this guard, the brand primitive overrides leak into the HC token cascade
 **Canonical placement.** This guide places `data-brand` on `<hx-theme>` so the HC guard above works as a single attribute selector. If you need to scope brands at `<body>` (as some Drupal multisite layouts do) the guard cannot be expressed as a single attribute selector — `theme` and `data-brand` live on different elements — and you must either (a) mirror the active theme onto `<body>` so `body[data-brand='...']:not([data-theme='high-contrast'])` works (CSS has no `!=` attribute operator; use `:not(...)` for negation), or (b) use the JS registry path.
 
 The `[data-brand]` attribute is purely a CSS scoping primitive. It does **not** reach into `<hx-theme>`'s JS-registry-driven `brand` attribute. The two override mechanisms compose; both must be HC-aware.
+
+**The runtime does not reflect `brand` to `data-brand`.** Setting `<hx-theme brand="harbor-health">` activates only the JS registry path. To also activate the CSS-pattern path on the same element, you must set `data-brand="harbor-health"` explicitly — `<hx-theme brand="harbor-health" data-brand="harbor-health" theme="light">`. Author-set `data-brand` is yours to manage across client-side brand changes; the component will not update it.
 :::
 
 ---

@@ -30,12 +30,14 @@
                          theme="high-contrast" (logs console.info) to preserve the
                          WCAG 7:1+ contrast contract.
 
-                         When set, the template emits BOTH `brand="..."` (consumed by
-                         the JS registry) and `data-brand="..."` (consumed by
-                         CSS-pattern selectors of the form
-                         `hx-theme[data-brand='...']:not([theme='high-contrast'])`,
-                         see BRAND_THEMING.md). The HC suppression for the CSS pattern
-                         lives in the selector itself, not in this template.
+                         The template emits ONLY `brand="..."` (consumed by the JS
+                         registry). It does NOT emit `data-brand="..."`: the runtime
+                         does not reflect `brand` to `data-brand`, so a Twig-emitted
+                         `data-brand` would go stale on client-side brand swaps and
+                         leak across HC. If you also want the CSS-pattern path
+                         (`hx-theme[data-brand='...']:not([theme='high-contrast'])`,
+                         see BRAND_THEMING.md), set `data-brand` explicitly via the
+                         `attributes` object — and accept that you own its lifecycle.
     attributes (object)  Optional. Additional HTML attributes spread onto <hx-theme>.
 
   Usage — Full page theming:
@@ -90,7 +92,7 @@
 
 <hx-theme
   theme="{{ theme|default('light') }}"
-  {% if brand is defined and brand %}brand="{{ brand }}" data-brand="{{ brand }}"{% endif %}
+  {% if brand is defined and brand %}brand="{{ brand }}"{% endif %}
   {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
 >
   {% block content %}{% endblock %}
