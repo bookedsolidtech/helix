@@ -226,18 +226,12 @@ describe('dark-mode token resolution', () => {
     expect(light.backgroundColor).toBe('rgb(10, 11, 12)');
   });
 
-  /**
-   * `default` chain coverage note: the four `:hover` consume sites in
-   * hx-button.styles.ts (inverted secondary/tertiary/ghost/outline) and the
-   * .side-nav__toggle:hover rule in hx-side-nav.styles.ts (incl. the round-15
-   * @supports color-mix fold) all reuse the identical token-fallback shape
-   * that the subtle-chain rest-state tests above exercise. Synthesizing :hover
-   * paint in vitest browser mode is unreliable (variant rest state has no
-   * --hx-button-bg binding, so a hover-only rebind doesn't surface as a stable
-   * backgroundColor delta we can assert without coupling to hover internals).
-   * Coverage falls back to the `contrast.test.ts` structural-shape lock plus
-   * file-level grep — every rule (rest-state path AND `@supports`-gated
-   * override path on side-nav) reads BOTH the deprecated and canonical names.
-   */
-
+  // Hover paint cannot be synthesized reliably in vitest browser mode (variant
+  // rest state has no --hx-button-bg binding, so a hover-only rebind doesn't
+  // surface as a stable backgroundColor delta). The .side-nav__toggle:hover
+  // deprecated→canonical chain — both the plain rule and the @supports
+  // color-mix branch — is covered by runtime adopted-stylesheet inspection in
+  // forced-colors-runtime.test.ts. The hx-button inverted hover rules reuse
+  // the identical fallback shape exercised by the subtle-chain rest-state
+  // tests above.
 });

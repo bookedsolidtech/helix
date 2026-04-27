@@ -84,7 +84,7 @@
     "hooks:animation-budget-check": "tsx scripts/hooks/animation-budget-check.ts",
     "hooks:vrt-critical-paths": "tsx scripts/hooks/vrt-critical-paths.ts",
     "changeset": "changeset",
-    "changeset:version": "changeset version && pnpm install --no-frozen-lockfile",
+    "changeset:version": "changeset version && pnpm install --no-frozen-lockfile && pnpm --filter=@helixui/library run figma:inventory",
     "changeset:publish": "changeset publish",
     "prepublishOnly": "node scripts/block-local-publish.mjs",
     "prepare": "husky"
