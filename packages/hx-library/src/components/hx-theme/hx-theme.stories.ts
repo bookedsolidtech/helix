@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
+import { html, nothing } from 'lit';
 import './hx-theme.js';
 import type { HelixTheme } from './hx-theme.js';
 
@@ -23,20 +23,10 @@ const meta = {
         type: { summary: "'light' | 'dark' | 'high-contrast' | 'auto'" },
       },
     },
-    system: {
-      control: 'boolean',
-      description:
-        'When true, auto-detects theme from the OS prefers-color-scheme media query. Overrides the theme prop.',
-      table: {
-        category: 'Theme',
-        defaultValue: { summary: 'false' },
-        type: { summary: 'boolean' },
-      },
-    },
     brand: {
       control: 'text',
       description:
-        'Brand identifier used to scope theme tokens. Allows multiple brands to coexist on the same page.',
+        'Registered brand name applied on top of the base theme. Must be registered via HelixBrandRegistry.register() first; an unregistered name logs a console.warn. Suppressed on theme="high-contrast" (logs console.info) to preserve the WCAG 7:1+ contrast guarantee. See BRAND_THEMING.md.',
       table: {
         category: 'Theme',
         type: { summary: 'string' },
@@ -44,22 +34,27 @@ const meta = {
     },
     motion: {
       control: { type: 'select' },
-      options: ['auto', 'reduced', 'full'],
+      options: ['full', 'reduced', 'none'],
       description:
-        'Motion preference override. "reduced" disables animations; "auto" follows the OS prefers-reduced-motion setting.',
+        'Motion preference override. "full" enables animations and honors OS prefers-reduced-motion; "reduced" forces reduced motion regardless of OS; "none" disables animations entirely.',
       table: {
         category: 'Theme',
-        defaultValue: { summary: 'auto' },
-        type: { summary: "'auto' | 'reduced' | 'full'" },
+        defaultValue: { summary: 'full' },
+        type: { summary: "'full' | 'reduced' | 'none'" },
       },
     },
   },
   args: {
     theme: 'light',
-    system: false,
+    brand: '',
+    motion: 'full',
   },
   render: (args) => html`
-    <hx-theme theme=${args.theme} ?system=${args.system}>
+    <hx-theme
+      theme=${args.theme}
+      brand=${args.brand ? args.brand : nothing}
+      motion=${args.motion}
+    >
       <div
         style="
           padding: 1.5rem;
@@ -145,14 +140,14 @@ export const HighContrast: Story = {
 };
 
 // ─────────────────────────────────────────────────
-// 4. SYSTEM — Auto-detect from OS preference
+// 4. AUTO — Auto-detect from OS preference
 // ─────────────────────────────────────────────────
 
 export const SystemDetection: Story = {
-  name: 'System Detection',
-  args: { system: true },
+  name: 'Auto (OS preference)',
+  args: { theme: 'auto' },
   render: () => html`
-    <hx-theme system>
+    <hx-theme theme="auto">
       <div
         style="
           padding: 1.5rem;

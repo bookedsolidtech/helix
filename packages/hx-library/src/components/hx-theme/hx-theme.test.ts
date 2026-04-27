@@ -2,7 +2,12 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixTheme } from './hx-theme.js';
-import { HelixBrandRegistry } from '@helixui/tokens';
+import {
+  HelixBrandRegistry,
+  REQUIRED_SEMANTIC_TOKENS,
+  highContrastTokenEntries,
+  tokenMap,
+} from '@helixui/tokens';
 import './index.js';
 
 afterEach(cleanup);
@@ -99,6 +104,147 @@ describe('hx-theme', () => {
       const textPrimary = getComputedStyle(el).getPropertyValue('--hx-color-text-primary').trim();
       expect(textPrimary.toLowerCase()).toBe('#ffffff');
     });
+
+    it('injects every HC token from tokens.json onto the host with the correct value', async () => {
+      // Value-aware sweep — walks tokens['high-contrast'] independently of
+      // the published `highContrastTokenEntries` array and asserts:
+      //   1. count parity (independent walk vs public export)
+      //   2. for every HC token, the resolved DOM value matches the
+      //      source-of-truth literal endpoint byte-for-byte. var() chains
+      //      are resolved through a merged light+HC expected map so cross-
+      //      layer references (HC token → light primitive) resolve to the
+      //      light literal — closes the round-19 cascade-shadow finding
+      //      that an HC-only resolver dropped cross-layer chains into the
+      //      existence-only fallback.
+      //   3. cycle / depth-limit failures fail loudly (kind === 'cycle')
+      //      so a pathological tokens.json chain does not silently slip.
+      const { tokens, highContrastTokenEntries } = await import('@helixui/tokens');
+
+      type RawToken = { value: string };
+      const isToken = (v: unknown): v is RawToken =>
+        typeof v === 'object' && v !== null && 'value' in (v as Record<string, unknown>);
+      const walk = (
+        node: Record<string, unknown>,
+        path: string[],
+        out: Map<string, string>,
+      ): void => {
+        for (const [key, val] of Object.entries(node)) {
+          const next = [...path, key];
+          if (isToken(val)) {
+            out.set(`--hx-${next.join('-')}`, val.value);
+          } else if (typeof val === 'object' && val !== null) {
+            walk(val as Record<string, unknown>, next, out);
+          }
+        }
+      };
+      const root = tokens as Record<string, unknown>;
+      const lightRoot: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(root)) {
+        if (k !== 'dark' && k !== 'high-contrast') lightRoot[k] = v;
+      }
+      const expectedLight = new Map<string, string>();
+      walk(lightRoot, [], expectedLight);
+      const expectedHc = new Map<string, string>();
+      walk(root['high-contrast'] as Record<string, unknown>, [], expectedHc);
+      // Merged map: light is the base, HC overlays selected names. Brand
+      // overrides are not in scope here (no brand applied on the fixture).
+      const expectedMerged = new Map(expectedLight);
+      for (const [k, v] of expectedHc) expectedMerged.set(k, v);
+
+      // Independent count must match the published export — silent truncation guard.
+      expect(highContrastTokenEntries.length, 'highContrastTokenEntries truncated vs tokens.json').toBe(
+        expectedHc.size,
+      );
+
+      // Resolve a var() chain through the merged map. Distinguishes:
+      //   - { kind: 'literal', value }: chain terminates on a literal
+      //   - { kind: 'cycle' }: depth limit / cycle / orphan (must fail loudly)
+      type Resolution = { kind: 'literal'; value: string } | { kind: 'cycle' };
+      const resolveChain = (raw: string, depth = 0): Resolution => {
+        if (depth > 10) return { kind: 'cycle' };
+        const m = raw.match(/^var\(\s*(--[\w-]+)\s*\)\s*$/);
+        if (!m) return { kind: 'literal', value: raw };
+        const target = expectedMerged.get(m[1] ?? '');
+        if (target === undefined) return { kind: 'cycle' };
+        return resolveChain(target, depth + 1);
+      };
+
+      const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      for (const [name, sourceValue] of expectedHc) {
+        const resolved = styles.getPropertyValue(name).trim();
+        const result = resolveChain(sourceValue);
+        if (result.kind === 'cycle') {
+          throw new Error(
+            `HC token ${name} resolved to a cycle/orphan via tokens.json (raw value: ${sourceValue}). ` +
+              `Either the chain depth exceeds 10 or a var() target is missing from the merged map.`,
+          );
+        }
+        // Literal endpoint — resolved DOM value must match byte-for-byte.
+        expect(resolved.toLowerCase(), `HC token ${name} value drift`).toBe(
+          result.value.toLowerCase(),
+        );
+      }
+    });
+
+    it('switches to HC sentinels when theme transitions light → high-contrast', async () => {
+      // R19 finding 3 — HC value-aware sweep above only runs on first mount.
+      // Theme-switch path was not exercised for HC. Sentinel: focus-ring-width
+      // (2px in light, 3px in HC) and border-width-thin (1px in light, 2px in HC).
+      const el = await fixture<HelixTheme>('<hx-theme theme="light">Content</hx-theme>');
+      await el.updateComplete;
+      const before = getComputedStyle(el);
+      expect(before.getPropertyValue('--hx-focus-ring-width').trim()).toBe('2px');
+      expect(before.getPropertyValue('--hx-border-width-thin').trim()).toBe('1px');
+
+      el.theme = 'high-contrast';
+      await el.updateComplete;
+      const after = getComputedStyle(el);
+      expect(after.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      expect(after.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
+      expect(
+        after.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
+      ).toBe('#000000');
+    });
+
+    it('injects HC sentinel values for branch-specific override paths', async () => {
+      // Branch-specific override paths the structural sweep can pass
+      // even with logic regressions (e.g. var() chains that resolve via
+      // light fallbacks instead of the HC-specific override). Each sentinel
+      // is a token whose drift would silently break a consumer-facing
+      // a11y pairing.
+      const el = await fixture<HelixTheme>('<hx-theme theme="high-contrast">Content</hx-theme>');
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // HC primary-500 — bright blue replaces light teal
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#3b82f6',
+      );
+      // HC text.on-primary-strong — black on bright HC primary fills (AAA)
+      expect(
+        styles.getPropertyValue('--hx-color-text-on-primary-strong').trim().toLowerCase(),
+      ).toBe('#000000');
+      // HC text.on-error-strong — black on bright HC error fills (AAA, paired
+      // with action.danger.bg-active below). Base value white fails AA on HC red.
+      expect(
+        styles.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
+      ).toBe('#000000');
+      // HC action.danger.bg-active — flips to HC error-500 (#F87171) so the
+      // pressed-state danger pairing with on-error-strong (#000000) clears AA.
+      // Base error-700 (#A21312) has no HC override → 2.64:1 fail without this.
+      expect(
+        styles.getPropertyValue('--hx-color-action-danger-bg-active').trim().toLowerCase(),
+      ).toBe('#f87171');
+      // HC border.on-dark-strong — solid white so inverted outlines remain visible
+      expect(
+        styles.getPropertyValue('--hx-color-border-on-dark-strong').trim().toLowerCase(),
+      ).toBe('#ffffff');
+      // HC focus-ring-width — thicker ring for HC visibility (3px vs 2px default)
+      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      // HC border-width-thin — thicker minimum border for HC visibility
+      expect(styles.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
+    });
   });
 
   // ─── effectiveTheme ───
@@ -183,57 +329,40 @@ describe('hx-theme', () => {
     });
   });
 
-  // ─── System detection ───
+  // ─── Auto (OS) detection ───
 
-  describe('System detection', () => {
-    it('effectiveTheme returns light or dark when system=true', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+  describe('Auto (OS) detection', () => {
+    it('effectiveTheme returns light or dark when theme="auto"', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
 
       const effective = el.effectiveTheme;
       expect(effective === 'light' || effective === 'dark').toBe(true);
     });
 
-    it('effectiveTheme ignores theme prop when system=true', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system theme="dark">Content</hx-theme>');
-      await el.updateComplete;
-
-      // system=true should use OS preference, not the explicit theme prop
-      const effective = el.effectiveTheme;
-      expect(effective === 'light' || effective === 'dark').toBe(true);
-    });
-
-    it('effectiveTheme uses theme prop when system=false', async () => {
+    it('effectiveTheme uses theme prop when theme="dark"', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="dark">Content</hx-theme>');
       expect(el.effectiveTheme).toBe('dark');
     });
 
-    it('switching system off restores theme prop', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system theme="dark">Content</hx-theme>');
+    it('switching from auto to dark resolves to dark', async () => {
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
 
-      el.system = false;
+      el.theme = 'dark';
       await el.updateComplete;
 
       expect(el.effectiveTheme).toBe('dark');
     });
   });
 
-  // ─── System mode token injection ───
+  // ─── Auto mode token injection ───
 
-  describe('System mode token injection', () => {
-    it('injects tokens (not just effectiveTheme string) when system=true', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
-      await el.updateComplete;
-      // The token must be injected regardless of which OS preference resolves
-      const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
-      expect(value).toBeTruthy();
-      expect(value.length).toBeGreaterThan(0);
-    });
-
-    it('injects tokens when theme="auto"', async () => {
+  describe('Auto mode token injection', () => {
+    it('injects tokens (not just effectiveTheme string) when theme="auto"', async () => {
       const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
+      // The token must be injected regardless of which OS preference resolves
       const value = getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim();
       expect(value).toBeTruthy();
       expect(value.length).toBeGreaterThan(0);
@@ -279,7 +408,7 @@ describe('hx-theme', () => {
 
   describe('Lifecycle', () => {
     it('cleans up media query listener on disconnect', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
 
       // Capture the internal handler reference before removal
@@ -489,13 +618,270 @@ describe('hx-theme', () => {
       expect(el.getAttribute('brand')).toBe('mercy');
       warnSpy.mockRestore();
     });
+
+    it('HC overlay wins over brand overrides on high-contrast theme', async () => {
+      // R20 BLOCKING (api-design high) — brand merge previously appended a
+      // later :host block that silently shadowed HC accessibility tokens
+      // (focus-ring-width, primary ramps tuned for AAA on #000, etc.),
+      // contradicting the BRAND_THEMING.md "WCAG 7:1+" contract. The fix
+      // re-emits the HC overlay AFTER the brand merge when
+      // effectiveTheme === 'high-contrast', so HC always wins on HC mode.
+      // This test registers a brand that explicitly redeclares HC-defined
+      // names with sub-AA values and asserts HC tokens survive intact.
+      const brandName = 'test-brand-r20-hc-low-contrast';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#fff8f0',
+        '--hx-color-primary-100': '#ffeacc',
+        '--hx-color-primary-200': '#ffd699',
+        '--hx-color-primary-300': '#ffbd66',
+        '--hx-color-primary-400': '#ffa033',
+        // Sub-AA on #000 (2.21:1) — would silently break HC a11y if it won.
+        '--hx-color-primary-500': '#003DA5',
+        '--hx-color-primary-600': '#002D8A',
+        '--hx-color-primary-700': '#002270',
+        '--hx-color-primary-800': '#001a55',
+        '--hx-color-primary-900': '#00103a',
+        '--hx-color-primary-950': '#00081d',
+        '--hx-color-secondary-50': '#f8f0ff',
+        '--hx-color-secondary-100': '#eaccff',
+        '--hx-color-secondary-200': '#d699ff',
+        '--hx-color-secondary-300': '#bd66ff',
+        '--hx-color-secondary-400': '#a033ff',
+        '--hx-color-secondary-500': '#8800ff',
+        '--hx-color-secondary-600': '#6d00cc',
+        '--hx-color-secondary-700': '#520099',
+        '--hx-color-secondary-800': '#370066',
+        '--hx-color-secondary-900': '#1b0033',
+        '--hx-color-secondary-950': '#0e001a',
+      });
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // HC values survive on a11y-critical tokens — brand cannot poison them.
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#3b82f6',
+      );
+      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      expect(styles.getPropertyValue('--hx-border-width-thin').trim()).toBe('2px');
+      expect(
+        styles.getPropertyValue('--hx-color-text-on-error-strong').trim().toLowerCase(),
+      ).toBe('#000000');
+      expect(
+        styles.getPropertyValue('--hx-color-action-danger-bg-active').trim().toLowerCase(),
+      ).toBe('#f87171');
+    });
+
+    it('HC suppresses brand merge across ALL 22 REQUIRED_SEMANTIC_TOKENS stops (data-driven)', async () => {
+      // R23 finding 3 — sampling-based coverage was the original gap. Drive
+      // the assertion loop from REQUIRED_SEMANTIC_TOKENS so every brand-
+      // required stop is asserted against either its HC overlay (when HC
+      // overlays it) or its light-primitive value (when HC does not), and
+      // never against the brand-supplied value. New required tokens added
+      // to the registry are auto-covered without test edits.
+      const brandName = 'test-brand-r23-data-driven';
+      const brandWhite: Record<string, string> = {};
+      for (const name of REQUIRED_SEMANTIC_TOKENS) brandWhite[name] = '#FFFFFF';
+      HelixBrandRegistry.register(brandName, brandWhite);
+
+      const hcOverlayMap = new Map(highContrastTokenEntries.map((t) => [t.name, t.value]));
+
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+
+      // Sanity: confirm REQUIRED_SEMANTIC_TOKENS is populated and includes
+      // the canonical 22 stops — guards against the loop trivially passing
+      // if the export ever drifts to an empty array.
+      expect(REQUIRED_SEMANTIC_TOKENS.length).toBeGreaterThanOrEqual(22);
+
+      for (const tokenName of REQUIRED_SEMANTIC_TOKENS) {
+        const actual = styles.getPropertyValue(tokenName).trim().toLowerCase();
+        // R24 finding 4 — never silently fall back to '' when a token is
+        // missing from BOTH the HC overlay and the base tokenMap. Such a
+        // gap is REQUIRED_SEMANTIC_TOKENS drift (registry says required,
+        // tokens.json no longer ships it) and the test must fail loudly,
+        // not assert `actual === ''`.
+        const raw = hcOverlayMap.get(tokenName) ?? tokenMap[tokenName];
+        expect(
+          raw,
+          `${tokenName} missing from both HC overlay and tokenMap — REQUIRED_SEMANTIC_TOKENS drift`,
+        ).toBeDefined();
+        const expected = raw!.toLowerCase();
+        // Brand value (#ffffff) must NEVER win on HC.
+        expect(actual, `${tokenName} should not match brand white`).not.toBe('#ffffff');
+        // Must match either the HC overlay (if defined for this token) or
+        // the base light primitive — never anything else.
+        expect(actual, `${tokenName} should resolve to HC overlay or light primitive`).toBe(
+          expected,
+        );
+      }
+    });
+
+    it('emits console.info when a registered brand is suppressed under HC, warn for unregistered', async () => {
+      // R23 finding 4 — the console.info is the entire "behavior change
+      // observable in development" deliverable. Without test coverage a
+      // future refactor or console-level filter can silently delete the
+      // signal. Asserts (a) registered + HC fires info (not warn),
+      // (b) unregistered + HC fires warn (not info).
+      const brandName = 'test-brand-r23-info-spy';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#000000',
+        '--hx-color-primary-100': '#000000',
+        '--hx-color-primary-200': '#000000',
+        '--hx-color-primary-300': '#000000',
+        '--hx-color-primary-400': '#000000',
+        '--hx-color-primary-500': '#000000',
+        '--hx-color-primary-600': '#000000',
+        '--hx-color-primary-700': '#000000',
+        '--hx-color-primary-800': '#000000',
+        '--hx-color-primary-900': '#000000',
+        '--hx-color-primary-950': '#000000',
+        '--hx-color-secondary-50': '#000000',
+        '--hx-color-secondary-100': '#000000',
+        '--hx-color-secondary-200': '#000000',
+        '--hx-color-secondary-300': '#000000',
+        '--hx-color-secondary-400': '#000000',
+        '--hx-color-secondary-500': '#000000',
+        '--hx-color-secondary-600': '#000000',
+        '--hx-color-secondary-700': '#000000',
+        '--hx-color-secondary-800': '#000000',
+        '--hx-color-secondary-900': '#000000',
+        '--hx-color-secondary-950': '#000000',
+      });
+
+      const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const registered = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}">Content</hx-theme>`,
+      );
+      await registered.updateComplete;
+
+      // R24 finding 5 — lock the call count so a regression that fires the
+      // info on every render (e.g. moved out of `_applyEffectiveTheme()`'s
+      // single-shot guard into `update()`) fails loudly instead of being
+      // hidden behind the substring check.
+      expect(infoSpy).toHaveBeenCalledTimes(1);
+      const infoCalls = infoSpy.mock.calls.flat().filter((arg) => typeof arg === 'string');
+      expect(infoCalls.some((m) => m.includes('suppressed on theme="high-contrast"'))).toBe(true);
+      expect(infoCalls.some((m) => m.includes(brandName))).toBe(true);
+      expect(warnSpy).not.toHaveBeenCalled();
+
+      infoSpy.mockClear();
+      warnSpy.mockClear();
+
+      const unregistered = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="not-registered-r23">Content</hx-theme>`,
+      );
+      await unregistered.updateComplete;
+
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const warnCalls = warnSpy.mock.calls.flat().filter((arg) => typeof arg === 'string');
+      expect(warnCalls.some((m) => m.includes('not-registered-r23'))).toBe(true);
+      expect(warnCalls.some((m) => m.includes('not registered'))).toBe(true);
+      expect(infoSpy).not.toHaveBeenCalled();
+
+      infoSpy.mockRestore();
+      warnSpy.mockRestore();
+    });
+
+    it('HC + brand + reduced motion triple stack — HC a11y survives, motion override applies', async () => {
+      // R21 finding 3 — exercises the full overlay stack (base → no brand
+      // because HC suppresses → reduced-motion). Documents that motion
+      // overrides do not interact with HC tokens (no overlap of names).
+      const brandName = 'test-brand-r21-triple-stack';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#fff8f0',
+        '--hx-color-primary-100': '#ffeacc',
+        '--hx-color-primary-200': '#ffd699',
+        '--hx-color-primary-300': '#ffbd66',
+        '--hx-color-primary-400': '#ffa033',
+        '--hx-color-primary-500': '#FF8800',
+        '--hx-color-primary-600': '#cc6d00',
+        '--hx-color-primary-700': '#995200',
+        '--hx-color-primary-800': '#663700',
+        '--hx-color-primary-900': '#331b00',
+        '--hx-color-primary-950': '#1a0e00',
+        '--hx-color-secondary-50': '#f8f0ff',
+        '--hx-color-secondary-100': '#eaccff',
+        '--hx-color-secondary-200': '#d699ff',
+        '--hx-color-secondary-300': '#bd66ff',
+        '--hx-color-secondary-400': '#a033ff',
+        '--hx-color-secondary-500': '#8800ff',
+        '--hx-color-secondary-600': '#6d00cc',
+        '--hx-color-secondary-700': '#520099',
+        '--hx-color-secondary-800': '#370066',
+        '--hx-color-secondary-900': '#1b0033',
+        '--hx-color-secondary-950': '#0e001a',
+      });
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="high-contrast" brand="${brandName}" motion="reduced">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // HC wins on its overlaid stops (brand suppressed on HC).
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#3b82f6',
+      );
+      expect(styles.getPropertyValue('--hx-focus-ring-width').trim()).toBe('3px');
+      // R22 finding 3 — assert the reduced-motion overlay actually applied.
+      // Without these, the test "passed" without exercising the motion layer.
+      expect(styles.getPropertyValue('--hx-duration-fast').trim()).toBe('0ms');
+      expect(styles.getPropertyValue('--hx-transition-fast').trim()).toBe('0ms linear');
+      expect(styles.getPropertyValue('--hx-easing-default').trim()).toBe('linear');
+    });
+
+    it('brand on light theme overrides primary color (brand-merge-skip is gated on HC only)', async () => {
+      // Sister test to the HC override test — confirms the brand-merge path
+      // still works for non-HC themes (i.e. the HC re-overlay is correctly
+      // gated on `effectiveTheme === 'high-contrast'` and does not regress
+      // brand support for light/dark consumers).
+      const brandName = 'test-brand-r20-light';
+      HelixBrandRegistry.register(brandName, {
+        '--hx-color-primary-50': '#fff8f0',
+        '--hx-color-primary-100': '#ffeacc',
+        '--hx-color-primary-200': '#ffd699',
+        '--hx-color-primary-300': '#ffbd66',
+        '--hx-color-primary-400': '#ffa033',
+        '--hx-color-primary-500': '#FF8800',
+        '--hx-color-primary-600': '#cc6d00',
+        '--hx-color-primary-700': '#995200',
+        '--hx-color-primary-800': '#663700',
+        '--hx-color-primary-900': '#331b00',
+        '--hx-color-primary-950': '#1a0e00',
+        '--hx-color-secondary-50': '#f8f0ff',
+        '--hx-color-secondary-100': '#eaccff',
+        '--hx-color-secondary-200': '#d699ff',
+        '--hx-color-secondary-300': '#bd66ff',
+        '--hx-color-secondary-400': '#a033ff',
+        '--hx-color-secondary-500': '#8800ff',
+        '--hx-color-secondary-600': '#6d00cc',
+        '--hx-color-secondary-700': '#520099',
+        '--hx-color-secondary-800': '#370066',
+        '--hx-color-secondary-900': '#1b0033',
+        '--hx-color-secondary-950': '#0e001a',
+      });
+      const el = await fixture<HelixTheme>(
+        `<hx-theme theme="light" brand="${brandName}">Content</hx-theme>`,
+      );
+      await el.updateComplete;
+      const styles = getComputedStyle(el);
+      // Brand wins on light (no HC re-overlay applied).
+      expect(styles.getPropertyValue('--hx-color-primary-500').trim().toLowerCase()).toBe(
+        '#ff8800',
+      );
+    });
   });
 
   // ─── theme change lifecycle / announcer ───
 
   describe('Announcer live region', () => {
     it('renders a visually-hidden [role="status"] span for AT announcements', async () => {
-      const el = await fixture<HelixTheme>('<hx-theme system>Content</hx-theme>');
+      const el = await fixture<HelixTheme>('<hx-theme theme="auto">Content</hx-theme>');
       await el.updateComplete;
       const announcer = shadowQuery(el, '[role="status"]');
       expect(announcer).toBeTruthy();
