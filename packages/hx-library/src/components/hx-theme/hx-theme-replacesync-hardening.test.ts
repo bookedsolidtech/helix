@@ -7,9 +7,11 @@ import { describe, it } from 'vitest';
 // flip to real assertions once Jake signs off on Path A (fail-fast at
 // registration) + defense-in-depth try/catch.
 //
-// Validator-level cases (~30 covering value categories: hex, oklch, rgb,
-// length, duration, var-reference, identifier, structural rejections) live
-// in packages/hx-tokens/src/__tests__/css-value-validator.test.ts when the
+// Validator-level cases (~45 covering all 15 value categories: color-hex,
+// color-oklch, color-rgb, color-hsl, color-named, length, unitless-number,
+// duration, easing, font-family, font-weight, var-reference, shadow,
+// gradient, identifier, plus structural rejections) live in
+// packages/hx-tokens/src/__tests__/css-value-validator.test.ts when the
 // validator lands. This file is the runtime-integration test stub.
 
 describe('hx-theme replaceSync hardening contract (3.3.0)', () => {
@@ -62,6 +64,9 @@ describe('hx-theme replaceSync hardening contract (3.3.0)', () => {
     );
     it.todo(
       'Defense-in-depth try/catch does not loop: a replaceSync() failure does not retrigger reconcile (no infinite recursion); the next reconcile event proceeds normally with whatever input the brand state currently has',
+    );
+    it.todo(
+      'Advisory state ordering invariant: when replaceSync() throws (forced via test hook), _lastBrandAdvisoryKey is NOT mutated before replaceSync() returns successfully; pending info/warn logs are NOT emitted on the failed call; the next successful reconcile emits the advisory transition relative to the previous (still-correct) state',
     );
   });
 });

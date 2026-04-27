@@ -78,10 +78,13 @@ describe('hx-theme HC brand-token split contract (3.3.0)', () => {
       'Empty non-color category: brand registers exactly the 22 required colors; mergeBrandTokens() under HC produces zero brand tokens; base HC overlay applies; no error',
     );
     it.todo(
-      'Re-registration atomicity: brand "acme" registered with valid mixed tokens; re-registration of "acme" with one invalid token (unknown --hx-foo-bar) throws; getBrandTokens("acme") returns the original mixed token map; applied sheet unchanged; subscribers NOT notified on the failed registration',
+      'Re-registration atomicity: brand "acme" registered with valid mixed tokens; re-registration of "acme" with one invalid token (unknown --hx-foo-bar) throws; getBrandTokens("acme") returns the original mixed token map; applied sheet unchanged; subscribers NOT notified on the failed registration; no brand-changed event emitted',
     );
     it.todo(
       'Advisory state ordering: when replaceSync() throws (forced via test hook), _lastBrandAdvisoryKey is NOT updated and pending logs are NOT emitted; subsequent reconcile that succeeds correctly emits the advisory transition relative to the previous (still-correct) state',
+    );
+    it.todo(
+      'Unrecognized-namespace rejection (rule 5): brand registers with a token whose name is neither --hx-* nor --brand-* (e.g. "foo-bar: 12px" or "--custom-prop: 1px"); register() throws with the unrecognized-namespace rejection message; isRegistered() returns false',
     );
   });
 });

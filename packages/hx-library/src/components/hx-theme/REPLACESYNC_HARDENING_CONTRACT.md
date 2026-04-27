@@ -9,7 +9,7 @@
 
 This contract is **a dependent** of `HC_BRAND_TOKEN_SPLIT_CONTRACT.md`, not a peer. R0 framed the two contracts as "independently mergeable"; R1 retracts that. The replaceSync hardening logic composes onto the categorization model defined in the HC split contract:
 
-- The `register()` body adds value validation as a new pass that runs **after** name validation / categorization (steps 2 and 3 of the HC contract's atomic re-registration sequence).
+- The `register()` body adds value validation as a new pass that runs **after** name validation but **before** categorization-and-store. The canonical pass order is presence → name namespace → value syntax → categorize → store, matching the HC contract's atomic re-registration sequence (steps 1–4) and the `_applyEffectiveTheme()` pseudocode in both contracts.
 - The categorization storage shape (`CategorizedBrandTokens`) is established by the HC contract; the validator does not introduce its own storage.
 - The defense-in-depth try/catch wrapper around `replaceSync()` is described in the HC contract's `_applyEffectiveTheme()` pseudocode and reused here. The two contracts share the same `replaceSync()` call site.
 

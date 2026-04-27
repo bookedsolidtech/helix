@@ -74,13 +74,15 @@ The registry uses a **token-name allowlist** for non-color tokens. The allowlist
 
 A brand token whose name matches neither the color allowlist nor the non-color allowlist is "unknown." Policy depends on namespace:
 
-| Namespace | Policy | Rationale |
-| --- | --- | --- |
-| `--hx-*` (framework) | **Reject at `register()`** with a clear error | Framework-namespace tokens are owned by HELiX. An unrecognized `--hx-*` token is either a typo (typo-and-suppress is silently wrong, especially for a11y-critical or layout-critical tokens) or a token introduced by a newer `@helixui/tokens` than the registry knows about. Both cases warrant explicit failure, not a safe-default. |
-| `--brand-*` (audited subprefixes) | **Allowed** per the table above | Audited subprefixes are the consumer-namespace escape hatch. |
-| `--brand-color-*`, `--brand-shadow-*`, `--brand-gradient-*`, `--brand-overlay-*` | **Reject at `register()`** | Color-bearing concepts have no HC-safe categorization under `--brand-*`. The error directs the author to the framework `--hx-color-*` surface. |
-| `--brand-<other>-*` (consumer namespace, not audited) | **Warn + treat as color** | Defaults to the safe HC behavior (suppression). The `console.warn` surfaces the gap so the brand author can rename to an audited subprefix or request the subprefix be added to the allowlist. |
-| Anything else (no recognized prefix) | **Reject at `register()`** | Tokens outside both `--hx-*` and `--brand-*` namespaces are not part of the HELiX token surface. The registry is not a generic CSS variable store. |
+The lookup is **mutually exclusive and ordered**: the first matching row wins. Reading the table top-to-bottom, the first row whose pattern matches the token name decides the policy.
+
+| # | Pattern | Policy | Rationale |
+| --- | --- | --- | --- |
+| 1 | `--hx-*` (framework namespace) | **Reject at `register()`** with a clear error | Framework-namespace tokens are owned by HELiX. An unrecognized `--hx-*` token is either a typo (typo-and-suppress is silently wrong, especially for a11y-critical or layout-critical tokens) or a token introduced by a newer `@helixui/tokens` than the registry knows about. Both cases warrant explicit failure, not a safe-default. |
+| 2 | `--brand-color-*`, `--brand-shadow-*`, `--brand-gradient-*`, `--brand-overlay-*` (color-bearing concepts under brand) | **Reject at `register()`** | Color-bearing concepts have no HC-safe categorization under `--brand-*`. The error directs the author to the framework `--hx-color-*` surface. **This row precedes row 3** so a token like `--brand-color-foo` matches here (reject) and never falls through to row 4 (warn). |
+| 3 | `--brand-layout-*`, `--brand-logo-*`, `--brand-spacing-*`, `--brand-typography-*` (audited subprefixes) | **Allowed** per the table in the previous section | Audited subprefixes are the consumer-namespace escape hatch. |
+| 4 | `--brand-*` (any other subprefix not matched by rows 2–3) | **Warn + treat as color** | Defaults to the safe HC behavior (suppression). The `console.warn` surfaces the gap so the brand author can rename to an audited subprefix or request the subprefix be added to the allowlist. |
+| 5 | Anything else (no recognized prefix — neither `--hx-*` nor `--brand-*`) | **Reject at `register()`** | Tokens outside both `--hx-*` and `--brand-*` namespaces are not part of the HELiX token surface. The registry is not a generic CSS variable store. |
 
 The "warn + treat as color" branch is now scoped narrowly to the `--brand-<other>-*` consumer-namespace gap. The `--hx-*` framework namespace gets strict rejection — there is no a11y-critical token that should silently get HC-suppressed because the registry didn't recognize its prefix.
 
