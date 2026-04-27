@@ -543,7 +543,7 @@ const PAIRS: PairSpec[] = [
   // and the lifted -400 fills lose UI-floor contrast against it — the
   // [inverted] variant is not designed to be used inside an already-dark
   // page, and proper dark-mode-inverted handling (mode-aware fill stop +
-  // mode-aware foreground) is tracked as a 3.2.x follow-up.
+  // mode-aware foreground) is tracked as a 3.3.x follow-up.
   {
     text: '--hx-color-action-primary-bg-inverted-hover',
     surface: '--hx-color-surface-inverse',
