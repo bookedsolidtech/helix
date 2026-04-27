@@ -569,6 +569,10 @@ Some brands require structural differences beyond color swaps — a different si
 
 CSS `::part()` selectors style component internals from outside the shadow boundary. Use them with brand-scoped selectors to apply brand-specific structural styles.
 
+:::caution[HC guard reminder]
+The snippets in this section and below use the **abbreviated** `[data-brand='...']` form for clarity. In production you must add the HC guard described in the top-of-page callout — `:not([theme='high-contrast'])` if `data-brand` lives on `<hx-theme>`, or a `body[data-theme]` mirror if `data-brand` lives on `<body>`. Unguarded brand styling leaks into HC and breaks the WCAG 7:1+ contract.
+:::
+
 ```css
 /* Harbor Health: uppercase tracking for clinical authority */
 [data-brand='harbor-health'] hx-button::part(button) {

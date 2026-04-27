@@ -36,7 +36,7 @@ const meta = {
       control: { type: 'select' },
       options: ['full', 'reduced', 'none'],
       description:
-        'Motion preference override. "full" enables all animations; "reduced" honors prefers-reduced-motion; "none" disables animations entirely.',
+        'Motion preference override. "full" enables animations and honors OS prefers-reduced-motion; "reduced" forces reduced motion regardless of OS; "none" disables animations entirely.',
       table: {
         category: 'Theme',
         defaultValue: { summary: 'full' },

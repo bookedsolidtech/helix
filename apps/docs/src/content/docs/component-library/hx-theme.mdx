@@ -206,12 +206,15 @@ hx-theme[theme='dark'] {
 ```
 
 :::caution[Brand suppression on `theme="high-contrast"`]
-The `brand` attribute is intentionally **suppressed** when `theme="high-contrast"`.
-The high-contrast token set is hand-tuned for WCAG 1.4.6 Enhanced Contrast (7:1+),
-and a brand color ramp cannot be assumed to meet that bar. Setting
-`<hx-theme theme="high-contrast" brand="mercy-health">` applies the base
-HC tokens alone and emits a `console.info` so the suppression is observable
-in development. Brand merging on `light` and `dark` is unaffected.
+The brand-specific token merge is intentionally **suppressed** when
+`theme="high-contrast"`. The `brand` attribute itself remains on the element
+(it reflects via `@property({ reflect: true })`), but its registered token
+ramp is not applied. The high-contrast token set is hand-tuned for WCAG 1.4.6
+Enhanced Contrast (7:1+), and a brand color ramp cannot be assumed to meet
+that bar. Setting `<hx-theme theme="high-contrast" brand="mercy-health">`
+applies the base HC tokens alone and emits a `console.info` so the
+suppression is observable in development. Brand merging on `light` and
+`dark` is unaffected.
 :::
 
 ## CSS Parts
