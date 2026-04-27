@@ -91,8 +91,8 @@
     inverted-rest bg at primary-600 (4.97:1 on light surface.inverse).
   - `dark.color.border.on-dark-{strong,default,subtle}` — added overrides so
     outline/focus-ring affordances drawn on the now-light surface.inverse stay
-    visible in dark mode (overlay-white-_ on light surface ≈ 1.1:1, invisible).
-    Flipped to overlay-black-_ (3.84:1 strong / proportional alphas for
+    visible in dark mode (`overlay-white-*` on light surface ≈ 1.1:1, invisible).
+    Flipped to `overlay-black-*` (3.84:1 strong / proportional alphas for
     default/subtle).
   - Inline fallback hex values updated across 45 component `.styles.ts` files
     to track the new primitive resolutions (`#6ab1b1`→`#0f7078` for focus,
