@@ -374,6 +374,50 @@ If your build strips side effects, HELiX components render without tokens (no co
 - `tokenStyles` export (deprecated in 2.1.2) removed. Use `lightTokenCss` for raw CSS or rely on automatic document-level adoption.
 - Semantic-tier token alignment — see the CHANGELOG for the complete delta.
 
+### 14.1 Border-on-dark token rename (3.2.2)
+
+In `@helixui/tokens@3.2.2`, two tokens that shipped in 3.2.0 / 3.2.1 were renamed because their values are translucent fills (30% / 10% white alpha) — they cannot satisfy the WCAG 1.4.11 3:1 contrast floor required of borders, and were always functioning as fills:
+
+| 3.2.0 / 3.2.1 (deprecated)          | 3.2.2 (canonical)                            |
+| ----------------------------------- | -------------------------------------------- |
+| `--hx-color-border-on-dark-default` | `--hx-color-surface-on-dark-overlay-default` |
+| `--hx-color-border-on-dark-subtle`  | `--hx-color-surface-on-dark-overlay-subtle`  |
+
+`--hx-color-border-on-dark-strong` is unchanged — its 70% alpha satisfies the 3:1 border contract and remains under `border.*`.
+
+**Component-internal consumption is safe in either direction.** Every `hx-*` rule that paints with these tokens reads the deprecated and canonical names with a both-name fallback chain, so a consumer override on either name reaches paint:
+
+```css
+hx-button[variant='tertiary'][inverted] {
+  /* Either of these works in 3.2.2: */
+  --hx-color-border-on-dark-subtle: rgb(7, 8, 9);
+  --hx-color-surface-on-dark-overlay-subtle: rgb(10, 11, 12);
+}
+```
+
+**Direct readers must migrate.** The deprecated names are no longer emitted at `:root` in `dist/tokens.css`. Downstream code that reads them outside of an `hx-*` component will resolve to an empty value:
+
+```css
+/* Downstream Drupal/app stylesheet (NOT inside an hx-* component shadow root) */
+.my-custom-overlay {
+  /* 3.2.0 / 3.2.1: resolves to var(--hx-overlay-white-30) */
+  /* 3.2.2:         resolves to empty */
+- background-color: var(--hx-color-border-on-dark-default);
++ background-color: var(--hx-color-surface-on-dark-overlay-default);
+}
+```
+
+```js
+// 3.2.0 / 3.2.1: returns "rgba(255, 255, 255, 0.3)" (or similar)
+// 3.2.2:         returns ""
+-getComputedStyle(document.documentElement).getPropertyValue('--hx-color-border-on-dark-default');
++getComputedStyle(document.documentElement).getPropertyValue(
+  '--hx-color-surface-on-dark-overlay-default',
+);
+```
+
+**Why we did not emit a `:root` alias.** A `:root { --hx-color-border-on-dark-default: var(--hx-color-surface-on-dark-overlay-default); }` declaration would resolve the inner `var()` at `:root`'s computed-value time (CSS Custom Properties §3) and freeze the result; host-scoped consumer overrides on the canonical name would be silently shadowed at every component consume site. We chose to break the undocumented direct-reader path explicitly rather than break the documented host-override path silently. The deprecated names are scheduled for hard removal in 4.0.0.
+
 ## 15. React wrapper
 
 `@helixui/react@3.0.0`:
