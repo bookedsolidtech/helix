@@ -3,6 +3,11 @@
 **Status:** design — implementation pending Jake's signoff per the planning rule.
 **Target:** `@helixui/library@3.3.0` + `@helixui/tokens@3.3.0` (additive registry validation surface).
 **Captured from:** Codex r33 finding 1 (high) on `7408c6694`, planning note `00-Planning/helix/HC brand-token suppression scope + replaceSync failure mode (deferred from 3.2.2).md`.
+**Revision history:** R0 initial (codex flagged 3 high + 5 medium across both contracts in this branch); **R1 (this document)** — single comprehensive redesign closing the HC-relevant findings. Per the planning rule: redesign once, do not iterate.
+
+## Sequencing relative to replaceSync hardening
+
+This contract is **a prerequisite** for `REPLACESYNC_HARDENING_CONTRACT.md`. The replaceSync hardening contract assumes a categorized storage model in `HelixBrandRegistry` (its `register()` body calls `categorizeTokens(tokens)` before storing). Implementation order: HC split first (introduces categorization storage), replaceSync hardening second (adds value validation to the same `register()` pass). The two contracts are not independently mergeable at the storage layer — the replaceSync contract is shaped to compose onto the categorization model defined here.
 
 ## Why this exists
 
@@ -58,25 +63,49 @@ The registry uses a **token-name allowlist** for non-color tokens. The allowlist
 | `--hx-transition-*` | `--hx-transition-fast/normal/slow`, easing tokens | Always merged |
 | `--hx-easing-*` | timing functions | Always merged |
 | `--hx-blur-*` | `--hx-blur-sm/md/lg` | Always merged (blur radius, no color) |
-| `--brand-*` | brand-namespace layout flags (`--brand-sidebar-enabled`, `--brand-logo-width`) | Always merged |
+| `--brand-layout-*` | `--brand-layout-sidebar-enabled`, `--brand-layout-rail-width` | Always merged (audited subprefix) |
+| `--brand-logo-*` | `--brand-logo-width`, `--brand-logo-height`, `--brand-logo-padding` | Always merged (audited subprefix) |
+| `--brand-spacing-*` | `--brand-spacing-content-pad`, `--brand-spacing-rail-gap` | Always merged (audited subprefix) |
+| `--brand-typography-*` | `--brand-typography-display-family`, `--brand-typography-body-family` | Always merged (audited subprefix) |
+
+**Why narrow `--brand-*` to audited subprefixes (R1).** R0 used a blanket `--brand-*` allowlist as the consumer-namespace escape hatch. Codex flagged this as an HC color-leak vector: a brand registering `--brand-color-foo` or `--brand-shadow-elevated` would be categorized as non-color (matches `--brand-*`, not `--hx-color-*`) and bypass HC suppression — silently breaching the WCAG 7:1+ contract. R1 narrows the consumer namespace to audited subprefixes that are semantically guaranteed not to carry color: `layout`, `logo`, `spacing`, `typography`. Color-bearing concepts under `--brand-*` (e.g. `--brand-color-*`, `--brand-shadow-*`, `--brand-gradient-*`, `--brand-overlay-*`) are explicitly **rejected** at registration with a clear error pointing to this contract — they have no legitimate HC-safe category and authoring them indicates the consumer should be using the framework `--hx-color-*` surface instead.
 
 ### Unknown tokens
 
-A brand token whose name matches **neither** the color allowlist nor the non-color allowlist is "unknown." Three policy options were considered:
+A brand token whose name matches neither the color allowlist nor the non-color allowlist is "unknown." Policy depends on namespace:
 
-| Option | Behavior | Trade-off |
+| Namespace | Policy | Rationale |
 | --- | --- | --- |
-| **Reject** | `register()` throws on unknown token | Strict; forces every consumer to update when the allowlist evolves |
-| **Warn + treat as color** | `console.warn` on unknown; suppress under HC (safe default) | Lenient at registration; defaults to safety |
-| **Warn + treat as non-color** | `console.warn` on unknown; merge under HC | Defaults to leakage risk |
+| `--hx-*` (framework) | **Reject at `register()`** with a clear error | Framework-namespace tokens are owned by HELiX. An unrecognized `--hx-*` token is either a typo (typo-and-suppress is silently wrong, especially for a11y-critical or layout-critical tokens) or a token introduced by a newer `@helixui/tokens` than the registry knows about. Both cases warrant explicit failure, not a safe-default. |
+| `--brand-*` (audited subprefixes) | **Allowed** per the table above | Audited subprefixes are the consumer-namespace escape hatch. |
+| `--brand-color-*`, `--brand-shadow-*`, `--brand-gradient-*`, `--brand-overlay-*` | **Reject at `register()`** | Color-bearing concepts have no HC-safe categorization under `--brand-*`. The error directs the author to the framework `--hx-color-*` surface. |
+| `--brand-<other>-*` (consumer namespace, not audited) | **Warn + treat as color** | Defaults to the safe HC behavior (suppression). The `console.warn` surfaces the gap so the brand author can rename to an audited subprefix or request the subprefix be added to the allowlist. |
+| Anything else (no recognized prefix) | **Reject at `register()`** | Tokens outside both `--hx-*` and `--brand-*` namespaces are not part of the HELiX token surface. The registry is not a generic CSS variable store. |
 
-**Decision: warn + treat as color (option 2).** The HC contract is a contrast guarantee — a token whose category is unknown gets the safe-default behavior (suppressed under HC). The console.warn surfaces the categorization gap so the brand author can either rename the token to fall under an allowlisted prefix or contribute the prefix back to the allowlist. This matches the existing "unregistered brand → warn + apply base theme only" pattern.
+The "warn + treat as color" branch is now scoped narrowly to the `--brand-<other>-*` consumer-namespace gap. The `--hx-*` framework namespace gets strict rejection — there is no a11y-critical token that should silently get HC-suppressed because the registry didn't recognize its prefix.
 
-Rejection (option 1) is too strict for a token surface that legitimately evolves. Treating-as-non-color (option 3) inverts the contract's safety bias.
+The advisory message for the warn+treat-as-color branch uses the same `_lastBrandAdvisoryKey` deduplication channel introduced in 3.2.2:
 
-The advisory message uses the same `_lastBrandAdvisoryKey` deduplication channel introduced in 3.2.2:
+> `[hx-theme] Brand "acme" registered token "--brand-cardstyle-radius" does not match an audited HC-safety subprefix. Defaulting to color-bearing (suppressed under HC). See HC_BRAND_TOKEN_SPLIT_CONTRACT.md for the audited allowlist.`
 
-> `[hx-theme] Brand "acme" registered token "--unknown-token" does not match any HC-safety category. Defaulting to color-bearing (suppressed under HC). See HC_BRAND_TOKEN_SPLIT_CONTRACT.md for allowlist.`
+The rejection messages are loud and specific:
+
+> `[HelixBrandRegistry] Brand "acme" token "--hx-foo-bar" is not a recognized framework token. Framework-namespace tokens are owned by HELiX; an unrecognized name is either a typo or an unsupported token. See HC_BRAND_TOKEN_SPLIT_CONTRACT.md.`
+
+> `[HelixBrandRegistry] Brand "acme" token "--brand-color-accent" uses a color-bearing concept under the --brand-* namespace. Color-bearing tokens belong to the framework --hx-color-* surface. See HC_BRAND_TOKEN_SPLIT_CONTRACT.md.`
+
+### Re-registration atomicity (R1 close of codex F8)
+
+`register()` is atomic with respect to validation failures. The sequence:
+
+1. Validate token presence (REQUIRED_SEMANTIC_TOKENS).
+2. Validate token names (categorization + namespace rejection per the unknown-token policy).
+3. Validate token values (replaceSync hardening contract — Path A).
+4. Categorize and store.
+
+If **any** of steps 1–3 throws, the registry's existing snapshot for `brandName` (if any) remains untouched. A failed re-registration does not corrupt the previously-stored brand. Subscribers (per the brand-reflection contract) are not notified on a failed registration — the registry was not mutated.
+
+This is implemented by validating into a local working set first, then performing a single `_brands.set(brandName, categorized)` only after every check passes. There is no in-place partial mutation.
 
 ### Categorization data model
 
@@ -118,37 +147,53 @@ function mergeBrandTokens(css, brandName, isHighContrast) {
 
 ## Updated `_applyEffectiveTheme()` shape
 
-The HC branch shrinks because brand merge becomes universal — only the *content* of the merge varies by theme:
+The HC branch shrinks because brand merge becomes universal — only the *content* of the merge varies by theme. Advisory state is committed **after** `replaceSync()` succeeds so a sheet-update failure does not leave logs/state ahead of the visually applied sheet (R1 close of codex F4 — see also `REPLACESYNC_HARDENING_CONTRACT.md` for the try/catch wrapper):
 
 ```
 function _applyEffectiveTheme() {
   let css = _buildThemeCss(effectiveTheme);
 
+  // Compute, but do not commit, the next advisory state.
+  let nextAdvisoryKey = null;
+  let pendingInfoLog = null;
+  let pendingWarnLog = null;
+
   if (brand !== '') {
     if (registry.isRegistered(brand)) {
       css = mergeBrandTokens(css, brand, effectiveTheme === 'high-contrast');
-      // Advisory channel: applied vs partially-applied (HC).
-      lastBrandAdvisoryKey = effectiveTheme === 'high-contrast'
+      nextAdvisoryKey = effectiveTheme === 'high-contrast'
         ? `${brand}|high-contrast|color-suppressed`
         : `${brand}|${effectiveTheme}|applied`;
-      // HC info log: emit when transitioning into HC with a registered brand.
-      if (effectiveTheme === 'high-contrast' && lastBrandAdvisoryKey changed) {
-        console.info('[hx-theme] Brand "X" color-bearing tokens suppressed on theme="high-contrast"; non-color tokens (typography, radius, layout) continue to apply.');
+      if (effectiveTheme === 'high-contrast' && nextAdvisoryKey !== _lastBrandAdvisoryKey) {
+        pendingInfoLog = '[hx-theme] Brand "X" color-bearing tokens suppressed on theme="high-contrast"; non-color tokens (typography, radius, layout) continue to apply.';
       }
     } else {
-      // Unregistered — base theme only, warn dedupe per existing pattern.
-      lastBrandAdvisoryKey = `${brand}|${effectiveTheme}|unregistered`;
-      console.warn('[hx-theme] Brand "X" is not registered. ...');
+      nextAdvisoryKey = `${brand}|${effectiveTheme}|unregistered`;
+      if (nextAdvisoryKey !== _lastBrandAdvisoryKey) {
+        pendingWarnLog = '[hx-theme] Brand "X" is not registered. ...';
+      }
     }
-  } else {
-    lastBrandAdvisoryKey = null;
   }
 
   if (effectiveMotion === 'reduced') {
     css += `\n:host {\n${_buildProps(_reducedMotionOverrides)}\n}`;
   }
 
-  themeSheet.replaceSync(css);
+  // Try the sheet update. Per replaceSync hardening contract, this is wrapped
+  // in try/catch as defense-in-depth. On failure, advisory state is NOT
+  // committed; the previous sheet remains visually applied and the previous
+  // advisory key remains accurate to that sheet.
+  try {
+    themeSheet.replaceSync(css);
+  } catch (err) {
+    console.error('[hx-theme] Theme sheet replaceSync threw: ...; sheet retained at last-good state. Advisory state NOT updated.');
+    return;
+  }
+
+  // Sheet committed successfully — now commit advisory state and emit logs.
+  _lastBrandAdvisoryKey = nextAdvisoryKey;
+  if (pendingInfoLog) console.info(pendingInfoLog);
+  if (pendingWarnLog) console.warn(pendingWarnLog);
 }
 ```
 
@@ -178,13 +223,18 @@ Plus state transitions:
 - **`high-contrast` → `light`** with mixed brand: color-bearing tokens re-apply; advisory transitions to `applied`.
 - **`brand="acme"` (mixed) → `brand="other"` (color-only)** under HC: non-color tokens from `acme` drop, base HC overlay applies, no merge from `other` (color suppressed).
 
-Plus categorization edge cases (codex test gap closure):
+Plus categorization edge cases (codex test gap closure + R1 closures):
 
-- **Unknown token warn dedupe**: brand registers with one unknown token; `register()` warns once per unknown token name (not per `register()` call). Two re-registrations with the same unknown token: one warn total.
-- **Allowlist prefix match is exact**: `--hx-color-something` is color-bearing (matches `--hx-color-*`); `--hx-color-mode-aware-thing` is also color-bearing; `--brand-color-foo` is non-color (matches `--brand-*`, not `--hx-color-*`). The prefix match runs left-to-right; the first matching prefix wins.
-- **Empty token map after categorization**: brand registers exactly the 22 required colors. Non-color category is empty; `mergeBrandTokens()` under HC produces zero brand tokens, base HC applies; no error.
+- **Unknown `--hx-*` rejected**: brand registers with `--hx-foo-bar: 12px` (unrecognized framework token); `register()` throws with the framework-namespace rejection message. Brand is not stored.
+- **`--brand-color-*` rejected**: brand registers with `--brand-color-accent: #ff0000`; `register()` throws with the color-bearing-under-brand rejection message. Brand is not stored.
+- **Audited `--brand-*` subprefix accepted**: brand registers with `--brand-layout-rail-width: 64px`; categorized as non-color; merges under all themes including HC.
+- **Unaudited `--brand-*` warn dedupe**: brand registers with `--brand-cardstyle-radius: 8px`; `register()` warns once per unknown token name (not per `register()` call). Two re-registrations with the same unaudited subprefix: one warn total.
+- **Allowlist prefix match is left-to-right**: `--hx-color-mode-aware-thing` categorizes as color-bearing (matches `--hx-color-*`); `--brand-layout-foo` categorizes as non-color (matches `--brand-layout-*`). The prefix match runs left-to-right; the first matching prefix wins.
+- **Empty non-color category**: brand registers exactly the 22 required colors. Non-color category is empty; `mergeBrandTokens()` under HC produces zero brand tokens, base HC applies; no error.
+- **Re-registration atomicity**: brand "acme" is registered with valid mixed tokens. Re-registration of "acme" with one invalid token (e.g. unknown `--hx-foo-bar`) throws; `getBrandTokens('acme')` continues to return the original mixed token map; the applied sheet is unchanged.
+- **Advisory state ordering**: when `replaceSync()` throws (forced via test hook), `_lastBrandAdvisoryKey` is NOT updated; subsequent reconcile that succeeds correctly emits the advisory transition relative to the previous (still-correct) state.
 
-Total: 9 + 3 + 3 = 15 `it.todo()` cases on the test stub.
+Total: 9 + 3 + 8 = 20 `it.todo()` cases on the test stub.
 
 ## Migration
 

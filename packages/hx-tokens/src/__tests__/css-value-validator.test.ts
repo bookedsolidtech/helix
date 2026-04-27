@@ -9,6 +9,10 @@ import { describe, it } from 'vitest';
 // from ever seeing malformed CSS. The defense-in-depth try/catch around
 // replaceSync() is the safety net for validator false-negatives, not the
 // primary mechanism.
+//
+// R1: 15 categories (R0 listed 13). Added missing it.todos for color-hsl,
+// font-family, font-weight, shadow, gradient, easing, unitless-number to
+// close codex F6.
 
 describe('validateTokenValue — 3.3.0 brand-token value validator', () => {
   // ─── color-hex ───────────────────────────────────────────────────────────
@@ -38,6 +42,14 @@ describe('validateTokenValue — 3.3.0 brand-token value validator', () => {
     it.todo('Negative: "rgb(zzz)" → invalid');
   });
 
+  // ─── color-hsl ───────────────────────────────────────────────────────────
+  describe('color-hsl category', () => {
+    it.todo('Positive: "hsl(220 50% 50%)" (modern syntax) → valid, category="color-hsl"');
+    it.todo('Positive: "hsla(220, 50%, 50%, 0.5)" (legacy syntax with alpha) → valid');
+    it.todo('Negative: "hsl(" (unbalanced) → invalid');
+    it.todo('Negative: "hsl(zz)" → invalid');
+  });
+
   // ─── color-named ─────────────────────────────────────────────────────────
   describe('color-named category', () => {
     it.todo('Positive: "red" → valid, category="color-named"');
@@ -55,12 +67,47 @@ describe('validateTokenValue — 3.3.0 brand-token value validator', () => {
     it.todo('Negative: "1.5..rem" (malformed number) → invalid');
   });
 
+  // ─── unitless-number ─────────────────────────────────────────────────────
+  describe('unitless-number category', () => {
+    it.todo('Positive: "1.5" → valid, category="unitless-number"');
+    it.todo('Positive: "0.25" → valid');
+    it.todo('Positive: "400" (integer, also valid as unitless-number or font-weight) → valid');
+    it.todo('Negative: "1..5" (malformed number) → invalid');
+    it.todo('Negative: "1.5x" (suffix without recognized unit) → invalid');
+  });
+
   // ─── duration ────────────────────────────────────────────────────────────
   describe('duration category', () => {
     it.todo('Positive: "200ms" → valid, category="duration"');
     it.todo('Positive: "0.2s" → valid');
-    it.todo('Negative: "200" (no unit) → invalid');
+    it.todo('Negative: "200" (no unit) → invalid as duration (may be valid as unitless-number)');
     it.todo('Negative: "200secs" (invalid unit) → invalid');
+  });
+
+  // ─── easing ──────────────────────────────────────────────────────────────
+  describe('easing category', () => {
+    it.todo('Positive: "ease" → valid, category="easing"');
+    it.todo('Positive: "linear" → valid');
+    it.todo('Positive: "cubic-bezier(0.4, 0, 0.2, 1)" → valid, category="easing"');
+    it.todo('Negative: "cubic-bezier(" (unbalanced) → invalid');
+    it.todo('Negative: "cubic-bezier(0.4)" (insufficient arguments) → invalid');
+  });
+
+  // ─── font-family ─────────────────────────────────────────────────────────
+  describe('font-family category', () => {
+    it.todo('Positive: "\'Inter\', sans-serif" → valid, category="font-family"');
+    it.todo('Positive: "Arial, Helvetica, sans-serif" (comma-separated stack) → valid');
+    it.todo('Positive: "system-ui" → valid');
+    it.todo('Negative: "\'Inter" (unbalanced quote) → invalid');
+    it.todo('Negative: "Arial," (trailing comma) → invalid');
+  });
+
+  // ─── font-weight ─────────────────────────────────────────────────────────
+  describe('font-weight category', () => {
+    it.todo('Positive: "400" → valid, category="font-weight" (or unitless-number — either is acceptable)');
+    it.todo('Positive: "bold" → valid, category="font-weight"');
+    it.todo('Positive: "normal" → valid');
+    it.todo('Negative: "bolder-than-bold" (unrecognized keyword) → invalid');
   });
 
   // ─── var-reference ───────────────────────────────────────────────────────
@@ -69,6 +116,24 @@ describe('validateTokenValue — 3.3.0 brand-token value validator', () => {
     it.todo('Positive: "var(--other-token, 1px)" (with fallback) → valid');
     it.todo('Negative: "var(" (unbalanced) → invalid');
     it.todo('Negative: "var(--other-token,)" (empty fallback) → invalid');
+  });
+
+  // ─── shadow ──────────────────────────────────────────────────────────────
+  describe('shadow category', () => {
+    it.todo('Positive: "0 1px 3px rgba(0,0,0,0.1)" → valid, category="shadow"');
+    it.todo('Positive: "inset 0 0 0 1px #000" → valid');
+    it.todo('Positive: "0 1px 3px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)" (multi-shadow) → valid');
+    it.todo('Negative: "0 1px 3px rgba(" (unbalanced inner paren) → invalid');
+    it.todo('Negative: "0 1px 3px ;" (rule-break attempt) → invalid');
+  });
+
+  // ─── gradient ────────────────────────────────────────────────────────────
+  describe('gradient category', () => {
+    it.todo('Positive: "linear-gradient(180deg, #fff, #000)" → valid, category="gradient"');
+    it.todo('Positive: "radial-gradient(circle, #fff, #000)" → valid');
+    it.todo('Positive: "conic-gradient(from 0deg, #fff, #000)" → valid');
+    it.todo('Negative: "linear-gradient(" (unbalanced) → invalid');
+    it.todo('Negative: "linear-gradient(180deg,)" (trailing comma in stops) → invalid');
   });
 
   // ─── identifier (permissive bucket) ──────────────────────────────────────

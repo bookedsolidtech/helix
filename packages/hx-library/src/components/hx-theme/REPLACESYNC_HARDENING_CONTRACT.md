@@ -3,6 +3,17 @@
 **Status:** design — implementation pending Jake's signoff per the planning rule.
 **Target:** `@helixui/library@3.3.0` + `@helixui/tokens@3.3.0` (additive validation surface).
 **Captured from:** Codex r33 finding 2 (medium) on `7408c6694`, planning note `00-Planning/helix/HC brand-token suppression scope + replaceSync failure mode (deferred from 3.2.2).md`.
+**Revision history:** R0 initial; **R1 (this document)** — close codex blocking findings F2 (independence claim contradicts shared `register()` body), F3 (Path A scope vs density/runtime-config), F5 (category count normalization). Per the planning rule: redesign once, do not iterate.
+
+## Sequencing — this contract depends on the HC split
+
+This contract is **a dependent** of `HC_BRAND_TOKEN_SPLIT_CONTRACT.md`, not a peer. R0 framed the two contracts as "independently mergeable"; R1 retracts that. The replaceSync hardening logic composes onto the categorization model defined in the HC split contract:
+
+- The `register()` body adds value validation as a new pass that runs **after** name validation / categorization (steps 2 and 3 of the HC contract's atomic re-registration sequence).
+- The categorization storage shape (`CategorizedBrandTokens`) is established by the HC contract; the validator does not introduce its own storage.
+- The defense-in-depth try/catch wrapper around `replaceSync()` is described in the HC contract's `_applyEffectiveTheme()` pseudocode and reused here. The two contracts share the same `replaceSync()` call site.
+
+Implementation order is therefore fixed: HC split first, replaceSync hardening second. Both contracts can ship in the same release (3.3.0) and the same PR pair, but the implementation diff for the validator must layer onto a `register()` body that already does categorization. Attempting to land the validator first is a wasted edit — the surface it modifies is materially reshaped by the HC split.
 
 ## Why this exists
 
@@ -59,23 +70,31 @@ The planning note frames the choice clearly:
 
 **Con.** "Last-good sheet" semantics under brand swap are ambiguous. If `brand="acme"` is good but `brand="bad"` is malformed, swapping to bad falls back to the acme sheet — the user sees acme branding when they expect bad branding (or no branding). The fallback is technically correct (last-good) but visually surprising.
 
-### Decision: Path A (fail fast at registration)
+### Decision: Path A (fail fast at registration) — for brand-registry inputs only
 
 Path A is the right choice for this contract because:
 
 1. **The registry is the contract enforcer in 3.3.0.** The HC brand-token split contract (`HC_BRAND_TOKEN_SPLIT_CONTRACT.md`) introduces categorization at registration. Adding value validation in the same pass is architectural coherence — the registry validates names *and* values, not one or the other.
 
-2. **The runtime stays simple.** `replaceSync()` cannot throw if every input has been validated. The sheet update path stays single-purpose; error recovery does not bloat the reconcile.
+2. **The runtime stays simple.** `replaceSync()` cannot throw if every brand-sourced input has been validated. The sheet update path stays single-purpose; error recovery does not bloat the reconcile.
 
 3. **Failure surfaces where authors can fix it.** A brand author registering at bootstrap gets an immediate exception with a clear message. They fix the token and move on. Path B's console.error in production is harder to track to its source.
 
 4. **Path B's "last-good sheet" UX is unfixable.** Brand swaps that fall back are visually misleading. The user-facing failure mode of Path A (an exception at bootstrap that prevents the app from booting) is unambiguous; the user-facing failure mode of Path B (the wrong brand visually applies) is silently wrong.
 
-Path B is *also* implemented as a defense-in-depth try/catch around `replaceSync()`, but it is the **fallback to fail-fast**, not the primary mechanism. If validation has a false negative (accepts a value the browser rejects), the try/catch catches it, logs, and surfaces via `console.error`. The contract is: the validator should never fail to catch real malformed values; the try/catch exists only to prevent runtime crashes when the validator is wrong.
+**Scope of Path A (R1 close of codex F3).** Path A applies only to inputs that flow through `HelixBrandRegistry.register()`. Other inputs to `replaceSync()` are explicitly **not** validated by the registry validator:
+
+- **Density tokens** — sourced from `tokens.json` via `@helixui/tokens` build output, not the brand registry. They are presumed valid because they are produced by the design-token build pipeline (which has its own correctness gates and a 100% trust boundary inside the package). Adding registry-style validation to the density layer is over-application of Path A.
+- **Theme CSS strings** — built from `tokens.json` via `_buildThemeCss()`. Same trust boundary as density.
+- **Future runtime-config injection** — hypothetical injection points (e.g. CMS-driven configuration, computed values) are out-of-scope for 3.3.0. If such a path is added later, that PR re-evaluates whether the validator should run on its inputs and whether Path A (validate at injection boundary) or Path B (try/catch at application) is the right primary mechanism for that surface.
+
+For each of these out-of-scope inputs, the **defense-in-depth try/catch is the only protection**. That is acceptable because (a) the inputs come from trusted sources (the package's own build output), (b) the failure mode is observable via `console.error`, and (c) the try/catch retains the previous sheet so the component does not render bare. The try/catch is not a degraded version of the validator — it is the appropriate primary mechanism for non-brand-registry inputs.
+
+Path B is *also* implemented as a defense-in-depth try/catch around `replaceSync()` for **all** inputs (brand-validated and not), but it is the **fallback to fail-fast** for brand inputs and the **primary mechanism** for everything else. If brand validation has a false negative (accepts a value the browser rejects), the try/catch catches it, logs, and surfaces via `console.error`. The contract is: the brand validator should never fail to catch real malformed brand values; the try/catch exists to (a) prevent runtime crashes when the validator is wrong, and (b) handle non-brand inputs that do not pass through the validator at all.
 
 ## The validator
 
-A small regex-based validator at `packages/hx-tokens/src/css-value-validator.ts`. Token values fall into a constrained set that does not require a full CSS parser:
+A small regex-based validator at `packages/hx-tokens/src/css-value-validator.ts`. Token values fall into 15 constrained categories that do not require a full CSS parser:
 
 ```ts
 type TokenValueCategory =
@@ -157,18 +176,25 @@ The try/catch is **defense-in-depth, not the primary mechanism**. The validator 
 
 ### Validator tests (`css-value-validator.test.ts` — new file)
 
-Each token value category has positive and negative cases:
+Each of the 15 token value categories has positive and negative cases:
 
 | Category | Positive | Negative |
 | --- | --- | --- |
 | color-hex | `#fff`, `#0F7078`, `#0f7078ff` | `#`, `#zz`, `#1234567` |
 | color-oklch | `oklch(0.5 0.2 240)`, `oklch(0.5 0.2 240 / 0.5)` | `oklch(invalid)`, `oklch(0.5 0.2)` (missing hue), `oklch(` (unbalanced) |
 | color-rgb | `rgb(255 0 0)`, `rgba(255, 0, 0, 0.5)` | `rgb(`, `rgb(255, 0)`, `rgb(zzz)` |
-| color-named | `red`, `transparent`, `currentColor` | `flarble` (unknown name — falls to identifier, permissive) |
+| color-hsl | `hsl(220 50% 50%)`, `hsla(220, 50%, 50%, 0.5)` | `hsl(`, `hsl(zz)` |
+| color-named | `red`, `transparent`, `currentColor` | (no negative — unknown names fall to identifier, permissive) |
 | length | `12px`, `1.5rem`, `100%`, `0` | `12pxx`, `1.5..rem`, control chars |
+| unitless-number | `1.5`, `0.25`, `400` | `1..5`, `1.5x` |
 | duration | `200ms`, `0.2s` | `200`, `200secs` |
-| var-reference | `var(--other)`, `var(--other, 1px)` | `var(`, `var(--other,)`  |
-| identifier | `'flat'`, `'rounded'` | (no negative — identifier is the permissive bucket) |
+| easing | `ease`, `linear`, `cubic-bezier(0.4, 0, 0.2, 1)` | `cubic-bezier(`, `cubic-bezier(0.4)` |
+| font-family | `'Inter', sans-serif`, `Arial, Helvetica, sans-serif` | `'Inter` (unbalanced quote), `Arial,` (trailing comma) |
+| font-weight | `400`, `bold`, `normal` | `bolder-than-bold` |
+| var-reference | `var(--other)`, `var(--other, 1px)` | `var(`, `var(--other,)` |
+| shadow | `0 1px 3px rgba(0,0,0,0.1)`, `inset 0 0 0 1px #000` | `0 1px 3px rgba(` (unbalanced), `0 1px 3px ;` (rule break) |
+| gradient | `linear-gradient(180deg, #fff, #000)`, `radial-gradient(circle, #fff, #000)` | `linear-gradient(`, `linear-gradient(180deg,)` (trailing comma) |
+| identifier | `flat`, `rounded` | (no negative — identifier is the permissive bucket) |
 
 Plus structural rejections (always invalid regardless of category):
 
@@ -178,7 +204,7 @@ Plus structural rejections (always invalid regardless of category):
 - Unbalanced quotes anywhere.
 - Standalone `}` (CSS rule break attempt).
 
-Total: ~30 `it.todo()` cases on the validator test stub.
+Total: ~45 `it.todo()` cases on the validator test stub (3 positives + 1–2 negatives per category × 15 categories + 5 structural rejections).
 
 ### Integration tests (`hx-theme-replacesync-hardening.test.ts` — new file)
 
@@ -217,15 +243,18 @@ For brands with valid tokens, this is a **non-breaking change**. The only observ
 
 - **Full CSS grammar validation** — the regex validator is permissive by design. Edge values that the browser would reject (e.g. `oklch()` with out-of-range chroma) may still pass validation. The defense-in-depth try/catch is the safety net for browser-reject-but-validator-accept cases.
 - **Async error reporting** — `replaceSync()` is synchronous; the try/catch is synchronous; errors surface via `console.error` immediately. No async error channel (event-bus, notification API) is added.
-- **Validator extension API** — brands cannot register custom value categories. The validator's categories are fixed in 3.3.0. If brand authors hit a real-world value the validator rejects but the browser accepts, file a bug; do not extend.
-- **Density token validation under `_applyDensity()`** — density tokens come from `tokens.json`, not the brand registry. They are presumed valid because they ship with `@helixui/tokens`. The defense-in-depth try/catch around `_applyDensity()`'s `replaceSync()` is the only protection; the validator does not run on density tokens.
+- **Validator extension API** — brands cannot register custom value categories. The validator's 15 categories are fixed in 3.3.0. If brand authors hit a real-world value the validator rejects but the browser accepts, file a bug; do not extend.
+- **Density token validation under `_applyDensity()`** — density tokens come from `tokens.json`, not the brand registry. They are presumed valid because they ship with `@helixui/tokens`. The defense-in-depth try/catch around `_applyDensity()`'s `replaceSync()` is the only protection; the validator does not run on density tokens. (See "Scope of Path A" above for the rationale.)
+- **Theme CSS validation** — same rationale as density. `_buildThemeCss()` produces strings from `tokens.json`; the try/catch is the only protection.
+- **Future runtime-config injection** — out-of-scope for 3.3.0. Re-evaluated at the time such a path is added.
 
 ## Approval gate
 
 Same shape as the sibling contracts: this document is the gate. Implementation begins after Jake confirms:
 
-- Path A (fail fast at registration) is the right primary mechanism vs Path B alone.
-- The defense-in-depth try/catch around `replaceSync()` is acceptable as a fallback.
-- The token value categories cover the surface (hex, oklch, rgb, hsl, named, length, duration, var-reference, font-family, font-weight, shadow, gradient, identifier).
+- Path A (fail fast at registration) is the right primary mechanism for **brand-registry inputs**, with the explicitly-narrowed scope: density and theme CSS strings are out-of-scope for the validator and rely on the try/catch alone.
+- The defense-in-depth try/catch around `replaceSync()` is acceptable as a fallback for brand inputs and as the primary mechanism for non-brand inputs (density, theme CSS).
+- The 15 token value categories cover the surface: `color-hex`, `color-oklch`, `color-rgb`, `color-hsl`, `color-named`, `length`, `unitless-number`, `duration`, `easing`, `font-family`, `font-weight`, `var-reference`, `shadow`, `gradient`, `identifier`.
 - The validator's permissive bias (false negatives caught by try/catch; false positives must be rare) is the right trade-off.
-- The 30 + 12 = 42 test stub cases pin the contract surface tightly enough.
+- The 45 + 12 = 57 test stub cases pin the contract surface tightly enough.
+- The HC-split-as-prerequisite sequencing is correct (HC split implementation lands first; replaceSync hardening composes onto it).
