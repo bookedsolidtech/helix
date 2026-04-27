@@ -106,7 +106,13 @@ export const helixCodeSnippetStyles = css`
   }
 
   .code-snippet__copy-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #0f7078);
+    /* Always-dark terminal surface — uses primary-400 (#6AB1B1, 7.27:1 on #0d1825)
+       instead of the light-mode --hx-focus-ring-color (primary-600, 1.4:1 fail on dark).
+       Deliberate primitive-tier consumption: there is no semantic focus-ring-on-dark
+       alias today — the dark.color.focus-ring override at tokens.json only fires under
+       theme=dark, but this surface is dark in every theme. Tracked for promotion to a
+       semantic alias in a future token-cascade follow-up. */
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-color-primary-400, #6ab1b1);
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
@@ -147,7 +153,13 @@ export const helixCodeSnippetStyles = css`
   }
 
   .code-snippet__expand-button:focus-visible {
-    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-focus-ring-color, #0f7078);
+    /* Always-dark terminal surface — uses primary-400 (#6AB1B1, 7.27:1 on #0d1825)
+       instead of the light-mode --hx-focus-ring-color (primary-600, 1.4:1 fail on dark).
+       Deliberate primitive-tier consumption: there is no semantic focus-ring-on-dark
+       alias today — the dark.color.focus-ring override at tokens.json only fires under
+       theme=dark, but this surface is dark in every theme. Tracked for promotion to a
+       semantic alias in a future token-cascade follow-up. */
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-color-primary-400, #6ab1b1);
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 

@@ -407,13 +407,11 @@ hx-button[variant='tertiary'][inverted] {
 }
 ```
 
-```js
-// 3.2.0 / 3.2.1: returns "rgba(255, 255, 255, 0.3)" (or similar)
-// 3.2.2:         returns ""
+```diff
+ // 3.2.0 / 3.2.1: returns "rgba(255, 255, 255, 0.3)" (or similar)
+ // 3.2.2:         returns ""
 -getComputedStyle(document.documentElement).getPropertyValue('--hx-color-border-on-dark-default');
-+getComputedStyle(document.documentElement).getPropertyValue(
-  '--hx-color-surface-on-dark-overlay-default',
-);
++getComputedStyle(document.documentElement).getPropertyValue('--hx-color-surface-on-dark-overlay-default');
 ```
 
 **Why we did not emit a `:root` alias.** Two alias variants were considered. Both fail at the same consume-site read order — and both would silently break the documented host-scoped canonical-override path.
