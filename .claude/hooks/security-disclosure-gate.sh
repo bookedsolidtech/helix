@@ -40,8 +40,23 @@ fi
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // ""')
 
 # Only intercept gh issue create
-if ! echo "$COMMAND" | grep -qE 'gh\s+issue\s+create'; then
-  exit 0
+# 0.16.3 F8: anchor at segment start so `gh pr create --body "context: gh issue create earlier"`
+# does not match. Same anchoring class as F5/F6 in this release. Source the
+# segment splitter and use any_segment_starts_with — when the cmd-segments
+# lib isn't reachable for any reason, fall back to the legacy unanchored
+# grep (defense-in-depth: better to over-block prose mentions than miss a
+# real `gh issue create`).
+# shellcheck source=_lib/cmd-segments.sh
+if [ -f "$(dirname "$0")/_lib/cmd-segments.sh" ]; then
+  # shellcheck source=_lib/cmd-segments.sh
+  source "$(dirname "$0")/_lib/cmd-segments.sh"
+  if ! any_segment_starts_with "$COMMAND" 'gh[[:space:]]+issue[[:space:]]+create'; then
+    exit 0
+  fi
+else
+  if ! echo "$COMMAND" | grep -qE 'gh\s+issue\s+create'; then
+    exit 0
+  fi
 fi
 
 require_jq
@@ -86,8 +101,107 @@ SECURITY_PATTERNS=(
   'jail.break'
 )
 
-# Scan the full command text (title + body + flags) for sensitive patterns
-FULL_TEXT=$(echo "$COMMAND" | tr '[:upper:]' '[:lower:]')
+# Scan the full command text (title + body + flags) for sensitive patterns.
+#
+# 0.16.3 discord-ops Round 9 #2 fix: pre-fix the scan only saw what was on
+# the command line, so `gh issue create --body-file leak.md` (or `-F`)
+# routed the body through a file the regex never read. We now resolve the
+# named flag's path argument(s), read up to 64 KiB of each (cap covers
+# realistic issue bodies; a multi-megabyte body is suspicious in itself),
+# and prepend the lowercased file contents to FULL_TEXT before the
+# pattern scan. Stdin form (`-F -` or `--body-file -`) is intentionally
+# skipped — the hook's stdin is the tool payload, not the issue body,
+# and re-reading is impossible. Files outside REA_ROOT (resolved via
+# `..` traversal) are refused as a defense-in-depth measure mirroring
+# protected-paths-bash-gate.sh's outside-root sentinel.
+REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+BODY_FILE_TEXT=""
+_extract_body_file_paths() {
+  # Emit each `--body-file PATH` and `-F PATH` argument on its own line.
+  # Skips the stdin form (`-`) and `-F=foo`/`--body-file=foo` (handled
+  # by a separate awk pass below).
+  printf '%s' "$COMMAND" \
+    | awk '
+        BEGIN { skip_next = 0; flag_was = "" }
+        {
+          n = split($0, toks, /[[:space:]]+/)
+          for (i = 1; i <= n; i++) {
+            t = toks[i]
+            if (skip_next) {
+              skip_next = 0
+              if (t == "-" || t == "") continue
+              # Strip surrounding quotes from the token if present.
+              gsub(/^["'"'"']/, "", t)
+              gsub(/["'"'"']$/, "", t)
+              print t
+              continue
+            }
+            if (t == "--body-file" || t == "-F") { skip_next = 1; continue }
+            # Equals form.
+            if (t ~ /^--body-file=/) {
+              v = substr(t, length("--body-file=") + 1)
+              gsub(/^["'"'"']/, "", v); gsub(/["'"'"']$/, "", v)
+              if (v != "" && v != "-") print v
+            }
+            if (t ~ /^-F=/) {
+              v = substr(t, length("-F=") + 1)
+              gsub(/^["'"'"']/, "", v); gsub(/["'"'"']$/, "", v)
+              if (v != "" && v != "-") print v
+            }
+          }
+        }'
+}
+while IFS= read -r body_path; do
+  [[ -z "$body_path" ]] && continue
+  raw_path="$body_path"
+  # Resolve relative to the hook's cwd (the agent's project dir). gh
+  # accepts both absolute paths (e.g. tmpfiles like /var/folders/…) and
+  # cwd-relative paths; we honor both. Absolute paths NOT containing
+  # `..` are taken at face value.
+  if [[ "$body_path" != /* ]]; then
+    body_path="$(pwd)/$body_path"
+  fi
+  # Walk `..` segments. The only outside-REA_ROOT shape we refuse is one
+  # where the canonical form contains `..` (i.e. an explicit traversal
+  # by the caller). Plain absolute tmp paths are NOT refused — gh issue
+  # body-files are very commonly written to /var/folders or /tmp and
+  # rejecting those would defeat the scan in routine use.
+  had_traversal=0
+  case "/$raw_path/" in */../*) had_traversal=1 ;; esac
+  resolved="$body_path"
+  if [[ "$had_traversal" -eq 1 ]]; then
+    IFS='/' read -ra _bf_parts_raw <<<"$body_path"
+    _bf_parts=()
+    for _seg in "${_bf_parts_raw[@]}"; do
+      case "$_seg" in
+        ''|.) continue ;;
+        ..) [[ "${#_bf_parts[@]}" -gt 0 ]] && unset '_bf_parts[${#_bf_parts[@]}-1]' ;;
+        *) _bf_parts+=("$_seg") ;;
+      esac
+    done
+    resolved="/$(IFS=/; printf '%s' "${_bf_parts[*]}")"
+    # If the raw path used `..` AND the resolved form escapes REA_ROOT,
+    # refuse — that's the obfuscation shape we care about. A file under
+    # /tmp or /var/folders without `..` segments is fine.
+    if [[ "$resolved" != "$REA_ROOT" && "$resolved" != "$REA_ROOT"/* ]]; then
+      printf 'security-disclosure-gate: --body-file path uses `..` traversal escaping project root; skipping body scan\n' >&2
+      continue
+    fi
+  fi
+  if [[ ! -r "$resolved" ]]; then
+    printf 'security-disclosure-gate: --body-file %s unreadable; skipping body scan\n' "$raw_path" >&2
+    continue
+  fi
+  # Cap at 64 KiB. Lowercase to match FULL_TEXT case folding.
+  body_chunk=$(head -c 65536 "$resolved" 2>/dev/null | tr '[:upper:]' '[:lower:]') || body_chunk=""
+  if [[ -n "$body_chunk" ]]; then
+    BODY_FILE_TEXT="${BODY_FILE_TEXT}
+${body_chunk}"
+  fi
+done < <(_extract_body_file_paths)
+
+FULL_TEXT="${BODY_FILE_TEXT}
+$(echo "$COMMAND" | tr '[:upper:]' '[:lower:]')"
 
 MATCHED_PATTERN=""
 for PATTERN in "${SECURITY_PATTERNS[@]}"; do

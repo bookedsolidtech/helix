@@ -245,13 +245,20 @@ fi
 
 # H12: curl/wget piped directly to shell (supply chain attack vector).
 # 0.16.1 helix-016 P1 fix: this check requires BOTH the curl/wget call
-# AND the `| sh` to appear in the same shell pipeline. The 0.16.0
-# refactor moved this into `any_segment_matches`, but the segmenter
-# splits on `|` first — so `curl https://x | sh` decomposed into two
-# segments (`curl https://x`, `sh`) and the regex (which requires both
-# in one segment) never matched. Pipe-RCE is fundamentally a
-# multi-segment property and must be checked against the raw command.
-if printf '%s' "$CMD" | grep -qiE '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh|zsh|fish)'; then
+# AND the `| sh` to appear in the same shell pipeline. Pipe-RCE is
+# fundamentally a multi-segment property — splitting on `|` would
+# decompose `curl https://x | sh` into two unrelated segments — so the
+# detection must run against the un-split command.
+#
+# 0.16.3 helix-016.1 #2 sibling fix: pre-fix the check ran against the
+# raw `$CMD`, which false-positived on `git commit -m "...curl|sh..."`
+# (literal pipe inside the commit-message body). The fix is to scan
+# the QUOTE-MASKED form of the command — same un-split shape, but
+# in-quote pipes are replaced with a sentinel that the regex doesn't
+# match. Real curl-pipe-shell still matches because the pipe between
+# `curl https://x` and `sh` is outside any quote span.
+H12_MASKED=$(quote_masked_cmd "$CMD")
+if printf '%s' "$H12_MASKED" | grep -qiE '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh|zsh|fish)'; then
   add_high \
     "curl/wget piped to shell — remote code execution" \
     "Executing remote scripts without inspection is a major supply chain risk." \
@@ -307,9 +314,26 @@ while IFS= read -r pattern; do
   DELEGATE_PATTERNS+=("$pattern")
 done < <(policy_list "delegate_to_subagent")
 
+# 0.16.3 discord-ops Round 9 #3 fix: anchor the match on segment-start
+# instead of unanchored substring search. The patterns from
+# `policy_list "delegate_to_subagent"` are command prefixes
+# (`pnpm run build`, `pnpm test`, `pnpm run lint`); a substring search
+# fired on commit messages and prose mentioning those prefixes
+# (`git commit -m "doc: when to delegate pnpm test to subagent"`).
+# `any_segment_starts_with` regexes against the prefix-stripped form of
+# each segment, so patterns now only match when the command segment
+# actually invokes the named tool.
+#
+# `grep -qF` was fixed-string; `any_segment_starts_with` runs grep -E.
+# The patterns from policy.yaml are literal prefixes — escape ERE
+# metacharacters before passing them through.
+_escape_ere() {
+  printf '%s' "$1" | sed 's/[][\\.*^$(){}+?|]/\\&/g'
+}
+
 for pattern in "${DELEGATE_PATTERNS[@]+"${DELEGATE_PATTERNS[@]}"}"; do
-  # Use fixed-string match — these are command prefixes, not regex.
-  if printf '%s' "$CMD" | grep -qF "$pattern"; then
+  pattern_re=$(_escape_ere "$pattern")
+  if any_segment_starts_with "$CMD" "${pattern_re}([[:space:]]|$)"; then
     add_high \
       "Context protection — command must run in a subagent" \
       "This command produces excessive output that will exhaust the coordinator context window. Delegate it to a subagent instead of running it directly." \

@@ -226,13 +226,16 @@ esac
 # §6 runs BEFORE the patch-session allowlist so hook-patch sessions cannot
 # reach .rea/policy.yaml, .rea/HALT, or .claude/settings.json via any glob
 # creativity.
-PROTECTED_PATTERNS=(
-  '.claude/settings.json'
-  '.claude/settings.local.json'
-  '.husky/'
-  '.rea/policy.yaml'
-  '.rea/HALT'
-)
+#
+# 0.16.3 F7: list is sourced from `_lib/protected-paths.sh`, which honors
+# the `protected_paths_relax` policy key (kill-switch invariants always
+# stay protected — see the lib for the always-protected subset).
+# shellcheck source=_lib/protected-paths.sh
+source "$(dirname "$0")/_lib/protected-paths.sh"
+# Trigger lazy load now so PROTECTED_PATTERNS reflects the relaxed list
+# from the start of this hook process.
+rea_path_is_protected "/__rea_force_load__" >/dev/null 2>&1 || true
+PROTECTED_PATTERNS=("${REA_PROTECTED_PATTERNS[@]}")
 
 # Patterns that are protected from general agent edits but can be unlocked by
 # REA_HOOK_PATCH_SESSION. Kept separate from the hard-protected list above so

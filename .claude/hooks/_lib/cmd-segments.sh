@@ -33,17 +33,23 @@
 #     form matches PATTERN (a `grep -qiE` extended regex). Returns 1
 #     if no segment matches.
 #
-# Quoting awareness: the splitter is NOT quote-aware. A separator inside
-# a quoted string would be split. This is INTENTIONAL and SAFE: the
-# segments-vs-callback contract is "find segments that anchor on a
-# trigger word." Over-splitting produces extra segments that don't
-# anchor; they're ignored. Under-splitting (treating a quoted separator
-# as part of one segment) is what the original bug was. The trade-off
-# explicitly accepts over-splitting.
+# Quoting awareness (0.16.3 helix-016.1 #2 fix): the splitter masks
+# shell separators that occur INSIDE matched `"..."` and `'...'` quote
+# spans before splitting. Earlier versions split on every unescaped
+# `&`/`;`/`|`/newline regardless of quote context, which produced
+# false-positive segment boundaries inside quoted prose:
 #
-# Quoting note for future maintainers: do not "fix" the over-splitting
-# without breaking the security property. Quote-aware splitting in pure
-# bash is a real lift; if needed it should move to a Node helper.
+#   echo "release note & git push --force now"
+#
+# The pre-fix splitter broke that into two segments and the H1 force-push
+# detector anchored on `git push --force` at the head of segment 2 — a
+# real false positive helix reproduced spontaneously during diagnostic
+# work. The fix walks the input once, replaces in-quote separators with
+# multi-byte sentinels (impossible-to-collide forms), splits on the
+# remaining un-quoted separators, then restores the sentinels back to
+# their literal characters in the surviving segments. Single-quoted spans
+# do NOT honor `\` escapes; double-quoted spans treat `\"` as a literal
+# `"` and skip past it.
 
 # Split $1 on shell command separators. Emits one segment per line on
 # stdout (empty segments preserved). Used by both higher-level helpers
@@ -53,6 +59,22 @@ _rea_split_segments() {
   # GNU sed and BSD sed both honor `s/PATTERN/\n/g` with `-E` for ERE.
   # We use printf+sed instead of bash IFS=$'...' read so the splitter
   # behaves identically across BSD and GNU sed.
+  #
+  # Pipeline overview (post-0.16.3 quote-mask):
+  #   1. awk one-pass mask: replace `;` `&` `|` `\n` INSIDE matched
+  #      `"..."` / `'...'` spans with multi-byte sentinels so the
+  #      separator-splitting passes below ignore them. Single-quoted
+  #      spans have no escape semantics; double-quoted spans treat
+  #      `\"` as a literal quote and continue inside the span.
+  #   2. existing `>|` swap (preserves the bash noclobber-override
+  #      operator across the splitting passes).
+  #   3. existing `&&` swap (so step 4 doesn't break compound `&&`
+  #      operators apart while still splitting on bare `&`).
+  #   4. sed split on `||`, `;`, bare `|`, bare `&`.
+  #   5. unswap `&&` / `>|` placeholders.
+  #   6. restore the in-quote sentinels back to literal chars so each
+  #      surviving segment sees its quoted prose intact (downstream
+  #      hooks regex against the segments and need the literal bytes).
   #
   # 0.16.0 codex P1 fix (helix-015 #3): the prior sed split on bare `|`
   # which broke bash's `>|` (noclobber-override redirect) into two
@@ -77,12 +99,130 @@ _rea_split_segments() {
   # token is `sleep`, and `any_segment_starts_with($CMD, 'git push')`
   # missed the force-push entirely. Add `&` to the separator set, but
   # AFTER `&&` is already swapped out so we don't break it apart.
-  printf '%s\n' "$cmd" \
+  # 0.16.3 helix-016.1 #2 fix: quote-mask in-quote separators before
+  # splitting so quoted prose no longer over-splits and anchors trigger
+  # words at the head of phantom segments. See header comment for the
+  # full rationale.
+  printf '%s' "$cmd" \
+    | awk '
+        BEGIN {
+          SC  = "__REA_SEP_SC_a8f2c1__"
+          AMP = "__REA_SEP_AMP_a8f2c1__"
+          PIPE = "__REA_SEP_PIPE_a8f2c1__"
+          NL  = "__REA_SEP_NL_a8f2c1__"
+        }
+        {
+          line = $0
+          out = ""
+          i = 1
+          n = length(line)
+          mode = 0  # 0=plain, 1=double, 2=single
+          while (i <= n) {
+            ch = substr(line, i, 1)
+            if (mode == 0) {
+              if (ch == "\"") { mode = 1; out = out ch; i++; continue }
+              if (ch == "'\''") { mode = 2; out = out ch; i++; continue }
+              out = out ch
+              i++
+              continue
+            }
+            if (mode == 2) {
+              # Single quotes: no escape semantics. Only `'\''` ends.
+              if (ch == "'\''") { mode = 0; out = out ch; i++; continue }
+              if (ch == ";")    { out = out SC;   i++; continue }
+              if (ch == "&")    { out = out AMP;  i++; continue }
+              if (ch == "|")    { out = out PIPE; i++; continue }
+              # awk record-mode: literal newlines inside single-quoted
+              # heredoc bodies arrive as separate records; mask is
+              # per-record so they remain separators across records by
+              # design (the original splitter behavior).
+              out = out ch
+              i++
+              continue
+            }
+            # mode == 1 (double-quoted)
+            if (ch == "\\" && i < n) {
+              # Preserve `\"` and `\\` escape sequences literally; do not
+              # exit the double-quoted span on the escaped quote.
+              nxt = substr(line, i + 1, 1)
+              out = out ch nxt
+              i += 2
+              continue
+            }
+            if (ch == "\"") { mode = 0; out = out ch; i++; continue }
+            if (ch == ";")  { out = out SC;   i++; continue }
+            if (ch == "&")  { out = out AMP;  i++; continue }
+            if (ch == "|")  { out = out PIPE; i++; continue }
+            out = out ch
+            i++
+          }
+          print out
+        }' \
     | sed -E 's/>\|/__REA_GTPIPE_a8f2c1__/g' \
     | sed -E 's/&&/__REA_LOGAND_a8f2c1__/g' \
     | sed -E 's/(\|\||;|\||&)/\n/g' \
     | sed -E 's/__REA_LOGAND_a8f2c1__/\n/g' \
-    | sed -E 's/__REA_GTPIPE_a8f2c1__/>|/g'
+    | sed -E 's/__REA_GTPIPE_a8f2c1__/>|/g' \
+    | sed -E 's/__REA_SEP_SC_a8f2c1__/;/g; s/__REA_SEP_AMP_a8f2c1__/\&/g; s/__REA_SEP_PIPE_a8f2c1__/|/g; s/__REA_SEP_NL_a8f2c1__/\n/g'
+}
+
+# Apply only the quote-mask preprocessing pass. Returns the input with
+# in-quote `;`/`&`/`|`/newline replaced by sentinels but WITHOUT splitting
+# on the un-masked operators. Useful for multi-segment-property checks
+# (H12 curl-pipe-shell) that need to scan the whole command-line as one
+# string while still ignoring in-quote prose. Restores quoted-content
+# pipe to a placeholder (`__REA_INQUOTE_PIPE__`) so a regex against the
+# masked output can match a real `|` token without false-positiving on
+# in-quote `|` characters.
+quote_masked_cmd() {
+  local cmd="$1"
+  printf '%s' "$cmd" \
+    | awk '
+        BEGIN {
+          INQ_PIPE = "__REA_INQUOTE_PIPE_a8f2c1__"
+          INQ_SC   = "__REA_INQUOTE_SC_a8f2c1__"
+          INQ_AMP  = "__REA_INQUOTE_AMP_a8f2c1__"
+        }
+        {
+          line = $0
+          out = ""
+          i = 1
+          n = length(line)
+          mode = 0
+          while (i <= n) {
+            ch = substr(line, i, 1)
+            if (mode == 0) {
+              if (ch == "\"") { mode = 1; out = out ch; i++; continue }
+              if (ch == "'\''") { mode = 2; out = out ch; i++; continue }
+              out = out ch
+              i++
+              continue
+            }
+            if (mode == 2) {
+              if (ch == "'\''") { mode = 0; out = out ch; i++; continue }
+              if (ch == "|") { out = out INQ_PIPE; i++; continue }
+              if (ch == ";") { out = out INQ_SC;   i++; continue }
+              if (ch == "&") { out = out INQ_AMP;  i++; continue }
+              out = out ch
+              i++
+              continue
+            }
+            if (ch == "\\" && i < n) {
+              out = out ch substr(line, i + 1, 1)
+              i += 2
+              continue
+            }
+            if (ch == "\"") { mode = 0; out = out ch; i++; continue }
+            if (ch == "|") { out = out INQ_PIPE; i++; continue }
+            if (ch == ";") { out = out INQ_SC;   i++; continue }
+            if (ch == "&") { out = out INQ_AMP;  i++; continue }
+            out = out ch
+            i++
+          }
+          # awk auto-appends a newline on `print`; strip it so the
+          # caller gets exactly what was passed in.
+          printf "%s", out
+        }'
 }
 
 # Strip leading whitespace and well-known command prefixes from a single

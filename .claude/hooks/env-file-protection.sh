@@ -65,7 +65,15 @@ truncate_cmd() {
 # The goal is to block casual and accidental reads, not defeat a determined
 # adversary with shell access.
 PATTERN_UTILITY='(cat|head|tail|less|more|grep|sed|awk|bat|strings|printf|xargs|tee|jq|python3?[[:space:]]+-c|ruby[[:space:]]+-e)[[:space:]]'
-# Also catch: source/., cp (reads then writes elsewhere)
+# Also catch: source/., cp (reads then writes elsewhere).
+#
+# 0.16.3 discord-ops Round 9 #4 fix: anchored on segment-start. Pre-fix
+# `any_segment_matches` matched anywhere in the segment, so
+# `git commit -m "fix: don't source .env files"` fired even though no
+# real source-of-.env was happening — the trigger words appeared inside
+# the quoted commit-message body. The patterns are command prefixes
+# (`source PATH`, `. PATH`, `cp X PATH`), so segment-start anchoring is
+# the correct shape.
 PATTERN_SOURCE='(source|\.)[[:space:]]+[^;|&]*\.env'
 PATTERN_CP_ENV='cp[[:space:]]+[^;|&]*\.env'
 # .env* files or .envrc (direnv)
@@ -83,9 +91,10 @@ if any_segment_matches_both "$CMD" "$PATTERN_UTILITY" "$PATTERN_ENV_FILE"; then
   MATCHES_BOTH_SAME_SEGMENT=1
 fi
 
-# Direct source/cp of .env files — always block
-if any_segment_matches "$CMD" "$PATTERN_SOURCE" || \
-   any_segment_matches "$CMD" "$PATTERN_CP_ENV"; then
+# Direct source/cp of .env files — always block (segment-start anchored
+# per discord-ops Round 9 #4).
+if any_segment_starts_with "$CMD" "$PATTERN_SOURCE" || \
+   any_segment_starts_with "$CMD" "$PATTERN_CP_ENV"; then
   TRUNCATED_CMD=$(truncate_cmd "$CMD")
   {
     printf 'ENV FILE PROTECTION: Direct sourcing or copying of .env files is blocked.\n'
