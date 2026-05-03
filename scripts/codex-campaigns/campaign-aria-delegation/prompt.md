@@ -17,7 +17,7 @@ You are running an adversarial review against a single HELiX component. Your sol
   - Any sub-component files in `{TARGET}/` (e.g. `hx-tabs/hx-tab.ts`, `hx-tabs/hx-tab-panel.ts`)
 - **Reference (READ-ONLY context):** `packages/hx-library/custom-elements.json` for the declared `tagName: "{TAG}"` block — useful to identify documented events, slots, and properties when cross-referencing the render method.
 
-You may read additional files inside `{TARGET}/` if helpful, but do not stray outside it. Do NOT open arbitrary files elsewhere in the repository.
+You may read additional files inside `{TARGET}/` if helpful, plus the single read-only file `packages/hx-library/custom-elements.json` for the documented `tagName: "{TAG}"` block (per the line above). Do NOT open any other files outside `{TARGET}/`.
 
 ---
 

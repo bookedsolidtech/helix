@@ -12,6 +12,7 @@ Verify that every HELiX component correctly delegates ARIA semantics across the 
 ## Scope
 
 - **Pilot:** `targets.txt` — 5 components chosen for breadth across ARIA pattern families:
+
   | Component         | WAI-ARIA APG pattern         | Why this target                                                                                       |
   | ----------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
   | `hx-dialog`       | Modal Dialog                 | Disclosure pattern, focus-trap, `aria-modal`, backdrop semantics, `inert` outside-content discipline. |
@@ -39,7 +40,7 @@ The campaign runner substitutes the following before invoking the `codex-adversa
 ### Pilot (5 components)
 
 ```bash
-# From a fresh, isolated Claude Code session — not your active dev session.
+# From a fresh, isolated session — not your active dev session.
 /codex-campaign aria-delegation
 ```
 
