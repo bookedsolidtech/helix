@@ -1,0 +1,25 @@
+# ARIA Delegation Campaign — pilot target list (5 components)
+#
+# Chosen to cover the breadth of ARIA pattern families a HELiX consumer
+# actually encounters in production:
+#
+#   - hx-dialog       Modal disclosure, focus-trap, inert backdrop, aria-modal
+#   - hx-tabs         Composite widget, tablist ownership, aria-controls IDREFs
+#                     across shadow boundary, roving tabindex vs activedescendant
+#   - hx-text-input   Form control, ElementInternals reflection, aria-invalid /
+#                     aria-required / aria-describedby chain (help + error)
+#   - hx-side-nav     Navigation landmark, expandable subtree, aria-current
+#   - hx-toast        Live region, role="status" vs role="alert", aria-atomic,
+#                     scoped vs page-level region semantics
+#
+# If the campaign infrastructure produces clean, hand-verifiable findings on
+# these five, scale to targets-full.txt. Do not skip the pilot — false-positive
+# ARIA findings burn the most expensive triage hours of any campaign.
+#
+# One component path per line. Lines starting with `#` and blank lines ignored.
+
+packages/hx-library/src/components/hx-dialog
+packages/hx-library/src/components/hx-tabs
+packages/hx-library/src/components/hx-text-input
+packages/hx-library/src/components/hx-side-nav
+packages/hx-library/src/components/hx-toast
