@@ -1,5 +1,94 @@
 # @helixui/tokens
 
+## 3.3.1
+
+### Patch Changes
+
+- dae4918: 3.3.0 brand→data-brand auto-reflection — contract design and test matrix only. Implementation paused pending operator signoff per the planning note's "design up front, get explicit signoff" recommendation. No runtime change in this changeset; this is the architectural artifact that lets the implementation diff land in a single shot rather than iterating through codex.
+
+  **What lands.**
+  - `packages/hx-library/src/components/hx-theme/BRAND_REFLECTION_CONTRACT.md` — the 4-shape × 3-theme × registered/unregistered matrix (24 cases) with row-by-row expected behavior, the narrowed registered-only management model, ownership-tracking model (discriminated `LastApplied` union), state-transition table, mutation guard semantics, late-registration recovery via additive registry subscription API, SSR adoption story, Drupal Twig alignment plan, and the docs delta for `multi-brand-theming.md:39`.
+  - `packages/hx-library/src/components/hx-theme/hx-theme-data-brand-reflection.test.ts` — 35 `it.todo()` cases: 24 row cases by case number, 5 state-transition todos, 2 mutation-guard todos, 3 R1 edge-case todos (late registration, ownership relinquish under external override, advisory dedupe), and 1 disconnect todo. The test file is the gate: when the contract flips to implementation, every `it.todo` becomes a real assertion.
+
+  **What does NOT land.**
+  - No change to `hx-theme.ts`. The runtime continues to NOT reflect `brand` to `data-brand` (current 3.2.x contract).
+  - No change to `hx-theme.twig`. The Twig helper continues to drop `data-brand` per R31 cleanup.
+  - No change to `multi-brand-theming.md`. The "runtime does not reflect" line at :39 remains accurate until the runtime change ships.
+  - No change to `HelixBrandRegistry`. The additive `subscribe(brandName, callback)` API specified in the contract lands with the implementation diff, not this design changeset.
+
+  **Why the artifact-only approach.**
+
+  The 3.2.2 codex iteration loop (rounds 26-29) attempted unconditional reflection inside an unrelated palette PR. Each round closed the previous round's findings and surfaced new edge cases. Codex was finding the matrix; the matrix needed to be designed first. The R29-R30 verdict, captured in `00-Planning/helix/Brand → data-brand Auto-Reflection (deferred from 3.2.2).md`:
+
+  > "Plan up front. Write the contract for all four shapes × three themes × registered/unregistered before writing code. Get explicit signoff. Don't let codex find the matrix for you."
+
+  This changeset is that plan. The signoff gate is explicit in the contract document. Implementation lands as a separate diff once Jake confirms the matrix.
+
+  **R0 → R1 redesign.**
+
+  R0 of this contract used an "aggressive cleanup" model: any `brand !== ''` authorized the runtime to overwrite or strip `data-brand` regardless of registration state. Codex review on R0 returned a `blocking` verdict with 1 high + 5 medium structural findings:
+  1. **Late registration / ordering hazard (high).** No event channel from registry → component; a brand registered after mount left the component in the unregistered path indefinitely.
+  2. **Ownership tracking precision (medium).** A boolean-equivalent `_managedDataBrand` flag could not distinguish "runtime's prior write still live" from "author has overwritten."
+  3. **Shape D unregistered loss (medium).** R0 stripped author-supplied `data-brand` even when the registry was inactive — silently destroying the cascade-only override path.
+  4. **Shape B HC asymmetry (medium).** R0 did not loud-document the safety implication that Shape B authors own the HC guard.
+  5. **Mutation guard precision (medium).** "Universal authorization" wording overstated what the design enforced without a `MutationObserver`.
+  6. **Test stub coverage gaps (medium).** No coverage for late-registration recovery, ownership relinquish under external override, or advisory dedupe.
+
+  R1 closes all six in a single revision per the planning rule ("redesign once, do not iterate"):
+  - F1 → additive `HelixBrandRegistry.subscribe(brandName, callback)` API; `register()` / `_clear()` invoke `_notify()` synchronously; `hx-theme` subscribes/unsubscribes across the lifecycle. Bumps `@helixui/tokens` because the public registry API surface widens.
+  - F2 → discriminated union `LastApplied = { kind: 'unmanaged' } | { kind: 'set', value: string } | { kind: 'cleared' }` for precise relinquish semantics.
+  - F3 → contract narrowed: runtime only manages `data-brand` when `brand !== '' AND isRegistered`. Cases 14, 16, 18, 20, 22, 24 expected outcomes flipped from "removed" to "untouched."
+  - F4 → Shape B HC safety implication block added to the contract; cases 11, 12 explicitly note "author-responsible HC guard."
+  - F5 → "authoritative at reconcile boundaries" framing replaces the universal-authorization wording; `MutationObserver` rejected with rationale.
+  - F6 → 3 new `it.todo` cases on the test stub (late registration, ownership relinquish under external override, advisory dedupe). Total stub count rises from 32 → 35.
+
+  **Codex review on this diff.**
+
+  A single codex pass on R1 closes the audit loop. If codex surfaces concerns on R1, they fall into two buckets per the contract's approval-gate section: (a) a row of the matrix that should flip — Jake's call — or (b) implementation-diff concerns, which are out of scope for this design-only changeset. The pattern from rounds 26-29 — codex round → patch → new finding → patch — is explicitly the failure mode this work avoids.
+
+- 65feccb: 3.3.0 theme architecture contracts — design-only changeset for two deferred items: (1) HC brand-token suppression scope, (2) `replaceSync()` failure-mode hardening. R1 redesign — closes 8 codex blocking findings from R0 in a single revision per the planning rule "redesign once, do not iterate." Implementation paused pending Jake's signoff per the planning rule "design up front, get explicit signoff." No runtime change in this changeset; the artifacts let the implementation diff land in a single shot rather than iterating through codex.
+
+  **What lands.**
+  - `packages/hx-library/src/components/hx-theme/HC_BRAND_TOKEN_SPLIT_CONTRACT.md` — color-vs-non-color allowlist categorization, namespace-stratified unknown-token policy (R1: strict rejection for unknown `--hx-*` and color-bearing `--brand-*`; warn-and-treat-as-color for unaudited `--brand-<other>-*`; audited `--brand-*` subprefixes accepted), updated `_applyEffectiveTheme()` shape with deferred-advisory-commit pseudocode (R1: advisory state commits only after `replaceSync()` succeeds), re-registration atomicity section, 9-case row matrix + 3 state transitions + 8 categorization edges = 20 test cases, migration story, and docs deltas for `BRAND_THEMING.md` + `multi-brand-theming.md:39`.
+  - `packages/hx-library/src/components/hx-theme/REPLACESYNC_HARDENING_CONTRACT.md` — Path A vs Path B analysis, decision (Path A primary for **brand-registry inputs only**; Path B primary for non-brand inputs like density/theme CSS; both surfaces share defense-in-depth try/catch), CSS value validator design (15 categories, regex-based, permissive identifier fallback), 45 validator test cases + 12 integration test cases. R1: HC-split-as-prerequisite sequencing (no longer "independently mergeable" — replaceSync hardening composes onto the categorization model from the HC contract).
+  - `packages/hx-library/src/components/hx-theme/hx-theme-hc-brand-split.test.ts` — 20 `it.todo()` cases (9 row + 3 transitions + 8 categorization edges) pinning the R1 HC split contract.
+  - `packages/hx-library/src/components/hx-theme/hx-theme-replacesync-hardening.test.ts` — 12 `it.todo()` cases (5 registration + 3 happy path + 2 defense-in-depth + 2 state invariants) pinning the runtime-integration surface of the replaceSync hardening contract.
+  - `packages/hx-tokens/src/__tests__/css-value-validator.test.ts` — ~45 `it.todo()` cases covering all 15 validator value categories (color-hex, color-oklch, color-rgb, color-hsl, color-named, length, unitless-number, duration, easing, font-family, font-weight, var-reference, shadow, gradient, identifier) and structural rejections (null bytes, unbalanced parens/quotes, empty string, rule-break attempts).
+
+  **What does NOT land.**
+  - No change to `hx-theme.ts`. HC suppression continues to drop ALL brand tokens (color and non-color); `replaceSync()` calls continue to be unwrapped and unvalidated.
+  - No change to `HelixBrandRegistry.register()`. Validation continues to check token presence only (the 22 `REQUIRED_SEMANTIC_TOKENS`), not value syntax, name namespace, or category.
+  - No `mergeBrandTokens()` signature change.
+  - No new CSS value validator module — the contract specifies it; the implementation lands separately.
+  - No changes to `BRAND_THEMING.md`, `multi-brand-theming.md`, or `hx-theme.mdx`. Doc deltas are queued in the contract documents.
+
+  **R0 → R1 redesign — codex blocking findings closed.**
+
+  Codex r-arch on R0 returned BLOCKING with 8 findings. R1 closes all 8 in a single revision:
+
+  | #   | R0 finding                                                                                                             | R1 closure                                                                                                                                                                                                                      |
+  | --- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | F1  | `--brand-*` allowlist is over-broad — admits `--brand-color-*`/`--brand-shadow-*` as non-color, leaking color under HC | HC contract narrows `--brand-*` to four audited subprefixes: `--brand-layout-*`, `--brand-logo-*`, `--brand-spacing-*`, `--brand-typography-*`                                                                                  |
+  | F2  | "Independently mergeable" claim contradicts shared `register()` body                                                   | Both contracts add a "Sequencing" block; HC split is now an explicit prerequisite of replaceSync hardening; the two share the categorized storage model                                                                         |
+  | F3  | Path A claim covers all `replaceSync()` inputs but density/theme strings don't pass through brand registry             | replaceSync contract narrows Path A scope to brand-registry inputs only; density and theme CSS strings rely on the try/catch as primary mechanism                                                                               |
+  | F4  | Advisory state committed before sheet update — log/state can run ahead of failed `replaceSync()`                       | HC contract's `_applyEffectiveTheme()` pseudocode defers advisory commit until after `replaceSync()` succeeds; new test case "Advisory state ordering" pins this                                                                |
+  | F5  | Token-value category count inconsistent (13 vs 15 across enum / intro / approval gate)                                 | Normalized to 15 across all locations: contract intro, enum, validator test stub, approval gate                                                                                                                                 |
+  | F6  | Validator test stub missing categories present in the enum                                                             | 7 missing categories added: color-hsl, unitless-number, easing, font-family, font-weight, shadow, gradient                                                                                                                      |
+  | F7  | Unknown-token "warn + treat as color" policy too permissive — masks `--hx-*` typos and hides a11y-critical token gaps  | Namespace-stratified policy: unknown `--hx-*` rejects (with rationale), color-bearing `--brand-*` rejects, unaudited `--brand-<other>-*` warns + treats as color, audited `--brand-*` subprefixes accept, anything else rejects |
+  | F8  | Re-registration atomicity unspecified — partial validation throw could corrupt previously-stored brand                 | HC contract adds atomicity section: validate into a working set, single `_brands.set()` only after every check passes, subscribers not notified on failed registration; new test case pins this                                 |
+
+  **Coupling between the two contracts.**
+
+  The HC split contract and the replaceSync hardening contract share the same surface (`HelixBrandRegistry.register()` validation pass, `_applyEffectiveTheme()` reconcile body) and are **not** independently mergeable at the storage layer. R1 narrows the prior independence claim: implementation order is fixed (HC split first, replaceSync hardening second). Both contracts can ship in the same PR pair, but the implementation diff for the validator must layer onto a `register()` body that already does categorization. Attempting to land the validator first wastes editing capacity — the surface it modifies is materially reshaped by the HC split.
+
+  **Sequencing relative to the brand-reflection PR.**
+
+  The brand-reflection contract (PR #1600) is independent of both contracts in this PR. All three contracts can ship in any order. If Jake signs all three off in one sitting, the implementation diffs can be staged sequentially without rebasing pain.
+
+  **Codex review on this diff.**
+
+  Single codex pass on R1 is acceptable per the planning rule. R1 is the redesign that closes the loop on R0's BLOCKING verdict. If R1 codex surfaces concerns, they convert to either (a) row-flip decisions for Jake or (b) implementation-diff acceptance criteria — not another redesign. Iteration on the contract surface is explicitly off the table per the planning note.
+
 ## 3.3.0
 
 ### Minor Changes
