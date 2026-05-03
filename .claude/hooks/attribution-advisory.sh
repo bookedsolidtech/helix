@@ -26,13 +26,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ─────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
 # ── 4. Check if attribution blocking is enabled ──────────────────────────────
 POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
@@ -50,14 +48,23 @@ if [[ -z "$CMD" ]]; then
   exit 0
 fi
 
+# 0.15.0: source the shared shell-segment splitter. Pre-fix, the
+# attribution patterns greped the FULL command — `git commit -m "Note:
+# Co-Authored-By with AI was removed in 0.14"` matched and the commit
+# was blocked even though the message was COMMENTING on attribution
+# rather than including it. Per-segment anchoring scopes detection to
+# segments whose first token is `git commit` / `gh pr create|edit`.
+# shellcheck source=_lib/cmd-segments.sh
+source "$(dirname "$0")/_lib/cmd-segments.sh"
+
 # ── 6. Check if this is a relevant command ────────────────────────────────────
 IS_RELEVANT=0
 
-if printf '%s' "$CMD" | grep -qiE 'gh[[:space:]]+pr[[:space:]]+(create|edit)'; then
+if any_segment_matches "$CMD" 'gh[[:space:]]+pr[[:space:]]+(create|edit)'; then
   IS_RELEVANT=1
 fi
 
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+commit'; then
+if any_segment_matches "$CMD" 'git[[:space:]]+commit'; then
   IS_RELEVANT=1
 fi
 
@@ -70,27 +77,27 @@ fi
 FOUND=0
 
 # Co-Authored-By with noreply@ email
-if printf '%s' "$CMD" | grep -qiE 'Co-Authored-By:.*noreply@'; then
+if any_segment_matches "$CMD" 'Co-Authored-By:.*noreply@'; then
   FOUND=1
 fi
 
 # Co-Authored-By with known AI names
-if printf '%s' "$CMD" | grep -qiE 'Co-Authored-By:.*\b(Claude|Sonnet|Opus|Haiku|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|Amazon Q|CodeWhisperer|Devin|Windsurf|Cline|Aider|Anthropic|OpenAI|GitHub Copilot)\b'; then
+if any_segment_matches "$CMD" 'Co-Authored-By:.*\b(Claude|Sonnet|Opus|Haiku|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|Amazon Q|CodeWhisperer|Devin|Windsurf|Cline|Aider|Anthropic|OpenAI|GitHub Copilot)\b'; then
   FOUND=1
 fi
 
 # "Generated/Built/Powered with/by [AI Tool]" lines
-if printf '%s' "$CMD" | grep -qiE '(Generated|Created|Built|Powered|Authored|Written|Produced)[[:space:]]+(with|by)[[:space:]]+(Claude|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|CodeWhisperer|Devin|Windsurf|Cline|Aider|AI|an? AI)\b'; then
+if any_segment_matches "$CMD" '(Generated|Created|Built|Powered|Authored|Written|Produced)[[:space:]]+(with|by)[[:space:]]+(Claude|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|CodeWhisperer|Devin|Windsurf|Cline|Aider|AI|an? AI)\b'; then
   FOUND=1
 fi
 
 # Markdown-linked attribution
-if printf '%s' "$CMD" | grep -qiE '\[Claude Code\]|\[GitHub Copilot\]|\[ChatGPT\]|\[Gemini\]|\[Cursor\]'; then
+if any_segment_matches "$CMD" '\[Claude Code\]|\[GitHub Copilot\]|\[ChatGPT\]|\[Gemini\]|\[Cursor\]'; then
   FOUND=1
 fi
 
 # Emoji attribution
-if printf '%s' "$CMD" | grep -qE '🤖.*[Gg]enerated'; then
+if any_segment_matches "$CMD" '🤖.*[Gg]enerated'; then
   FOUND=1
 fi
 

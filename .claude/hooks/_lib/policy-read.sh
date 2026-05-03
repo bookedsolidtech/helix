@@ -7,7 +7,10 @@
 # project root via rea_root() from halt-check.sh, but will re-derive it if
 # REA_ROOT is unset.
 
-set -euo pipefail
+# NOTE: do NOT set `-e` here — see hooks/_lib/halt-check.sh for the
+# rationale. This is a sourced library; -e would propagate to callers
+# and cause spurious exit-1s on benign non-zero returns from grep/sed.
+set -uo pipefail
 
 # Resolve the path to .rea/policy.yaml for the current project.
 # Prints an empty string if no policy file is found — callers should treat

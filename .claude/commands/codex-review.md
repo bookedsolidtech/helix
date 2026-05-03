@@ -2,17 +2,17 @@
 description: Run an adversarial review of the current branch via the Codex plugin (GPT-5.4). First-class step in the REA engineering process.
 argument-hint: "[diff-target]"
 allowed-tools:
-  - Agent
   - Bash(git diff:*)
   - Bash(git log:*)
   - Bash(git branch:*)
   - Bash(git rev-parse:*)
   - Read
+  - Agent
 ---
 
 # /codex-review — Adversarial Review via Codex
 
-Invokes the Codex plugin (`/codex adversarial-review`) on the current branch's diff, captures the result, and records it to the REA audit log. Adversarial review by an independent model (GPT-5.4) is a **first-class, non-optional step** in the REA engineering process — it is the counterweight to Opus-authored code.
+Invokes the Codex plugin (`/codex:adversarial-review`) on the current branch's diff, captures the result, and records it to the REA audit log. Adversarial review by an independent model (GPT-5.4) is a **first-class, non-optional step** in the REA engineering process — it is the counterweight to Opus-authored code.
 
 ## Why this exists
 
@@ -53,25 +53,19 @@ Invoke the `codex-adversarial` agent with:
 - The commit log summary
 - The full diff text
 
-The agent wraps `/codex adversarial-review` and returns structured findings.
+The agent wraps `/codex:adversarial-review` and returns structured findings.
 
-## Step 3 — Record to audit log
+## Step 3 — (Optional) verify audit entry
 
-Every Codex invocation produces an audit entry. The `codex-adversarial` agent writes it via the middleware chain automatically, but verify the entry was recorded:
+Audit emission is **optional** in 0.11.0+. The pre-push gate is stateless and does not consult audit records to decide pass/fail; the agent's structured findings ARE the review. The agent will append an audit entry when it helps forensic traceability (intermittent verdicts, review-history audits) but its absence is not a failure.
+
+If you want to confirm an entry was written for this run:
 
 ```bash
 tail -n 1 .rea/audit.jsonl
 ```
 
-The entry must include:
-
-- `tool: "codex-adversarial-review"`
-- `head_sha: <SHA>`
-- `target: <ref>`
-- `finding_count: <N>`
-- `verdict: pass | concerns | blocking`
-
-If the audit entry is missing, report it clearly — do not proceed as if the review happened.
+A `codex-adversarial-review` entry with `head_sha`, `target`, `finding_count`, and `verdict` fields is informative — but DO NOT treat its absence as a failure. The review happened if the agent returned text. (Pre-0.15.0 this step was a hard verification gate that contradicted the agent's "audit optional" contract — see Helix Finding 3, 2026-05-03.)
 
 ## Step 4 — Report
 
@@ -91,12 +85,10 @@ If the verdict is `blocking`, state plainly: "Do not merge until the blocking fi
 
 ## Pre-merge usage
 
-The recommended BST workflow runs `/codex-review` twice:
+This command is the **interactive** Codex adversarial review. The **pre-push** gate at `rea hook push-gate` runs Codex independently on every push — you do not need to run `/codex-review` to "prime" the push-gate. The two are complementary:
 
-1. After implementation, on the feature branch — catches issues early
-2. Immediately before merge, on the PR branch — records a fresh audit entry that the `push-review-gate` hook can check for freshness
-
-Both invocations are cheap. Run both.
+- `/codex-review` — rich, interactive review output in the chat. Use during implementation to catch issues early, at review checkpoints, or whenever you want Codex's read on a specific diff.
+- `rea hook push-gate` (wired to `.husky/pre-push`) — fresh Codex review on every push. If Codex surfaces blocking/concerns findings, the push exits 2; Claude reads `.rea/last-review.json`, fixes, and pushes again.
 
 ## Constraints
 

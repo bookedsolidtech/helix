@@ -18,13 +18,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
 # ── 4. Check if enabled ──────────────────────────────────────────────────────
 POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
@@ -41,10 +39,15 @@ if [[ -z "$FILE_PATH" ]]; then
   exit 0
 fi
 
-# Normalize to relative path
-if [[ "$FILE_PATH" == "$REA_ROOT"/* ]]; then
-  FILE_PATH="${FILE_PATH#$REA_ROOT/}"
-fi
+# 0.16.0 fix D.1: normalize via shared `_lib/path-normalize.sh` so
+# Windows / Git Bash backslash paths and URL-encoded forms are handled
+# uniformly with the rest of the hook layer. Pre-fix, this hook only
+# stripped $REA_ROOT prefix — `src\gateway\foo.ts` (Windows) or
+# `src%2Fgateway%2Ffoo.ts` (URL-encoded) silently bypassed the
+# architectural review.
+# shellcheck source=_lib/path-normalize.sh
+source "$(dirname "$0")/_lib/path-normalize.sh"
+FILE_PATH=$(normalize_path "$FILE_PATH")
 
 # ── 6. Check architecture-sensitive paths ─────────────────────────────────────
 ARCH_PATTERNS=(
