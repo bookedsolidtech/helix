@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# .husky/pre-push.d/30-helix-styles-token-discipline
+# Helix-local pre-push fragment: design-token discipline in component styles.
+#
+# Scans changed packages/hx-library/src/components/**/*.styles.ts files in the
+# push range for hardcoded design primitives (color literals, raw px/rem) that
+# escape the var(--hx-*) cascade. Comments and var() fallback values are
+# stripped first so only true outside-the-cascade leakage trips the gate.
+#
+# Skip-fast: no .styles.ts changed in push range -> exit 0.
+# Bypass: HELIX_SKIP_TOKEN_DISCIPLINE=1 git push  (escape hatch).
+
+set -euo pipefail
+
+if [ "${HELIX_SKIP_TOKEN_DISCIPLINE:-0}" = "1" ]; then
+  echo "pre-push: token-discipline -- bypassed via HELIX_SKIP_TOKEN_DISCIPLINE=1"
+  exit 0
+fi
+
+BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null \
+  | sed 's|refs/remotes/origin/||' || echo "dev")
+
+COMMON_ANCESTOR=$(git merge-base HEAD "origin/${BASE_BRANCH}" 2>/dev/null || echo "")
+if [ -z "$COMMON_ANCESTOR" ]; then
+  echo "pre-push: token-discipline -- no merge-base with origin/${BASE_BRANCH}, skipping"
+  exit 0
+fi
+
+CHANGED_STYLES=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
+  | grep -E '^packages/hx-library/src/components/.*\.styles\.ts$' || true)
+
+if [ -z "$CHANGED_STYLES" ]; then
+  echo "pre-push: token-discipline -- no .styles.ts changes in push range, skipping"
+  exit 0
+fi
+
+VIOLATIONS=$(printf '%s\n' "$CHANGED_STYLES" | while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  [ -f "$f" ] || continue
+  awk '
+    BEGIN { in_block = 0 }
+    {
+      line = $0
+      while (1) {
+        if (in_block) {
+          end = index(line, "*/")
+          if (end == 0) { line = ""; break }
+          line = substr(line, end + 2); in_block = 0
+        } else {
+          start = index(line, "/*")
+          if (start == 0) break
+          rest = substr(line, start + 2)
+          end = index(rest, "*/")
+          if (end == 0) { line = substr(line, 1, start - 1); in_block = 1; break }
+          line = substr(line, 1, start - 1) substr(rest, end + 2)
+        }
+      }
+      sub("//.*$", "", line)
+      while (match(line, /var\([^()]*\)/)) {
+        line = substr(line, 1, RSTART - 1) substr(line, RSTART + RLENGTH)
+      }
+      if (line ~ /#[0-9a-fA-F]{3,8}\>/ \
+          || line ~ /\<(rgb|rgba|hsl|hsla|oklch|oklab|lab|lch|color)\(/ \
+          || line ~ /\<[0-9]+(\.[0-9]+)?(px|rem|em)\>/) {
+        printf "%s:%d: %s\n", FILENAME, NR, $0
+      }
+    }
+  ' "$f"
+done)
+
+if [ -n "$VIOLATIONS" ]; then
+  echo "pre-push: token-discipline -- HARDCODED PRIMITIVES DETECTED" >&2
+  echo "" >&2
+  echo "$VIOLATIONS" >&2
+  echo "" >&2
+  echo "Component styles must consume design tokens through the var() cascade." >&2
+  echo "Pattern: var(--hx-{component}-{property}, var(--hx-{semantic}, #fallback))" >&2
+  echo "" >&2
+  echo "Allowed inside var() fallback chains; flagged when bare." >&2
+  echo "Bypass (escape hatch): HELIX_SKIP_TOKEN_DISCIPLINE=1 git push" >&2
+  exit 1
+fi
+
+echo "  v token-discipline passed"

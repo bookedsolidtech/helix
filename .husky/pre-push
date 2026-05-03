@@ -127,6 +127,24 @@ if [ "$COVERAGE_ENABLED" = "true" ] && script_exists "test"; then
   fi
 fi
 
+
+# >>> pre-push.d fragments >>>
+if [ -d ".husky/pre-push.d" ]; then
+  for FRAGMENT in .husky/pre-push.d/*; do
+    [ -f "$FRAGMENT" ] && [ -x "$FRAGMENT" ] || continue
+    NAME=$(basename "$FRAGMENT")
+    echo "pre-push: running fragment ${NAME}..."
+    if ! "$FRAGMENT" > "$OUT" 2>&1; then
+      echo ""
+      echo "GATE FAILED: ${NAME}"
+      cat "$OUT"
+      echo ""
+      FAILED="${FAILED} ${NAME}"
+    fi
+  done
+fi
+# <<< pre-push.d fragments <<<
+
 # ── Report ────────────────────────────────────────────────────────────────────
 HOOKS_LIB="$(git rev-parse --show-toplevel 2>/dev/null)/hooks/_lib/discord.sh"
 
