@@ -92,7 +92,11 @@ if any_segment_matches "$CMD" '(Generated|Created|Built|Powered|Authored|Written
 fi
 
 # Markdown-linked attribution
-if any_segment_matches "$CMD" '\[Claude Code\]|\[GitHub Copilot\]|\[ChatGPT\]|\[Gemini\]|\[Cursor\]'; then
+# 0.16.2 helix-017 P3 #4: anchor on `[Text](` (markdown link shape) so
+# legitimate bracketed mentions like `gh pr edit --body "support [Claude
+# Code] hook output"` don't false-positive. The actual attribution we
+# care about is structural — `Generated with [Claude Code](https://...)`.
+if any_segment_matches "$CMD" '\[Claude Code\]\(|\[GitHub Copilot\]\(|\[ChatGPT\]\(|\[Gemini\]\(|\[Cursor\]\('; then
   FOUND=1
 fi
 

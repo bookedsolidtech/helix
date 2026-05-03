@@ -183,6 +183,34 @@ any_segment_raw_matches() {
   return 1
 }
 
+# Return 0 if any single segment of $1 (after prefix-stripping) matches
+# BOTH extended regex $2 AND extended regex $3. Case-insensitive. Returns
+# 1 if no single segment matches both patterns.
+#
+# Use this when two patterns must co-occur within the SAME shell command
+# segment to constitute a detection — e.g. env-file-protection's
+# "utility + .env-filename" rule. Pre-fix env-file-protection used two
+# independent `any_segment_matches` calls and OR-combined the booleans,
+# which mis-fires across multi-segment constructions like
+# `echo "log: cat is broken" ; touch foo.env` (utility in segment 1,
+# .env name in segment 2 — both flags set, false-positive block).
+#
+# 0.16.2 helix-017 P2 #2 fix.
+any_segment_matches_both() {
+  local cmd="$1"
+  local pattern_a="$2"
+  local pattern_b="$3"
+  local segment stripped
+  while IFS= read -r segment; do
+    stripped=$(_rea_strip_prefix "$segment")
+    if printf '%s' "$stripped" | grep -qiE "$pattern_a" \
+       && printf '%s' "$stripped" | grep -qiE "$pattern_b"; then
+      return 0
+    fi
+  done < <(_rea_split_segments "$cmd")
+  return 1
+}
+
 # Return 0 if any segment of $1 (after prefix-stripping) STARTS WITH
 # the extended regex $2. Case-insensitive. Returns 1 if no segment
 # starts with the pattern.

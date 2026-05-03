@@ -71,19 +71,16 @@ PATTERN_CP_ENV='cp[[:space:]]+[^;|&]*\.env'
 # .env* files or .envrc (direnv)
 PATTERN_ENV_FILE='(\.env[a-zA-Z0-9._-]*|\.envrc)([[:space:]]|"|'"'"'|$)'
 
-MATCHES_UTILITY=0
-MATCHES_ENV_FILE=0
-
-# 0.15.0: per-segment match. Pre-fix this greped the FULL command which
-# false-positived on commit messages: `git commit -m "stop reading .env
-# files via cat"` matched both PATTERN_UTILITY (cat) and PATTERN_ENV_FILE
-# (.env) and the hook blocked a perfectly safe commit.
-if any_segment_matches "$CMD" "$PATTERN_UTILITY"; then
-  MATCHES_UTILITY=1
-fi
-
-if any_segment_matches "$CMD" "$PATTERN_ENV_FILE"; then
-  MATCHES_ENV_FILE=1
+# 0.16.2 helix-017 P2 #2: utility AND env-filename must co-occur within
+# the SAME shell segment. Pre-fix this set two independent booleans
+# (any segment with utility OR any segment with .env) and AND'd them,
+# which false-positived across multi-segment constructions like
+# `echo "log: cat is broken" ; touch foo.env` (utility in segment 1,
+# .env name in segment 2). Detection is fundamentally a same-segment
+# co-occurrence property.
+MATCHES_BOTH_SAME_SEGMENT=0
+if any_segment_matches_both "$CMD" "$PATTERN_UTILITY" "$PATTERN_ENV_FILE"; then
+  MATCHES_BOTH_SAME_SEGMENT=1
 fi
 
 # Direct source/cp of .env files — always block
@@ -101,7 +98,7 @@ if any_segment_matches "$CMD" "$PATTERN_SOURCE" || \
   exit 2
 fi
 
-if [[ $MATCHES_UTILITY -eq 1 && $MATCHES_ENV_FILE -eq 1 ]]; then
+if [[ $MATCHES_BOTH_SAME_SEGMENT -eq 1 ]]; then
   TRUNCATED_CMD=$(truncate_cmd "$CMD")
   {
     printf 'ENV FILE PROTECTION: Reading .env files via Bash is blocked.\n'

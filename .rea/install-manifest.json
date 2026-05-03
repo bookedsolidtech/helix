@@ -1,12 +1,12 @@
 {
-  "version": "0.16.1",
+  "version": "0.16.2",
   "profile": "unknown",
   "installed_at": "2026-04-23T15:09:02.547Z",
-  "upgraded_at": "2026-05-03T22:10:14.143Z",
+  "upgraded_at": "2026-05-03T22:21:59.243Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
-      "sha256": "f1d562e1a61b0359650dd3408f0d8680fd81b3fb730069f8dbfe05387b6969d0",
+      "sha256": "5a963e79d26f2f9a4673951f093b38ee8084e4c35004844a31cb16efd0edfee6",
       "source": "hook"
     },
     {
@@ -46,7 +46,7 @@
     },
     {
       "path": ".claude/hooks/attribution-advisory.sh",
-      "sha256": "7179ce6880479706f14406743cc820c6033fc8a4a6a3d9953e719c6f48f02ba0",
+      "sha256": "109844439a45617c9f54f6d69ff16b77b5e55b39be26a193ab6d01085b80709b",
       "source": "hook"
     },
     {
@@ -71,7 +71,7 @@
     },
     {
       "path": ".claude/hooks/env-file-protection.sh",
-      "sha256": "ea079f4e7f94410ac18f854182d2c883739705f3a1601df3c9fdb5893ed77ccb",
+      "sha256": "52b9009b476eb9d133cf9f47c882e523f4e7091b5f3b00af0e4c4960a65f4dfe",
       "source": "hook"
     },
     {
@@ -176,7 +176,7 @@
     },
     {
       "path": ".husky/commit-msg",
-      "sha256": "e1f5f8a8a7536d13fa5f3fe168326c9caaf5cc14352064f13857a5fceb1eb23f",
+      "sha256": "53573ef6b8d73bc72dc5e77ca6be21169d6a2ff254bffb2fa43acf1ac070f4ae",
       "source": "husky"
     },
     {
