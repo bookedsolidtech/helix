@@ -23,7 +23,8 @@ awk '
 ' "${PRE_PUSH}.tmp" > "${PRE_PUSH}.tmp2"
 mv "${PRE_PUSH}.tmp2" "${PRE_PUSH}.tmp"
 
-# Inject clean block before the Report header.
+# Inject clean block before the Report header. Fail fast if the anchor is missing
+# rather than silently producing an unwired script.
 awk '
   /^# ── Report/ && !done {
     print "# >>> pre-push.d fragments >>>"
@@ -42,11 +43,15 @@ awk '
     print "  done"
     print "fi"
     print "# <<< pre-push.d fragments <<<"
-    print ""
     done = 1
   }
   { print }
-' "${PRE_PUSH}.tmp" > "${PRE_PUSH}.tmp2"
+  END { exit done ? 0 : 1 }
+' "${PRE_PUSH}.tmp" > "${PRE_PUSH}.tmp2" || {
+  echo "wire: anchor '# ── Report' not found in $PRE_PUSH -- refusing to overwrite." >&2
+  rm -f "${PRE_PUSH}.tmp" "${PRE_PUSH}.tmp2"
+  exit 1
+}
 
 mv "${PRE_PUSH}.tmp2" "$PRE_PUSH"
 rm -f "${PRE_PUSH}.tmp"

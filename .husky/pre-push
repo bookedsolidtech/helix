@@ -128,6 +128,7 @@ if [ "$COVERAGE_ENABLED" = "true" ] && script_exists "test"; then
 fi
 
 
+
 # >>> pre-push.d fragments >>>
 if [ -d ".husky/pre-push.d" ]; then
   for FRAGMENT in .husky/pre-push.d/*; do
@@ -144,7 +145,6 @@ if [ -d ".husky/pre-push.d" ]; then
   done
 fi
 # <<< pre-push.d fragments <<<
-
 # ── Report ────────────────────────────────────────────────────────────────────
 HOOKS_LIB="$(git rev-parse --show-toplevel 2>/dev/null)/hooks/_lib/discord.sh"
 

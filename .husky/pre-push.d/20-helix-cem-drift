@@ -37,7 +37,7 @@ if [ -z "$LIBRARY_SOURCE_CHANGED" ]; then
   exit 0
 fi
 
-if ! git diff --quiet -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" 2>/dev/null; then
+if ! git diff --quiet HEAD -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" 2>/dev/null; then
   echo "pre-push: cem-drift -- refusing to run with uncommitted CEM changes:" >&2
   git status -s -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" >&2
   echo "Resolution: commit or stash CEM changes before pushing." >&2
@@ -51,9 +51,9 @@ if ! pnpm --filter=@helixui/library run cem >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! git diff --quiet -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH"; then
+if ! git diff --quiet HEAD -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH"; then
   echo "pre-push: cem-drift -- DRIFT DETECTED" >&2
-  git diff --stat -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" >&2
+  git diff --stat HEAD -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" >&2
   echo "" >&2
   echo "The Custom Elements Manifest is out of sync with library source." >&2
   echo "Resolution:" >&2

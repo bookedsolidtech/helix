@@ -59,9 +59,9 @@ VIOLATIONS=$(printf '%s\n' "$CHANGED_STYLES" | while IFS= read -r f; do
       while (match(line, /var\([^()]*\)/)) {
         line = substr(line, 1, RSTART - 1) substr(line, RSTART + RLENGTH)
       }
-      if (line ~ /#[0-9a-fA-F]{3,8}\>/ \
-          || line ~ /\<(rgb|rgba|hsl|hsla|oklch|oklab|lab|lch|color)\(/ \
-          || line ~ /\<[0-9]+(\.[0-9]+)?(px|rem|em)\>/) {
+      if (line ~ /#[0-9a-fA-F]{3,8}($|[^0-9a-zA-Z_])/ \
+          || line ~ /(^|[^a-zA-Z_])(rgb|rgba|hsl|hsla|oklch|oklab|lab|lch|color)\(/ \
+          || line ~ /(^|[^0-9a-zA-Z_])[0-9]+(\.[0-9]+)?(px|rem|em)($|[^0-9a-zA-Z_])/) {
         printf "%s:%d: %s\n", FILENAME, NR, $0
       }
     }
