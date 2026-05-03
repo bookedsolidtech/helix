@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-04-27T10:30:57.950Z",
+  "generatedAt": "2026-05-03T13:42:50.577Z",
   "sourceCem": "custom-elements.json",
-  "helixVersion": "3.3.0",
-  "tokensVersion": "3.3.0",
+  "helixVersion": "3.3.1",
+  "tokensVersion": "3.3.1",
   "components": [
     {
       "tag": "hx-accordion",
