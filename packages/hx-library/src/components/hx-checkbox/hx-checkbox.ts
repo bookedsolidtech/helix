@@ -470,10 +470,18 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   /** @internal */
   _updateValidity(): void {
     if (this.required && !this.checked) {
+      // Codex round-17 P2: anchor validity UI to the announced surface. On
+      // the modern path the host is the canonical announced/focus surface
+      // (the inner input is `aria-hidden + tabindex=-1`), so reportValidity()
+      // would otherwise focus a hidden node. On the fallback path the inner
+      // input is the announced surface.
+      const anchor: HTMLElement | undefined = this._supportsIdrefRefs
+        ? this
+        : (this._inputEl ?? undefined);
       this._internals.setValidity(
         { valueMissing: true },
         this.error || this.requiredMessage,
-        this._inputEl ?? undefined,
+        anchor,
       );
     } else {
       this._internals.setValidity({});

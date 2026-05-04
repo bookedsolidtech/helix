@@ -575,10 +575,18 @@ export class HelixToggleButton extends HelixElement {
   /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.pressed) {
+      // Codex round-17 P2: anchor validity UI to the announced surface. On
+      // the modern path the host is the canonical announced/focus surface
+      // (the inner button is `aria-hidden + tabindex=-1`), so passing the
+      // host avoids `reportValidity()` landing focus on a hidden node. On
+      // the fallback path the inner button is the announced surface.
+      const anchor: HTMLElement | undefined = this._supportsIdrefRefs
+        ? this
+        : (this.shadowRoot?.querySelector<HTMLElement>('[part="button"]') ?? undefined);
       this._internals.setValidity(
         { valueMissing: true },
         'Please activate this toggle button.',
-        this.shadowRoot?.querySelector<HTMLElement>('[part="button"]') ?? undefined,
+        anchor,
       );
     } else {
       this._internals.setValidity({});

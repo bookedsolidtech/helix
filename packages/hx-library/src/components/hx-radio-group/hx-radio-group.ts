@@ -152,6 +152,15 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
    */
   @state() private _hasHelpSlot = false;
 
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the render-time branch between modern (host-canonical via
+   * internals) and fallback (inner fieldset is the announced surface).
+   * Codex round-17 P1.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+
   // ─── Internal IDs ───
 
   /**
@@ -251,6 +260,10 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Codex round-17 P1: detect IDL element-references API support so
+    // render() can branch the fieldset between presentational (modern) and
+    // group-with-aria (fallback) treatments.
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
     this.addEventListener('hx-radio-select', this._handleRadioSelect);
     this.addEventListener('keydown', this._handleKeydown);
     // Seed root-independent semantics from connect so the host announces the
@@ -404,18 +417,21 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
     } else {
-      // ─── No-IDL-ref fallback (codex round-7 #5) ───
+      // ─── No-IDL-ref fallback (codex round-7 #5, round-17 P1) ───
       // The IDL element-references API is unavailable, so internal shadow
-      // help/error wrappers cannot be projected onto the host accessibility
-      // node via `internals.aria*Elements`. Mirror the resolved ids onto the
-      // host's `aria-labelledby` / `aria-describedby` attributes instead — the
-      // shadow-internal ids resolve through the host's shadow root for AT
-      // walking the tree. Only set the attributes when our resolution
-      // contributed an internal element (legend, help, error) that the
-      // consumer-supplied tokens did not already cover; otherwise leave the
-      // consumer-provided string attributes untouched. Codex prior round
-      // already records consumer tokens in `data-aria-*` mirrors via
-      // `mixinDelegatesAria`, so unconditional clearing would clobber them.
+      // help/error/legend wrappers cannot be projected onto the host
+      // accessibility node via `internals.aria*Elements`.
+      //
+      // Codex round-17 P1: mirroring shadow-internal ids onto the host's
+      // `aria-labelledby` / `aria-describedby` attributes is broken per spec
+      // — IDREFs only resolve within the host's containing root, not across
+      // the shadow boundary, so legacy engines (notably Firefox today) drop
+      // those references and the group becomes anonymous/undescribed. Own
+      // the description chain on the inner shadow `<fieldset>` (which lives
+      // in the same root as the legend/help/error wrappers, so its IDREFs
+      // resolve correctly) and promote that fieldset to `role="group"` on
+      // the fallback path so AT announces a labeled group container. Host
+      // attributes carry only the consumer-supplied tokens.
       const consumerLabelIds = new Set((externalLabelTokens?.split(/\s+/) ?? []).filter(Boolean));
       const consumerDescIds = new Set((externalDescTokens?.split(/\s+/) ?? []).filter(Boolean));
 
@@ -426,36 +442,67 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
         .map((el) => el.id)
         .filter((id) => id && !consumerDescIds.has(id));
 
-      // Codex round-10 P2: write the merged value derived from the *consumer
-      // baseline* (not the live attribute), so transitions that drop internal
-      // ids (e.g. clearing helpText) shrink the attribute back rather than
-      // leaving stale tokens behind.
-      const mergedLabel =
-        [...consumerLabelIds, ...internalLabelIds].filter(Boolean).join(' ') || '';
+      // Host attributes: ONLY consumer tokens (never shadow-internal ids).
+      const hostLabel = [...consumerLabelIds].filter(Boolean).join(' ') || '';
       const liveLabel = this.getAttribute('aria-labelledby');
-      if (mergedLabel) {
-        if (liveLabel !== mergedLabel) {
-          this.setAttribute('aria-labelledby', mergedLabel);
+      if (hostLabel) {
+        if (liveLabel !== hostLabel) {
+          this.setAttribute('aria-labelledby', hostLabel);
         }
-        this._lastWrittenLabelledBy = mergedLabel;
-      } else if (liveLabel !== null) {
-        // Both consumer and internal contributed nothing; clear the mirror.
+        this._lastWrittenLabelledBy = hostLabel;
+      } else if (liveLabel !== null && this._lastWrittenLabelledBy !== null) {
         this.removeAttribute('aria-labelledby');
         this._lastWrittenLabelledBy = null;
       }
 
-      const mergedDesc = [...consumerDescIds, ...internalDescIds].filter(Boolean).join(' ') || '';
+      const hostDesc = [...consumerDescIds].filter(Boolean).join(' ') || '';
       const liveDesc = this.getAttribute('aria-describedby');
-      if (mergedDesc) {
-        if (liveDesc !== mergedDesc) {
-          this.setAttribute('aria-describedby', mergedDesc);
+      if (hostDesc) {
+        if (liveDesc !== hostDesc) {
+          this.setAttribute('aria-describedby', hostDesc);
         }
-        this._lastWrittenDescribedBy = mergedDesc;
-      } else if (liveDesc !== null) {
-        // No consumer tokens AND no internal ids — clear stale mirror so
-        // removed help/error wrappers don't leave behind broken IDREFs.
+        this._lastWrittenDescribedBy = hostDesc;
+      } else if (liveDesc !== null && this._lastWrittenDescribedBy !== null) {
         this.removeAttribute('aria-describedby');
         this._lastWrittenDescribedBy = null;
+      }
+
+      // Inner fieldset: owns the merged labelledby/describedby chain so the
+      // shadow-internal ids resolve correctly within the same root. Promote
+      // role to "group" so AT announces a labeled group on the fallback
+      // path.
+      const fieldset = this.shadowRoot?.querySelector<HTMLFieldSetElement>('fieldset');
+      if (fieldset) {
+        const mergedLabel =
+          [...consumerLabelIds, ...internalLabelIds].filter(Boolean).join(' ') || '';
+        if (mergedLabel) {
+          if (fieldset.getAttribute('aria-labelledby') !== mergedLabel) {
+            fieldset.setAttribute('aria-labelledby', mergedLabel);
+          }
+        } else if (fieldset.hasAttribute('aria-labelledby')) {
+          fieldset.removeAttribute('aria-labelledby');
+        }
+        const mergedDesc = [...consumerDescIds, ...internalDescIds].filter(Boolean).join(' ') || '';
+        if (mergedDesc) {
+          if (fieldset.getAttribute('aria-describedby') !== mergedDesc) {
+            fieldset.setAttribute('aria-describedby', mergedDesc);
+          }
+        } else if (fieldset.hasAttribute('aria-describedby')) {
+          fieldset.removeAttribute('aria-describedby');
+        }
+        if (fieldset.getAttribute('role') !== 'group') {
+          fieldset.setAttribute('role', 'group');
+        }
+        if (this.required && fieldset.getAttribute('aria-required') !== 'true') {
+          fieldset.setAttribute('aria-required', 'true');
+        } else if (!this.required && fieldset.hasAttribute('aria-required')) {
+          fieldset.removeAttribute('aria-required');
+        }
+        if (hasError && fieldset.getAttribute('aria-invalid') !== 'true') {
+          fieldset.setAttribute('aria-invalid', 'true');
+        } else if (!hasError && fieldset.hasAttribute('aria-invalid')) {
+          fieldset.removeAttribute('aria-invalid');
+        }
       }
     }
   }
@@ -869,11 +916,17 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       'fieldset--required': this.required,
     };
 
+    // Codex round-17 P1: on the no-IDL-ref fallback path the inner fieldset
+    // owns the description chain (so shadow-internal IDREFs resolve in the
+    // same root). `_syncHostAriaSemantics()` sets role/aria-* imperatively
+    // in that branch; on the modern path the host carries the role via
+    // ElementInternals so the fieldset stays presentational.
+    const fieldsetRole = this._supportsIdrefRefs ? 'presentation' : nothing;
     return html`
       <fieldset
         part="fieldset"
         class=${classMap(fieldsetClasses)}
-        role="presentation"
+        role=${fieldsetRole}
         aria-orientation=${this.orientation === 'horizontal' ? 'horizontal' : nothing}
       >
         ${this.label

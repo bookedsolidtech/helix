@@ -415,10 +415,19 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   /** @internal */
   override _updateValidity(): void {
     if (this.required && !this.checked) {
+      // Codex round-17 P2: anchor validity UI to the announced surface. On
+      // the modern path the host carries `role=switch` via internals and is
+      // the canonical focus target (the inner track button is `aria-hidden +
+      // tabindex=-1`), so reportValidity() would otherwise focus a hidden
+      // node. On the fallback path the inner button is the announced
+      // surface.
+      const anchor: HTMLElement | undefined = this._supportsIdrefRefs
+        ? this
+        : (this._trackEl ?? undefined);
       this._internals.setValidity(
         { valueMissing: true },
         this.error || this.requiredMessage,
-        this._trackEl ?? undefined,
+        anchor,
       );
     } else {
       this._internals.setValidity({});
