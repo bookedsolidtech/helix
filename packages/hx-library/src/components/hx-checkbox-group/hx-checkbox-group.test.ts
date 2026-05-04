@@ -901,9 +901,16 @@ describe('hx-checkbox-group', () => {
         // Modern browsers (Chromium 134+, Safari 17.4+) — IDL element references.
         expect(refs.indexOf(helpDiv)).toBeGreaterThanOrEqual(0);
       } else {
-        // No-IDL-ref fallback: tokens space-joined on the host attribute.
+        // No-IDL-ref fallback (round-19 contract): help/error TEXT mirrors
+        // through `internals.ariaDescription`; the host `aria-describedby`
+        // attribute carries ONLY consumer-supplied tokens, so the shadow
+        // wrapper id MUST NOT appear there.
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null })
+            .ariaDescription ?? '';
+        expect(ariaDescription).toContain('Hint');
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
-        expect(tokens).toContain(helpDiv.id);
+        expect(tokens).not.toContain(helpDiv.id);
       }
     });
 
@@ -931,8 +938,18 @@ describe('hx-checkbox-group', () => {
         expect(refs.indexOf(errorDiv)).toBeGreaterThanOrEqual(0);
         expect(refs.indexOf(helpDiv)).toBe(-1);
       } else {
+        // No-IDL-ref fallback (round-19 contract): help/error TEXT mirrors
+        // through `internals.ariaDescription`; the host `aria-describedby`
+        // attribute carries ONLY consumer-supplied tokens, so the shadow
+        // wrapper ids MUST NOT appear there. Help is hidden when error is
+        // active, so its text must be absent from `ariaDescription` too.
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null })
+            .ariaDescription ?? '';
+        expect(ariaDescription).toContain('Required');
+        expect(ariaDescription).not.toContain('Hint');
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
-        expect(tokens).toContain(errorDiv.id);
+        expect(tokens).not.toContain(errorDiv.id);
         expect(tokens).not.toContain(helpDiv.id);
       }
     });
