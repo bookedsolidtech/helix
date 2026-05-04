@@ -6,6 +6,16 @@ import './index.js';
 
 afterEach(cleanup);
 
+/**
+ * Strongly-typed harness for the private internals the suite reaches into.
+ * Codex round-7 finding `#4` replaced scattered `as any` casts with this
+ * single seam — TypeScript strict mode keeps holding the line on the rest
+ * of the suite.
+ */
+type RadioGroupTestHarness = HxRadioGroup & {
+  _internals: ElementInternals;
+};
+
 describe('hx-radio-group', () => {
   // ─── Rendering: Group (5) ───
 
@@ -1073,8 +1083,7 @@ describe('hx-radio-group', () => {
       const el = await fixture<HxRadioGroup>(
         `<hx-radio-group label="Color"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.role).toBe('radiogroup');
     });
 
@@ -1082,8 +1091,7 @@ describe('hx-radio-group', () => {
       const el = await fixture<HxRadioGroup>(
         `<hx-radio-group label="Notification Channel"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.ariaLabel).toBe('Notification Channel');
     });
 
@@ -1091,8 +1099,7 @@ describe('hx-radio-group', () => {
       const el = await fixture<HxRadioGroup>(
         `<hx-radio-group label="Internal" aria-label="Public name"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.ariaLabel).toBe('Public name');
     });
 
@@ -1101,8 +1108,7 @@ describe('hx-radio-group', () => {
         `<hx-radio-group label="Color" orientation="horizontal"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.ariaOrientation).toBe('horizontal');
       // Inner fieldset also exposes the attribute so AT walking the shadow
       // tree sees a consistent orientation.
@@ -1115,8 +1121,7 @@ describe('hx-radio-group', () => {
         `<hx-radio-group label="Color" required><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.ariaInvalid).toBe('true');
     });
 
@@ -1130,8 +1135,7 @@ describe('hx-radio-group', () => {
       expect(helpDiv.hasAttribute('hidden')).toBe(false);
       // Host carries the describedBy reference via internals; inner fieldset
       // does not duplicate it.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       type InternalsWithRefs = ElementInternals & {
         ariaDescribedByElements: Element[] | null;
       };
@@ -1149,8 +1153,7 @@ describe('hx-radio-group', () => {
         `<hx-radio-group label="Color" help-text="Hint" error="Required"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
       const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
       type InternalsWithRefs = ElementInternals & {
@@ -1189,8 +1192,7 @@ describe('hx-radio-group', () => {
       // Select 'red' through the API.
       el.value = 'red';
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.validity.valid).toBe(true);
 
       // Remove the currently-selected radio.
@@ -1213,8 +1215,7 @@ describe('hx-radio-group', () => {
           <hx-radio value="red" label="Red"></hx-radio>
         </hx-radio-group>
       `);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       // No selection → invalid.
       expect(el.value).toBe('');
       expect(internals.validity.valid).toBe(false);
@@ -1244,8 +1245,7 @@ describe('hx-radio-group', () => {
       `);
       el.value = 'red';
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.validity.valid).toBe(true);
 
       // Disable the selected radio, then trigger slotchange by re-inserting

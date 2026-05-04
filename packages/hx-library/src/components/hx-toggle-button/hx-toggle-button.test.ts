@@ -6,6 +6,17 @@ import './index.js';
 
 afterEach(cleanup);
 
+/**
+ * Strongly-typed harness for the private internals the fallback-path tests
+ * reach into. Codex round-7 finding `#8` replaced scattered `as any` casts
+ * with this single seam — TypeScript strict mode keeps holding the line.
+ */
+type ToggleButtonTestHarness = HelixToggleButton & {
+  _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
+};
+
 describe('hx-toggle-button', () => {
   // ─── Rendering (6) ───
 
@@ -413,12 +424,16 @@ describe('hx-toggle-button', () => {
     });
 
     it('checkValidity returns false when required and not pressed', async () => {
-      const el = await fixture<HelixToggleButton>('<hx-toggle-button required>Toggle</hx-toggle-button>');
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required>Toggle</hx-toggle-button>',
+      );
       expect(el.checkValidity()).toBe(false);
     });
 
     it('checkValidity returns true when required and pressed', async () => {
-      const el = await fixture<HelixToggleButton>('<hx-toggle-button required pressed>Toggle</hx-toggle-button>');
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required pressed>Toggle</hx-toggle-button>',
+      );
       expect(el.checkValidity()).toBe(true);
     });
 
@@ -428,8 +443,10 @@ describe('hx-toggle-button', () => {
     });
 
     it('validity.valueMissing is true when required and not pressed', async () => {
-      const el = await fixture<HelixToggleButton>('<hx-toggle-button required>Toggle</hx-toggle-button>');
-      expect(el.validity.valueMissing).toBe(true)
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required>Toggle</hx-toggle-button>',
+      );
+      expect(el.validity.valueMissing).toBe(true);
     });
   });
 
@@ -570,9 +587,7 @@ describe('hx-toggle-button', () => {
         const el = await fixture<HelixToggleButton>('<hx-toggle-button></hx-toggle-button>');
         await el.updateComplete;
         const relevantCalls = warnSpy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('No accessible label found'),
+          (call) => typeof call[0] === 'string' && call[0].includes('No accessible label found'),
         );
         expect(relevantCalls.length).toBeGreaterThan(0);
       } finally {
@@ -586,9 +601,7 @@ describe('hx-toggle-button', () => {
         const el = await fixture<HelixToggleButton>('<hx-toggle-button>Mute</hx-toggle-button>');
         await el.updateComplete;
         const relevantCalls = warnSpy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('No accessible label found'),
+          (call) => typeof call[0] === 'string' && call[0].includes('No accessible label found'),
         );
         expect(relevantCalls).toHaveLength(0);
       } finally {
@@ -604,9 +617,7 @@ describe('hx-toggle-button', () => {
         );
         await el.updateComplete;
         const relevantCalls = warnSpy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('No accessible label found'),
+          (call) => typeof call[0] === 'string' && call[0].includes('No accessible label found'),
         );
         expect(relevantCalls).toHaveLength(0);
       } finally {
@@ -742,9 +753,7 @@ describe('hx-toggle-button', () => {
 
   describe('Host-canonical surface (codex round-1 #1)', () => {
     it('host has tabindex="0" when not disabled', async () => {
-      const el = await fixture<HelixToggleButton>(
-        '<hx-toggle-button>Toggle</hx-toggle-button>',
-      );
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       expect(el.getAttribute('tabindex')).toBe('0');
     });
 
@@ -756,9 +765,7 @@ describe('hx-toggle-button', () => {
     });
 
     it('host tabindex flips when disabled toggles', async () => {
-      const el = await fixture<HelixToggleButton>(
-        '<hx-toggle-button>Toggle</hx-toggle-button>',
-      );
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       expect(el.getAttribute('tabindex')).toBe('0');
       el.disabled = true;
       await el.updateComplete;
@@ -769,18 +776,14 @@ describe('hx-toggle-button', () => {
     });
 
     it('inner <button> is aria-hidden and tabindex=-1 (demoted)', async () => {
-      const el = await fixture<HelixToggleButton>(
-        '<hx-toggle-button>Toggle</hx-toggle-button>',
-      );
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('aria-hidden')).toBe('true');
       expect(btn.getAttribute('tabindex')).toBe('-1');
     });
 
     it('host Space activates toggle (host is the focus target)', async () => {
-      const el = await fixture<HelixToggleButton>(
-        '<hx-toggle-button>Toggle</hx-toggle-button>',
-      );
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       el.focus();
       const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
       await userEvent.keyboard('{Space}');
@@ -789,9 +792,7 @@ describe('hx-toggle-button', () => {
     });
 
     it('host Enter activates toggle (host is the focus target)', async () => {
-      const el = await fixture<HelixToggleButton>(
-        '<hx-toggle-button>Toggle</hx-toggle-button>',
-      );
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
       el.focus();
       const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
       await userEvent.keyboard('{Enter}');
@@ -852,9 +853,7 @@ describe('hx-toggle-button', () => {
     });
 
     it('updates ariaLabel when slot text changes (slotchange resync)', async () => {
-      const el = await fixture<HelixToggleButton>(
-        '<hx-toggle-button>Initial</hx-toggle-button>',
-      );
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Initial</hx-toggle-button>');
       const internals = (el as unknown as { _internals: ElementInternals })._internals;
       expect(internals.ariaLabel).toBe('Initial');
       el.textContent = 'Changed';
@@ -889,10 +888,9 @@ describe('hx-toggle-button', () => {
 
   describe('No-IDL-ref fallback render (round-2 F2)', () => {
     async function forceFallbackPath(el: HelixToggleButton): Promise<void> {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const anyEl = el as any;
-      anyEl._supportsIdrefRefs = false;
-      anyEl._syncHostAriaSemantics();
+      const harness = el as ToggleButtonTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
       el.requestUpdate();
       await el.updateComplete;
     }
@@ -937,8 +935,7 @@ describe('hx-toggle-button', () => {
         '<hx-toggle-button label="Bold"></hx-toggle-button>',
       );
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as ToggleButtonTestHarness)._internals;
       expect(internals.role).toBe('button');
 
       await forceFallbackPath(el);

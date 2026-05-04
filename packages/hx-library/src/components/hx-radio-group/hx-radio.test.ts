@@ -371,8 +371,18 @@ describe('hx-radio', () => {
         ariaDescribedByElements: Element[] | null;
       };
       const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
-      expect(refs).toBeTruthy();
-      expect(refs).toContain(help);
+      // Codex round-7 finding `#11`: branch on platform support for IDL
+      // element references. On Firefox/WebKit `ariaDescribedByElements` is
+      // unavailable, so the IDREF branch in `_syncHostAriaSemantics()` is
+      // skipped and the round-7 #5 fallback mirrors the help id onto the
+      // host's `aria-describedby` attribute instead — assert against the
+      // surface that was actually populated on this engine.
+      if (refs) {
+        expect(refs).toContain(help);
+      } else {
+        const tokens = group.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).toContain(help!.id);
+      }
     });
 
     it('renders error text with role="alert" when error is set', async () => {
