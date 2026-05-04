@@ -1323,5 +1323,32 @@ describe('hx-checkbox-group', () => {
       expect(internals.ariaDescription).toContain('Updated error');
       expect(internals.ariaDescription).not.toContain('Original error');
     });
+
+    it('fallback path: in-place slotted help-text textContent edits resync internals.ariaDescription', async () => {
+      // Codex round-24 P3 test gap: parity with the error-slot test above.
+      // The help-text slot has the same `MutationObserver` wired in
+      // commit 1c07237e2 — verify in-place `textContent` edits on an already
+      // assigned `<slot name="help-text">` node replay
+      // `_syncHostAriaSemantics()` and refresh `internals.ariaDescription`.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <span slot="help-text">Initial help</span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDescription).toContain('Initial help');
+
+      const slottedHelp = el.querySelector('[slot="help-text"]') as HTMLSpanElement;
+      slottedHelp.textContent = 'Updated help';
+      // The observer schedules a microtask; await one to flush.
+      await Promise.resolve();
+
+      expect(internals.ariaDescription).toContain('Updated help');
+      expect(internals.ariaDescription).not.toContain('Initial help');
+    });
   });
 });
