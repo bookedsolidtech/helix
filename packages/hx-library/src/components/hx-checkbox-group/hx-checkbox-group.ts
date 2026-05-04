@@ -269,11 +269,20 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     // Prefer consumer-supplied host aria-label; fall back to the visible legend
     // text (label property or label slot) so the host always carries an
     // accessible name.
+    //
+    // Codex round-7 #0: on the no-IDL-ref fallback path the slotted legend
+    // is the only source of an accessible name (the IDREF branch wires it via
+    // `ariaLabelledByElements`, which is unavailable here). Read the rendered
+    // legend's `textContent` so a `<slot name="label">` payload contributes to
+    // `internals.ariaLabel` — without this, fallback browsers leave the host
+    // unnamed when only the slot supplies the legend.
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const internalLegendText =
+      this.shadowRoot?.getElementById(this._labelId)?.textContent?.trim() || this.label || null;
     if (hostAriaLabel) {
       internals.ariaLabel = hostAriaLabel;
     } else if (!this.getAttribute('aria-labelledby')) {
-      internals.ariaLabel = this.label || null;
+      internals.ariaLabel = internalLegendText;
     } else {
       internals.ariaLabel = null;
     }

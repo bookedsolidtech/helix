@@ -136,6 +136,62 @@ const DEFAULT_HOST_OBSERVED_ATTRS: readonly string[] = [
 ];
 
 /**
+ * Per-root shared observer registry. Codex round-7 finding #11 (perf).
+ *
+ * Round-1 created a `subtree: true` MutationObserver per host instance, so a
+ * page with N IDREF-aware controls would receive N×M sync callbacks for any
+ * unrelated childList/id mutation in the document. This registry collapses
+ * the cost: a single observer per Document/ShadowRoot fans mutations out to
+ * the registered subscribers (the per-host `sync` callbacks) only.
+ *
+ * The registry uses a `WeakMap` keyed by root so subscribers are garbage
+ * collected with their roots. Subscribers are stored in a `Set` keyed by the
+ * `sync` callback identity so re-installation is idempotent.
+ *
+ * @internal
+ */
+interface SharedRootObserverEntry {
+  observer: MutationObserver;
+  subscribers: Set<() => void>;
+}
+
+const sharedRootObservers: WeakMap<Document | ShadowRoot, SharedRootObserverEntry> = new WeakMap();
+
+function subscribeToRoot(root: Document | ShadowRoot, sync: () => void): () => void {
+  let entry = sharedRootObservers.get(root);
+  if (!entry) {
+    const subscribers = new Set<() => void>();
+    const observer = new MutationObserver(() => {
+      // Snapshot subscribers before invocation: a sync() callback may itself
+      // resubscribe (e.g. component reattach), and Set iteration over a live
+      // collection during mutation is undefined.
+      Array.from(subscribers).forEach((fn) => {
+        fn();
+      });
+    });
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['id'],
+    });
+    entry = { observer, subscribers };
+    sharedRootObservers.set(root, entry);
+  }
+  entry.subscribers.add(sync);
+
+  return () => {
+    const current = sharedRootObservers.get(root);
+    if (!current) return;
+    current.subscribers.delete(sync);
+    if (current.subscribers.size === 0) {
+      current.observer.disconnect();
+      sharedRootObservers.delete(root);
+    }
+  };
+}
+
+/**
  * Installs a `MutationObserver` pair that keeps host ARIA semantics in sync
  * with mutations to consumer-supplied attributes AND late-target / id
  * mutations in the host's resolved root.
@@ -151,8 +207,9 @@ const DEFAULT_HOST_OBSERVED_ATTRS: readonly string[] = [
  * `resync()` method is safe to call from any lifecycle hook.
  *
  * Costs are bounded: the host observer touches one element; the root
- * observer is `subtree: true` but only listens for `id` and `childList`
- * mutations which fire infrequently in practice.
+ * observer is shared per `Document`/`ShadowRoot` (codex round-7 #11) so every
+ * subscribing host pays a single attach cost regardless of how many other
+ * IDREF-aware controls share the root.
  */
 export function installAriaIdrefMirror(
   host: Element,
@@ -173,10 +230,12 @@ export function installAriaIdrefMirror(
     attributeFilter: [...observedAttributes],
   });
 
-  // Observe the host's resolved root so late-inserted targets and id renames
-  // re-resolve through the IDREF path. Re-attached on every resync since the
-  // host's root can change across DOM moves.
-  let rootObserver: MutationObserver | null = null;
+  // Subscribe to the shared per-root observer so late-inserted targets and id
+  // renames re-resolve through the IDREF path. Round-7 #11 collapses N
+  // per-instance subtree observers into one per root, so on pages with many
+  // controls a single mutation produces a single subscriber fan-out instead
+  // of `controls × mutations` observer callbacks.
+  let unsubscribeRoot: (() => void) | null = null;
   let observedRoot: Document | ShadowRoot | null = null;
 
   const attachRootObserver = (): void => {
@@ -186,14 +245,8 @@ export function installAriaIdrefMirror(
       return;
     }
     if (root === observedRoot) return;
-    rootObserver?.disconnect();
-    rootObserver = new MutationObserver(() => sync());
-    rootObserver.observe(root, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['id'],
-    });
+    unsubscribeRoot?.();
+    unsubscribeRoot = subscribeToRoot(root, sync);
     observedRoot = root;
   };
 
@@ -208,8 +261,8 @@ export function installAriaIdrefMirror(
     },
     disconnect(): void {
       hostObserver.disconnect();
-      rootObserver?.disconnect();
-      rootObserver = null;
+      unsubscribeRoot?.();
+      unsubscribeRoot = null;
       observedRoot = null;
     },
   };
