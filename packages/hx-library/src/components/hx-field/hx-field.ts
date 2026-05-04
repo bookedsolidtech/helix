@@ -29,6 +29,17 @@ function isFormControl(el: Element): el is HTMLElement {
  * `disconnectedCallback`. This is an intentional, documented accessibility
  * mechanism.
  *
+ * **`aria-label` ownership model:** When `label` is set and no shadow `<label>`
+ * is rendered, hx-field writes `aria-label` to the slotted control and stamps
+ * a `data-hx-owns-label="true"` ownership marker. Consumers signal "I own this
+ * value, do not touch it" by either (a) setting `data-aria-managed` on the
+ * control, or (b) overwriting `aria-label` to a different value than the one
+ * hx-field last wrote — both release the host's claim. **Limitation:** because
+ * detection is snapshot-based, a consumer rewrite to the *exact same value*
+ * hx-field last wrote cannot be observed; to genuinely take ownership in that
+ * case the consumer must write a different value, set `data-aria-managed`, or
+ * remove the `data-hx-owns-label` marker themselves.
+ *
  * @summary Layout wrapper for label, control, help text, and error message.
  *
  * @tag hx-field
@@ -239,8 +250,13 @@ export class HelixField extends HelixElement {
 
   /**
    * Tracks whether the dev-time competing-label warning has already been
-   * emitted for the currently adopted slotted control. Reset whenever a new
-   * control is adopted via `_resolveSlottedControl()`.
+   * emitted for the currently adopted slotted control.
+   *
+   * Latch semantics: this fires **once per adopted control**. The latch is
+   * only reset on adoption (`_resolveSlottedControl()`) or disconnection.
+   * Toggling `data-aria-managed` on/off on the same control after the
+   * warning has fired does NOT re-arm the latch — by design, to avoid
+   * console spam from consumers who toggle the attribute repeatedly.
    * @internal
    */
   private _competingLabelWarned = false;
@@ -369,6 +385,19 @@ export class HelixField extends HelixElement {
    * syncs treat the value as consumer-owned. This keeps the marker honest
    * without a MutationObserver.
    *
+   * Cross-host migration / pre-mounted marker: if the marker is present but
+   * `_lastWrittenAriaLabel === null`, this host has never written to the
+   * control. Either (a) the control was migrated from a prior hx-field that
+   * stamped the marker, or (b) a consumer pre-mounted the marker themselves.
+   * In both cases this host has no ownership claim, so we strip the orphan
+   * marker and treat the value as consumer-owned. Without this, a fresh host
+   * with `label=""` would silently strip the inherited aria-label.
+   *
+   * Note (snapshot limitation): if the consumer rewrites `aria-label` to the
+   * exact same value we last wrote, we cannot detect the overwrite — to
+   * genuinely take ownership in that case the consumer must either write a
+   * different value or remove the `data-hx-owns-label` marker themselves.
+   *
    * Absence of the marker (or presence of `data-aria-managed`) means the
    * consumer owns the value and hx-field must not touch it.
    * @internal
@@ -376,8 +405,14 @@ export class HelixField extends HelixElement {
   private _hostOwnsAriaLabel(control: HTMLElement): boolean {
     if (control.hasAttribute('data-aria-managed')) return false;
     if (!control.hasAttribute(HelixField._ARIA_LABEL_OWNED_ATTR)) return false;
+    if (this._lastWrittenAriaLabel === null) {
+      // Orphan marker — either migrated from a prior host or pre-mounted by
+      // the consumer. This host has no claim; release and defer to consumer.
+      control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+      return false;
+    }
     const liveValue = control.getAttribute('aria-label');
-    if (this._lastWrittenAriaLabel !== null && liveValue !== this._lastWrittenAriaLabel) {
+    if (liveValue !== this._lastWrittenAriaLabel) {
       // Consumer rewrote the attribute under us — they are the owner now.
       control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
       this._lastWrittenAriaLabel = null;

@@ -1155,5 +1155,49 @@ describe('hx-field', () => {
         document.body.removeChild(container);
       }
     });
+
+    it('releases an orphan ownership marker pre-mounted on a fresh control', async () => {
+      // Regression guard for round-13 follow-up F1: if a slotted control
+      // arrives with `data-hx-owns-label="true"` already stamped (e.g. it
+      // was migrated from a prior hx-field, or a consumer pre-mounted the
+      // marker themselves) and the new hx-field has never written to it,
+      // the new host's `_lastWrittenAriaLabel` is `null`. Without the F1
+      // guard, the value mismatch check `liveValue !== _lastWrittenAriaLabel`
+      // short-circuits with `null !== "A"` returning true, so the host
+      // would claim ownership and clobber the value on the next sync.
+      // The fix: when the marker is present but the snapshot is null, the
+      // host has no claim — strip the orphan marker and treat the value as
+      // consumer-owned (defense-in-depth).
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        // Build an input with the ownership marker AND aria-label already
+        // stamped — simulating either cross-host migration or a consumer
+        // who pre-mounted the marker themselves.
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.setAttribute('aria-label', 'A');
+        input.setAttribute('data-hx-owns-label', 'true');
+
+        const field = document.createElement('hx-field') as HelixField;
+        // Note: NO label prop — field has never written to this control,
+        // so its `_lastWrittenAriaLabel` is null when the marker is seen.
+        field.appendChild(input);
+        container.appendChild(field);
+
+        // Wait for slotchange + initial sync to settle.
+        await field.updateComplete;
+        await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
+        await field.updateComplete;
+
+        // The orphan marker must be stripped, the consumer's aria-label
+        // must be preserved untouched, and the field must NOT have claimed
+        // ownership on its first encounter with this control.
+        expect(input.getAttribute('aria-label')).toBe('A');
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+      } finally {
+        container.remove();
+      }
+    });
   });
 });
