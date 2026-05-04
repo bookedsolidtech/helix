@@ -244,6 +244,11 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     this.removeEventListener('keydown', this._handleKeydown);
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
+    // Codex round-7 finding #6: tear down the per-child disabled observer so
+    // detached radios don't keep a strong reference back into a group whose
+    // host is being torn down.
+    this._childDisabledObserver?.disconnect();
+    this._childDisabledObserver = null;
     // Release suppression on every previously-tracked child so they regain
     // stand-alone behaviour if re-parented or kept in the document after the
     // group is removed. Codex round-3 finding #1 (defense-in-depth).
@@ -310,33 +315,78 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       internals.ariaLabel = null;
     }
 
+    // Resolve the candidate label/desc element references once — the IDL-ref
+    // path consumes them as `Element[]`, the fallback path mirrors their `id`
+    // tokens onto the host's `aria-labelledby` / `aria-describedby` attributes
+    // so that AT can still locate the shadow help/error wrappers via the
+    // stable shadow-internal ids.
+    const internalLegend = this.shadowRoot?.getElementById(`${this._groupId}-legend`);
+    const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+    const errorEl = this.shadowRoot?.getElementById(this._errorId);
+
+    const externalLabelTokens = this.getAttribute('aria-labelledby');
+    const externalDescTokens = this.getAttribute('aria-describedby');
+
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    if (labelEls.length === 0 && !hostAriaLabel && this.label && internalLegend) {
+      labelEls.push(internalLegend);
+    }
+
+    const descEls = resolveIdrefTokens(this, externalDescTokens);
+    if (helpEl && (this.helpText || this._hasHelpSlot)) {
+      descEls.push(helpEl);
+    }
+    if (errorEl && (this.error || this._hasErrorSlot)) {
+      descEls.push(errorEl);
+    }
+
     if (supportsIdrefElementReferences(internals)) {
       type InternalsWithRefs = ElementInternals & {
         ariaLabelledByElements: Element[] | null;
         ariaDescribedByElements: Element[] | null;
       };
       const refsInternals = internals as InternalsWithRefs;
-
-      const externalLabelTokens = this.getAttribute('aria-labelledby');
-      const externalDescTokens = this.getAttribute('aria-describedby');
-
-      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
-      const internalLegend = this.shadowRoot?.getElementById(`${this._groupId}-legend`);
-      if (labelEls.length === 0 && !hostAriaLabel && this.label && internalLegend) {
-        labelEls.push(internalLegend);
-      }
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
-
-      const descEls = resolveIdrefTokens(this, externalDescTokens);
-      const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
-      const errorEl = this.shadowRoot?.getElementById(this._errorId);
-      if (helpEl && (this.helpText || this._hasHelpSlot)) {
-        descEls.push(helpEl);
-      }
-      if (errorEl && (this.error || this._hasErrorSlot)) {
-        descEls.push(errorEl);
-      }
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+    } else {
+      // ─── No-IDL-ref fallback (codex round-7 #5) ───
+      // The IDL element-references API is unavailable, so internal shadow
+      // help/error wrappers cannot be projected onto the host accessibility
+      // node via `internals.aria*Elements`. Mirror the resolved ids onto the
+      // host's `aria-labelledby` / `aria-describedby` attributes instead — the
+      // shadow-internal ids resolve through the host's shadow root for AT
+      // walking the tree. Only set the attributes when our resolution
+      // contributed an internal element (legend, help, error) that the
+      // consumer-supplied tokens did not already cover; otherwise leave the
+      // consumer-provided string attributes untouched. Codex prior round
+      // already records consumer tokens in `data-aria-*` mirrors via
+      // `mixinDelegatesAria`, so unconditional clearing would clobber them.
+      const consumerLabelIds = new Set((externalLabelTokens?.split(/\s+/) ?? []).filter(Boolean));
+      const consumerDescIds = new Set((externalDescTokens?.split(/\s+/) ?? []).filter(Boolean));
+
+      const internalLabelIds = labelEls
+        .map((el) => el.id)
+        .filter((id) => id && !consumerLabelIds.has(id));
+      const internalDescIds = descEls
+        .map((el) => el.id)
+        .filter((id) => id && !consumerDescIds.has(id));
+
+      if (internalLabelIds.length > 0) {
+        const merged = [...consumerLabelIds, ...internalLabelIds].join(' ');
+        if (this.getAttribute('aria-labelledby') !== merged) {
+          this.setAttribute('aria-labelledby', merged);
+        }
+      }
+      if (internalDescIds.length > 0) {
+        const merged = [...consumerDescIds, ...internalDescIds].join(' ');
+        if (this.getAttribute('aria-describedby') !== merged) {
+          this.setAttribute('aria-describedby', merged);
+        }
+      } else if (consumerDescIds.size === 0 && this.hasAttribute('aria-describedby')) {
+        // No consumer tokens AND no internal ids — clear stale mirror so
+        // removed help/error wrappers don't leave behind broken IDREFs.
+        this.removeAttribute('aria-describedby');
+      }
     }
   }
 
@@ -344,6 +394,11 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     super.firstUpdated(changedProperties);
     this._syncRadios();
     this._previousRadios = this._getRadios();
+    // Codex round-7 finding #6: observe in-place `disabled` mutations on the
+    // initial child set. The slotchange handler refreshes this on every slot
+    // pass, but firstUpdated covers the case where the initial children are
+    // never re-slotted (e.g. static markup mounted once).
+    this._installChildDisabledObservers();
     // WCAG 4.1.2: warn when no accessible name is available for the radio group.
     // The fieldset needs either a label prop (rendered as <legend>) or an aria-label
     // attribute on the host element so screen readers can identify the group.
@@ -541,17 +596,50 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
 
   /**
    * Handles slotchange events on the default slot. Refreshes the cached
-   * radio list, then reconciles `value`, `setFormValue`, and validity against
-   * the currently-slotted children. Codex round-2 finding #3: previously this
-   * handler only invalidated the cache and re-synced child state, so removing
-   * the currently-selected radio (or disabling it, or adding a new
-   * `checked` radio) left `this.value` and the submitted form value pointing
-   * at stale state and `_updateValidity` was never re-run.
+   * radio list, reconciles `value`/`setFormValue`/validity against the new
+   * children, then re-tunes the per-child disabled observer so in-place
+   * `radio.disabled = true` mutations trigger the same reconcile pass.
+   *
+   * Codex round-2 finding #3: previously this handler only invalidated the
+   * cache and re-synced child state, so removing the currently-selected
+   * radio (or disabling it, or adding a new `checked` radio) left
+   * `this.value` and the submitted form value pointing at stale state and
+   * `_updateValidity` was never re-run.
+   *
+   * Codex round-7 finding #6: an in-place `selectedRadio.disabled = true`
+   * never re-entered this reconciler (the radio remained slotted), so the
+   * group could keep submitting a disabled value and stay valid until some
+   * unrelated slot mutation kicked things over. The per-child observer
+   * installed at the end of this method re-runs the same reconcile logic on
+   * every `disabled` attribute mutation.
    * @internal
    */
   private _handleSlotChange(): void {
     this._cachedRadios = null;
+    this._reconcileChildren();
+    this._installChildDisabledObservers();
+  }
 
+  /**
+   * Per-child `disabled` attribute observer. Mirrors the slotchange
+   * reconcile pipeline so an in-place `radio.disabled = true` collapses the
+   * group's `value`/form participation/validity. Round-7 finding #6.
+   *
+   * One observer is shared across all currently-slotted radios; it is
+   * disconnected and re-attached on every slotchange so children that have
+   * left the group stop firing reconcile passes.
+   * @internal
+   */
+  private _childDisabledObserver: MutationObserver | null = null;
+
+  /**
+   * Re-runs the slotchange reconcile pass without touching the disabled
+   * observer wiring. Called from the slotchange handler and from the
+   * per-child disabled observer; factored out so both entry points share
+   * the same value/formValue/validity reconciliation path. Round-7 #6.
+   * @internal
+   */
+  private _reconcileChildren(): void {
     // Snapshot of the previous slot pass so we can release `_groupedSuppress`
     // on any radio that has left this group. Codex round-3 finding #1
     // (defense-in-depth symmetry).
@@ -598,6 +686,36 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       }
     });
     this._previousRadios = this._getRadios();
+  }
+
+  /**
+   * Installs (or re-installs) a single MutationObserver across the current
+   * set of slotted `<hx-radio>` children, listening for `disabled` attribute
+   * mutations. Round-7 finding #6: in-place `disabled = true` never reaches
+   * the slotchange-driven reconciler otherwise.
+   * @internal
+   */
+  private _installChildDisabledObservers(): void {
+    this._childDisabledObserver?.disconnect();
+    const radios = this._getRadios();
+    if (radios.length === 0) {
+      this._childDisabledObserver = null;
+      return;
+    }
+    const observer = new MutationObserver((mutations) => {
+      // Filter to disabled-attribute mutations only — the observer is scoped
+      // to attributeFilter:['disabled'] but the callback still fires per
+      // mutation record, so guard cheaply against noise.
+      if (!mutations.some((m) => m.attributeName === 'disabled')) return;
+      this._reconcileChildren();
+    });
+    radios.forEach((radio) => {
+      observer.observe(radio, {
+        attributes: true,
+        attributeFilter: ['disabled'],
+      });
+    });
+    this._childDisabledObserver = observer;
   }
 
   // ─── Form Integration ───
