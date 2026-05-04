@@ -1148,7 +1148,32 @@ describe('hx-radio-group', () => {
       }
     });
 
-    it('host ariaDescribedByElements orders help text before error', async () => {
+    it('host ariaDescribedByElements references help text in the help-only state', async () => {
+      // Codex round-16 P2: in the help-only state the help element appears
+      // in the describedby chain. The help+error state drops help (covered
+      // by the next test).
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" help-text="Hint"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs.indexOf(helpDiv)).toBeGreaterThanOrEqual(0);
+      } else {
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).toContain(helpDiv.id);
+      }
+    });
+
+    it('drops help-text from describedBy chain when an error is active (round-16 P2)', async () => {
+      // Codex round-16 P2: when both help and error are present, the help
+      // wrapper is hidden — referencing it in host semantics would have AT
+      // announce stale guidance ahead of the validation error.
       const el = await fixture<HxRadioGroup>(
         `<hx-radio-group label="Color" help-text="Hint" error="Required"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
@@ -1156,15 +1181,19 @@ describe('hx-radio-group', () => {
       const internals = (el as RadioGroupTestHarness)._internals;
       const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
       const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
+      expect(helpDiv.hasAttribute('hidden')).toBe(true);
+      expect(errorDiv.hasAttribute('hidden')).toBe(false);
       type InternalsWithRefs = ElementInternals & {
         ariaDescribedByElements: Element[] | null;
       };
       const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
       if (refs) {
-        expect(refs.indexOf(helpDiv)).toBeLessThan(refs.indexOf(errorDiv));
+        expect(refs.indexOf(errorDiv)).toBeGreaterThanOrEqual(0);
+        expect(refs.indexOf(helpDiv)).toBe(-1);
       } else {
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
-        expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+        expect(tokens).toContain(errorDiv.id);
+        expect(tokens).not.toContain(helpDiv.id);
       }
     });
 

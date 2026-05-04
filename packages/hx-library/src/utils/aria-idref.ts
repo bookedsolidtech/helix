@@ -269,35 +269,70 @@ export function installAriaIdrefMirror(
   // per-instance subtree observers into one per root, so on pages with many
   // controls a single mutation produces a single subscriber fan-out instead
   // of `controls × mutations` observer callbacks.
-  let unsubscribeRoot: (() => void) | null = null;
-  let observedRoot: Document | ShadowRoot | null = null;
+  //
+  // Codex round-16 P1: subscribe to every root the resolver can match — the
+  // host's own root, every enclosing shadow root, and the owner document.
+  // Without this, dynamic IDREF targets in ancestor scopes (legitimate per
+  // the round-15 widened resolver) bind correctly on first render but never
+  // resync when the outer document mutates. We track active subscriptions
+  // by root and incrementally diff on `attachRootObservers()` so resync
+  // calls don't churn observers when nothing has changed.
+  const rootSubscriptions = new Map<Document | ShadowRoot, () => void>();
 
-  const attachRootObserver = (): void => {
-    if (!observeRoot) return;
-    const root = host.getRootNode();
-    if (!(root instanceof Document) && !(root instanceof ShadowRoot)) {
-      return;
+  const computeRootsToObserve = (): Array<Document | ShadowRoot> => {
+    const roots: Array<Document | ShadowRoot> = [];
+    let current: Node | null = host.getRootNode();
+    while (current instanceof ShadowRoot) {
+      roots.push(current);
+      const shadowHost: Element | null = current.host ?? null;
+      current = shadowHost ? shadowHost.getRootNode() : null;
     }
-    if (root === observedRoot) return;
-    unsubscribeRoot?.();
-    unsubscribeRoot = subscribeToRoot(root, sync);
-    observedRoot = root;
+    if (current instanceof Document && !roots.includes(current)) {
+      roots.push(current);
+    }
+    const ownerDoc = host.ownerDocument;
+    if (ownerDoc && !roots.includes(ownerDoc)) {
+      roots.push(ownerDoc);
+    }
+    return roots;
   };
 
-  attachRootObserver();
+  const attachRootObservers = (): void => {
+    if (!observeRoot) return;
+    const wanted = computeRootsToObserve();
+    const wantedSet = new Set(wanted);
+    // Remove subscriptions for roots no longer in scope (e.g. when the host
+    // is moved between trees and the old ancestor chain no longer applies).
+    for (const [root, unsub] of rootSubscriptions) {
+      if (!wantedSet.has(root)) {
+        unsub();
+        rootSubscriptions.delete(root);
+      }
+    }
+    // Add subscriptions for new roots (host's root + ancestor shadow roots
+    // + owner document) that the resolver can now match against.
+    for (const root of wanted) {
+      if (!rootSubscriptions.has(root)) {
+        rootSubscriptions.set(root, subscribeToRoot(root, sync));
+      }
+    }
+  };
+
+  attachRootObservers();
   // Initial sync — caller's `sync` reads the current attribute snapshot.
   sync();
 
   return {
     resync(): void {
-      attachRootObserver();
+      attachRootObservers();
       sync();
     },
     disconnect(): void {
       hostObserver.disconnect();
-      unsubscribeRoot?.();
-      unsubscribeRoot = null;
-      observedRoot = null;
+      for (const unsub of rootSubscriptions.values()) {
+        unsub();
+      }
+      rootSubscriptions.clear();
     },
   };
 }
