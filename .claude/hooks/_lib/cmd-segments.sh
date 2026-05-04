@@ -181,7 +181,14 @@ _rea_unwrap_nested_shells() {
       # alternation `(^|[[:space:]&|;])` therefore cannot anchor on a
       # masked separator, and the shell-name token itself can no longer
       # appear adjacent to a masked quote-introducer.
-      WRAP = "(^|[[:space:]&|;])(bash|sh|zsh|dash|ksh)([[:space:]]+-[a-zA-Z]+)*[[:space:]]+-(c|lc|lic|ic|cl|cli|li|il)[[:space:]]+"
+      # 0.19.0 security review M1: extend the shell-name set to cover
+      # every commonly-installed POSIX-style shell. mksh / oksh / yash /
+      # posh ship on minimal containers, csh/tcsh on legacy macOS,
+      # fish on dev workstations. Each accepts -c with a quoted body.
+      # NOTE: pwsh (PowerShell) uses -Command / -EncodedCommand and is
+      # NOT covered here. Adding pwsh requires a separate code path
+      # because EncodedCommand base64-decodes at runtime.
+      WRAP = "(^|[[:space:]&|;])(bash|sh|zsh|dash|ksh|mksh|oksh|posh|yash|csh|tcsh|fish)([[:space:]]+-[a-zA-Z]+)*[[:space:]]+-(c|lc|lic|ic|cl|cli|li|il)[[:space:]]+"
       # Track the cursor in BOTH raw and masked. Because the mask is
       # byte-for-byte width-preserving, the same RSTART/RLENGTH applies
       # to both — but each iteration of the loop must SLICE both strings

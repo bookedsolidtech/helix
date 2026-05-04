@@ -70,3 +70,78 @@ resolve_parent_realpath() {
   resolved=$(cd -P -- "$parent_dir" 2>/dev/null && pwd -P 2>/dev/null) || resolved=""
   printf '%s' "$resolved"
 }
+
+# 0.20.1 helix-021 fixes: shared helper for the Bash-tier symlink
+# resolution that the Write-tier `blocked-paths-enforcer.sh` has had
+# since 0.10.x. Given a project-relative LOGICAL_PATH (already
+# normalized via normalize_path) and the original raw token (whose
+# parent dir may exist on disk), return the resolved-symlink
+# project-relative form on stdout.
+#
+# Returns:
+#   - The empty string if the parent doesn't exist (caller can't
+#     resolve, falls back to LOGICAL_PATH only).
+#   - A literal `__rea_outside_root__:<resolved>` sentinel when the
+#     parent's realpath escapes REA_ROOT. Caller refuses with the
+#     same shape as the existing outside-REA_ROOT check.
+#   - The project-relative resolved form (lowercased to match
+#     case-insensitive comparisons elsewhere) when resolution
+#     succeeds.
+#
+# Reference:
+#   `blocked-paths-enforcer.sh` lines ~205-238 for the Write-tier
+#   reference implementation that this helper backports to Bash-tier.
+rea_resolved_relative_form() {
+  local raw_token="$1"
+  # Skip absolute paths whose logical form is already outside REA_ROOT
+  # — `/tmp/log`, `/var/log/x`, etc. The caller's logical-path check
+  # has already decided whether to allow or refuse based on the
+  # logical form. Re-running symlink resolution on these would
+  # produce a false "symlink resolves outside project root" refusal
+  # (because `/tmp` resolves to `/private/tmp` on macOS, which is
+  # technically outside REA_ROOT). The threat model for THIS helper
+  # is intra-project symlink walks: a path the caller thinks is
+  # under REA_ROOT but resolves elsewhere via an intermediate
+  # symlink. Pure external paths are out of scope.
+  if [[ "$raw_token" == /* ]]; then
+    # Canonicalize REA_ROOT for the comparison.
+    local rea_root_canon_for_skip
+    rea_root_canon_for_skip=$(cd -P -- "$REA_ROOT" 2>/dev/null && pwd -P 2>/dev/null) || rea_root_canon_for_skip="$REA_ROOT"
+    if [[ "$raw_token" != "$rea_root_canon_for_skip"/* && "$raw_token" != "$REA_ROOT"/* ]]; then
+      printf ''
+      return 0
+    fi
+  fi
+  local resolved_parent
+  resolved_parent=$(resolve_parent_realpath "$raw_token")
+  if [[ -z "$resolved_parent" ]]; then
+    printf ''
+    return 0
+  fi
+  # Canonicalize REA_ROOT the same way `pwd -P` canonicalized
+  # `resolved_parent`. macOS resolves `/var/folders/...` to
+  # `/private/var/folders/...` because `/var` is a symlink to
+  # `/private/var`; without this normalization the prefix-equality
+  # below produces a false outside-REA_ROOT sentinel for every path
+  # under a tmpdir that started life as `/var/...`. Memo-friendly:
+  # `cd -P` runs once per hook invocation; the cost is bounded.
+  local rea_root_canon
+  rea_root_canon=$(cd -P -- "$REA_ROOT" 2>/dev/null && pwd -P 2>/dev/null) || rea_root_canon="$REA_ROOT"
+  # Outside-REA_ROOT guard. The resolve may walk a symlink that exits
+  # the project tree entirely; emit the sentinel so the caller
+  # refuses with the same wording as the logical-path traversal
+  # check.
+  if [[ "$resolved_parent" != "$rea_root_canon" && "$resolved_parent" != "$rea_root_canon"/* ]]; then
+    printf '__rea_outside_root__:%s/%s' "$resolved_parent" "$(basename -- "$raw_token")"
+    return 0
+  fi
+  # Strip canonical REA_ROOT prefix, append basename, lowercase to
+  # match rea_path_is_protected's case-insensitive comparison.
+  local rel
+  if [[ "$resolved_parent" == "$rea_root_canon" ]]; then
+    rel="$(basename -- "$raw_token")"
+  else
+    rel="${resolved_parent#"$rea_root_canon"/}/$(basename -- "$raw_token")"
+  fi
+  printf '%s' "$rel" | tr '[:upper:]' '[:lower:]'
+}

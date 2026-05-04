@@ -27,6 +27,8 @@ set -uo pipefail
 
 # shellcheck source=_lib/protected-paths.sh
 source "$(dirname "$0")/_lib/protected-paths.sh"
+# shellcheck source=_lib/path-normalize.sh
+source "$(dirname "$0")/_lib/path-normalize.sh"
 # shellcheck source=_lib/cmd-segments.sh
 source "$(dirname "$0")/_lib/cmd-segments.sh"
 
@@ -235,7 +237,7 @@ _check_segment() {
           # walking — there may be more positional args.
           local _t
           _t=$(_normalize_target "$target_token")
-          # 0.16.0 codex P2-3: outside-REA_ROOT sentinel handling.
+          # 0.16.0 codex P2-3: outside-REA_ROOT sentinel handling (logical).
           if [[ "$_t" == __rea_outside_root__:* ]]; then
             local resolved="${_t#__rea_outside_root__:}"
             {
@@ -244,15 +246,37 @@ _check_segment() {
             } >&2
             exit 2
           fi
-          if rea_path_is_protected "$_t"; then
+          # 0.20.1 helix-021 #1: resolve intermediate symlinks via
+          # `cd -P / pwd -P` parent-canonicalization (Write-tier parity).
+          # `ln -s ../ .husky/pre-push.d/linkdir; printf x > .husky/pre-push.d/linkdir/pre-push`
+          # had a logical form of `.husky/pre-push.d/linkdir/pre-push`
+          # that didn't match any protected pattern; the resolved form
+          # is `.husky/pre-push` which DOES match. Refuse on either.
+          local _t_resolved
+          _t_resolved=$(rea_resolved_relative_form "$target_token")
+          if [[ "$_t_resolved" == __rea_outside_root__:* ]]; then
+            local resolved="${_t_resolved#__rea_outside_root__:}"
+            {
+              printf 'PROTECTED PATH (bash): symlink resolves outside project root\n'
+              printf '  Logical: %s\n  Resolved: %s\n' "$target_token" "$resolved"
+            } >&2
+            exit 2
+          fi
+          if rea_path_is_protected "$_t" \
+             || ([[ -n "$_t_resolved" ]] && rea_path_is_protected "$_t_resolved"); then
             local matched=""
             local pattern_lc
+            local hit_form="$_t"
+            if [[ -n "$_t_resolved" ]] && rea_path_is_protected "$_t_resolved" \
+               && ! rea_path_is_protected "$_t"; then
+              hit_form="$_t_resolved"
+            fi
             for pattern in "${REA_PROTECTED_PATTERNS[@]}"; do
               pattern_lc=$(printf '%s' "$pattern" | tr '[:upper:]' '[:lower:]')
-              if [[ "$_t" == "$pattern_lc" ]]; then matched="$pattern"; break; fi
-              if [[ "$pattern_lc" == */ && "$_t" == "$pattern_lc"* ]]; then matched="$pattern"; break; fi
+              if [[ "$hit_form" == "$pattern_lc" ]]; then matched="$pattern"; break; fi
+              if [[ "$pattern_lc" == */ && "$hit_form" == "$pattern_lc"* ]]; then matched="$pattern"; break; fi
             done
-            _refuse "$matched" "$_t" "$segment"
+            _refuse "$matched" "$hit_form" "$segment"
           fi
           # Reset target_token so the post-loop check doesn't double-check.
           target_token=""
@@ -283,17 +307,38 @@ _check_segment() {
     } >&2
     exit 2
   fi
-  if rea_path_is_protected "$target"; then
+  # 0.20.1 helix-021 #1: resolve intermediate symlinks. See parallel
+  # block in the multi-target loop above for the rationale.
+  local target_resolved
+  target_resolved=$(rea_resolved_relative_form "$target_token")
+  if [[ "$target_resolved" == __rea_outside_root__:* ]]; then
+    local resolved="${target_resolved#__rea_outside_root__:}"
+    {
+      printf 'PROTECTED PATH (bash): symlink resolves outside project root\n'
+      printf '\n'
+      printf '  Logical:  %s\n' "$target_token"
+      printf '  Resolved: %s\n' "$resolved"
+      printf '  Segment:  %s\n' "$segment"
+    } >&2
+    exit 2
+  fi
+  if rea_path_is_protected "$target" \
+     || ([[ -n "$target_resolved" ]] && rea_path_is_protected "$target_resolved"); then
     # Find the matching pattern for the error message. Both `target`
     # and `pattern` lowercased to match `_normalize_target`'s case-
     # insensitive output (helix-015 P1 fix).
     local matched="" pattern_lc
+    local hit_form="$target"
+    if [[ -n "$target_resolved" ]] && rea_path_is_protected "$target_resolved" \
+       && ! rea_path_is_protected "$target"; then
+      hit_form="$target_resolved"
+    fi
     for pattern in "${REA_PROTECTED_PATTERNS[@]}"; do
       pattern_lc=$(printf '%s' "$pattern" | tr '[:upper:]' '[:lower:]')
-      if [[ "$target" == "$pattern_lc" ]]; then matched="$pattern"; break; fi
-      if [[ "$pattern_lc" == */ && "$target" == "$pattern_lc"* ]]; then matched="$pattern"; break; fi
+      if [[ "$hit_form" == "$pattern_lc" ]]; then matched="$pattern"; break; fi
+      if [[ "$pattern_lc" == */ && "$hit_form" == "$pattern_lc"* ]]; then matched="$pattern"; break; fi
     done
-    _refuse "$matched" "$target" "$segment"
+    _refuse "$matched" "$hit_form" "$segment"
   fi
   return 0
 }

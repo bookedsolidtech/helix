@@ -50,15 +50,29 @@ source "$(dirname "$0")/_lib/path-normalize.sh"
 FILE_PATH=$(normalize_path "$FILE_PATH")
 
 # ── 6. Check architecture-sensitive paths ─────────────────────────────────────
-ARCH_PATTERNS=(
-  'src/types/'
-  'src/gateway/'
-  'src/config/'
-  'src/cli/commands/init/'
-  'hooks/_lib/'
-  'templates/'
-  'profiles/'
-)
+# 0.20.1 helix-round-N P2: read patterns from policy. Pre-fix the
+# rea-internal source-tree patterns (`src/gateway/`, `hooks/_lib/`,
+# `profiles/`, etc.) shipped as hardcoded defaults — irrelevant noise
+# in consumer projects whose architecture-sensitive paths are
+# different. Consumers with their own architecture surfaces declare
+# them in `.rea/policy.yaml::architecture_review.patterns`. The
+# bst-internal profile pins the rea-source patterns so the dogfood
+# install behaves the same as before; consumers without a pattern
+# set get a silent no-op.
+# shellcheck source=_lib/policy-read.sh
+source "$(dirname "$0")/_lib/policy-read.sh"
+
+ARCH_PATTERNS=()
+while IFS= read -r entry; do
+  [[ -z "$entry" ]] && continue
+  ARCH_PATTERNS+=("$entry")
+done < <(policy_list "architecture_review.patterns" 2>/dev/null || true)
+
+if [[ ${#ARCH_PATTERNS[@]} -eq 0 ]]; then
+  # Empty/unset policy → silent no-op. Consumers who haven't declared
+  # architecture-sensitive paths see zero advisory output.
+  exit 0
+fi
 
 MATCHED=""
 for pattern in "${ARCH_PATTERNS[@]}"; do

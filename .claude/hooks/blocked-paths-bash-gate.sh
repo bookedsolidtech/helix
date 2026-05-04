@@ -161,6 +161,13 @@ _refuse() {
 }
 
 # Check a single resolved-target token. Refuses on hit.
+#
+# 0.20.1 helix-021 #2: in addition to the logical post-_normalize_target
+# form, also check the symlink-resolved form. Pre-fix `ln -s . linkroot;
+# printf x > linkroot/.env` had a logical form of `linkroot/.env`
+# (no match against blocked_paths) but a resolved form of `.env`
+# (which DOES match). Refuse on either match. Write-tier
+# `blocked-paths-enforcer.sh` already has this resolution since 0.10.x.
 _check_token() {
   local token="$1" segment="$2"
   [[ -z "$token" ]] && return 0
@@ -172,8 +179,20 @@ _check_token() {
     # outside-root rejection on the protected list itself.
     return 0
   fi
+  # Symlink-resolved form via shared helper. Returns empty when the
+  # parent doesn't exist (legitimate "creating the parent" case);
+  # outside-REA_ROOT sentinel when the symlink walks out of the
+  # project (silently allow — same as the logical-path branch above).
+  local resolved_symlink
+  resolved_symlink=$(rea_resolved_relative_form "$token")
+  if [[ "$resolved_symlink" == __rea_outside_root__:* ]]; then
+    resolved_symlink=""
+  fi
   if _match_blocked "$resolved"; then
     _refuse "$MATCHED" "$resolved" "$segment"
+  fi
+  if [[ -n "$resolved_symlink" ]] && _match_blocked "$resolved_symlink"; then
+    _refuse "$MATCHED" "$resolved_symlink" "$segment"
   fi
   return 0
 }

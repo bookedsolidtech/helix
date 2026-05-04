@@ -1,12 +1,12 @@
 {
-  "version": "0.19.0",
+  "version": "0.21.0",
   "profile": "bst-internal",
   "installed_at": "2026-04-23T15:09:02.547Z",
-  "upgraded_at": "2026-05-04T02:35:25.722Z",
+  "upgraded_at": "2026-05-04T03:05:22.901Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
-      "sha256": "1813e590ab65f3eb270f040b21cff6348a6b2f3dea7a232781d04053d4de2b4b",
+      "sha256": "20ee41c06dd67f1ba19662eba57dfbc4fea3fe199b6a2f7f95d5b1c474ad31bc",
       "source": "hook"
     },
     {
@@ -21,7 +21,7 @@
     },
     {
       "path": ".claude/hooks/_lib/path-normalize.sh",
-      "sha256": "2e5204a1eddbcfd868bdfac60411c03fb6cb59605ccdf206b974c8cbdcb53934",
+      "sha256": "9fa2054bc519e9f0f3237a7f671740d3dec0f472f792cb1a0483402735f68d19",
       "source": "hook"
     },
     {
@@ -36,22 +36,22 @@
     },
     {
       "path": ".claude/hooks/_lib/protected-paths.sh",
-      "sha256": "3e9366d817a2421a08e8f3b2ebf4a68bc48aef075fa8bd44864308e8c63b063f",
+      "sha256": "8a3c0bf922dee194295a8c1bd2dab7c32bb216007a4b0929ad129e70254421b6",
       "source": "hook"
     },
     {
       "path": ".claude/hooks/architecture-review-gate.sh",
-      "sha256": "80224c976a144ac57c2269a933eb5c92fb1a499d8122c888a04dcc60ff585cd9",
+      "sha256": "658f28b11e563743239ee2ee716ebb687edcf8aa45e4b273d5fa4d276b6fcd9d",
       "source": "hook"
     },
     {
       "path": ".claude/hooks/attribution-advisory.sh",
-      "sha256": "ea01801c50fa6c2afd43b15deb570c7ae0ba6627d761a7167add7bb2b031b86b",
+      "sha256": "5262575e6881d47673db7af5aa1acff770f16e623d401fe288dc22d6525d7932",
       "source": "hook"
     },
     {
       "path": ".claude/hooks/blocked-paths-bash-gate.sh",
-      "sha256": "edd1636d60f7a9a2ba4374c7088dc6b7c172cb3cad684402def0138e5e357c2b",
+      "sha256": "f21aa7ba60ad61ad1f7258a12ba9dfac5dfa18e4c2acf68aa1e9123bb625077b",
       "source": "hook"
     },
     {
@@ -86,7 +86,7 @@
     },
     {
       "path": ".claude/hooks/protected-paths-bash-gate.sh",
-      "sha256": "cb60c9bb12c150f808144a2a4457ded83ac52fb29f30bfe3894ef484eb3f95de",
+      "sha256": "7cb38e0a6ad92d447bb3e42304e80e79e5287e2ae5c46d90c4d0b396acf0442b",
       "source": "hook"
     },
     {
@@ -101,7 +101,7 @@
     },
     {
       "path": ".claude/hooks/settings-protection.sh",
-      "sha256": "e5a232e591449083181cf7ccba0dcdcf39830c71aa9aac6bd6f10d5e11b3a9d8",
+      "sha256": "64b2b50a90bed0589551cb849016adffc9c0ab0313cbc71ca1ca154fdb3236dc",
       "source": "hook"
     },
     {
@@ -181,7 +181,7 @@
     },
     {
       "path": ".husky/commit-msg",
-      "sha256": "9c6f6e58ec3ee7fbaa6533abec5868cee6a3ebc3272969248dd736131df9174d",
+      "sha256": "70e9d3b52320f1eca888266de2fbf994de5d4617bb7a9ba814bfd6f9206c5809",
       "source": "husky"
     },
     {

@@ -86,9 +86,9 @@ MATCHES=""
 # Pattern 2 below catches Co-Authored-By with named tools regardless of
 # email, so dropping users.noreply.github.com from this branch only
 # relaxes the check for human collaborators — never for AI.
-if grep -qiE 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com)' "$COMMIT_MSG_FILE" 2>/dev/null; then
+if grep -qiE 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com|mistral\.ai|xai-org|x\.ai|inflection\.ai|perplexity\.ai|replit\.com|jetbrains\.com|bito\.ai|pieces\.app|phind\.com|you\.com)' "$COMMIT_MSG_FILE" 2>/dev/null; then
   BLOCKED=1
-  MATCHES="${MATCHES}$(grep -niE 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com)' "$COMMIT_MSG_FILE" 2>/dev/null)
+  MATCHES="${MATCHES}$(grep -niE 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com|mistral\.ai|xai-org|x\.ai|inflection\.ai|perplexity\.ai|replit\.com|jetbrains\.com|bito\.ai|pieces\.app|phind\.com|you\.com)' "$COMMIT_MSG_FILE" 2>/dev/null)
 "
 fi
 

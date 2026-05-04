@@ -102,7 +102,7 @@ FOUND=0
 # below catches Co-Authored-By with named tools regardless of the email
 # domain, so dropping `users.noreply.github.com` from the noreply
 # pattern only relaxes the check for human collaborators — never for AI.
-if any_segment_matches "$CMD" 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com)'; then
+if any_segment_matches "$CMD" 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com|mistral\.ai|xai-org|x\.ai|inflection\.ai|perplexity\.ai|replit\.com|jetbrains\.com|bito\.ai|pieces\.app|phind\.com|you\.com)'; then
   FOUND=1
 fi
 

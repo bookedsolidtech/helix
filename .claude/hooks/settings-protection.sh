@@ -199,8 +199,15 @@ case "$LOWER_NORM" in
     if [ -d "$parent_dir" ]; then
       resolved_parent=$(cd -P -- "$parent_dir" 2>/dev/null && pwd -P 2>/dev/null) || resolved_parent=""
       if [ -n "$resolved_parent" ]; then
+        # 0.20.1 helix-021 #3: directory-boundary on the case glob.
+        # Pre-fix `*"/.husky/commit-msg.d"*` matched `.husky/commit-msg.d.bak/`
+        # too (substring without trailing-slash anchor). A symlink
+        # `.husky/pre-push.d/linkdir -> ../pre-push.d.bak` then resolved
+        # to `.husky/pre-push.d.bak/...` and slipped through.
+        # The trailing `/` on each pattern (and the explicit
+        # exact-match arm) requires a real directory boundary.
         case "$resolved_parent" in
-          *"/.husky/commit-msg.d"*|*"/.husky/pre-push.d"*) : ;;
+          */.husky/commit-msg.d|*/.husky/commit-msg.d/*|*/.husky/pre-push.d|*/.husky/pre-push.d/*) : ;;
           *)
             {
               printf 'SETTINGS PROTECTION: extension path resolves outside surface\n'
