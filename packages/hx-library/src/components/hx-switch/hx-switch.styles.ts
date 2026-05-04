@@ -51,6 +51,22 @@ export const helixSwitchStyles = css`
     appearance: none;
   }
 
+  /*
+   * Host-focus path: on the modern (IDL element-references) render branch the
+   * host is the tabbable surface (tabindex=0) and the inner track button is
+   * demoted to tabindex=-1. Drive the focus ring from ':host(:focus-visible)'
+   * so keyboard users still see a visible affordance. Codex round-11 P1.
+   */
+  :host(:focus-visible) .switch__track {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
+  /*
+   * Fallback (no-IDL-ref) path: the host carries tabindex=-1 and the inner
+   * track button is the tab target. Native :focus-visible drives the ring.
+   */
   .switch__track:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-switch-focus-ring-color, var(--hx-focus-ring-color, #0f7078));

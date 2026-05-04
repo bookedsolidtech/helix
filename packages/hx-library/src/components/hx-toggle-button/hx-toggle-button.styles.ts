@@ -36,6 +36,22 @@ export const helixToggleButtonStyles = css`
     -webkit-user-select: none;
   }
 
+  /*
+   * Host-focus path: on the modern (IDL element-references) render branch the
+   * host is the tabbable surface (tabindex=0) and the inner <button> is
+   * demoted to tabindex=-1. Drive the focus ring from ':host(:focus-visible)'
+   * so keyboard users still see a visible affordance. Codex round-11 P1.
+   */
+  :host(:focus-visible) .button {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-toggle-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
+  /*
+   * Fallback (no-IDL-ref) path: the host carries tabindex=-1 and the inner
+   * <button> is the tab target. Native :focus-visible drives the ring.
+   */
   .button:focus-visible {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-toggle-button-focus-ring-color, var(--hx-focus-ring-color, #0f7078));

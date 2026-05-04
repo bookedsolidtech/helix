@@ -72,6 +72,23 @@ export const helixCheckboxStyles = css`
 
   /* ─── Focus Ring ─── */
 
+  /*
+   * Host-focus path: on the modern (IDL element-references) render branch the
+   * host is the tabbable surface (tabindex=0) and the inner input is demoted
+   * to tabindex=-1. Drive the focus ring from ':host(:focus-visible)' so
+   * keyboard users still get a visible affordance. Codex round-11 P1.
+   */
+  :host(:focus-visible) .checkbox__box {
+    outline: var(--hx-checkbox-focus-ring-width, var(--hx-focus-ring-width, 2px)) solid
+      var(--hx-checkbox-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-checkbox-focus-ring-offset, var(--hx-focus-ring-offset, 2px));
+  }
+
+  /*
+   * Fallback (no-IDL-ref) path: the host carries tabindex=-1 and the inner
+   * input is the tab target. The native :focus-visible on the input drives
+   * the same visual ring, scoped via the inner-state class.
+   */
   .checkbox__input:focus-visible ~ .checkbox__box {
     outline: var(--hx-checkbox-focus-ring-width, var(--hx-focus-ring-width, 2px)) solid
       var(--hx-checkbox-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
