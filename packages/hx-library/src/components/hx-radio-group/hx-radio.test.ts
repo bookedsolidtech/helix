@@ -358,16 +358,25 @@ describe('hx-radio', () => {
       expect(marker).toBeTruthy();
     });
 
-    it('renders help text and exposes it via aria-describedby', async () => {
+    it('renders help text and exposes it via host aria-describedby', async () => {
       const group = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Group" help-text="Choose carefully">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const help = shadowQuery(group, '[part="help-text"]');
+      const help = shadowQuery<HTMLElement>(group, '[part="help-text"]');
       expect(help?.textContent).toContain('Choose carefully');
-      const fieldset = shadowQuery<HTMLFieldSetElement>(group, 'fieldset')!;
-      expect(fieldset.getAttribute('aria-describedby')).toBeTruthy();
+      const internals = (group as unknown as { _internals: ElementInternals })._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(help);
+      } else {
+        const tokens = group.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).toContain(help?.id);
+      }
     });
 
     it('renders error text with role="alert" when error is set', async () => {
