@@ -1,8 +1,8 @@
 {
-  "version": "0.22.0",
+  "version": "0.23.0",
   "profile": "bst-internal",
   "installed_at": "2026-04-23T15:09:02.547Z",
-  "upgraded_at": "2026-05-04T03:55:51.897Z",
+  "upgraded_at": "2026-05-04T23:17:20.364Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
@@ -56,7 +56,7 @@
     },
     {
       "path": ".claude/hooks/blocked-paths-bash-gate.sh",
-      "sha256": "04bdedd0406d1caf1b2db83cff44ee010bf3a29736fdfd39bb05aba8b29ad2a9",
+      "sha256": "7c0f9b3304c7caf6b7f7b46801b49ff6b440a47d965814820807d331de8c531e",
       "source": "hook"
     },
     {
@@ -91,7 +91,7 @@
     },
     {
       "path": ".claude/hooks/protected-paths-bash-gate.sh",
-      "sha256": "b584e78079a46a89e5fb1cb53490dab872be9a57755c811d9b118c8b38d5ab51",
+      "sha256": "d82f05c827f8adec8e9428a1acd56c6a94723479e6e7f1821eb34668f48f5cbe",
       "source": "hook"
     },
     {
