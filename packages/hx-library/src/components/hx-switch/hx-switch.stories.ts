@@ -138,11 +138,19 @@ type Story = StoryObj;
 // Helpers
 // ─────────────────────────────────────────────────
 
-/** Resolves the native button[role="switch"] inside the shadow root. */
+/**
+ * Resolves the native track button inside the shadow root.
+ *
+ * Round-1 host-canonical refactor moved `role="switch"` from the inner button
+ * to the host via `ElementInternals.role`. Modern engines (`_supportsIdrefRefs`
+ * = true) render the inner button without a role attribute. Stories must
+ * query by `[part="track"]` so they resolve the same element on both render
+ * branches.
+ */
 function getTrack(canvasElement: HTMLElement): HTMLButtonElement {
   const host = canvasElement.querySelector('hx-switch');
   if (!host) throw new Error('hx-switch not found in canvas');
-  const track = host.shadowRoot?.querySelector<HTMLButtonElement>('[role="switch"]');
+  const track = host.shadowRoot?.querySelector<HTMLButtonElement>('[part="track"]');
   if (!track) throw new Error('switch track not found in shadow root');
   return track;
 }
@@ -367,7 +375,7 @@ export const InAForm: Story = {
     // Toggle the HIPAA switch on
     const switches = canvasElement.querySelectorAll('hx-switch');
     const hipaaSwitch = switches[0];
-    const hipaaTrack = hipaaSwitch?.shadowRoot?.querySelector<HTMLButtonElement>('[role="switch"]');
+    const hipaaTrack = hipaaSwitch?.shadowRoot?.querySelector<HTMLButtonElement>('[part="track"]');
     if (hipaaTrack) {
       await userEvent.click(hipaaTrack);
     }
@@ -756,20 +764,27 @@ export const KeyboardToggle: Story = {
   },
   play: async ({ canvasElement }) => {
     const track = getTrack(canvasElement);
+    const host = canvasElement.querySelector('hx-switch') as HTMLElement & {
+      checked: boolean;
+    };
 
-    // Focus the switch track directly (userEvent.tab doesn't cross shadow DOM)
-    track.focus();
-    const host = canvasElement.querySelector('hx-switch')!;
-    await expect(host.shadowRoot!.activeElement).toBe(track);
+    // Round-1 host-canonical refactor: on modern engines the host is the
+    // announced focus + activation target (inner button is `aria-hidden +
+    // tabindex=-1`). Dispatch keydown directly to the host so the assertion
+    // exercises the host activation path the way assistive tech does.
+    host.focus();
+    await expect(document.activeElement).toBe(host);
 
     // Press Space to toggle on
-    await userEvent.keyboard(' ');
+    host.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
     await waitForUpdate(canvasElement);
+    await expect(host.checked).toBe(true);
     await expect(track.getAttribute('aria-checked')).toBe('true');
 
     // Press Space again to toggle off
-    await userEvent.keyboard(' ');
+    host.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
     await waitForUpdate(canvasElement);
+    await expect(host.checked).toBe(false);
     await expect(track.getAttribute('aria-checked')).toBe('false');
   },
 };
@@ -844,7 +859,7 @@ export const FormDataParticipation: Story = {
   play: async ({ canvasElement }) => {
     // Toggle the switch on
     const switchEl = canvasElement.querySelector('hx-switch');
-    const track = switchEl?.shadowRoot?.querySelector<HTMLButtonElement>('[role="switch"]');
+    const track = switchEl?.shadowRoot?.querySelector<HTMLButtonElement>('[part="track"]');
     if (!track) throw new Error('Track not found');
 
     await userEvent.click(track);
