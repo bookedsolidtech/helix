@@ -1112,5 +1112,54 @@ describe('hx-checkbox-group', () => {
       expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
       expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
     });
+
+    // ─── Codex round-20 P2: required marker must not pollute fallback ariaLabel ───
+    it('fallback path: required visible marker is excluded from host fallback ariaLabel', async () => {
+      // Codex round-20 P2 regression: the legend renders a visible
+      // `<span class="fieldset__required-marker" aria-hidden="true">*</span>`
+      // as a sibling of `<slot name="label">` in shadow DOM. An earlier
+      // implementation read the rendered legend's `textContent`, which
+      // flattened the marker into the fallback `internals.ariaLabel` —
+      // engines without `ariaLabelledByElements` (Firefox today) then
+      // announced "Topics *". The fallback name resolution must consult
+      // `this.label` (and slot-assigned nodes via `slot.assignedNodes()`)
+      // so the marker — which lives outside the slot — is excluded.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" required>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      // Sanity: the visible marker is rendered inside the legend.
+      const marker = shadowQuery(el, '.fieldset__required-marker');
+      expect(marker).toBeTruthy();
+      expect(marker?.textContent).toBe('*');
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Topics');
+      expect(internals.ariaLabel).not.toContain('*');
+    });
+
+    it('fallback path: slotted label content contributes to ariaLabel without the marker', async () => {
+      // When the consumer supplies the legend via `<slot name="label">`
+      // (no `label` property), the fallback must still produce a clean
+      // accessible name. Reading slot-assigned nodes excludes the marker
+      // because the marker is rendered as a sibling of the slot in shadow
+      // DOM, not inside the slotted content.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group required>
+          <span slot="label">Topics</span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Topics');
+      expect(internals.ariaLabel).not.toContain('*');
+    });
   });
 });

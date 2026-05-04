@@ -1392,5 +1392,30 @@ describe('hx-radio-group', () => {
       expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
       expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
     });
+
+    // ─── Codex round-20 P2 parity: required marker must not pollute fallback ariaLabel ───
+    it('fallback path: required visible marker is excluded from host fallback ariaLabel', async () => {
+      // hx-radio-group renders the visible required marker as a sibling of
+      // the legend's `${this.label}` text node. The fallback `_syncHostAriaSemantics`
+      // path uses `this.label || null` directly (it never reads shadow
+      // `textContent`), so the marker cannot leak into `internals.ariaLabel`.
+      // This parity test locks the invariant in alongside the hx-checkbox-group
+      // round-20 fix.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" required>
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const marker = shadowQuery(el, '.fieldset__required-marker');
+      expect(marker).toBeTruthy();
+      expect(marker?.textContent).toBe('*');
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Color');
+      expect(internals.ariaLabel).not.toContain('*');
+    });
   });
 });

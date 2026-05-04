@@ -319,13 +319,28 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     //
     // Codex round-7 #0: on the no-IDL-ref fallback path the slotted legend
     // is the only source of an accessible name (the IDREF branch wires it via
-    // `ariaLabelledByElements`, which is unavailable here). Read the rendered
-    // legend's `textContent` so a `<slot name="label">` payload contributes to
+    // `ariaLabelledByElements`, which is unavailable here). Read the slot's
+    // assigned nodes for a `<slot name="label">` payload so it contributes to
     // `internals.ariaLabel` — without this, fallback browsers leave the host
     // unnamed when only the slot supplies the legend.
+    //
+    // Codex round-20 P2: do NOT read the rendered <legend>'s `textContent`.
+    // The legend renders the visible required marker as a sibling of the
+    // `<slot name="label">` (`<span class="fieldset__required-marker"
+    // aria-hidden="true">*</span>`) — flattening descendants would fold the
+    // visible "*" into the host's ariaLabel ("Topics *"), so AT mis-announces
+    // required groups. Read assigned slot nodes directly: the marker lives
+    // outside the slot in shadow DOM, so it is excluded cleanly. Mirrors the
+    // hx-radio-group fallback (which has no label slot, only `this.label`).
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
-    const internalLegendText =
-      this.shadowRoot?.getElementById(this._labelId)?.textContent?.trim() || this.label || null;
+    const labelSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="label"]');
+    const slottedLabelText =
+      labelSlot
+        ?.assignedNodes()
+        .map((node) => node.textContent ?? '')
+        .join('')
+        .trim() || '';
+    const internalLegendText = this.label || slottedLabelText || null;
     if (hostAriaLabel) {
       internals.ariaLabel = hostAriaLabel;
     } else if (!this.getAttribute('aria-labelledby')) {
