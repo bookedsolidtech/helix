@@ -476,7 +476,12 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
         } else if (!this.required && fieldset.hasAttribute('aria-required')) {
           fieldset.removeAttribute('aria-required');
         }
-        const isInvalid = !!hasError;
+        // Codex round-18 P2: drive `aria-invalid` from the actual ValidityState,
+        // not from `hasError` (which reflects only visible error content).
+        // A required group with no selection is invalid via setValidity()
+        // before any error text is supplied; legacy/no-IDL-ref engines must
+        // hear that invalid state on the announced fieldset surface.
+        const isInvalid = !this._internals.validity.valid;
         if (isInvalid && fieldset.getAttribute('aria-invalid') !== 'true') {
           fieldset.setAttribute('aria-invalid', 'true');
         } else if (!isInvalid && fieldset.hasAttribute('aria-invalid')) {

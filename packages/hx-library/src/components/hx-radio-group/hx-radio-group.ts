@@ -498,9 +498,15 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
         } else if (!this.required && fieldset.hasAttribute('aria-required')) {
           fieldset.removeAttribute('aria-required');
         }
-        if (hasError && fieldset.getAttribute('aria-invalid') !== 'true') {
+        // Codex round-18 P2: drive `aria-invalid` from the actual ValidityState,
+        // not from `hasError`. A required radiogroup with no selection is
+        // invalid via setValidity() before any error text exists, and the
+        // fallback fieldset is the announced surface — legacy/no-IDL-ref
+        // engines depend on this to surface required-field errors.
+        const isInvalid = !this._internals.validity.valid;
+        if (isInvalid && fieldset.getAttribute('aria-invalid') !== 'true') {
           fieldset.setAttribute('aria-invalid', 'true');
-        } else if (!hasError && fieldset.hasAttribute('aria-invalid')) {
+        } else if (!isInvalid && fieldset.hasAttribute('aria-invalid')) {
           fieldset.removeAttribute('aria-invalid');
         }
       }
@@ -801,8 +807,22 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     // pass through `updated()` runs `_syncRadios` again, which restores each
     // radio's individual disabled flag and re-checks the matching value.
     if (this.disabled) {
-      // Validity still reflects the (preserved) value; setFormValue is omitted
-      // because a disabled control shouldn't contribute to form submission.
+      // Codex round-18 P2: even while disabled, if the previously-selected
+      // radio has been *removed* from the DOM (vs merely disabled by the
+      // group), `this.value` references a value that no slotted child
+      // carries, so the group would resubmit a stale option after re-enable.
+      // We must clear `value` in that case while still preserving selection
+      // across pure disable→enable cycles where the radio still exists.
+      // Detect "selected option still in DOM" by membership lookup on the
+      // raw children, ignoring their disabled flag (since group-level
+      // disable forces them all disabled by _syncRadios).
+      const presentValues = this._getRadios().map((r) => r.value);
+      if (this.value && !presentValues.includes(this.value)) {
+        this.value = '';
+      }
+      // Validity reflects the (possibly-cleared) value; setFormValue is
+      // omitted because a disabled control shouldn't contribute to form
+      // submission.
       this._updateValidity();
     } else {
       const selected = this._getRadios().find((r) => r.checked && !r.disabled);
