@@ -14,6 +14,8 @@ afterEach(cleanup);
  */
 type RadioGroupTestHarness = HxRadioGroup & {
   _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
 };
 
 describe('hx-radio-group', () => {
@@ -1293,6 +1295,102 @@ describe('hx-radio-group', () => {
       // group's `value` collapses to '' and required-validity fails.
       expect(el.value).toBe('');
       expect(internals.validity.valid).toBe(false);
+    });
+  });
+
+  // ─── Codex round-19 P1: single accessible-container invariant (4) ───
+
+  describe('Single accessible-container invariant (round-19 P1)', () => {
+    /**
+     * Forces the no-IDL-ref fallback branch so the assertions below exercise
+     * the same code path a legacy engine (e.g. Firefox today) would take.
+     * Mirrors the `hx-checkbox` test harness pattern.
+     */
+    async function forceFallbackPath(el: HxRadioGroup): Promise<void> {
+      const harness = el as RadioGroupTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('modern path: host owns role="radiogroup", inner fieldset is presentation', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(internals.role).toBe('radiogroup');
+      expect(fieldset.getAttribute('role')).toBe('presentation');
+    });
+
+    it('fallback path: host still owns role="radiogroup", inner fieldset stays presentation', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      // Single accessible container — the host. AT must NOT see a nested
+      // host radiogroup → inner group → controls hierarchy.
+      expect(internals.role).toBe('radiogroup');
+      expect(fieldset.getAttribute('role')).toBe('presentation');
+    });
+
+    it('fallback path: inner fieldset has no aria-labelledby / aria-describedby / aria-required / aria-invalid', async () => {
+      // With help text + error + required, prior rounds spliced shadow
+      // help/error ids onto the inner fieldset; round-19 drops that splice
+      // entirely (shadow IDREFs cannot resolve to consumer light DOM, so
+      // merging them was always broken on the fallback path).
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" help-text="Hint" error="Required" required>
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-required')).toBe(false);
+      expect(fieldset.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('fallback path: consumer aria-labelledby / aria-describedby still mirror onto host', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'rg-ext-label';
+      labelHost.textContent = 'External Label';
+      const helpHost = document.createElement('span');
+      helpHost.id = 'rg-ext-help';
+      helpHost.textContent = 'External Help';
+      container.appendChild(labelHost);
+      container.appendChild(helpHost);
+
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group aria-labelledby="rg-ext-label" aria-describedby="rg-ext-help">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      // Consumer-supplied tokens stay on the host (they resolve in the host's
+      // containing root). Inner fieldset is untouched.
+      expect(el.getAttribute('aria-labelledby')).toBe('rg-ext-label');
+      expect(el.getAttribute('aria-describedby')).toBe('rg-ext-help');
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
     });
   });
 });
