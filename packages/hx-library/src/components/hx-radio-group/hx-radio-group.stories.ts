@@ -1063,19 +1063,25 @@ export const KeyboardNavigation: Story = {
 
     // Arrow Down should move to next and select it.
     // `checked` is reflected on hx-radio — ARIA state is on ElementInternals, not DOM attrs.
-    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    radios[0].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
     expect(radios[1].hasAttribute('checked')).toBe(true);
 
     // Arrow Down again
-    radios[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    radios[1].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('third');
     expect(radios[2].hasAttribute('checked')).toBe(true);
 
     // Arrow Up should move back
-    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
+    radios[2].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('second');
     expect(radios[1].hasAttribute('checked')).toBe(true);
@@ -1104,19 +1110,27 @@ export const ArrowWrap: Story = {
     expect(group!.value).toBe('alpha');
 
     // Navigate to last
-    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    radios[0].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 50));
-    radios[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    radios[1].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 50));
     expect(group!.value).toBe('gamma');
 
     // Arrow Down from last should wrap to first
-    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    radios[2].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('alpha');
 
     // Arrow Up from first should wrap to last
-    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
+    radios[0].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('gamma');
   },
@@ -1144,12 +1158,16 @@ export const DisabledSkip: Story = {
     expect(group!.value).toBe('first');
 
     // Arrow Down should skip disabled "second" and land on "third"
-    radios[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    radios[0].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('third');
 
     // Arrow Down from "third" should wrap and skip disabled, landing on "first"
-    radios[2].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
+    radios[2].dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }),
+    );
     await new Promise((r) => setTimeout(r, 100));
     expect(group!.value).toBe('first');
   },
@@ -1312,7 +1330,10 @@ export const TreatmentPreference: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     label: 'Preferred Contact Method',
     helpText: 'Choose how you would like us to reach you.',

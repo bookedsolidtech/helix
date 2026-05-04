@@ -8,8 +8,38 @@ import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
+
+/**
+ * Reads visible text from a shadow wrapper that contains a `<slot>`. Prefers
+ * the slot's flattened assigned-nodes text when light DOM is projected,
+ * otherwise falls back to the wrapper's own `textContent` (so property-driven
+ * fallback content rendered inside the slot is still readable). Codex
+ * round-23 P2 (Finding B): a wrapper-element `textContent` read does NOT
+ * cross the shadow → light-DOM slot boundary, so the previous direct
+ * `textContent` mirror returned empty when a consumer slotted help/error
+ * content instead of using the property.
+ */
+function readSlottedOrShadowText(wrapper: Element): string {
+  const slot = wrapper.querySelector('slot');
+  if (slot) {
+    const assigned = (slot as HTMLSlotElement).assignedNodes({ flatten: true });
+    if (assigned.length > 0) {
+      return assigned
+        .map((node) => node.textContent ?? '')
+        .join('')
+        .trim();
+    }
+  }
+  return (wrapper.textContent ?? '').trim();
+}
 
 /** Detail for the hx-change event dispatched by hx-checkbox-group. */
 export interface HxCheckboxGroupChangeDetail {
@@ -49,7 +79,8 @@ export interface HxCheckboxGroupChangeDetail {
  *   {% endfor %}
  * </hx-checkbox-group>
  * ```
- * The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
+ * The group is the sole form participant — children are suppressed via
+ * `_groupedSuppress`. Setting `name` on a child has no effect inside a group.
  * @cssprop [--hx-opacity-disabled] - Opacity.
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-checkbox-group-font-family=var(--hx-font-family-sans)] - CSS custom property.
@@ -140,6 +171,17 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   @state() private _hasErrorSlot = false;
   /** Whether the named help-text slot contains projected content. @internal */
   @state() private _hasHelpSlot = false;
+  /** Whether the named label slot contains projected content. @internal */
+  @state() private _hasLabelSlot = false;
+
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the render-time branch between modern (host-canonical via
+   * internals) and fallback (inner fieldset is the announced surface).
+   * Codex round-17 P1.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
 
   // ─── Internal IDs ───
 
@@ -149,6 +191,8 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   private _helpTextId = `${this._groupId}-help`;
   /** @internal */
   private _errorId = `${this._groupId}-error`;
+  /** @internal */
+  private _labelId = `${this._groupId}-label`;
 
   // ─── Slot Handlers ───
 
@@ -156,24 +200,240 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    // Codex round-23 P2 (Finding B): re-tune the in-place text observer over
+    // the new assigned-node set so in-place `textContent` rewrites of slotted
+    // error nodes resync `internals.ariaDescription` on the no-IDL-ref
+    // fallback path. `slotchange` only fires when the *node set* changes;
+    // mutating an already-assigned node's text does not, so a separate
+    // observer is required. Mirrors `_installLabelSlotTextObserver`.
+    this._installErrorSlotTextObserver(slot);
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    // Codex round-23 P2 (Finding B): same pattern as the error slot — keep
+    // `internals.ariaDescription` in sync with in-place text edits on already
+    // assigned help-text nodes.
+    this._installHelpSlotTextObserver(slot);
+    this._syncHostAriaSemantics();
   }
+
+  /** @internal */
+  private _handleLabelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasLabelSlot = slot.assignedNodes().length > 0;
+    // Codex round-21 P3: re-tune the in-place text observer over the new
+    // assigned-node set. `slotchange` fires when the node *set* changes; the
+    // observer below catches `textContent` rewrites on already-assigned nodes
+    // (which do NOT fire `slotchange`). Re-installing here resets the watch
+    // so detached nodes stop firing into a torn-down host and newly assigned
+    // nodes contribute to the host's fallback `internals.ariaLabel` resync.
+    this._installLabelSlotTextObserver(slot);
+    // Pick up any text-content changes that landed alongside the slot
+    // mutation in the same task — _syncHostAriaSemantics reads the slot's
+    // assigned-nodes textContent for the no-IDL-ref fallback ariaLabel.
+    this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Watches assigned `<slot name="label">` nodes for in-place text mutations
+   * so the no-IDL-ref fallback `internals.ariaLabel` stays in sync when a
+   * framework rewrites `textContent` of an already-assigned node without
+   * replacing it. `slotchange` does NOT fire for those mutations, so a
+   * separate observer is required. Codex round-21 P3 (mirrors the
+   * `hx-toggle-button` pattern from round-13 P2).
+   * @internal
+   */
+  private _labelSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * label-slot nodes. Disconnects any prior observer first so detached nodes
+   * stop firing into a torn-down host. Codex round-21 P3.
+   * @internal
+   */
+  private _installLabelSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._labelSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._labelSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      // Resync host ARIA semantics: the fallback `internals.ariaLabel` is
+      // derived from the slot's assigned-nodes `textContent`, so an in-place
+      // edit must replay the resolution that ran at first paint.
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._labelSlotTextObserver = observer;
+  }
+
+  /**
+   * Watches assigned `<slot name="help-text">` nodes for in-place text
+   * mutations so the no-IDL-ref fallback `internals.ariaDescription` stays in
+   * sync when a framework rewrites `textContent` of an already-assigned node
+   * without replacing it. `slotchange` does NOT fire for those mutations, so
+   * a separate observer is required. Codex round-23 P2 (Finding B) — mirrors
+   * the round-21 P3 label-slot observer pattern.
+   * @internal
+   */
+  private _helpSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * Watches assigned `<slot name="error">` nodes for in-place text mutations
+   * so the no-IDL-ref fallback `internals.ariaDescription` stays in sync when
+   * a framework rewrites `textContent` of an already-assigned node without
+   * replacing it. Codex round-23 P2 (Finding B).
+   * @internal
+   */
+  private _errorSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * help-text-slot nodes. Codex round-23 P2 (Finding B).
+   * @internal
+   */
+  private _installHelpSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._helpSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._helpSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._helpSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * error-slot nodes. Codex round-23 P2 (Finding B).
+   * @internal
+   */
+  private _installErrorSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._errorSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._errorSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._errorSlotTextObserver = observer;
+  }
+
+  /**
+   * Handle for the shared IDREF observer. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Deferred copy of `error` driven through reactive state so the persistent
+   * live region can re-announce on transitions without direct DOM mutation.
+   * Codex round-1 finding #10.
+   * @internal
+   */
+  @state() private _announcedError = '';
+
+  /**
+   * Last value of `aria-labelledby` we wrote to the host. Used to distinguish
+   * external (consumer) attribute mutations from our own internal augmentation
+   * writes when refreshing the host-attribute fallback. Codex round-10 P2:
+   * without this guard, an internal mutation observer fire would re-read the
+   * already-augmented host attribute as if it were consumer-supplied, causing
+   * legend/help/error ids to leak forward as "consumer tokens" forever.
+   * @internal
+   */
+  private _lastWrittenLabelledBy: string | null = null;
+  /** @internal — see `_lastWrittenLabelledBy`. */
+  private _lastWrittenDescribedBy: string | null = null;
+  /**
+   * Most recently observed *consumer-supplied* `aria-labelledby` baseline (the
+   * set of tokens the consumer themselves wrote on the host). Refreshed only
+   * when the host attribute changes via an external write — internal writes
+   * leave the baseline untouched.
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+  /** @internal — see `_consumerLabelledBy`. */
+  private _consumerDescribedBy: string | null = null;
 
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Detect IDL element-references API support so render() can branch the
+    // fieldset between presentational (modern) and group-with-aria
+    // (fallback) treatments. Codex round-17 P1.
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
     this.addEventListener('hx-change', this._handleCheckboxChange);
+    // Seed root-independent semantics from connect.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+    // Codex round-10 P2: re-apply child suppression on reattach. On the first
+    // mount `firstUpdated()` runs `_syncCheckboxNames()` later, but when the
+    // same group node is detached and re-inserted (with the same children
+    // already in place), `firstUpdated()` does NOT re-fire. Without this,
+    // `disconnectedCallback()`'s suppression-clearing leaves children
+    // form-active alongside the group on the next attach, which reintroduces
+    // the duplicate-submission bug the round-1 fix eliminated.
+    if (this._getCheckboxes().length > 0) {
+      this._syncCheckboxNames();
+      this._previousChildren = this._getCheckboxes();
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('hx-change', this._handleCheckboxChange);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    // Codex round-21 P3: tear down the slot-label text observer so detached
+    // assigned nodes stop firing into a torn-down host.
+    this._labelSlotTextObserver?.disconnect();
+    this._labelSlotTextObserver = null;
+    // Codex round-23 P2 (Finding B): tear down the help/error slot text
+    // observers for the same reason.
+    this._helpSlotTextObserver?.disconnect();
+    this._helpSlotTextObserver = null;
+    this._errorSlotTextObserver?.disconnect();
+    this._errorSlotTextObserver = null;
+    // Release suppression on every previously-tracked child so they regain
+    // stand-alone form participation if re-parented or kept in the document
+    // after the group is removed. Codex round-3 finding #1.
+    this._previousChildren.forEach((cb) => {
+      if (this._suppressedChildren.has(cb)) {
+        cb._groupedSuppress = false;
+        this._suppressedChildren.delete(cb);
+      }
+    });
+    this._previousChildren = [];
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -184,18 +444,261 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     if (changedProperties.has('name')) {
       this._syncCheckboxNames();
     }
-    // Force screen reader re-announcement when error text changes (a11y-v3-005)
-    if (changedProperties.has('error') && this.error) {
-      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
-      if (errorEl) {
-        const msg = this.error;
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+    // Codex round-1 finding #10: drive re-announcement from reactive state
+    // so the persistent live region stays in the shadow tree across error
+    // transitions. The previous direct `errorEl.textContent =` mutation
+    // deleted the slot subtree the renderer just produced.
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string;
+      if (previousError && this.error) {
+        this._announcedError = '';
         requestAnimationFrame(() => {
-          errorEl.textContent = '';
-          requestAnimationFrame(() => {
-            errorEl.textContent = msg;
-          });
+          this._announcedError = this.error;
         });
+      } else {
+        this._announcedError = this.error;
       }
+    }
+  }
+
+  /**
+   * Mirrors group semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-checkbox-group>` reach the announced control. Without host-level
+   * semantics, the announced node is the shadow `<fieldset>`, which is
+   * unreachable from light-DOM IDREFs.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'group';
+    internals.ariaRequired = this.required ? 'true' : 'false';
+    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+    internals.ariaDisabled = this.disabled ? 'true' : 'false';
+
+    // Prefer consumer-supplied host aria-label; fall back to the visible legend
+    // text (label property or label slot) so the host always carries an
+    // accessible name.
+    //
+    // Codex round-7 #0: on the no-IDL-ref fallback path the slotted legend
+    // is the only source of an accessible name (the IDREF branch wires it via
+    // `ariaLabelledByElements`, which is unavailable here). Read the slot's
+    // assigned nodes for a `<slot name="label">` payload so it contributes to
+    // `internals.ariaLabel` — without this, fallback browsers leave the host
+    // unnamed when only the slot supplies the legend.
+    //
+    // Codex round-20 P2: do NOT read the rendered <legend>'s `textContent`.
+    // The legend renders the visible required marker as a sibling of the
+    // `<slot name="label">` (`<span class="fieldset__required-marker"
+    // aria-hidden="true">*</span>`) — flattening descendants would fold the
+    // visible "*" into the host's ariaLabel ("Topics *"), so AT mis-announces
+    // required groups. Read assigned slot nodes directly: the marker lives
+    // outside the slot in shadow DOM, so it is excluded cleanly. Mirrors the
+    // hx-radio-group fallback (which has no label slot, only `this.label`).
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const labelSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="label"]');
+    const labelSlotHasAssignedNodes = (labelSlot?.assignedNodes().length ?? 0) > 0;
+    const slottedLabelText =
+      labelSlot
+        ?.assignedNodes()
+        .map((node) => node.textContent ?? '')
+        .join('')
+        .trim() || '';
+    // Codex round-22 P2: documented contract — `@slot label - Rich HTML group
+    // label (overrides the label property when used)`. Slot wins. When a
+    // consumer supplies BOTH `label="..."` AND `<span slot="label">...</span>`,
+    // the slot is the public-facing legend; the property must not clobber it
+    // on the fallback path's `internals.ariaLabel`.
+    //
+    // Codex round-23 P2 (Finding A): the slot precedence must hold even when
+    // the slot is whitespace-only or empty. Previously `slottedLabelText ||
+    // this.label` fell through to the property when the slot trimmed to '',
+    // which diverged from the visible legend (the slot suppresses fallback
+    // text via `<slot name="label">${this.label}</slot>` — the slot's
+    // assigned-node trail wins, so the rendered legend stays empty too). Use
+    // the slot's *assigned-node presence* as the precedence signal: any
+    // assigned nodes mean the slot is in use, so the property must NOT leak
+    // into `internals.ariaLabel`. Empty-string slots resolve to `null` (no
+    // accessible name) — the same outcome the visible legend produces.
+    const internalLegendText = labelSlotHasAssignedNodes
+      ? slottedLabelText || null
+      : this.label || null;
+
+    // Codex round-10 P2: refresh the consumer baseline only when the host
+    // attribute moved due to an *external* write. Compare the live attribute
+    // against our last-written snapshot — if it differs, the consumer wrote.
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    if (liveLabelledBy !== this._lastWrittenLabelledBy) {
+      this._consumerLabelledBy = liveLabelledBy;
+    }
+    const liveDescribedBy = this.getAttribute('aria-describedby');
+    if (liveDescribedBy !== this._lastWrittenDescribedBy) {
+      this._consumerDescribedBy = liveDescribedBy;
+    }
+    const externalLabelTokens = this._consumerLabelledBy;
+    const externalDescTokens = this._consumerDescribedBy;
+
+    // Resolve the candidate label/desc element references once — both render
+    // branches (modern IDL-ref and host-attribute fallback) consume the same
+    // collections; the IDL-ref branch assigns them as `Element[]`, the
+    // fallback mirrors their `id` tokens onto the host's `aria-*` attributes.
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    // Codex round-35 (medium): `aria-labelledby` is only "effective" when at
+    // least one IDREF resolves to a real element. A typo or transiently-
+    // missing target must NOT erase the visible legend — fall back to the
+    // legend slot/property so the group keeps a name on both render paths.
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!hasEffectiveLabelledBy) {
+      internals.ariaLabel = internalLegendText;
+    } else {
+      internals.ariaLabel = null;
+    }
+    const internalLegend = this.shadowRoot?.getElementById(this._labelId);
+    if (
+      labelEls.length === 0 &&
+      !hostAriaLabel &&
+      (this.label || this._hasLabelSlot) &&
+      internalLegend
+    ) {
+      labelEls.push(internalLegend);
+    }
+
+    const descEls = resolveIdrefTokens(this, externalDescTokens);
+    const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+    const errorEl = this.shadowRoot?.getElementById(this._errorId);
+    const hasError = !!(this.error || this._hasErrorSlot);
+    // Codex round-15 P2: drop help text from the describedby chain while an
+    // error is active. The render path hides the help wrapper in that state
+    // (`?hidden=${!hasHelp || hasError}`); appending the hidden node to host
+    // semantics would make AT announce stale guidance ahead of the
+    // validation error. Mirrors the hx-switch and hx-checkbox treatment.
+    if (helpEl && !hasError && (this.helpText || this._hasHelpSlot)) {
+      descEls.push(helpEl);
+    }
+    if (errorEl && hasError) {
+      descEls.push(errorEl);
+    }
+
+    // Branch off the cached `_supportsIdrefRefs` (seeded at connect by the
+    // platform probe) so tests can force the fallback branch by flipping the
+    // flag. TODO(codex round-19 follow-up): re-probe on `adoptedCallback` if
+    // we ever support cross-document moves; today the cached value is set
+    // once at connect.
+    if (this._supportsIdrefRefs) {
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+      // Clear any stale fallback `ariaDescription` string in case a prior sync
+      // ran on the fallback path (e.g. tests flipping `_supportsIdrefRefs`).
+      // The modern path uses element references exclusively; coexisting strings
+      // would cause AT to announce the description twice.
+      internals.ariaDescription = null;
+    } else {
+      // ─── No-IDL-ref fallback (codex round-19 P1) ───
+      // The IDL element-references API is unavailable, so internal shadow
+      // help/error/legend wrappers cannot be projected onto the host
+      // accessibility node via `internals.aria*Elements`.
+      //
+      // Codex round-19 P1: keep the host as the canonical accessible-container
+      // surface on BOTH modern and fallback paths. Earlier rounds promoted the
+      // inner fieldset to `role="group"` here and tried to splice consumer
+      // light-DOM ids together with shadow-internal ids on the fieldset's
+      // `aria-labelledby` / `aria-describedby`. That created two nested
+      // accessible containers (host group → inner group → controls) AND the
+      // spliced shadow IDREFs could never resolve to consumer light-DOM
+      // targets, so the inner fieldset's "external label" was silently broken.
+      //
+      // The correct trade-off on legacy engines (notably Firefox today): the
+      // host owns the role + ARIA strings (via `internals.role`,
+      // `internals.ariaLabel`, and the host attribute mirror below); we accept
+      // a documented loss of *internal* legend/help/error references and rely
+      // on consumer-supplied light-DOM tokens, which resolve correctly in the
+      // host's containing root. The inner fieldset stays presentational on
+      // both paths so AT announces a single accessible container.
+      const consumerLabelIds = new Set((externalLabelTokens?.split(/\s+/) ?? []).filter(Boolean));
+      const consumerDescIds = new Set((externalDescTokens?.split(/\s+/) ?? []).filter(Boolean));
+
+      // Host attributes: ONLY consumer tokens (never shadow-internal ids —
+      // those cannot resolve across the shadow boundary). Restore the
+      // consumer baseline on the host so its accessible-name computation in
+      // the light DOM resolves the labels the consumer wired up. If the
+      // consumer supplied nothing, clear any stale mirror we may have
+      // written in a prior round.
+      //
+      // Codex round-35 (medium): mirror consumer tokens to the host attribute
+      // ONLY when at least one token resolves to a real element. Broken
+      // tokens (typo, target not yet attached) would otherwise erase the
+      // accessible name on legacy engines per ARIA priority
+      // (aria-labelledby > aria-label > internals.ariaLabel). When tokens
+      // don't resolve, clear the host attribute so the `internals.ariaLabel`
+      // fallback the modern path set above (`internalLegendText`) wins.
+      const hostLabel = hasEffectiveLabelledBy
+        ? [...consumerLabelIds].filter(Boolean).join(' ')
+        : '';
+      const liveLabel = this.getAttribute('aria-labelledby');
+      if (hostLabel) {
+        if (liveLabel !== hostLabel) {
+          this.setAttribute('aria-labelledby', hostLabel);
+        }
+        this._lastWrittenLabelledBy = hostLabel;
+      } else if (liveLabel !== null) {
+        // Codex round-36 (medium): when consumer-supplied tokens don't
+        // resolve (`!hasEffectiveLabelledBy`), actively clear the host
+        // attribute even if WE didn't write it. Per ARIA priority
+        // (aria-labelledby > aria-label > internals.ariaLabel), a broken
+        // consumer-authored attribute on the announced surface erases the
+        // legend on legacy engines. The original tokens remain cached in
+        // `_consumerLabelledBy` so they replay on a future sync if the
+        // target later attaches.
+        this.removeAttribute('aria-labelledby');
+        this._lastWrittenLabelledBy = null;
+      }
+
+      const hostDesc = [...consumerDescIds].filter(Boolean).join(' ') || '';
+      const liveDesc = this.getAttribute('aria-describedby');
+      if (hostDesc) {
+        if (liveDesc !== hostDesc) {
+          this.setAttribute('aria-describedby', hostDesc);
+        }
+        this._lastWrittenDescribedBy = hostDesc;
+      } else if (liveDesc !== null && this._lastWrittenDescribedBy !== null) {
+        this.removeAttribute('aria-describedby');
+        this._lastWrittenDescribedBy = null;
+      }
+
+      // Codex round-22 P1 #2: on the no-IDL-ref fallback path, consumer-supplied
+      // describedby tokens reach the host (above) but the *internal* shadow
+      // help/error wrappers cannot be referenced from light-DOM IDREFs. Mirror
+      // their `textContent` into `internals.ariaDescription` so the host's
+      // accessible description still surfaces the live help/error strings on
+      // legacy engines (Firefox today). The string-form description hook is
+      // independent of element references and survives the shadow boundary.
+      // Empty strings are normalized to `null` so AT does not announce an
+      // empty description.
+      //
+      // Codex round-23 P2 (Finding B): a wrapper-element `textContent` read
+      // does NOT cross the shadow → light-DOM slot boundary — it returns only
+      // the wrapper's shadow tree, which for a slotted help/error is just the
+      // slot's fallback (empty when a property is not set). Use a helper that
+      // prefers the slot's flattened assigned-nodes text when present and
+      // falls back to the wrapper's textContent for property-rendered fallback
+      // content. The new help/error slot text observers (above) keep this in
+      // sync when a framework rewrites the slotted node's textContent in place.
+      const helpText =
+        helpEl && !hasError && (this.helpText || this._hasHelpSlot)
+          ? readSlottedOrShadowText(helpEl)
+          : '';
+      const errorText = errorEl && hasError ? readSlottedOrShadowText(errorEl) : '';
+      const internalDescriptionText = [helpText, errorText].filter(Boolean).join(' ');
+      internals.ariaDescription = internalDescriptionText || null;
     }
   }
 
@@ -203,6 +706,7 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     super.firstUpdated(changedProperties);
     this._syncCheckboxes();
     this._syncCheckboxNames();
+    this._previousChildren = this._getCheckboxes();
     const checkedValues = this._getCheckedValues();
     this._updateFormValue(checkedValues);
     this._updateValidity(checkedValues);
@@ -230,14 +734,87 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     });
   }
 
-  /** @internal */
+  /**
+   * Tracks the set of checkboxes most recently flagged with
+   * `_groupedSuppress = true` so a child removed from the group can have its
+   * suppression cleared and regain stand-alone form participation. Codex
+   * round-3 finding #1.
+   * @internal
+   */
+  private _suppressedChildren = new WeakSet<HelixCheckbox>();
+
+  /**
+   * Centralizes form participation on the group: when an `hx-checkbox` is
+   * grouped, the group is the sole form participant. Without this, both the
+   * group AND each child would call `setFormValue` for the same name, causing
+   * every checked value to submit twice.
+   *
+   * Codex round-2 finding #1 used `cb.name = ''` as the suppression signal.
+   * Codex round-3 finding #1 hardened that: a consumer (or framework binding)
+   * that re-set `cb.name = 'foo'` after attach regained form participation
+   * because the child's `name` setter re-armed `_updateFormValue()` while no
+   * `slotchange` re-fired to re-null the name.
+   *
+   * The fix is a durable, name-independent kill switch — `_groupedSuppress` —
+   * on each child. While the flag is set the child's `_updateFormValue()`
+   * short-circuits to `setFormValue(null)` regardless of its `name` value.
+   * Children removed from the group have the flag cleared so they regain
+   * stand-alone form participation.
+   * @internal
+   */
   private _syncCheckboxNames(): void {
-    if (!this.name) return;
-    const checkboxes = this._getCheckboxes();
-    checkboxes.forEach((cb) => {
-      cb.name = this.name;
+    const current = new Set(this._getCheckboxes());
+    // Clear suppression on any previously-grouped child that has since been
+    // removed from this group. WeakSet has no iterator, so we re-walk current
+    // children plus track removals via the slotchange handler's "delta" — but
+    // since WeakSet does not enumerate, we instead resolve via the child's
+    // own state below: any child WITH the flag that is no longer a current
+    // child must be cleared. To do that without enumeration we mark all
+    // current children true here and rely on `_handleSlotChange` to clear
+    // departed children explicitly via `_clearSuppressionForRemoved()`.
+    // Group ownership invariant (round-3 hardening, reaffirmed round-22):
+    // `hx-checkbox-group` is the sole form participant for its children, full
+    // stop. Children inside a group never submit independently, regardless of
+    // whether the group or the child carries a `name` attribute. Any consumer
+    // who attaches a `<hx-checkbox name="...">` directly inside a
+    // `<hx-checkbox-group>` (even one without its own `name`) is misusing the
+    // API — the child must be moved out of the group to submit independently.
+    // Suppression is unconditional to prevent re-arming attacks where
+    // `cb.name = ''` would otherwise restore stand-alone participation while
+    // the child still appears "grouped".
+    current.forEach((cb) => {
+      cb._groupedSuppress = true;
+      this._suppressedChildren.add(cb);
     });
   }
+
+  /**
+   * Clears `_groupedSuppress` on any checkbox that was previously in this
+   * group but has since been removed (re-parented or detached). Called from
+   * `_handleSlotChange()` after `_syncCheckboxNames()` re-applies the flag
+   * to current children.
+   *
+   * `previousChildren` is a snapshot captured before slot mutation; any child
+   * in that set but not in the current set has left the group and must have
+   * its suppression cleared so stand-alone use restores form participation.
+   * @internal
+   */
+  private _clearSuppressionForRemoved(previousChildren: HelixCheckbox[]): void {
+    const current = new Set(this._getCheckboxes());
+    previousChildren.forEach((cb) => {
+      if (!current.has(cb) && this._suppressedChildren.has(cb)) {
+        cb._groupedSuppress = false;
+        this._suppressedChildren.delete(cb);
+      }
+    });
+  }
+
+  /**
+   * Snapshot of children captured before each `slotchange` so removed children
+   * can be detected (WeakSet is non-enumerable).
+   * @internal
+   */
+  private _previousChildren: HelixCheckbox[] = [];
 
   // ─── Event Handling ───
 
@@ -270,7 +847,13 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   /** @internal */
   private _handleSlotChange(): void {
     this._syncCheckboxes();
+    // Capture pre-mutation snapshot from the previous _previousChildren cache
+    // (the previous slot pass) so removed children can be released from
+    // suppression. Then refresh the snapshot for the next slotchange.
+    const previous = this._previousChildren;
     this._syncCheckboxNames();
+    this._clearSuppressionForRemoved(previous);
+    this._previousChildren = this._getCheckboxes();
     const checkedValues = this._getCheckedValues();
     this._updateFormValue(checkedValues);
     this._updateValidity(checkedValues);
@@ -302,6 +885,8 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     } else {
       this._internals.setValidity({});
     }
+    // Codex round-1 finding #6: re-sync host ARIA after every setValidity().
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -339,6 +924,7 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
 
   override render() {
     const hasError = !!this.error || this._hasErrorSlot;
+    const hasHelp = !!this.helpText || this._hasHelpSlot;
 
     const fieldsetClasses = {
       fieldset: true,
@@ -347,22 +933,18 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       'fieldset--required': this.required,
     };
 
-    const describedBy =
-      [
-        hasError ? this._errorId : null,
-        this.helpText || this._hasHelpSlot ? this._helpTextId : null,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
-
+    // Codex round-19 P1: inner fieldset is presentational on BOTH the modern
+    // and no-IDL-ref fallback paths so AT announces exactly one accessible
+    // container (the host). Earlier rounds promoted the fieldset to
+    // `role="group"` on the fallback branch and spliced shadow-internal ids
+    // into its aria-* attributes; that produced nested host→fieldset groups
+    // and broke external IDREFs (shadow ids cannot resolve across the
+    // boundary). The host carries the role + accessible name via
+    // ElementInternals on both paths.
     return html`
-      <fieldset
-        part="group"
-        class=${classMap(fieldsetClasses)}
-        aria-describedby=${describedBy ?? nothing}
-      >
-        <legend part="label" class="fieldset__legend">
-          <slot name="label">${this.label}</slot>
+      <fieldset part="group" class=${classMap(fieldsetClasses)} role="presentation">
+        <legend part="label" class="fieldset__legend" id=${this._labelId}>
+          <slot name="label" @slotchange=${this._handleLabelSlotChange}>${this.label}</slot>
           ${this.required
             ? html`<span class="fieldset__required-marker" aria-hidden="true">*</span>`
             : nothing}
@@ -372,13 +954,34 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
           <slot @slotchange=${this._handleSlotChange}></slot>
         </div>
 
-        ${hasError
-          ? html`<div part="error" class="fieldset__error" id=${this._errorId} role="alert">
-              <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
-            </div>`
-          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        <!--
+          Persistent live region. role="alert" is set from first paint so
+          assistive tech tracks a stable element across error transitions;
+          the content updates rather than the container being replaced.
+        -->
+        <div
+          part="error"
+          class="fieldset__error"
+          id=${this._errorId}
+          role="alert"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}
+            >${this._announcedError}</slot
+          >
+        </div>
 
-        <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
+        <!--
+          Persistent help-text wrapper, hidden when error overrides so guidance
+          does not compete with validation feedback. Always in the shadow tree
+          so the host's aria-describedby chain is stable.
+        -->
+        <div
+          part="help-text"
+          class="fieldset__help-text"
+          id=${this._helpTextId}
+          ?hidden=${!hasHelp || hasError}
+        >
           <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
         </div>
       </fieldset>
