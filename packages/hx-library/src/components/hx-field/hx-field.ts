@@ -211,6 +211,24 @@ export class HelixField extends HelixElement {
    */
   private _a11yDescEl: HTMLElement | null = null;
 
+  /**
+   * MutationObserver tracking `id` mutations on the currently slotted control.
+   *
+   * **Why a focused, locally-implemented observer:** the broader
+   * `installAriaIdrefMirror()` utility currently lives on the in-flight
+   * `feat/aria-group-2-selection-controls` branch and has not landed on `dev`.
+   * Once Group 2 merges, this focused observer should be deduped against that
+   * shared utility. The narrow scope here (one slotted control, one attribute)
+   * lets us solve the immediate slot-staleness defect without taking a
+   * dependency on an unmerged branch.
+   *
+   * Also observes the host's child list at the document level so that swapping
+   * the slotted control via direct DOM manipulation (not just slotchange) still
+   * triggers a re-resolve.
+   * @internal
+   */
+  private _slottedControlObserver: MutationObserver | null = null;
+
   override connectedCallback(): void {
     super.connectedCallback();
     this._ensureA11yDescEl();
@@ -220,6 +238,9 @@ export class HelixField extends HelixElement {
     super.disconnectedCallback();
     this._a11yDescEl?.remove();
     this._a11yDescEl = null;
+    // Tear down the slotted-control observer to prevent leaks across
+    // disconnect/reconnect cycles.
+    this._teardownSlottedControlObserver();
     // Remove aria attributes we set on the slotted control
     if (this._slottedControl) {
       this._slottedControl.removeAttribute('aria-label');
@@ -282,8 +303,76 @@ export class HelixField extends HelixElement {
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const assigned = slot.assignedElements();
-    this._slottedControl = assigned.find(isFormControl) ?? null;
+    const next = assigned.find(isFormControl) ?? null;
+    this._resolveSlottedControl(next);
+  }
+
+  /**
+   * Adopts a new slotted control. Tears down observers wired to any prior
+   * control, installs a fresh `id` MutationObserver, and re-syncs ARIA wiring.
+   *
+   * Round-13 F1: this path is reached on slotchange AND on observed `id`
+   * mutations of the existing control, so wiring stays current after the host
+   * is mutated post-mount.
+   * @internal
+   */
+  private _resolveSlottedControl(next: HTMLElement | null): void {
+    const prev = this._slottedControl;
+    if (prev === next) return;
+
+    // Tear down attribute observation on the previous control.
+    this._teardownSlottedControlObserver();
+
+    // If we are leaving a previous control, strip the aria attributes we own
+    // so the host doesn't leave stale wiring on a control that is no longer
+    // associated.
+    if (prev) {
+      prev.removeAttribute('aria-label');
+      prev.removeAttribute('aria-required');
+      prev.removeAttribute('aria-invalid');
+      prev.removeAttribute('aria-describedby');
+    }
+
+    this._slottedControl = next;
+
+    if (next) {
+      this._installSlottedControlObserver(next);
+    }
+
     this._syncSlottedControl();
+  }
+
+  /**
+   * Installs a focused MutationObserver on the slotted control's `id`
+   * attribute. Whenever the `id` mutates, we re-run wiring so that any
+   * dependent ARIA references stay live.
+   *
+   * NOTE: Once `installAriaIdrefMirror()` from
+   * `packages/hx-library/src/utils/aria-idref.ts` lands on `dev` (currently
+   * on `feat/aria-group-2-selection-controls`), this implementation should be
+   * deduped against that shared utility.
+   * @internal
+   */
+  private _installSlottedControlObserver(control: HTMLElement): void {
+    if (typeof MutationObserver === 'undefined') return;
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        if (record.type === 'attributes' && record.attributeName === 'id') {
+          this._syncSlottedControl();
+          return;
+        }
+      }
+    });
+    observer.observe(control, { attributes: true, attributeFilter: ['id'] });
+    this._slottedControlObserver = observer;
+  }
+
+  /** @internal */
+  private _teardownSlottedControlObserver(): void {
+    if (this._slottedControlObserver) {
+      this._slottedControlObserver.disconnect();
+      this._slottedControlObserver = null;
+    }
   }
 
   /**

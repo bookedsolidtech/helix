@@ -856,4 +856,120 @@ describe('hx-field', () => {
       }
     });
   });
+
+  // ─── ARIA: slotted control re-resolution (round-13 F1) ───
+
+  describe('ARIA: slotted control re-resolution (F1)', () => {
+    /**
+     * Wait one microtask + one MutationObserver tick. MutationObserver
+     * callbacks are delivered as microtasks, so a second `updateComplete`
+     * after a forced render is sufficient — but we also yield to a fresh
+     * microtask to ensure the observer record has been flushed.
+     */
+    async function flushMutations(el: HelixField): Promise<void> {
+      await el.updateComplete;
+      await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
+      await el.updateComplete;
+    }
+
+    it('re-syncs ARIA wiring when the slotted control is replaced post-mount', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Name" required error="Required"><input id="first" type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+
+      const first = el.querySelector('input#first') as HTMLInputElement;
+      expect(first.getAttribute('aria-label')).toBe('Name');
+      expect(first.getAttribute('aria-required')).toBe('true');
+      expect(first.getAttribute('aria-invalid')).toBe('true');
+
+      // Swap the slotted control: remove the original, append a fresh one.
+      first.remove();
+      const replacement = document.createElement('input');
+      replacement.type = 'text';
+      replacement.id = 'second';
+      el.appendChild(replacement);
+
+      await flushMutations(el);
+
+      expect(replacement.getAttribute('aria-label')).toBe('Name');
+      expect(replacement.getAttribute('aria-required')).toBe('true');
+      expect(replacement.getAttribute('aria-invalid')).toBe('true');
+      expect(replacement.hasAttribute('aria-describedby')).toBe(true);
+
+      // The original control should have been stripped of host-owned ARIA.
+      expect(first.hasAttribute('aria-label')).toBe(false);
+      expect(first.hasAttribute('aria-required')).toBe(false);
+      expect(first.hasAttribute('aria-invalid')).toBe(false);
+      expect(first.hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    it('re-syncs ARIA wiring when the slotted control id is mutated post-mount', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field error="Required"><input id="initial" type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+
+      // Capture the describedby value BEFORE mutating the id. The component
+      // currently points aria-describedby at the host's own light-DOM
+      // description span (id ends with -desc), so the value is stable across
+      // id changes — but the wiring SHOULD be re-evaluated.
+      const initialDescId = input.getAttribute('aria-describedby');
+      expect(initialDescId).toBeTruthy();
+
+      // Mutate the id — the observer should fire a sync.
+      input.id = 'mutated';
+      await flushMutations(el);
+
+      // Wiring is still applied (no stale removal).
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      expect(input.getAttribute('aria-describedby')).toBe(initialDescId);
+    });
+
+    it('does not re-write ARIA when an unrelated attribute mutates', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Name"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('Name');
+
+      // Mutating an unrelated attribute should not fire our id observer.
+      // We can't directly observe "no work happened", but we can confirm
+      // the wiring remains stable and unchanged.
+      input.setAttribute('placeholder', 'Type here');
+      await flushMutations(el);
+
+      expect(input.getAttribute('aria-label')).toBe('Name');
+      expect(input.getAttribute('placeholder')).toBe('Type here');
+    });
+
+    it('disconnects the id MutationObserver on disconnectedCallback', async () => {
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Name"><input type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+
+        el.remove();
+
+        // After disconnect, the host has stripped ARIA. Mutating the id on
+        // the now-orphaned input must NOT cause the host to re-write any
+        // ARIA attributes (the observer is torn down).
+        input.id = 'after-disconnect';
+        await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
+
+        expect(input.hasAttribute('aria-label')).toBe(false);
+        expect(input.hasAttribute('aria-required')).toBe(false);
+        expect(input.hasAttribute('aria-invalid')).toBe(false);
+        expect(input.hasAttribute('aria-describedby')).toBe(false);
+      } finally {
+        document.body.removeChild(container);
+      }
+    });
+  });
 });
