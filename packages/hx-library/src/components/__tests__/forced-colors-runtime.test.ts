@@ -96,6 +96,120 @@ describe('forced-colors mixin adoption (runtime)', () => {
   });
 });
 
+describe('hx-nav-item forced-colors disabled opacity scoping (runtime)', () => {
+  /*
+   * Regression for #46: the forced-colors `opacity: 1` reset previously
+   * targeted `:host([disabled])`, but the source declaration at line 109
+   * applies opacity to `.nav-item__link`. The mis-scoped reset had no
+   * effect — disabled links rendered at 0.5 opacity in Windows High
+   * Contrast mode, dimming GrayText below the WCAG 2.1 AA non-text
+   * contrast minimum. The reset must live on the same selector that sets
+   * the opacity in the first place.
+   */
+  it('disabled .nav-item__link receives opacity:1 inside @media (forced-colors: active)', async () => {
+    await fixture<HTMLElement>(
+      '<hx-side-nav><hx-nav-item href="/a" disabled>Disabled</hx-nav-item></hx-side-nav>',
+    );
+    const navItem = document.querySelector('hx-nav-item') as HTMLElement;
+    expect(navItem, 'fixture must render hx-nav-item').toBeTruthy();
+
+    const forcedColorsCss = collectMediaRuleCss(navItem, 'forced-colors: active');
+    expect(forcedColorsCss, 'hx-nav-item must emit a forced-colors media block').not.toBe('');
+
+    // The reset MUST be scoped to .nav-item__link (matching the source
+    // declaration at line 109). A reset on bare :host([disabled]) does
+    // not override .nav-item__link's opacity and is the bug we are
+    // fixing.
+    const disabledLinkRule = forcedColorsCss.match(
+      /:host\(\[disabled\]\)\s+\.nav-item__link\s*\{[^}]*\}/,
+    );
+    expect(
+      disabledLinkRule,
+      'expected `:host([disabled]) .nav-item__link { ... }` rule inside forced-colors block',
+    ).not.toBeNull();
+    expect(disabledLinkRule![0]).toMatch(/opacity:\s*1\b/);
+    expect(disabledLinkRule![0]).toContain('graytext');
+  });
+
+  it('forced-colors block does NOT reset opacity on bare :host([disabled]) (wrong selector)', async () => {
+    await fixture<HTMLElement>(
+      '<hx-side-nav><hx-nav-item href="/a" disabled>Disabled</hx-nav-item></hx-side-nav>',
+    );
+    const navItem = document.querySelector('hx-nav-item') as HTMLElement;
+    const forcedColorsCss = collectMediaRuleCss(navItem, 'forced-colors: active');
+
+    // Match :host([disabled]) NOT followed by a descendant selector.
+    // If a bare host-only opacity reset exists, the bug has regressed.
+    const bareHostDisabled = forcedColorsCss.match(
+      /:host\(\[disabled\]\)\s*\{([^}]*)\}/,
+    );
+    if (bareHostDisabled) {
+      expect(
+        bareHostDisabled[1],
+        'bare :host([disabled]) inside forced-colors must not carry opacity (it cannot reach .nav-item__link)',
+      ).not.toMatch(/opacity:/);
+    }
+  });
+
+  /*
+   * Cascade-order regression net: both rules use selector
+   * `:host([disabled]) .nav-item__link` with identical specificity, so the
+   * forced-colors override only wins because it appears later in source
+   * order. If a future refactor moves the @media block above line 109 of
+   * hx-nav-item.styles.ts, the override silently loses and disabled links
+   * regress to 0.5 opacity in Windows High Contrast mode — while the rule-
+   * shape assertions above still pass green. Pin the source-order invariant
+   * directly by walking the adopted stylesheets in order.
+   */
+  it('forced-colors disabled override appears AFTER the regular-mode opacity rule', async () => {
+    await fixture<HTMLElement>(
+      '<hx-side-nav><hx-nav-item href="/a" disabled>Disabled</hx-nav-item></hx-side-nav>',
+    );
+    const navItem = document.querySelector('hx-nav-item') as HTMLElement;
+    const sheets = (navItem.shadowRoot?.adoptedStyleSheets ?? []) as CSSStyleSheet[];
+
+    let regularIndex = -1;
+    let forcedColorsIndex = -1;
+    let cursor = 0;
+
+    for (const sheet of sheets) {
+      for (const rule of Array.from(sheet.cssRules)) {
+        if (
+          rule instanceof CSSStyleRule &&
+          rule.selectorText === ':host([disabled]) .nav-item__link' &&
+          /opacity:\s*var\(--hx-opacity-disabled/.test(rule.cssText) &&
+          regularIndex === -1
+        ) {
+          regularIndex = cursor;
+        }
+        if (
+          rule instanceof CSSMediaRule &&
+          rule.conditionText.includes('forced-colors: active')
+        ) {
+          for (const inner of Array.from(rule.cssRules)) {
+            if (
+              inner instanceof CSSStyleRule &&
+              inner.selectorText === ':host([disabled]) .nav-item__link' &&
+              /opacity:\s*1\b/.test(inner.cssText)
+            ) {
+              forcedColorsIndex = cursor;
+              break;
+            }
+          }
+        }
+        cursor += 1;
+      }
+    }
+
+    expect(regularIndex, 'regular-mode :host([disabled]) .nav-item__link opacity rule must exist').toBeGreaterThan(-1);
+    expect(forcedColorsIndex, 'forced-colors override on :host([disabled]) .nav-item__link must exist').toBeGreaterThan(-1);
+    expect(
+      forcedColorsIndex,
+      'forced-colors override must appear after the regular-mode rule (equal-specificity cascade depends on source order)',
+    ).toBeGreaterThan(regularIndex);
+  });
+});
+
 describe('hx-side-nav toggle:hover token chain (runtime)', () => {
   it('plain .side-nav__toggle:hover reads deprecated→canonical→hex fallback', async () => {
     const el = await fixture<HTMLElement>('<hx-side-nav></hx-side-nav>');
