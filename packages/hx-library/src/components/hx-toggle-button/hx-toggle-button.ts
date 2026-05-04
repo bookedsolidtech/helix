@@ -540,6 +540,15 @@ export class HelixToggleButton extends HelixElement {
         detail: { pressed: this.pressed },
       }),
     );
+
+    // Codex round-12 P2: on the modern path the host owns role="button" and
+    // tabindex=0; the inner <button tabindex="-1"> is aria-hidden. Native
+    // click activation on a `<button>` still focuses it, which would leave
+    // `document.activeElement` and AT focus on a hidden node. Move focus to
+    // the host so the announced surface is also the focus target.
+    if (this._supportsIdrefRefs) {
+      this.focus();
+    }
   }
 
   // ─── Render Helpers ───

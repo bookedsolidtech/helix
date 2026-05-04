@@ -482,6 +482,14 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   /** @internal */
   private _handleClick(): void {
     this._toggle();
+    // Codex round-12 P2: on the modern path the host owns role="switch" and
+    // tabindex=0; the inner <button tabindex="-1"> is aria-hidden. Native
+    // click activation on a `<button>` still focuses it, which would leave
+    // `document.activeElement` and AT focus on a hidden node. Move focus back
+    // to the host so the announced surface is also the focus target.
+    if (this._supportsIdrefRefs) {
+      this.focus();
+    }
   }
 
   /** Handles keydown events — Space toggles the switch per ARIA APG. */

@@ -715,7 +715,17 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     // radio when the group's current value is empty. We therefore peek at the
     // raw children first to detect "pre-checked" adoption, then commit through
     // the normal sync pipeline.
-    const externallyChecked = this._getRadios().find((r) => r.checked && !r.disabled);
+    //
+    // Codex round-12 P2: prefer a checked radio whose value differs from the
+    // current group value — that is the "newly externally checked" candidate.
+    // The naive `.find(r.checked && !r.disabled)` returned the first checked
+    // radio in DOM order, which is typically the previously-selected one whose
+    // value already matches `this.value`, so an appended `<hx-radio checked>`
+    // with a different value would be rejected by the next `_syncRadios()`
+    // pass. Falling back to "any checked radio" still handles the
+    // empty-group / first-mount case.
+    const candidates = this._getRadios().filter((r) => r.checked && !r.disabled);
+    const externallyChecked = candidates.find((r) => r.value !== this.value) ?? candidates[0];
     if (externallyChecked && externallyChecked.value !== this.value) {
       this.value = externallyChecked.value;
     }

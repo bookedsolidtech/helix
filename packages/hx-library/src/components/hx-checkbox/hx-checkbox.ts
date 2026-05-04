@@ -534,6 +534,16 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
         detail: { checked: this.checked, value: this.value },
       }),
     );
+
+    // Codex round-12 P2 (parity with hx-switch / hx-toggle-button): on the
+    // modern path the host owns role="checkbox" and tabindex=0; the inner
+    // `<input>` is aria-hidden and tabindex=-1. Clicking the surrounding
+    // `<label>` still routes activation to the input via native label-forward,
+    // which focuses the input. Move focus to the host so the announced
+    // surface is also the focus target.
+    if (this._supportsIdrefRefs) {
+      this.focus();
+    }
   }
 
   /**
