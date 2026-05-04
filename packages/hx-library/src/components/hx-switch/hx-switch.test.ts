@@ -3,6 +3,12 @@ import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-u
 import type { HxSwitch } from './hx-switch.js';
 import './index.js';
 
+type SwitchTestHarness = HxSwitch & {
+  _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
+};
+
 afterEach(cleanup);
 
 describe('hx-switch', () => {
@@ -856,10 +862,9 @@ describe('hx-switch', () => {
 
   describe('No-IDL-ref fallback render (round-2 F2)', () => {
     async function forceFallbackPath(el: HxSwitch): Promise<void> {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const anyEl = el as any;
-      anyEl._supportsIdrefRefs = false;
-      anyEl._syncHostAriaSemantics();
+      const harness = el as SwitchTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
       el.requestUpdate();
       await el.updateComplete;
     }
@@ -898,8 +903,7 @@ describe('hx-switch', () => {
     it('host internals.role is cleared on the fallback path', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as SwitchTestHarness)._internals;
       expect(internals.role).toBe('switch');
 
       await forceFallbackPath(el);

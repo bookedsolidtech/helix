@@ -243,6 +243,7 @@ export const helixCheckboxStyles = css`
       border: 2px solid ButtonText;
     }
 
+    :host(:focus-visible) .checkbox__box,
     .checkbox__input:focus-visible ~ .checkbox__box {
       outline: 3px solid Highlight;
       outline-offset: 2px;

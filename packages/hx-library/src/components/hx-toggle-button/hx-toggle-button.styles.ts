@@ -250,6 +250,7 @@ export const helixToggleButtonStyles = css`
       border: 2px solid ButtonText;
     }
 
+    :host(:focus-visible) .button,
     .button:focus-visible {
       outline: 3px solid Highlight;
       outline-offset: 2px;

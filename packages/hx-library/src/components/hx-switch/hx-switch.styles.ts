@@ -204,6 +204,7 @@ export const helixSwitchStyles = css`
       border: 2px solid ButtonText;
     }
 
+    :host(:focus-visible) .switch__track,
     .switch__track:focus-visible {
       outline: 3px solid Highlight;
       outline-offset: 2px;

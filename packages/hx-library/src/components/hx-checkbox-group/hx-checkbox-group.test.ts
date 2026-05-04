@@ -5,6 +5,9 @@ import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import '../hx-checkbox/index.js';
 import './index.js';
 
+type CheckboxGroupHarness = HelixCheckboxGroup & { _internals: ElementInternals };
+type GroupedSuppressHarness = HelixCheckbox & { _groupedSuppress: boolean };
+
 afterEach(cleanup);
 
 describe('hx-checkbox-group', () => {
@@ -798,8 +801,7 @@ describe('hx-checkbox-group', () => {
           <hx-checkbox value="a" label="A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as CheckboxGroupHarness)._internals;
       expect(internals.role).toBe('group');
     });
 
@@ -809,8 +811,7 @@ describe('hx-checkbox-group', () => {
           <hx-checkbox value="a" label="A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as CheckboxGroupHarness)._internals;
       expect(internals.ariaLabel).toBe('Notification Topics');
     });
 
@@ -820,8 +821,7 @@ describe('hx-checkbox-group', () => {
           <hx-checkbox value="a" label="A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as CheckboxGroupHarness)._internals;
       expect(internals.ariaLabel).toBe('Public name');
     });
 
@@ -831,8 +831,7 @@ describe('hx-checkbox-group', () => {
           <hx-checkbox value="a" label="A"></hx-checkbox>
         </hx-checkbox-group>
       `);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as CheckboxGroupHarness)._internals;
       expect(internals.ariaRequired).toBe('true');
     });
 
@@ -846,8 +845,7 @@ describe('hx-checkbox-group', () => {
         </hx-checkbox-group>
       `);
       await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const internals = (el as any)._internals as ElementInternals;
+      const internals = (el as CheckboxGroupHarness)._internals;
       expect(internals.validity.valid).toBe(false);
       expect(internals.ariaInvalid).toBe('true');
     });
@@ -958,21 +956,37 @@ describe('hx-checkbox-group', () => {
   // ─── Codex round-2 finding #1: centralised form participation (3) ───
 
   describe('Form submission: no double-submit (round-2 F1)', () => {
-    it('clears child name when grouped so the group is the sole form participant', async () => {
-      const el = await fixture<HelixCheckboxGroup>(`
+    it('grouped children preserve their own name but FormData omits child keys', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
         <hx-checkbox-group label="Topics" name="topics">
-          <hx-checkbox value="a" label="A"></hx-checkbox>
-          <hx-checkbox value="b" label="B"></hx-checkbox>
+          <hx-checkbox value="a" label="A" name="custom-a" checked></hx-checkbox>
+          <hx-checkbox value="b" label="B" name="custom-b" checked></hx-checkbox>
         </hx-checkbox-group>
-      `);
+      `;
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      container.appendChild(form);
+      const el = form.querySelector('hx-checkbox-group') as HelixCheckboxGroup;
       await el.updateComplete;
       const checkboxes = Array.from(el.querySelectorAll('hx-checkbox')) as HelixCheckbox[];
-      // Children must NOT carry the group's name — round-2 finding #1.
-      // If they did, both group AND child would call setFormValue under the
-      // same name and FormData would contain duplicate entries.
-      for (const cb of checkboxes) {
-        expect(cb.name).toBe('');
-      }
+      for (const cb of checkboxes) await cb.updateComplete;
+
+      // Round-3 hardening: the group does NOT mutate the child name (round-2
+      // cleared it, which broke when consumers re-set it post-attach). The
+      // public contract is FormData-shaped: the group's `topics` key carries
+      // the checked value, child names are preserved verbatim, and no child
+      // key appears even though both children carry their own names. The
+      // suppression mechanism is asserted at the white-box level by the
+      // dedicated round-3 F1 test below.
+      expect(checkboxes[0].name).toBe('custom-a');
+      expect(checkboxes[1].name).toBe('custom-b');
+
+      const data = new FormData(form);
+      expect(data.getAll('topics').map((v) => String(v))).toEqual(['a', 'b']);
+      expect(data.has('custom-a')).toBe(false);
+      expect(data.has('custom-b')).toBe(false);
+      form.remove();
     });
 
     it('FormData contains each checked value exactly once (no duplicates)', async () => {
@@ -1005,29 +1019,50 @@ describe('hx-checkbox-group', () => {
       form.remove();
     });
 
-    it('group-suppresses each child via _groupedSuppress (round-3 F1 hardening)', async () => {
-      // Round-2 used `cb.name = ''` as the suppression signal, which broke if
-      // a consumer re-set the name post-attach. Round-3 introduces a
-      // name-independent flag — `_groupedSuppress` — that the group toggles
-      // on/off as children join and leave. We assert the flag here directly
-      // and the consumer-mutation case in the post-attach test below.
-      const el = await fixture<HelixCheckboxGroup>(`
-        <hx-checkbox-group label="Topics">
-          <hx-checkbox value="a" label="A" name="kept-by-consumer"></hx-checkbox>
+    it('group-suppresses each child via _groupedSuppress, surviving late child name mutation', async () => {
+      // Round-2 used `cb.name = ''` as the suppression signal — a consumer or
+      // framework binding that re-set `cb.name` post-attach regained form
+      // participation through the `name` setter. Round-3 introduces the
+      // name-independent `_groupedSuppress` flag as a durable kill switch:
+      // `_updateFormValue()` returns null whenever the flag is set,
+      // regardless of `name` (see hx-checkbox.ts:529). This test exercises
+      // both the property-level flag and the FormData-level proof — the
+      // exact regression vector from round-2 is the late `cb.name = ...`
+      // mutation, so we drive that explicitly.
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-checkbox-group label="Topics" name="topics">
+          <hx-checkbox value="a" label="A" name="kept-by-consumer" checked></hx-checkbox>
         </hx-checkbox-group>
-      `);
+      `;
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      container.appendChild(form);
+      const el = form.querySelector('hx-checkbox-group') as HelixCheckboxGroup;
       await el.updateComplete;
       const cb = el.querySelector('hx-checkbox') as HelixCheckbox;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((cb as any)._groupedSuppress).toBe(true);
-      // The child's `name` is preserved verbatim — group does not mutate it.
+      await cb.updateComplete;
+
+      expect((cb as GroupedSuppressHarness)._groupedSuppress).toBe(true);
       expect(cb.name).toBe('kept-by-consumer');
 
-      // Setting group name late re-runs sync; the flag must still be set.
-      el.name = 'topics';
-      await el.updateComplete;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((cb as any)._groupedSuppress).toBe(true);
+      // Pre-rename snapshot: suppression already holds at attach. This is
+      // load-bearing because a broken impl would serialize under the
+      // `kept-by-consumer` key here, before the rename ever runs.
+      const before = new FormData(form);
+      expect(before.getAll('topics').map((v) => String(v))).toEqual(['a']);
+      expect(before.has('kept-by-consumer')).toBe(false);
+
+      // Late child-name mutation — the round-2 regression vector. The flag
+      // must still be set and FormData must omit the new name.
+      cb.name = 'late-name';
+      await cb.updateComplete;
+      expect((cb as GroupedSuppressHarness)._groupedSuppress).toBe(true);
+
+      const after = new FormData(form);
+      expect(after.getAll('topics').map((v) => String(v))).toEqual(['a']);
+      expect(after.has('late-name')).toBe(false);
+      form.remove();
     });
   });
 
