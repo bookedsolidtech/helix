@@ -212,33 +212,38 @@ export class HelixField extends HelixElement {
   private _a11yDescEl: HTMLElement | null = null;
 
   /**
-   * Tracks whether the consumer pre-set `aria-label` on the slotted control
-   * before hx-field had a chance to write its own. When true, hx-field
-   * suppresses its own `aria-label` write to honor the consumer override.
+   * Marker attribute placed on the slotted control whenever hx-field writes
+   * `aria-label` to it. Presence of this marker indicates host ownership of
+   * the attribute; absence means the value belongs to the consumer.
    *
-   * Captured per-control on slotchange so swapping the control resets the
-   * detection. See round-13 F2 for context on the precedence hazard.
+   * Ownership is recomputed from the live DOM on every `_syncSlottedControl()`
+   * call rather than cached in a flag — this keeps post-mount mutations
+   * (consumer adds/removes `aria-label`, toggles `data-aria-managed`)
+   * authoritative instead of letting a stale snapshot win.
+   *
+   * See round-13 F2 for context on the precedence hazard.
    * @internal
    */
-  private _consumerSetAriaLabel = false;
+  private static readonly _ARIA_LABEL_OWNED_ATTR = 'data-hx-owns-label';
 
   /**
-   * MutationObserver tracking `id` mutations on the currently slotted control.
-   *
-   * **Why a focused, locally-implemented observer:** the broader
-   * `installAriaIdrefMirror()` utility currently lives on the in-flight
-   * `feat/aria-group-2-selection-controls` branch and has not landed on `dev`.
-   * Once Group 2 merges, this focused observer should be deduped against that
-   * shared utility. The narrow scope here (one slotted control, one attribute)
-   * lets us solve the immediate slot-staleness defect without taking a
-   * dependency on an unmerged branch.
-   *
-   * Also observes the host's child list at the document level so that swapping
-   * the slotted control via direct DOM manipulation (not just slotchange) still
-   * triggers a re-resolve.
+   * Last `aria-label` value written by hx-field to the currently adopted
+   * control. Used in combination with the ownership marker to detect a
+   * consumer overwrite: if the marker is present but the live value no
+   * longer matches what we last wrote, the consumer has taken over and we
+   * release the marker so subsequent syncs treat the value as consumer-
+   * owned.
    * @internal
    */
-  private _slottedControlObserver: MutationObserver | null = null;
+  private _lastWrittenAriaLabel: string | null = null;
+
+  /**
+   * Tracks whether the dev-time competing-label warning has already been
+   * emitted for the currently adopted slotted control. Reset whenever a new
+   * control is adopted via `_resolveSlottedControl()`.
+   * @internal
+   */
+  private _competingLabelWarned = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -249,23 +254,17 @@ export class HelixField extends HelixElement {
     super.disconnectedCallback();
     this._a11yDescEl?.remove();
     this._a11yDescEl = null;
-    // Tear down the slotted-control observer to prevent leaks across
-    // disconnect/reconnect cycles.
-    this._teardownSlottedControlObserver();
     // Remove aria attributes we set on the slotted control. We only remove
-    // `aria-label` if the consumer did not pre-set it — otherwise we never
-    // wrote it (see _syncSlottedControl) and removing would clobber the
-    // consumer's override.
+    // `aria-label` if hx-field owns it (marker present) — otherwise the
+    // value belongs to the consumer and removing would clobber their input.
     if (this._slottedControl) {
-      if (!this._consumerSetAriaLabel) {
-        this._slottedControl.removeAttribute('aria-label');
-      }
+      this._releaseHostOwnedAriaLabel(this._slottedControl);
       this._slottedControl.removeAttribute('aria-required');
       this._slottedControl.removeAttribute('aria-invalid');
       this._slottedControl.removeAttribute('aria-describedby');
       this._slottedControl = null;
     }
-    this._consumerSetAriaLabel = false;
+    this._competingLabelWarned = false;
   }
 
   override updated(changedProps: PropertyValues<this>): void {
@@ -325,92 +324,78 @@ export class HelixField extends HelixElement {
   }
 
   /**
-   * Adopts a new slotted control. Tears down observers wired to any prior
-   * control, installs a fresh `id` MutationObserver, and re-syncs ARIA wiring.
+   * Adopts a new slotted control and re-syncs ARIA wiring.
    *
-   * Round-13 F1: this path is reached on slotchange AND on observed `id`
-   * mutations of the existing control, so wiring stays current after the host
-   * is mutated post-mount.
+   * Ownership of `aria-label` is tracked via the
+   * `data-hx-owns-label` marker attribute on the control itself, recomputed
+   * on every `_syncSlottedControl()` call — there is no cached ownership
+   * flag, so post-mount mutations of `aria-label` and `data-aria-managed`
+   * by the consumer are always honored.
    * @internal
    */
   private _resolveSlottedControl(next: HTMLElement | null): void {
     const prev = this._slottedControl;
     if (prev === next) return;
 
-    // Tear down attribute observation on the previous control.
-    this._teardownSlottedControlObserver();
-
     // If we are leaving a previous control, strip the aria attributes we own
     // so the host doesn't leave stale wiring on a control that is no longer
-    // associated. We never remove an `aria-label` we did not write
+    // associated. We only remove `aria-label` if hx-field owns it
     // (round-13 F2 — respect consumer overrides).
     if (prev) {
-      if (!this._consumerSetAriaLabel) {
-        prev.removeAttribute('aria-label');
-      }
+      this._releaseHostOwnedAriaLabel(prev);
       prev.removeAttribute('aria-required');
       prev.removeAttribute('aria-invalid');
       prev.removeAttribute('aria-describedby');
     }
 
     this._slottedControl = next;
-
-    if (next) {
-      // F2: capture consumer intent BEFORE we ever write to the control.
-      // Skip detection for hx-* and data-aria-managed since we never write
-      // to those anyway — the existing skip conditions in
-      // _syncSlottedControl handle them.
-      const isManaged = next.tagName.startsWith('HX-') || next.hasAttribute('data-aria-managed');
-      this._consumerSetAriaLabel = !isManaged && next.hasAttribute('aria-label');
-
-      if (this._consumerSetAriaLabel && this.label && !this._hasLabelSlot) {
-        // Dev-only: warn that the consumer's aria-label takes precedence
-        // over the visible label prop. Production builds drop this call
-        // entirely via the import.meta.env.DEV gate inside devWarn.
-        devWarn(
-          'hx-field',
-          'Slotted control already has `aria-label`. The consumer override is being respected; the visible `label` prop will not be mirrored to the control. Remove one of the two to silence this warning.',
-        );
-      }
-
-      this._installSlottedControlObserver(next);
-    } else {
-      this._consumerSetAriaLabel = false;
-    }
+    // Reset the once-per-adoption warning latch so the warning can fire
+    // again for the freshly adopted control.
+    this._competingLabelWarned = false;
+    // Drop the value snapshot from any previous adoption.
+    this._lastWrittenAriaLabel = null;
 
     this._syncSlottedControl();
   }
 
   /**
-   * Installs a focused MutationObserver on the slotted control's `id`
-   * attribute. Whenever the `id` mutates, we re-run wiring so that any
-   * dependent ARIA references stay live.
+   * Returns true if hx-field owns the `aria-label` on the given control —
+   * i.e. the host wrote it, the marker attribute is still present, AND the
+   * live value still matches the value the host last wrote.
    *
-   * NOTE: Once `installAriaIdrefMirror()` from
-   * `packages/hx-library/src/utils/aria-idref.ts` lands on `dev` (currently
-   * on `feat/aria-group-2-selection-controls`), this implementation should be
-   * deduped against that shared utility.
+   * Side effect: when the marker is present but the value no longer matches
+   * `_lastWrittenAriaLabel`, the consumer has overwritten the host value
+   * directly. We release the marker (and reset the snapshot) so subsequent
+   * syncs treat the value as consumer-owned. This keeps the marker honest
+   * without a MutationObserver.
+   *
+   * Absence of the marker (or presence of `data-aria-managed`) means the
+   * consumer owns the value and hx-field must not touch it.
    * @internal
    */
-  private _installSlottedControlObserver(control: HTMLElement): void {
-    if (typeof MutationObserver === 'undefined') return;
-    const observer = new MutationObserver((records) => {
-      for (const record of records) {
-        if (record.type === 'attributes' && record.attributeName === 'id') {
-          this._syncSlottedControl();
-          return;
-        }
-      }
-    });
-    observer.observe(control, { attributes: true, attributeFilter: ['id'] });
-    this._slottedControlObserver = observer;
+  private _hostOwnsAriaLabel(control: HTMLElement): boolean {
+    if (control.hasAttribute('data-aria-managed')) return false;
+    if (!control.hasAttribute(HelixField._ARIA_LABEL_OWNED_ATTR)) return false;
+    const liveValue = control.getAttribute('aria-label');
+    if (this._lastWrittenAriaLabel !== null && liveValue !== this._lastWrittenAriaLabel) {
+      // Consumer rewrote the attribute under us — they are the owner now.
+      control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+      this._lastWrittenAriaLabel = null;
+      return false;
+    }
+    return true;
   }
 
-  /** @internal */
-  private _teardownSlottedControlObserver(): void {
-    if (this._slottedControlObserver) {
-      this._slottedControlObserver.disconnect();
-      this._slottedControlObserver = null;
+  /**
+   * Removes the host-owned `aria-label` and its ownership marker if (and only
+   * if) hx-field still owns them. Consumer-set values are left untouched.
+   * @internal
+   */
+  private _releaseHostOwnedAriaLabel(control: HTMLElement): void {
+    if (this._hostOwnsAriaLabel(control)) {
+      control.removeAttribute('aria-label');
+      control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+      this._lastWrittenAriaLabel = null;
     }
   }
 
@@ -437,6 +422,13 @@ export class HelixField extends HelixElement {
    * - `HX-*` elements manage their own ARIA attributes; bridging is skipped.
    * - Elements with `data-aria-managed` attribute opt out of ARIA mutation;
    *   bridging is skipped entirely for those elements.
+   *
+   * **Round-13 F2 ownership model:** `aria-label` ownership is recomputed
+   * from the live DOM on every call. If the marker attribute
+   * `data-hx-owns-label` is present, hx-field owns the value and may
+   * overwrite or remove it. Otherwise the consumer owns it, and hx-field
+   * leaves it alone. This makes post-mount consumer mutations
+   * (add/remove/replace) authoritative without relying on a stale flag.
    */
   /** @internal */
   private _syncSlottedControl(): void {
@@ -447,6 +439,10 @@ export class HelixField extends HelixElement {
     if (control.tagName.startsWith('HX-')) return;
 
     // Elements that declare data-aria-managed opt out of ARIA mutation
+    // entirely — including any host-owned aria-label we may have written
+    // before the attribute was added. We do NOT remove a host-owned label
+    // here because doing so would silently strip the visible label simply
+    // because the consumer toggled the opt-out.
     if (control.hasAttribute('data-aria-managed')) return;
 
     const hasError = !!this.error || this._hasErrorSlot;
@@ -454,17 +450,36 @@ export class HelixField extends HelixElement {
 
     // Label association: aria-label bridges the shadow DOM boundary.
     //
-    // Round-13 F2: if the consumer pre-set `aria-label` on the slotted
-    // control (captured at slotchange in `_consumerSetAriaLabel`), we do
-    // NOT touch it. Writing our own would silently win over their override.
-    // The dev-only warning is emitted from `_resolveSlottedControl` to keep
-    // this hot path free of conditional console work.
-    if (this._consumerSetAriaLabel) {
-      // Intentionally no-op — respect the consumer's aria-label.
+    // Round-13 F2: ownership is decided by the marker on the control, not a
+    // cached flag. A consumer-owned value is always left intact.
+    const hostOwnsLabel = this._hostOwnsAriaLabel(control);
+    const consumerHasLabel = control.hasAttribute('aria-label') && !hostOwnsLabel;
+
+    if (consumerHasLabel) {
+      // Consumer owns the value — never touch it.
+      if (this.label && !this._hasLabelSlot && !this._competingLabelWarned) {
+        // Dev-only: warn once per adoption that the consumer's aria-label
+        // takes precedence over the visible `label` prop. Production builds
+        // drop this call entirely via the `import.meta.env.DEV` gate inside
+        // `devWarn`. The latch (`_competingLabelWarned`) is reset on every
+        // adoption in `_resolveSlottedControl()`.
+        devWarn(
+          'hx-field',
+          'Slotted control already has `aria-label`. The consumer override is being respected; the visible `label` prop will not be mirrored to the control. Remove one of the two to silence this warning.',
+        );
+        this._competingLabelWarned = true;
+      }
     } else if (this.label && !this._hasLabelSlot) {
+      // Host writes the label and stamps the ownership marker so a future
+      // sync can tell its own value apart from a consumer override.
       control.setAttribute('aria-label', this.label);
+      control.setAttribute(HelixField._ARIA_LABEL_OWNED_ATTR, 'true');
+      this._lastWrittenAriaLabel = this.label;
     } else {
-      control.removeAttribute('aria-label');
+      // No host-supplied label and no consumer label — clean up any prior
+      // host-owned value. (If the consumer set one in the meantime, the
+      // `consumerHasLabel` branch above handles it.)
+      this._releaseHostOwnedAriaLabel(control);
     }
 
     // Required state
