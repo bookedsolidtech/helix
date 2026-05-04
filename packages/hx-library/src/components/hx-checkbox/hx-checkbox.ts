@@ -10,6 +10,7 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixCheckboxStyles } from './hx-checkbox.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
 const _nextCheckboxId = createIdCounter('hx-checkbox');
@@ -202,6 +203,12 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   /** @internal */
   @state() private _hasErrorSlot = false;
 
+  /** @internal */
+  @state() private _hasHelpTextSlot = false;
+
+  /** @internal */
+  @state() private _hasLabelSlot = false;
+
   /**
    * Deferred copy of this.error used inside the live region. Injected after
    * the region is visible (via requestAnimationFrame) so screen readers
@@ -222,6 +229,22 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /** @internal */
+  private _handleHelpTextSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpTextSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  /** @internal */
+  private _handleLabelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    // Default slot may include the fallback `${this.label}` text node — count
+    // assigned (not flattened) nodes so the slot fallback is not mistaken for
+    // user-supplied content. The visible label is independently tracked via
+    // the `label` property below.
+    this._hasLabelSlot = slot.assignedNodes().length > 0;
+  }
+
   // ─── Lifecycle ───
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -229,6 +252,13 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
     }
+
+    // Host-elevated ARIA semantics. The checkbox role lives on the host so that
+    // consumer-supplied `aria-label`/`aria-labelledby`/`aria-describedby` on
+    // `<hx-checkbox>` resolve in light DOM and reach the announced control.
+    // Without this, the semantic surface is the inner shadow `<input>` which
+    // cannot see light-DOM IDREF targets across the shadow boundary.
+    this._syncHostAriaSemantics();
     // Warn when accessible-label is set alongside a visible label — they are mutually exclusive.
     // Checked unconditionally (not gated on changedProperties) because ariaLabel is provided by
     // mixinDelegatesAria via Object.defineProperty and never appears in changedProperties.
@@ -361,6 +391,83 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     this._inputEl?.focus(options);
   }
 
+  // ─── Host ARIA Semantics (ElementInternals) ───
+
+  /**
+   * Mirrors checkbox semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-checkbox>` reach the announced control. Without this, those
+   * attributes — intercepted by `mixinDelegatesAria` and stored on the host —
+   * would not propagate through to the inner shadow `<input>`.
+   *
+   * Codex finding (aria-delegation, severity high): the announced semantic
+   * node was the inner `<input>` and the host's labelled-by tokens could not
+   * cross the shadow boundary.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'checkbox';
+    internals.ariaChecked = this.indeterminate
+      ? 'mixed'
+      : this.checked
+        ? 'true'
+        : 'false';
+    internals.ariaRequired = this.required ? 'true' : 'false';
+    // Drive aria-invalid from validity state, not from visible error content.
+    // A required-but-unchecked checkbox sets `valueMissing` via setValidity()
+    // but may render no visible error yet — assistive tech still needs to hear
+    // the invalid state.
+    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+    internals.ariaDisabled = this.disabled ? 'true' : 'false';
+
+    const hostLabel = this._effectiveLabel;
+    internals.ariaLabel = hostLabel || null;
+
+    // Resolve consumer-supplied IDREF tokens (stored as data-aria-* by
+    // mixinDelegatesAria) against the host's root node, then merge with
+    // shadow-internal label/help/error elements via the IDL element-references
+    // API. Element references work cross-shadow in a way that ID strings on
+    // the host cannot.
+    if (supportsIdrefElementReferences(internals)) {
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+
+      const externalLabelTokens = this.getAttribute('data-aria-labelledby');
+      const externalDescTokens = this.getAttribute('data-aria-describedby');
+
+      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+      // Append the internal label element when the visible label has content
+      // and no external labelling source already names the host.
+      const internalLabel = this.shadowRoot?.getElementById(this._labelId);
+      const hasVisibleLabel = !!this.label || this._hasLabelSlot;
+      if (
+        labelEls.length === 0 &&
+        !hostLabel &&
+        hasVisibleLabel &&
+        internalLabel
+      ) {
+        labelEls.push(internalLabel);
+      }
+      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
+
+      const descEls = resolveIdrefTokens(this, externalDescTokens);
+      // Help-text-first ordering: guidance precedes validation feedback.
+      const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+      const errorEl = this.shadowRoot?.getElementById(this._errorId);
+      if (helpEl && (this.helpText || this._hasHelpTextSlot)) {
+        descEls.push(helpEl);
+      }
+      if (errorEl && (this.error || this._hasErrorSlot)) {
+        descEls.push(errorEl);
+      }
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+    }
+  }
+
   // ─── Render ───
 
   // P2-05: monotonic counter — collision-free and deterministic
@@ -375,6 +482,12 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 
   override render() {
     const hasError = !!this.error || this._hasErrorSlot;
+    const hasHelpText = !!this.helpText || this._hasHelpTextSlot;
+    const hasVisibleLabel = !!this.label || this._hasLabelSlot;
+    // Drive aria-invalid from the same validity source used by setValidity()
+    // so a required-unchecked checkbox is announced as invalid even before any
+    // visible error content has rendered.
+    const isInvalid = hasError || (this.required && !this.checked);
 
     const containerClasses = {
       checkbox: true,
@@ -388,13 +501,18 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       'checkbox--lg': this.size === 'lg',
     };
 
-    // P2-06: simplified — hasError already includes _hasErrorSlot
+    // describedBy chain: help-text first, error appended (assistive tech reads
+    // guidance before validation feedback). Both ids are persistent in the
+    // shadow tree so this list is stable across content transitions.
     const describedBy =
-      [hasError ? this._errorId : null, this.helpText && !hasError ? this._helpTextId : null]
+      [hasHelpText ? this._helpTextId : null, hasError ? this._errorId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
     const hostAriaLabel = this._effectiveLabel || undefined;
+    // Only point the inner input at `_labelId` when there is actual visible
+    // label content; otherwise the input would reference an empty container.
+    const useInternalLabelId = !hostAriaLabel && hasVisibleLabel;
 
     return html`
       <div class=${classMap(containerClasses)}>
@@ -410,10 +528,10 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
             name=${ifDefined(this.name || undefined)}
             .value=${this.value}
             aria-checked=${this.indeterminate ? 'mixed' : nothing}
-            aria-invalid=${hasError ? 'true' : nothing}
+            aria-invalid=${isInvalid ? 'true' : nothing}
             aria-describedby=${ifDefined(describedBy)}
             aria-label=${ifDefined(hostAriaLabel)}
-            aria-labelledby=${ifDefined(!hostAriaLabel ? this._labelId : undefined)}
+            aria-labelledby=${ifDefined(useInternalLabelId ? this._labelId : undefined)}
             @keydown=${this._handleKeyDown}
             @click=${(e: Event) => {
               e.preventDefault();
@@ -441,7 +559,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
           </span>
 
           <span part="label" class="checkbox__label" id=${this._labelId}>
-            <slot>${this.label}</slot>
+            <slot @slotchange=${this._handleLabelSlotChange}>${this.label}</slot>
             ${this.required
               ? html`<span class="checkbox__required-marker" aria-hidden="true">*</span>`
               : nothing}
@@ -449,10 +567,10 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
         </label>
 
         <!--
-          P0-01: wrapper div always owns _errorId so aria-describedby works regardless
-          of whether error content comes from the .error property or the named slot.
-          P1-02: role="status" (implicit aria-live="polite") replaces role="alert" +
-          aria-live="polite" which was semantically contradictory.
+          P0-01: wrapper div always owns _errorId so aria-describedby works
+          regardless of whether error content comes from the .error property
+          or the named slot. role="status" replaces aria-live="polite" to
+          avoid conflicting live-region semantics.
         -->
         <div
           part="error"
@@ -466,13 +584,22 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
           </slot>
         </div>
 
-        ${this.helpText && !hasError
-          ? html`
-              <div part="help-text" class="checkbox__help-text" id=${this._helpTextId}>
-                <slot name="help-text">${this.helpText}</slot>
-              </div>
-            `
-          : nothing}
+        <!--
+          Persistent help-text container. Rendered whenever the property OR
+          the slot has content, hidden when an error is present so guidance
+          does not compete with validation feedback. Always present in the
+          shadow tree so the host's aria-describedby chain remains stable.
+        -->
+        <div
+          part="help-text"
+          class="checkbox__help-text"
+          id=${this._helpTextId}
+          ?hidden=${!hasHelpText || hasError}
+        >
+          <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}
+            >${this.helpText}</slot
+          >
+        </div>
       </div>
     `;
   }

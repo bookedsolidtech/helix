@@ -150,12 +150,15 @@ describe('hx-checkbox', () => {
       expect(input.getAttribute('aria-invalid')).toBe('true');
     });
 
-    it('error hides help text', async () => {
+    it('error hides help text (visually hidden, kept in DOM for stable describedBy)', async () => {
       const el = await fixture<HelixCheckbox>(
         '<hx-checkbox error="Error" help-text="Help"></hx-checkbox>',
       );
-      const helpText = shadowQuery(el, '.checkbox__help-text');
-      expect(helpText).toBeNull();
+      const helpText = shadowQuery<HTMLElement>(el, '.checkbox__help-text');
+      // Persistent in the DOM so the describedBy chain remains stable across
+      // error transitions, but visually hidden via the `hidden` attribute.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -171,12 +174,13 @@ describe('hx-checkbox', () => {
       expect(helpText?.textContent?.trim()).toContain('Check to agree');
     });
 
-    it('help text hidden when error present', async () => {
+    it('help text hidden (but persistent) when error present', async () => {
       const el = await fixture<HelixCheckbox>(
         '<hx-checkbox help-text="Help" error="Error"></hx-checkbox>',
       );
-      const helpText = shadowQuery(el, '.checkbox__help-text');
-      expect(helpText).toBeNull();
+      const helpText = shadowQuery<HTMLElement>(el, '.checkbox__help-text');
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -944,6 +948,106 @@ describe('hx-checkbox', () => {
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('aria-invalid')).toBe('true');
+    });
+  });
+
+  // ─── ARIA delegation: host-elevated semantics (codex aria-group-2) ───
+
+  describe('ARIA delegation: host semantics', () => {
+    it('host carries role="checkbox" via ElementInternals', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Agree"></hx-checkbox>');
+      // ElementInternals reflects the role on the accessibility tree even when
+      // role attribute is absent from the host.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.role).toBe('checkbox');
+    });
+
+    it('host ariaChecked tracks checked state', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Agree"></hx-checkbox>');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaChecked).toBe('false');
+      el.checked = true;
+      await el.updateComplete;
+      expect(internals.ariaChecked).toBe('true');
+    });
+
+    it('host ariaChecked is "mixed" when indeterminate', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Agree"></hx-checkbox>');
+      el.indeterminate = true;
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaChecked).toBe('mixed');
+    });
+
+    it('host ariaInvalid is driven by validity, not visible error content', async () => {
+      // A required-but-unchecked checkbox is invalid via setValidity()
+      // even though no error message is rendered yet.
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox required label="Agree"></hx-checkbox>',
+      );
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.validity.valid).toBe(false);
+      expect(internals.ariaInvalid).toBe('true');
+    });
+
+    it('host ariaRequired reflects required property', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox required label="Agree"></hx-checkbox>',
+      );
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaRequired).toBe('true');
+    });
+
+    it('host ariaLabel mirrors accessible-label so cross-shadow naming works', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox accessible-label="Confirm consent"></hx-checkbox>',
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaLabel).toBe('Confirm consent');
+    });
+
+    it('persistent help-text container renders when only the slot has content', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Agree"><span slot="help-text">Read carefully</span></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.checkbox__help-text')!;
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv.hasAttribute('hidden')).toBe(false);
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-describedby')).toContain(helpDiv.id);
+    });
+
+    it('aria-describedby orders help text before error', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox help-text="Hint" error="Required"></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const tokens = input.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+      const helpDiv = shadowQuery<HTMLElement>(el, '.checkbox__help-text')!;
+      const errorDiv = shadowQuery<HTMLElement>(el, '.checkbox__error')!;
+      expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+    });
+
+    it('inner input does not point at empty label container when no visible label', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox accessible-label="Confirm consent"></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // accessible-label takes precedence — the label slot is empty, so no
+      // labelledby on the inner input would resolve to empty content.
+      expect(input.hasAttribute('aria-labelledby')).toBe(false);
+      expect(input.getAttribute('aria-label')).toBe('Confirm consent');
     });
   });
 });
