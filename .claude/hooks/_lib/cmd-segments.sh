@@ -51,6 +51,90 @@
 # do NOT honor `\` escapes; double-quoted spans treat `\"` as a literal
 # `"` and skip past it.
 
+# Unwrap nested shell wrappers — `bash -c 'PAYLOAD'`, `sh -lc "PAYLOAD"`,
+# `zsh -ic 'PAYLOAD'`, etc. Emits the input string AS-IS plus each inner
+# PAYLOAD as a separate line. Pre-0.17.0 the splitter never parsed
+# inside wrapped quotes, so `bash -c 'git push --force'` produced a
+# single segment whose first token was `bash` — defeating every check
+# that uses `any_segment_starts_with`. This helper makes the inner
+# payload visible as its own segment, so every existing detection rule
+# fires uniformly on wrapped and unwrapped commands.
+#
+# Closes helix-017 #1, #2, #3 (0.16.2):
+#   - `bash -lc 'git push --force origin HEAD'`  → payload now seen by H1
+#   - `bash -c 'printf x > .rea/HALT'`           → payload now seen by bash-gate
+#   - `bash -lc 'npm install some-package'`      → payload now seen by audit-gate
+#
+# Recognized wrapper shape (case-insensitive shell name):
+#   (bash|sh|zsh|dash|ksh) [optional -flags...] (-c|-lc|-lic|-ic|-cl|-cli) (QUOTED_ARG)
+#
+# QUOTED_ARG can be single- or double-quoted. Single-quote bodies have no
+# escape semantics. Double-quote bodies treat \" and \\ as literal
+# escapes (per POSIX). Multiple wrappers per command-line are handled
+# (e.g. `foo; bash -c 'bar' && sh -c 'baz'` emits both `bar` and `baz`).
+#
+# Limitation: ONE level of unwrapping. A wrapper inside a wrapper
+# (`bash -c "bash -c 'innermost'"`) emits only the second-level payload
+# (`bash -c 'innermost'`), not the third-level. This is enough for
+# every consumer-reported bypass; deeper nesting can be added later
+# without changing the contract.
+_rea_unwrap_nested_shells() {
+  local cmd="$1"
+  printf '%s\n' "$cmd"
+  printf '%s' "$cmd" | awk '
+    BEGIN {
+      # Wrapper-prefix regex: shell-name + optional flag tokens + -c-style flag.
+      # Each flag token is `-` followed by 1+ letters and trailing space.
+      WRAP = "(^|[[:space:]&|;])(bash|sh|zsh|dash|ksh)([[:space:]]+-[a-zA-Z]+)*[[:space:]]+-(c|lc|lic|ic|cl|cli|li|il)[[:space:]]+"
+    }
+    {
+      rest = $0
+      while (length(rest) > 0) {
+        if (! match(rest, WRAP)) break
+        # Tail begins immediately after the matched wrapper prefix.
+        tail = substr(rest, RSTART + RLENGTH)
+        first = substr(tail, 1, 1)
+        if (first == "'\''") {
+          # Single-quoted body: no escape semantics; runs to next `'"'"'`.
+          body = substr(tail, 2)
+          end = index(body, "'\''")
+          if (end == 0) { rest = substr(tail, 2); continue }
+          payload = substr(body, 1, end - 1)
+          print payload
+          rest = substr(body, end + 1)
+          continue
+        }
+        if (first == "\"") {
+          # Double-quoted body: \" and \\ are literal escapes.
+          body = substr(tail, 2)
+          n = length(body)
+          j = 1
+          out = ""
+          closed = 0
+          while (j <= n) {
+            c = substr(body, j, 1)
+            if (c == "\\" && j < n) {
+              nxt = substr(body, j + 1, 1)
+              if (nxt == "\"" || nxt == "\\") { out = out nxt; j += 2; continue }
+              out = out c nxt
+              j += 2
+              continue
+            }
+            if (c == "\"") { closed = j; break }
+            out = out c
+            j++
+          }
+          if (closed == 0) { rest = substr(tail, 2); continue }
+          print out
+          rest = substr(body, closed + 1)
+          continue
+        }
+        # Non-quoted argument — proceed past the matched prefix only.
+        rest = tail
+      }
+    }'
+}
+
 # Split $1 on shell command separators. Emits one segment per line on
 # stdout (empty segments preserved). Used by both higher-level helpers
 # below; not generally called by hooks directly.
@@ -103,7 +187,14 @@ _rea_split_segments() {
   # splitting so quoted prose no longer over-splits and anchors trigger
   # words at the head of phantom segments. See header comment for the
   # full rationale.
-  printf '%s' "$cmd" \
+  #
+  # 0.17.0 helix-017 #1-#3 fix: unwrap `bash -c 'PAYLOAD'` style
+  # wrappers BEFORE the quote-mask + split passes. The unwrap step
+  # emits the original line plus each inner PAYLOAD as separate
+  # records; the existing pipeline then quote-masks and splits each
+  # record independently. Inner payload anchors trigger words for the
+  # `any_segment_*` checks downstream.
+  _rea_unwrap_nested_shells "$cmd" \
     | awk '
         BEGIN {
           SC  = "__REA_SEP_SC_a8f2c1__"

@@ -75,8 +75,16 @@ _rea_is_kill_switch() {
   return 1
 }
 
-# Load the effective list, applying `protected_paths_relax` from policy.
+# Load the effective list, applying `protected_writes` (full override
+# from policy) and `protected_paths_relax` (subtractor) from policy.
 # Sources policy-read.sh on demand so this lib stays self-contained.
+#
+# 0.17.0 helix-018 Option A: `protected_writes` lets consumers fully
+# define the protected list. When set, replaces the hardcoded default;
+# kill-switch invariants are always added back regardless. When unset,
+# defaults to REA_PROTECTED_PATTERNS_FULL (the historical 5 patterns).
+# `protected_paths_relax` then subtracts from whatever the effective
+# set is (kill-switch invariants are non-relaxable).
 _rea_load_protected_patterns() {
   if [ "$_REA_PROTECTED_PATTERNS_LOADED" = "1" ]; then
     return 0
@@ -89,12 +97,69 @@ _rea_load_protected_patterns() {
     source "${BASH_SOURCE[0]%/*}/policy-read.sh" 2>/dev/null || true
   fi
 
+  # Read both policy keys.
+  local writes_list=()
   local relax_list=()
+  local protected_writes_set=0
   if command -v policy_list >/dev/null 2>&1; then
+    # `protected_writes`: detect "set but empty" vs "unset" via a probe.
+    # policy_list returns nothing for both cases, so we use a sentinel
+    # check on the YAML key existence via a separate probe.
+    local pw_present
+    pw_present=$(policy_scalar "protected_writes" 2>/dev/null || true)
+    # If the key is a list (yq returns "null" or empty for scalar reads
+    # of a list), policy_list reads it. We detect "key exists" by
+    # checking either policy_scalar's return OR policy_list's output.
+    while IFS= read -r entry; do
+      [ -z "$entry" ] && continue
+      writes_list+=("$entry")
+      protected_writes_set=1
+    done < <(policy_list "protected_writes" 2>/dev/null || true)
+    # If pw_present is "[]" (empty array) — policy_list returns nothing
+    # but the key IS set. policy_scalar of a list returns "null" or
+    # the literal `[]`. Treat any of those as "set".
+    case "$pw_present" in
+      '[]'|'null') protected_writes_set=1 ;;
+    esac
+
     while IFS= read -r entry; do
       [ -z "$entry" ] && continue
       relax_list+=("$entry")
     done < <(policy_list "protected_paths_relax" 2>/dev/null || true)
+  fi
+
+  # Compose the BASE list:
+  #   - If `protected_writes` set in policy: that list, plus kill-switch
+  #     invariants always added (deduped).
+  #   - Else: REA_PROTECTED_PATTERNS_FULL (hardcoded historical default).
+  local base_list=()
+  if [ "$protected_writes_set" = "1" ]; then
+    local w
+    for w in "${writes_list[@]+"${writes_list[@]}"}"; do
+      base_list+=("$w")
+    done
+    # Add kill-switch invariants if not already present.
+    local inv inv_lc found
+    for inv in "${REA_KILL_SWITCH_INVARIANTS[@]}"; do
+      inv_lc=$(printf '%s' "$inv" | tr '[:upper:]' '[:lower:]')
+      found=0
+      local b b_lc
+      for b in "${base_list[@]+"${base_list[@]}"}"; do
+        b_lc=$(printf '%s' "$b" | tr '[:upper:]' '[:lower:]')
+        if [[ "$b_lc" == "$inv_lc" ]]; then
+          found=1
+          break
+        fi
+      done
+      if [ "$found" = "0" ]; then
+        base_list+=("$inv")
+      fi
+    done
+  else
+    local pat
+    for pat in "${REA_PROTECTED_PATTERNS_FULL[@]}"; do
+      base_list+=("$pat")
+    done
   fi
 
   # Validate relax entries: any kill-switch invariant in the list is
@@ -112,10 +177,10 @@ _rea_load_protected_patterns() {
     fi
   done
 
-  # Build the effective list: every FULL entry that is NOT in the
+  # Build the effective list: every BASE entry that is NOT in the
   # relaxed set (case-insensitive comparison).
   local pat pat_lc rentry rentry_lc relaxed
-  for pat in "${REA_PROTECTED_PATTERNS_FULL[@]}"; do
+  for pat in "${base_list[@]+"${base_list[@]}"}"; do
     pat_lc=$(printf '%s' "$pat" | tr '[:upper:]' '[:lower:]')
     relaxed=0
     for rentry in "${relaxed_set[@]+"${relaxed_set[@]}"}"; do

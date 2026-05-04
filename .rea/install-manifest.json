@@ -1,12 +1,12 @@
 {
-  "version": "0.16.4",
+  "version": "0.17.0",
   "profile": "unknown",
   "installed_at": "2026-04-23T15:09:02.547Z",
-  "upgraded_at": "2026-05-03T23:22:10.199Z",
+  "upgraded_at": "2026-05-04T00:30:04.071Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
-      "sha256": "5bd1b13737d76b7c06f217a926247b2346307e880dbea57d024f782f93f0b00b",
+      "sha256": "986b7452040c7ebf82e8e8c7162d9c56b7c1bbca1636859c9928d4589bcf7e84",
       "source": "hook"
     },
     {
@@ -36,7 +36,7 @@
     },
     {
       "path": ".claude/hooks/_lib/protected-paths.sh",
-      "sha256": "c0e85fa95569e056839783cfbb061c4369186e2c172a709c01ff7e99773d53ac",
+      "sha256": "0f5ba2c71d55c9f51801bd52052bcc443312ff19cfd3973a1da8effc3c648822",
       "source": "hook"
     },
     {
@@ -66,12 +66,12 @@
     },
     {
       "path": ".claude/hooks/dangerous-bash-interceptor.sh",
-      "sha256": "47f9c17101de93b6f3d2baac90081c04da9b3ccf3a6dd2c10518df2d5f84130f",
+      "sha256": "1d13c9684c233eaa3aa7e50d0b0496a2756a6e03d555423a97407c9996280776",
       "source": "hook"
     },
     {
       "path": ".claude/hooks/dependency-audit-gate.sh",
-      "sha256": "3cb0f130e98f730a633ba8e6f4db106b02387a9771a48f1e1c3543494b9f4184",
+      "sha256": "dac01da3189704d52d677f4493b607771ac687b7ce5a16caabbcf1e94487e60d",
       "source": "hook"
     },
     {
@@ -96,7 +96,7 @@
     },
     {
       "path": ".claude/hooks/security-disclosure-gate.sh",
-      "sha256": "767a687407dea29b4d585c8c3893dc9f8e3a9ddbcbdaa7f92c38ab1702b583a1",
+      "sha256": "52255795e2a2b30d3c6b7953c0d12f2355827fb096f10beab2f7ab8224681040",
       "source": "hook"
     },
     {

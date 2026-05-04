@@ -58,14 +58,27 @@ extract_packages() {
   # outer command — but they're never the FIRST token on a segment, so
   # the anchor rejects them.
 
-  # Tokenize on shell separators. Each `IFS=` entry becomes a separate
-  # segment we can anchor against. We use bash's `mapfile` with a sed
-  # to inject newlines at separators; awk-based splitting handles the
-  # quoting heuristic well enough for the realistic cases (agent-issued
-  # commands rarely have separators inside single-quoted strings that
-  # would confuse this).
+  # 0.17.0 helix-017 #3: unwrap nested-shell wrappers (`bash -c 'PAYLOAD'`,
+  # `sh -lc "PAYLOAD"`, etc.) before splitting so the inner install
+  # command becomes a segment that anchors against the install-pattern
+  # check below. Pre-fix `bash -lc 'npm install pkg'` produced a single
+  # segment whose first token was `bash` — install-detection skipped.
+  # 0.17.0 helix-019 #3: delegate splitting to the shared
+  # `_rea_split_segments` so this gate inherits the full separator set
+  # (including bare `&` background-process operator added in 0.16.1)
+  # and the quote-mask that prevents over-fire from in-quote separators.
+  # Pre-fix the local segmenter splat on `|||&&|;|` only, missing bare
+  # `&` — `echo warmup & pnpm add lodash` stayed merged into one segment
+  # and the install-pattern leading-token check skipped it entirely.
   local segments
-  segments=$(printf '%s\n' "$cmd" | sed -E 's/(\|\||\&\&|;|\|)/\n/g')
+  if [ -f "$(dirname "$0")/_lib/cmd-segments.sh" ]; then
+    # shellcheck source=_lib/cmd-segments.sh
+    source "$(dirname "$0")/_lib/cmd-segments.sh"
+    segments=$(_rea_split_segments "$cmd")
+  else
+    # Fallback (lib unavailable): legacy local splitter preserved.
+    segments=$(printf '%s\n' "$cmd" | sed -E 's/(\|\||\&\&|;|\||\&)/\n/g')
+  fi
 
   while IFS= read -r segment; do
     # Trim leading whitespace.

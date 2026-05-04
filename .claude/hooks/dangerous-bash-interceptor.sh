@@ -257,8 +257,21 @@ fi
 # in-quote pipes are replaced with a sentinel that the regex doesn't
 # match. Real curl-pipe-shell still matches because the pipe between
 # `curl https://x` and `sh` is outside any quote span.
-H12_MASKED=$(quote_masked_cmd "$CMD")
-if printf '%s' "$H12_MASKED" | grep -qiE '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh|zsh|fish)'; then
+# 0.17.0 helix-017 #1 fix: also scan inner payloads of nested-shell
+# wrappers (`zsh -c "curl https://x | sh"`). The unwrap helper emits
+# the original command + each inner payload as separate lines; we
+# quote-mask each line independently and grep. If ANY emitted line
+# contains a real curl-pipe-shell, fire H12.
+H12_HIT=0
+while IFS= read -r _h12_line; do
+  [ -z "$_h12_line" ] && continue
+  _h12_masked=$(quote_masked_cmd "$_h12_line")
+  if printf '%s' "$_h12_masked" | grep -qiE '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh|zsh|fish)'; then
+    H12_HIT=1
+    break
+  fi
+done < <(_rea_unwrap_nested_shells "$CMD")
+if [ "$H12_HIT" = "1" ]; then
   add_high \
     "curl/wget piped to shell — remote code execution" \
     "Executing remote scripts without inspection is a major supply chain risk." \

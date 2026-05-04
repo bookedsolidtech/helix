@@ -118,37 +118,87 @@ REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 BODY_FILE_TEXT=""
 _extract_body_file_paths() {
   # Emit each `--body-file PATH` and `-F PATH` argument on its own line.
-  # Skips the stdin form (`-`) and `-F=foo`/`--body-file=foo` (handled
-  # by a separate awk pass below).
+  # Skips the stdin form (`-`) and emits the path verbatim from the
+  # equals-form (`--body-file=PATH` / `-F=PATH`).
+  #
+  # 0.17.0 helix-019 #2: quote-aware tokenization. The pre-fix awk split
+  # on whitespace, breaking `--body-file "security notes.md"` into three
+  # tokens — the hook then tried to read `"security` (with literal
+  # leading quote), failed, and silently skipped the body scan. Now we
+  # walk the string with quote-state awareness: whitespace inside
+  # matched `"..."` / `'...'` spans is part of the token, not a
+  # separator. Single-quote spans have no escape semantics; double-quote
+  # spans treat `\"` and `\\` as literal escapes (POSIX shell rules).
   printf '%s' "$COMMAND" \
     | awk '
-        BEGIN { skip_next = 0; flag_was = "" }
+        BEGIN { skip_next = 0 }
+        function strip_outer_quotes(s,    n, first, last) {
+          n = length(s)
+          if (n < 2) return s
+          first = substr(s, 1, 1)
+          last  = substr(s, n, 1)
+          if ((first == "\"" && last == "\"") || (first == "'\''" && last == "'\''")) {
+            return substr(s, 2, n - 2)
+          }
+          return s
+        }
+        function emit_token(t) {
+          if (skip_next) {
+            skip_next = 0
+            if (t == "-" || t == "") return
+            t = strip_outer_quotes(t)
+            print t
+            return
+          }
+          if (t == "--body-file" || t == "-F") { skip_next = 1; return }
+          if (t ~ /^--body-file=/) {
+            v = substr(t, length("--body-file=") + 1)
+            v = strip_outer_quotes(v)
+            if (v != "" && v != "-") print v
+          }
+          if (t ~ /^-F=/) {
+            v = substr(t, length("-F=") + 1)
+            v = strip_outer_quotes(v)
+            if (v != "" && v != "-") print v
+          }
+        }
         {
-          n = split($0, toks, /[[:space:]]+/)
-          for (i = 1; i <= n; i++) {
-            t = toks[i]
-            if (skip_next) {
-              skip_next = 0
-              if (t == "-" || t == "") continue
-              # Strip surrounding quotes from the token if present.
-              gsub(/^["'"'"']/, "", t)
-              gsub(/["'"'"']$/, "", t)
-              print t
+          line = $0
+          n = length(line)
+          i = 1
+          tok = ""
+          mode = 0  # 0=plain, 1=double-quoted, 2=single-quoted
+          while (i <= n) {
+            ch = substr(line, i, 1)
+            if (mode == 0) {
+              if (ch == " " || ch == "\t") {
+                if (tok != "") { emit_token(tok); tok = "" }
+                i++; continue
+              }
+              if (ch == "\"") { mode = 1; tok = tok ch; i++; continue }
+              if (ch == "'\''") { mode = 2; tok = tok ch; i++; continue }
+              tok = tok ch
+              i++
               continue
             }
-            if (t == "--body-file" || t == "-F") { skip_next = 1; continue }
-            # Equals form.
-            if (t ~ /^--body-file=/) {
-              v = substr(t, length("--body-file=") + 1)
-              gsub(/^["'"'"']/, "", v); gsub(/["'"'"']$/, "", v)
-              if (v != "" && v != "-") print v
+            if (mode == 1) {
+              if (ch == "\\" && i < n) {
+                nxt = substr(line, i + 1, 1)
+                tok = tok ch nxt
+                i += 2
+                continue
+              }
+              if (ch == "\"") { mode = 0; tok = tok ch; i++; continue }
+              tok = tok ch
+              i++
+              continue
             }
-            if (t ~ /^-F=/) {
-              v = substr(t, length("-F=") + 1)
-              gsub(/^["'"'"']/, "", v); gsub(/["'"'"']$/, "", v)
-              if (v != "" && v != "-") print v
-            }
+            # mode == 2
+            if (ch == "'\''") { mode = 0; tok = tok ch; i++; continue }
+            tok = tok ch
+            i++
           }
+          if (tok != "") emit_token(tok)
         }'
 }
 while IFS= read -r body_path; do
@@ -180,12 +230,24 @@ while IFS= read -r body_path; do
       esac
     done
     resolved="/$(IFS=/; printf '%s' "${_bf_parts[*]}")"
-    # If the raw path used `..` AND the resolved form escapes REA_ROOT,
-    # refuse — that's the obfuscation shape we care about. A file under
-    # /tmp or /var/folders without `..` segments is fine.
+    # 0.17.0 helix-019 #1: HARD REFUSAL on traversal escaping REA_ROOT.
+    # Pre-fix the gate logged "skipping body scan" and exited 0 — every
+    # sensitive payload at the resolved external path bypassed the
+    # disclosure check. The traversal-out-of-root shape exists ONLY to
+    # obfuscate; legitimate workflows pass absolute tmpfile paths
+    # (`/tmp/...`, `/var/folders/...`) without `..` segments.
     if [[ "$resolved" != "$REA_ROOT" && "$resolved" != "$REA_ROOT"/* ]]; then
-      printf 'security-disclosure-gate: --body-file path uses `..` traversal escaping project root; skipping body scan\n' >&2
-      continue
+      {
+        printf 'SECURITY DISCLOSURE GATE: --body-file path traversal escapes project root\n'
+        printf '\n'
+        printf '  Path:     %s\n' "$raw_path"
+        printf '  Resolved: %s\n' "$resolved"
+        printf '\n'
+        printf '  Rule: --body-file paths whose canonical form uses `..` segments to\n'
+        printf '        escape REA_ROOT are refused. Move the file inside the project\n'
+        printf '        tree, or paste the body inline via --body.\n'
+      } >&2
+      exit 2
     fi
   fi
   if [[ ! -r "$resolved" ]]; then
