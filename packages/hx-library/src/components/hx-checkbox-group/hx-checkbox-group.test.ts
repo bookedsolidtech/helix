@@ -955,21 +955,29 @@ describe('hx-checkbox-group', () => {
       form.remove();
     });
 
-    it('clears child name even when set late on the group', async () => {
+    it('group-suppresses each child via _groupedSuppress (round-3 F1 hardening)', async () => {
+      // Round-2 used `cb.name = ''` as the suppression signal, which broke if
+      // a consumer re-set the name post-attach. Round-3 introduces a
+      // name-independent flag — `_groupedSuppress` — that the group toggles
+      // on/off as children join and leave. We assert the flag here directly
+      // and the consumer-mutation case in the post-attach test below.
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Topics">
-          <hx-checkbox value="a" label="A" name="should-be-cleared"></hx-checkbox>
+          <hx-checkbox value="a" label="A" name="kept-by-consumer"></hx-checkbox>
         </hx-checkbox-group>
       `);
       await el.updateComplete;
-      // firstUpdated/_handleSlotChange must clear pre-existing child names too.
       const cb = el.querySelector('hx-checkbox') as HelixCheckbox;
-      expect(cb.name).toBe('');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((cb as any)._groupedSuppress).toBe(true);
+      // The child's `name` is preserved verbatim — group does not mutate it.
+      expect(cb.name).toBe('kept-by-consumer');
 
-      // Set group name late and verify child stays cleared.
+      // Setting group name late re-runs sync; the flag must still be set.
       el.name = 'topics';
       await el.updateComplete;
-      expect(cb.name).toBe('');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((cb as any)._groupedSuppress).toBe(true);
     });
   });
 });

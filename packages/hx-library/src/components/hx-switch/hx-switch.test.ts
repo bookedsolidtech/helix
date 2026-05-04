@@ -877,5 +877,28 @@ describe('hx-switch', () => {
       expect(internals.role).toBe(null);
       expect(internals.ariaChecked).toBe(null);
     });
+
+    // ─── Codex round-3 finding #2 (1) ───
+
+    it('clicking the inner button on the fallback path toggles host.checked and fires hx-change', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button.switch__track')!;
+      expect(el.checked).toBe(false);
+
+      const eventPromise = oneEvent<CustomEvent<{ checked: boolean; value: string }>>(
+        el,
+        'hx-change',
+      );
+      // Round-3 F2: AT activation lands on the announced inner button. The
+      // inner click handler must produce a real toggle and emit `hx-change`.
+      btn.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+      expect(el.checked).toBe(true);
+      expect(event.detail.checked).toBe(true);
+    });
   });
 });

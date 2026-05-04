@@ -945,5 +945,27 @@ describe('hx-toggle-button', () => {
       expect(internals.role).toBe(null);
       expect(internals.ariaPressed).toBe(null);
     });
+
+    // ─── Codex round-3 finding #2 (1) ───
+
+    it('clicking the inner button on the fallback path toggles host.pressed and fires hx-toggle', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button[part="button"]')!;
+      expect(el.pressed).toBe(false);
+
+      const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
+      // Round-3 F2: AT activation lands on the announced inner button. The
+      // inner click handler must produce a real toggle and emit `hx-toggle`.
+      btn.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+      expect(el.pressed).toBe(true);
+      expect(event.detail.pressed).toBe(true);
+    });
   });
 });

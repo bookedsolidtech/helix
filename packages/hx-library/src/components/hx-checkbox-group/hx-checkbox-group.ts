@@ -55,7 +55,8 @@ export interface HxCheckboxGroupChangeDetail {
  *   {% endfor %}
  * </hx-checkbox-group>
  * ```
- * The `name` attribute propagates automatically to child checkboxes — no Drupal behavior required.
+ * The group is the sole form participant — children are suppressed via
+ * `_groupedSuppress`. Setting `name` on a child has no effect inside a group.
  * @cssprop [--hx-opacity-disabled] - Opacity.
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-checkbox-group-font-family=var(--hx-font-family-sans)] - CSS custom property.
@@ -211,6 +212,16 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     this.removeEventListener('hx-change', this._handleCheckboxChange);
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
+    // Release suppression on every previously-tracked child so they regain
+    // stand-alone form participation if re-parented or kept in the document
+    // after the group is removed. Codex round-3 finding #1.
+    this._previousChildren.forEach((cb) => {
+      if (this._suppressedChildren.has(cb)) {
+        cb._groupedSuppress = false;
+        this._suppressedChildren.delete(cb);
+      }
+    });
+    this._previousChildren = [];
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -310,6 +321,7 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     super.firstUpdated(changedProperties);
     this._syncCheckboxes();
     this._syncCheckboxNames();
+    this._previousChildren = this._getCheckboxes();
     const checkedValues = this._getCheckedValues();
     this._updateFormValue(checkedValues);
     this._updateValidity(checkedValues);
@@ -338,23 +350,76 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   }
 
   /**
+   * Tracks the set of checkboxes most recently flagged with
+   * `_groupedSuppress = true` so a child removed from the group can have its
+   * suppression cleared and regain stand-alone form participation. Codex
+   * round-3 finding #1.
+   * @internal
+   */
+  private _suppressedChildren = new WeakSet<HelixCheckbox>();
+
+  /**
    * Centralizes form participation on the group: when an `hx-checkbox` is
    * grouped, the group is the sole form participant. Without this, both the
    * group AND each child would call `setFormValue` for the same name, causing
-   * every checked value to submit twice. Codex round-2 finding #1.
+   * every checked value to submit twice.
    *
-   * Children are also form-associated and continue to participate when used
-   * stand-alone (no parent group). Inside a group we explicitly null the
-   * child name so the child's `_updateFormValue()` short-circuits to
-   * `setFormValue(null)` (see hx-checkbox).
+   * Codex round-2 finding #1 used `cb.name = ''` as the suppression signal.
+   * Codex round-3 finding #1 hardened that: a consumer (or framework binding)
+   * that re-set `cb.name = 'foo'` after attach regained form participation
+   * because the child's `name` setter re-armed `_updateFormValue()` while no
+   * `slotchange` re-fired to re-null the name.
+   *
+   * The fix is a durable, name-independent kill switch — `_groupedSuppress` —
+   * on each child. While the flag is set the child's `_updateFormValue()`
+   * short-circuits to `setFormValue(null)` regardless of its `name` value.
+   * Children removed from the group have the flag cleared so they regain
+   * stand-alone form participation.
    * @internal
    */
   private _syncCheckboxNames(): void {
-    const checkboxes = this._getCheckboxes();
-    checkboxes.forEach((cb) => {
-      cb.name = '';
+    const current = new Set(this._getCheckboxes());
+    // Clear suppression on any previously-grouped child that has since been
+    // removed from this group. WeakSet has no iterator, so we re-walk current
+    // children plus track removals via the slotchange handler's "delta" — but
+    // since WeakSet does not enumerate, we instead resolve via the child's
+    // own state below: any child WITH the flag that is no longer a current
+    // child must be cleared. To do that without enumeration we mark all
+    // current children true here and rely on `_handleSlotChange` to clear
+    // departed children explicitly via `_clearSuppressionForRemoved()`.
+    current.forEach((cb) => {
+      cb._groupedSuppress = true;
+      this._suppressedChildren.add(cb);
     });
   }
+
+  /**
+   * Clears `_groupedSuppress` on any checkbox that was previously in this
+   * group but has since been removed (re-parented or detached). Called from
+   * `_handleSlotChange()` after `_syncCheckboxNames()` re-applies the flag
+   * to current children.
+   *
+   * `previousChildren` is a snapshot captured before slot mutation; any child
+   * in that set but not in the current set has left the group and must have
+   * its suppression cleared so stand-alone use restores form participation.
+   * @internal
+   */
+  private _clearSuppressionForRemoved(previousChildren: HelixCheckbox[]): void {
+    const current = new Set(this._getCheckboxes());
+    previousChildren.forEach((cb) => {
+      if (!current.has(cb) && this._suppressedChildren.has(cb)) {
+        cb._groupedSuppress = false;
+        this._suppressedChildren.delete(cb);
+      }
+    });
+  }
+
+  /**
+   * Snapshot of children captured before each `slotchange` so removed children
+   * can be detected (WeakSet is non-enumerable).
+   * @internal
+   */
+  private _previousChildren: HelixCheckbox[] = [];
 
   // ─── Event Handling ───
 
@@ -387,7 +452,13 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   /** @internal */
   private _handleSlotChange(): void {
     this._syncCheckboxes();
+    // Capture pre-mutation snapshot from the previous _previousChildren cache
+    // (the previous slot pass) so removed children can be released from
+    // suppression. Then refresh the snapshot for the next slotchange.
+    const previous = this._previousChildren;
     this._syncCheckboxNames();
+    this._clearSuppressionForRemoved(previous);
+    this._previousChildren = this._getCheckboxes();
     const checkedValues = this._getCheckedValues();
     this._updateFormValue(checkedValues);
     this._updateValidity(checkedValues);

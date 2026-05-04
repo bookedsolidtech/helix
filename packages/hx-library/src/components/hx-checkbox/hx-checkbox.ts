@@ -215,6 +215,32 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   @state() private _hasLabelSlot = false;
 
   /**
+   * Set by `hx-checkbox-group` to mark this child as group-managed. While
+   * truthy, `_updateFormValue()` short-circuits to `setFormValue(null)`
+   * regardless of `name`, so the child does NOT participate in form submission
+   * — only the group does. This is durable against post-attach mutations to
+   * `cb.name` by consumers/frameworks (which would otherwise re-arm
+   * `_updateFormValue()` via the `name` setter and cause double-submission).
+   * Codex round-3 finding #1.
+   *
+   * Public via accessor for the group's exclusive use; the underscore prefix
+   * marks it as group-internal (not consumer API). The group sets it during
+   * `slotchange` and clears it (via the same setter) when a child is removed.
+   * @internal
+   */
+  set _groupedSuppress(value: boolean) {
+    if (this.__groupedSuppress === value) return;
+    this.__groupedSuppress = value;
+    // Re-run form-value sync so the suppression takes effect immediately.
+    this._updateFormValue();
+  }
+  get _groupedSuppress(): boolean {
+    return this.__groupedSuppress;
+  }
+  /** @internal */
+  private __groupedSuppress = false;
+
+  /**
    * Deferred copy of this.error used inside the live region. Injected after
    * the region is visible (via requestAnimationFrame) so screen readers
    * re-announce the message even if it was set before the region became
@@ -468,14 +494,19 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   // ─── Event Handling ───
 
   /**
-   * Writes the checkbox value to ElementInternals' form value. When the
-   * checkbox is grouped (`hx-checkbox-group` clears `name` on children to
-   * centralize submission), this short-circuits to `null` so the same value
-   * is not appended twice under the same form name. Codex round-2 finding #1.
+   * Writes the checkbox value to ElementInternals' form value. Suppressed when
+   * the checkbox is grouped — `hx-checkbox-group` flips `_groupedSuppress` on
+   * children so the group is the sole form participant.
+   *
+   * Codex round-3 finding #1: round-2 used `cb.name = ''` as the suppression
+   * signal, but a consumer (or framework binding) that re-set `cb.name = 'foo'`
+   * after attach regained form participation through the `name` setter. The
+   * `_groupedSuppress` flag is a durable, name-independent kill switch.
+   * Stand-alone checkboxes (no parent group) are unaffected.
    * @internal
    */
   private _updateFormValue(): void {
-    if (!this.name) {
+    if (this.__groupedSuppress || !this.name) {
       this._internals.setFormValue(null);
       return;
     }
@@ -504,6 +535,42 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       }),
     );
   }
+
+  /**
+   * Handles native `change` events from the inner `<input type=checkbox>` on
+   * the no-IDL-ref fallback path. On that path the inner input is the
+   * announced surface (no `aria-hidden`, `tabindex=0`) and AT activates it
+   * directly — pointer/keyboard activation flips `input.checked` natively.
+   * We mirror the input's state onto the host, dispatch `hx-change`, and
+   * update form participation.
+   *
+   * Codex round-3 finding #2: round-2 left the inner input click suppressed
+   * on both paths, so on no-IDL-ref browsers AT activation could not toggle
+   * the control. The fix is to NOT suppress click on the fallback path and
+   * to honor the resulting `change` event here.
+   * @internal
+   */
+  private _handleInternalChange = (e: Event): void => {
+    e.stopPropagation();
+    if (this.disabled) return;
+    const input = e.currentTarget as HTMLInputElement;
+    // The native input flipped its own state; mirror onto the host. Avoid
+    // re-toggling — `_handleChange()` toggles `this.checked = !this.checked`,
+    // which would invert the user's actual choice.
+    this.indeterminate = false;
+    this.checked = input.checked;
+
+    this._updateFormValue();
+    this._handleInteractionInput();
+
+    this.dispatchEvent(
+      new CustomEvent<{ checked: boolean; value: string }>('hx-change', {
+        bubbles: true,
+        composed: true,
+        detail: { checked: this.checked, value: this.value },
+      }),
+    );
+  };
 
   /** @internal */
   private _handleKeyDown(e: KeyboardEvent): void {
@@ -720,9 +787,43 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     const innerIsAnnounced = !this._supportsIdrefRefs;
     const innerTabIndex = innerIsAnnounced && !this.disabled ? '0' : '-1';
 
+    // Codex round-3 finding #2: branch the inner input event model on
+    // platform support.
+    //
+    // Modern path (`innerIsAnnounced === false`): the inner input is
+    // `aria-hidden + tabindex=-1` — AT cannot reach it. Pointer clicks on the
+    // inner input bubble through the surrounding `<label>` whose `@click`
+    // handler runs `_handleChange()`. The inner click handler suppresses the
+    // native click so the label's click is the sole activation pipeline,
+    // avoiding double-toggle. Native `change` is also swallowed.
+    //
+    // Fallback path (`innerIsAnnounced === true`): the inner input IS the
+    // announced surface (no `aria-hidden`, `tabindex=0`). AT activation lands
+    // directly on the input and must produce a real toggle. We do NOT
+    // suppress click; instead we wire `@change=${_handleInternalChange}` so
+    // the host mirrors the input's state, fires `hx-change`, and updates
+    // form participation. The label's `@click` is a no-op on this path —
+    // pointer clicks on the label bubble to the input which toggles natively.
+    const innerClickHandler = innerIsAnnounced
+      ? undefined
+      : (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        };
+    const innerChangeHandler = innerIsAnnounced
+      ? this._handleInternalChange
+      : (e: Event) => e.stopPropagation();
+    const labelClickHandler = innerIsAnnounced ? undefined : this._handleChange;
+    // On the fallback path the native input owns Space/Enter activation; its
+    // native `change` event flows through `_handleInternalChange`. Wiring the
+    // host-side `_handleKeyDown` here would double-toggle (native flips +
+    // _handleChange flips again). On the modern path the input is `aria-hidden
+    // + tabindex=-1` so this handler is defensive only.
+    const innerKeyDownHandler = innerIsAnnounced ? undefined : this._handleKeyDown;
+
     return html`
       <div class=${classMap(containerClasses)}>
-        <label part="control" class="checkbox__control" @click=${this._handleChange}>
+        <label part="control" class="checkbox__control" @click=${ifDefined(labelClickHandler)}>
           <input
             class="checkbox__input"
             type="checkbox"
@@ -740,12 +841,9 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
             aria-label=${ifDefined(hostAriaLabel)}
             aria-labelledby=${ifDefined(innerLabelledBy)}
             aria-hidden=${innerIsAnnounced ? nothing : 'true'}
-            @keydown=${this._handleKeyDown}
-            @click=${(e: Event) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            @change=${(e: Event) => e.stopPropagation()}
+            @keydown=${ifDefined(innerKeyDownHandler)}
+            @click=${ifDefined(innerClickHandler)}
+            @change=${innerChangeHandler}
           />
 
           <span part="checkbox" class="checkbox__box">

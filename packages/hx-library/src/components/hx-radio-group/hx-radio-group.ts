@@ -207,6 +207,23 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
    */
   @state() private _announcedError = '';
 
+  /**
+   * Tracks group-suppressed child radios so detached children can have the
+   * flag cleared. Defense-in-depth symmetry with `hx-checkbox-group` —
+   * `hx-radio` is not form-associated today, so the flag is inert, but the
+   * parity keeps the contract identical between the two group/child families
+   * for any future form-association on `hx-radio`. Codex round-3 finding #1.
+   * @internal
+   */
+  private _suppressedChildren = new WeakSet<HelixRadio>();
+
+  /**
+   * Snapshot of children captured before each `slotchange` so removed
+   * children can be released from suppression (WeakSet is non-enumerable).
+   * @internal
+   */
+  private _previousRadios: HelixRadio[] = [];
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -227,6 +244,16 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     this.removeEventListener('keydown', this._handleKeydown);
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
+    // Release suppression on every previously-tracked child so they regain
+    // stand-alone behaviour if re-parented or kept in the document after the
+    // group is removed. Codex round-3 finding #1 (defense-in-depth).
+    this._previousRadios.forEach((radio) => {
+      if (this._suppressedChildren.has(radio)) {
+        radio._groupedSuppress = false;
+        this._suppressedChildren.delete(radio);
+      }
+    });
+    this._previousRadios = [];
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -316,6 +343,7 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
     this._syncRadios();
+    this._previousRadios = this._getRadios();
     // WCAG 4.1.2: warn when no accessible name is available for the radio group.
     // The fieldset needs either a label prop (rendered as <legend>) or an aria-label
     // attribute on the host element so screen readers can identify the group.
@@ -368,6 +396,13 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     const enabledRadios = this._getEnabledRadios();
 
     radios.forEach((radio) => {
+      // Codex round-3 finding #1 (defense-in-depth symmetry with hx-checkbox):
+      // mark every group-managed child so any future form-association change
+      // on `hx-radio` is automatically suppressed inside the group. The flag
+      // is currently inert on `hx-radio` (which is not form-associated).
+      radio._groupedSuppress = true;
+      this._suppressedChildren.add(radio);
+
       const isChecked = radio.value === this.value && this.value !== '';
       radio.checked = isChecked;
 
@@ -517,6 +552,11 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
   private _handleSlotChange(): void {
     this._cachedRadios = null;
 
+    // Snapshot of the previous slot pass so we can release `_groupedSuppress`
+    // on any radio that has left this group. Codex round-3 finding #1
+    // (defense-in-depth symmetry).
+    const previous = this._previousRadios;
+
     // Reconcile against currently-slotted children BEFORE _syncRadios runs.
     // _syncRadios() unconditionally overwrites `radio.checked` from `this.value`,
     // which would clobber an externally-set `checked=true` on a newly-added
@@ -547,6 +587,17 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       this._internals.setFormValue(this.value || null);
       this._updateValidity();
     }
+
+    // Release suppression on any radio that left the group. Then refresh the
+    // snapshot for the next slotchange. Codex round-3 finding #1.
+    const current = new Set(this._getRadios());
+    previous.forEach((radio) => {
+      if (!current.has(radio) && this._suppressedChildren.has(radio)) {
+        radio._groupedSuppress = false;
+        this._suppressedChildren.delete(radio);
+      }
+    });
+    this._previousRadios = this._getRadios();
   }
 
   // ─── Form Integration ───

@@ -1153,5 +1153,158 @@ describe('hx-checkbox', () => {
       expect(internals.ariaChecked).toBe(null);
       expect(internals.ariaLabel).toBe(null);
     });
+
+    // ─── Codex round-3 finding #2 (3) ───
+
+    it('clicking the inner input on the fallback path toggles host.checked and fires hx-change', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(el.checked).toBe(false);
+
+      const eventPromise = oneEvent<CustomEvent<{ checked: boolean; value: string }>>(
+        el,
+        'hx-change',
+      );
+      // Native click on the announced inner input — must toggle and emit.
+      // Round-3 finding #2: round-2 left `e.preventDefault()` on the inner
+      // input click suppressor, so AT activation could not toggle.
+      input.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+
+      expect(el.checked).toBe(true);
+      expect(input.checked).toBe(true);
+      expect(event.detail.checked).toBe(true);
+      expect(event.detail.value).toBe('on');
+    });
+
+    it('a second inner-input click on the fallback path toggles back to unchecked', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Accept" checked></hx-checkbox>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(el.checked).toBe(true);
+
+      const eventPromise = oneEvent<CustomEvent<{ checked: boolean; value: string }>>(
+        el,
+        'hx-change',
+      );
+      input.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+
+      expect(el.checked).toBe(false);
+      expect(input.checked).toBe(false);
+      expect(event.detail.checked).toBe(false);
+    });
+
+    it('modern path still suppresses inner-input click (no double-toggle from label-click handler)', async () => {
+      // Sanity: on the modern path the inner input click is preventDefault-ed
+      // and the label's @click=${_handleChange} drives the toggle. Clicking
+      // the input directly here lands on the input, but its click handler
+      // suppresses the default + bubble so the label handler never runs.
+      // This guards against regressing the modern path while fixing fallback.
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((el as any)._supportsIdrefRefs).toBe(true);
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const startChecked = el.checked;
+
+      // Dispatch a click that does NOT bubble through the label (synthetic
+      // direct dispatch). This mimics AT activation routed straight to the
+      // hidden inner input — should be a no-op on the modern path.
+      input.dispatchEvent(new MouseEvent('click', { bubbles: false, cancelable: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(startChecked);
+    });
+  });
+
+  // ─── Codex round-3 finding #1: groupedSuppress flag (3) ───
+
+  describe('Group-suppression flag (round-3 F1)', () => {
+    it('child remains suppressed in a group even after consumer mutates name post-attach', async () => {
+      const { form, el } = (await formFixtureGroup()) as {
+        form: HTMLFormElement;
+        el: HelixCheckbox;
+      };
+
+      // Pre-condition: only one entry per checked value under group name.
+      let data = new FormData(form);
+      expect(data.getAll('group-name')).toEqual(['a', 'b']);
+      // No stray entries under the (currently null) child name.
+      expect(data.getAll('hijack')).toEqual([]);
+
+      // Consumer/framework mutates the child's `name` post-attach. Round-2
+      // would have re-armed `_updateFormValue()` and double-submitted; round-3
+      // suppression must hold.
+      el.name = 'hijack';
+      await el.updateComplete;
+      data = new FormData(form);
+      expect(data.getAll('group-name')).toEqual(['a', 'b']);
+      expect(data.getAll('hijack')).toEqual([]);
+    });
+
+    it('removing a child from the group clears _groupedSuppress so it regains stand-alone form participation', async () => {
+      const { form, el } = (await formFixtureGroup()) as {
+        form: HTMLFormElement;
+        el: HelixCheckbox;
+      };
+      const group = el.parentElement!;
+      // While inside group: child is suppressed.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((el as any)._groupedSuppress).toBe(true);
+
+      // Re-parent: move the checkbox out of the group, give it a name, mark checked.
+      el.name = 'solo-name';
+      el.value = 'solo-value';
+      el.checked = true;
+      group.removeChild(el);
+      // Wait for slotchange to fire on the group.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      // Append back to the form (sibling of the group).
+      form.appendChild(el);
+      await el.updateComplete;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((el as any)._groupedSuppress).toBe(false);
+      const data = new FormData(form);
+      expect(data.getAll('solo-name')).toEqual(['solo-value']);
+    });
+
+    /**
+     * Builds a form containing an `<hx-checkbox-group name="group-name">` with
+     * two checked children for the round-3 F1 tests. Cannot live at module
+     * scope because hx-checkbox-group is imported lazily from the test file
+     * via `await import` to keep the module graph small.
+     */
+    async function formFixtureGroup(): Promise<{ form: HTMLFormElement; el: HelixCheckbox }> {
+      // Side-effect import registers hx-checkbox-group.
+      await import('../hx-checkbox-group/index.js');
+      const container = document.getElementById('test-fixture-container')!;
+      const form = document.createElement('form');
+      form.addEventListener('submit', (e) => e.preventDefault());
+      form.innerHTML = `
+        <hx-checkbox-group name="group-name" label="G">
+          <hx-checkbox value="a" checked></hx-checkbox>
+          <hx-checkbox value="b" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `;
+      container.appendChild(form);
+      const group = form.querySelector('hx-checkbox-group')!;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (group as any).updateComplete;
+      const el = form.querySelector('hx-checkbox')!;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (el as any).updateComplete;
+      return { form, el: el as HelixCheckbox };
+    }
   });
 });
