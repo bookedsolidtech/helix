@@ -212,6 +212,17 @@ export class HelixField extends HelixElement {
   private _a11yDescEl: HTMLElement | null = null;
 
   /**
+   * Tracks whether the consumer pre-set `aria-label` on the slotted control
+   * before hx-field had a chance to write its own. When true, hx-field
+   * suppresses its own `aria-label` write to honor the consumer override.
+   *
+   * Captured per-control on slotchange so swapping the control resets the
+   * detection. See round-13 F2 for context on the precedence hazard.
+   * @internal
+   */
+  private _consumerSetAriaLabel = false;
+
+  /**
    * MutationObserver tracking `id` mutations on the currently slotted control.
    *
    * **Why a focused, locally-implemented observer:** the broader
@@ -241,14 +252,20 @@ export class HelixField extends HelixElement {
     // Tear down the slotted-control observer to prevent leaks across
     // disconnect/reconnect cycles.
     this._teardownSlottedControlObserver();
-    // Remove aria attributes we set on the slotted control
+    // Remove aria attributes we set on the slotted control. We only remove
+    // `aria-label` if the consumer did not pre-set it — otherwise we never
+    // wrote it (see _syncSlottedControl) and removing would clobber the
+    // consumer's override.
     if (this._slottedControl) {
-      this._slottedControl.removeAttribute('aria-label');
+      if (!this._consumerSetAriaLabel) {
+        this._slottedControl.removeAttribute('aria-label');
+      }
       this._slottedControl.removeAttribute('aria-required');
       this._slottedControl.removeAttribute('aria-invalid');
       this._slottedControl.removeAttribute('aria-describedby');
       this._slottedControl = null;
     }
+    this._consumerSetAriaLabel = false;
   }
 
   override updated(changedProps: PropertyValues<this>): void {
@@ -325,9 +342,12 @@ export class HelixField extends HelixElement {
 
     // If we are leaving a previous control, strip the aria attributes we own
     // so the host doesn't leave stale wiring on a control that is no longer
-    // associated.
+    // associated. We never remove an `aria-label` we did not write
+    // (round-13 F2 — respect consumer overrides).
     if (prev) {
-      prev.removeAttribute('aria-label');
+      if (!this._consumerSetAriaLabel) {
+        prev.removeAttribute('aria-label');
+      }
       prev.removeAttribute('aria-required');
       prev.removeAttribute('aria-invalid');
       prev.removeAttribute('aria-describedby');
@@ -336,7 +356,26 @@ export class HelixField extends HelixElement {
     this._slottedControl = next;
 
     if (next) {
+      // F2: capture consumer intent BEFORE we ever write to the control.
+      // Skip detection for hx-* and data-aria-managed since we never write
+      // to those anyway — the existing skip conditions in
+      // _syncSlottedControl handle them.
+      const isManaged = next.tagName.startsWith('HX-') || next.hasAttribute('data-aria-managed');
+      this._consumerSetAriaLabel = !isManaged && next.hasAttribute('aria-label');
+
+      if (this._consumerSetAriaLabel && this.label && !this._hasLabelSlot) {
+        // Dev-only: warn that the consumer's aria-label takes precedence
+        // over the visible label prop. Production builds drop this call
+        // entirely via the import.meta.env.DEV gate inside devWarn.
+        devWarn(
+          'hx-field',
+          'Slotted control already has `aria-label`. The consumer override is being respected; the visible `label` prop will not be mirrored to the control. Remove one of the two to silence this warning.',
+        );
+      }
+
       this._installSlottedControlObserver(next);
+    } else {
+      this._consumerSetAriaLabel = false;
     }
 
     this._syncSlottedControl();
@@ -413,8 +452,16 @@ export class HelixField extends HelixElement {
     const hasError = !!this.error || this._hasErrorSlot;
     const hasDesc = !!(this.error || this.helpText || this._hasErrorSlot || this._hasHelpSlot);
 
-    // Label association: aria-label bridges the shadow DOM boundary
-    if (this.label && !this._hasLabelSlot) {
+    // Label association: aria-label bridges the shadow DOM boundary.
+    //
+    // Round-13 F2: if the consumer pre-set `aria-label` on the slotted
+    // control (captured at slotchange in `_consumerSetAriaLabel`), we do
+    // NOT touch it. Writing our own would silently win over their override.
+    // The dev-only warning is emitted from `_resolveSlottedControl` to keep
+    // this hot path free of conditional console work.
+    if (this._consumerSetAriaLabel) {
+      // Intentionally no-op — respect the consumer's aria-label.
+    } else if (this.label && !this._hasLabelSlot) {
       control.setAttribute('aria-label', this.label);
     } else {
       control.removeAttribute('aria-label');
