@@ -199,19 +199,34 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   /** @internal */
   @state() private _fallbackAriaLabel: string | null = null;
 
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the render-time branch between the modern path (host is the
+   * announced surface, inner button is `aria-hidden + tabindex=-1`) and the
+   * fallback path (inner button is the announced surface, host is demoted).
+   * Codex round-2 finding #2.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Detect platform support for IDL element references. Codex round-2
+    // finding #2: drives the render-time branch.
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
     // Seed root-independent semantics so the host announces the switch role
     // immediately on connect — before the first paint.
     this._syncHostAriaSemantics();
-    // Codex round-1 finding #1: host is the canonical announced surface;
-    // make it the focus target so the inner `<button role=switch>` can be
-    // demoted via `aria-hidden + tabindex=-1` without violating the
-    // aria-hidden-focus rule.
+    // Codex round-1 finding #1: host is the canonical announced surface on
+    // modern browsers, so the inner `<button role=switch>` is demoted via
+    // `aria-hidden + tabindex=-1`.
+    // Codex round-2 finding #2: on no-IDL-ref browsers the inner button is
+    // the announced surface (it carries native button semantics + ARIA
+    // role/state), so the host is demoted to `tabindex=-1`.
     if (!this.hasAttribute('tabindex') && !this.disabled) {
-      this.setAttribute('tabindex', '0');
+      this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
     }
     this.addEventListener('keydown', this._handleHostKeyDown);
     this.addEventListener('click', this._handleHostClick);
@@ -228,9 +243,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     this._ariaMirror = null;
   }
 
-  /** @internal */
+  /**
+   * Host-level keydown handler. Active only on the modern path; on the
+   * no-IDL-ref fallback the inner `<button>` owns native activation.
+   * Codex round-2 finding #2.
+   * @internal
+   */
   private _handleHostKeyDown = (e: KeyboardEvent): void => {
     if (this.disabled) return;
+    if (!this._supportsIdrefRefs) return;
     if (e.target !== this) return;
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
@@ -238,9 +259,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     }
   };
 
-  /** @internal */
+  /**
+   * Host-level click handler. Active only on the modern path; on the
+   * fallback path AT activation flows directly to the inner button.
+   * Codex round-2 finding #2.
+   * @internal
+   */
   private _handleHostClick = (e: MouseEvent): void => {
     if (this.disabled) return;
+    if (!this._supportsIdrefRefs) return;
     const path = e.composedPath();
     if (path[0] !== this) return;
     this._toggle();
@@ -251,8 +278,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
     }
-    if (changedProperties.has('disabled')) {
-      this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    if (
+      changedProperties.has('disabled') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_supportsIdrefRefs')
+    ) {
+      // Codex round-2 finding #2: keep host tabindex aligned with the chosen
+      // announced surface. On no-IDL-ref browsers the inner button owns tab
+      // order, so re-enabling the host should leave it `tabindex=-1`.
+      const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
     }
     // Re-resolve element references against the (possibly mutated) shadow
     // tree. `_syncHostAriaSemantics()` is also invoked from `_updateValidity()`
@@ -271,22 +305,28 @@ export class HelixSwitch extends FormMixin(HelixElement) {
    */
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
-    internals.role = 'switch';
-    internals.ariaChecked = this.checked ? 'true' : 'false';
-    internals.ariaRequired = this.required ? 'true' : 'false';
-    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
-    internals.ariaDisabled = this.disabled ? 'true' : 'false';
-
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
-    if (hostAriaLabel) {
-      internals.ariaLabel = hostAriaLabel;
-    } else if (!this.getAttribute('aria-labelledby')) {
-      internals.ariaLabel = this.label || null;
-    } else {
-      internals.ariaLabel = null;
-    }
 
-    if (supportsIdrefElementReferences(internals)) {
+    // Codex round-2 finding #2: branch on platform support. Modern path —
+    // host is the announced surface and carries `role=switch` + state via
+    // ElementInternals. Fallback path — inner `<button role=switch>` is the
+    // announced surface; clear host role/state so AT does not double-announce.
+    if (this._supportsIdrefRefs) {
+      // ─── Modern path ───
+      internals.role = 'switch';
+      internals.ariaChecked = this.checked ? 'true' : 'false';
+      internals.ariaRequired = this.required ? 'true' : 'false';
+      internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+      internals.ariaDisabled = this.disabled ? 'true' : 'false';
+
+      if (hostAriaLabel) {
+        internals.ariaLabel = hostAriaLabel;
+      } else if (!this.getAttribute('aria-labelledby')) {
+        internals.ariaLabel = this.label || null;
+      } else {
+        internals.ariaLabel = null;
+      }
+
       type InternalsWithRefs = ElementInternals & {
         ariaLabelledByElements: Element[] | null;
         ariaDescribedByElements: Element[] | null;
@@ -314,18 +354,29 @@ export class HelixSwitch extends FormMixin(HelixElement) {
         descEls.push(errorEl);
       }
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
-      // Clear fallback state when IDL refs are available so render() does not
-      // double-apply attributes.
+      // Clear fallback state when IDL refs are available.
       this._fallbackAriaLabelledBy = null;
       this._fallbackAriaDescribedBy = null;
       this._fallbackAriaLabel = null;
     } else {
-      // Codex round-1 finding #8: on no-IDL-ref browsers the inner `<button>`
-      // is the focus target and AT cannot reach host-level IDREFs. Mirror the
-      // consumer-supplied tokens onto the inner button so consumer wiring still
-      // resolves through the shadow root for shadow-internal IDs.
+      // ─── Fallback path: inner button is the announced surface ───
+      // Round-2 finding #2: round-1 set host role/state via internals AND
+      // mirrored aria-* onto the `aria-hidden` inner button — making the
+      // mirrored attributes inert. The fix is to clear host role/state on
+      // internals so AT does not double-announce, and let the inner button
+      // (rendered without aria-hidden, with `tabindex=0`, with role=switch
+      // and aria-checked) be the announced surface.
+      internals.role = null;
+      internals.ariaChecked = null;
+      internals.ariaRequired = null;
+      internals.ariaInvalid = null;
+      internals.ariaDisabled = null;
+      internals.ariaLabel = null;
+
       this._fallbackAriaLabelledBy = this.getAttribute('aria-labelledby') || null;
       this._fallbackAriaDescribedBy = this.getAttribute('aria-describedby') || null;
+      // Compute resolved label for the inner button: explicit aria-label
+      // tokens, then the public `label` property as a last resort.
       this._fallbackAriaLabel = hostAriaLabel || null;
     }
   }
@@ -501,6 +552,17 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     const innerLabelledBy = this._fallbackAriaLabelledBy ?? (hasLabel ? this._labelId : undefined);
     const innerAriaLabel = this._fallbackAriaLabel ?? undefined;
 
+    // Codex round-2 finding #2: branch the inner button on platform support.
+    // Modern path — host is announced, inner button is `aria-hidden + tabindex=-1`.
+    // Fallback path — inner button is announced (NO aria-hidden, role=switch,
+    // tabindex=0) so consumer-mirrored aria-* attributes resolve through a
+    // visible accessibility-tree node and AT can name + activate it natively.
+    const innerIsAnnounced = !this._supportsIdrefRefs;
+    const innerTabIndex = innerIsAnnounced && !this.disabled ? '0' : '-1';
+    // On the fallback path the inner button must carry role=switch so AT
+    // announces "switch", aria-checked for state, and aria-required when set.
+    const innerRole = innerIsAnnounced ? 'switch' : nothing;
+
     return html`
       <div part="switch" class=${classMap(containerClasses)}>
         <div class="switch__control-row">
@@ -509,14 +571,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
             class="switch__track"
             id=${this._switchId}
             type="button"
-            tabindex="-1"
+            role=${innerRole}
+            tabindex=${innerTabIndex}
             aria-checked=${this.checked ? 'true' : 'false'}
             aria-labelledby=${ifDefined(innerLabelledBy)}
             aria-describedby=${ifDefined(innerDescribedBy)}
             aria-label=${ifDefined(innerAriaLabel)}
             aria-invalid=${isInvalid ? 'true' : nothing}
             aria-required=${this.required ? 'true' : nothing}
-            aria-hidden="true"
+            aria-hidden=${innerIsAnnounced ? nothing : 'true'}
             ?disabled=${this.disabled}
             @click=${this._handleClick}
             @keydown=${this._handleKeyDown}

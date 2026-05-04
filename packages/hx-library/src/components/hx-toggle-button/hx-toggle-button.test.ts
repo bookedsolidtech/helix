@@ -884,4 +884,66 @@ describe('hx-toggle-button', () => {
       expect(internals.ariaInvalid).toBe('false');
     });
   });
+
+  // ─── Codex round-2 finding #2: no-IDL-ref fallback render path (4) ───
+
+  describe('No-IDL-ref fallback render (round-2 F2)', () => {
+    async function forceFallbackPath(el: HelixToggleButton): Promise<void> {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const anyEl = el as any;
+      anyEl._supportsIdrefRefs = false;
+      anyEl._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('inner button is NOT aria-hidden and is in tab order on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button[part="button"]')!;
+      expect(btn.hasAttribute('aria-hidden')).toBe(false);
+      expect(btn.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host is demoted to tabindex=-1 on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host activation handlers do NOT fire on Space/Enter on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const startPressed = el.pressed;
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      // Round-2 finding #2: on fallback the inner button receives native
+      // activation; host handlers are no-ops.
+      expect(el.pressed).toBe(startPressed);
+    });
+
+    it('host internals.role is cleared on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.role).toBe('button');
+
+      await forceFallbackPath(el);
+      expect(internals.role).toBe(null);
+      expect(internals.ariaPressed).toBe(null);
+    });
+  });
 });

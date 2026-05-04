@@ -1051,4 +1051,107 @@ describe('hx-checkbox', () => {
       expect(input.getAttribute('aria-label')).toBe('Confirm consent');
     });
   });
+
+  // ─── Codex round-2 finding #2: no-IDL-ref fallback render path (5) ───
+
+  describe('No-IDL-ref fallback render (round-2 F2)', () => {
+    /**
+     * Helper: simulates a browser without ElementInternals IDL element
+     * references by flipping the private `_supportsIdrefRefs` flag and
+     * re-running the host ARIA sync + a render cycle. The flag is normally
+     * set in `connectedCallback()` based on `supportsIdrefElementReferences`.
+     */
+    async function forceFallbackPath(el: HelixCheckbox): Promise<void> {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const anyEl = el as any;
+      anyEl._supportsIdrefRefs = false;
+      // Re-run the host sync so internals are cleared and fallback state populates.
+      anyEl._syncHostAriaSemantics();
+      // Force a re-render.
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('inner input is NOT aria-hidden and is in tab order on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Round-2 finding #2: on no-IDL-ref browsers the inner input must be
+      // the announced surface — NOT aria-hidden, AND it owns tab order.
+      expect(input.hasAttribute('aria-hidden')).toBe(false);
+      expect(input.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host is demoted to tabindex=-1 on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      // The host must not steal focus; the inner input owns it.
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('inner input mirrors data-aria-labelledby/describedby from host on the fallback path', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      // Light-DOM IDREF targets in the same root.
+      const labelHost = document.createElement('span');
+      labelHost.id = 'cbx-ext-label';
+      labelHost.textContent = 'External Label';
+      const helpHost = document.createElement('span');
+      helpHost.id = 'cbx-ext-help';
+      helpHost.textContent = 'External Help';
+      container.appendChild(labelHost);
+      container.appendChild(helpHost);
+
+      const el = await fixture<HelixCheckbox>(
+        `<hx-checkbox aria-labelledby="cbx-ext-label" aria-describedby="cbx-ext-help"></hx-checkbox>`,
+      );
+      await el.updateComplete;
+      // mixinDelegatesAria mirrors aria-* to data-aria-* on the host.
+      expect(el.getAttribute('data-aria-labelledby')).toBe('cbx-ext-label');
+      expect(el.getAttribute('data-aria-describedby')).toBe('cbx-ext-help');
+
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // The inner input gets the mirrored tokens so AT can resolve them.
+      expect(input.getAttribute('aria-labelledby')).toBe('cbx-ext-label');
+      const innerDesc = input.getAttribute('aria-describedby') ?? '';
+      expect(innerDesc.split(/\s+/)).toContain('cbx-ext-help');
+    });
+
+    it('host activation handlers do NOT fire on Space/Enter on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const startChecked = el.checked;
+      // Dispatch a Space keydown directly on the host — round-1 it would
+      // toggle the checkbox via _handleHostKeyDown. Round-2 finding #2 makes
+      // host handlers no-op on the fallback path; the inner native input
+      // would handle activation natively.
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(startChecked);
+    });
+
+    it('host ariaInternals role is cleared on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.role).toBe('checkbox');
+
+      await forceFallbackPath(el);
+
+      // Round-2 finding #2: host role/state cleared so AT does not
+      // double-announce alongside the inner native checkbox.
+      expect(internals.role).toBe(null);
+      expect(internals.ariaChecked).toBe(null);
+      expect(internals.ariaLabel).toBe(null);
+    });
+  });
 });

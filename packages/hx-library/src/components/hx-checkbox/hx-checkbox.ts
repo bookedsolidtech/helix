@@ -262,18 +262,26 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Detect platform support for IDL element references. Cached as reactive
+    // state so the render-time branch is consistent across update cycles and
+    // tests can stub it deterministically. Codex round-2 finding #2.
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
     // Seed root-independent semantics so the host carries the checkbox role
     // and reactive ARIA state from the moment of connection — before the
     // first paint. This closes the gap where AT scanning between connect
     // and `firstUpdated()` would see an unannounced surface.
     this._syncHostAriaSemantics();
-    // Codex round-1 finding #1: host is the canonical announced surface;
-    // make it the focus target so the inner `<input>` (which carries native
-    // checkbox semantics that cannot be stripped) can be removed from the
-    // a11y tree via `aria-hidden + tabindex=-1` without violating the
-    // aria-hidden-focus rule.
+    // Codex round-1 finding #1: host is the canonical announced surface on
+    // modern browsers, so the inner `<input>` is demoted via
+    // `aria-hidden + tabindex=-1` and the host owns tab order.
+    //
+    // Codex round-2 finding #2: on no-IDL-ref browsers the inner `<input>`
+    // is the only surface AT can reach, so the host is demoted to
+    // `tabindex=-1` and the inner input owns tab order. Without this,
+    // `aria-labelledby`/`aria-describedby` on the inner input were inert
+    // (the input was `aria-hidden`), leaving the control unnamed.
     if (!this.hasAttribute('tabindex') && !this.disabled) {
-      this.setAttribute('tabindex', '0');
+      this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
     }
     this.addEventListener('keydown', this._handleHostKeyDown);
     this.addEventListener('click', this._handleHostClick);
@@ -295,11 +303,16 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   }
 
   /**
-   * Host-level keydown handler. Space toggles per ARIA APG checkbox pattern.
+   * Host-level keydown handler. Space toggles per ARIA APG checkbox pattern
+   * — but only on the modern path where the host is the announced focus
+   * surface. On the no-IDL-ref fallback (round-2 finding #2), the inner
+   * `<input>` owns focus + native Space activation, so the host stays out
+   * of the activation pipeline to avoid double-toggle.
    * @internal
    */
   private _handleHostKeyDown = (e: KeyboardEvent): void => {
     if (this.disabled) return;
+    if (!this._supportsIdrefRefs) return;
     // Only handle when the host itself is the focus target — events from
     // slotted/nested controls bubble through here too.
     if (e.target !== this) return;
@@ -311,12 +324,14 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 
   /**
    * Host-level click handler. Routes clicks on the host (e.g. via assistive
-   * tech activation) to the change handler. Inner control clicks bubble
-   * through here too, but composedPath()[0] reveals the true origin.
+   * tech activation) to the change handler — only on the modern path. On the
+   * fallback path the inner input is the announced surface and natively
+   * receives clicks/AT activation.
    * @internal
    */
   private _handleHostClick = (e: MouseEvent): void => {
     if (this.disabled) return;
+    if (!this._supportsIdrefRefs) return;
     // Only respond to clicks that originated on the host itself. Bubbled
     // events from inner shadow elements (which toggle through the existing
     // label/input change handler) are skipped to avoid double-activation.
@@ -327,17 +342,26 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-    if (changedProperties.has('checked') || changedProperties.has('value')) {
-      this._internals.setFormValue(this.checked ? this.value : null);
+    if (
+      changedProperties.has('checked') ||
+      changedProperties.has('value') ||
+      changedProperties.has('name')
+    ) {
+      this._updateFormValue();
     }
 
     // Codex round-1 finding #1: keep host focusability in sync with disabled
     // state. Disabled custom elements should not be in tab order.
-    if (changedProperties.has('disabled')) {
+    // Codex round-2 finding #2: on no-IDL-ref browsers the host is demoted
+    // to `tabindex=-1` so the inner input remains the announced surface.
+    if (
+      changedProperties.has('disabled') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_supportsIdrefRefs')
+    ) {
       if (this.disabled) {
         this.setAttribute('tabindex', '-1');
       } else {
-        this.setAttribute('tabindex', '0');
+        this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
       }
     }
 
@@ -443,6 +467,21 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
 
   // ─── Event Handling ───
 
+  /**
+   * Writes the checkbox value to ElementInternals' form value. When the
+   * checkbox is grouped (`hx-checkbox-group` clears `name` on children to
+   * centralize submission), this short-circuits to `null` so the same value
+   * is not appended twice under the same form name. Codex round-2 finding #1.
+   * @internal
+   */
+  private _updateFormValue(): void {
+    if (!this.name) {
+      this._internals.setFormValue(null);
+      return;
+    }
+    this._internals.setFormValue(this.checked ? this.value : null);
+  }
+
   /** @internal */
   private _handleChange(): void {
     if (this.disabled) return;
@@ -450,7 +489,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     this.indeterminate = false;
     this.checked = !this.checked;
 
-    this._internals.setFormValue(this.checked ? this.value : null);
+    this._updateFormValue();
     this._handleInteractionInput();
 
     /**
@@ -502,25 +541,27 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    */
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
-    internals.role = 'checkbox';
-    internals.ariaChecked = this.indeterminate ? 'mixed' : this.checked ? 'true' : 'false';
-    internals.ariaRequired = this.required ? 'true' : 'false';
-    // Drive aria-invalid from validity state, not from visible error content.
-    // A required-but-unchecked checkbox sets `valueMissing` via setValidity()
-    // but may render no visible error yet — assistive tech still needs to hear
-    // the invalid state.
-    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
-    internals.ariaDisabled = this.disabled ? 'true' : 'false';
-
     const hostLabel = this._effectiveLabel;
-    internals.ariaLabel = hostLabel || null;
 
-    // Resolve consumer-supplied IDREF tokens (stored as data-aria-* by
-    // mixinDelegatesAria) against the host's root node, then merge with
-    // shadow-internal label/help/error elements via the IDL element-references
-    // API. Element references work cross-shadow in a way that ID strings on
-    // the host cannot.
-    if (supportsIdrefElementReferences(internals)) {
+    // Codex round-2 finding #2: branch on platform support for IDL element
+    // references. On modern browsers the host is the canonical announced
+    // surface and carries all checkbox semantics via ElementInternals. On
+    // older browsers the inner `<input>` is the announced surface, so the
+    // host's role/state are cleared and the consumer-supplied IDREFs are
+    // mirrored to the inner input via render-time fallback state.
+    if (this._supportsIdrefRefs) {
+      // ─── Modern path: host is the announced surface ───
+      internals.role = 'checkbox';
+      internals.ariaChecked = this.indeterminate ? 'mixed' : this.checked ? 'true' : 'false';
+      internals.ariaRequired = this.required ? 'true' : 'false';
+      // Drive aria-invalid from validity state, not from visible error content.
+      // A required-but-unchecked checkbox sets `valueMissing` via setValidity()
+      // but may render no visible error yet — assistive tech still needs to hear
+      // the invalid state.
+      internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+      internals.ariaDisabled = this.disabled ? 'true' : 'false';
+      internals.ariaLabel = hostLabel || null;
+
       type InternalsWithRefs = ElementInternals & {
         ariaLabelledByElements: Element[] | null;
         ariaDescribedByElements: Element[] | null;
@@ -555,14 +596,24 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       this._fallbackAriaLabelledBy = null;
       this._fallbackAriaDescribedBy = null;
     } else {
-      // No-IDL-ref fallback (Firefox <126, Safari <17.4). `mixinDelegatesAria`
-      // strips consumer `aria-labelledby`/`aria-describedby` to `data-aria-*`
-      // on the host so the announced surface stays clean. Without IDL element
-      // references those tokens never reach the inner input — mirror them
-      // back as `aria-*` on the inner `<input>` so consumer wiring still
-      // resolves through the shadow root. Cross-boundary IDREFs remain
-      // unreachable (same baseline as pre-fix) but shadow-internal IDs work.
-      // Codex round-1 finding #7.
+      // ─── Fallback path: inner <input> is the announced surface ───
+      // Codex round-2 finding #2: in round-1 we set host role/state via
+      // ElementInternals AND mirrored aria-labelledby/describedby onto the
+      // inner input. But the inner input was kept `aria-hidden`, making the
+      // mirrored attributes inert — the control had no accessible name on
+      // older browsers. The fix is to demote the host (clear its role/state
+      // on internals so AT does not double-announce) and let the inner native
+      // `<input type=checkbox>` be the announced surface, with consumer
+      // IDREFs mirrored as real `aria-*` attributes that resolve through the
+      // shadow root for shadow-internal IDs (cross-boundary IDREFs remain
+      // unreachable on these engines — same baseline as the pre-fix code).
+      internals.role = null;
+      internals.ariaChecked = null;
+      internals.ariaRequired = null;
+      internals.ariaInvalid = null;
+      internals.ariaDisabled = null;
+      internals.ariaLabel = null;
+
       const externalLabelTokens = this.getAttribute('data-aria-labelledby');
       const externalDescTokens = this.getAttribute('data-aria-describedby');
       this._fallbackAriaLabelledBy = externalLabelTokens || null;
@@ -584,6 +635,20 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    * @internal
    */
   @state() private _fallbackAriaDescribedBy: string | null = null;
+
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the render-time branch between the modern path (host is the
+   * announced surface, inner input is `aria-hidden + tabindex=-1`) and the
+   * fallback path (inner input is the announced surface, host is demoted).
+   *
+   * Round-2 finding #2: the previous fallback mirrored `aria-labelledby` /
+   * `aria-describedby` onto an `aria-hidden` inner input, leaving older
+   * browsers with no accessible name. The fallback now keeps the inner input
+   * in the a11y tree so AT can name and activate it natively.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
 
   // ─── Render ───
 
@@ -645,6 +710,16 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // internal label association.
     const innerLabelledBy = fallbackLabelledBy ?? (useInternalLabelId ? this._labelId : undefined);
 
+    // Codex round-2 finding #2: branch the inner input on platform support.
+    // Modern path — host is announced, inner input is `aria-hidden + tabindex=-1`.
+    // Fallback path — inner input is announced (NO aria-hidden, tabindex=0)
+    // so consumer-mirrored aria-labelledby/describedby actually resolve to a
+    // visible accessibility-tree node. The inner input keeps its own click
+    // suppressor because the visible activation surface is the surrounding
+    // `<label>`; the input's native click activation is wired through that.
+    const innerIsAnnounced = !this._supportsIdrefRefs;
+    const innerTabIndex = innerIsAnnounced && !this.disabled ? '0' : '-1';
+
     return html`
       <div class=${classMap(containerClasses)}>
         <label part="control" class="checkbox__control" @click=${this._handleChange}>
@@ -652,7 +727,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
             class="checkbox__input"
             type="checkbox"
             id=${this._id}
-            tabindex="-1"
+            tabindex=${innerTabIndex}
             .checked=${live(this.checked)}
             .indeterminate=${live(this.indeterminate)}
             ?disabled=${this.disabled}
@@ -664,7 +739,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
             aria-describedby=${ifDefined(innerDescribedBy)}
             aria-label=${ifDefined(hostAriaLabel)}
             aria-labelledby=${ifDefined(innerLabelledBy)}
-            aria-hidden="true"
+            aria-hidden=${innerIsAnnounced ? nothing : 'true'}
             @keydown=${this._handleKeyDown}
             @click=${(e: Event) => {
               e.preventDefault();

@@ -822,4 +822,60 @@ describe('hx-switch', () => {
       expect(errorDiv?.hasAttribute('hidden')).toBe(true);
     });
   });
+
+  // ─── Codex round-2 finding #2: no-IDL-ref fallback render path (4) ───
+
+  describe('No-IDL-ref fallback render (round-2 F2)', () => {
+    async function forceFallbackPath(el: HxSwitch): Promise<void> {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const anyEl = el as any;
+      anyEl._supportsIdrefRefs = false;
+      anyEl._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('inner button is NOT aria-hidden, has role=switch, and is in tab order on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button.switch__track')!;
+      expect(btn.hasAttribute('aria-hidden')).toBe(false);
+      expect(btn.getAttribute('role')).toBe('switch');
+      expect(btn.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host is demoted to tabindex=-1 on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host activation handlers do NOT fire on Space on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const startChecked = el.checked;
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      // Round-2 finding #2: host handlers no-op on the fallback path; the
+      // inner native button handles activation directly.
+      expect(el.checked).toBe(startChecked);
+    });
+
+    it('host internals.role is cleared on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.role).toBe('switch');
+
+      await forceFallbackPath(el);
+      expect(internals.role).toBe(null);
+      expect(internals.ariaChecked).toBe(null);
+    });
+  });
 });
