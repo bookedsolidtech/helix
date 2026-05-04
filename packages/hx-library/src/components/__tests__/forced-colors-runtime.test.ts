@@ -150,6 +150,64 @@ describe('hx-nav-item forced-colors disabled opacity scoping (runtime)', () => {
       ).not.toMatch(/opacity:/);
     }
   });
+
+  /*
+   * Cascade-order regression net: both rules use selector
+   * `:host([disabled]) .nav-item__link` with identical specificity, so the
+   * forced-colors override only wins because it appears later in source
+   * order. If a future refactor moves the @media block above line 109 of
+   * hx-nav-item.styles.ts, the override silently loses and disabled links
+   * regress to 0.5 opacity in Windows High Contrast mode — while the rule-
+   * shape assertions above still pass green. Pin the source-order invariant
+   * directly by walking the adopted stylesheets in order.
+   */
+  it('forced-colors disabled override appears AFTER the regular-mode opacity rule', async () => {
+    await fixture<HTMLElement>(
+      '<hx-side-nav><hx-nav-item href="/a" disabled>Disabled</hx-nav-item></hx-side-nav>',
+    );
+    const navItem = document.querySelector('hx-nav-item') as HTMLElement;
+    const sheets = (navItem.shadowRoot?.adoptedStyleSheets ?? []) as CSSStyleSheet[];
+
+    let regularIndex = -1;
+    let forcedColorsIndex = -1;
+    let cursor = 0;
+
+    for (const sheet of sheets) {
+      for (const rule of Array.from(sheet.cssRules)) {
+        if (
+          rule instanceof CSSStyleRule &&
+          rule.selectorText === ':host([disabled]) .nav-item__link' &&
+          /opacity:\s*var\(--hx-opacity-disabled/.test(rule.cssText) &&
+          regularIndex === -1
+        ) {
+          regularIndex = cursor;
+        }
+        if (
+          rule instanceof CSSMediaRule &&
+          rule.conditionText.includes('forced-colors: active')
+        ) {
+          for (const inner of Array.from(rule.cssRules)) {
+            if (
+              inner instanceof CSSStyleRule &&
+              inner.selectorText === ':host([disabled]) .nav-item__link' &&
+              /opacity:\s*1\b/.test(inner.cssText)
+            ) {
+              forcedColorsIndex = cursor;
+              break;
+            }
+          }
+        }
+        cursor += 1;
+      }
+    }
+
+    expect(regularIndex, 'regular-mode :host([disabled]) .nav-item__link opacity rule must exist').toBeGreaterThan(-1);
+    expect(forcedColorsIndex, 'forced-colors override on :host([disabled]) .nav-item__link must exist').toBeGreaterThan(-1);
+    expect(
+      forcedColorsIndex,
+      'forced-colors override must appear after the regular-mode rule (equal-specificity cascade depends on source order)',
+    ).toBeGreaterThan(regularIndex);
+  });
 });
 
 describe('hx-side-nav toggle:hover token chain (runtime)', () => {
