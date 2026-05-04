@@ -581,6 +581,28 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     }
   }
 
+  /**
+   * Stable inner-input click suppressor for the modern (announced-host) path.
+   * Hoisted to a class field so Lit sees a stable listener identity across
+   * renders; previously inline arrows were re-allocated each render and
+   * caused listener detach/re-attach churn (codex round-4 F3 — performance).
+   * @internal
+   */
+  private _suppressInnerClick = (e: Event): void => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  /**
+   * Stable inner-input change suppressor for the modern (announced-host) path.
+   * Mirrors the click suppressor above — stable identity across renders so
+   * Lit's event-listener cache keeps a single registration (codex round-4 F3).
+   * @internal
+   */
+  private _suppressInnerChange = (e: Event): void => {
+    e.stopPropagation();
+  };
+
   // ─── Public Methods ───
 
   /**
@@ -804,15 +826,13 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // the host mirrors the input's state, fires `hx-change`, and updates
     // form participation. The label's `@click` is a no-op on this path —
     // pointer clicks on the label bubble to the input which toggles natively.
-    const innerClickHandler = innerIsAnnounced
-      ? undefined
-      : (e: Event) => {
-          e.preventDefault();
-          e.stopPropagation();
-        };
+    // Codex round-4 F3 (performance): handlers are class-field arrows with
+    // stable identity, so Lit's event-listener cache keeps a single
+    // registration across re-renders instead of detach/re-attach churn.
+    const innerClickHandler = innerIsAnnounced ? undefined : this._suppressInnerClick;
     const innerChangeHandler = innerIsAnnounced
       ? this._handleInternalChange
-      : (e: Event) => e.stopPropagation();
+      : this._suppressInnerChange;
     const labelClickHandler = innerIsAnnounced ? undefined : this._handleChange;
     // On the fallback path the native input owns Space/Enter activation; its
     // native `change` event flows through `_handleInternalChange`. Wiring the

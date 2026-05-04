@@ -1204,6 +1204,28 @@ describe('hx-checkbox', () => {
       expect(event.detail.checked).toBe(false);
     });
 
+    // Codex round-4 F1: label-click activation on the fallback path was
+    // uncovered. Real AT/pointer activation lands on the surrounding <label>
+    // (the `.checkbox__control` element); native label-forward toggles the
+    // inner input which fires `change`, which `_handleInternalChange` mirrors
+    // onto the host. Must produce exactly one `hx-change`.
+    it('clicking the LABEL on the fallback path toggles via native label-forward and fires hx-change exactly once', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const label = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      let count = 0;
+      el.addEventListener('hx-change', () => {
+        count++;
+      });
+      label.click();
+      await el.updateComplete;
+
+      expect(el.checked).toBe(true);
+      expect(count).toBe(1);
+    });
+
     it('modern path still suppresses inner-input click (no double-toggle from label-click handler)', async () => {
       // Sanity: on the modern path the inner input click is preventDefault-ed
       // and the label's @click=${_handleChange} drives the toggle. Clicking
@@ -1250,6 +1272,58 @@ describe('hx-checkbox', () => {
       data = new FormData(form);
       expect(data.getAll('group-name')).toEqual(['a', 'b']);
       expect(data.getAll('hijack')).toEqual([]);
+    });
+
+    // Codex round-4 F2: when the GROUP itself is removed from the DOM (vs.
+    // the child being re-parented), the group's disconnectedCallback must
+    // release `_groupedSuppress` on every tracked child so a still-live child
+    // reference regains stand-alone form participation when re-attached
+    // somewhere else. Round-3 added the cleanup; this test exercises it.
+    it('removing the group from the DOM clears _groupedSuppress on its children so they regain stand-alone form participation', async () => {
+      await import('../hx-checkbox-group/index.js');
+      const container = document.getElementById('test-fixture-container')!;
+
+      // Group with a single named, checked child.
+      const groupHost = document.createElement('div');
+      groupHost.innerHTML = `
+        <hx-checkbox-group name="grp" label="G">
+          <hx-checkbox value="solo" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `;
+      container.appendChild(groupHost);
+      const group = groupHost.querySelector('hx-checkbox-group')!;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (group as any).updateComplete;
+      const child = groupHost.querySelector('hx-checkbox') as HelixCheckbox;
+      await child.updateComplete;
+
+      // Pre-condition: child is suppressed while inside the group.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((child as any)._groupedSuppress).toBe(true);
+
+      // Remove the GROUP from the DOM (group disconnectedCallback fires).
+      // The child reference is still live and detached together with the group.
+      groupHost.removeChild(group);
+      // Allow disconnect lifecycle + microtask drain.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // Group cleanup must have released suppression on the still-live child.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((child as any)._groupedSuppress).toBe(false);
+
+      // Reattach the child stand-alone inside a real form and confirm it
+      // participates under its own name (real form participation regained).
+      const form = document.createElement('form');
+      form.addEventListener('submit', (e) => e.preventDefault());
+      child.name = 'solo-name';
+      child.value = 'solo-value';
+      child.checked = true;
+      form.appendChild(child);
+      container.appendChild(form);
+      await child.updateComplete;
+
+      const data = new FormData(form);
+      expect(data.getAll('solo-name')).toEqual(['solo-value']);
     });
 
     it('removing a child from the group clears _groupedSuppress so it regains stand-alone form participation', async () => {
