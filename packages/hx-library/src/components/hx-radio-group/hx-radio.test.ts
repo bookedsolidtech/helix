@@ -371,12 +371,8 @@ describe('hx-radio', () => {
         ariaDescribedByElements: Element[] | null;
       };
       const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
-      if (refs) {
-        expect(refs).toContain(help);
-      } else {
-        const tokens = group.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
-        expect(tokens).toContain(help?.id);
-      }
+      expect(refs).toBeTruthy();
+      expect(refs).toContain(help);
     });
 
     it('renders error text with role="alert" when error is set', async () => {
