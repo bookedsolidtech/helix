@@ -25,6 +25,26 @@ into its light DOM children for ARIA describedby linkage across the shadow
 DOM boundary. This span has `id="${fieldId}-desc"` and is removed on
 `disconnectedCallback`. This is an intentional, documented accessibility
 mechanism.
+
+**`aria-label` ownership model:** When `label` is set and no shadow `<label>`
+is rendered, hx-field writes `aria-label` to the slotted control and stamps
+a `data-hx-owns-label="true"` ownership marker.
+
+Consumers have two ways to keep their value safe from hx-field's writes:
+  (a) **Suspend** all ARIA bridging by setting `data-aria-managed` on the
+      control. While present, hx-field skips every aria-* mutation and
+      leaves any existing marker/snapshot in place — removing
+      `data-aria-managed` later may resume host ownership of an `aria-label`
+      value that still matches the snapshot.
+  (b) **Release** ownership permanently by overwriting `aria-label` to a
+      different value than the one hx-field last wrote. The mismatch
+      triggers `_releaseHostOwnedAriaLabel`, which strips the marker and
+      clears the snapshot, transferring ownership to the consumer.
+
+**Limitation:** because release detection is snapshot-based, a consumer
+rewrite to the *exact same value* hx-field last wrote is invisible. To
+genuinely take ownership in that case the consumer must write a different
+value (even briefly), or remove the `data-hx-owns-label` marker themselves.
  *
  * @example
  * ```tsx
