@@ -176,12 +176,25 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   private _handleErrorSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    // Codex round-23 P2 (Finding B): re-tune the in-place text observer over
+    // the new assigned-node set so in-place `textContent` rewrites of slotted
+    // error nodes resync `internals.ariaDescription` on the no-IDL-ref
+    // fallback path. `slotchange` only fires when the *node set* changes;
+    // mutating an already-assigned node's text does not, so a separate
+    // observer is required. Mirrors `_installLabelSlotTextObserver`.
+    this._installErrorSlotTextObserver(slot);
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    // Codex round-23 P2 (Finding B): same pattern as the error slot — keep
+    // `internals.ariaDescription` in sync with in-place text edits on already
+    // assigned help-text nodes.
+    this._installHelpSlotTextObserver(slot);
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -238,6 +251,74 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       });
     });
     this._labelSlotTextObserver = observer;
+  }
+
+  /**
+   * Watches assigned `<slot name="help-text">` nodes for in-place text
+   * mutations so the no-IDL-ref fallback `internals.ariaDescription` stays in
+   * sync when a framework rewrites `textContent` of an already-assigned node
+   * without replacing it. `slotchange` does NOT fire for those mutations, so
+   * a separate observer is required. Codex round-23 P2 (Finding B) — mirrors
+   * the round-21 P3 label-slot observer pattern.
+   * @internal
+   */
+  private _helpSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * Watches assigned `<slot name="error">` nodes for in-place text mutations
+   * so the no-IDL-ref fallback `internals.ariaDescription` stays in sync when
+   * a framework rewrites `textContent` of an already-assigned node without
+   * replacing it. Codex round-23 P2 (Finding B).
+   * @internal
+   */
+  private _errorSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * help-text-slot nodes. Codex round-23 P2 (Finding B).
+   * @internal
+   */
+  private _installHelpSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._helpSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._helpSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._helpSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * error-slot nodes. Codex round-23 P2 (Finding B).
+   * @internal
+   */
+  private _installErrorSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._errorSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._errorSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._errorSlotTextObserver = observer;
   }
 
   /**
@@ -313,6 +394,12 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     // assigned nodes stop firing into a torn-down host.
     this._labelSlotTextObserver?.disconnect();
     this._labelSlotTextObserver = null;
+    // Codex round-23 P2 (Finding B): tear down the help/error slot text
+    // observers for the same reason.
+    this._helpSlotTextObserver?.disconnect();
+    this._helpSlotTextObserver = null;
+    this._errorSlotTextObserver?.disconnect();
+    this._errorSlotTextObserver = null;
     // Release suppression on every previously-tracked child so they regain
     // stand-alone form participation if re-parented or kept in the document
     // after the group is removed. Codex round-3 finding #1.
@@ -388,6 +475,7 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     // hx-radio-group fallback (which has no label slot, only `this.label`).
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
     const labelSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="label"]');
+    const labelSlotHasAssignedNodes = (labelSlot?.assignedNodes().length ?? 0) > 0;
     const slottedLabelText =
       labelSlot
         ?.assignedNodes()
@@ -399,7 +487,20 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     // consumer supplies BOTH `label="..."` AND `<span slot="label">...</span>`,
     // the slot is the public-facing legend; the property must not clobber it
     // on the fallback path's `internals.ariaLabel`.
-    const internalLegendText = slottedLabelText || this.label || null;
+    //
+    // Codex round-23 P2 (Finding A): the slot precedence must hold even when
+    // the slot is whitespace-only or empty. Previously `slottedLabelText ||
+    // this.label` fell through to the property when the slot trimmed to '',
+    // which diverged from the visible legend (the slot suppresses fallback
+    // text via `<slot name="label">${this.label}</slot>` — the slot's
+    // assigned-node trail wins, so the rendered legend stays empty too). Use
+    // the slot's *assigned-node presence* as the precedence signal: any
+    // assigned nodes mean the slot is in use, so the property must NOT leak
+    // into `internals.ariaLabel`. Empty-string slots resolve to `null` (no
+    // accessible name) — the same outcome the visible legend produces.
+    const internalLegendText = labelSlotHasAssignedNodes
+      ? slottedLabelText || null
+      : this.label || null;
     if (hostAriaLabel) {
       internals.ariaLabel = hostAriaLabel;
     } else if (!this.getAttribute('aria-labelledby')) {

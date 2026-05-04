@@ -1269,5 +1269,59 @@ describe('hx-checkbox-group', () => {
       const internals = (el as unknown as { _internals: ElementInternals })._internals;
       expect(internals.ariaLabel).toBe('Public');
     });
+
+    // ─── Codex round-23 P2 (Finding A): empty slot still wins over label property ───
+    it('fallback path: empty slot label suppresses label property fallback in internals.ariaLabel', async () => {
+      // Codex round-23 P2 regression: a whitespace-only or empty
+      // `<span slot="label">` previously trimmed to '' and let the resolution
+      // fall through to `this.label`, so the host announced the property name
+      // ("Internal") while the rendered legend stayed empty (the slot
+      // suppresses fallback content whenever it has assigned nodes). The fix
+      // gates precedence on assigned-node *presence*, not on the trimmed text.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Internal">
+          <span slot="label"></span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      // The slot has assigned nodes (an empty span), so it wins. The trimmed
+      // text is '', so the fallback ariaLabel is null — same outcome AT sees
+      // for the visible legend (which renders the empty span and nothing
+      // else; the property fallback is suppressed by the slot's presence).
+      expect(internals.ariaLabel).toBeNull();
+    });
+
+    // ─── Codex round-23 P2 (Finding B): in-place error/help slot edits resync ariaDescription ───
+    it('fallback path: in-place slotted error textContent edits resync internals.ariaDescription', async () => {
+      // Codex round-23 P2 regression: `internals.ariaDescription` is a
+      // one-shot snapshot. An in-place `textContent` rewrite on an already
+      // assigned `<slot name="error">` node does NOT fire `slotchange`, so a
+      // separate `MutationObserver` over the slot's assigned nodes is
+      // required to replay `_syncHostAriaSemantics()` and refresh the
+      // fallback `internals.ariaDescription` string.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <span slot="error">Original error</span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDescription).toContain('Original error');
+
+      const slottedError = el.querySelector('[slot="error"]') as HTMLSpanElement;
+      slottedError.textContent = 'Updated error';
+      // The observer schedules a microtask; await one to flush.
+      await Promise.resolve();
+
+      expect(internals.ariaDescription).toContain('Updated error');
+      expect(internals.ariaDescription).not.toContain('Original error');
+    });
   });
 });

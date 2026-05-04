@@ -1452,5 +1452,35 @@ describe('hx-radio-group', () => {
       expect(internals.ariaDescription).toBeTruthy();
       expect(internals.ariaDescription).toContain('Pick a color');
     });
+
+    // ─── Codex round-23 P2 (Finding C): in-place error/help slot edits resync ariaDescription ───
+    it('fallback path: in-place slotted error textContent edits resync internals.ariaDescription', async () => {
+      // Codex round-23 P2 regression: `internals.ariaDescription` is a
+      // one-shot snapshot. An in-place `textContent` rewrite on an already
+      // assigned `<slot name="error">` node does NOT fire `slotchange`, so a
+      // separate `MutationObserver` over the slot's assigned nodes is
+      // required to replay `_syncHostAriaSemantics()` and refresh the
+      // fallback `internals.ariaDescription` string. Mirrors the round-21 P3
+      // label-slot observer pattern in hx-checkbox-group.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color">
+          <span slot="error">Original error</span>
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaDescription).toContain('Original error');
+
+      const slottedError = el.querySelector('[slot="error"]') as HTMLSpanElement;
+      slottedError.textContent = 'Updated error';
+      // The observer schedules a microtask; await one to flush.
+      await Promise.resolve();
+
+      expect(internals.ariaDescription).toContain('Updated error');
+      expect(internals.ariaDescription).not.toContain('Original error');
+    });
   });
 });

@@ -188,6 +188,15 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
   private _handleErrorSlotChange(e: Event): void {
     if (!(e.target instanceof HTMLSlotElement)) return;
     this._hasErrorSlot = e.target.assignedNodes({ flatten: true }).length > 0;
+    // Codex round-23 P2 (Finding C): re-tune the in-place text observer over
+    // the new assigned-node set so in-place `textContent` rewrites of slotted
+    // error nodes resync `internals.ariaDescription` on the no-IDL-ref
+    // fallback path. `slotchange` only fires when the *node set* changes;
+    // mutating an already-assigned node's text does not, so a separate
+    // observer is required. Mirrors the round-21 P3 label-slot observer in
+    // hx-checkbox-group.
+    this._installErrorSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
   }
 
   /**
@@ -200,6 +209,78 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
   private _handleHelpSlotChange(e: Event): void {
     if (!(e.target instanceof HTMLSlotElement)) return;
     this._hasHelpSlot = e.target.assignedNodes({ flatten: true }).length > 0;
+    // Codex round-23 P2 (Finding C): same pattern as the error slot — keep
+    // `internals.ariaDescription` in sync with in-place text edits on already
+    // assigned help-text nodes.
+    this._installHelpSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Watches assigned `<slot name="help-text">` nodes for in-place text
+   * mutations so the no-IDL-ref fallback `internals.ariaDescription` stays in
+   * sync when a framework rewrites `textContent` of an already-assigned node
+   * without replacing it. `slotchange` does NOT fire for those mutations, so
+   * a separate observer is required. Codex round-23 P2 (Finding C).
+   * @internal
+   */
+  private _helpSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * Watches assigned `<slot name="error">` nodes for in-place text mutations
+   * so the no-IDL-ref fallback `internals.ariaDescription` stays in sync when
+   * a framework rewrites `textContent` of an already-assigned node without
+   * replacing it. Codex round-23 P2 (Finding C).
+   * @internal
+   */
+  private _errorSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * help-text-slot nodes. Codex round-23 P2 (Finding C).
+   * @internal
+   */
+  private _installHelpSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._helpSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._helpSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._helpSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * error-slot nodes. Codex round-23 P2 (Finding C).
+   * @internal
+   */
+  private _installErrorSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._errorSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._errorSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._errorSlotTextObserver = observer;
   }
 
   /**
@@ -298,6 +379,12 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     // host is being torn down.
     this._childDisabledObserver?.disconnect();
     this._childDisabledObserver = null;
+    // Codex round-23 P2 (Finding C): tear down the help/error slot text
+    // observers so detached assigned nodes stop firing into a torn-down host.
+    this._helpSlotTextObserver?.disconnect();
+    this._helpSlotTextObserver = null;
+    this._errorSlotTextObserver?.disconnect();
+    this._errorSlotTextObserver = null;
     // Release suppression on every previously-tracked child so they regain
     // stand-alone behaviour if re-parented or kept in the document after the
     // group is removed. Codex round-3 finding #1 (defense-in-depth).
