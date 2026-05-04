@@ -279,11 +279,15 @@ export const helixNavItemStyles = css`
       border-color: Highlight;
     }
 
-    :host([disabled]) {
-      opacity: 1;
-    }
-
+    /*
+     * Reset opacity on the SAME selector that sets it (.nav-item__link, line
+     * 109) — the original :host([disabled]) reset was scoped to the host and
+     * therefore had no effect on the link's 0.5 opacity. In forced-colors mode
+     * GrayText must render at full opacity to preserve the system contrast
+     * contract (WCAG 2.1 AA non-text contrast).
+     */
     :host([disabled]) .nav-item__link {
+      opacity: 1;
       color: GrayText;
       border-color: GrayText;
     }
