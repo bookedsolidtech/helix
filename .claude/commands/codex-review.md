@@ -2,17 +2,17 @@
 description: Run an adversarial review of the current branch via the Codex plugin (GPT-5.4). First-class step in the REA engineering process.
 argument-hint: "[diff-target]"
 allowed-tools:
-  - Agent
   - Bash(git diff:*)
   - Bash(git log:*)
   - Bash(git branch:*)
   - Bash(git rev-parse:*)
   - Read
+  - Agent
 ---
 
 # /codex-review — Adversarial Review via Codex
 
-Invokes the Codex plugin (`/codex adversarial-review`) on the current branch's diff, captures the result, and records it to the REA audit log. Adversarial review by an independent model (GPT-5.4) is a **first-class, non-optional step** in the REA engineering process — it is the counterweight to Opus-authored code.
+Invokes the Codex plugin (`/codex:adversarial-review`) on the current branch's diff, captures the result, and records it to the REA audit log. Adversarial review by an independent model (GPT-5.4) is a **first-class, non-optional step** in the REA engineering process — it is the counterweight to Opus-authored code.
 
 ## Why this exists
 
@@ -53,25 +53,23 @@ Invoke the `codex-adversarial` agent with:
 - The commit log summary
 - The full diff text
 
-The agent wraps `/codex adversarial-review` and returns structured findings.
+The agent wraps `/codex:adversarial-review` and returns structured findings.
 
-## Step 3 — Record to audit log
+## Step 3 — Verify audit entry — REQUIRED
 
-Every Codex invocation produces an audit entry. The `codex-adversarial` agent writes it via the middleware chain automatically, but verify the entry was recorded:
+The `codex-adversarial` agent **MUST** emit an audit entry for every invocation. This is the same contract documented in `agents/codex-adversarial.md` Step 4 and matches the runtime behavior of `rea hook push-gate` (which always calls `appendAuditRecord` on a completed review — see `src/hooks/push-gate/index.ts`'s `EVT_REVIEWED` path).
+
+Verify the entry was written:
 
 ```bash
 tail -n 1 .rea/audit.jsonl
 ```
 
-The entry must include:
+The expected entry has `tool_name: "codex.review"`, `server_name: "codex"`, and `metadata` containing `head_sha`, `target`, `finding_count`, and `verdict`. If the entry is missing, the review **did not complete its contract** — surface that to the user as a failure.
 
-- `tool: "codex-adversarial-review"`
-- `head_sha: <SHA>`
-- `target: <ref>`
-- `finding_count: <N>`
-- `verdict: pass | concerns | blocking`
+**Why audit emission is required even though the pre-push gate is stateless:** the 0.11.0 push-gate decides pass/fail on Codex's live verdict, not on a receipt in the audit log — but the audit record is still the operator's only forensic trail for an interactive `/codex-review` run. Without it, "did this review actually happen" becomes unanswerable, which is exactly the failure mode helixir flagged across rounds 65/66/73 in the 0.13–0.17 cycle. Runtime always emits; the agent always emits; the slash command verifies. Three checkpoints, one contract.
 
-If the audit entry is missing, report it clearly — do not proceed as if the review happened.
+(Earlier docs in 0.15+ said this step was "optional"; that wording contradicted both the agent's Step 4 and the runtime behavior of `safeAppend` in `src/hooks/push-gate/index.ts`. Reconciled in 0.18.0 — helixir Finding #6 across cycles 1–7.)
 
 ## Step 4 — Report
 
@@ -91,12 +89,10 @@ If the verdict is `blocking`, state plainly: "Do not merge until the blocking fi
 
 ## Pre-merge usage
 
-The recommended BST workflow runs `/codex-review` twice:
+This command is the **interactive** Codex adversarial review. The **pre-push** gate at `rea hook push-gate` runs Codex independently on every push — you do not need to run `/codex-review` to "prime" the push-gate. The two are complementary:
 
-1. After implementation, on the feature branch — catches issues early
-2. Immediately before merge, on the PR branch — records a fresh audit entry that the `push-review-gate` hook can check for freshness
-
-Both invocations are cheap. Run both.
+- `/codex-review` — rich, interactive review output in the chat. Use during implementation to catch issues early, at review checkpoints, or whenever you want Codex's read on a specific diff.
+- `rea hook push-gate` (wired to `.husky/pre-push`) — fresh Codex review on every push. If Codex surfaces blocking/concerns findings, the push exits 2; Claude reads `.rea/last-review.json`, fixes, and pushes again.
 
 ## Constraints
 

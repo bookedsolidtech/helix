@@ -29,23 +29,24 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── HALT check ────────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
-FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
-CONTENT_WRITE=$(printf '%s' "$INPUT" | jq -r '.tool_input.content // empty' 2>/dev/null)
-CONTENT_EDIT=$(printf '%s' "$INPUT"  | jq -r '.tool_input.new_string // empty' 2>/dev/null)
+# 0.16.0: payload extraction moved to `_lib/payload-read.sh`. The shared
+# helpers handle Write content / Edit new_string / MultiEdit edits[] /
+# NotebookEdit new_source with the same defensive type-guards. Adding
+# the next write-tier tool is a one-line edit there, not a sweep
+# across N hooks.
+# shellcheck source=_lib/payload-read.sh
+source "$(dirname "$0")/_lib/payload-read.sh"
 
-if [[ -n "$CONTENT_WRITE" ]]; then
-  CONTENT="$CONTENT_WRITE"
-elif [[ -n "$CONTENT_EDIT" ]]; then
-  CONTENT="$CONTENT_EDIT"
-else
+FILE_PATH=$(extract_file_path "$INPUT")
+CONTENT=$(extract_write_content "$INPUT")
+
+if [[ -z "$CONTENT" ]]; then
   exit 0
 fi
 

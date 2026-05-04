@@ -23,13 +23,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
 # ── 4. Extract file path from payload ─────────────────────────────────────────
 FILE_PATH=$(printf '%s' "$INPUT" | jq -r '.tool_input.file_path // empty' 2>/dev/null)
@@ -100,18 +98,52 @@ AGENT_WRITABLE=(
   '.rea/audit/'
 )
 
-normalize_path() {
-  local p="$1"
-  local root="$REA_ROOT"
-  if [[ "$p" == "$root"/* ]]; then
-    p="${p#$root/}"
-  fi
-  p=$(printf '%s' "$p" | sed 's/%2[Ff]/\//g; s/%2[Ee]/./g; s/%20/ /g')
-  p="${p#./}"
-  printf '%s' "$p"
-}
+# 0.16.0: normalize_path migrated to shared `_lib/path-normalize.sh`.
+# Both this hook AND settings-protection.sh consume the same helper
+# so URL-decoding / backslash-translation / `./`-stripping cannot
+# drift between them again.
+# shellcheck source=_lib/path-normalize.sh
+source "$(dirname "$0")/_lib/path-normalize.sh"
 
 NORMALIZED=$(normalize_path "$FILE_PATH")
+
+# ── 5a. Path-traversal rejection (0.14.0 iron-gate fix) ───────────────────────
+# Reject any path containing a `..` segment BEFORE the literal-match below.
+# Without this, `foo/../CODEOWNERS` would get past `normalize_path()` (which
+# only strips leading project root + URL-decodes) and the literal-match
+# loop would compare `foo/../CODEOWNERS` against the literal `CODEOWNERS`
+# entry — which doesn't match, so the policy lets the write through. The
+# downstream Write/Edit tool then resolves the traversal and writes to
+# `CODEOWNERS` anyway, defeating the gate.
+#
+# Mirrors settings-protection.sh §5a (which has had this guard since
+# 0.10.x). Both pre- and post-decode forms are checked because
+# normalize_path() URL-decodes earlier and an attacker could split the
+# traversal across encodings (`%2E%2E/`, `..%2F`, etc.).
+raw_has_traversal=0
+norm_has_traversal=0
+case "/$FILE_PATH/" in
+  */../*) raw_has_traversal=1 ;;
+esac
+case "/$NORMALIZED/" in
+  */../*) norm_has_traversal=1 ;;
+esac
+# Also catch URL-encoded traversal in case some tool routes raw-encoded
+# paths through here (e.g. file:// inputs). normalize_path()'s decoder
+# only handles a fixed set; an unrecognized encoding would slip past.
+case "$FILE_PATH" in
+  *%2[Ee]%2[Ee]*|*%2[Ee].*|*.%2[Ee]*) raw_has_traversal=1 ;;
+esac
+if [[ "$raw_has_traversal" -eq 1 ]] || [[ "$norm_has_traversal" -eq 1 ]]; then
+  {
+    printf 'BLOCKED PATH: path traversal rejected\n'
+    printf '\n'
+    printf '  File: %s\n' "$FILE_PATH"
+    printf "  Rule: path contains a '..' segment; rewrite to a canonical\n"
+    printf '        project-relative path without traversal.\n'
+  } >&2
+  exit 2
+fi
 
 for writable in "${AGENT_WRITABLE[@]}"; do
   if [[ "$NORMALIZED" == "$writable" ]] || [[ "$NORMALIZED" == "$writable"* && "$writable" == */ ]]; then
@@ -172,5 +204,42 @@ for blocked in "${BLOCKED_PATHS[@]}"; do
     exit 2
   fi
 done
+
+# ── 0.16.0 fix H.2: intermediate-symlink resolution ──────────────────────────
+# Same shape as Helix Finding 2 against blocked_paths policy entries.
+# If `secrets/` is in blocked_paths and an attacker creates
+# `pretty/ -> ../secrets/`, then writes `pretty/foo`, the literal-match
+# loop above sees `pretty/foo` (no match) and exits 0 — the downstream
+# Write tool follows the symlink and lands the body in `secrets/foo`.
+# Mirrors settings-protection.sh §6c.
+if [[ -e "$FILE_PATH" || -d "$(dirname -- "$FILE_PATH")" ]]; then
+  parent_dir=$(dirname -- "$FILE_PATH")
+  if [[ -d "$parent_dir" ]]; then
+    resolved_parent=$(cd -P -- "$parent_dir" 2>/dev/null && pwd -P 2>/dev/null) || resolved_parent=""
+    if [[ -n "$resolved_parent" && "$resolved_parent" == "$REA_ROOT"/* ]]; then
+      relative_resolved="${resolved_parent#"$REA_ROOT"/}"
+      resolved_target="${relative_resolved}/$(basename -- "$FILE_PATH")"
+      resolved_target_lc=$(printf '%s' "$resolved_target" | tr '[:upper:]' '[:lower:]')
+      for blocked in "${BLOCKED_PATHS[@]}"; do
+        blocked_lc=$(printf '%s' "$blocked" | tr '[:upper:]' '[:lower:]')
+        if [[ "$resolved_target_lc" == "$blocked_lc" ]] || \
+           { [[ "$blocked_lc" == */ ]] && [[ "$resolved_target_lc" == "$blocked_lc"* ]]; }; then
+          {
+            printf 'BLOCKED PATH: intermediate-symlink resolution blocked\n'
+            printf '\n'
+            printf '  Logical:  %s\n' "$FILE_PATH"
+            printf '  Resolved: %s\n' "$resolved_target"
+            printf '  Blocked by: %s\n' "$blocked"
+            printf '  Source: .rea/policy.yaml → blocked_paths\n'
+            printf '\n'
+            printf '  Rule: an intermediate directory of the path is a symlink\n'
+            printf '        whose target falls inside a blocked policy entry.\n'
+          } >&2
+          exit 2
+        fi
+      done
+    fi
+  fi
+fi
 
 exit 0
