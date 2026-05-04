@@ -1161,5 +1161,61 @@ describe('hx-checkbox-group', () => {
       expect(internals.ariaLabel).toBe('Topics');
       expect(internals.ariaLabel).not.toContain('*');
     });
+
+    // ─── Codex round-21 P3: in-place slotted label textContent edits ───
+    it('fallback path: in-place slotted label textContent edits resync host ariaLabel', async () => {
+      // Codex round-21 P3 regression: an in-place rewrite such as
+      // `labelNode.textContent = 'New label'` does NOT fire `slotchange`,
+      // so the no-IDL-ref fallback `internals.ariaLabel` would otherwise
+      // keep announcing the stale name (Firefox today). A MutationObserver
+      // over the slot's assigned nodes (`characterData`/`childList`/
+      // `subtree`) catches the edit and replays `_syncHostAriaSemantics()`
+      // so the fallback name updates within a microtask.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group>
+          <span slot="label">Old Label</span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Old Label');
+
+      // In-place textContent rewrite — same node, no slotchange.
+      const slottedLabel = el.querySelector('[slot="label"]') as HTMLSpanElement;
+      slottedLabel.textContent = 'New Label';
+
+      // The observer schedules a microtask; await one to flush.
+      await Promise.resolve();
+      // _syncHostAriaSemantics ran via the observer; verify the fallback name
+      // mirrors the new content.
+      expect(internals.ariaLabel).toBe('New Label');
+    });
+
+    it('fallback path: nested DOM edits inside slotted label resync host ariaLabel', async () => {
+      // The observer subtree is enabled, so descendant text mutations within
+      // a slotted wrapper element also trigger the resync. This guards
+      // frameworks that render the legend through a wrapper element and
+      // mutate a child text node in place.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group>
+          <span slot="label"><strong>Old Strong</strong></span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Old Strong');
+
+      const strong = el.querySelector('[slot="label"] strong') as HTMLElement;
+      strong.textContent = 'New Strong';
+      await Promise.resolve();
+
+      expect(internals.ariaLabel).toBe('New Strong');
+    });
   });
 });

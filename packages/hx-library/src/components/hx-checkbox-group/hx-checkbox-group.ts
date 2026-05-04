@@ -188,6 +188,56 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   private _handleLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlot = slot.assignedNodes().length > 0;
+    // Codex round-21 P3: re-tune the in-place text observer over the new
+    // assigned-node set. `slotchange` fires when the node *set* changes; the
+    // observer below catches `textContent` rewrites on already-assigned nodes
+    // (which do NOT fire `slotchange`). Re-installing here resets the watch
+    // so detached nodes stop firing into a torn-down host and newly assigned
+    // nodes contribute to the host's fallback `internals.ariaLabel` resync.
+    this._installLabelSlotTextObserver(slot);
+    // Pick up any text-content changes that landed alongside the slot
+    // mutation in the same task — _syncHostAriaSemantics reads the slot's
+    // assigned-nodes textContent for the no-IDL-ref fallback ariaLabel.
+    this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Watches assigned `<slot name="label">` nodes for in-place text mutations
+   * so the no-IDL-ref fallback `internals.ariaLabel` stays in sync when a
+   * framework rewrites `textContent` of an already-assigned node without
+   * replacing it. `slotchange` does NOT fire for those mutations, so a
+   * separate observer is required. Codex round-21 P3 (mirrors the
+   * `hx-toggle-button` pattern from round-13 P2).
+   * @internal
+   */
+  private _labelSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * label-slot nodes. Disconnects any prior observer first so detached nodes
+   * stop firing into a torn-down host. Codex round-21 P3.
+   * @internal
+   */
+  private _installLabelSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._labelSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._labelSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      // Resync host ARIA semantics: the fallback `internals.ariaLabel` is
+      // derived from the slot's assigned-nodes `textContent`, so an in-place
+      // edit must replay the resolution that ran at first paint.
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._labelSlotTextObserver = observer;
   }
 
   /**
@@ -259,6 +309,10 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     this.removeEventListener('hx-change', this._handleCheckboxChange);
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
+    // Codex round-21 P3: tear down the slot-label text observer so detached
+    // assigned nodes stop firing into a torn-down host.
+    this._labelSlotTextObserver?.disconnect();
+    this._labelSlotTextObserver = null;
     // Release suppression on every previously-tracked child so they regain
     // stand-alone form participation if re-parented or kept in the document
     // after the group is removed. Codex round-3 finding #1.
