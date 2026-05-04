@@ -17,6 +17,30 @@ import {
 
 const _nextRadioGroupId = createIdCounter('hx-radio-group');
 
+/**
+ * Reads visible text from a shadow wrapper that contains a `<slot>`. Prefers
+ * the slot's flattened assigned-nodes text when light DOM is projected,
+ * otherwise falls back to the wrapper's own `textContent` (so property-driven
+ * fallback content rendered inside the slot is still readable). Codex
+ * round-23 P2 (Finding C): a wrapper-element `textContent` read does NOT
+ * cross the shadow → light-DOM slot boundary, so the previous direct
+ * `textContent` mirror returned empty when a consumer slotted help/error
+ * content instead of using the property.
+ */
+function readSlottedOrShadowText(wrapper: Element): string {
+  const slot = wrapper.querySelector('slot');
+  if (slot) {
+    const assigned = (slot as HTMLSlotElement).assignedNodes({ flatten: true });
+    if (assigned.length > 0) {
+      return assigned
+        .map((node) => node.textContent ?? '')
+        .join('')
+        .trim();
+    }
+  }
+  return (wrapper.textContent ?? '').trim();
+}
+
 /** Detail for the hx-change event dispatched by hx-radio-group. */
 export interface HxRadioGroupChangeDetail {
   value: string;
@@ -573,11 +597,17 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       // independent of element references and survives the shadow boundary.
       // Empty strings are normalized to `null` so AT does not announce an
       // empty description.
+      // Codex round-23 P2 (Finding C): use a slot-aware text read so slotted
+      // help/error content surfaces into `internals.ariaDescription` —
+      // wrapper `textContent` does NOT cross the shadow → light-DOM slot
+      // boundary. The new help/error slot text observers (above) keep this
+      // in sync when a framework rewrites the slotted node's textContent in
+      // place.
       const helpText =
         helpEl && !hasError && (this.helpText || this._hasHelpSlot)
-          ? (helpEl.textContent ?? '').trim()
+          ? readSlottedOrShadowText(helpEl)
           : '';
-      const errorText = errorEl && hasError ? (errorEl.textContent ?? '').trim() : '';
+      const errorText = errorEl && hasError ? readSlottedOrShadowText(errorEl) : '';
       const internalDescriptionText = [helpText, errorText].filter(Boolean).join(' ');
       internals.ariaDescription = internalDescriptionText || null;
     }
