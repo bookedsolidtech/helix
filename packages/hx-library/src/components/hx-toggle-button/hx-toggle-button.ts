@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
+import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
 
 /** Detail for the hx-toggle event dispatched by hx-toggle-button. */
 export interface HxToggleDetail {
@@ -199,6 +200,55 @@ export class HelixToggleButton extends HelixElement {
       changedProperties.has('required')
     ) {
       this._syncFormValue();
+    }
+
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Mirrors toggle-button semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-toggle-button>` reach the announced control. The codex aria-group-2
+   * finding identified that the inner shadow `<button>` was the only carrier of
+   * the toggle role + pressed state, leaving host-level IDREF tokens stranded
+   * across the shadow boundary.
+   *
+   * The shadow `<button>` keeps `aria-pressed`/`aria-label` mirrored for
+   * backwards-compat with existing tests and for browsers without IDL element
+   * references; the host is the canonical announced surface.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'button';
+    internals.ariaPressed = this.pressed ? 'true' : 'false';
+    internals.ariaDisabled = this.disabled ? 'true' : 'false';
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!this.getAttribute('aria-labelledby')) {
+      internals.ariaLabel = this.label ?? null;
+    } else {
+      internals.ariaLabel = null;
+    }
+
+    if (supportsIdrefElementReferences(internals)) {
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+
+      const externalLabelTokens = this.getAttribute('aria-labelledby');
+      const externalDescTokens = this.getAttribute('aria-describedby');
+
+      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
+
+      const descEls = resolveIdrefTokens(this, externalDescTokens);
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
     }
   }
 

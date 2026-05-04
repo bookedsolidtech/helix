@@ -679,4 +679,58 @@ describe('hx-toggle-button', () => {
       expect(btn.classList.contains('button--sm')).toBe(false);
     });
   });
+
+  // ─── ARIA delegation: host semantics ───
+  //
+  // Codex aria-group-2 finding: APG toggle-button semantics must reach the
+  // host so consumer-supplied aria-label / aria-labelledby / aria-describedby
+  // on <hx-toggle-button> aren't trapped behind the shadow boundary.
+
+  describe('ARIA delegation: host semantics', () => {
+    it('exposes role="button" via ElementInternals on the host', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('button');
+    });
+
+    it('mirrors ariaPressed on host as pressed toggles', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaPressed).toBe('false');
+      el.pressed = true;
+      await el.updateComplete;
+      expect(internals.ariaPressed).toBe('true');
+    });
+
+    it('mirrors disabled to host ariaDisabled', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute" disabled></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDisabled).toBe('true');
+      el.disabled = false;
+      await el.updateComplete;
+      expect(internals.ariaDisabled).toBe('false');
+    });
+
+    it('mirrors label property to host ariaLabel when no aria-labelledby is set', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Mute');
+    });
+
+    it('prefers consumer-supplied aria-label over the label property', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Ignored" aria-label="Custom"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Custom');
+    });
+  });
 });
