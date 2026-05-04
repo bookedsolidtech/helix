@@ -8,7 +8,12 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixRadio } from './hx-radio.js';
-import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextRadioGroupId = createIdCounter('hx-radio-group');
 
@@ -188,18 +193,40 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     this._hasHelpSlot = e.target.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /**
+   * Handle for the shared IDREF observer. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Deferred copy of `error` driven through reactive state so the persistent
+   * live region can re-announce on transitions without direct DOM mutation.
+   * Codex round-1 finding #10.
+   * @internal
+   */
+  @state() private _announcedError = '';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('hx-radio-select', this._handleRadioSelect);
     this.addEventListener('keydown', this._handleKeydown);
+    // Seed root-independent semantics from connect so the host announces the
+    // radiogroup role before first paint.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('hx-radio-select', this._handleRadioSelect);
     this.removeEventListener('keydown', this._handleKeydown);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -213,17 +240,20 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     }
     // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
     this._syncHostAriaSemantics();
-    // Force screen reader re-announcement when error text changes (a11y-v3-005).
-    if (changedProperties.has('error') && this.error) {
-      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
-      if (errorEl) {
-        const msg = this.error;
+    // Codex round-1 finding #10: drive re-announcement from reactive state
+    // so the persistent live region stays in the shadow tree across error
+    // transitions. Direct `textContent` mutation would delete the slot
+    // subtree the renderer just produced.
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string;
+      if (previousError && this.error) {
+        // Error→error: clear then re-set after rAF so AT re-announces.
+        this._announcedError = '';
         requestAnimationFrame(() => {
-          errorEl.textContent = '';
-          requestAnimationFrame(() => {
-            errorEl.textContent = msg;
-          });
+          this._announcedError = this.error;
         });
+      } else {
+        this._announcedError = this.error;
       }
     }
   }
@@ -499,6 +529,8 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     } else {
       this._internals.setValidity({});
     }
+    // Codex round-1 finding #6: re-sync host ARIA after every setValidity().
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -538,22 +570,11 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       'fieldset--required': this.required,
     };
 
-    // help-text first, error appended — assistive tech announces guidance
-    // before validation feedback.
-    const describedByIds = [hasHelp ? this._helpTextId : null, hasError ? this._errorId : null]
-      .filter(Boolean)
-      .join(' ');
-    const describedBy = describedByIds || nothing;
-
     return html`
       <fieldset
         part="fieldset"
         class=${classMap(fieldsetClasses)}
-        role="radiogroup"
-        aria-labelledby=${this.label ? legendId : nothing}
-        aria-describedby=${describedBy}
-        aria-required=${this.required ? 'true' : nothing}
-        aria-invalid=${hasError ? 'true' : nothing}
+        role="presentation"
         aria-orientation=${this.orientation === 'horizontal' ? 'horizontal' : nothing}
       >
         ${this.label
@@ -583,7 +604,9 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
           role="alert"
           ?hidden=${!hasError}
         >
-          <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}
+            >${this._announcedError}</slot
+          >
         </div>
 
         <!--

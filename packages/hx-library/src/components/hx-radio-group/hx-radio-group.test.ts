@@ -49,14 +49,18 @@ describe('hx-radio-group', () => {
       expect(legend).toBeNull();
     });
 
-    it('has role="radiogroup" on shadow fieldset', async () => {
+    it('exposes role="radiogroup" on host via ElementInternals (codex aria-group-2)', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('radiogroup');
+      // Inner fieldset is presentation-only; its role attribute is removed
+      // so AT does not see two stacked radiogroup roles.
       const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.getAttribute('role')).toBe('radiogroup');
+      expect(fieldset?.getAttribute('role')).toBe('presentation');
     });
   });
 
@@ -606,14 +610,16 @@ describe('hx-radio-group', () => {
   // ─── Accessibility (4) ───
 
   describe('Accessibility', () => {
-    it('shadow fieldset has role="radiogroup"', async () => {
+    it('host carries role="radiogroup" via ElementInternals; inner fieldset is presentation', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('radiogroup');
       const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.getAttribute('role')).toBe('radiogroup');
+      expect(fieldset?.getAttribute('role')).toBe('presentation');
     });
 
     it('legend renders label text for accessible grouping', async () => {
@@ -638,66 +644,85 @@ describe('hx-radio-group', () => {
       expect(input?.getAttribute('aria-hidden')).toBe('true');
     });
 
-    it('sets aria-required on radiogroup when required', async () => {
+    it('sets host ariaRequired via internals when required', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" required>
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.getAttribute('aria-required')).toBe('true');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).toBe('true');
     });
 
-    it('does not set aria-required when not required', async () => {
+    it('does not set host ariaRequired="true" when not required', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.hasAttribute('aria-required')).toBe(false);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).not.toBe('true');
     });
 
-    it('sets aria-labelledby pointing to legend id', async () => {
+    it('host ariaLabelledByElements points to the visible legend (when no consumer aria-labelledby)', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="My Group">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
       const legend = shadowQuery(el, 'legend');
-      const labelledBy = fieldset?.getAttribute('aria-labelledby');
-      expect(labelledBy).toBeTruthy();
-      expect(legend?.id).toBe(labelledBy);
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs) {
+        // IDL element references — modern browsers.
+        expect(refs).toContain(legend);
+      } else {
+        // No-IDL-ref fallback: host ariaLabel mirrors the label property.
+        expect(internals.ariaLabel).toContain('My Group');
+      }
     });
 
-    it('sets aria-describedby to error id when error is present', async () => {
+    it('host ariaDescribedByElements references error wrapper when error is set', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" error="Required field">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby');
-      // WCAG 1.3.1: the _errorId is on the persistent wrapper div surrounding the error
-      // slot, not on the inner .fieldset__error element, so the ID stays stable whether
-      // error content comes from the slot or the property.
-      const errorWrapper = describedBy ? el.shadowRoot?.getElementById(describedBy) : null;
-      expect(describedBy).toBeTruthy();
-      expect(errorWrapper).toBeTruthy();
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const errorWrapper = shadowQuery<HTMLElement>(el, '.fieldset__error');
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(errorWrapper);
+      } else {
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).toContain(errorWrapper?.id);
+      }
     });
 
-    it('sets aria-describedby to help-text id when help text is present', async () => {
+    it('host ariaDescribedByElements references help-text wrapper when help text is set', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" help-text="Select one">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby');
-      const helpText = shadowQuery(el, '.fieldset__help-text');
-      expect(describedBy).toBeTruthy();
-      expect(helpText?.id).toBe(describedBy);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const helpText = shadowQuery<HTMLElement>(el, '.fieldset__help-text');
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(helpText);
+      } else {
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).toContain(helpText?.id);
+      }
     });
 
     it('checked radio has checked attribute reflected', async () => {
@@ -1103,20 +1128,41 @@ describe('hx-radio-group', () => {
       const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
       expect(helpDiv).toBeTruthy();
       expect(helpDiv.hasAttribute('hidden')).toBe(false);
-      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
-      expect(fieldset.getAttribute('aria-describedby')).toContain(helpDiv.id);
+      // Host carries the describedBy reference via internals; inner fieldset
+      // does not duplicate it.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(helpDiv);
+      } else {
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).toContain(helpDiv.id);
+      }
     });
 
-    it('aria-describedby orders help text before error', async () => {
+    it('host ariaDescribedByElements orders help text before error', async () => {
       const el = await fixture<HxRadioGroup>(
         `<hx-radio-group label="Color" help-text="Hint" error="Required"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
       );
       await el.updateComplete;
-      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
-      const tokens = fieldset.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
       const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
       const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
-      expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs.indexOf(helpDiv)).toBeLessThan(refs.indexOf(errorDiv));
+      } else {
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+      }
     });
 
     it('error live region is persistent in the shadow tree', async () => {

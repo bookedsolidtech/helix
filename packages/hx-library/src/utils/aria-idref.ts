@@ -91,3 +91,126 @@ export function mergeTokenLists(...lists: Array<string | null | undefined>): str
   }
   return out.length > 0 ? out.join(' ') : null;
 }
+
+/**
+ * Options accepted by `installAriaIdrefMirror()`.
+ */
+export interface AriaIdrefMirrorOptions {
+  /**
+   * Attribute names on the host whose mutations should trigger a resync.
+   * Defaults to `['aria-labelledby', 'aria-describedby', 'aria-label']` plus
+   * the `data-aria-*` mirrors used by `mixinDelegatesAria`.
+   */
+  observedAttributes?: string[];
+  /**
+   * Whether to observe the resolved root for `id` attribute and `childList`
+   * mutations so that late-inserted IDREF targets and id renames trigger a
+   * resync. Defaults to `true`.
+   */
+  observeRoot?: boolean;
+}
+
+/**
+ * Handle returned by `installAriaIdrefMirror()`. Call `disconnect()` from
+ * `disconnectedCallback()` to tear the observers down. `resync()` forces an
+ * immediate sync — useful from `connectedCallback()` after the host has been
+ * re-attached to a new root.
+ */
+export interface AriaIdrefMirrorHandle {
+  /** Force an immediate sync. */
+  resync(): void;
+  /** Tear down all observers and listeners. */
+  disconnect(): void;
+}
+
+/**
+ * Default attribute set observed on the host for ARIA / data-aria mirroring.
+ */
+const DEFAULT_HOST_OBSERVED_ATTRS: readonly string[] = [
+  'aria-label',
+  'aria-labelledby',
+  'aria-describedby',
+  'data-aria-label',
+  'data-aria-labelledby',
+  'data-aria-describedby',
+];
+
+/**
+ * Installs a `MutationObserver` pair that keeps host ARIA semantics in sync
+ * with mutations to consumer-supplied attributes AND late-target / id
+ * mutations in the host's resolved root.
+ *
+ * The `sync` callback is invoked on:
+ *   1. Initial install (synchronously)
+ *   2. Any change to one of the observed host attributes
+ *   3. Any `id` attribute mutation, child insertion, or child removal in the
+ *      resolved root (Document or ShadowRoot containing the host)
+ *
+ * Components should call this from `connectedCallback()` and call
+ * `handle.disconnect()` from `disconnectedCallback()`. The handle's
+ * `resync()` method is safe to call from any lifecycle hook.
+ *
+ * Costs are bounded: the host observer touches one element; the root
+ * observer is `subtree: true` but only listens for `id` and `childList`
+ * mutations which fire infrequently in practice.
+ */
+export function installAriaIdrefMirror(
+  host: Element,
+  sync: () => void,
+  options: AriaIdrefMirrorOptions = {},
+): AriaIdrefMirrorHandle {
+  const observedAttributes = options.observedAttributes ?? DEFAULT_HOST_OBSERVED_ATTRS;
+  const observeRoot = options.observeRoot ?? true;
+
+  // Observe consumer mutations to the host's ARIA / data-aria attributes.
+  // We do NOT use `observedAttributes`/`attributeChangedCallback` here because
+  // that requires class-level wiring that conflicts with downstream mixins
+  // (e.g. `mixinDelegatesAria` already commandeers `attributeChangedCallback`
+  // for the same attributes). A scoped `MutationObserver` is reentry-safe.
+  const hostObserver = new MutationObserver(() => sync());
+  hostObserver.observe(host, {
+    attributes: true,
+    attributeFilter: [...observedAttributes],
+  });
+
+  // Observe the host's resolved root so late-inserted targets and id renames
+  // re-resolve through the IDREF path. Re-attached on every resync since the
+  // host's root can change across DOM moves.
+  let rootObserver: MutationObserver | null = null;
+  let observedRoot: Document | ShadowRoot | null = null;
+
+  const attachRootObserver = (): void => {
+    if (!observeRoot) return;
+    const root = host.getRootNode();
+    if (!(root instanceof Document) && !(root instanceof ShadowRoot)) {
+      return;
+    }
+    if (root === observedRoot) return;
+    rootObserver?.disconnect();
+    rootObserver = new MutationObserver(() => sync());
+    rootObserver.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['id'],
+    });
+    observedRoot = root;
+  };
+
+  attachRootObserver();
+  // Initial sync — caller's `sync` reads the current attribute snapshot.
+  sync();
+
+  return {
+    resync(): void {
+      attachRootObserver();
+      sync();
+    },
+    disconnect(): void {
+      hostObserver.disconnect();
+      rootObserver?.disconnect();
+      rootObserver = null;
+      observedRoot = null;
+    },
+  };
+}

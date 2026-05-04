@@ -7,7 +7,12 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSwitchStyles } from './hx-switch.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
-import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextSwitchId = createIdCounter('hx-switch');
 
@@ -174,14 +179,84 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   @property({ attribute: 'required-message' })
   requiredMessage = 'This field is required.';
 
+  /**
+   * Handle for the shared IDREF observer. Installed in `connectedCallback()`
+   * so late-mutated `aria-labelledby`/`aria-describedby` and late-inserted
+   * IDREF targets are picked up. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * No-IDL-ref fallback tokens applied to the inner button so consumer
+   * labelling resolves through the shadow root. Tracked as reactive state
+   * so values flow through the next `render()`.
+   * @internal
+   */
+  @state() private _fallbackAriaLabelledBy: string | null = null;
+  /** @internal */
+  @state() private _fallbackAriaDescribedBy: string | null = null;
+  /** @internal */
+  @state() private _fallbackAriaLabel: string | null = null;
+
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Seed root-independent semantics so the host announces the switch role
+    // immediately on connect — before the first paint.
+    this._syncHostAriaSemantics();
+    // Codex round-1 finding #1: host is the canonical announced surface;
+    // make it the focus target so the inner `<button role=switch>` can be
+    // demoted via `aria-hidden + tabindex=-1` without violating the
+    // aria-hidden-focus rule.
+    if (!this.hasAttribute('tabindex') && !this.disabled) {
+      this.setAttribute('tabindex', '0');
+    }
+    this.addEventListener('keydown', this._handleHostKeyDown);
+    this.addEventListener('click', this._handleHostClick);
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this._handleHostKeyDown);
+    this.removeEventListener('click', this._handleHostClick);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  /** @internal */
+  private _handleHostKeyDown = (e: KeyboardEvent): void => {
+    if (this.disabled) return;
+    if (e.target !== this) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      this._toggle();
+    }
+  };
+
+  /** @internal */
+  private _handleHostClick = (e: MouseEvent): void => {
+    if (this.disabled) return;
+    const path = e.composedPath();
+    if (path[0] !== this) return;
+    this._toggle();
+  };
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
     }
-    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    if (changedProperties.has('disabled')) {
+      this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    }
+    // Re-resolve element references against the (possibly mutated) shadow
+    // tree. `_syncHostAriaSemantics()` is also invoked from `_updateValidity()`
+    // and by the IDREF mirror observer.
     this._syncHostAriaSemantics();
   }
 
@@ -239,6 +314,19 @@ export class HelixSwitch extends FormMixin(HelixElement) {
         descEls.push(errorEl);
       }
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+      // Clear fallback state when IDL refs are available so render() does not
+      // double-apply attributes.
+      this._fallbackAriaLabelledBy = null;
+      this._fallbackAriaDescribedBy = null;
+      this._fallbackAriaLabel = null;
+    } else {
+      // Codex round-1 finding #8: on no-IDL-ref browsers the inner `<button>`
+      // is the focus target and AT cannot reach host-level IDREFs. Mirror the
+      // consumer-supplied tokens onto the inner button so consumer wiring still
+      // resolves through the shadow root for shadow-internal IDs.
+      this._fallbackAriaLabelledBy = this.getAttribute('aria-labelledby') || null;
+      this._fallbackAriaDescribedBy = this.getAttribute('aria-describedby') || null;
+      this._fallbackAriaLabel = hostAriaLabel || null;
     }
   }
 
@@ -256,6 +344,10 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     } else {
       this._internals.setValidity({});
     }
+    // Codex round-1 finding #6: sync host ARIA semantics immediately after
+    // every `setValidity()` call so `internals.ariaInvalid` reflects the
+    // current `ValidityState` rather than the previous render snapshot.
+    this._syncHostAriaSemantics();
   }
 
   protected override _onFormReset(): void {
@@ -352,9 +444,13 @@ export class HelixSwitch extends FormMixin(HelixElement) {
 
   // ─── Public Methods ───
 
-  /** Moves focus to the switch track element. */
+  /**
+   * Moves focus to the host. Codex round-1 finding #1 relocated the focus
+   * target from the inner `<button role=switch>` to the host so that AT
+   * announces a single widget; the host carries the canonical role/state.
+   */
   override focus(options?: FocusOptions): void {
-    this._trackEl?.focus(options);
+    super.focus(options);
   }
 
   // ─── Render ───
@@ -396,6 +492,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
         .filter(Boolean)
         .join(' ') || undefined;
 
+    // Codex round-1 finding #8: merge consumer fallback tokens with the
+    // shadow-internal describedBy chain on browsers without IDL element
+    // references. Internal `_labelId` is preferred when no consumer
+    // labelledby tokens are supplied.
+    const innerDescribedBy =
+      [describedBy ?? null, this._fallbackAriaDescribedBy].filter(Boolean).join(' ') || undefined;
+    const innerLabelledBy = this._fallbackAriaLabelledBy ?? (hasLabel ? this._labelId : undefined);
+    const innerAriaLabel = this._fallbackAriaLabel ?? undefined;
+
     return html`
       <div part="switch" class=${classMap(containerClasses)}>
         <div class="switch__control-row">
@@ -404,12 +509,14 @@ export class HelixSwitch extends FormMixin(HelixElement) {
             class="switch__track"
             id=${this._switchId}
             type="button"
-            role="switch"
+            tabindex="-1"
             aria-checked=${this.checked ? 'true' : 'false'}
-            aria-labelledby=${ifDefined(hasLabel ? this._labelId : undefined)}
-            aria-describedby=${ifDefined(describedBy)}
+            aria-labelledby=${ifDefined(innerLabelledBy)}
+            aria-describedby=${ifDefined(innerDescribedBy)}
+            aria-label=${ifDefined(innerAriaLabel)}
             aria-invalid=${isInvalid ? 'true' : nothing}
             aria-required=${this.required ? 'true' : nothing}
+            aria-hidden="true"
             ?disabled=${this.disabled}
             @click=${this._handleClick}
             @keydown=${this._handleKeyDown}

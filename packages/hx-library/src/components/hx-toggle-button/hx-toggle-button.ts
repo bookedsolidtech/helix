@@ -1,11 +1,17 @@
-import { html, nothing, type PropertyValues } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
-import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 /** Detail for the hx-toggle event dispatched by hx-toggle-button. */
 export interface HxToggleDetail {
@@ -173,10 +179,102 @@ export class HelixToggleButton extends HelixElement {
     return this._internals.reportValidity();
   }
 
+  /**
+   * Handle for the shared IDREF observer. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Default-slot text content captured for use as the host's accessible name
+   * when no explicit `label`/`aria-label`/`aria-labelledby` is supplied.
+   * Codex round-1 finding #9.
+   * @internal
+   */
+  @state() private _slotLabelText: string = '';
+
+  /** No-IDL-ref fallback tokens applied to the inner button. @internal */
+  @state() private _fallbackAriaLabelledBy: string | null = null;
+  /** @internal */
+  @state() private _fallbackAriaDescribedBy: string | null = null;
+  /** @internal */
+  @state() private _fallbackAriaLabel: string | null = null;
+
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Seed root-independent semantics from the moment of connection so AT
+    // sees the toggle role + pressed state before the first paint.
+    this._syncHostAriaSemantics();
+    // Codex round-1 finding #1: host is the canonical announced surface;
+    // make it the focus target so the inner `<button>` can be demoted via
+    // `aria-hidden + tabindex=-1` without violating the aria-hidden-focus
+    // rule.
+    if (!this.hasAttribute('tabindex') && !this.disabled) {
+      this.setAttribute('tabindex', '0');
+    }
+    this.addEventListener('keydown', this._handleHostKeyDown);
+    this.addEventListener('click', this._handleHostClickRouted);
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this._handleHostKeyDown);
+    this.removeEventListener('click', this._handleHostClickRouted);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  /** @internal */
+  private _handleHostKeyDown = (e: KeyboardEvent): void => {
+    if (this.disabled) return;
+    if (e.target !== this) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      this._invokeToggle();
+    }
+  };
+
+  /**
+   * Host-level click router. The inner `<button>` is `aria-hidden + tabindex=-1`
+   * but still receives clicks via mouse activation; toggling is handled by
+   * the inner `_handleClick`. Host-level clicks (composed path origin === host)
+   * only come from AT activation or programmatic triggers, so we route those
+   * to the toggle pipeline.
+   * @internal
+   */
+  private _handleHostClickRouted = (e: MouseEvent): void => {
+    if (this.disabled) return;
+    // Only fire when the host itself originated the click — inner-button
+    // clicks bubble through here too but are handled by `_handleClick`.
+    const path = e.composedPath();
+    if (path[0] !== this) return;
+    this._invokeToggle();
+  };
+
+  /** @internal */
+  private _invokeToggle(): void {
+    this.pressed = !this.pressed;
+    this._syncFormValue();
+    this.dispatchEvent(
+      new CustomEvent<{ pressed: boolean }>('hx-toggle', {
+        bubbles: true,
+        composed: true,
+        detail: { pressed: this.pressed },
+      }),
+    );
+  }
 
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
+
+    // Track default-slot text content so it can serve as the accessible
+    // name when no explicit label is set. Codex round-1 finding #9.
+    this._captureSlotLabelText();
 
     if (!this.label) {
       const slot = this._defaultSlot;
@@ -202,7 +300,37 @@ export class HelixToggleButton extends HelixElement {
       this._syncFormValue();
     }
 
+    if (changedProperties.has('disabled')) {
+      this.setAttribute('tabindex', this.disabled ? '-1' : '0');
+    }
+
     // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Reads the default slot's flattened text content into `_slotLabelText`.
+   * Called from `firstUpdated()` and `slotchange` so host-canonical semantics
+   * pick up slotted label text. Codex round-1 finding #9.
+   * @internal
+   */
+  private _captureSlotLabelText(): void {
+    const slot = this._defaultSlot;
+    if (!slot) {
+      this._slotLabelText = '';
+      return;
+    }
+    const text = slot
+      .assignedNodes({ flatten: true })
+      .map((n) => n.textContent ?? '')
+      .join(' ')
+      .trim();
+    this._slotLabelText = text;
+  }
+
+  /** @internal */
+  private _handleDefaultSlotChange(): void {
+    this._captureSlotLabelText();
     this._syncHostAriaSemantics();
   }
 
@@ -224,15 +352,28 @@ export class HelixToggleButton extends HelixElement {
     internals.role = 'button';
     internals.ariaPressed = this.pressed ? 'true' : 'false';
     internals.ariaDisabled = this.disabled ? 'true' : 'false';
+    // Codex round-1 finding #6: drive aria-invalid from the live ValidityState
+    // so a required-but-unpressed toggle is announced as invalid even before
+    // any visible affordance renders. `_updateValidity()` calls this method
+    // synchronously after every `setValidity()`.
+    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
 
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const hasLabelledBy = !!this.getAttribute('aria-labelledby');
+    let resolvedLabel: string | null;
     if (hostAriaLabel) {
-      internals.ariaLabel = hostAriaLabel;
-    } else if (!this.getAttribute('aria-labelledby')) {
-      internals.ariaLabel = this.label ?? null;
+      resolvedLabel = hostAriaLabel;
+    } else if (hasLabelledBy) {
+      resolvedLabel = null;
+    } else if (this.label) {
+      resolvedLabel = this.label;
     } else {
-      internals.ariaLabel = null;
+      // Codex round-1 finding #9: default-slot text becomes the accessible
+      // name when no explicit label is provided. Without this, slotted text
+      // never reaches the host's announced surface.
+      resolvedLabel = this._slotLabelText || null;
     }
+    internals.ariaLabel = resolvedLabel;
 
     if (supportsIdrefElementReferences(internals)) {
       type InternalsWithRefs = ElementInternals & {
@@ -249,6 +390,16 @@ export class HelixToggleButton extends HelixElement {
 
       const descEls = resolveIdrefTokens(this, externalDescTokens);
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+      // Clear fallbacks when IDL refs are available.
+      this._fallbackAriaLabelledBy = null;
+      this._fallbackAriaDescribedBy = null;
+      this._fallbackAriaLabel = null;
+    } else {
+      // Codex round-1 finding #8: mirror consumer tokens onto the inner
+      // button so it has an accessible name on no-IDL-ref browsers.
+      this._fallbackAriaLabelledBy = this.getAttribute('aria-labelledby') || null;
+      this._fallbackAriaDescribedBy = this.getAttribute('aria-describedby') || null;
+      this._fallbackAriaLabel = resolvedLabel;
     }
   }
 
@@ -291,6 +442,9 @@ export class HelixToggleButton extends HelixElement {
     } else {
       this._internals.setValidity({});
     }
+    // Codex round-1 finding #6: keep `internals.ariaInvalid` aligned with the
+    // current `ValidityState`.
+    this._syncHostAriaSemantics();
   }
 
   // ─── Event Handling ───
@@ -328,7 +482,7 @@ export class HelixToggleButton extends HelixElement {
         <slot name="prefix"></slot>
       </span>
       <span part="label" class="button__label">
-        <slot></slot>
+        <slot @slotchange=${this._handleDefaultSlotChange}></slot>
       </span>
       <span part="suffix" class="button__suffix">
         <slot name="suffix"></slot>
@@ -346,14 +500,25 @@ export class HelixToggleButton extends HelixElement {
       'button--pressed': this.pressed,
     };
 
+    // Codex round-1 finding #8: on no-IDL-ref browsers fall back to mirroring
+    // host aria tokens onto the inner button so it has an accessible name
+    // when focused.
+    const innerAriaLabel = this._fallbackAriaLabel ?? this.label ?? undefined;
+    const innerAriaLabelledBy = this._fallbackAriaLabelledBy ?? undefined;
+    const innerAriaDescribedBy = this._fallbackAriaDescribedBy ?? undefined;
+
     return html`
       <button
         part="button"
         class=${classMap(classes)}
         ?disabled=${this.disabled}
         type="button"
+        tabindex="-1"
         aria-pressed=${this.pressed ? 'true' : 'false'}
-        aria-label=${this.label ?? nothing}
+        aria-label=${ifDefined(innerAriaLabel)}
+        aria-labelledby=${ifDefined(innerAriaLabelledBy)}
+        aria-describedby=${ifDefined(innerAriaDescribedBy)}
+        aria-hidden="true"
         @click=${this._handleClick}
       >
         ${this._renderInner()}

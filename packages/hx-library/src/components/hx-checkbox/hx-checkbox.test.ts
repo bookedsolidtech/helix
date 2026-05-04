@@ -545,12 +545,13 @@ describe('hx-checkbox', () => {
   // ─── Methods (1) ───
 
   describe('Methods', () => {
-    it('focus() moves focus to input element', async () => {
+    it('focus() moves focus to host (codex round-1 finding #1)', async () => {
       const el = await fixture<HelixCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
-      el.focus();
       await el.updateComplete;
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(el.shadowRoot?.activeElement).toBe(input);
+      el.focus();
+      // Host is now the canonical announced surface and the focus target.
+      // The inner `<input>` is `aria-hidden + tabindex=-1`.
+      expect(document.activeElement).toBe(el);
     });
   });
 

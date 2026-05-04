@@ -733,4 +733,155 @@ describe('hx-toggle-button', () => {
       expect(internals.ariaLabel).toBe('Custom');
     });
   });
+
+  // ─── Codex round-1 finding #1: host-canonical announced surface ───
+  //
+  // The host carries role/state via ElementInternals; the inner <button> is
+  // demoted with `aria-hidden + tabindex=-1` so AT only sees one widget. Host
+  // tabindex flips with disabled to keep tab order correct.
+
+  describe('Host-canonical surface (codex round-1 #1)', () => {
+    it('host has tabindex="0" when not disabled', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Toggle</hx-toggle-button>',
+      );
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host has tabindex="-1" when disabled', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button disabled>Toggle</hx-toggle-button>',
+      );
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host tabindex flips when disabled toggles', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Toggle</hx-toggle-button>',
+      );
+      expect(el.getAttribute('tabindex')).toBe('0');
+      el.disabled = true;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+      el.disabled = false;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('inner <button> is aria-hidden and tabindex=-1 (demoted)', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Toggle</hx-toggle-button>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-hidden')).toBe('true');
+      expect(btn.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host Space activates toggle (host is the focus target)', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Toggle</hx-toggle-button>',
+      );
+      el.focus();
+      const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
+      await userEvent.keyboard('{Space}');
+      const event = await eventPromise;
+      expect(event.detail.pressed).toBe(true);
+    });
+
+    it('host Enter activates toggle (host is the focus target)', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Toggle</hx-toggle-button>',
+      );
+      el.focus();
+      const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
+      await userEvent.keyboard('{Enter}');
+      const event = await eventPromise;
+      expect(event.detail.pressed).toBe(true);
+    });
+  });
+
+  // ─── Codex round-1 finding #5: host semantics seeded in connectedCallback ───
+  //
+  // Without this, AT scanning the page between connect and the first
+  // updated() cycle would see an unannounced surface. Verifies the
+  // role/state is present immediately after construction.
+
+  describe('Host semantics seeded in connectedCallback (codex round-1 #5)', () => {
+    it('host carries role="button" before first render completes', async () => {
+      const el = document.createElement('hx-toggle-button') as HelixToggleButton;
+      el.label = 'Mute';
+      document.body.appendChild(el);
+      // Synchronously after connect — no awaits — internals must already be
+      // populated. Without the connectedCallback seed this would be null/empty.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('button');
+      expect(internals.ariaPressed).toBe('false');
+      el.remove();
+    });
+  });
+
+  // ─── Codex round-1 finding #9: default-slot text as accessible name ───
+  //
+  // When no explicit `label`/`aria-label`/`aria-labelledby` is set, the
+  // default-slot text content becomes the host's ariaLabel so AT announces
+  // the slotted label rather than an unnamed widget.
+
+  describe('Default-slot text as accessible name (codex round-1 #9)', () => {
+    it('uses default-slot text when no label/aria-label is provided', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Mute notifications</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Mute notifications');
+    });
+
+    it('label property takes precedence over default-slot text', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Explicit">Slotted</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Explicit');
+    });
+
+    it('aria-label takes precedence over default-slot text', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-label="Custom">Slotted</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Custom');
+    });
+
+    it('updates ariaLabel when slot text changes (slotchange resync)', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Initial</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Initial');
+      el.textContent = 'Changed';
+      // slotchange → _captureSlotLabelText → _syncHostAriaSemantics
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      await el.updateComplete;
+      expect(internals.ariaLabel).toBe('Changed');
+    });
+  });
+
+  // ─── Codex round-1 finding #6: aria-invalid ordered after validity ───
+
+  describe('aria-invalid ordered after validity (codex round-1 #6)', () => {
+    it('host ariaInvalid reflects required+unpressed validity', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required label="Accept">Accept</hx-toggle-button>',
+      );
+      // _updateValidity() runs through _syncFormValue() in firstUpdated,
+      // which calls _syncHostAriaSemantics() AFTER setValidity(). The host
+      // should report invalid synchronously.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.validity.valueMissing).toBe(true);
+      expect(internals.ariaInvalid).toBe('true');
+      el.pressed = true;
+      await el.updateComplete;
+      expect(internals.validity.valueMissing).toBe(false);
+      expect(internals.ariaInvalid).toBe('false');
+    });
+  });
 });

@@ -880,18 +880,28 @@ describe('hx-checkbox-group', () => {
       expect(after?.hasAttribute('hidden')).toBe(false);
     });
 
-    it('aria-describedby orders help text before error', async () => {
+    it('host ariaDescribedByElements orders help text before error', async () => {
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Topics" help-text="Hint" error="Required">
           <hx-checkbox value="a" label="A"></hx-checkbox>
         </hx-checkbox-group>
       `);
       await el.updateComplete;
-      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
-      const tokens = fieldset.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
       const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
       const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
-      expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        // Modern browsers (Chromium 134+, Safari 17.4+) — IDL element references.
+        expect(refs.indexOf(helpDiv)).toBeLessThan(refs.indexOf(errorDiv));
+      } else {
+        // No-IDL-ref fallback: tokens space-joined on the host attribute.
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+      }
     });
   });
 });

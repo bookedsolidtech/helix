@@ -14,11 +14,14 @@ describe('hx-switch', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders a button with role="switch"', async () => {
+    it('renders a button as the inner toggle control (role lives on host)', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       expect(track).toBeTruthy();
       expect(track?.tagName.toLowerCase()).toBe('button');
+      // Host carries role="switch" via ElementInternals (codex aria-group-2).
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('switch');
     });
 
     it('renders thumb inside track', async () => {
@@ -48,15 +51,19 @@ describe('hx-switch', () => {
       expect(el.hasAttribute('checked')).toBe(true);
     });
 
-    it('sets aria-checked="true" when checked', async () => {
+    it('sets host ariaChecked="true" via internals when checked', async () => {
       const el = await fixture<HxSwitch>('<hx-switch checked></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('true');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-checked')).toBe('true');
     });
 
-    it('has aria-checked="false" when unchecked', async () => {
+    it('has host ariaChecked="false" via internals when unchecked', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('false');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-checked')).toBe('false');
     });
   });
@@ -94,9 +101,11 @@ describe('hx-switch', () => {
       expect(marker?.textContent).toBe('*');
     });
 
-    it('sets aria-required="true" on track', async () => {
+    it('sets host ariaRequired="true" via internals when required', async () => {
       const el = await fixture<HxSwitch>('<hx-switch required></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).toBe('true');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-required')).toBe('true');
     });
   });
@@ -141,7 +150,7 @@ describe('hx-switch', () => {
 
     it('track has aria-labelledby pointing to label id', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const label = shadowQuery(el, '[part="label"]');
       expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
     });
@@ -164,9 +173,12 @@ describe('hx-switch', () => {
       expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
     });
 
-    it('sets aria-invalid="true" on track', async () => {
+    it('sets aria-invalid="true" on inner track when error is present', async () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Error"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      // The inner-button aria-invalid is presentation-driven (mirrors the
+      // visible error state); the host internals.ariaInvalid is validity-
+      // driven and stays "false" for a non-required, presentation-only error.
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-invalid')).toBe('true');
     });
 
@@ -245,7 +257,7 @@ describe('hx-switch', () => {
     it('slotted label content sets aria-labelledby on track', async () => {
       const el = await fixture<HxSwitch>('<hx-switch><strong>Slotted Label</strong></hx-switch>');
       await el.updateComplete;
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const label = shadowQuery(el, '[part="label"]');
       expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
     });
@@ -463,38 +475,45 @@ describe('hx-switch', () => {
       expect(el.checked).toBe(false);
     });
 
-    it('disabled inner button still has tabIndex=0 (keyboard exclusion via _toggle() guard, not tabIndex)', async () => {
-      // Native <button disabled> retains tabIndex=0 — the browser does not change tabIndex on disable.
-      // Keyboard interaction is prevented by the _toggle() guard checking this.disabled (A-12).
+    it('disabled host has tabindex=-1; inner button stays tabIndex=-1 (host-canonical surface, codex round-1 #1)', async () => {
+      // Codex aria-group-2 round-1: host is the canonical announced surface
+      // and the focus target. Inner <button> is permanently aria-hidden +
+      // tabindex=-1 so AT never lands on it. When disabled, the host
+      // tabindex flips from "0" to "-1" to remove it from the tab order.
       const el = await fixture<HxSwitch>('<hx-switch disabled></hx-switch>');
+      expect(el.getAttribute('tabindex')).toBe('-1');
       const track = shadowQuery<HTMLButtonElement>(el, '.switch__track');
-      expect(track?.tabIndex).toBe(0);
+      expect(track?.tabIndex).toBe(-1);
     });
   });
 
   // --- Accessibility (4) ---
 
   describe('Accessibility', () => {
-    it('uses role="switch" not role="checkbox"', async () => {
+    it('uses role="switch" on host (via internals) not role="checkbox"', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
-      expect(track).toBeTruthy();
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('switch');
+      // Inner button no longer carries a role; assistive tech reaches the host.
       const checkbox = shadowQuery(el, '[role="checkbox"]');
       expect(checkbox).toBeNull();
     });
 
-    it('aria-checked toggles with checked state', async () => {
+    it('aria-checked toggles with checked state on host internals and inner', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const track = shadowQuery(el, '.switch__track');
+      expect(internals.ariaChecked).toBe('false');
       expect(track?.getAttribute('aria-checked')).toBe('false');
       el.checked = true;
       await el.updateComplete;
+      expect(internals.ariaChecked).toBe('true');
       expect(track?.getAttribute('aria-checked')).toBe('true');
     });
 
     it('aria-describedby references error ID when error set', async () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Bad"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const errorDiv = shadowQuery(el, '.switch__error');
       const describedBy = track?.getAttribute('aria-describedby');
       expect(describedBy).toContain(errorDiv?.id);
@@ -502,7 +521,7 @@ describe('hx-switch', () => {
 
     it('aria-describedby references help text ID when helpText set', async () => {
       const el = await fixture<HxSwitch>('<hx-switch help-text="Some help"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const helpDiv = shadowQuery(el, '.switch__help-text');
       const describedBy = track?.getAttribute('aria-describedby');
       expect(describedBy).toContain(helpDiv?.id);
@@ -510,19 +529,24 @@ describe('hx-switch', () => {
 
     it('aria-describedby is absent when no error or helpText', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Plain"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.hasAttribute('aria-describedby')).toBe(false);
     });
 
-    it('aria-invalid is absent when no error', async () => {
+    it('host ariaInvalid is null when no error and not required', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="No error"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaInvalid).toBe('false');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.hasAttribute('aria-invalid')).toBe(false);
     });
 
-    it('aria-required is absent when not required', async () => {
+    it('host ariaRequired is null when not required', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Optional"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      // ariaRequired is set to "true" only when required is true; otherwise null/empty.
+      expect(internals.ariaRequired).not.toBe('true');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.hasAttribute('aria-required')).toBe(false);
     });
   });
@@ -562,12 +586,13 @@ describe('hx-switch', () => {
   // --- Methods (1) ---
 
   describe('Methods', () => {
-    it('focus() moves focus to track button', async () => {
+    it('focus() moves focus to host (codex round-1 finding #1)', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Test"></hx-switch>');
       await el.updateComplete;
       el.focus();
-      const track = shadowQuery<HTMLButtonElement>(el, '.switch__track')!;
-      expect(el.shadowRoot?.activeElement).toBe(track);
+      // Host is now the canonical announced surface and the focus target.
+      // The inner `<button>` is `aria-hidden + tabindex=-1`.
+      expect(document.activeElement).toBe(el);
     });
   });
 
@@ -751,21 +776,41 @@ describe('hx-switch', () => {
       expect(helpWrapper?.hasAttribute('hidden')).toBe(false);
     });
 
-    it('emits help-text first, then error in describedBy ordering on the inner track', async () => {
+    it('emits help-text first, then error in describedBy ordering on host internals', async () => {
       const el = await fixture<HxSwitch>(
         '<hx-switch label="Toggle" help-text="Help" error="Bad"></hx-switch>',
       );
-      const track = shadowQuery(el, '[role="switch"]');
-      const describedBy = track?.getAttribute('aria-describedby') || '';
+      // Codex round-1 finding #1: the host is the canonical announced surface.
+      // The describedBy chain is exposed through `internals.ariaDescribedByElements`
+      // (when supported) rather than via an attribute on the inner control.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
       const helpDiv = shadowQuery(el, '.switch__help-text');
       const errorDiv = shadowQuery(el, '.switch__error');
       expect(helpDiv?.id).toBeTruthy();
       expect(errorDiv?.id).toBeTruthy();
-      const helpIdx = describedBy.indexOf(helpDiv!.id);
-      const errIdx = describedBy.indexOf(errorDiv!.id);
-      expect(helpIdx).toBeGreaterThanOrEqual(0);
-      expect(errIdx).toBeGreaterThanOrEqual(0);
-      expect(helpIdx).toBeLessThan(errIdx);
+
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs && refs.length > 0) {
+        // Modern path: IDL element references.
+        const helpIdx = refs.indexOf(helpDiv!);
+        const errIdx = refs.indexOf(errorDiv!);
+        expect(helpIdx).toBeGreaterThanOrEqual(0);
+        expect(errIdx).toBeGreaterThanOrEqual(0);
+        expect(helpIdx).toBeLessThan(errIdx);
+      } else {
+        // No-IDL-ref fallback path: token list mirrored on the inner button
+        // so consumer wiring still resolves shadow-internal IDs.
+        const track = shadowQuery(el, '.switch__track');
+        const describedBy = track?.getAttribute('aria-describedby') || '';
+        const helpIdx = describedBy.indexOf(helpDiv!.id);
+        const errIdx = describedBy.indexOf(errorDiv!.id);
+        expect(helpIdx).toBeGreaterThanOrEqual(0);
+        expect(errIdx).toBeGreaterThanOrEqual(0);
+        expect(helpIdx).toBeLessThan(errIdx);
+      }
     });
 
     it('keeps the error live region in the DOM with role="alert" before any error fires', async () => {

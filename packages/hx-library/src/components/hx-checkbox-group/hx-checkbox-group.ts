@@ -8,7 +8,12 @@ import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
-import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
 
@@ -175,16 +180,37 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     this._hasLabelSlot = slot.assignedNodes().length > 0;
   }
 
+  /**
+   * Handle for the shared IDREF observer. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Deferred copy of `error` driven through reactive state so the persistent
+   * live region can re-announce on transitions without direct DOM mutation.
+   * Codex round-1 finding #10.
+   * @internal
+   */
+  @state() private _announcedError = '';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('hx-change', this._handleCheckboxChange);
+    // Seed root-independent semantics from connect.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('hx-change', this._handleCheckboxChange);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -197,20 +223,19 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     }
     // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
     this._syncHostAriaSemantics();
-    // Force screen reader re-announcement when error text changes (a11y-v3-005).
-    // The live region container itself is persistent in the shadow tree (see
-    // render); only the content is mutated, which fits the WAI-ARIA model for
-    // role=alert updates.
-    if (changedProperties.has('error') && this.error) {
-      const errorEl = this.shadowRoot?.getElementById(this._errorId);
-      if (errorEl) {
-        const msg = this.error;
+    // Codex round-1 finding #10: drive re-announcement from reactive state
+    // so the persistent live region stays in the shadow tree across error
+    // transitions. The previous direct `errorEl.textContent =` mutation
+    // deleted the slot subtree the renderer just produced.
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string;
+      if (previousError && this.error) {
+        this._announcedError = '';
         requestAnimationFrame(() => {
-          errorEl.textContent = '';
-          requestAnimationFrame(() => {
-            errorEl.textContent = msg;
-          });
+          this._announcedError = this.error;
         });
+      } else {
+        this._announcedError = this.error;
       }
     }
   }
@@ -384,6 +409,8 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     } else {
       this._internals.setValidity({});
     }
+    // Codex round-1 finding #6: re-sync host ARIA after every setValidity().
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -430,20 +457,8 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       'fieldset--required': this.required,
     };
 
-    // help-text first, error appended — assistive tech announces guidance
-    // before validation feedback.
-    const describedBy =
-      [hasHelp ? this._helpTextId : null, hasError ? this._errorId : null]
-        .filter(Boolean)
-        .join(' ') || undefined;
-
     return html`
-      <fieldset
-        part="group"
-        class=${classMap(fieldsetClasses)}
-        aria-describedby=${describedBy ?? nothing}
-        aria-invalid=${hasError ? 'true' : nothing}
-      >
+      <fieldset part="group" class=${classMap(fieldsetClasses)} role="presentation">
         <legend part="label" class="fieldset__legend" id=${this._labelId}>
           <slot name="label" @slotchange=${this._handleLabelSlotChange}>${this.label}</slot>
           ${this.required
@@ -467,7 +482,9 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
           role="alert"
           ?hidden=${!hasError}
         >
-          <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}
+            >${this._announcedError}</slot
+          >
         </div>
 
         <!--
