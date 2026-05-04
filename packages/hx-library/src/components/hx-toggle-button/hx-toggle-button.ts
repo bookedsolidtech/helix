@@ -297,6 +297,24 @@ export class HelixToggleButton extends HelixElement {
     );
   }
 
+  /**
+   * Moves focus to the announced toggle-button surface. Codex round-1 finding
+   * `#1` made the host the canonical focus target on modern engines so AT
+   * announces a single widget. Round-7 finding `#9` extends that contract to
+   * the no-IDL-ref fallback: when the host is demoted (`tabindex=-1`,
+   * role/state cleared on `internals`) the inner `<button>` owns the announced
+   * semantics and tab order, so programmatic `focus()` must redirect there —
+   * otherwise scripted focus and error recovery land on the demoted host on
+   * unsupported engines.
+   */
+  override focus(options?: FocusOptions): void {
+    if (this._supportsIdrefRefs) {
+      super.focus(options);
+      return;
+    }
+    this.shadowRoot?.querySelector<HTMLButtonElement>('[part="button"]')?.focus(options);
+  }
+
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
 

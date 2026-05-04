@@ -496,12 +496,21 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   // ─── Public Methods ───
 
   /**
-   * Moves focus to the host. Codex round-1 finding #1 relocated the focus
-   * target from the inner `<button role=switch>` to the host so that AT
-   * announces a single widget; the host carries the canonical role/state.
+   * Moves focus to the announced switch surface. Codex round-1 finding #1
+   * relocated the focus target to the host so AT announces a single widget;
+   * the host carries the canonical role/state on modern engines. Round-7
+   * finding #7 extends that contract to the no-IDL-ref fallback: when the
+   * host is demoted (`tabindex=-1`, role/state cleared on `internals`) the
+   * inner `<button role=switch>` owns the announced semantics and tab order,
+   * so programmatic `focus()` must redirect there — otherwise scripted focus
+   * and error recovery land on the demoted host on unsupported engines.
    */
   override focus(options?: FocusOptions): void {
-    super.focus(options);
+    if (this._supportsIdrefRefs) {
+      super.focus(options);
+      return;
+    }
+    this._trackEl?.focus(options);
   }
 
   // ─── Render ───

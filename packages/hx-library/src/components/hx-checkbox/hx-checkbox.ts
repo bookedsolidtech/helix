@@ -606,12 +606,21 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   // ─── Public Methods ───
 
   /**
-   * Moves focus to the checkbox host element. Codex round-1 finding #1
-   * relocated the focus target from the inner `<input>` to the host so that
-   * AT only sees one announced widget; the host is the canonical surface.
+   * Moves focus to the announced checkbox surface. Codex round-1 finding #1
+   * relocated the focus target from the inner `<input>` to the host on
+   * modern engines so AT only sees one announced widget. Round-7 finding #3
+   * extends that contract to the no-IDL-ref fallback: when the host is
+   * demoted (`tabindex=-1`, role/state cleared on `internals`) the inner
+   * `<input>` owns the announced semantics and tab order, so programmatic
+   * `focus()` must redirect there — otherwise scripted focus and error
+   * recovery land on the demoted host on unsupported engines.
    */
   override focus(options?: FocusOptions): void {
-    super.focus(options);
+    if (this._supportsIdrefRefs) {
+      super.focus(options);
+      return;
+    }
+    this._inputEl?.focus(options);
   }
 
   // ─── Host ARIA Semantics (ElementInternals) ───
