@@ -788,4 +788,110 @@ describe('hx-checkbox-group', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── ARIA delegation: host-elevated semantics (codex aria-group-2) ───
+
+  describe('ARIA delegation: host semantics', () => {
+    it('host carries role="group" via ElementInternals', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.role).toBe('group');
+    });
+
+    it('host ariaLabel mirrors the visible label so cross-shadow naming works', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Notification Topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaLabel).toBe('Notification Topics');
+    });
+
+    it('host aria-label attribute wins over the visible label', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Internal" aria-label="Public name">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaLabel).toBe('Public name');
+    });
+
+    it('host ariaRequired reflects required property', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" required>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaRequired).toBe('true');
+    });
+
+    it('host ariaInvalid is driven by validity, not visible error content', async () => {
+      // required + nothing checked = valueMissing without yet having an error
+      // attribute set on the host.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" required>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+          <hx-checkbox value="b" label="B"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.validity.valid).toBe(false);
+      expect(internals.ariaInvalid).toBe('true');
+    });
+
+    it('error live region is persistent in the shadow tree', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error');
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('hidden')).toBe(true);
+    });
+
+    it('error live region updates content rather than being recreated', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const before = shadowQuery<HTMLElement>(el, '.fieldset__error');
+      el.error = 'Required';
+      await el.updateComplete;
+      const after = shadowQuery<HTMLElement>(el, '.fieldset__error');
+      // Same identity: container is persistent; only its content/visibility
+      // mutates in response to validation changes.
+      expect(after).toBe(before);
+      expect(after?.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('aria-describedby orders help text before error', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" help-text="Hint" error="Required">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
+      const tokens = fieldset.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
+      expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+    });
+  });
 });

@@ -8,6 +8,7 @@ import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
 
 const _nextCheckboxGroupId = createIdCounter('hx-checkbox-group');
 
@@ -140,6 +141,8 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   @state() private _hasErrorSlot = false;
   /** Whether the named help-text slot contains projected content. @internal */
   @state() private _hasHelpSlot = false;
+  /** Whether the named label slot contains projected content. @internal */
+  @state() private _hasLabelSlot = false;
 
   // ─── Internal IDs ───
 
@@ -149,6 +152,8 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   private _helpTextId = `${this._groupId}-help`;
   /** @internal */
   private _errorId = `${this._groupId}-error`;
+  /** @internal */
+  private _labelId = `${this._groupId}-label`;
 
   // ─── Slot Handlers ───
 
@@ -162,6 +167,12 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   private _handleHelpSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  /** @internal */
+  private _handleLabelSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasLabelSlot = slot.assignedNodes().length > 0;
   }
 
   // ─── Lifecycle ───
@@ -184,9 +195,14 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     if (changedProperties.has('name')) {
       this._syncCheckboxNames();
     }
-    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+    // Force screen reader re-announcement when error text changes (a11y-v3-005).
+    // The live region container itself is persistent in the shadow tree (see
+    // render); only the content is mutated, which fits the WAI-ARIA model for
+    // role=alert updates.
     if (changedProperties.has('error') && this.error) {
-      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
+      const errorEl = this.shadowRoot?.getElementById(this._errorId);
       if (errorEl) {
         const msg = this.error;
         requestAnimationFrame(() => {
@@ -196,6 +212,72 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
           });
         });
       }
+    }
+  }
+
+  /**
+   * Mirrors group semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-checkbox-group>` reach the announced control. Without host-level
+   * semantics, the announced node is the shadow `<fieldset>`, which is
+   * unreachable from light-DOM IDREFs.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'group';
+    internals.ariaRequired = this.required ? 'true' : 'false';
+    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+    internals.ariaDisabled = this.disabled ? 'true' : 'false';
+
+    // Prefer consumer-supplied host aria-label; fall back to the visible legend
+    // text (label property or label slot) so the host always carries an
+    // accessible name.
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!this.getAttribute('aria-labelledby')) {
+      internals.ariaLabel = this.label || null;
+    } else {
+      internals.ariaLabel = null;
+    }
+
+    if (supportsIdrefElementReferences(internals)) {
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+
+      const externalLabelTokens = this.getAttribute('aria-labelledby');
+      const externalDescTokens = this.getAttribute('aria-describedby');
+
+      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+      // If no external labelling source, fall back to the internal legend so
+      // the host still has an accessible name across the boundary.
+      const internalLegend = this.shadowRoot?.getElementById(this._labelId);
+      if (
+        labelEls.length === 0 &&
+        !hostAriaLabel &&
+        (this.label || this._hasLabelSlot) &&
+        internalLegend
+      ) {
+        labelEls.push(internalLegend);
+      }
+      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
+
+      const descEls = resolveIdrefTokens(this, externalDescTokens);
+      // help-text first (guidance), then error (validation feedback). Both
+      // wrappers are persistent in the shadow tree so the chain is stable.
+      const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+      const errorEl = this.shadowRoot?.getElementById(this._errorId);
+      if (helpEl && (this.helpText || this._hasHelpSlot)) {
+        descEls.push(helpEl);
+      }
+      if (errorEl && (this.error || this._hasErrorSlot)) {
+        descEls.push(errorEl);
+      }
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
     }
   }
 
@@ -339,6 +421,7 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
 
   override render() {
     const hasError = !!this.error || this._hasErrorSlot;
+    const hasHelp = !!this.helpText || this._hasHelpSlot;
 
     const fieldsetClasses = {
       fieldset: true,
@@ -347,11 +430,10 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       'fieldset--required': this.required,
     };
 
+    // help-text first, error appended — assistive tech announces guidance
+    // before validation feedback.
     const describedBy =
-      [
-        hasError ? this._errorId : null,
-        this.helpText || this._hasHelpSlot ? this._helpTextId : null,
-      ]
+      [hasHelp ? this._helpTextId : null, hasError ? this._errorId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -360,9 +442,10 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
         part="group"
         class=${classMap(fieldsetClasses)}
         aria-describedby=${describedBy ?? nothing}
+        aria-invalid=${hasError ? 'true' : nothing}
       >
-        <legend part="label" class="fieldset__legend">
-          <slot name="label">${this.label}</slot>
+        <legend part="label" class="fieldset__legend" id=${this._labelId}>
+          <slot name="label" @slotchange=${this._handleLabelSlotChange}>${this.label}</slot>
           ${this.required
             ? html`<span class="fieldset__required-marker" aria-hidden="true">*</span>`
             : nothing}
@@ -372,13 +455,32 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
           <slot @slotchange=${this._handleSlotChange}></slot>
         </div>
 
-        ${hasError
-          ? html`<div part="error" class="fieldset__error" id=${this._errorId} role="alert">
-              <slot name="error" @slotchange=${this._handleErrorSlotChange}> ${this.error} </slot>
-            </div>`
-          : html`<slot name="error" @slotchange=${this._handleErrorSlotChange}></slot>`}
+        <!--
+          Persistent live region. role="alert" is set from first paint so
+          assistive tech tracks a stable element across error transitions;
+          the content updates rather than the container being replaced.
+        -->
+        <div
+          part="error"
+          class="fieldset__error"
+          id=${this._errorId}
+          role="alert"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
+        </div>
 
-        <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
+        <!--
+          Persistent help-text wrapper, hidden when error overrides so guidance
+          does not compete with validation feedback. Always in the shadow tree
+          so the host's aria-describedby chain is stable.
+        -->
+        <div
+          part="help-text"
+          class="fieldset__help-text"
+          id=${this._helpTextId}
+          ?hidden=${!hasHelp || hasError}
+        >
           <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
         </div>
       </fieldset>
