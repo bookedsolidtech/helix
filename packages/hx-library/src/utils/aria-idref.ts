@@ -77,9 +77,7 @@ export interface AriaIdrefSnapshot {
  * duplicates. `null`/empty inputs are skipped. Returns `null` when the merged
  * list is empty.
  */
-export function mergeTokenLists(
-  ...lists: Array<string | null | undefined>
-): string | null {
+export function mergeTokenLists(...lists: Array<string | null | undefined>): string | null {
   const seen = new Set<string>();
   const out: string[] = [];
   for (const list of lists) {

@@ -408,11 +408,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
     internals.role = 'checkbox';
-    internals.ariaChecked = this.indeterminate
-      ? 'mixed'
-      : this.checked
-        ? 'true'
-        : 'false';
+    internals.ariaChecked = this.indeterminate ? 'mixed' : this.checked ? 'true' : 'false';
     internals.ariaRequired = this.required ? 'true' : 'false';
     // Drive aria-invalid from validity state, not from visible error content.
     // A required-but-unchecked checkbox sets `valueMissing` via setValidity()
@@ -444,12 +440,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       // and no external labelling source already names the host.
       const internalLabel = this.shadowRoot?.getElementById(this._labelId);
       const hasVisibleLabel = !!this.label || this._hasLabelSlot;
-      if (
-        labelEls.length === 0 &&
-        !hostLabel &&
-        hasVisibleLabel &&
-        internalLabel
-      ) {
+      if (labelEls.length === 0 && !hostLabel && hasVisibleLabel && internalLabel) {
         labelEls.push(internalLabel);
       }
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
