@@ -337,12 +337,22 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     });
   }
 
-  /** @internal */
+  /**
+   * Centralizes form participation on the group: when an `hx-checkbox` is
+   * grouped, the group is the sole form participant. Without this, both the
+   * group AND each child would call `setFormValue` for the same name, causing
+   * every checked value to submit twice. Codex round-2 finding #1.
+   *
+   * Children are also form-associated and continue to participate when used
+   * stand-alone (no parent group). Inside a group we explicitly null the
+   * child name so the child's `_updateFormValue()` short-circuits to
+   * `setFormValue(null)` (see hx-checkbox).
+   * @internal
+   */
   private _syncCheckboxNames(): void {
-    if (!this.name) return;
     const checkboxes = this._getCheckboxes();
     checkboxes.forEach((cb) => {
-      cb.name = this.name;
+      cb.name = '';
     });
   }
 

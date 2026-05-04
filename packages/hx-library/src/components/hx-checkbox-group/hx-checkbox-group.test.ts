@@ -904,4 +904,72 @@ describe('hx-checkbox-group', () => {
       }
     });
   });
+
+  // ─── Codex round-2 finding #1: centralised form participation (3) ───
+
+  describe('Form submission: no double-submit (round-2 F1)', () => {
+    it('clears child name when grouped so the group is the sole form participant', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" name="topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+          <hx-checkbox value="b" label="B"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      const checkboxes = Array.from(el.querySelectorAll('hx-checkbox')) as HelixCheckbox[];
+      // Children must NOT carry the group's name — round-2 finding #1.
+      // If they did, both group AND child would call setFormValue under the
+      // same name and FormData would contain duplicate entries.
+      for (const cb of checkboxes) {
+        expect(cb.name).toBe('');
+      }
+    });
+
+    it('FormData contains each checked value exactly once (no duplicates)', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = `
+        <hx-checkbox-group label="Options" name="opts">
+          <hx-checkbox value="a" label="A" checked></hx-checkbox>
+          <hx-checkbox value="b" label="B"></hx-checkbox>
+          <hx-checkbox value="c" label="C" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `;
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      container.appendChild(form);
+      const el = form.querySelector('hx-checkbox-group') as HelixCheckboxGroup;
+      await el.updateComplete;
+      // Allow any updated() side effects (form value writes) to settle.
+      const checkboxes = Array.from(el.querySelectorAll('hx-checkbox')) as HelixCheckbox[];
+      for (const cb of checkboxes) await cb.updateComplete;
+
+      const data = new FormData(form);
+      const submitted = data.getAll('opts').map((v) => String(v));
+      // Round-2 finding #1: checked values must appear exactly once.
+      // Pre-fix the group + each child would each append, producing duplicates.
+      const aCount = submitted.filter((v) => v === 'a').length;
+      const cCount = submitted.filter((v) => v === 'c').length;
+      expect(aCount).toBe(1);
+      expect(cCount).toBe(1);
+      expect(submitted).not.toContain('b');
+      form.remove();
+    });
+
+    it('clears child name even when set late on the group', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <hx-checkbox value="a" label="A" name="should-be-cleared"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      // firstUpdated/_handleSlotChange must clear pre-existing child names too.
+      const cb = el.querySelector('hx-checkbox') as HelixCheckbox;
+      expect(cb.name).toBe('');
+
+      // Set group name late and verify child stays cleared.
+      el.name = 'topics';
+      await el.updateComplete;
+      expect(cb.name).toBe('');
+    });
+  });
 });
