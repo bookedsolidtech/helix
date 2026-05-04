@@ -1175,4 +1175,95 @@ describe('hx-radio-group', () => {
       expect(errorDiv?.hasAttribute('hidden')).toBe(true);
     });
   });
+
+  // ─── Codex round-2 finding #3: slot reconciliation (3) ───
+
+  describe('Slot mutations: value/formValue/validity reconciliation (round-2 F3)', () => {
+    it('clears value, formValue, and re-validates when the selected radio is removed', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" name="color" required>
+          <hx-radio value="red" label="Red"></hx-radio>
+          <hx-radio value="blue" label="Blue"></hx-radio>
+        </hx-radio-group>
+      `);
+      // Select 'red' through the API.
+      el.value = 'red';
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.validity.valid).toBe(true);
+
+      // Remove the currently-selected radio.
+      const red = el.querySelector('hx-radio[value="red"]') as HxRadio;
+      red.remove();
+      // Wait for slotchange + reactive cycle.
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await el.updateComplete;
+
+      // value clears, validity re-runs (required + no value = invalid).
+      expect(el.value).toBe('');
+      expect(internals.validity.valid).toBe(false);
+      expect(internals.validity.valueMissing).toBe(true);
+    });
+
+    it('adopts a newly-added pre-checked radio (value, formValue, validity)', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" name="color" required>
+          <hx-radio value="red" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      // No selection → invalid.
+      expect(el.value).toBe('');
+      expect(internals.validity.valid).toBe(false);
+
+      // Inject a new radio that is already checked.
+      const blue = document.createElement('hx-radio') as HxRadio;
+      blue.setAttribute('value', 'blue');
+      blue.setAttribute('label', 'Blue');
+      blue.checked = true;
+      el.appendChild(blue);
+
+      // Wait for slotchange + reactive cycle.
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await el.updateComplete;
+
+      expect(el.value).toBe('blue');
+      expect(internals.validity.valid).toBe(true);
+    });
+
+    it('treats the currently-selected radio as not-selected when it becomes disabled', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" name="color" required>
+          <hx-radio value="red" label="Red"></hx-radio>
+          <hx-radio value="blue" label="Blue"></hx-radio>
+        </hx-radio-group>
+      `);
+      el.value = 'red';
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.validity.valid).toBe(true);
+
+      // Disable the selected radio, then trigger slotchange by re-inserting
+      // (the F3 reconciler runs on slot mutations — this simulates a parent
+      // template re-render that swaps a now-disabled child back in).
+      const red = el.querySelector('hx-radio[value="red"]') as HxRadio;
+      red.disabled = true;
+      red.remove();
+      el.insertBefore(red, el.firstChild);
+
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await el.updateComplete;
+
+      // The disabled radio is no longer treated as the selection — the
+      // group's `value` collapses to '' and required-validity fails.
+      expect(el.value).toBe('');
+      expect(internals.validity.valid).toBe(false);
+    });
+  });
 });

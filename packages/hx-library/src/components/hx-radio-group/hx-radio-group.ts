@@ -505,12 +505,48 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
   };
 
   /**
-   * Handles slotchange events on the default slot to refresh the radio cache.
+   * Handles slotchange events on the default slot. Refreshes the cached
+   * radio list, then reconciles `value`, `setFormValue`, and validity against
+   * the currently-slotted children. Codex round-2 finding #3: previously this
+   * handler only invalidated the cache and re-synced child state, so removing
+   * the currently-selected radio (or disabling it, or adding a new
+   * `checked` radio) left `this.value` and the submitted form value pointing
+   * at stale state and `_updateValidity` was never re-run.
    * @internal
    */
   private _handleSlotChange(): void {
     this._cachedRadios = null;
+
+    // Reconcile against currently-slotted children BEFORE _syncRadios runs.
+    // _syncRadios() unconditionally overwrites `radio.checked` from `this.value`,
+    // which would clobber an externally-set `checked=true` on a newly-added
+    // radio when the group's current value is empty. We therefore peek at the
+    // raw children first to detect "pre-checked" adoption, then commit through
+    // the normal sync pipeline.
+    const externallyChecked = this._getRadios().find((r) => r.checked && !r.disabled);
+    if (externallyChecked && externallyChecked.value !== this.value) {
+      this.value = externallyChecked.value;
+    }
+
     this._syncRadios();
+
+    // After sync, the group's `value` and the children's `checked` flags are
+    // canonical. If the previously-selected radio was removed or disabled,
+    // `selected` becomes undefined and `reconciled` collapses to '', clearing
+    // form participation.
+    const selected = this._getRadios().find((r) => r.checked && !r.disabled);
+    const reconciled = selected?.value ?? '';
+    if (reconciled !== this.value) {
+      this.value = reconciled;
+      this._internals.setFormValue(this.value || null);
+      this._updateValidity();
+    } else {
+      // Always re-run setFormValue + validity. `value` may be stable while
+      // membership/disabled-state changed, and a freshly-adopted pre-checked
+      // radio still needs its value pushed to the form.
+      this._internals.setFormValue(this.value || null);
+      this._updateValidity();
+    }
   }
 
   // ─── Form Integration ───
