@@ -1417,5 +1417,40 @@ describe('hx-radio-group', () => {
       expect(internals.ariaLabel).toBe('Color');
       expect(internals.ariaLabel).not.toContain('*');
     });
+
+    // ─── Codex round-22 P1 #2: shadow help/error strings reach the host ───
+    it('fallback path: error textContent mirrors into internals.ariaDescription', async () => {
+      // Codex round-22 P1 #2 regression: on the no-IDL-ref fallback path
+      // earlier rounds only mirrored consumer-supplied describedby tokens
+      // onto the host, leaving the internal shadow `error` wrapper
+      // unassociated with the radiogroup on Firefox-class engines. The fix
+      // string-mirrors the wrapper's textContent into `internals.ariaDescription`,
+      // which survives the shadow boundary independently of element references.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" error="This field is required">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('This field is required');
+    });
+
+    it('fallback path: help-text textContent mirrors into internals.ariaDescription', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" help-text="Pick a color">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('Pick a color');
+    });
   });
 });

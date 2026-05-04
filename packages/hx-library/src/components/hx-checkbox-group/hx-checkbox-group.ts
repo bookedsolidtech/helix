@@ -394,7 +394,12 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
         .map((node) => node.textContent ?? '')
         .join('')
         .trim() || '';
-    const internalLegendText = this.label || slottedLabelText || null;
+    // Codex round-22 P2: documented contract — `@slot label - Rich HTML group
+    // label (overrides the label property when used)`. Slot wins. When a
+    // consumer supplies BOTH `label="..."` AND `<span slot="label">...</span>`,
+    // the slot is the public-facing legend; the property must not clobber it
+    // on the fallback path's `internals.ariaLabel`.
+    const internalLegendText = slottedLabelText || this.label || null;
     if (hostAriaLabel) {
       internals.ariaLabel = hostAriaLabel;
     } else if (!this.getAttribute('aria-labelledby')) {
@@ -461,6 +466,11 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       const refsInternals = internals as InternalsWithRefs;
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+      // Clear any stale fallback `ariaDescription` string in case a prior sync
+      // ran on the fallback path (e.g. tests flipping `_supportsIdrefRefs`).
+      // The modern path uses element references exclusively; coexisting strings
+      // would cause AT to announce the description twice.
+      internals.ariaDescription = null;
     } else {
       // ─── No-IDL-ref fallback (codex round-19 P1) ───
       // The IDL element-references API is unavailable, so internal shadow
@@ -518,6 +528,23 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
         this.removeAttribute('aria-describedby');
         this._lastWrittenDescribedBy = null;
       }
+
+      // Codex round-22 P1 #2: on the no-IDL-ref fallback path, consumer-supplied
+      // describedby tokens reach the host (above) but the *internal* shadow
+      // help/error wrappers cannot be referenced from light-DOM IDREFs. Mirror
+      // their `textContent` into `internals.ariaDescription` so the host's
+      // accessible description still surfaces the live help/error strings on
+      // legacy engines (Firefox today). The string-form description hook is
+      // independent of element references and survives the shadow boundary.
+      // Empty strings are normalized to `null` so AT does not announce an
+      // empty description.
+      const helpText =
+        helpEl && !hasError && (this.helpText || this._hasHelpSlot)
+          ? (helpEl.textContent ?? '').trim()
+          : '';
+      const errorText = errorEl && hasError ? (errorEl.textContent ?? '').trim() : '';
+      const internalDescriptionText = [helpText, errorText].filter(Boolean).join(' ');
+      internals.ariaDescription = internalDescriptionText || null;
     }
   }
 
@@ -591,6 +618,16 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     // child must be cleared. To do that without enumeration we mark all
     // current children true here and rely on `_handleSlotChange` to clear
     // departed children explicitly via `_clearSuppressionForRemoved()`.
+    // Group ownership invariant (round-3 hardening, reaffirmed round-22):
+    // `hx-checkbox-group` is the sole form participant for its children, full
+    // stop. Children inside a group never submit independently, regardless of
+    // whether the group or the child carries a `name` attribute. Any consumer
+    // who attaches a `<hx-checkbox name="...">` directly inside a
+    // `<hx-checkbox-group>` (even one without its own `name`) is misusing the
+    // API — the child must be moved out of the group to submit independently.
+    // Suppression is unconditional to prevent re-arming attacks where
+    // `cb.name = ''` would otherwise restore stand-alone participation while
+    // the child still appears "grouped".
     current.forEach((cb) => {
       cb._groupedSuppress = true;
       this._suppressedChildren.add(cb);

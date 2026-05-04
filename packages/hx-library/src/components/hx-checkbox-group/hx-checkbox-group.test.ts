@@ -1217,5 +1217,57 @@ describe('hx-checkbox-group', () => {
 
       expect(internals.ariaLabel).toBe('New Strong');
     });
+
+    // ─── Codex round-22 P1 #2: shadow help/error strings reach the host ───
+    it('fallback path: error textContent mirrors into internals.ariaDescription', async () => {
+      // Codex round-22 P1 #2 regression: on the no-IDL-ref fallback path
+      // earlier rounds only mirrored consumer-supplied describedby tokens
+      // onto the host, leaving the internal shadow `error` wrapper
+      // unassociated with the radiogroup on Firefox-class engines. The fix
+      // string-mirrors the wrapper's textContent into `internals.ariaDescription`,
+      // which survives the shadow boundary independently of element references.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" error="This field is required">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('This field is required');
+    });
+
+    it('fallback path: help-text textContent mirrors into internals.ariaDescription', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" help-text="Pick one or more topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('Pick one or more topics');
+    });
+
+    // ─── Codex round-22 P2: slot label overrides the label property ───
+    it('fallback path: slotted label content overrides label property in internals.ariaLabel', async () => {
+      // Documented contract: `@slot label - Rich HTML group label (overrides
+      // the label property when used)`. With both supplied, the slot wins.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Internal">
+          <span slot="label">Public</span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Public');
+    });
   });
 });

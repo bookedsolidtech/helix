@@ -421,6 +421,11 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       const refsInternals = internals as InternalsWithRefs;
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+      // Clear any stale fallback `ariaDescription` string in case a prior sync
+      // ran on the fallback path (e.g. tests flipping `_supportsIdrefRefs`).
+      // The modern path uses element references exclusively; coexisting strings
+      // would cause AT to announce the description twice.
+      internals.ariaDescription = null;
     } else {
       // ─── No-IDL-ref fallback (codex round-19 P1) ───
       // The IDL element-references API is unavailable, so internal shadow
@@ -471,6 +476,23 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
         this.removeAttribute('aria-describedby');
         this._lastWrittenDescribedBy = null;
       }
+
+      // Codex round-22 P1 #2: on the no-IDL-ref fallback path, consumer-supplied
+      // describedby tokens reach the host (above) but the *internal* shadow
+      // help/error wrappers cannot be referenced from light-DOM IDREFs. Mirror
+      // their `textContent` into `internals.ariaDescription` so the host's
+      // accessible description still surfaces the live help/error strings on
+      // legacy engines (Firefox today). The string-form description hook is
+      // independent of element references and survives the shadow boundary.
+      // Empty strings are normalized to `null` so AT does not announce an
+      // empty description.
+      const helpText =
+        helpEl && !hasError && (this.helpText || this._hasHelpSlot)
+          ? (helpEl.textContent ?? '').trim()
+          : '';
+      const errorText = errorEl && hasError ? (errorEl.textContent ?? '').trim() : '';
+      const internalDescriptionText = [helpText, errorText].filter(Boolean).join(' ');
+      internals.ariaDescription = internalDescriptionText || null;
     }
   }
 
