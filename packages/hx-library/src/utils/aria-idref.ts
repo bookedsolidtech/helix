@@ -25,23 +25,57 @@
  */
 
 /**
- * Resolves a whitespace-separated IDREF token list to live element references
- * by querying the host's root node (Document or ShadowRoot).
+ * Resolves a whitespace-separated IDREF token list to live element references.
  *
- * Tokens that fail to resolve are silently dropped — this matches native
- * platform behaviour for `aria-labelledby` and `aria-describedby`.
+ * Searches the host's containing root first (Document or ShadowRoot), then
+ * walks up through enclosing shadow hosts, and finally falls back to the
+ * top-level Document. Codex round-15 P1: hx-* controls embedded inside an
+ * outer component's shadow tree often legitimately reference labels/descriptions
+ * declared in the outer document or in an ancestor shadow tree. Restricting
+ * resolution to a single root left those controls anonymous on the
+ * `ariaLabelledByElements` / `ariaDescribedByElements` path. The IDL
+ * element-references API accepts any element regardless of root, so widening
+ * the search closes that gap.
+ *
+ * Tokens that fail to resolve at every level are silently dropped — matching
+ * native attribute-string platform behaviour where unresolved tokens are
+ * ignored.
  */
 export function resolveIdrefTokens(host: Element, tokens: string | null): Element[] {
   if (!tokens) return [];
-  const root = host.getRootNode();
-  if (!(root instanceof Document) && !(root instanceof ShadowRoot)) {
-    return [];
-  }
   const ids = tokens.split(/\s+/).filter(Boolean);
+  if (ids.length === 0) return [];
+
+  // Build the ordered list of roots to search: host's own root first
+  // (closest scope), then walking outward through enclosing shadow hosts,
+  // then the top-level Document. Each id resolves at the first root that
+  // owns it, mirroring how shadow-encapsulation-aware AT walks the tree.
+  const roots: Array<Document | ShadowRoot> = [];
+  let current: Node | null = host.getRootNode();
+  while (current instanceof ShadowRoot) {
+    roots.push(current);
+    const shadowHost: Element | null = current.host ?? null;
+    current = shadowHost ? shadowHost.getRootNode() : null;
+  }
+  if (current instanceof Document) {
+    roots.push(current);
+  }
+  // If host is detached or in an unusual root, also try the top-level
+  // ownerDocument as a defensive last resort.
+  const ownerDoc = host.ownerDocument;
+  if (ownerDoc && !roots.includes(ownerDoc)) {
+    roots.push(ownerDoc);
+  }
+
   const out: Element[] = [];
   for (const id of ids) {
-    const el = root.getElementById(id);
-    if (el) out.push(el);
+    for (const root of roots) {
+      const el = root.getElementById(id);
+      if (el) {
+        out.push(el);
+        break;
+      }
+    }
   }
   return out;
 }

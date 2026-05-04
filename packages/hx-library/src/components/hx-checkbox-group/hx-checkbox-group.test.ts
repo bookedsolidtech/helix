@@ -880,7 +880,38 @@ describe('hx-checkbox-group', () => {
       expect(after?.hasAttribute('hidden')).toBe(false);
     });
 
-    it('host ariaDescribedByElements orders help text before error', async () => {
+    it('host ariaDescribedByElements references help text in the help-only state', async () => {
+      // Codex round-15 P2: when both help-text and error are present, help is
+      // hidden and dropped from the describedby chain. This test exercises
+      // the help-only state to confirm help remains referenced when no error
+      // is active.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" help-text="Hint">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        // Modern browsers (Chromium 134+, Safari 17.4+) — IDL element references.
+        expect(refs.indexOf(helpDiv)).toBeGreaterThanOrEqual(0);
+      } else {
+        // No-IDL-ref fallback: tokens space-joined on the host attribute.
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).toContain(helpDiv.id);
+      }
+    });
+
+    it('drops help-text from describedBy chain when an error is active (round-15 P2)', async () => {
+      // Codex round-15 P2: hidden help must not appear in the describedby
+      // chain. The render path hides the help wrapper when an error is
+      // active; appending it to host semantics would have AT announce stale
+      // guidance ahead of the validation error.
       const el = await fixture<HelixCheckboxGroup>(`
         <hx-checkbox-group label="Topics" help-text="Hint" error="Required">
           <hx-checkbox value="a" label="A"></hx-checkbox>
@@ -890,17 +921,19 @@ describe('hx-checkbox-group', () => {
       const internals = (el as unknown as { _internals: ElementInternals })._internals;
       const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
       const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
+      expect(helpDiv.hasAttribute('hidden')).toBe(true);
+      expect(errorDiv.hasAttribute('hidden')).toBe(false);
       type InternalsWithRefs = ElementInternals & {
         ariaDescribedByElements: Element[] | null;
       };
       const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
       if (refs) {
-        // Modern browsers (Chromium 134+, Safari 17.4+) — IDL element references.
-        expect(refs.indexOf(helpDiv)).toBeLessThan(refs.indexOf(errorDiv));
+        expect(refs.indexOf(errorDiv)).toBeGreaterThanOrEqual(0);
+        expect(refs.indexOf(helpDiv)).toBe(-1);
       } else {
-        // No-IDL-ref fallback: tokens space-joined on the host attribute.
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
-        expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+        expect(tokens).toContain(errorDiv.id);
+        expect(tokens).not.toContain(helpDiv.id);
       }
     });
   });

@@ -370,10 +370,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
       const descEls = resolveIdrefTokens(this, externalDescTokens);
       const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
       const errorEl = this.shadowRoot?.getElementById(this._errorId);
-      if (helpEl && (this.helpText || this._hasHelpTextSlot)) {
+      const hasError = !!(this.error || this._hasErrorSlot);
+      // Codex round-15 P2: drop help text from the describedby chain while
+      // an error is active. The render path hides the help wrapper in that
+      // state (`?hidden=${... || hasError}`); appending the hidden node here
+      // would have AT announce stale guidance ahead of the validation error.
+      if (helpEl && !hasError && (this.helpText || this._hasHelpTextSlot)) {
         descEls.push(helpEl);
       }
-      if (errorEl && (this.error || this._hasErrorSlot)) {
+      if (errorEl && hasError) {
         descEls.push(errorEl);
       }
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
@@ -578,8 +583,12 @@ export class HelixSwitch extends FormMixin(HelixElement) {
 
     // help-text first, error appended — assistive tech announces guidance
     // before validation feedback. Both ids are persistent in the shadow tree.
+    // Codex round-15 P2: drop help text from the chain when an error is
+    // active. The help wrapper renders hidden in that state, so referencing
+    // it would have AT announce stale guidance ahead of the validation
+    // error. Mirrors the modern-path host-internals chain.
     const describedBy =
-      [hasHelpText ? this._helpTextId : null, hasError ? this._errorId : null]
+      [!hasError && hasHelpText ? this._helpTextId : null, hasError ? this._errorId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 

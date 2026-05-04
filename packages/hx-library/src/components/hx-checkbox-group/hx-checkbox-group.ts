@@ -353,10 +353,16 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     const descEls = resolveIdrefTokens(this, externalDescTokens);
     const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
     const errorEl = this.shadowRoot?.getElementById(this._errorId);
-    if (helpEl && (this.helpText || this._hasHelpSlot)) {
+    const hasError = !!(this.error || this._hasErrorSlot);
+    // Codex round-15 P2: drop help text from the describedby chain while an
+    // error is active. The render path hides the help wrapper in that state
+    // (`?hidden=${!hasHelp || hasError}`); appending the hidden node to host
+    // semantics would make AT announce stale guidance ahead of the
+    // validation error. Mirrors the hx-switch and hx-checkbox treatment.
+    if (helpEl && !hasError && (this.helpText || this._hasHelpSlot)) {
       descEls.push(helpEl);
     }
-    if (errorEl && (this.error || this._hasErrorSlot)) {
+    if (errorEl && hasError) {
       descEls.push(errorEl);
     }
 

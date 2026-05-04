@@ -777,8 +777,12 @@ describe('hx-switch', () => {
     });
 
     it('emits help-text first, then error in describedBy ordering on host internals', async () => {
+      // Codex round-15 P2: when both help and error are present, the help
+      // wrapper is hidden and dropped from the describedby chain — AT must
+      // not announce stale guidance ahead of the validation error. This test
+      // verifies the help-only state still announces help.
       const el = await fixture<HxSwitch>(
-        '<hx-switch label="Toggle" help-text="Help" error="Bad"></hx-switch>',
+        '<hx-switch label="Toggle" help-text="Help"></hx-switch>',
       );
       // Codex round-1 finding #1: the host is the canonical announced surface.
       // The describedBy chain is exposed through `internals.ariaDescribedByElements`
@@ -794,22 +798,47 @@ describe('hx-switch', () => {
       };
       const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
       if (refs && refs.length > 0) {
-        // Modern path: IDL element references.
-        const helpIdx = refs.indexOf(helpDiv!);
-        const errIdx = refs.indexOf(errorDiv!);
-        expect(helpIdx).toBeGreaterThanOrEqual(0);
-        expect(errIdx).toBeGreaterThanOrEqual(0);
-        expect(helpIdx).toBeLessThan(errIdx);
+        // Modern path: IDL element references. Help-only state has only help
+        // in the chain; the error wrapper is hidden and not referenced.
+        expect(refs.indexOf(helpDiv!)).toBeGreaterThanOrEqual(0);
+        expect(refs.indexOf(errorDiv!)).toBe(-1);
       } else {
         // No-IDL-ref fallback path: token list mirrored on the inner button
         // so consumer wiring still resolves shadow-internal IDs.
         const track = shadowQuery(el, '.switch__track');
         const describedBy = track?.getAttribute('aria-describedby') || '';
-        const helpIdx = describedBy.indexOf(helpDiv!.id);
-        const errIdx = describedBy.indexOf(errorDiv!.id);
-        expect(helpIdx).toBeGreaterThanOrEqual(0);
-        expect(errIdx).toBeGreaterThanOrEqual(0);
-        expect(helpIdx).toBeLessThan(errIdx);
+        expect(describedBy).toContain(helpDiv!.id);
+        expect(describedBy).not.toContain(errorDiv!.id);
+      }
+    });
+
+    it('drops help-text from describedBy chain when an error is active (round-15 P2)', async () => {
+      // Codex round-15 P2: hidden help must not appear in the describedby
+      // chain. AT would otherwise announce stale guidance ahead of the
+      // validation error in the very state where the UI suppresses it.
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Toggle" help-text="Help" error="Bad"></hx-switch>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const helpDiv = shadowQuery(el, '.switch__help-text');
+      const errorDiv = shadowQuery(el, '.switch__error');
+      expect(helpDiv?.hasAttribute('hidden')).toBe(true);
+      expect(errorDiv?.hasAttribute('hidden')).toBe(false);
+
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs && refs.length > 0) {
+        // Modern path: only the error is referenced.
+        expect(refs.indexOf(errorDiv!)).toBeGreaterThanOrEqual(0);
+        expect(refs.indexOf(helpDiv!)).toBe(-1);
+      } else {
+        // Fallback path: only the error id appears in the inner-button chain.
+        const track = shadowQuery(el, '.switch__track');
+        const describedBy = track?.getAttribute('aria-describedby') || '';
+        expect(describedBy).toContain(errorDiv!.id);
+        expect(describedBy).not.toContain(helpDiv!.id);
       }
     });
 
