@@ -379,7 +379,12 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       descEls.push(errorEl);
     }
 
-    if (supportsIdrefElementReferences(internals)) {
+    // Branch off the cached `_supportsIdrefRefs` (seeded at connect by the
+    // platform probe) so tests can force the fallback branch by flipping the
+    // flag. TODO(codex round-19 follow-up): re-probe on `adoptedCallback` if
+    // we ever support cross-document moves; today the cached value is set
+    // once at connect.
+    if (this._supportsIdrefRefs) {
       type InternalsWithRefs = ElementInternals & {
         ariaLabelledByElements: Element[] | null;
         ariaDescribedByElements: Element[] | null;
@@ -388,37 +393,36 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
     } else {
-      // ─── No-IDL-ref fallback (codex round-10 P1, round-17 P1) ───
+      // ─── No-IDL-ref fallback (codex round-19 P1) ───
       // The IDL element-references API is unavailable, so internal shadow
       // help/error/legend wrappers cannot be projected onto the host
       // accessibility node via `internals.aria*Elements`.
       //
-      // Codex round-17 P1: mirroring shadow-internal ids onto the host's
-      // `aria-labelledby` / `aria-describedby` attributes is broken per spec
-      // — IDREFs only resolve within the host's containing root, not across
-      // the shadow boundary, so legacy engines (notably Firefox today) drop
-      // those references and the group becomes anonymous/undescribed.
-      // The fix: own the description chain on the inner shadow `<fieldset>`
-      // (which lives in the same root as the legend/help/error wrappers,
-      // so its IDREFs resolve correctly) and promote that fieldset to
-      // `role="group"` on the fallback path so AT announces a labeled
-      // group container. Host attributes carry only the consumer-supplied
-      // tokens (which resolve in the host's containing root).
+      // Codex round-19 P1: keep the host as the canonical accessible-container
+      // surface on BOTH modern and fallback paths. Earlier rounds promoted the
+      // inner fieldset to `role="group"` here and tried to splice consumer
+      // light-DOM ids together with shadow-internal ids on the fieldset's
+      // `aria-labelledby` / `aria-describedby`. That created two nested
+      // accessible containers (host group → inner group → controls) AND the
+      // spliced shadow IDREFs could never resolve to consumer light-DOM
+      // targets, so the inner fieldset's "external label" was silently broken.
+      //
+      // The correct trade-off on legacy engines (notably Firefox today): the
+      // host owns the role + ARIA strings (via `internals.role`,
+      // `internals.ariaLabel`, and the host attribute mirror below); we accept
+      // a documented loss of *internal* legend/help/error references and rely
+      // on consumer-supplied light-DOM tokens, which resolve correctly in the
+      // host's containing root. The inner fieldset stays presentational on
+      // both paths so AT announces a single accessible container.
       const consumerLabelIds = new Set((externalLabelTokens?.split(/\s+/) ?? []).filter(Boolean));
       const consumerDescIds = new Set((externalDescTokens?.split(/\s+/) ?? []).filter(Boolean));
 
-      const internalLabelIds = labelEls
-        .map((el) => el.id)
-        .filter((id) => id && !consumerLabelIds.has(id));
-      const internalDescIds = descEls
-        .map((el) => el.id)
-        .filter((id) => id && !consumerDescIds.has(id));
-
-      // Host attributes: ONLY consumer tokens (never shadow-internal ids).
-      // Restore the consumer baseline on the host so its accessible-name
-      // computation in the light DOM resolves the labels the consumer wired
-      // up. If the consumer supplied nothing, clear any stale mirror we
-      // may have written in a prior round.
+      // Host attributes: ONLY consumer tokens (never shadow-internal ids —
+      // those cannot resolve across the shadow boundary). Restore the
+      // consumer baseline on the host so its accessible-name computation in
+      // the light DOM resolves the labels the consumer wired up. If the
+      // consumer supplied nothing, clear any stale mirror we may have
+      // written in a prior round.
       const hostLabel = [...consumerLabelIds].filter(Boolean).join(' ') || '';
       const liveLabel = this.getAttribute('aria-labelledby');
       if (hostLabel) {
@@ -444,49 +448,6 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       } else if (liveDesc !== null && this._lastWrittenDescribedBy !== null) {
         this.removeAttribute('aria-describedby');
         this._lastWrittenDescribedBy = null;
-      }
-
-      // Inner fieldset: owns the merged labelledby/describedby chain so the
-      // shadow-internal ids resolve correctly within the same root. Promote
-      // role to "group" on this path so AT announces a labeled group.
-      const fieldset = this.shadowRoot?.querySelector<HTMLFieldSetElement>('fieldset');
-      if (fieldset) {
-        const mergedLabel =
-          [...consumerLabelIds, ...internalLabelIds].filter(Boolean).join(' ') || '';
-        if (mergedLabel) {
-          if (fieldset.getAttribute('aria-labelledby') !== mergedLabel) {
-            fieldset.setAttribute('aria-labelledby', mergedLabel);
-          }
-        } else if (fieldset.hasAttribute('aria-labelledby')) {
-          fieldset.removeAttribute('aria-labelledby');
-        }
-        const mergedDesc = [...consumerDescIds, ...internalDescIds].filter(Boolean).join(' ') || '';
-        if (mergedDesc) {
-          if (fieldset.getAttribute('aria-describedby') !== mergedDesc) {
-            fieldset.setAttribute('aria-describedby', mergedDesc);
-          }
-        } else if (fieldset.hasAttribute('aria-describedby')) {
-          fieldset.removeAttribute('aria-describedby');
-        }
-        if (fieldset.getAttribute('role') !== 'group') {
-          fieldset.setAttribute('role', 'group');
-        }
-        if (this.required && fieldset.getAttribute('aria-required') !== 'true') {
-          fieldset.setAttribute('aria-required', 'true');
-        } else if (!this.required && fieldset.hasAttribute('aria-required')) {
-          fieldset.removeAttribute('aria-required');
-        }
-        // Codex round-18 P2: drive `aria-invalid` from the actual ValidityState,
-        // not from `hasError` (which reflects only visible error content).
-        // A required group with no selection is invalid via setValidity()
-        // before any error text is supplied; legacy/no-IDL-ref engines must
-        // hear that invalid state on the announced fieldset surface.
-        const isInvalid = !this._internals.validity.valid;
-        if (isInvalid && fieldset.getAttribute('aria-invalid') !== 'true') {
-          fieldset.setAttribute('aria-invalid', 'true');
-        } else if (!isInvalid && fieldset.hasAttribute('aria-invalid')) {
-          fieldset.removeAttribute('aria-invalid');
-        }
       }
     }
   }
@@ -712,14 +673,16 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       'fieldset--required': this.required,
     };
 
-    // Codex round-17 P1: on the no-IDL-ref fallback path the fieldset owns
-    // the description chain (so shadow-internal IDREFs resolve in the same
-    // root). `_syncHostAriaSemantics()` sets role/aria-* imperatively in
-    // that branch; on the modern path the host carries the role via
-    // ElementInternals so the fieldset stays presentational.
-    const fieldsetRole = this._supportsIdrefRefs ? 'presentation' : nothing;
+    // Codex round-19 P1: inner fieldset is presentational on BOTH the modern
+    // and no-IDL-ref fallback paths so AT announces exactly one accessible
+    // container (the host). Earlier rounds promoted the fieldset to
+    // `role="group"` on the fallback branch and spliced shadow-internal ids
+    // into its aria-* attributes; that produced nested host→fieldset groups
+    // and broke external IDREFs (shadow ids cannot resolve across the
+    // boundary). The host carries the role + accessible name via
+    // ElementInternals on both paths.
     return html`
-      <fieldset part="group" class=${classMap(fieldsetClasses)} role=${fieldsetRole}>
+      <fieldset part="group" class=${classMap(fieldsetClasses)} role="presentation">
         <legend part="label" class="fieldset__legend" id=${this._labelId}>
           <slot name="label" @slotchange=${this._handleLabelSlotChange}>${this.label}</slot>
           ${this.required

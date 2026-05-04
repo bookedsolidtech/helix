@@ -1013,4 +1013,104 @@ describe('hx-checkbox-group', () => {
       expect((cb as any)._groupedSuppress).toBe(true);
     });
   });
+
+  // ─── Codex round-19 P1: single accessible-container invariant (4) ───
+
+  describe('Single accessible-container invariant (round-19 P1)', () => {
+    /**
+     * Forces the no-IDL-ref fallback branch so the assertions below exercise
+     * the same code path a legacy engine (e.g. Firefox today) would take.
+     * Mirrors the `hx-checkbox` test harness pattern.
+     */
+    type GroupTestHarness = HelixCheckboxGroup & {
+      _supportsIdrefRefs: boolean;
+      _syncHostAriaSemantics(): void;
+    };
+    async function forceFallbackPath(el: HelixCheckboxGroup): Promise<void> {
+      const harness = el as GroupTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('modern path: host owns role="group", inner fieldset is presentation', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(internals.role).toBe('group');
+      expect(fieldset.getAttribute('role')).toBe('presentation');
+    });
+
+    it('fallback path: host still owns role="group", inner fieldset stays presentation', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      // Single accessible container — the host. AT must NOT see a nested
+      // host group → inner group → controls hierarchy.
+      expect(internals.role).toBe('group');
+      expect(fieldset.getAttribute('role')).toBe('presentation');
+    });
+
+    it('fallback path: inner fieldset has no aria-labelledby / aria-describedby / aria-required / aria-invalid', async () => {
+      // With help text + error + required, prior rounds spliced shadow
+      // help/error ids onto the inner fieldset; round-19 drops that splice
+      // entirely (shadow IDREFs cannot resolve to consumer light DOM, so
+      // merging them was always broken on the fallback path).
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" help-text="Hint" error="Required" required>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-required')).toBe(false);
+      expect(fieldset.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('fallback path: consumer aria-labelledby / aria-describedby still mirror onto host', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'cbxg-ext-label';
+      labelHost.textContent = 'External Label';
+      const helpHost = document.createElement('span');
+      helpHost.id = 'cbxg-ext-help';
+      helpHost.textContent = 'External Help';
+      container.appendChild(labelHost);
+      container.appendChild(helpHost);
+
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group aria-labelledby="cbxg-ext-label" aria-describedby="cbxg-ext-help">
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      // Consumer-supplied tokens stay on the host (they resolve in the host's
+      // containing root). Inner fieldset is untouched.
+      expect(el.getAttribute('aria-labelledby')).toBe('cbxg-ext-label');
+      expect(el.getAttribute('aria-describedby')).toBe('cbxg-ext-help');
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
+    });
+  });
 });
