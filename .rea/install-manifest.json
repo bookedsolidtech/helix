@@ -1,12 +1,12 @@
 {
-  "version": "0.21.0",
+  "version": "0.22.0",
   "profile": "bst-internal",
   "installed_at": "2026-04-23T15:09:02.547Z",
-  "upgraded_at": "2026-05-04T03:05:22.901Z",
+  "upgraded_at": "2026-05-04T03:55:51.897Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
-      "sha256": "20ee41c06dd67f1ba19662eba57dfbc4fea3fe199b6a2f7f95d5b1c474ad31bc",
+      "sha256": "32879325d90fc0358049ac05c6fade47029a75cee827310a6b0452c075e21fc7",
       "source": "hook"
     },
     {
@@ -20,8 +20,13 @@
       "source": "hook"
     },
     {
+      "path": ".claude/hooks/_lib/interpreter-scanner.sh",
+      "sha256": "1564d8aa4e337f3914b0361497a7d2900b3ac656b29e3896fbce67cbe5b0e4f9",
+      "source": "hook"
+    },
+    {
       "path": ".claude/hooks/_lib/path-normalize.sh",
-      "sha256": "9fa2054bc519e9f0f3237a7f671740d3dec0f472f792cb1a0483402735f68d19",
+      "sha256": "eb773a1ed5fd49ea46ac1af41c1744af8e213e5942b763ea8a936aa0557abe5b",
       "source": "hook"
     },
     {
@@ -51,7 +56,7 @@
     },
     {
       "path": ".claude/hooks/blocked-paths-bash-gate.sh",
-      "sha256": "f21aa7ba60ad61ad1f7258a12ba9dfac5dfa18e4c2acf68aa1e9123bb625077b",
+      "sha256": "04bdedd0406d1caf1b2db83cff44ee010bf3a29736fdfd39bb05aba8b29ad2a9",
       "source": "hook"
     },
     {
@@ -86,7 +91,7 @@
     },
     {
       "path": ".claude/hooks/protected-paths-bash-gate.sh",
-      "sha256": "7cb38e0a6ad92d447bb3e42304e80e79e5287e2ae5c46d90c4d0b396acf0442b",
+      "sha256": "b584e78079a46a89e5fb1cb53490dab872be9a57755c811d9b118c8b38d5ab51",
       "source": "hook"
     },
     {

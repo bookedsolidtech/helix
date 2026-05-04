@@ -87,14 +87,29 @@
 # correct. We only need the mask to suppress matching; the captured
 # payload is read off the original string.
 #
-# Limitation: ONE level of unwrapping. A wrapper inside a wrapper
-# (`bash -c "bash -c 'innermost'"`) emits only the second-level payload
-# (`bash -c 'innermost'`), not the third-level. This is enough for
-# every consumer-reported bypass; deeper nesting can be added later
-# without changing the contract.
+# 0.21.2 helix-022 #3: recurse to fixed point with depth bound 8.
+# Pre-fix the function did exactly ONE level of unwrap, so
+# `bash -lc "bash -lc 'printf x > .rea/HALT'"` emitted the
+# middle wrapper as a segment but NEVER the inner `printf x > ...`.
+# Now each extracted payload is re-fed through the unwrap until
+# either no payload is found (fixed point) or depth 8 is reached.
+# Depth limit prevents pathological inputs; on overflow the helper
+# emits a stderr advisory but does not refuse — caller falls back
+# to logical-form-only enforcement of the partial unwrap.
 _rea_unwrap_nested_shells() {
+  _rea_unwrap_at_depth "$1" 0
+}
+
+_rea_unwrap_at_depth() {
   local cmd="$1"
+  local depth="$2"
+  local max_depth=8
   printf '%s\n' "$cmd"
+  if [[ $depth -ge $max_depth ]]; then
+    printf 'rea: nested-shell unwrap depth limit (%d) reached on payload %.80s...\n' \
+      "$max_depth" "$cmd" >&2
+    return 0
+  fi
   # Build a mask where in-quote `"` `'` `;` `&` `|` characters are
   # replaced with multi-byte sentinels so the wrapper regex below
   # cannot match wrapper syntax that lives inside outer quoted prose.
@@ -172,7 +187,10 @@ _rea_unwrap_nested_shells() {
   # masked form; payload extraction reads the raw form using the same
   # offsets. Because the mask is byte-for-byte width-preserving, the
   # same RSTART/RLENGTH applies to both.
-  printf '' | awk -v raw="$cmd" -v masked="$masked" '
+  #
+  # 0.21.2: capture payloads to a local var; iterate to recurse.
+  local _unwrap_payloads
+  _unwrap_payloads=$(printf '' | awk -v raw="$cmd" -v masked="$masked" '
     BEGIN {
       # Wrapper-prefix regex: shell-name + optional flag tokens + -c-style flag.
       # Each flag token is `-` followed by 1+ letters and trailing space.
@@ -263,7 +281,14 @@ _rea_unwrap_nested_shells() {
     }
     # Empty action with no input rules — explicitly drive the loop from
     # END so awk does not require any input records.
-    END {}'
+    END {}')
+  # Recurse on each extracted payload with depth+1.
+  if [[ -n "$_unwrap_payloads" ]]; then
+    while IFS= read -r _unwrap_p; do
+      [[ -z "$_unwrap_p" ]] && continue
+      _rea_unwrap_at_depth "$_unwrap_p" $((depth + 1))
+    done <<< "$_unwrap_payloads"
+  fi
 }
 
 # Split $1 on shell command separators. Emits one segment per line on

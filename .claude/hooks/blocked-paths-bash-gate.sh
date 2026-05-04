@@ -45,6 +45,8 @@ source "$(dirname "$0")/_lib/path-normalize.sh"
 source "$(dirname "$0")/_lib/policy-read.sh"
 # shellcheck source=_lib/halt-check.sh
 source "$(dirname "$0")/_lib/halt-check.sh"
+# shellcheck source=_lib/interpreter-scanner.sh
+source "$(dirname "$0")/_lib/interpreter-scanner.sh"
 
 INPUT=$(cat)
 
@@ -270,25 +272,17 @@ _check_segment() {
       ;;
   esac
 
-  # Node-interpreter fs.writeFileSync / fs.appendFileSync / fs.createWriteStream
-  # detection (discord-ops Round 9 #1 explicit shape). Anchored on
-  # `node -e ...` or `node --eval ...`. Conservative regex: pulls the
-  # first quoted argument out of the call.
-  local re_node_write='(^|[[:space:]])node[[:space:]]+(-e|--eval|-p|--print)[[:space:]]+'
-  if [[ "$segment" =~ $re_node_write ]]; then
-    # Find any quoted-string argument that contains fs.write* /
-    # fs.append* / createWriteStream + a path-looking arg. This is a
-    # best-effort scan; the goal is the obvious vector, not full JS.
-    local node_targets
-    node_targets=$(printf '%s' "$segment" \
-      | grep -oE "fs\.(writeFileSync|writeFile|appendFileSync|appendFile|createWriteStream)\([[:space:]]*[\"'][^\"']+[\"']" \
-      | sed -E "s/.*\([[:space:]]*[\"']([^\"']+)[\"'].*/\\1/" || true)
-    if [[ -n "$node_targets" ]]; then
-      while IFS= read -r tgt; do
-        [[ -z "$tgt" ]] && continue
-        _check_token "$tgt" "$segment"
-      done <<<"$node_targets"
-    fi
+  # 0.21.2 helix-022 #2: interpreter scanner factored to
+  # _lib/interpreter-scanner.sh and shared with protected-paths-bash-gate.
+  # Covers node -e fs.writeFileSync, python -c open(...,'w'),
+  # ruby -e File.write, perl -e open(FH,'>...').
+  local interp_targets
+  interp_targets=$(rea_interpreter_write_targets "$segment")
+  if [[ -n "$interp_targets" ]]; then
+    while IFS= read -r tgt; do
+      [[ -z "$tgt" ]] && continue
+      _check_token "$tgt" "$segment"
+    done <<<"$interp_targets"
   fi
 
   return 0

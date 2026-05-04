@@ -31,6 +31,8 @@ source "$(dirname "$0")/_lib/protected-paths.sh"
 source "$(dirname "$0")/_lib/path-normalize.sh"
 # shellcheck source=_lib/cmd-segments.sh
 source "$(dirname "$0")/_lib/cmd-segments.sh"
+# shellcheck source=_lib/interpreter-scanner.sh
+source "$(dirname "$0")/_lib/interpreter-scanner.sh"
 
 INPUT=$(cat)
 
@@ -72,6 +74,20 @@ _normalize_target() {
   # Strip matching surrounding quotes.
   if [[ "$t" =~ ^\"(.*)\"$ ]]; then t="${BASH_REMATCH[1]}"; fi
   if [[ "$t" =~ ^\'(.*)\'$ ]]; then t="${BASH_REMATCH[1]}"; fi
+  # 0.21.2 helix-022 #5: fail closed on shell parameter/command
+  # substitution in the target. `printf x > "$p"` (where p was set
+  # earlier in the segment to `.rea/HALT`) bypassed the gate because
+  # neither the logical nor resolved-form check matched the literal
+  # string `$p`. We DO NOT try to resolve `$NAME=value` assignments
+  # in the same segment — that's a partial-execution semantic this
+  # static analyzer cannot guarantee. Refuse with a clear sentinel
+  # so the caller emits the actionable error message.
+  case "$t" in
+    *'$'*|*'`'*)
+      printf '__rea_unresolved_expansion__:%s' "$t"
+      return 0
+      ;;
+  esac
   # If the path contains `..` segments, resolve them aggressively. We
   # cannot rely on `realpath` being installed; do a manual resolution
   # by walking segments. This is the helix-015 P1 fix: pre-fix, the
@@ -121,6 +137,83 @@ _normalize_target() {
   printf '%s' "$t" | tr '[:upper:]' '[:lower:]'
 }
 
+# 0.21.2 helix-022 #4: cp/mv destination extractor. Walks the segment
+# token-by-token, skips flags (single-dash, double-dash, `--` end-of-
+# options separator), returns the LAST positional argument — which is
+# the destination per POSIX cp/mv semantic.
+#
+# Handles:
+#   cp src dst           → dst
+#   cp -f src dst        → dst
+#   cp --force src dst   → dst
+#   cp a b c dst         → dst (multi-source: last is destination)
+#   cp -- -src dst       → dst (-- ends option processing)
+#   cp -t dir src        → src is the source after -t flag (-t SOURCE_FIRST)
+#                          but we don't try to follow -t semantics; we
+#                          conservatively treat the LAST positional as
+#                          the destination, which over-blocks `-t dir src`
+#                          (destination becomes `src`) — the caller's
+#                          rea_path_is_protected check then determines
+#                          if that's actually protected. False-positive
+#                          case is narrow.
+#
+# Flag-with-value awareness: short flag clusters that take a value
+# (cp -t TARGET_DIR, mv -S SUFFIX, install -m MODE, etc.) consume the
+# next token. Conservative heuristic: known short-options-with-values
+# get the next token consumed.
+_extract_cpmv_destination() {
+  local segment="$1"
+  local stripped="${segment#"${segment%%[![:space:]]*}"}"
+  # Word-split on whitespace. `set --` is intentional; downstream
+  # iteration consumes positional args.
+  local positionals=()
+  local found_cmd=""
+  local end_of_options=0
+  # shellcheck disable=SC2086
+  set -- $stripped
+  while [ "$#" -gt 0 ]; do
+    local tok="$1"
+    shift
+    if [[ -z "$found_cmd" ]]; then
+      case "$tok" in
+        cp|mv) found_cmd="$tok" ;;
+      esac
+      continue
+    fi
+    if [[ "$end_of_options" -eq 1 ]]; then
+      positionals+=("$tok")
+      continue
+    fi
+    case "$tok" in
+      --) end_of_options=1; continue ;;
+      --*=*) continue ;;
+      --*)
+        # Long flags that take a value as the next token.
+        case "$tok" in
+          --target-directory|--reply|--suffix|--backup|--reflink|--strip-trailing-slashes)
+            shift 2>/dev/null || true
+            ;;
+        esac
+        continue
+        ;;
+      -*)
+        # Short flag cluster. Check the LAST char — if it's a known
+        # value-taking flag, consume the next token.
+        case "$tok" in
+          *-t|*-S|*-Z|*-T) shift 2>/dev/null || true ;;
+        esac
+        continue
+        ;;
+      *)
+        positionals+=("$tok")
+        ;;
+    esac
+  done
+  if [[ ${#positionals[@]} -ge 2 ]]; then
+    printf '%s' "${positionals[$((${#positionals[@]} - 1))]}"
+  fi
+}
+
 # Refuse and exit 2 with a uniform error message.
 _refuse() {
   local pattern="$1" target="$2" segment="$3"
@@ -159,7 +252,15 @@ _check_segment() {
   # pattern accepts: optional fd-prefix, then `>` or `>>` or `>|`, with
   # optional `&` for stderr-merge variants.
   local re_redirect='(^|[[:space:]])(&>>|&>|[0-9]+>>|[0-9]+>\||[0-9]+>|>>|>\||>)[[:space:]]*([^[:space:]&|;<>]+)'
-  local re_cpmv='(^|[[:space:]])(cp|mv)[[:space:]]+[^&|;<>]+[[:space:]]([^[:space:]&|;<>]+)[[:space:]]*$'
+  # 0.21.2 helix-022 #4: cp/mv detection now uses an explicit argv-walk
+  # (`_extract_cpmv_destination`) instead of regex-with-backtracking so
+  # every shape is handled — `cp -f src dst`, multi-source `cp a b dst`,
+  # `cp --no-clobber src dst`, `cp -- src dst`. The walker treats the
+  # LAST positional as the destination (POSIX cp/mv semantic). The
+  # sentinel `re_cpmv` regex below is retained ONLY as a cheap pre-screen
+  # — it matches the command name to avoid running the walker on every
+  # segment, but never returns the destination (the walker does).
+  local re_cpmv_screen='(^|[[:space:]])(cp|mv)[[:space:]]+'
   local re_sed='(^|[[:space:]])sed[[:space:]]+(-[a-zA-Z]*i[a-zA-Z]*[^[:space:]]*)[[:space:]]+[^&|;<>]+[[:space:]]([^[:space:]&|;<>]+)[[:space:]]*$'
   local re_dd='(^|[[:space:]])dd[[:space:]]+[^&|;<>]*of=([^[:space:]&|;<>]+)'
   # 0.15.0 codex P1 fix: replaced the bash-3.2-broken `(...)*` pattern
@@ -171,9 +272,17 @@ _check_segment() {
   if [[ "$segment" =~ $re_redirect ]]; then
     target_token="${BASH_REMATCH[3]}"
     detected_form="redirect ${BASH_REMATCH[2]}"
-  elif [[ "$segment" =~ $re_cpmv ]]; then
-    target_token="${BASH_REMATCH[3]}"
-    detected_form="${BASH_REMATCH[2]}"
+  elif [[ "$segment" =~ $re_cpmv_screen ]]; then
+    # 0.21.2 helix-022 #4: extract destination via argv-walk; LAST
+    # positional is the destination per POSIX cp/mv semantic.
+    local _cpmv_cmd="${BASH_REMATCH[2]}"
+    target_token=$(_extract_cpmv_destination "$segment")
+    detected_form="$_cpmv_cmd"
+    if [[ -z "$target_token" ]]; then
+      # No positional destination found — segment isn't actually a
+      # valid cp/mv invocation. Fall through.
+      :
+    fi
   elif [[ "$segment" =~ $re_sed ]]; then
     target_token="${BASH_REMATCH[3]}"
     detected_form="sed -i"
@@ -246,6 +355,18 @@ _check_segment() {
             } >&2
             exit 2
           fi
+          # 0.21.2 helix-022 #5: shell expansion in target — refuse.
+          if [[ "$_t" == __rea_unresolved_expansion__:* ]]; then
+            local raw="${_t#__rea_unresolved_expansion__:}"
+            {
+              printf 'PROTECTED PATH (bash): unresolved shell expansion in target\n'
+              printf '  Token: %s\n  Segment: %s\n' "$raw" "$segment"
+              printf '  Rule: $-substitution and `command-substitution` in redirect\n'
+              printf '        targets are refused at static-analysis time. Resolve\n'
+              printf '        the variable to a literal path before the redirect.\n'
+            } >&2
+            exit 2
+          fi
           # 0.20.1 helix-021 #1: resolve intermediate symlinks via
           # `cd -P / pwd -P` parent-canonicalization (Write-tier parity).
           # `ln -s ../ .husky/pre-push.d/linkdir; printf x > .husky/pre-push.d/linkdir/pre-push`
@@ -285,7 +406,13 @@ _check_segment() {
     done
   fi
 
+  # 0.21.2 helix-022 #2: when no shell-redirect target was found,
+  # interpreter-scanner pass before returning. `node -e
+  # "fs.writeFileSync('.rea/HALT','x')"` has NO redirect or cp/mv
+  # token but still writes a protected path. Run the scanner on the
+  # raw segment; refuse if any extracted target is protected.
   if [[ -z "$target_token" ]]; then
+    _interpreter_scan_and_refuse_protected "$segment"
     return 0
   fi
 
@@ -304,6 +431,21 @@ _check_segment() {
       printf '  Rule: bash redirects whose target resolves outside REA_ROOT\n'
       printf '        are refused. Use a project-relative path without `..`\n'
       printf '        segments.\n'
+    } >&2
+    exit 2
+  fi
+  # 0.21.2 helix-022 #5: shell expansion in target — refuse.
+  if [[ "$target" == __rea_unresolved_expansion__:* ]]; then
+    local raw="${target#__rea_unresolved_expansion__:}"
+    {
+      printf 'PROTECTED PATH (bash): unresolved shell expansion in target\n'
+      printf '\n'
+      printf '  Token:   %s\n' "$raw"
+      printf '  Segment: %s\n' "$segment"
+      printf '\n'
+      printf '  Rule: $-substitution and `command-substitution` in redirect\n'
+      printf '        targets are refused at static-analysis time. Resolve\n'
+      printf '        the variable to a literal path before the redirect.\n'
     } >&2
     exit 2
   fi
@@ -340,7 +482,53 @@ _check_segment() {
     done
     _refuse "$matched" "$hit_form" "$segment"
   fi
+
+  # 0.21.2 helix-022 #2: interpreter-scanner pass even when a
+  # shell-redirect target was already found. A single segment can
+  # have BOTH a shell redirect AND a node -e fs.write*; both must
+  # be checked.
+  _interpreter_scan_and_refuse_protected "$segment"
+
   return 0
+}
+
+# 0.21.2 helix-022 #2: interpreter-scanner pass. Catches
+# `node -e "fs.writeFileSync('.rea/HALT','x')"` and equivalents in
+# python/ruby/perl. The blocked-paths sibling has had this since
+# 0.16.3 F3; this is parity. Each extracted target runs through
+# `_normalize_target` + `rea_path_is_protected` so the existing
+# logical-form + symlink-resolved-form checks both apply.
+_interpreter_scan_and_refuse_protected() {
+  local segment="$1"
+  local _interp_targets
+  _interp_targets=$(rea_interpreter_write_targets "$segment")
+  [[ -z "$_interp_targets" ]] && return 0
+  while IFS= read -r _interp_t; do
+    [[ -z "$_interp_t" ]] && continue
+    local _norm
+    _norm=$(_normalize_target "$_interp_t")
+    if [[ "$_norm" == __rea_outside_root__:* || "$_norm" == __rea_unresolved_expansion__:* ]]; then
+      continue
+    fi
+    local _norm_resolved
+    _norm_resolved=$(rea_resolved_relative_form "$_interp_t")
+    if rea_path_is_protected "$_norm" \
+       || ([[ -n "$_norm_resolved" && "$_norm_resolved" != __rea_outside_root__:* ]] \
+          && rea_path_is_protected "$_norm_resolved"); then
+      local matched_interp="" pattern_lc
+      local hit_form="$_norm"
+      if [[ -n "$_norm_resolved" ]] && rea_path_is_protected "$_norm_resolved" \
+         && ! rea_path_is_protected "$_norm"; then
+        hit_form="$_norm_resolved"
+      fi
+      for pattern in "${REA_PROTECTED_PATTERNS[@]}"; do
+        pattern_lc=$(printf '%s' "$pattern" | tr '[:upper:]' '[:lower:]')
+        if [[ "$hit_form" == "$pattern_lc" ]]; then matched_interp="$pattern"; break; fi
+        if [[ "$pattern_lc" == */ && "$hit_form" == "$pattern_lc"* ]]; then matched_interp="$pattern"; break; fi
+      done
+      _refuse "$matched_interp" "$hit_form" "$segment"
+    fi
+  done <<<"$_interp_targets"
 }
 
 for_each_segment "$CMD" _check_segment

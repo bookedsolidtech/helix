@@ -58,9 +58,36 @@ resolve_parent_realpath() {
   local parent_dir
   parent_dir=$(dirname -- "$target_path")
   if [[ ! -d "$parent_dir" ]]; then
-    # Parent doesn't exist yet — caller should treat as "no realpath
-    # available" and fall back to logical-path checks. Return empty.
-    printf ''
+    # 0.21.2 helix-022 #1: parent doesn't exist on disk — but a
+    # SYMLINK along the path might. Walk up to the nearest existing
+    # ancestor, resolve THAT, then append the unresolved tail. Pre-fix
+    # this returned empty for any path whose terminal directory is
+    # created mid-segment (`mkdir -p linkroot/.husky/sub` followed by
+    # a redirect into `.husky/sub/X`); the caller fell back to logical-
+    # path-only enforcement, restoring the symlink-walk bypass.
+    local walk="$parent_dir"
+    local tail=""
+    while [[ -n "$walk" && "$walk" != "/" && "$walk" != "." && ! -d "$walk" ]]; do
+      tail="$(basename -- "$walk")${tail:+/$tail}"
+      walk="$(dirname -- "$walk")"
+    done
+    if [[ -z "$walk" || "$walk" == "/" ]]; then
+      # Walked all the way up; no existing ancestor inside the project.
+      # Caller still has the logical-path check; return empty.
+      printf ''
+      return 0
+    fi
+    local resolved_walk
+    resolved_walk=$(cd -P -- "$walk" 2>/dev/null && pwd -P 2>/dev/null) || resolved_walk=""
+    if [[ -z "$resolved_walk" ]]; then
+      printf ''
+      return 0
+    fi
+    if [[ -n "$tail" ]]; then
+      printf '%s/%s' "$resolved_walk" "$tail"
+    else
+      printf '%s' "$resolved_walk"
+    fi
     return 0
   fi
   # `cd -P` follows symlinks; `pwd -P` prints the resolved physical
