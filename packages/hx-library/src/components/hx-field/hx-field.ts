@@ -31,14 +31,23 @@ function isFormControl(el: Element): el is HTMLElement {
  *
  * **`aria-label` ownership model:** When `label` is set and no shadow `<label>`
  * is rendered, hx-field writes `aria-label` to the slotted control and stamps
- * a `data-hx-owns-label="true"` ownership marker. Consumers signal "I own this
- * value, do not touch it" by either (a) setting `data-aria-managed` on the
- * control, or (b) overwriting `aria-label` to a different value than the one
- * hx-field last wrote — both release the host's claim. **Limitation:** because
- * detection is snapshot-based, a consumer rewrite to the *exact same value*
- * hx-field last wrote cannot be observed; to genuinely take ownership in that
- * case the consumer must write a different value, set `data-aria-managed`, or
- * remove the `data-hx-owns-label` marker themselves.
+ * a `data-hx-owns-label="true"` ownership marker.
+ *
+ * Consumers have two ways to keep their value safe from hx-field's writes:
+ *   (a) **Suspend** all ARIA bridging by setting `data-aria-managed` on the
+ *       control. While present, hx-field skips every aria-* mutation and
+ *       leaves any existing marker/snapshot in place — removing
+ *       `data-aria-managed` later may resume host ownership of an `aria-label`
+ *       value that still matches the snapshot.
+ *   (b) **Release** ownership permanently by overwriting `aria-label` to a
+ *       different value than the one hx-field last wrote. The mismatch
+ *       triggers `_releaseHostOwnedAriaLabel`, which strips the marker and
+ *       clears the snapshot, transferring ownership to the consumer.
+ *
+ * **Limitation:** because release detection is snapshot-based, a consumer
+ * rewrite to the *exact same value* hx-field last wrote is invisible. To
+ * genuinely take ownership in that case the consumer must write a different
+ * value (even briefly), or remove the `data-hx-owns-label` marker themselves.
  *
  * @summary Layout wrapper for label, control, help text, and error message.
  *
