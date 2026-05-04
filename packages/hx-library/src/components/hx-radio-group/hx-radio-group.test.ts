@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HxRadioGroup } from './hx-radio-group.js';
 import type { HxRadio } from './hx-radio.js';
@@ -617,6 +617,54 @@ describe('hx-radio-group', () => {
       `);
       expect(el.validity.valueMissing).toBe(true);
     });
+
+    // Codex round-35 (CR major + Low #4) + round-36 (Low #4): the
+    // setValidity() anchor must be a focusable interactive radio so the UA
+    // can route validation UI / error recovery to the actual control surface.
+    // The presentational .fieldset__group (role="none") is not focusable; a
+    // disabled radio is not focusable either. These tests capture the third
+    // argument to setValidity() directly so the chain order is locked in
+    // (round-35 fix would have regressed silently if we only asserted
+    // `checkValidity()`).
+    it('setValidity anchor falls through to the first enabled radio when nothing is checked', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Pick" required>
+          <hx-radio value="a" label="A" disabled></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+        </hx-radio-group>
+      `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const setValiditySpy = vi.spyOn(internals, 'setValidity');
+      // Trigger a fresh setValidity by re-asserting required.
+      el.required = false;
+      await el.updateComplete;
+      el.required = true;
+      await el.updateComplete;
+      const lastCall = setValiditySpy.mock.calls.at(-1);
+      expect(lastCall?.[0]).toEqual({ valueMissing: true });
+      // First radio is disabled — anchor must skip it and pick the second.
+      expect(lastCall?.[2]).toBe(el.querySelector('hx-radio[value="b"]'));
+      expect(lastCall?.[2]).not.toBe(el.querySelector('hx-radio[value="a"]'));
+    });
+
+    it('setValidity anchor never falls through to the presentational group when an enabled radio exists', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Pick" required>
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const setValiditySpy = vi.spyOn(internals, 'setValidity');
+      el.required = false;
+      await el.updateComplete;
+      el.required = true;
+      await el.updateComplete;
+      const lastCall = setValiditySpy.mock.calls.at(-1);
+      expect(lastCall?.[2]).toBe(el.querySelector('hx-radio[value="a"]'));
+      // The presentational group div carries role="none" and is unfocusable.
+      const groupDiv = (el.shadowRoot as ShadowRoot).querySelector('.fieldset__group');
+      expect(lastCall?.[2]).not.toBe(groupDiv);
+    });
   });
 
   // ─── Accessibility (4) ───
@@ -676,6 +724,29 @@ describe('hx-radio-group', () => {
       expect(internals.ariaRequired).not.toBe('true');
     });
 
+    // Codex round-35 (medium) follow-up (Low #5): hasEffectiveLabelledBy
+    // contract. Broken aria-labelledby tokens must NOT erase the visible
+    // legend on either render path — they should fall through to `label`.
+    it('keeps the legend accessible name when aria-labelledby points to a missing id', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Topics" aria-labelledby="rg-missing-target">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs) {
+        const legend = shadowQuery(el, 'legend');
+        expect(refs).toContain(legend);
+      } else {
+        expect(internals.ariaLabel).toBe('Topics');
+        expect(el.getAttribute('aria-labelledby')).toBeNull();
+      }
+    });
+
     it('host ariaLabelledByElements points to the visible legend (when no consumer aria-labelledby)', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="My Group">
@@ -717,8 +788,8 @@ describe('hx-radio-group', () => {
         // attribute carries ONLY consumer-supplied tokens, so the shadow
         // wrapper id MUST NOT appear there.
         const ariaDescription =
-          (internals as ElementInternals & { ariaDescription: string | null })
-            .ariaDescription ?? '';
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
         expect(ariaDescription).toContain('Required field');
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
         expect(tokens).not.toContain(errorWrapper.id);
@@ -745,8 +816,8 @@ describe('hx-radio-group', () => {
         // attribute carries ONLY consumer-supplied tokens, so the shadow
         // wrapper id MUST NOT appear there.
         const ariaDescription =
-          (internals as ElementInternals & { ariaDescription: string | null })
-            .ariaDescription ?? '';
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
         expect(ariaDescription).toContain('Select one');
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
         expect(tokens).not.toContain(helpText.id);
@@ -1166,8 +1237,8 @@ describe('hx-radio-group', () => {
         // attribute carries ONLY consumer-supplied tokens, so the shadow
         // wrapper id MUST NOT appear there.
         const ariaDescription =
-          (internals as ElementInternals & { ariaDescription: string | null })
-            .ariaDescription ?? '';
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
         expect(ariaDescription).toContain('Pick wisely');
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
         expect(tokens).not.toContain(helpDiv.id);
@@ -1196,8 +1267,8 @@ describe('hx-radio-group', () => {
         // attribute carries ONLY consumer-supplied tokens, so the shadow
         // wrapper id MUST NOT appear there.
         const ariaDescription =
-          (internals as ElementInternals & { ariaDescription: string | null })
-            .ariaDescription ?? '';
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
         expect(ariaDescription).toContain('Hint');
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
         expect(tokens).not.toContain(helpDiv.id);
@@ -1231,8 +1302,8 @@ describe('hx-radio-group', () => {
         // wrapper ids MUST NOT appear there. Help is hidden when error is
         // active, so its text must be absent from `ariaDescription` too.
         const ariaDescription =
-          (internals as ElementInternals & { ariaDescription: string | null })
-            .ariaDescription ?? '';
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
         expect(ariaDescription).toContain('Required');
         expect(ariaDescription).not.toContain('Hint');
         const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];

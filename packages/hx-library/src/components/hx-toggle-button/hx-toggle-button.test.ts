@@ -78,6 +78,48 @@ describe('hx-toggle-button', () => {
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('aria-pressed')).toBe('true');
     });
+
+    // Codex round-35 follow-up (Low #5) + round-36 (medium): hasEffective-
+    // LabelledBy contract. A typo or missing target in `aria-labelledby` must
+    // NOT erase the accessible name on EITHER render path — the modern path
+    // falls through to internals.ariaLabel = slot text; the legacy fallback
+    // clears the inner button's aria-labelledby so the inner aria-label wins.
+    it('keeps the slot accessible name when aria-labelledby points to a missing id', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-labelledby="does-not-exist">Save</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const innerBtn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      // Modern path: host owns the name via internals.ariaLabel (= slot text).
+      // Legacy path: internals.ariaLabel is null (host role cleared); the
+      // inner native button is the announced surface and must NOT carry the
+      // broken aria-labelledby — its aria-label carries the slot text.
+      if (internals.role === 'button') {
+        expect(internals.ariaLabel).toBe('Save');
+      } else {
+        expect(innerBtn.getAttribute('aria-labelledby')).toBeNull();
+        expect(innerBtn.getAttribute('aria-label')).toBe('Save');
+      }
+    });
+
+    it('uses aria-labelledby when at least one referenced element exists', async () => {
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<span id="external-label-tb">External label</span>',
+      );
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-labelledby="external-label-tb">Save</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const innerBtn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      if (internals.role === 'button') {
+        expect(internals.ariaLabel).toBeNull();
+      } else {
+        // Legacy path: inner button mirrors the resolved labelledby tokens.
+        expect(innerBtn.getAttribute('aria-labelledby')).toBe('external-label-tb');
+      }
+      document.getElementById('external-label-tb')?.remove();
+    });
   });
 
   // ─── Attribute Reflection (3) ───

@@ -467,13 +467,6 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     internals.ariaOrientation = this.orientation === 'horizontal' ? 'horizontal' : 'vertical';
 
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
-    if (hostAriaLabel) {
-      internals.ariaLabel = hostAriaLabel;
-    } else if (!this.getAttribute('aria-labelledby')) {
-      internals.ariaLabel = this.label || null;
-    } else {
-      internals.ariaLabel = null;
-    }
 
     // Resolve the candidate label/desc element references once — the IDL-ref
     // path consumes them as `Element[]`, the fallback path mirrors their `id`
@@ -501,6 +494,18 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     const externalDescTokens = this._consumerDescribedBy;
 
     const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    // Codex round-35 finding (CR major + codex follow-up): `aria-labelledby`
+    // is only "effective" when at least one IDREF resolves. A typo or
+    // transiently-missing target must NOT erase the visible label — fall back
+    // to `label` so the radiogroup keeps a name on both paths.
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!hasEffectiveLabelledBy) {
+      internals.ariaLabel = this.label || null;
+    } else {
+      internals.ariaLabel = null;
+    }
     if (labelEls.length === 0 && !hostAriaLabel && this.label && internalLegend) {
       labelEls.push(internalLegend);
     }
@@ -564,14 +569,33 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
 
       // Host attributes: ONLY consumer tokens (never shadow-internal ids —
       // those cannot resolve across the shadow boundary).
-      const hostLabel = [...consumerLabelIds].filter(Boolean).join(' ') || '';
+      //
+      // Codex round-35 (medium): mirror consumer tokens to the host attribute
+      // ONLY when at least one token resolves to a real element. A broken
+      // `aria-labelledby` (typo, target not yet attached) would otherwise
+      // erase the accessible name on legacy engines per ARIA priority
+      // (aria-labelledby > aria-label > internals.ariaLabel). When tokens
+      // don't resolve, clear the host attribute so the `internals.ariaLabel`
+      // fallback the modern path set above (`this.label`) wins.
+      const hostLabel = hasEffectiveLabelledBy
+        ? [...consumerLabelIds].filter(Boolean).join(' ')
+        : '';
       const liveLabel = this.getAttribute('aria-labelledby');
       if (hostLabel) {
         if (liveLabel !== hostLabel) {
           this.setAttribute('aria-labelledby', hostLabel);
         }
         this._lastWrittenLabelledBy = hostLabel;
-      } else if (liveLabel !== null && this._lastWrittenLabelledBy !== null) {
+      } else if (liveLabel !== null) {
+        // Codex round-36 (medium): when consumer-supplied tokens don't
+        // resolve (`!hasEffectiveLabelledBy`), actively clear the host
+        // attribute even if WE didn't write it. Per ARIA priority
+        // (aria-labelledby > aria-label > internals.ariaLabel), a broken
+        // consumer-authored attribute on the announced surface erases the
+        // legend on legacy engines. The original tokens remain cached in
+        // `_consumerLabelledBy` so they replay on a future sync if the
+        // target later attaches and `hasEffectiveLabelledBy` flips back to
+        // true.
         this.removeAttribute('aria-labelledby');
         this._lastWrittenLabelledBy = null;
       }
@@ -987,10 +1011,25 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
    */
   override _updateValidity(): void {
     if (this.required && !this.value) {
+      // Codex round-35 finding (CR major): anchor `setValidity()` to an actual
+      // radio. The presentational `.fieldset__group` div is `role="none"` and
+      // not focusable, so anchoring there leaves UA validation UI / error
+      // recovery disconnected from the interactive surface.
+      //
+      // Codex round-35 follow-up (Low #4): drop the unconditional `radios[0]`
+      // tier — a disabled radio is not focusable and cannot host UA validation
+      // UI either. Prefer checked-enabled, then any enabled, then the
+      // presentational group as a last resort (still better than `undefined`
+      // because it pins UA error positioning to the visible group bounds).
+      const anchor =
+        this._getRadios().find((radio) => radio.checked && !radio.disabled) ??
+        this._getEnabledRadios()[0] ??
+        this._groupEl ??
+        undefined;
       this._internals.setValidity(
         { valueMissing: true },
         this.error || 'Please select an option.',
-        this._groupEl ?? undefined,
+        anchor,
       );
     } else {
       this._internals.setValidity({});

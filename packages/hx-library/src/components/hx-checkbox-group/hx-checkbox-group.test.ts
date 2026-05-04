@@ -590,6 +590,30 @@ describe('hx-checkbox-group', () => {
       `);
       expect(el.reportValidity()).toBe(false);
     });
+
+    // Codex round-36 (medium): hasEffectiveLabelledBy contract — broken
+    // aria-labelledby tokens must NOT erase the legend on either modern or
+    // legacy paths. The host attribute mirror must clear the broken
+    // consumer-supplied attribute so internals.ariaLabel takes over.
+    it('keeps the legend accessible name when aria-labelledby points to a missing id', async () => {
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group label="Topics" aria-labelledby="cbg-missing-target">
+          <hx-checkbox value="a" label="Option A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs && refs.length > 0) {
+        const legend = shadowQuery(el, 'legend');
+        expect(refs).toContain(legend);
+      } else {
+        expect(internals.ariaLabel).toBe('Topics');
+        expect(el.getAttribute('aria-labelledby')).toBeNull();
+      }
+    });
   });
 
   // ─── Dynamic Children (P2-03) ───

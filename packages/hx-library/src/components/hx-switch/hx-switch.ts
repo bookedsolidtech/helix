@@ -329,6 +329,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const externalLabelTokens = this.getAttribute('aria-labelledby');
+    const externalDescTokens = this.getAttribute('aria-describedby');
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    // Codex round-35 finding (CR major + codex follow-up): `aria-labelledby`
+    // is only "effective" when at least one IDREF resolves to an element. A
+    // typo or transiently-missing target must NOT erase the visible label —
+    // fall back to `label` / slot so a labeled switch never becomes unnamed
+    // on either render path.
+    const hasEffectiveLabelledBy = labelEls.length > 0;
 
     // Codex round-2 finding #2: branch on platform support. Modern path —
     // host is the announced surface and carries `role=switch` + state via
@@ -344,7 +353,7 @@ export class HelixSwitch extends FormMixin(HelixElement) {
 
       if (hostAriaLabel) {
         internals.ariaLabel = hostAriaLabel;
-      } else if (!this.getAttribute('aria-labelledby')) {
+      } else if (!hasEffectiveLabelledBy) {
         internals.ariaLabel = this.label || null;
       } else {
         internals.ariaLabel = null;
@@ -356,10 +365,6 @@ export class HelixSwitch extends FormMixin(HelixElement) {
       };
       const refsInternals = internals as InternalsWithRefs;
 
-      const externalLabelTokens = this.getAttribute('aria-labelledby');
-      const externalDescTokens = this.getAttribute('aria-describedby');
-
-      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
       const internalLabel = this.shadowRoot?.getElementById(this._labelId);
       const hasLabel = !!this.label || this._hasDefaultSlot;
       if (labelEls.length === 0 && !hostAriaLabel && hasLabel && internalLabel) {
@@ -401,11 +406,13 @@ export class HelixSwitch extends FormMixin(HelixElement) {
       internals.ariaDisabled = null;
       internals.ariaLabel = null;
 
-      this._fallbackAriaLabelledBy = this.getAttribute('aria-labelledby') || null;
-      this._fallbackAriaDescribedBy = this.getAttribute('aria-describedby') || null;
-      // Compute resolved label for the inner button: explicit aria-label
-      // tokens, then the public `label` property as a last resort.
-      this._fallbackAriaLabel = hostAriaLabel || null;
+      // Round-35 codex follow-up: only mirror the consumer's labelledby tokens
+      // when at least one resolves; otherwise the inner button must fall back
+      // to `aria-label` (label property or slot) so the switch keeps a name
+      // when an IDREF is a typo. Same contract as the modern path.
+      this._fallbackAriaLabelledBy = hasEffectiveLabelledBy ? externalLabelTokens : null;
+      this._fallbackAriaDescribedBy = externalDescTokens || null;
+      this._fallbackAriaLabel = hasEffectiveLabelledBy ? null : hostAriaLabel || this.label || null;
     }
   }
 

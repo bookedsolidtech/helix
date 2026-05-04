@@ -476,11 +476,19 @@ export class HelixToggleButton extends HelixElement {
     const internals = this._internals;
 
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
-    const hasLabelledBy = !!this.getAttribute('aria-labelledby');
+    const externalLabelTokens = this.getAttribute('aria-labelledby');
+    const externalDescTokens = this.getAttribute('aria-describedby');
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    const descEls = resolveIdrefTokens(this, externalDescTokens);
+    // Codex round-35 finding (CR major): `aria-labelledby` is only "effective"
+    // when at least one IDREF resolves. A typo or transiently-missing target
+    // must NOT erase the visible label — fall back to label/slot text so a
+    // visibly-labeled toggle never becomes unnamed.
+    const hasEffectiveLabelledBy = labelEls.length > 0;
     let resolvedLabel: string | null;
     if (hostAriaLabel) {
       resolvedLabel = hostAriaLabel;
-    } else if (hasLabelledBy) {
+    } else if (hasEffectiveLabelledBy) {
       resolvedLabel = null;
     } else if (this.label) {
       resolvedLabel = this.label;
@@ -513,13 +521,7 @@ export class HelixToggleButton extends HelixElement {
       };
       const refsInternals = internals as InternalsWithRefs;
 
-      const externalLabelTokens = this.getAttribute('aria-labelledby');
-      const externalDescTokens = this.getAttribute('aria-describedby');
-
-      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
-      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
-
-      const descEls = resolveIdrefTokens(this, externalDescTokens);
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
       // Clear fallbacks when IDL refs are available.
       this._fallbackAriaLabelledBy = null;
@@ -538,8 +540,14 @@ export class HelixToggleButton extends HelixElement {
       internals.ariaInvalid = null;
       internals.ariaLabel = null;
 
-      this._fallbackAriaLabelledBy = this.getAttribute('aria-labelledby') || null;
-      this._fallbackAriaDescribedBy = this.getAttribute('aria-describedby') || null;
+      // Codex round-36 (medium): gate the fallback label tokens on the
+      // *effective* labelledby contract. Mirroring broken consumer tokens to
+      // the inner button on legacy engines erases the accessible name —
+      // exactly the bug the modern path now defends against. When tokens
+      // don't resolve, fall through to `_fallbackAriaLabel` (resolvedLabel)
+      // so the slot/property still names the announced surface.
+      this._fallbackAriaLabelledBy = hasEffectiveLabelledBy ? externalLabelTokens : null;
+      this._fallbackAriaDescribedBy = externalDescTokens || null;
       this._fallbackAriaLabel = resolvedLabel;
     }
   }

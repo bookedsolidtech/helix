@@ -525,13 +525,6 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     const internalLegendText = labelSlotHasAssignedNodes
       ? slottedLabelText || null
       : this.label || null;
-    if (hostAriaLabel) {
-      internals.ariaLabel = hostAriaLabel;
-    } else if (!this.getAttribute('aria-labelledby')) {
-      internals.ariaLabel = internalLegendText;
-    } else {
-      internals.ariaLabel = null;
-    }
 
     // Codex round-10 P2: refresh the consumer baseline only when the host
     // attribute moved due to an *external* write. Compare the live attribute
@@ -552,6 +545,18 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     // collections; the IDL-ref branch assigns them as `Element[]`, the
     // fallback mirrors their `id` tokens onto the host's `aria-*` attributes.
     const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    // Codex round-35 (medium): `aria-labelledby` is only "effective" when at
+    // least one IDREF resolves to a real element. A typo or transiently-
+    // missing target must NOT erase the visible legend — fall back to the
+    // legend slot/property so the group keeps a name on both render paths.
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!hasEffectiveLabelledBy) {
+      internals.ariaLabel = internalLegendText;
+    } else {
+      internals.ariaLabel = null;
+    }
     const internalLegend = this.shadowRoot?.getElementById(this._labelId);
     if (
       labelEls.length === 0 &&
@@ -627,17 +632,32 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       // the light DOM resolves the labels the consumer wired up. If the
       // consumer supplied nothing, clear any stale mirror we may have
       // written in a prior round.
-      const hostLabel = [...consumerLabelIds].filter(Boolean).join(' ') || '';
+      //
+      // Codex round-35 (medium): mirror consumer tokens to the host attribute
+      // ONLY when at least one token resolves to a real element. Broken
+      // tokens (typo, target not yet attached) would otherwise erase the
+      // accessible name on legacy engines per ARIA priority
+      // (aria-labelledby > aria-label > internals.ariaLabel). When tokens
+      // don't resolve, clear the host attribute so the `internals.ariaLabel`
+      // fallback the modern path set above (`internalLegendText`) wins.
+      const hostLabel = hasEffectiveLabelledBy
+        ? [...consumerLabelIds].filter(Boolean).join(' ')
+        : '';
       const liveLabel = this.getAttribute('aria-labelledby');
       if (hostLabel) {
         if (liveLabel !== hostLabel) {
           this.setAttribute('aria-labelledby', hostLabel);
         }
         this._lastWrittenLabelledBy = hostLabel;
-      } else if (liveLabel !== null && this._lastWrittenLabelledBy !== null) {
-        // Only clear when the previous value was something *we* wrote;
-        // never clobber a consumer-supplied attribute that arrived between
-        // syncs.
+      } else if (liveLabel !== null) {
+        // Codex round-36 (medium): when consumer-supplied tokens don't
+        // resolve (`!hasEffectiveLabelledBy`), actively clear the host
+        // attribute even if WE didn't write it. Per ARIA priority
+        // (aria-labelledby > aria-label > internals.ariaLabel), a broken
+        // consumer-authored attribute on the announced surface erases the
+        // legend on legacy engines. The original tokens remain cached in
+        // `_consumerLabelledBy` so they replay on a future sync if the
+        // target later attaches.
         this.removeAttribute('aria-labelledby');
         this._lastWrittenLabelledBy = null;
       }

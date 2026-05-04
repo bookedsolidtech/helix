@@ -160,6 +160,28 @@ describe('hx-switch', () => {
       const label = shadowQuery(el, '[part="label"]');
       expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
     });
+
+    // Codex round-36 (independent observation): hasEffectiveLabelledBy parity
+    // with hx-toggle-button / hx-radio-group. A missing IDREF must NOT erase
+    // the label property — fall through to internals.ariaLabel = this.label.
+    it('keeps the label accessible name when aria-labelledby points to a missing id', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Dark mode" aria-labelledby="sw-missing-target"></hx-switch>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs && refs.length > 0) {
+        // Modern path: at least the visible internal label element is referenced.
+        const label = shadowQuery(el, '[part="label"]');
+        expect(refs).toContain(label);
+      } else {
+        // No-IDL-ref fallback path: internals.ariaLabel carries the property.
+        expect(internals.ariaLabel).toBe('Dark mode');
+      }
+    });
   });
 
   // --- Property: error (4) ---
