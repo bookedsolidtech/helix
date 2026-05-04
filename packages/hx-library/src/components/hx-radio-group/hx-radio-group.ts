@@ -8,6 +8,7 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixRadioGroupStyles } from './hx-radio-group.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixRadio } from './hx-radio.js';
+import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
 
 const _nextRadioGroupId = createIdCounter('hx-radio-group');
 
@@ -140,6 +141,12 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
    */
   @state() private _hasErrorSlot = false;
 
+  /**
+   * Tracks whether the help-text slot has assigned content.
+   * @internal
+   */
+  @state() private _hasHelpSlot = false;
+
   // ─── Internal IDs ───
 
   /**
@@ -169,6 +176,18 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     this._hasErrorSlot = e.target.assignedNodes({ flatten: true }).length > 0;
   }
 
+  /**
+   * Handles slotchange events on the help-text slot to detect assigned content.
+   * Codex aria-group-2 finding: slot-only help text was not contributing to
+   * `aria-describedby` because the wrapper was conditionally rendered on the
+   * `helpText` property alone.
+   * @internal
+   */
+  private _handleHelpSlotChange(e: Event): void {
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasHelpSlot = e.target.assignedNodes({ flatten: true }).length > 0;
+  }
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -192,7 +211,9 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     if (changedProperties.has('disabled')) {
       this._syncRadios();
     }
-    // Force screen reader re-announcement when error text changes (a11y-v3-005)
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+    // Force screen reader re-announcement when error text changes (a11y-v3-005).
     if (changedProperties.has('error') && this.error) {
       const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
       if (errorEl) {
@@ -204,6 +225,61 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
           });
         });
       }
+    }
+  }
+
+  /**
+   * Mirrors radiogroup semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-radio-group>` reach the announced control. The codex aria-group-2
+   * finding identified that the inner `<fieldset>` was the announced node and
+   * the host's external IDREF tokens could not cross the shadow boundary.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'radiogroup';
+    internals.ariaRequired = this.required ? 'true' : 'false';
+    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+    internals.ariaDisabled = this.disabled ? 'true' : 'false';
+    internals.ariaOrientation = this.orientation === 'horizontal' ? 'horizontal' : 'vertical';
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!this.getAttribute('aria-labelledby')) {
+      internals.ariaLabel = this.label || null;
+    } else {
+      internals.ariaLabel = null;
+    }
+
+    if (supportsIdrefElementReferences(internals)) {
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+
+      const externalLabelTokens = this.getAttribute('aria-labelledby');
+      const externalDescTokens = this.getAttribute('aria-describedby');
+
+      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+      const internalLegend = this.shadowRoot?.getElementById(`${this._groupId}-legend`);
+      if (labelEls.length === 0 && !hostAriaLabel && this.label && internalLegend) {
+        labelEls.push(internalLegend);
+      }
+      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
+
+      const descEls = resolveIdrefTokens(this, externalDescTokens);
+      const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+      const errorEl = this.shadowRoot?.getElementById(this._errorId);
+      if (helpEl && (this.helpText || this._hasHelpSlot)) {
+        descEls.push(helpEl);
+      }
+      if (errorEl && (this.error || this._hasErrorSlot)) {
+        descEls.push(errorEl);
+      }
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
     }
   }
 
@@ -451,7 +527,8 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
   // ─── Render ───
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
+    const hasHelp = !!this.helpText || this._hasHelpSlot;
     const legendId = `${this._groupId}-legend`;
 
     const fieldsetClasses = {
@@ -461,14 +538,9 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
       'fieldset--required': this.required,
     };
 
-    // WCAG 1.3.1: _errorId is now on the persistent wrapper div around the error slot,
-    // so it remains valid whether error content comes from the slot or the property.
-    const hasHelp = !!this.helpText;
-    const hasErrorContent = hasError || this._hasErrorSlot;
-    const describedByIds = [
-      hasErrorContent ? this._errorId : null,
-      hasHelp ? this._helpTextId : null,
-    ]
+    // help-text first, error appended — assistive tech announces guidance
+    // before validation feedback.
+    const describedByIds = [hasHelp ? this._helpTextId : null, hasError ? this._errorId : null]
       .filter(Boolean)
       .join(' ');
     const describedBy = describedByIds || nothing;
@@ -481,6 +553,8 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
         aria-labelledby=${this.label ? legendId : nothing}
         aria-describedby=${describedBy}
         aria-required=${this.required ? 'true' : nothing}
+        aria-invalid=${hasError ? 'true' : nothing}
+        aria-orientation=${this.orientation === 'horizontal' ? 'horizontal' : nothing}
       >
         ${this.label
           ? html`
@@ -497,23 +571,35 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
           <slot @slotchange=${this._handleSlotChange}></slot>
         </div>
 
-        <!-- WCAG 1.3.1: wrap slot in a persistent container so _errorId stays stable
-             regardless of whether error content comes from the slot or the property. -->
-        <div id=${this._errorId}>
-          <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-            ${hasError
-              ? html`<div part="error" class="fieldset__error" role="alert">${this.error}</div>`
-              : nothing}
-          </slot>
+        <!--
+          Persistent error live region. role="alert" is set from first paint
+          so the WAI-ARIA contract for live updates is honoured: content
+          changes in place rather than the container being toggled.
+        -->
+        <div
+          part="error"
+          class="fieldset__error"
+          id=${this._errorId}
+          role="alert"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
         </div>
 
-        ${this.helpText && !hasError
-          ? html`
-              <div part="help-text" class="fieldset__help-text" id=${this._helpTextId}>
-                <slot name="help-text">${this.helpText}</slot>
-              </div>
-            `
-          : nothing}
+        <!--
+          Persistent help-text container. Rendered whenever the property OR
+          the slot has content; hidden when an error is present so guidance
+          does not compete with validation feedback. Always in the shadow
+          tree so the host's aria-describedby chain is stable.
+        -->
+        <div
+          part="help-text"
+          class="fieldset__help-text"
+          id=${this._helpTextId}
+          ?hidden=${!hasHelp || hasError}
+        >
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+        </div>
       </fieldset>
     `;
   }

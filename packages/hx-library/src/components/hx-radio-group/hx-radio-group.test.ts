@@ -240,14 +240,17 @@ describe('hx-radio-group', () => {
       expect(helpText?.textContent?.trim()).toBe('Select one option');
     });
 
-    it('error hides help text', async () => {
+    it('error hides help text (visually hidden, kept in DOM for stable describedBy)', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" error="Error" help-text="Help">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const helpText = shadowQuery(el, '.fieldset__help-text');
-      expect(helpText).toBeNull();
+      const helpText = shadowQuery<HTMLElement>(el, '.fieldset__help-text');
+      // Persistent in the DOM so the describedBy chain remains stable across
+      // error transitions, but visually hidden via the `hidden` attribute.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -1035,6 +1038,95 @@ describe('hx-radio-group', () => {
       const assigned = slot.assignedElements();
       expect(assigned).toHaveLength(1);
       expect((assigned[0] as HTMLElement).textContent).toBe('Choose one');
+    });
+  });
+
+  // ─── ARIA delegation: host-elevated semantics (codex aria-group-2) ───
+
+  describe('ARIA delegation: host semantics', () => {
+    it('host carries role="radiogroup" via ElementInternals', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.role).toBe('radiogroup');
+    });
+
+    it('host ariaLabel mirrors the visible label so cross-shadow naming works', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Notification Channel"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaLabel).toBe('Notification Channel');
+    });
+
+    it('host aria-label attribute wins over the visible label', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Internal" aria-label="Public name"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaLabel).toBe('Public name');
+    });
+
+    it('host ariaOrientation reflects horizontal orientation', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" orientation="horizontal"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaOrientation).toBe('horizontal');
+      // Inner fieldset also exposes the attribute so AT walking the shadow
+      // tree sees a consistent orientation.
+      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
+      expect(fieldset.getAttribute('aria-orientation')).toBe('horizontal');
+    });
+
+    it('host ariaInvalid is driven by validity, not visible error content', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" required><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const internals = (el as any)._internals as ElementInternals;
+      expect(internals.ariaInvalid).toBe('true');
+    });
+
+    it('persistent help-text container renders when only the slot has content', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color"><hx-radio value="a" label="A"></hx-radio><span slot="help-text">Pick wisely</span></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv.hasAttribute('hidden')).toBe(false);
+      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
+      expect(fieldset.getAttribute('aria-describedby')).toContain(helpDiv.id);
+    });
+
+    it('aria-describedby orders help text before error', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" help-text="Hint" error="Required"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
+      const tokens = fieldset.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
+      expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+    });
+
+    it('error live region is persistent in the shadow tree', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error');
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('hidden')).toBe(true);
     });
   });
 });
