@@ -7,7 +7,14 @@ import { repeat } from 'lit/directives/repeat.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSelectStyles } from './hx-select.styles.js';
-import { forcedColorsField } from '../../styles/forced-colors.js';
+// Round-2 finding 7: do NOT compose `forcedColorsField`. The shared mixin's
+// selectors target real `<input>`/`<select>`/`[part="input"]`/`[part="control"]`
+// surfaces, which `hx-select` does not expose — the announced control is the
+// `[part="trigger"]` div. The bespoke `.field__trigger:focus-visible` rule
+// inside `hx-select.styles.ts` is the only forced-colors path that paints,
+// so composing the mixin would only add dead selectors. Per the
+// `forced-colors.ts` contract ("compose mixin OR author bespoke block, not
+// both"), we author the bespoke block.
 import { devWarn } from '../../utils/dev-warn.js';
 import {
   installAriaIdrefMirror,
@@ -153,7 +160,7 @@ export interface HxSelectChangeDetail {
  */
 @customElement('hx-select')
 export class HelixSelect extends FormMixin(HelixElement) {
-  static override styles = [helixSelectStyles, forcedColorsField];
+  static override styles = helixSelectStyles;
 
   // ─── Form Association ───
 
@@ -278,8 +285,19 @@ export class HelixSelect extends FormMixin(HelixElement) {
   @state() private _options: SelectOption[] = [];
   /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
+  /** Whether the named label slot contains projected content. @internal */
+  @state() private _hasLabelSlot = false;
   /** Whether the help-text slot contains projected content. @internal */
   @state() private _hasHelpSlot = false;
+  /**
+   * The id assigned to the first slotted label node so it can join the
+   * accessible-name chain (parity with `hx-time-picker`). The slot's projected
+   * light-DOM elements stay in the light tree, so we attach a stable id and
+   * resolve the element directly into `labelEls` for the modern path. Round-2
+   * finding 3.
+   * @internal
+   */
+  @state() private _slottedLabelId = '';
   /** Zero-based index of the keyboard-focused option in the listbox; -1 means none. @internal */
   @state() private _focusedOptionIndex = -1;
   /**
@@ -307,6 +325,26 @@ export class HelixSelect extends FormMixin(HelixElement) {
    * @internal
    */
   @state() private _announcedError = '';
+  /**
+   * Cached invalidity flag derived from `internals.validity.valid` after the
+   * latest `setValidity()` call. Both the modern (`internals.ariaInvalid`)
+   * and fallback (host attribute) writes read from the same source so they
+   * cannot disagree. Round-2 finding 2.
+   * @internal
+   */
+  @state() private _invalid = false;
+  /**
+   * Whether to render fallback host-canonical ARIA. On the fallback path the
+   * host carries `role="combobox"` and the consumer-facing ARIA attributes
+   * (label, describedby, required, invalid, expanded, haspopup, controls,
+   * activedescendant, disabled), and the inner trigger drops its role + ARIA
+   * mirror so AT does not see a doubled accessible. Round-2 finding 1
+   * (Option B parity with Group 2 round-36). Tracks `!_supportsIdrefRefs`.
+   * @internal
+   */
+  private get _useFallbackHostRole(): boolean {
+    return !this._supportsIdrefRefs;
+  }
 
   // ─── Queries ───
 
@@ -452,12 +490,13 @@ export class HelixSelect extends FormMixin(HelixElement) {
     if (
       !this.label &&
       !this.accessibleLabel &&
+      !this._hasLabelSlot &&
       !this.getAttribute('aria-label') &&
       !this.getAttribute('aria-labelledby')
     ) {
       devWarn(
         'hx-select',
-        'No accessible label provided. Set the `label` attribute, `accessible-label`, `aria-label`, or `aria-labelledby` on the host. An unlabeled select violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+        'No accessible label provided. Set the `label` attribute, `accessible-label`, `aria-label`, `aria-labelledby`, or project a `<slot name="label">` child. An unlabeled select violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
       );
     }
   }
@@ -482,7 +521,15 @@ export class HelixSelect extends FormMixin(HelixElement) {
     // would conflict with the inner trigger and produce a doubled accessible.
     internals.role = null;
     internals.ariaRequired = this.required ? 'true' : 'false';
-    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+    // Round-2 finding 2: read `internals.validity.valid` once and cache the
+    // derived flag in reactive state so the modern (`internals.ariaInvalid`)
+    // and fallback (inner-trigger / host-mirror attribute) writes both read
+    // from the same source. Decoupling `aria-invalid` from `hasError` was the
+    // round-1 defect — required+empty with no `error` prop was announced
+    // valid on fallback but invalid on modern.
+    const isInvalid = !internals.validity.valid;
+    this._invalid = isInvalid;
+    internals.ariaInvalid = isInvalid ? 'true' : 'false';
     internals.ariaDisabled = this.disabled ? 'true' : 'false';
 
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
@@ -491,6 +538,15 @@ export class HelixSelect extends FormMixin(HelixElement) {
     // path consumes them as `Element[]`, the fallback path mirrors consumer
     // tokens onto the host attribute.
     const internalLabel = this.shadowRoot?.getElementById(this._labelId);
+    // Round-2 finding 3: the `<slot name="label">` projects light-DOM nodes,
+    // so the visible-label element lives outside the shadow tree and cannot
+    // be looked up via shadowRoot.getElementById. Resolve the slotted-label
+    // element via its tracked id so the accessible-name chain includes the
+    // consumer's slotted label even when the `label` property is empty.
+    const slottedLabelEl =
+      this._slottedLabelId && this._hasLabelSlot
+        ? (document.getElementById(this._slottedLabelId) ?? this.querySelector(`#${this._slottedLabelId}`))
+        : null;
     const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
     const errorEl = this.shadowRoot?.getElementById(this._errorId);
 
@@ -512,17 +568,36 @@ export class HelixSelect extends FormMixin(HelixElement) {
     // Group 2 round-35 (CR major + codex follow-up): `aria-labelledby` is
     // only "effective" when at least one IDREF resolves. A typo or
     // transiently-missing target must NOT erase the visible label — fall back
-    // to `label` / `accessibleLabel` so the field keeps a name on both paths.
+    // to `label` / `accessibleLabel` / slotted label so the field keeps a name
+    // on both paths.
     const hasEffectiveLabelledBy = labelEls.length > 0;
+    // Round-2 finding 3: when the consumer projects a `<span slot="label">`
+    // they expect that element to contribute to the accessible name with
+    // zero additional API. Treat it equivalently to `this.label` — and like
+    // any other non-resolving labelledby, it must not erase the visible
+    // label when missing.
+    const effectiveLabelText = this.label || (this._hasLabelSlot ? '*slotted*' : '');
     if (hostAriaLabel) {
       internals.ariaLabel = hostAriaLabel;
     } else if (!hasEffectiveLabelledBy) {
-      internals.ariaLabel = this.label || this.accessibleLabel || null;
+      // Prefer the slotted label element via labelledByElements over a string
+      // mirror so AT walks the visible label node directly.
+      if (this._hasLabelSlot && slottedLabelEl) {
+        internals.ariaLabel = null;
+      } else if (effectiveLabelText && effectiveLabelText !== '*slotted*') {
+        internals.ariaLabel = this.label || this.accessibleLabel || null;
+      } else {
+        internals.ariaLabel = this.accessibleLabel || null;
+      }
     } else {
       internals.ariaLabel = null;
     }
-    if (labelEls.length === 0 && !hostAriaLabel && this.label && internalLabel) {
-      labelEls.push(internalLabel);
+    if (labelEls.length === 0 && !hostAriaLabel) {
+      if (this._hasLabelSlot && slottedLabelEl) {
+        labelEls.push(slottedLabelEl);
+      } else if (this.label && internalLabel) {
+        labelEls.push(internalLabel);
+      }
     }
 
     const descEls = resolveIdrefTokens(this, externalDescTokens);
@@ -548,6 +623,11 @@ export class HelixSelect extends FormMixin(HelixElement) {
       // Clear stale fallback ariaDescription string if a prior sync ran on
       // the fallback path (e.g. tests flipping `_supportsIdrefRefs`).
       internals.ariaDescription = null;
+      // Round-2 finding 1: ensure host fallback role/ARIA attributes are not
+      // lingering from a previous fallback-path sync (e.g. tests that flip
+      // `_supportsIdrefRefs`). The modern path keeps the host roleless so
+      // the inner trigger remains the announced combobox.
+      this._clearHostFallbackAria();
     } else {
       // ─── No-IDL-ref fallback (Group 2 round-19 P1 parity) ───
       // The IDL element-references API is unavailable, so internal shadow
@@ -581,12 +661,19 @@ export class HelixSelect extends FormMixin(HelixElement) {
 
       const hostDesc = [...consumerDescIds].filter(Boolean).join(' ') || '';
       const liveDesc = this.getAttribute('aria-describedby');
+      // Round-2 finding 4: symmetric clears — both describedby and labelledby
+      // drop the host attribute when the consumer's tokens are unresolvable
+      // / empty. The previous `_lastWrittenDescribedBy !== null` guard left a
+      // consumer-set `aria-describedby="missing-id"` on initial paint
+      // un-cleared, so legacy engines saw a broken IDREF that erased the
+      // accessible description. Cache replay via `_consumerDescribedBy` is
+      // unaffected — the original tokens stay cached for future resolution.
       if (hostDesc) {
         if (liveDesc !== hostDesc) {
           this.setAttribute('aria-describedby', hostDesc);
         }
         this._lastWrittenDescribedBy = hostDesc;
-      } else if (liveDesc !== null && this._lastWrittenDescribedBy !== null) {
+      } else if (liveDesc !== null) {
         this.removeAttribute('aria-describedby');
         this._lastWrittenDescribedBy = null;
       }
@@ -603,7 +690,122 @@ export class HelixSelect extends FormMixin(HelixElement) {
       const errorText = errorEl && hasError ? readSlottedOrShadowText(errorEl) : '';
       const internalDescriptionText = [helpText, errorText].filter(Boolean).join(' ');
       internals.ariaDescription = internalDescriptionText || null;
+
+      // Round-2 finding 1 (Option B parity with Group 2 round-36): on the
+      // fallback path, promote the *host* to the announced combobox surface.
+      // Without IDL element references the consumer's `aria-label` /
+      // `aria-labelledby` / `aria-describedby` cannot reach the inner trigger
+      // across the shadow boundary, so the trigger announces only the host
+      // attribute mirror. Move `role="combobox"` and the ARIA mirror to the
+      // host so AT walks the consumer-authored naming chain. The inner
+      // trigger drops its role + ARIA on fallback (see render()) to avoid a
+      // doubled accessible.
+      this._writeHostFallbackAria({
+        hostAriaLabel,
+        isInvalid,
+      });
     }
+  }
+
+  /**
+   * Writes host-level fallback ARIA attributes when the platform lacks IDL
+   * element-reference support. Pairs with the render-time branch that drops
+   * the inner trigger's role + ARIA mirror on fallback. Round-2 finding 1
+   * (Option B). Internal writes are tracked so we do not double-process them
+   * via the IDREF mirror.
+   * @internal
+   */
+  private _writeHostFallbackAria(args: {
+    hostAriaLabel: string;
+    isInvalid: boolean;
+  }): void {
+    const { hostAriaLabel, isInvalid } = args;
+
+    // Combobox role + popup wiring lives on the host so AT consumes it.
+    if (this.getAttribute('role') !== 'combobox') {
+      this.setAttribute('role', 'combobox');
+    }
+    if (this.getAttribute('aria-haspopup') !== 'listbox') {
+      this.setAttribute('aria-haspopup', 'listbox');
+    }
+    if (this.getAttribute('aria-controls') !== this._listboxId) {
+      this.setAttribute('aria-controls', this._listboxId);
+    }
+    // aria-expanded mirrors `open`.
+    const expanded = this.open ? 'true' : 'false';
+    if (this.getAttribute('aria-expanded') !== expanded) {
+      this.setAttribute('aria-expanded', expanded);
+    }
+    // aria-activedescendant mirrors the keyboard-focused option.
+    const activeDescendant =
+      this.open && this._focusedOptionIndex >= 0 ? this._optionId(this._focusedOptionIndex) : null;
+    if (activeDescendant) {
+      if (this.getAttribute('aria-activedescendant') !== activeDescendant) {
+        this.setAttribute('aria-activedescendant', activeDescendant);
+      }
+    } else if (this.hasAttribute('aria-activedescendant')) {
+      this.removeAttribute('aria-activedescendant');
+    }
+    // aria-required / aria-invalid / aria-disabled mirror the boolean state.
+    const requiredAttr = this.required ? 'true' : null;
+    if (requiredAttr) {
+      if (this.getAttribute('aria-required') !== requiredAttr) {
+        this.setAttribute('aria-required', requiredAttr);
+      }
+    } else if (this.hasAttribute('aria-required')) {
+      this.removeAttribute('aria-required');
+    }
+    const invalidAttr = isInvalid ? 'true' : null;
+    if (invalidAttr) {
+      if (this.getAttribute('aria-invalid') !== invalidAttr) {
+        this.setAttribute('aria-invalid', invalidAttr);
+      }
+    } else if (this.hasAttribute('aria-invalid')) {
+      this.removeAttribute('aria-invalid');
+    }
+    const disabledAttr = this.disabled ? 'true' : null;
+    if (disabledAttr) {
+      if (this.getAttribute('aria-disabled') !== disabledAttr) {
+        this.setAttribute('aria-disabled', disabledAttr);
+      }
+    } else if (this.hasAttribute('aria-disabled')) {
+      this.removeAttribute('aria-disabled');
+    }
+    // aria-label mirrors consumer `aria-label`, then `accessibleLabel`, then
+    // `label`. Skip when an effective `aria-labelledby` or slotted-label
+    // resolves — labelledby has higher ARIA priority.
+    if (!hostAriaLabel) {
+      const candidate = this.accessibleLabel || this.label || '';
+      // Only set a label string when there is no labelledby chain; otherwise
+      // the label string would shadow the labelledby reference.
+      const hasLabelledBy = this.hasAttribute('aria-labelledby');
+      if (!hasLabelledBy && candidate) {
+        if (this.getAttribute('aria-label') !== candidate) {
+          this.setAttribute('aria-label', candidate);
+        }
+      } else if (this.hasAttribute('aria-label') && !this.getAttribute('aria-label')?.trim()) {
+        this.removeAttribute('aria-label');
+      }
+    }
+  }
+
+  /**
+   * Removes any host-level fallback ARIA attributes the component may have
+   * written on a previous sync. Used when the platform supports IDL element
+   * references — the host stays roleless on the modern path so the inner
+   * trigger keeps its `role="combobox"` and AT does not see two announced
+   * surfaces. Round-2 finding 1.
+   * @internal
+   */
+  private _clearHostFallbackAria(): void {
+    if (this.getAttribute('role') === 'combobox') this.removeAttribute('role');
+    if (this.hasAttribute('aria-haspopup')) this.removeAttribute('aria-haspopup');
+    if (this.hasAttribute('aria-controls')) this.removeAttribute('aria-controls');
+    if (this.hasAttribute('aria-expanded')) this.removeAttribute('aria-expanded');
+    if (this.hasAttribute('aria-activedescendant')) this.removeAttribute('aria-activedescendant');
+    if (this.hasAttribute('aria-required')) this.removeAttribute('aria-required');
+    if (this.hasAttribute('aria-invalid')) this.removeAttribute('aria-invalid');
+    if (this.hasAttribute('aria-disabled')) this.removeAttribute('aria-disabled');
   }
 
   /**
@@ -780,6 +982,38 @@ export class HelixSelect extends FormMixin(HelixElement) {
   }
 
   // ─── Slot Change Handlers ───
+
+  /**
+   * Round-2 finding 3: tracks the slotted label so projected `<span slot="label">`
+   * content joins the accessible-name chain without forcing the consumer to
+   * also pass the `label` property. Mirrors the `hx-time-picker` pattern:
+   * assign a stable id, expose it as `_slottedLabelId`, and re-resolve the
+   * label element in `_syncHostAriaSemantics`. `slotchange` fires once on
+   * connect for any initially projected children, so the ARIA chain is
+   * primed before `firstUpdated`.
+   * @internal
+   */
+  private _handleLabelSlotChange(e: Event): void {
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    const nodes = e.target.assignedNodes({ flatten: true });
+    this._hasLabelSlot = nodes.length > 0;
+    if (this._hasLabelSlot) {
+      const labelEl = nodes.find((n) => n.nodeType === Node.ELEMENT_NODE) as HTMLElement | undefined;
+      if (labelEl) {
+        if (!labelEl.id) {
+          labelEl.id = `${this._selectId}-slotted-label`;
+        }
+        this._slottedLabelId = labelEl.id;
+      } else {
+        // Slot has only text nodes — no element to id, fall through to
+        // text-only naming via internals.ariaLabel.
+        this._slottedLabelId = '';
+      }
+    } else {
+      this._slottedLabelId = '';
+    }
+    this._syncHostAriaSemantics();
+  }
 
   /** @internal */
   private _handleErrorSlotChange(e: Event): void {
@@ -1042,22 +1276,18 @@ export class HelixSelect extends FormMixin(HelixElement) {
       [`field__select--${this.size}`]: true,
     };
 
-    // Group 2 round-19 P1: on the modern (host-canonical) path the host owns
-    // labelledby/describedby/required/invalid via ElementInternals — drop
-    // the inner-trigger and hidden-native mirrors so AT does not announce
-    // duplicate names/descriptions. The fallback path keeps the inner
-    // attributes so legacy engines (Firefox today) still surface them via
-    // attribute IDREF lookup within the shadow root.
-    const fallbackDescribedBy = !this._supportsIdrefRefs
-      ? [hasError ? this._errorId : null, hasHelp && !hasError ? this._helpTextId : null]
-          .filter(Boolean)
-          .join(' ') || undefined
-      : undefined;
+    // Round-2 finding 1: both paths drop the inner-trigger and hidden-native
+    // ARIA mirror. Modern path: host owns labelledby/describedby/required/
+    // invalid via ElementInternals. Fallback path: the host carries the
+    // combobox role + ARIA mirror as an attribute (see `_writeHostFallbackAria`),
+    // and the inner trigger drops its role so AT does not announce a doubled
+    // accessible. The hidden native `<select>` is `aria-hidden="true"`, so it
+    // is never the announced surface and needs no ARIA either way.
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
         <!-- Label -->
-        <slot name="label">
+        <slot name="label" @slotchange=${this._handleLabelSlotChange}>
           ${this.label
             ? html`<label
                 part="label"
@@ -1087,24 +1317,27 @@ export class HelixSelect extends FormMixin(HelixElement) {
             part="trigger"
             id=${this._selectId}
             class=${classMap(triggerClasses)}
-            role="combobox"
+            role=${this._useFallbackHostRole ? nothing : 'combobox'}
             tabindex=${this.disabled ? '-1' : '0'}
-            aria-expanded=${this.open ? 'true' : 'false'}
-            aria-haspopup="listbox"
-            aria-controls=${this._listboxId}
-            aria-activedescendant=${this.open && this._focusedOptionIndex >= 0
-              ? this._optionId(this._focusedOptionIndex)
-              : nothing}
-            aria-invalid=${this._supportsIdrefRefs ? nothing : hasError ? 'true' : nothing}
-            aria-describedby=${this._supportsIdrefRefs ? nothing : ifDefined(fallbackDescribedBy)}
-            aria-required=${this._supportsIdrefRefs ? nothing : this.required ? 'true' : nothing}
-            aria-disabled=${this.disabled ? 'true' : nothing}
-            aria-labelledby=${this._supportsIdrefRefs
+            aria-expanded=${this._useFallbackHostRole ? nothing : this.open ? 'true' : 'false'}
+            aria-haspopup=${this._useFallbackHostRole ? nothing : 'listbox'}
+            aria-controls=${this._useFallbackHostRole ? nothing : this._listboxId}
+            aria-activedescendant=${this._useFallbackHostRole
               ? nothing
-              : ifDefined(this.label ? this._labelId : undefined)}
-            aria-label=${this._supportsIdrefRefs
+              : this.open && this._focusedOptionIndex >= 0
+                ? this._optionId(this._focusedOptionIndex)
+                : nothing}
+            aria-invalid=${nothing}
+            aria-describedby=${nothing}
+            aria-required=${nothing}
+            aria-disabled=${this._useFallbackHostRole ? nothing : this.disabled ? 'true' : nothing}
+            aria-labelledby=${nothing}
+            aria-label=${this._useFallbackHostRole
               ? nothing
-              : ifDefined(this.accessibleLabel ?? undefined)}
+              : (this.getAttribute('aria-label')?.trim() ||
+                  this.label ||
+                  this.accessibleLabel ||
+                  nothing)}
             @click=${this._toggleDropdown}
             @keydown=${this._handleKeydown}
           >
@@ -1135,12 +1368,6 @@ export class HelixSelect extends FormMixin(HelixElement) {
             ?required=${this.required}
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
-            aria-label=${this._supportsIdrefRefs
-              ? nothing
-              : ifDefined(this.accessibleLabel ?? undefined)}
-            aria-invalid=${this._supportsIdrefRefs ? nothing : hasError ? 'true' : nothing}
-            aria-describedby=${this._supportsIdrefRefs ? nothing : ifDefined(fallbackDescribedBy)}
-            aria-required=${this._supportsIdrefRefs ? nothing : this.required ? 'true' : nothing}
             @change=${this._handleNativeChange}
           >
             ${this.placeholder
