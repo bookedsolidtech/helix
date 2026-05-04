@@ -242,6 +242,11 @@ export class HelixToggleButton extends HelixElement {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleHostKeyDown);
     this.removeEventListener('click', this._handleHostClickRouted);
+    // Codex round-13 P2: tear down the assigned-node text observer so a
+    // detached host does not receive mutation callbacks from nodes that may
+    // outlive it (e.g. lifted out of the slot but kept in the document).
+    this._slotTextObserver?.disconnect();
+    this._slotTextObserver = null;
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
   }
@@ -321,6 +326,10 @@ export class HelixToggleButton extends HelixElement {
     // Track default-slot text content so it can serve as the accessible
     // name when no explicit label is set. Codex round-1 finding #9.
     this._captureSlotLabelText();
+    // Codex round-13 P2: also observe in-place text mutations on assigned
+    // nodes so framework-driven `Mute` → `Unmute` rewrites refresh the
+    // cached label without requiring the consumer to swap the node.
+    this._installSlotTextObserver();
 
     if (!this.label) {
       const slot = this._defaultSlot;
@@ -381,10 +390,50 @@ export class HelixToggleButton extends HelixElement {
     this._slotLabelText = text;
   }
 
+  /**
+   * Watches assigned default-slot nodes for in-place text mutations so the
+   * cached `_slotLabelText` (and thus `internals.ariaLabel`) stays in sync
+   * when a framework rewrites textContent of an already-assigned node without
+   * replacing it. `slotchange` does NOT fire for those mutations, so a
+   * separate observer is required. Codex round-13 P2.
+   * @internal
+   */
+  private _slotTextObserver: MutationObserver | null = null;
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * default-slot nodes. Disconnects any prior observer first so detached
+   * nodes stop firing into a torn-down host.
+   * @internal
+   */
+  private _installSlotTextObserver(): void {
+    this._slotTextObserver?.disconnect();
+    const slot = this._defaultSlot;
+    if (!slot) {
+      this._slotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._captureSlotLabelText();
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes({ flatten: true }).forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._slotTextObserver = observer;
+  }
+
   /** @internal */
   private _handleDefaultSlotChange(): void {
     this._captureSlotLabelText();
     this._syncHostAriaSemantics();
+    // Re-tune the in-place text observer over the new assigned-node set
+    // (codex round-13 P2).
+    this._installSlotTextObserver();
   }
 
   /**

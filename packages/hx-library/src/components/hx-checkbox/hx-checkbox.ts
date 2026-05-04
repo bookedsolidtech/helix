@@ -690,13 +690,19 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
 
       const descEls = resolveIdrefTokens(this, externalDescTokens);
-      // Help-text-first ordering: guidance precedes validation feedback.
+      // Codex round-13 P2: while an error is active, drop help text from the
+      // described-by chain. The visible help node is suppressed in the render
+      // tree, but referenced descriptions are announced even when their nodes
+      // are hidden — leaving help in the chain would have AT read stale
+      // guidance before the validation error. Otherwise help precedes error so
+      // guidance reads before validation feedback when only one is shown.
       const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
       const errorEl = this.shadowRoot?.getElementById(this._errorId);
-      if (helpEl && (this.helpText || this._hasHelpTextSlot)) {
+      const hasError = !!(this.error || this._hasErrorSlot);
+      if (helpEl && (this.helpText || this._hasHelpTextSlot) && !hasError) {
         descEls.push(helpEl);
       }
-      if (errorEl && (this.error || this._hasErrorSlot)) {
+      if (errorEl && hasError) {
         descEls.push(errorEl);
       }
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
@@ -791,11 +797,15 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       'checkbox--lg': this.size === 'lg',
     };
 
-    // describedBy chain: help-text first, error appended (assistive tech reads
-    // guidance before validation feedback). Both ids are persistent in the
-    // shadow tree so this list is stable across content transitions.
+    // describedBy chain: while an error is active, the visible help text is
+    // suppressed in the rendered tree, so we must also drop it from the
+    // described-by chain — referenced descriptions are announced even when
+    // their nodes are hidden, and announcing stale guidance before the
+    // validation error confuses screen-reader users (codex round-13 P2).
+    // Otherwise help-text precedes error in the chain so guidance is read
+    // before validation feedback when only one is shown.
     const describedBy =
-      [hasHelpText ? this._helpTextId : null, hasError ? this._errorId : null]
+      [hasError ? null : hasHelpText ? this._helpTextId : null, hasError ? this._errorId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
