@@ -1,9 +1,19 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HxSelect } from './hx-select.js';
 import './index.js';
 
 afterEach(cleanup);
+
+/**
+ * Strongly-typed harness for the private internals the suite reaches into.
+ * Mirrors the Group 2 hx-radio-group test pattern.
+ */
+type SelectTestHarness = HxSelect & {
+  _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
+};
 
 describe('hx-select', () => {
   // ─── Rendering (5) ───
@@ -1338,6 +1348,510 @@ describe('hx-select', () => {
       const el = await fixture<HxSelect>('<hx-select label="Empty select"></hx-select>');
       await expect(el.updateComplete).resolves.toBeTruthy();
       expect(el.shadowRoot).toBeTruthy();
+    });
+  });
+
+  // ─── ARIA Group 3 — Host-canonical ARIA via ElementInternals ───
+
+  describe('Host-canonical ARIA (Group 3 round-1)', () => {
+    it('host carries no role via internals — APG combobox stays on the inner trigger', async () => {
+      // Path A: setting `internals.role = 'combobox'` would conflict with the
+      // inner `<div role="combobox">` and produce a doubled accessible. The
+      // host is explicitly roleless.
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country">
+          <option value="us">United States</option>
+        </hx-select>
+      `);
+      const internals = (el as SelectTestHarness)._internals;
+      expect(internals.role).toBeNull();
+      const trigger = shadowQuery(el, '[role="combobox"]');
+      expect(trigger).toBeTruthy();
+    });
+
+    it('reflects host aria-label into internals.ariaLabel when set', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select aria-label="Pick a country">
+          <option value="us">United States</option>
+        </hx-select>
+      `);
+      const internals = (el as SelectTestHarness)._internals;
+      expect(internals.ariaLabel).toBe('Pick a country');
+    });
+
+    it('reflects label property into internals.ariaLabel when no consumer aria-label', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country">
+          <option value="us">United States</option>
+        </hx-select>
+      `);
+      const internals = (el as SelectTestHarness)._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs) {
+        // Modern path: labelledByElements points at the visible label.
+        const label = shadowQuery(el, 'label');
+        expect(refs).toContain(label);
+      } else {
+        // Fallback path: `internals.ariaLabel` mirrors the label property.
+        expect(internals.ariaLabel).toContain('Country');
+      }
+    });
+
+    it('sets host ariaRequired via internals when required', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" required>
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      const internals = (el as SelectTestHarness)._internals;
+      expect(internals.ariaRequired).toBe('true');
+    });
+
+    it('sets host ariaInvalid via internals when validity invalid', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" required>
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      // Required + empty value → valueMissing → invalid → ariaInvalid="true"
+      expect(internals.ariaInvalid).toBe('true');
+    });
+
+    it('sets host ariaDisabled via internals when disabled', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" disabled>
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      const internals = (el as SelectTestHarness)._internals;
+      expect(internals.ariaDisabled).toBe('true');
+    });
+
+    it('host ariaDescribedByElements references error wrapper when error is set', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" error="Required field">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      const errorWrapper = shadowQuery<HTMLElement>(el, '.field__error')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(errorWrapper);
+      } else {
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Required field');
+      }
+    });
+
+    it('host ariaDescribedByElements references help wrapper when help text is set (no error)', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" help-text="Pick one">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      const helpEl = shadowQuery<HTMLElement>(el, '.field__help-text')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(helpEl);
+      } else {
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Pick one');
+      }
+    });
+
+    it('drops help wrapper from describedby chain when error is active (round-16 P2 parity)', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" help-text="Pick one" error="Required">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      const helpEl = shadowQuery<HTMLElement>(el, '.field__help-text')!;
+      const errorEl = shadowQuery<HTMLElement>(el, '.field__error')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(errorEl);
+        expect(refs).not.toContain(helpEl);
+      } else {
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Required');
+        expect(ariaDescription).not.toContain('Pick one');
+      }
+    });
+
+    it('inner trigger does not carry aria-labelledby/describedby/required/invalid on modern path', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" help-text="Pick one" required error="Required">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const harness = el as SelectTestHarness;
+      // Skip if the platform forced fallback (Firefox today).
+      if (!harness._supportsIdrefRefs) return;
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(trigger.hasAttribute('aria-labelledby')).toBe(false);
+      expect(trigger.hasAttribute('aria-describedby')).toBe(false);
+      expect(trigger.hasAttribute('aria-required')).toBe(false);
+      expect(trigger.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('hidden native select does not carry aria-labelledby/describedby/required/invalid on modern path', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" help-text="Pick one" required error="Required">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const harness = el as SelectTestHarness;
+      if (!harness._supportsIdrefRefs) return;
+      const nativeSelect = shadowQuery<HTMLSelectElement>(el, 'select')!;
+      expect(nativeSelect.hasAttribute('aria-labelledby')).toBe(false);
+      expect(nativeSelect.hasAttribute('aria-describedby')).toBe(false);
+      expect(nativeSelect.hasAttribute('aria-required')).toBe(false);
+      expect(nativeSelect.hasAttribute('aria-invalid')).toBe(false);
+    });
+  });
+
+  // ─── ARIA Group 3 — hasEffectiveLabelledBy gate ───
+
+  describe('hasEffectiveLabelledBy gate (Group 3 round-1)', () => {
+    // Group 2 round-35 (medium) parity: a typo or transiently-missing target
+    // in `aria-labelledby` must NOT erase the visible label — fall back to
+    // `label` so the field keeps a name on both render paths.
+    it('keeps the accessible name when aria-labelledby points to a missing id (modern path)', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" aria-labelledby="hx-select-missing-target">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs) {
+        const label = shadowQuery(el, 'label');
+        expect(refs).toContain(label);
+      } else {
+        expect(internals.ariaLabel).toBe('Country');
+        // Group 2 round-36: broken consumer attribute must be cleared from
+        // host on fallback so ARIA priority does not drop the name.
+        expect(el.getAttribute('aria-labelledby')).toBeNull();
+      }
+    });
+
+    it('clears host aria-labelledby attribute when consumer tokens do not resolve (fallback path)', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" aria-labelledby="hx-select-missing-target-2">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const harness = el as SelectTestHarness;
+      // Force fallback path so the round-36 attribute-clear assertion runs.
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+      // Round-36: when consumer tokens don't resolve, the host attribute is
+      // cleared so ARIA priority does not drop the visible label.
+      expect(el.getAttribute('aria-labelledby')).toBeNull();
+      expect(harness._internals.ariaLabel).toBe('Country');
+    });
+
+    it('replays cached consumer labelledby once the target attaches', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" aria-labelledby="hx-select-late-target">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      // Target is missing on initial paint — consumer tokens cached, falls
+      // back to the visible label.
+      const internals = (el as SelectTestHarness)._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const before = (internals as InternalsWithRefs).ariaLabelledByElements ?? [];
+      const labelEl = shadowQuery(el, 'label');
+      // Either modern path resolves to the visible label OR fallback sets ariaLabel.
+      if (before.length > 0) {
+        expect(before).toContain(labelEl);
+      } else {
+        expect(internals.ariaLabel).toBe('Country');
+      }
+      // Now attach the target. The shared root mutation observer should
+      // re-resolve and the cached consumer token replays.
+      const target = document.createElement('span');
+      target.id = 'hx-select-late-target';
+      target.textContent = 'Late Target';
+      container.appendChild(target);
+      // Allow the mutation observer + microtask to flush.
+      await new Promise((r) => setTimeout(r, 0));
+      await el.updateComplete;
+      const after = (internals as InternalsWithRefs).ariaLabelledByElements ?? [];
+      if (after.length > 0) {
+        expect(after).toContain(target);
+      }
+    });
+  });
+
+  // ─── ARIA Group 3 — setValidity anchor ───
+
+  describe('setValidity anchor (Group 3 round-1)', () => {
+    // Group 2 round-35 finding (CR major): the setValidity() anchor must be
+    // a focusable, interactive element so the UA can route validation UI /
+    // error recovery to the actual control surface. The visible trigger div
+    // carries `role="combobox"` and `tabindex="0"` — that is the anchor.
+    it('setValidity anchor is the focusable inner trigger (combobox)', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" required>
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      const setValiditySpy = vi.spyOn(internals, 'setValidity');
+      // Trigger a fresh setValidity by re-asserting required.
+      el.required = false;
+      await el.updateComplete;
+      el.required = true;
+      await el.updateComplete;
+      const lastCall = setValiditySpy.mock.calls.at(-1);
+      expect(lastCall?.[0]).toEqual({ valueMissing: true });
+      const trigger = shadowQuery<HTMLElement>(el, '[role="combobox"]')!;
+      expect(lastCall?.[2]).toBe(trigger);
+      // Confirm the anchor really is focusable.
+      expect(trigger.tabIndex).toBe(0);
+    });
+
+    it('setValidity anchor never falls through to the aria-hidden native select when the trigger exists', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" required>
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      const setValiditySpy = vi.spyOn(internals, 'setValidity');
+      el.required = false;
+      await el.updateComplete;
+      el.required = true;
+      await el.updateComplete;
+      const lastCall = setValiditySpy.mock.calls.at(-1);
+      const nativeSelect = shadowQuery<HTMLSelectElement>(el, 'select')!;
+      // The native select is `aria-hidden="true"` and `tabindex="-1"`; it
+      // cannot host UA validation UI.
+      expect(lastCall?.[2]).not.toBe(nativeSelect);
+    });
+  });
+
+  // ─── ARIA Group 3 — Forced-colors host-focus parity ───
+
+  describe('Forced-colors host-focus parity (Group 3 round-1)', () => {
+    // The host stays roleless and the inner trigger remains the focus
+    // surface, so the existing `.field__trigger:focus-visible` rule under
+    // `@media (forced-colors: active)` is what AT and HC users see. This
+    // test asserts the rule survives in the component stylesheet so a future
+    // refactor cannot silently regress it (Group 2 round-22 parity).
+    it('forced-colors stylesheet retains a :focus-visible outline on the trigger', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const sheets = (el.shadowRoot as ShadowRoot).adoptedStyleSheets ?? [];
+      const cssText = sheets
+        .flatMap((sheet) =>
+          Array.from(sheet.cssRules ?? []).map((rule) => (rule as CSSRule).cssText),
+        )
+        .join('\n');
+      // Locate the forced-colors media block and confirm it includes a
+      // :focus-visible rule that paints an outline (Highlight system color).
+      expect(cssText).toMatch(/forced-colors:\s*active/);
+      expect(cssText).toMatch(/:focus-visible[^}]*outline[^}]*Highlight/);
+    });
+  });
+
+  // ─── ARIA Group 3 — Consumer aria-describedby preservation through error cycle ───
+
+  describe('Consumer aria-describedby preservation (Group 3 round-1)', () => {
+    // The `_consumerDescribedBy` cache holds the consumer-authored token
+    // list across error → recovery transitions so the component does not
+    // erase consumer-supplied descriptions when toggling its own error
+    // state. Aligned with Group 2 round-10 P2.
+    it('preserves consumer aria-describedby through error → recovery cycle (fallback path)', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const consumerHelp = document.createElement('span');
+      consumerHelp.id = 'hx-select-consumer-help';
+      consumerHelp.textContent = 'Consumer-authored description';
+      container.appendChild(consumerHelp);
+
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" aria-describedby="hx-select-consumer-help">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const harness = el as SelectTestHarness;
+      // Force fallback so we exercise the host-attribute mirror branch.
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+
+      // Consumer token survives on the host attribute.
+      expect(el.getAttribute('aria-describedby')).toBe('hx-select-consumer-help');
+
+      // Toggle error on — the consumer token must remain on the host (the
+      // shadow `error` wrapper id is NOT spliced into host attributes; that
+      // text-mirrors via `internals.ariaDescription` instead).
+      el.error = 'Required';
+      await el.updateComplete;
+      harness._syncHostAriaSemantics();
+      await el.updateComplete;
+      expect(el.getAttribute('aria-describedby')).toBe('hx-select-consumer-help');
+
+      // Recover from error — consumer token still preserved.
+      el.error = '';
+      await el.updateComplete;
+      harness._syncHostAriaSemantics();
+      await el.updateComplete;
+      expect(el.getAttribute('aria-describedby')).toBe('hx-select-consumer-help');
+    });
+
+    it('preserves consumer aria-describedby on the modern path through error cycle', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const consumerHelp = document.createElement('span');
+      consumerHelp.id = 'hx-select-consumer-help-modern';
+      consumerHelp.textContent = 'Consumer-authored description';
+      container.appendChild(consumerHelp);
+
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" aria-describedby="hx-select-consumer-help-modern">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      const internals = (el as SelectTestHarness)._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      // Modern path: consumer's element is in the live element-references
+      // list. Adding an error appends the shadow error wrapper without
+      // dropping the consumer reference.
+      const before = (internals as InternalsWithRefs).ariaDescribedByElements ?? [];
+      if (before.length > 0) {
+        expect(before).toContain(consumerHelp);
+      }
+      el.error = 'Required';
+      await el.updateComplete;
+      const errorWrapper = shadowQuery<HTMLElement>(el, '.field__error')!;
+      const during = (internals as InternalsWithRefs).ariaDescribedByElements ?? [];
+      if (during.length > 0) {
+        expect(during).toContain(consumerHelp);
+        expect(during).toContain(errorWrapper);
+      }
+      el.error = '';
+      await el.updateComplete;
+      const after = (internals as InternalsWithRefs).ariaDescribedByElements ?? [];
+      if (after.length > 0) {
+        expect(after).toContain(consumerHelp);
+      }
+    });
+  });
+
+  // ─── ARIA Group 3 — Slot-aware describedby (fallback path) ───
+
+  describe('Slot-aware describedby — fallback path (Group 3 round-1)', () => {
+    /**
+     * Forces the no-IDL-ref fallback branch so the assertions exercise the
+     * same code path a legacy engine (e.g. Firefox today) would take.
+     */
+    async function forceFallbackPath(el: HxSelect): Promise<void> {
+      const harness = el as SelectTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('error textContent mirrors into internals.ariaDescription on fallback path', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" error="This field is required">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      const internals = (el as SelectTestHarness)._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('This field is required');
+    });
+
+    it('help-text textContent mirrors into internals.ariaDescription on fallback path', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country" help-text="Pick a country">
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      const internals = (el as SelectTestHarness)._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('Pick a country');
+    });
+
+    it('in-place slotted help-text textContent edits resync internals.ariaDescription', async () => {
+      const el = await fixture<HxSelect>(`
+        <hx-select label="Country">
+          <span slot="help-text">Initial help</span>
+          <option value="us">US</option>
+        </hx-select>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      const internals = (el as SelectTestHarness)._internals;
+      expect(internals.ariaDescription).toContain('Initial help');
+
+      const slottedHelp = el.querySelector('[slot="help-text"]') as HTMLSpanElement;
+      slottedHelp.textContent = 'Updated help';
+      // The observer schedules a microtask; await one to flush.
+      await Promise.resolve();
+      expect(internals.ariaDescription).toContain('Updated help');
+      expect(internals.ariaDescription).not.toContain('Initial help');
     });
   });
 });

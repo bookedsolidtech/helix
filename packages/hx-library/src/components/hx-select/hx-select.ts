@@ -9,6 +9,33 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSelectStyles } from './hx-select.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+
+/**
+ * Reads visible text from a shadow wrapper that contains a `<slot>`. Prefers
+ * the slot's flattened assigned-nodes text when light DOM is projected,
+ * otherwise falls back to the wrapper's own `textContent` (so property-driven
+ * fallback content rendered inside the slot is still readable). Aligned with
+ * the Group 2 round-23 P2 helper used by `hx-radio-group` / `hx-checkbox-group`.
+ */
+function readSlottedOrShadowText(wrapper: Element): string {
+  const slot = wrapper.querySelector('slot');
+  if (slot) {
+    const assigned = (slot as HTMLSlotElement).assignedNodes({ flatten: true });
+    if (assigned.length > 0) {
+      return assigned
+        .map((node) => node.textContent ?? '')
+        .join('')
+        .trim();
+    }
+  }
+  return (wrapper.textContent ?? '').trim();
+}
 
 // PERF: hx-select exceeds 5KB budget (6.31kb gzipped) -- custom listbox, keyboard navigation, grouped options
 
@@ -251,8 +278,35 @@ export class HelixSelect extends FormMixin(HelixElement) {
   @state() private _options: SelectOption[] = [];
   /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
+  /** Whether the help-text slot contains projected content. @internal */
+  @state() private _hasHelpSlot = false;
   /** Zero-based index of the keyboard-focused option in the listbox; -1 means none. @internal */
   @state() private _focusedOptionIndex = -1;
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the render-time branch between modern (host-canonical via internals
+   * element references) and fallback (host-attribute mirror only). Aligned
+   * with Group 2 round-17 P1.
+   *
+   * ARCHITECTURE — Path A (host-as-form-field, inner-as-combobox):
+   * The host owns `internals.ariaLabel`, `internals.ariaLabelledByElements`,
+   * `internals.ariaDescribedByElements`, `internals.ariaRequired`,
+   * `internals.ariaInvalid`, `internals.ariaDisabled`. The host does NOT own
+   * `internals.role` — `role="combobox"` stays on the inner trigger element
+   * per the APG combobox pattern (ARIA 1.2 places `combobox` semantics on
+   * the editable text field, not its container). Promoting the host to
+   * `combobox` would conflict with the inner trigger's role and produce a
+   * doubled accessible.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+  /**
+   * Deferred copy of `error` driven through reactive state so the persistent
+   * live region can re-announce on transitions without direct DOM mutation.
+   * Aligned with Group 2 round-1 finding #10.
+   * @internal
+   */
+  @state() private _announcedError = '';
 
   // ─── Queries ───
 
@@ -273,7 +327,61 @@ export class HelixSelect extends FormMixin(HelixElement) {
     return opt ? opt.label : this.value;
   }
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /**
+   * Handle for the shared IDREF observer. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+  /**
+   * Watches assigned `<slot name="help-text">` nodes for in-place text
+   * mutations so the no-IDL-ref fallback `internals.ariaDescription` stays in
+   * sync. Aligned with Group 2 round-23 P2 (Finding C).
+   * @internal
+   */
+  private _helpSlotTextObserver: MutationObserver | null = null;
+  /**
+   * Watches assigned `<slot name="error">` nodes for in-place text mutations.
+   * Aligned with Group 2 round-23 P2 (Finding C).
+   * @internal
+   */
+  private _errorSlotTextObserver: MutationObserver | null = null;
+  /**
+   * Last value of `aria-labelledby` we wrote to the host. Used to distinguish
+   * external (consumer) attribute mutations from our own internal augmentation
+   * writes. Aligned with Group 2 round-10 P2.
+   * @internal
+   */
+  private _lastWrittenLabelledBy: string | null = null;
+  /** @internal — see `_lastWrittenLabelledBy`. */
+  private _lastWrittenDescribedBy: string | null = null;
+  /**
+   * Most recently observed *consumer-supplied* `aria-labelledby` baseline.
+   * Refreshed only when the host attribute changes via an external write —
+   * internal writes leave the baseline untouched. Cached so consumer tokens
+   * can replay if their target element later attaches to the DOM.
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+  /** @internal — see `_consumerLabelledBy`. */
+  private _consumerDescribedBy: string | null = null;
+
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Group 2 round-17 P1 parity: detect IDL element-references API support
+    // so render() can branch between modern (host-canonical via internals
+    // element references) and fallback (host-attribute mirror) treatments.
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
+    // Seed root-independent semantics from connect so the host announces the
+    // form-field semantics before first paint.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -284,6 +392,12 @@ export class HelixSelect extends FormMixin(HelixElement) {
       this.open = false;
       this._focusedOptionIndex = -1;
     }
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    this._helpSlotTextObserver?.disconnect();
+    this._helpSlotTextObserver = null;
+    this._errorSlotTextObserver?.disconnect();
+    this._errorSlotTextObserver = null;
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -308,19 +422,236 @@ export class HelixSelect extends FormMixin(HelixElement) {
         );
       }
     }
-    // Force screen reader re-announcement when error text changes (a11y-v3-005)
-    if (changedProperties.has('error') && this.error) {
-      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
-      if (errorEl) {
-        const msg = this.error;
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+    // Group 2 round-1 finding #10: drive re-announcement from reactive state
+    // so the persistent live region stays in the shadow tree across error
+    // transitions. The persistent `<div role="alert">` always lives in DOM;
+    // changing `_announcedError` re-paints its slot fallback content and AT
+    // re-announces.
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string;
+      if (previousError && this.error) {
+        // Error→error: clear then re-set after rAF so AT re-announces.
+        this._announcedError = '';
         requestAnimationFrame(() => {
-          errorEl.textContent = '';
-          requestAnimationFrame(() => {
-            errorEl.textContent = msg;
-          });
+          this._announcedError = this.error;
         });
+      } else {
+        this._announcedError = this.error;
       }
     }
+  }
+
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+    // WCAG 4.1.2: warn when no accessible name is available. The trigger
+    // needs either a `label` prop, an `accessible-label` attribute, or a
+    // host-level `aria-label` / `aria-labelledby` so AT can identify the
+    // form field.
+    if (
+      !this.label &&
+      !this.accessibleLabel &&
+      !this.getAttribute('aria-label') &&
+      !this.getAttribute('aria-labelledby')
+    ) {
+      devWarn(
+        'hx-select',
+        'No accessible label provided. Set the `label` attribute, `accessible-label`, `aria-label`, or `aria-labelledby` on the host. An unlabeled select violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      );
+    }
+  }
+
+  // ─── Host-canonical ARIA sync ───
+
+  /**
+   * Mirrors form-field semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-select>` reach the announced control. The Group 3 scope identified
+   * that the inner combobox `<div>` was the announced node and the host's
+   * external IDREF tokens could not cross the shadow boundary.
+   *
+   * Path A: host owns label/describedby/required/invalid/disabled. Host does
+   * NOT own role — `role="combobox"` stays on the inner trigger per APG.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    // Path A: explicitly leave host roleless so the inner combobox/listbox
+    // surface stays canonical. Setting `internals.role = 'combobox'` here
+    // would conflict with the inner trigger and produce a doubled accessible.
+    internals.role = null;
+    internals.ariaRequired = this.required ? 'true' : 'false';
+    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+    internals.ariaDisabled = this.disabled ? 'true' : 'false';
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+
+    // Resolve the candidate label/desc element references once — the IDL-ref
+    // path consumes them as `Element[]`, the fallback path mirrors consumer
+    // tokens onto the host attribute.
+    const internalLabel = this.shadowRoot?.getElementById(this._labelId);
+    const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+    const errorEl = this.shadowRoot?.getElementById(this._errorId);
+
+    // Group 2 round-10 P2: refresh the consumer baseline only when the host
+    // attribute moved due to an *external* write. Compare the live attribute
+    // against our last-written snapshot — if it differs, the consumer wrote.
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    if (liveLabelledBy !== this._lastWrittenLabelledBy) {
+      this._consumerLabelledBy = liveLabelledBy;
+    }
+    const liveDescribedBy = this.getAttribute('aria-describedby');
+    if (liveDescribedBy !== this._lastWrittenDescribedBy) {
+      this._consumerDescribedBy = liveDescribedBy;
+    }
+    const externalLabelTokens = this._consumerLabelledBy;
+    const externalDescTokens = this._consumerDescribedBy;
+
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    // Group 2 round-35 (CR major + codex follow-up): `aria-labelledby` is
+    // only "effective" when at least one IDREF resolves. A typo or
+    // transiently-missing target must NOT erase the visible label — fall back
+    // to `label` / `accessibleLabel` so the field keeps a name on both paths.
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!hasEffectiveLabelledBy) {
+      internals.ariaLabel = this.label || this.accessibleLabel || null;
+    } else {
+      internals.ariaLabel = null;
+    }
+    if (labelEls.length === 0 && !hostAriaLabel && this.label && internalLabel) {
+      labelEls.push(internalLabel);
+    }
+
+    const descEls = resolveIdrefTokens(this, externalDescTokens);
+    const hasError = !!(this.error || this._hasErrorSlot);
+    // Group 2 round-16 P2: drop help text from the describedby chain while an
+    // error is active so AT does not announce stale guidance ahead of the
+    // validation error.
+    if (helpEl && !hasError && (this.helpText || this._hasHelpSlot)) {
+      descEls.push(helpEl);
+    }
+    if (errorEl && hasError) {
+      descEls.push(errorEl);
+    }
+
+    if (this._supportsIdrefRefs) {
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+      // Clear stale fallback ariaDescription string if a prior sync ran on
+      // the fallback path (e.g. tests flipping `_supportsIdrefRefs`).
+      internals.ariaDescription = null;
+    } else {
+      // ─── No-IDL-ref fallback (Group 2 round-19 P1 parity) ───
+      // The IDL element-references API is unavailable, so internal shadow
+      // help/error/label wrappers cannot be projected onto the host
+      // accessibility node via `internals.aria*Elements`. The host owns the
+      // ARIA strings (via `internals.ariaLabel`, `internals.ariaDescription`)
+      // and we mirror only consumer-supplied tokens onto the host attribute
+      // (shadow ids cannot resolve across the boundary).
+      const consumerLabelIds = new Set((externalLabelTokens?.split(/\s+/) ?? []).filter(Boolean));
+      const consumerDescIds = new Set((externalDescTokens?.split(/\s+/) ?? []).filter(Boolean));
+
+      // Group 2 round-35 (medium) + round-36 (medium): mirror consumer tokens
+      // to the host attribute ONLY when at least one resolves. Otherwise
+      // actively clear the host attribute — per ARIA priority a broken
+      // `aria-labelledby` would otherwise erase the accessible name on
+      // legacy engines. The original tokens stay cached in
+      // `_consumerLabelledBy` so they replay if the target later attaches.
+      const hostLabel = hasEffectiveLabelledBy
+        ? [...consumerLabelIds].filter(Boolean).join(' ')
+        : '';
+      const liveLabel = this.getAttribute('aria-labelledby');
+      if (hostLabel) {
+        if (liveLabel !== hostLabel) {
+          this.setAttribute('aria-labelledby', hostLabel);
+        }
+        this._lastWrittenLabelledBy = hostLabel;
+      } else if (liveLabel !== null) {
+        this.removeAttribute('aria-labelledby');
+        this._lastWrittenLabelledBy = null;
+      }
+
+      const hostDesc = [...consumerDescIds].filter(Boolean).join(' ') || '';
+      const liveDesc = this.getAttribute('aria-describedby');
+      if (hostDesc) {
+        if (liveDesc !== hostDesc) {
+          this.setAttribute('aria-describedby', hostDesc);
+        }
+        this._lastWrittenDescribedBy = hostDesc;
+      } else if (liveDesc !== null && this._lastWrittenDescribedBy !== null) {
+        this.removeAttribute('aria-describedby');
+        this._lastWrittenDescribedBy = null;
+      }
+
+      // Group 2 round-22 P1 #2 + round-23 P2 (Finding C): mirror shadow
+      // help/error textContent into `internals.ariaDescription` so the host's
+      // accessible description still surfaces the live help/error strings on
+      // legacy engines. Slot-aware text read crosses the shadow → light-DOM
+      // boundary; the slot text observers replay this on in-place edits.
+      const helpText =
+        helpEl && !hasError && (this.helpText || this._hasHelpSlot)
+          ? readSlottedOrShadowText(helpEl)
+          : '';
+      const errorText = errorEl && hasError ? readSlottedOrShadowText(errorEl) : '';
+      const internalDescriptionText = [helpText, errorText].filter(Boolean).join(' ');
+      internals.ariaDescription = internalDescriptionText || null;
+    }
+  }
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * help-text-slot nodes. Aligned with Group 2 round-23 P2 (Finding C).
+   * @internal
+   */
+  private _installHelpSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._helpSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._helpSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._helpSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * error-slot nodes. Aligned with Group 2 round-23 P2 (Finding C).
+   * @internal
+   */
+  private _installErrorSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._errorSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._errorSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._errorSlotTextObserver = observer;
   }
 
   // ─── Form Integration ───
@@ -333,6 +664,13 @@ export class HelixSelect extends FormMixin(HelixElement) {
   /** @internal */
   override _updateValidity(): void {
     if (this.required && !this.value) {
+      // Group 2 round-35 finding (CR major): anchor `setValidity()` to a
+      // focusable, interactive element so the UA can route validation UI /
+      // error recovery to the actual control surface. The visible trigger
+      // div is the `role="combobox"` focus target; prefer it. The hidden
+      // native `<select>` is `tabindex="-1"` and aria-hidden so it cannot
+      // host UA validation UI — only fall through to it when the trigger
+      // has not yet rendered (defensive; should not happen post-firstUpdated).
       this._internals.setValidity(
         { valueMissing: true },
         this.error || this.labelRequired,
@@ -341,6 +679,9 @@ export class HelixSelect extends FormMixin(HelixElement) {
     } else {
       this._internals.setValidity({});
     }
+    // Group 2 round-1 finding #6: re-sync host ARIA after every setValidity()
+    // so `aria-invalid` reflects the freshly computed validity state.
+    this._syncHostAriaSemantics();
   }
 
   // ─── Form Lifecycle Hooks ───
@@ -442,8 +783,22 @@ export class HelixSelect extends FormMixin(HelixElement) {
 
   /** @internal */
   private _handleErrorSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasErrorSlot = e.target.assignedNodes({ flatten: true }).length > 0;
+    // Group 2 round-23 P2 (Finding C): re-tune the in-place text observer
+    // over the new assigned-node set so in-place `textContent` rewrites of
+    // slotted error nodes resync `internals.ariaDescription` on the no-IDL-ref
+    // fallback path. `slotchange` only fires when the *node set* changes.
+    this._installErrorSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
+  }
+
+  /** @internal */
+  private _handleHelpSlotChange(e: Event): void {
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasHelpSlot = e.target.assignedNodes({ flatten: true }).length > 0;
+    this._installHelpSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
   }
 
   // ─── Dropdown Control ───
@@ -666,6 +1021,7 @@ export class HelixSelect extends FormMixin(HelixElement) {
 
   override render() {
     const hasError = !!this.error || this._hasErrorSlot;
+    const hasHelp = !!this.helpText || this._hasHelpSlot;
 
     const fieldClasses = {
       field: true,
@@ -686,13 +1042,17 @@ export class HelixSelect extends FormMixin(HelixElement) {
       [`field__select--${this.size}`]: true,
     };
 
-    const describedBy =
-      [
-        hasError || this._hasErrorSlot ? this._errorId : null,
-        this.helpText ? this._helpTextId : null,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
+    // Group 2 round-19 P1: on the modern (host-canonical) path the host owns
+    // labelledby/describedby/required/invalid via ElementInternals — drop
+    // the inner-trigger and hidden-native mirrors so AT does not announce
+    // duplicate names/descriptions. The fallback path keeps the inner
+    // attributes so legacy engines (Firefox today) still surface them via
+    // attribute IDREF lookup within the shadow root.
+    const fallbackDescribedBy = !this._supportsIdrefRefs
+      ? [hasError ? this._errorId : null, hasHelp && !hasError ? this._helpTextId : null]
+          .filter(Boolean)
+          .join(' ') || undefined
+      : undefined;
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -715,7 +1075,14 @@ export class HelixSelect extends FormMixin(HelixElement) {
 
         <!-- Select Wrapper: trigger + listbox -->
         <div part="select-wrapper" class="field__select-wrapper">
-          <!-- Custom Trigger (combobox — div to avoid native role conflicts per APG) -->
+          <!--
+            Custom trigger — div carries role=combobox per the APG combobox
+            pattern. Path A: the host stays roleless via internals so the inner
+            combobox role remains canonical and AT does not see a doubled
+            accessible. On the modern path (_supportsIdrefRefs) the host owns
+            labelledby/describedby/required/invalid via ElementInternals, so
+            we omit those attributes here.
+          -->
           <div
             part="trigger"
             id=${this._selectId}
@@ -728,12 +1095,16 @@ export class HelixSelect extends FormMixin(HelixElement) {
             aria-activedescendant=${this.open && this._focusedOptionIndex >= 0
               ? this._optionId(this._focusedOptionIndex)
               : nothing}
-            aria-invalid=${hasError ? 'true' : nothing}
-            aria-describedby=${ifDefined(describedBy)}
-            aria-required=${this.required ? 'true' : nothing}
+            aria-invalid=${this._supportsIdrefRefs ? nothing : hasError ? 'true' : nothing}
+            aria-describedby=${this._supportsIdrefRefs ? nothing : ifDefined(fallbackDescribedBy)}
+            aria-required=${this._supportsIdrefRefs ? nothing : this.required ? 'true' : nothing}
             aria-disabled=${this.disabled ? 'true' : nothing}
-            aria-labelledby=${ifDefined(this.label ? this._labelId : undefined)}
-            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
+            aria-labelledby=${this._supportsIdrefRefs
+              ? nothing
+              : ifDefined(this.label ? this._labelId : undefined)}
+            aria-label=${this._supportsIdrefRefs
+              ? nothing
+              : ifDefined(this.accessibleLabel ?? undefined)}
             @click=${this._toggleDropdown}
             @keydown=${this._handleKeydown}
           >
@@ -764,10 +1135,12 @@ export class HelixSelect extends FormMixin(HelixElement) {
             ?required=${this.required}
             ?disabled=${this.disabled}
             name=${ifDefined(this.name || undefined)}
-            aria-label=${ifDefined(this.accessibleLabel ?? undefined)}
-            aria-invalid=${hasError ? 'true' : nothing}
-            aria-describedby=${ifDefined(describedBy)}
-            aria-required=${this.required ? 'true' : nothing}
+            aria-label=${this._supportsIdrefRefs
+              ? nothing
+              : ifDefined(this.accessibleLabel ?? undefined)}
+            aria-invalid=${this._supportsIdrefRefs ? nothing : hasError ? 'true' : nothing}
+            aria-describedby=${this._supportsIdrefRefs ? nothing : ifDefined(fallbackDescribedBy)}
+            aria-required=${this._supportsIdrefRefs ? nothing : this.required ? 'true' : nothing}
             @change=${this._handleNativeChange}
           >
             ${this.placeholder
@@ -779,23 +1152,38 @@ export class HelixSelect extends FormMixin(HelixElement) {
         <!-- Hidden slot (options are read from here) -->
         <slot @slotchange=${this._handleSlotChange} style="display:none;"></slot>
 
-        <!-- Error -->
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${hasError
-            ? html`<div part="error" class="field__error" id=${this._errorId} role="alert">
-                ${this.error}
-              </div>`
-            : nothing}
-        </slot>
+        <!--
+          Persistent error live region. role="alert" is set from first paint
+          so the WAI-ARIA contract for live updates is honoured: content
+          changes in place rather than the container being toggled. Aligned
+          with Group 2 round-1 finding #10.
+        -->
+        <div
+          part="error"
+          class="field__error"
+          id=${this._errorId}
+          role="alert"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}
+            >${this._announcedError}</slot
+          >
+        </div>
 
-        <!-- Help Text -->
-        ${this.helpText && !hasError
-          ? html`
-              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help-text">${this.helpText}</slot>
-              </div>
-            `
-          : nothing}
+        <!--
+          Persistent help-text container. Rendered whenever the property OR
+          the slot has content; hidden when an error is present so guidance
+          does not compete with validation feedback. Always in the shadow
+          tree so the host's aria-describedby chain is stable.
+        -->
+        <div
+          part="help-text"
+          class="field__help-text"
+          id=${this._helpTextId}
+          ?hidden=${!hasHelp || hasError}
+        >
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+        </div>
       </div>
     `;
   }
