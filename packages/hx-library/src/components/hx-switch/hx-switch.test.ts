@@ -173,7 +173,9 @@ describe('hx-switch', () => {
     it('error hides help text', async () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Error" help-text="Help"></hx-switch>');
       const helpText = shadowQuery(el, '.switch__help-text');
-      expect(helpText).toBeNull();
+      // Persistent wrapper: present in DOM but hidden when error is active.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -190,7 +192,9 @@ describe('hx-switch', () => {
     it('help text hidden when error present', async () => {
       const el = await fixture<HxSwitch>('<hx-switch help-text="Help" error="Error"></hx-switch>');
       const helpText = shadowQuery(el, '.switch__help-text');
-      expect(helpText).toBeNull();
+      // Persistent wrapper: present in DOM but hidden when error is active.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -677,6 +681,100 @@ describe('hx-switch', () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Oops"></hx-switch>');
       const container = shadowQuery(el, '.switch');
       expect(container?.classList.contains('switch--error')).toBe(true);
+    });
+  });
+
+  // ─── ARIA delegation: host semantics ───
+  //
+  // Codex aria-group-2 finding: switch role + state must reach the host so
+  // consumer-supplied aria-label / aria-labelledby / aria-describedby on
+  // <hx-switch> aren't stranded outside the shadow boundary.
+
+  describe('ARIA delegation: host semantics', () => {
+    it('exposes role="switch" via ElementInternals on the host', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Subscribe"></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('switch');
+    });
+
+    it('mirrors ariaChecked on host as checked toggles', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Toggle"></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('false');
+      el.checked = true;
+      await el.updateComplete;
+      expect(internals.ariaChecked).toBe('true');
+    });
+
+    it('mirrors label property to host ariaLabel when no aria-labelledby is set', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Receive emails"></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Receive emails');
+    });
+
+    it('prefers consumer-supplied aria-label over the label property', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Ignored" aria-label="Custom label"></hx-switch>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Custom label');
+    });
+
+    it('drives ariaInvalid from validity (required+unchecked is invalid before render)', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Agree" required></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaInvalid).toBe('true');
+      el.checked = true;
+      await el.updateComplete;
+      expect(internals.ariaInvalid).toBe('false');
+    });
+
+    it('mirrors required to host ariaRequired', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Agree" required></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).toBe('true');
+    });
+
+    it('renders persistent help-text wrapper that is hidden until content arrives via slot', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Toggle"></hx-switch>');
+      const helpWrapper = shadowQuery(el, '.switch__help-text');
+      expect(helpWrapper).toBeTruthy();
+      expect(helpWrapper?.hasAttribute('hidden')).toBe(true);
+
+      // Slot content should be detected and the wrapper should expose itself.
+      const slotted = document.createElement('span');
+      slotted.slot = 'help-text';
+      slotted.textContent = 'From slot';
+      el.appendChild(slotted);
+      await el.updateComplete;
+      await el.updateComplete; // second cycle: slotchange -> state -> render
+      expect(helpWrapper?.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('emits help-text first, then error in describedBy ordering on the inner track', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Toggle" help-text="Help" error="Bad"></hx-switch>',
+      );
+      const track = shadowQuery(el, '[role="switch"]');
+      const describedBy = track?.getAttribute('aria-describedby') || '';
+      const helpDiv = shadowQuery(el, '.switch__help-text');
+      const errorDiv = shadowQuery(el, '.switch__error');
+      expect(helpDiv?.id).toBeTruthy();
+      expect(errorDiv?.id).toBeTruthy();
+      const helpIdx = describedBy.indexOf(helpDiv!.id);
+      const errIdx = describedBy.indexOf(errorDiv!.id);
+      expect(helpIdx).toBeGreaterThanOrEqual(0);
+      expect(errIdx).toBeGreaterThanOrEqual(0);
+      expect(helpIdx).toBeLessThan(errIdx);
+    });
+
+    it('keeps the error live region in the DOM with role="alert" before any error fires', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Toggle"></hx-switch>');
+      const errorDiv = shadowQuery(el, '.switch__error');
+      // Persistent live region: present from first paint, hidden until needed.
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('hidden')).toBe(true);
     });
   });
 });

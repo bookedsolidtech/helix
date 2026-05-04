@@ -7,6 +7,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSwitchStyles } from './hx-switch.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
+import { resolveIdrefTokens, supportsIdrefElementReferences } from '../../utils/aria-idref.js';
 
 const _nextSwitchId = createIdCounter('hx-switch');
 
@@ -180,6 +181,65 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     if (changedProperties.has('checked') || changedProperties.has('value')) {
       this._internals.setFormValue(this.checked ? this.value : null);
     }
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Mirrors switch semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-switch>` reach the announced control. The codex aria-group-2
+   * finding identified that the inner shadow `<button role=switch>` was the
+   * only carrier of switch semantics, leaving host-level IDREF tokens stranded
+   * on the wrong side of the shadow boundary.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'switch';
+    internals.ariaChecked = this.checked ? 'true' : 'false';
+    internals.ariaRequired = this.required ? 'true' : 'false';
+    internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+    internals.ariaDisabled = this.disabled ? 'true' : 'false';
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (!this.getAttribute('aria-labelledby')) {
+      internals.ariaLabel = this.label || null;
+    } else {
+      internals.ariaLabel = null;
+    }
+
+    if (supportsIdrefElementReferences(internals)) {
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+
+      const externalLabelTokens = this.getAttribute('aria-labelledby');
+      const externalDescTokens = this.getAttribute('aria-describedby');
+
+      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+      const internalLabel = this.shadowRoot?.getElementById(this._labelId);
+      const hasLabel = !!this.label || this._hasDefaultSlot;
+      if (labelEls.length === 0 && !hostAriaLabel && hasLabel && internalLabel) {
+        labelEls.push(internalLabel);
+      }
+      refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
+
+      const descEls = resolveIdrefTokens(this, externalDescTokens);
+      const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+      const errorEl = this.shadowRoot?.getElementById(this._errorId);
+      if (helpEl && (this.helpText || this._hasHelpTextSlot)) {
+        descEls.push(helpEl);
+      }
+      if (errorEl && (this.error || this._hasErrorSlot)) {
+        descEls.push(errorEl);
+      }
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+    }
   }
 
   // ─── Form Integration ───
@@ -230,6 +290,10 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   /** @internal */
   @state() private _hasDefaultSlot = false;
 
+  /** Whether the help-text slot has assigned content. */
+  /** @internal */
+  @state() private _hasHelpTextSlot = false;
+
   // ─── Slot Handlers ───
 
   /** Updates _hasErrorSlot when error slot content changes. */
@@ -244,6 +308,13 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   private _handleDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasDefaultSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  /** Updates _hasHelpTextSlot when help-text slot content changes. */
+  /** @internal */
+  private _handleHelpTextSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    this._hasHelpTextSlot = slot.assignedNodes({ flatten: true }).length > 0;
   }
 
   // ─── Event Handling ───
@@ -302,8 +373,12 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   private _errorId = `${this._switchId}-error`;
 
   override render() {
-    const hasError = !!this.error;
+    const hasError = !!this.error || this._hasErrorSlot;
+    const hasHelpText = !!this.helpText || this._hasHelpTextSlot;
     const hasLabel = !!this.label || this._hasDefaultSlot;
+    // Validity-driven invalid state: a required-but-unchecked switch is
+    // invalid via setValidity() even before any visible error renders.
+    const isInvalid = hasError || (this.required && !this.checked);
 
     const containerClasses = {
       switch: true,
@@ -314,11 +389,10 @@ export class HelixSwitch extends FormMixin(HelixElement) {
       [`switch--${this.size}`]: true,
     };
 
+    // help-text first, error appended — assistive tech announces guidance
+    // before validation feedback. Both ids are persistent in the shadow tree.
     const describedBy =
-      [
-        hasError || this._hasErrorSlot ? this._errorId : null,
-        this.helpText && !hasError ? this._helpTextId : null,
-      ]
+      [hasHelpText ? this._helpTextId : null, hasError ? this._errorId : null]
         .filter(Boolean)
         .join(' ') || undefined;
 
@@ -334,7 +408,7 @@ export class HelixSwitch extends FormMixin(HelixElement) {
             aria-checked=${this.checked ? 'true' : 'false'}
             aria-labelledby=${ifDefined(hasLabel ? this._labelId : undefined)}
             aria-describedby=${ifDefined(describedBy)}
-            aria-invalid=${hasError ? 'true' : nothing}
+            aria-invalid=${isInvalid ? 'true' : nothing}
             aria-required=${this.required ? 'true' : nothing}
             ?disabled=${this.disabled}
             @click=${this._handleClick}
@@ -350,21 +424,37 @@ export class HelixSwitch extends FormMixin(HelixElement) {
           </label>
         </div>
 
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${hasError
-            ? html`<div part="error" class="switch__error" id=${this._errorId} role="alert">
-                ${this.error}
-              </div>`
-            : nothing}
-        </slot>
+        <!--
+          Persistent error live region. Slot fallback content provides the
+          property-driven message; consumers can replace it via slot="error".
+          The wrapper carries a stable id so aria-describedby remains valid
+          across both code paths and across show/hide transitions.
+        -->
+        <div
+          part="error"
+          class="switch__error"
+          id=${this._errorId}
+          role="alert"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}>${this.error}</slot>
+        </div>
 
-        ${this.helpText && !hasError
-          ? html`
-              <div part="help-text" class="switch__help-text" id=${this._helpTextId}>
-                <slot name="help-text">${this.helpText}</slot>
-              </div>
-            `
-          : nothing}
+        <!--
+          Persistent help-text wrapper. Rendered whenever the property OR the
+          slot has content; hidden when an error is present so guidance does
+          not compete with validation feedback.
+        -->
+        <div
+          part="help-text"
+          class="switch__help-text"
+          id=${this._helpTextId}
+          ?hidden=${!hasHelpText || hasError}
+        >
+          <slot name="help-text" @slotchange=${this._handleHelpTextSlotChange}
+            >${this.helpText}</slot
+          >
+        </div>
       </div>
     `;
   }
