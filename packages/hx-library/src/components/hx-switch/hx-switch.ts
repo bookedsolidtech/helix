@@ -209,6 +209,16 @@ export class HelixSwitch extends FormMixin(HelixElement) {
    */
   @state() private _supportsIdrefRefs = true;
 
+  /**
+   * Tracks whether the host's `tabindex` is managed by the component itself
+   * (vs. set explicitly by a consumer). Codex round-14 P2: a consumer-supplied
+   * `tabindex` (e.g. roving-tabindex toolbar pattern with `tabindex="-1"`)
+   * must survive disabled flips and re-renders. Only re-assert tabindex in
+   * `updated()` when the component originally claimed it.
+   * @internal
+   */
+  private _internalTabindexManaged = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -225,8 +235,16 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     // Codex round-2 finding #2: on no-IDL-ref browsers the inner button is
     // the announced surface (it carries native button semantics + ARIA
     // role/state), so the host is demoted to `tabindex=-1`.
-    if (!this.hasAttribute('tabindex') && !this.disabled) {
-      this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
+    // Codex round-14 P2: only claim ownership of `tabindex` when no consumer
+    // value is present. Consumers using roving-tabindex toolbar patterns
+    // must be able to set `tabindex="-1"` on the host without it being
+    // clobbered on every disabled flip. Note we still claim ownership when
+    // disabled — the initial value is `-1` to keep the host out of tab order
+    // and `updated()` re-asserts the appropriate value when disabled flips.
+    if (!this.hasAttribute('tabindex')) {
+      this._internalTabindexManaged = true;
+      const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
     }
     this.addEventListener('keydown', this._handleHostKeyDown);
     this.addEventListener('click', this._handleHostClick);
@@ -285,8 +303,13 @@ export class HelixSwitch extends FormMixin(HelixElement) {
       // Codex round-2 finding #2: keep host tabindex aligned with the chosen
       // announced surface. On no-IDL-ref browsers the inner button owns tab
       // order, so re-enabling the host should leave it `tabindex=-1`.
-      const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
-      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
+      // Codex round-14 P2: only re-assert when the component owns tabindex.
+      // Consumer-managed values (e.g. roving-tabindex toolbar with `-1`) must
+      // not be overwritten on disabled flips or supports-flag transitions.
+      if (this._internalTabindexManaged) {
+        const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+        this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
+      }
     }
     // Re-resolve element references against the (possibly mutated) shadow
     // tree. `_syncHostAriaSemantics()` is also invoked from `_updateValidity()`
@@ -566,8 +589,22 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     // labelledby tokens are supplied.
     const innerDescribedBy =
       [describedBy ?? null, this._fallbackAriaDescribedBy].filter(Boolean).join(' ') || undefined;
-    const innerLabelledBy = this._fallbackAriaLabelledBy ?? (hasLabel ? this._labelId : undefined);
+    // Codex round-14 P2: per ARIA spec, `aria-labelledby` overrides
+    // `aria-label`. On the no-IDL-ref fallback path the consumer-set
+    // `aria-label` was being shadowed because we always assigned the
+    // internal `_labelId`. When the consumer supplied an `aria-label` (and
+    // did NOT supply an `aria-labelledby`), omit the internal labelledby so
+    // AT announces the consumer-supplied name — matching the modern path
+    // and the spec. Consumer-supplied `aria-labelledby` (mirrored into
+    // `_fallbackAriaLabelledBy`) still wins over the internal label.
     const innerAriaLabel = this._fallbackAriaLabel ?? undefined;
+    const innerLabelledBy = this._fallbackAriaLabelledBy
+      ? this._fallbackAriaLabelledBy
+      : innerAriaLabel
+        ? undefined
+        : hasLabel
+          ? this._labelId
+          : undefined;
 
     // Codex round-2 finding #2: branch the inner button on platform support.
     // Modern path — host is announced, inner button is `aria-hidden + tabindex=-1`.

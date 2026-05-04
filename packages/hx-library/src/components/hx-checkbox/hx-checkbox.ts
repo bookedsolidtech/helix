@@ -306,8 +306,16 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // `tabindex=-1` and the inner input owns tab order. Without this,
     // `aria-labelledby`/`aria-describedby` on the inner input were inert
     // (the input was `aria-hidden`), leaving the control unnamed.
-    if (!this.hasAttribute('tabindex') && !this.disabled) {
-      this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
+    // Codex round-14 P2: only claim ownership of `tabindex` when no consumer
+    // value is present. Consumers using roving-tabindex toolbar patterns
+    // must be able to set `tabindex="-1"` on the host without it being
+    // clobbered on every disabled flip. Note we still claim ownership when
+    // disabled — the initial value is `-1` to keep the host out of tab order
+    // and `updated()` re-asserts the appropriate value when disabled flips.
+    if (!this.hasAttribute('tabindex')) {
+      this._internalTabindexManaged = true;
+      const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
     }
     this.addEventListener('keydown', this._handleHostKeyDown);
     this.addEventListener('click', this._handleHostClick);
@@ -380,14 +388,19 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // state. Disabled custom elements should not be in tab order.
     // Codex round-2 finding #2: on no-IDL-ref browsers the host is demoted
     // to `tabindex=-1` so the inner input remains the announced surface.
+    // Codex round-14 P2: only re-assert when the component owns tabindex.
+    // Consumer-managed values (e.g. roving-tabindex toolbar with `-1`) must
+    // not be overwritten on disabled flips or supports-flag transitions.
     if (
       changedProperties.has('disabled') ||
       (changedProperties as Map<PropertyKey, unknown>).has('_supportsIdrefRefs')
     ) {
-      if (this.disabled) {
-        this.setAttribute('tabindex', '-1');
-      } else {
-        this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
+      if (this._internalTabindexManaged) {
+        if (this.disabled) {
+          this.setAttribute('tabindex', '-1');
+        } else {
+          this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
+        }
       }
     }
 
@@ -763,6 +776,16 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    * @internal
    */
   @state() private _supportsIdrefRefs = true;
+
+  /**
+   * Tracks whether the host's `tabindex` is managed by the component itself
+   * (vs. set explicitly by a consumer). Codex round-14 P2: a consumer-supplied
+   * `tabindex` (e.g. roving-tabindex toolbar pattern with `tabindex="-1"`)
+   * must survive disabled flips and re-renders. Only re-assert tabindex in
+   * `updated()` when the component originally claimed it.
+   * @internal
+   */
+  private _internalTabindexManaged = false;
 
   // ─── Render ───
 

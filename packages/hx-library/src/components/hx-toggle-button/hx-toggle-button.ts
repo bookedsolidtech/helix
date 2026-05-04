@@ -210,6 +210,16 @@ export class HelixToggleButton extends HelixElement {
    */
   @state() private _supportsIdrefRefs = true;
 
+  /**
+   * Tracks whether the host's `tabindex` is managed by the component itself
+   * (vs. set explicitly by a consumer). Codex round-14 P2: a consumer-supplied
+   * `tabindex` (e.g. roving-tabindex toolbar pattern with `tabindex="-1"`)
+   * must survive disabled flips and re-renders. Only re-assert tabindex in
+   * `updated()` when the component originally claimed it.
+   * @internal
+   */
+  private _internalTabindexManaged = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -228,8 +238,16 @@ export class HelixToggleButton extends HelixElement {
     // the announced surface (it carries native button + aria-pressed), so
     // the host is demoted to `tabindex=-1` and lets the inner button own
     // tab order + activation.
-    if (!this.hasAttribute('tabindex') && !this.disabled) {
-      this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
+    // Codex round-14 P2: only claim ownership of `tabindex` when no consumer
+    // value is present. Consumers using roving-tabindex toolbar patterns
+    // must be able to set `tabindex="-1"` on the host without it being
+    // clobbered on every disabled flip. Note we still claim ownership when
+    // disabled — the initial value is `-1` to keep the host out of tab order
+    // and `updated()` re-asserts the appropriate value when disabled flips.
+    if (!this.hasAttribute('tabindex')) {
+      this._internalTabindexManaged = true;
+      const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
     }
     this.addEventListener('keydown', this._handleHostKeyDown);
     this.addEventListener('click', this._handleHostClickRouted);
@@ -362,8 +380,13 @@ export class HelixToggleButton extends HelixElement {
       // Codex round-2 finding #2: align host tabindex with the chosen
       // announced surface. On no-IDL-ref browsers the inner button owns
       // tab order, so re-enabling the host should leave it `tabindex=-1`.
-      const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
-      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
+      // Codex round-14 P2: only re-assert when the component owns tabindex.
+      // Consumer-managed values (e.g. roving-tabindex toolbar with `-1`) must
+      // not be overwritten on disabled flips or supports-flag transitions.
+      if (this._internalTabindexManaged) {
+        const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+        this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
+      }
     }
 
     // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
