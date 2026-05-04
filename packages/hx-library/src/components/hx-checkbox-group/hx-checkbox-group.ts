@@ -195,6 +195,29 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
    */
   @state() private _announcedError = '';
 
+  /**
+   * Last value of `aria-labelledby` we wrote to the host. Used to distinguish
+   * external (consumer) attribute mutations from our own internal augmentation
+   * writes when refreshing the host-attribute fallback. Codex round-10 P2:
+   * without this guard, an internal mutation observer fire would re-read the
+   * already-augmented host attribute as if it were consumer-supplied, causing
+   * legend/help/error ids to leak forward as "consumer tokens" forever.
+   * @internal
+   */
+  private _lastWrittenLabelledBy: string | null = null;
+  /** @internal — see `_lastWrittenLabelledBy`. */
+  private _lastWrittenDescribedBy: string | null = null;
+  /**
+   * Most recently observed *consumer-supplied* `aria-labelledby` baseline (the
+   * set of tokens the consumer themselves wrote on the host). Refreshed only
+   * when the host attribute changes via an external write — internal writes
+   * leave the baseline untouched.
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+  /** @internal — see `_consumerLabelledBy`. */
+  private _consumerDescribedBy: string | null = null;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -205,6 +228,17 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     this._ariaMirror = installAriaIdrefMirror(this, () => {
       this._syncHostAriaSemantics();
     });
+    // Codex round-10 P2: re-apply child suppression on reattach. On the first
+    // mount `firstUpdated()` runs `_syncCheckboxNames()` later, but when the
+    // same group node is detached and re-inserted (with the same children
+    // already in place), `firstUpdated()` does NOT re-fire. Without this,
+    // `disconnectedCallback()`'s suppression-clearing leaves children
+    // form-active alongside the group on the next attach, which reintroduces
+    // the duplicate-submission bug the round-1 fix eliminated.
+    if (this._getCheckboxes().length > 0) {
+      this._syncCheckboxNames();
+      this._previousChildren = this._getCheckboxes();
+    }
   }
 
   override disconnectedCallback(): void {
@@ -287,42 +321,97 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
       internals.ariaLabel = null;
     }
 
+    // Codex round-10 P2: refresh the consumer baseline only when the host
+    // attribute moved due to an *external* write. Compare the live attribute
+    // against our last-written snapshot — if it differs, the consumer wrote.
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    if (liveLabelledBy !== this._lastWrittenLabelledBy) {
+      this._consumerLabelledBy = liveLabelledBy;
+    }
+    const liveDescribedBy = this.getAttribute('aria-describedby');
+    if (liveDescribedBy !== this._lastWrittenDescribedBy) {
+      this._consumerDescribedBy = liveDescribedBy;
+    }
+    const externalLabelTokens = this._consumerLabelledBy;
+    const externalDescTokens = this._consumerDescribedBy;
+
+    // Resolve the candidate label/desc element references once — both render
+    // branches (modern IDL-ref and host-attribute fallback) consume the same
+    // collections; the IDL-ref branch assigns them as `Element[]`, the
+    // fallback mirrors their `id` tokens onto the host's `aria-*` attributes.
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    const internalLegend = this.shadowRoot?.getElementById(this._labelId);
+    if (
+      labelEls.length === 0 &&
+      !hostAriaLabel &&
+      (this.label || this._hasLabelSlot) &&
+      internalLegend
+    ) {
+      labelEls.push(internalLegend);
+    }
+
+    const descEls = resolveIdrefTokens(this, externalDescTokens);
+    const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
+    const errorEl = this.shadowRoot?.getElementById(this._errorId);
+    if (helpEl && (this.helpText || this._hasHelpSlot)) {
+      descEls.push(helpEl);
+    }
+    if (errorEl && (this.error || this._hasErrorSlot)) {
+      descEls.push(errorEl);
+    }
+
     if (supportsIdrefElementReferences(internals)) {
       type InternalsWithRefs = ElementInternals & {
         ariaLabelledByElements: Element[] | null;
         ariaDescribedByElements: Element[] | null;
       };
       const refsInternals = internals as InternalsWithRefs;
-
-      const externalLabelTokens = this.getAttribute('aria-labelledby');
-      const externalDescTokens = this.getAttribute('aria-describedby');
-
-      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
-      // If no external labelling source, fall back to the internal legend so
-      // the host still has an accessible name across the boundary.
-      const internalLegend = this.shadowRoot?.getElementById(this._labelId);
-      if (
-        labelEls.length === 0 &&
-        !hostAriaLabel &&
-        (this.label || this._hasLabelSlot) &&
-        internalLegend
-      ) {
-        labelEls.push(internalLegend);
-      }
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
-
-      const descEls = resolveIdrefTokens(this, externalDescTokens);
-      // help-text first (guidance), then error (validation feedback). Both
-      // wrappers are persistent in the shadow tree so the chain is stable.
-      const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
-      const errorEl = this.shadowRoot?.getElementById(this._errorId);
-      if (helpEl && (this.helpText || this._hasHelpSlot)) {
-        descEls.push(helpEl);
-      }
-      if (errorEl && (this.error || this._hasErrorSlot)) {
-        descEls.push(errorEl);
-      }
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+    } else {
+      // ─── No-IDL-ref fallback (codex round-10 P1) ───
+      // The IDL element-references API is unavailable, so internal shadow
+      // help/error/legend wrappers cannot be projected onto the host
+      // accessibility node via `internals.aria*Elements`. Mirror the resolved
+      // ids onto the host's `aria-labelledby` / `aria-describedby` attributes
+      // instead — the shadow-internal ids resolve through the host's shadow
+      // root for AT walking the tree. The consumer baseline is read from the
+      // attribute when an *external* mutation occurred (see snapshot above);
+      // internal augmentation writes do not pollute the baseline.
+      const consumerLabelIds = new Set((externalLabelTokens?.split(/\s+/) ?? []).filter(Boolean));
+      const consumerDescIds = new Set((externalDescTokens?.split(/\s+/) ?? []).filter(Boolean));
+
+      const internalLabelIds = labelEls
+        .map((el) => el.id)
+        .filter((id) => id && !consumerLabelIds.has(id));
+      const internalDescIds = descEls
+        .map((el) => el.id)
+        .filter((id) => id && !consumerDescIds.has(id));
+
+      const mergedLabel =
+        [...consumerLabelIds, ...internalLabelIds].filter(Boolean).join(' ') || '';
+      const liveLabel = this.getAttribute('aria-labelledby');
+      if (mergedLabel) {
+        if (liveLabel !== mergedLabel) {
+          this.setAttribute('aria-labelledby', mergedLabel);
+        }
+        this._lastWrittenLabelledBy = mergedLabel;
+      } else if (liveLabel !== null) {
+        this.removeAttribute('aria-labelledby');
+        this._lastWrittenLabelledBy = null;
+      }
+
+      const mergedDesc = [...consumerDescIds, ...internalDescIds].filter(Boolean).join(' ') || '';
+      const liveDesc = this.getAttribute('aria-describedby');
+      if (mergedDesc) {
+        if (liveDesc !== mergedDesc) {
+          this.setAttribute('aria-describedby', mergedDesc);
+        }
+        this._lastWrittenDescribedBy = mergedDesc;
+      } else if (liveDesc !== null) {
+        this.removeAttribute('aria-describedby');
+        this._lastWrittenDescribedBy = null;
+      }
     }
   }
 

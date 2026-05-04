@@ -224,6 +224,29 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
    */
   private _previousRadios: HelixRadio[] = [];
 
+  /**
+   * Last value of `aria-labelledby` we wrote to the host. Used to distinguish
+   * external (consumer) attribute mutations from our own internal augmentation
+   * writes when refreshing the host-attribute fallback. Codex round-10 P2:
+   * without this guard, an internal mutation observer fire would re-read the
+   * already-augmented host attribute as if it were consumer-supplied, causing
+   * legend/help/error ids to leak forward as "consumer tokens" forever.
+   * @internal
+   */
+  private _lastWrittenLabelledBy: string | null = null;
+  /** @internal — see `_lastWrittenLabelledBy`. */
+  private _lastWrittenDescribedBy: string | null = null;
+  /**
+   * Most recently observed *consumer-supplied* `aria-labelledby` baseline (the
+   * set of tokens the consumer themselves wrote on the host). Refreshed only
+   * when the host attribute changes via an external write — internal writes
+   * leave the baseline untouched.
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+  /** @internal — see `_consumerLabelledBy`. */
+  private _consumerDescribedBy: string | null = null;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -236,6 +259,19 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     this._ariaMirror = installAriaIdrefMirror(this, () => {
       this._syncHostAriaSemantics();
     });
+    // Codex round-10 P2 (parity with hx-checkbox-group): re-apply child
+    // suppression on reattach so a detached-then-reinserted group with the
+    // same `<hx-radio>` children still claims them. `_groupedSuppress` is
+    // currently inert on `hx-radio`, but the lifecycle parity keeps the
+    // contract identical for any future form-association on the radio child.
+    const existing = this._getRadios();
+    if (existing.length > 0) {
+      existing.forEach((radio) => {
+        radio._groupedSuppress = true;
+        this._suppressedChildren.add(radio);
+      });
+      this._previousRadios = existing;
+    }
   }
 
   override disconnectedCallback(): void {
@@ -324,8 +360,21 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
     const errorEl = this.shadowRoot?.getElementById(this._errorId);
 
-    const externalLabelTokens = this.getAttribute('aria-labelledby');
-    const externalDescTokens = this.getAttribute('aria-describedby');
+    // Codex round-10 P2: refresh the consumer baseline only when the host
+    // attribute moved due to an *external* write. Compare the live attribute
+    // against our last-written snapshot — if it differs, the consumer wrote.
+    // This prevents internally-augmented values (containing legend/help/error
+    // ids we appended) from being re-read as if they were consumer tokens.
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    if (liveLabelledBy !== this._lastWrittenLabelledBy) {
+      this._consumerLabelledBy = liveLabelledBy;
+    }
+    const liveDescribedBy = this.getAttribute('aria-describedby');
+    if (liveDescribedBy !== this._lastWrittenDescribedBy) {
+      this._consumerDescribedBy = liveDescribedBy;
+    }
+    const externalLabelTokens = this._consumerLabelledBy;
+    const externalDescTokens = this._consumerDescribedBy;
 
     const labelEls = resolveIdrefTokens(this, externalLabelTokens);
     if (labelEls.length === 0 && !hostAriaLabel && this.label && internalLegend) {
@@ -371,21 +420,36 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
         .map((el) => el.id)
         .filter((id) => id && !consumerDescIds.has(id));
 
-      if (internalLabelIds.length > 0) {
-        const merged = [...consumerLabelIds, ...internalLabelIds].join(' ');
-        if (this.getAttribute('aria-labelledby') !== merged) {
-          this.setAttribute('aria-labelledby', merged);
+      // Codex round-10 P2: write the merged value derived from the *consumer
+      // baseline* (not the live attribute), so transitions that drop internal
+      // ids (e.g. clearing helpText) shrink the attribute back rather than
+      // leaving stale tokens behind.
+      const mergedLabel =
+        [...consumerLabelIds, ...internalLabelIds].filter(Boolean).join(' ') || '';
+      const liveLabel = this.getAttribute('aria-labelledby');
+      if (mergedLabel) {
+        if (liveLabel !== mergedLabel) {
+          this.setAttribute('aria-labelledby', mergedLabel);
         }
+        this._lastWrittenLabelledBy = mergedLabel;
+      } else if (liveLabel !== null) {
+        // Both consumer and internal contributed nothing; clear the mirror.
+        this.removeAttribute('aria-labelledby');
+        this._lastWrittenLabelledBy = null;
       }
-      if (internalDescIds.length > 0) {
-        const merged = [...consumerDescIds, ...internalDescIds].join(' ');
-        if (this.getAttribute('aria-describedby') !== merged) {
-          this.setAttribute('aria-describedby', merged);
+
+      const mergedDesc = [...consumerDescIds, ...internalDescIds].filter(Boolean).join(' ') || '';
+      const liveDesc = this.getAttribute('aria-describedby');
+      if (mergedDesc) {
+        if (liveDesc !== mergedDesc) {
+          this.setAttribute('aria-describedby', mergedDesc);
         }
-      } else if (consumerDescIds.size === 0 && this.hasAttribute('aria-describedby')) {
+        this._lastWrittenDescribedBy = mergedDesc;
+      } else if (liveDesc !== null) {
         // No consumer tokens AND no internal ids — clear stale mirror so
         // removed help/error wrappers don't leave behind broken IDREFs.
         this.removeAttribute('aria-describedby');
+        this._lastWrittenDescribedBy = null;
       }
     }
   }
@@ -662,13 +726,27 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     // canonical. If the previously-selected radio was removed or disabled,
     // `selected` becomes undefined and `reconciled` collapses to '', clearing
     // form participation.
-    const selected = this._getRadios().find((r) => r.checked && !r.disabled);
-    const reconciled = selected?.value ?? '';
-    if (reconciled !== this.value) {
-      this.value = reconciled;
-      this._internals.setFormValue(this.value || null);
+    //
+    // Codex round-10 P1: when the group itself is disabled, every radio is
+    // force-disabled by `_syncRadios`. The post-sync `selected` lookup excludes
+    // disabled radios, so it would always collapse to '' and wipe the user's
+    // selection across a disable→enable cycle. Group-level disable is a
+    // visual/interaction lock — it must preserve `value` and form participation
+    // (matching native `<fieldset disabled>` semantics where the form value is
+    // simply omitted from submission while disabled). When `this.disabled` is
+    // true we leave `value` and form state untouched; the next disabled→false
+    // pass through `updated()` runs `_syncRadios` again, which restores each
+    // radio's individual disabled flag and re-checks the matching value.
+    if (this.disabled) {
+      // Validity still reflects the (preserved) value; setFormValue is omitted
+      // because a disabled control shouldn't contribute to form submission.
       this._updateValidity();
     } else {
+      const selected = this._getRadios().find((r) => r.checked && !r.disabled);
+      const reconciled = selected?.value ?? '';
+      if (reconciled !== this.value) {
+        this.value = reconciled;
+      }
       // Always re-run setFormValue + validity. `value` may be stable while
       // membership/disabled-state changed, and a freshly-adopted pre-checked
       // radio still needs its value pushed to the form.
