@@ -58,13 +58,24 @@ fi
 source "$(dirname "$0")/_lib/cmd-segments.sh"
 
 # ── 6. Check if this is a relevant command ────────────────────────────────────
+# 0.18.0 helix-020 / discord-ops Round 10 #2 fix (G4.A): use
+# `any_segment_starts_with`, not `any_segment_matches`. The pre-fix
+# matcher used the unanchored form, so a segment like
+#   gh pr edit --body "tracked: gh pr create earlier in the run"
+# triggered IS_RELEVANT=1 because the substring `gh pr create` was
+# anywhere in the segment. The downstream attribution check then
+# scanned the body for the markdown-link / Co-Authored-By patterns,
+# and ANY mention of those terms in the body's prose got blocked
+# even though the actual command was a `gh pr edit` whose intent had
+# nothing to do with structural attribution. The same anchoring fix
+# `dangerous-bash-interceptor.sh` got in 0.16.3 F5 finally lands here.
 IS_RELEVANT=0
 
-if any_segment_matches "$CMD" 'gh[[:space:]]+pr[[:space:]]+(create|edit)'; then
+if any_segment_starts_with "$CMD" 'gh[[:space:]]+pr[[:space:]]+(create|edit)'; then
   IS_RELEVANT=1
 fi
 
-if any_segment_matches "$CMD" 'git[[:space:]]+commit'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+commit'; then
   IS_RELEVANT=1
 fi
 
@@ -77,7 +88,21 @@ fi
 FOUND=0
 
 # Co-Authored-By with noreply@ email
-if any_segment_matches "$CMD" 'Co-Authored-By:.*noreply@'; then
+# 0.18.0 helix-020 / discord-ops Round 10 #3 fix (G4.B): exclude
+# GitHub's legitimate `<user>@users.noreply.github.com` collaborator
+# footers from the noreply match. Pre-fix the regex `Co-Authored-By:.*noreply@`
+# matched both AI-tool noreply addresses (anthropic.com, openai.com,
+# github-copilot, etc.) AND GitHub's per-user noreply form, blocking
+# legitimate human collaborator credits. The new regex requires
+# `noreply@` to be followed by something that ISN'T `users.noreply.github.com`
+# — covered via a negative-lookahead simulation: match `noreply@` then
+# either end-of-line, whitespace, `>`, or a domain that does NOT begin
+# with `users.noreply.github.com`. Posix ERE has no lookarounds, so we
+# enumerate the allowed-prefix shapes explicitly. The "AI names" branch
+# below catches Co-Authored-By with named tools regardless of the email
+# domain, so dropping `users.noreply.github.com` from the noreply
+# pattern only relaxes the check for human collaborators — never for AI.
+if any_segment_matches "$CMD" 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com)'; then
   FOUND=1
 fi
 

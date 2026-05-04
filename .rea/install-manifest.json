@@ -1,12 +1,12 @@
 {
-  "version": "0.17.0",
-  "profile": "unknown",
+  "version": "0.18.0",
+  "profile": "bst-internal",
   "installed_at": "2026-04-23T15:09:02.547Z",
-  "upgraded_at": "2026-05-04T00:30:04.071Z",
+  "upgraded_at": "2026-05-04T01:52:07.734Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
-      "sha256": "986b7452040c7ebf82e8e8c7162d9c56b7c1bbca1636859c9928d4589bcf7e84",
+      "sha256": "1813e590ab65f3eb270f040b21cff6348a6b2f3dea7a232781d04053d4de2b4b",
       "source": "hook"
     },
     {
@@ -31,12 +31,12 @@
     },
     {
       "path": ".claude/hooks/_lib/policy-read.sh",
-      "sha256": "480c5a0935f33f65d8bb3dfafc13e4f5819942ffe875953fe2e8607fd8222739",
+      "sha256": "07a06688f91d8fdde98785c586259d59769a6ed4a0e693ab66db66a24ae967bb",
       "source": "hook"
     },
     {
       "path": ".claude/hooks/_lib/protected-paths.sh",
-      "sha256": "0f5ba2c71d55c9f51801bd52052bcc443312ff19cfd3973a1da8effc3c648822",
+      "sha256": "3e9366d817a2421a08e8f3b2ebf4a68bc48aef075fa8bd44864308e8c63b063f",
       "source": "hook"
     },
     {
@@ -46,7 +46,7 @@
     },
     {
       "path": ".claude/hooks/attribution-advisory.sh",
-      "sha256": "109844439a45617c9f54f6d69ff16b77b5e55b39be26a193ab6d01085b80709b",
+      "sha256": "ea01801c50fa6c2afd43b15deb570c7ae0ba6627d761a7167add7bb2b031b86b",
       "source": "hook"
     },
     {
@@ -96,7 +96,7 @@
     },
     {
       "path": ".claude/hooks/security-disclosure-gate.sh",
-      "sha256": "52255795e2a2b30d3c6b7953c0d12f2355827fb096f10beab2f7ab8224681040",
+      "sha256": "f05838f8e2ddb9f0f2d4fbfdee57a00978dcfd9e0fb862be02021714dc9c01e3",
       "source": "hook"
     },
     {
@@ -121,7 +121,7 @@
     },
     {
       "path": ".claude/agents/codex-adversarial.md",
-      "sha256": "c27f642fc2955c38a8175105d3e882ab03f7a47e2e340ad08a803884be0d4ae9",
+      "sha256": "7d30f0040d16eb765abddc73263c5674337e7ffec1a90a00a8448d93f28aded3",
       "source": "agent"
     },
     {
@@ -156,7 +156,7 @@
     },
     {
       "path": ".claude/commands/codex-review.md",
-      "sha256": "d4654cf14b2a850e76567c346d42335a423238ac2919eaf4c1482c846d1458c1",
+      "sha256": "3a9885edcb838d81d0e299d0e755136acf907eeb228e46f40965b0f085155adb",
       "source": "command"
     },
     {
@@ -181,7 +181,7 @@
     },
     {
       "path": ".husky/commit-msg",
-      "sha256": "53573ef6b8d73bc72dc5e77ca6be21169d6a2ff254bffb2fa43acf1ac070f4ae",
+      "sha256": "9c6f6e58ec3ee7fbaa6533abec5868cee6a3ebc3272969248dd736131df9174d",
       "source": "husky"
     },
     {

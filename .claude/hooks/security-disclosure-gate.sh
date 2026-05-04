@@ -171,6 +171,23 @@ _extract_body_file_paths() {
           while (i <= n) {
             ch = substr(line, i, 1)
             if (mode == 0) {
+              # 0.18.0 helix-020 G3.B fix: in plain (unquoted) mode,
+              # `\X` (any character X) is the POSIX shell escape for
+              # the literal character X — most commonly a space in
+              # paths like `path\ with\ spaces.md`. Pre-fix the
+              # tokenizer treated the `\` as an ordinary character and
+              # truncated at the following space, dropping the rest of
+              # the path. We now consume the backslash and emit the
+              # following byte as a literal part of the current token.
+              # `\<eol>` (line-continuation) is left intact — emit the
+              # `\` and let the splitter flow into the next record on
+              # the assumption that the caller already joined the line.
+              if (ch == "\\" && i < n) {
+                nxt = substr(line, i + 1, 1)
+                tok = tok nxt
+                i += 2
+                continue
+              }
               if (ch == " " || ch == "\t") {
                 if (tok != "") { emit_token(tok); tok = "" }
                 i++; continue

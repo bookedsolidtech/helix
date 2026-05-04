@@ -73,6 +73,20 @@
 # escapes (per POSIX). Multiple wrappers per command-line are handled
 # (e.g. `foo; bash -c 'bar' && sh -c 'baz'` emits both `bar` and `baz`).
 #
+# 0.18.0 helix-020 G1.A fix: the unwrap pass scans a QUOTE-MASKED form
+# of the input, not the raw input. Pre-fix, a quoted argument that
+# MENTIONED a wrapper (e.g. `git commit -m "docs: mention bash -c 'npm
+# install left-pad'"`) would emit a phantom inner-payload segment, and
+# `dependency-audit-gate.sh` would block the innocent commit. The
+# quote-mask layer (the same one `_rea_split_segments` uses) replaces
+# all in-quote separators AND in-quote single/double quote characters
+# with multi-byte sentinels — so the wrapper regex can no longer match
+# inside an outer quoted span. The unwrapped payload itself is still
+# emitted from the un-masked input by recomputing offsets back to the
+# raw string, so escape semantics inside legitimate wrappers stay
+# correct. We only need the mask to suppress matching; the captured
+# payload is read off the original string.
+#
 # Limitation: ONE level of unwrapping. A wrapper inside a wrapper
 # (`bash -c "bash -c 'innermost'"`) emits only the second-level payload
 # (`bash -c 'innermost'`), not the third-level. This is enough for
@@ -81,32 +95,130 @@
 _rea_unwrap_nested_shells() {
   local cmd="$1"
   printf '%s\n' "$cmd"
-  printf '%s' "$cmd" | awk '
+  # Build a mask where in-quote `"` `'` `;` `&` `|` characters are
+  # replaced with multi-byte sentinels so the wrapper regex below
+  # cannot match wrapper syntax that lives inside outer quoted prose.
+  # We also mask the in-quote QUOTE characters themselves so the awk
+  # body's quote-state heuristic (which looks at the byte immediately
+  # after the matched wrapper-prefix region) cannot mistake an inner
+  # quote for a payload-opening quote. Sentinel bytes are aligned to
+  # be the same width as their original character (single-byte) so
+  # offsets into the raw string remain valid for payload extraction.
+  #
+  # Approach: rather than synthesize a per-byte sentinel of width 1,
+  # we run the awk wrapper-scan against a SEPARATE masked stream and
+  # then translate matched RSTART/RLENGTH offsets back to the original
+  # string. We do that by passing both strings into awk (raw via stdin,
+  # masked via -v MASKED) and tracking the same index across both —
+  # since the mask substitutes single bytes with single bytes only
+  # (placeholder bytes drawn from the C0 control-character range) the
+  # offsets line up.
+  #
+  # Placeholder bytes — chosen from the C0 control range so they
+  # cannot appear in real shell input under UTF-8 (NUL, BEL, VT, FF
+  # are reserved by some shells; we use SOH/STX/ETX/ENQ/ACK which are
+  # not assigned operational meaning by any shell we ship with).
+  #   \x01 SOH — replaces in-quote `"`
+  #   \x02 STX — replaces in-quote `'`
+  #   \x03 ETX — replaces in-quote `;`
+  #   \x05 ENQ — replaces in-quote `&`
+  #   \x06 ACK — replaces in-quote `|`
+  local masked
+  masked=$(printf '%s' "$cmd" | awk '
+    {
+      line = $0
+      out = ""
+      i = 1
+      n = length(line)
+      mode = 0
+      while (i <= n) {
+        ch = substr(line, i, 1)
+        if (mode == 0) {
+          if (ch == "\"") { mode = 1; out = out ch; i++; continue }
+          if (ch == "'\''") { mode = 2; out = out ch; i++; continue }
+          out = out ch
+          i++
+          continue
+        }
+        if (mode == 2) {
+          if (ch == "'\''") { mode = 0; out = out "\002"; i++; continue }
+          if (ch == ";") { out = out "\003"; i++; continue }
+          if (ch == "&") { out = out "\005"; i++; continue }
+          if (ch == "|") { out = out "\006"; i++; continue }
+          if (ch == "\"") { out = out "\001"; i++; continue }
+          out = out ch
+          i++
+          continue
+        }
+        # mode == 1 (double-quoted)
+        if (ch == "\\" && i < n) {
+          # Preserve the escape pair literally — width preserved.
+          nxt = substr(line, i + 1, 1)
+          out = out ch nxt
+          i += 2
+          continue
+        }
+        if (ch == "\"") { mode = 0; out = out "\001"; i++; continue }
+        if (ch == ";") { out = out "\003"; i++; continue }
+        if (ch == "&") { out = out "\005"; i++; continue }
+        if (ch == "|") { out = out "\006"; i++; continue }
+        if (ch == "'\''") { out = out "\002"; i++; continue }
+        out = out ch
+        i++
+      }
+      printf "%s", out
+    }')
+  # Pass both raw and masked into awk. Wrapper-regex matches against the
+  # masked form; payload extraction reads the raw form using the same
+  # offsets. Because the mask is byte-for-byte width-preserving, the
+  # same RSTART/RLENGTH applies to both.
+  printf '' | awk -v raw="$cmd" -v masked="$masked" '
     BEGIN {
       # Wrapper-prefix regex: shell-name + optional flag tokens + -c-style flag.
       # Each flag token is `-` followed by 1+ letters and trailing space.
+      # NOTE: matches only OUTSIDE outer quoted spans because in-quote
+      # `"`, `'\''`, `;`, `&`, `|` are masked out in `masked`. The leading
+      # alternation `(^|[[:space:]&|;])` therefore cannot anchor on a
+      # masked separator, and the shell-name token itself can no longer
+      # appear adjacent to a masked quote-introducer.
       WRAP = "(^|[[:space:]&|;])(bash|sh|zsh|dash|ksh)([[:space:]]+-[a-zA-Z]+)*[[:space:]]+-(c|lc|lic|ic|cl|cli|li|il)[[:space:]]+"
-    }
-    {
-      rest = $0
-      while (length(rest) > 0) {
-        if (! match(rest, WRAP)) break
-        # Tail begins immediately after the matched wrapper prefix.
-        tail = substr(rest, RSTART + RLENGTH)
-        first = substr(tail, 1, 1)
-        if (first == "'\''") {
-          # Single-quoted body: no escape semantics; runs to next `'"'"'`.
-          body = substr(tail, 2)
+      # Track the cursor in BOTH raw and masked. Because the mask is
+      # byte-for-byte width-preserving, the same RSTART/RLENGTH applies
+      # to both — but each iteration of the loop must SLICE both strings
+      # by the same amount so subsequent matches see synchronized tails.
+      mrest = masked
+      rrest = raw
+      while (length(mrest) > 0) {
+        if (! match(mrest, WRAP)) break
+        # Tail begins immediately after the matched wrapper prefix in
+        # BOTH strings (offsets line up — mask is width-preserving).
+        mtail = substr(mrest, RSTART + RLENGTH)
+        rtail = substr(rrest, RSTART + RLENGTH)
+        # The wrapper-payload-introducing quote must be a REAL outer
+        # quote — i.e. not a masked in-quote sentinel. Probe the raw
+        # form for the introducer character, which the mask preserved
+        # verbatim only when it was an outer quote.
+        first = substr(rtail, 1, 1)
+        mfirst = substr(mtail, 1, 1)
+        if (first == "'\''" && mfirst == "'\''") {
+          # Single-quoted body: no escape semantics; runs to next `'\''`.
+          body = substr(rtail, 2)
+          mbody = substr(mtail, 2)
           end = index(body, "'\''")
-          if (end == 0) { rest = substr(tail, 2); continue }
+          if (end == 0) {
+            mrest = substr(mtail, 2)
+            rrest = substr(rtail, 2)
+            continue
+          }
           payload = substr(body, 1, end - 1)
           print payload
-          rest = substr(body, end + 1)
+          mrest = substr(mbody, end + 1)
+          rrest = substr(body, end + 1)
           continue
         }
-        if (first == "\"") {
+        if (first == "\"" && mfirst == "\"") {
           # Double-quoted body: \" and \\ are literal escapes.
-          body = substr(tail, 2)
+          body = substr(rtail, 2)
           n = length(body)
           j = 1
           out = ""
@@ -124,15 +236,27 @@ _rea_unwrap_nested_shells() {
             out = out c
             j++
           }
-          if (closed == 0) { rest = substr(tail, 2); continue }
+          if (closed == 0) {
+            mrest = substr(mtail, 2)
+            rrest = substr(rtail, 2)
+            continue
+          }
           print out
-          rest = substr(body, closed + 1)
+          # Skip past the opening `"` (1 byte) AND the closing `"` (1
+          # byte at body[closed], i.e. mtail[closed+1]). Cursor lands
+          # at mtail[closed+2].
+          mrest = substr(mtail, closed + 2)
+          rrest = substr(rtail, closed + 2)
           continue
         }
         # Non-quoted argument — proceed past the matched prefix only.
-        rest = tail
+        mrest = mtail
+        rrest = rtail
       }
-    }'
+    }
+    # Empty action with no input rules — explicitly drive the loop from
+    # END so awk does not require any input records.
+    END {}'
 }
 
 # Split $1 on shell command separators. Emits one segment per line on

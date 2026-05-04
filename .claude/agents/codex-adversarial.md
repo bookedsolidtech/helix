@@ -32,13 +32,18 @@ You may read additional files in the repo if needed for context, but do so read-
 1. **Check HALT and policy** — read `.rea/policy.yaml`, check `.rea/HALT`. If frozen, stop immediately.
 2. **Validate Codex availability** — if `/codex` is not installed, report and stop. Do not silently fall back to another reviewer.
 3. **Prepare the Codex invocation** — construct the adversarial-review prompt with the diff, commit log, and any relevant context files.
-4. **Invoke `/codex:adversarial-review`** — this call flows through the REA middleware chain (audit → kill-switch → tier → policy → redact → injection → execute → result-size-cap).
+4. **Invoke `/codex:adversarial-review --model gpt-5.4`** — pass the `--model` flag explicitly to pin the iron-gate model regardless of plugin defaults or `~/.codex/config.toml` resolution. The codex-companion script accepts `--model` (see `codex-companion.mjs:684`). This call flows through the REA middleware chain (audit → kill-switch → tier → policy → redact → injection → execute → result-size-cap).
 
    **Model pinning (0.16.1+):** when the codex plugin's adversarial-review supports model overrides, request `gpt-5.4` with `model_reasoning_effort: high` to match the push-gate's iron-gate defaults. Pre-0.16.1, in-session adversarial reviews ran on whatever the plugin defaulted to (likely `codex-auto-review` at medium reasoning) — meaningfully WEAKER than the push-gate's `gpt-5.4` + `high`. This caused a "in-session review passes, push-gate review fails" pattern reported by helix across 014 / 015 / 016. If the plugin call accepts model parameters, pass them. If it does not, fall back to invoking `codex exec review --base <ref> --json --ephemeral -c model="gpt-5.4" -c model_reasoning_effort="high"` directly via `Bash` — same shape the push-gate uses (see `src/hooks/push-gate/codex-runner.ts::runCodexReview`). The cost of the stronger model is small relative to the cost of shipping a release with a P1 bypass that gets caught at consumer push time.
 5. **Parse the Codex output** — extract structured findings.
 6. **Classify findings** by category: security, correctness, edge cases, test gaps, API design, performance.
 7. **Assign verdict**: `pass` (no material findings), `concerns` (findings worth addressing but not blocking), `blocking` (findings that must be fixed before merge).
-8. **Emit an audit entry — REQUIRED** for every `/codex-review` invocation. The pre-push gate does not consult audit records to decide pass/fail (post-0.11.0 the gate is stateless), but the `/codex-review` slash command's Step 3 verifies an audit entry was appended for this run and surfaces "review never happened" to the user when one is missing. The two specs are a contract pair — audit emission is what tells the operator their interactive review actually completed. Append via the public `@bookedsolid/rea/audit` helper:
+8. **Emit an audit entry — REQUIRED** for every `/codex-review` invocation. This is one of three identical contract checkpoints:
+   - The runtime always emits (`src/hooks/push-gate/index.ts` calls `appendAuditRecord` via `safeAppend` on every completed review — see `EVT_REVIEWED`).
+   - This agent always emits (this step).
+   - The `/codex-review` slash command's Step 3 verifies the entry exists and surfaces "review never happened" as a failure if it does not.
+
+   The pre-push gate does not consult audit records to decide pass/fail (post-0.11.0 the gate is stateless), but the audit record is still the operator's only forensic trail for an interactive review. Without it, "did this review actually happen" becomes unanswerable. Reconciled in 0.18.0 (helixir Finding #6 across cycles 1–7) so the three documents — `commands/codex-review.md`, `agents/codex-adversarial.md`, `src/hooks/push-gate/index.ts` — describe the same contract in identical wording. Append via the public `@bookedsolid/rea/audit` helper:
 
    ```ts
    import { appendAuditRecord, CODEX_REVIEW_TOOL_NAME, CODEX_REVIEW_SERVER_NAME, Tier, InvocationStatus } from '@bookedsolid/rea/audit';

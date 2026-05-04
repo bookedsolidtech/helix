@@ -58,6 +58,13 @@ REA_KILL_SWITCH_INVARIANTS=(
 # first call to `rea_path_is_protected`; stays the same for the lifetime
 # of the hook process.
 REA_PROTECTED_PATTERNS=()
+# 0.18.0 helix-020 G2 fix: track which patterns came from the consumer's
+# explicit `protected_writes` override (vs. the hardcoded default). The
+# override-first ordering in `rea_path_is_protected` checks ONLY this
+# subset before consulting the extension-surface allow-list, so an
+# explicit `protected_writes: [.husky/pre-push.d/]` can re-protect a
+# path that the allow-list would otherwise let through.
+REA_PROTECTED_OVERRIDE_PATTERNS=()
 _REA_PROTECTED_PATTERNS_LOADED=0
 
 # True if $1 is a kill-switch invariant (case-insensitive exact or
@@ -195,6 +202,31 @@ _rea_load_protected_patterns() {
     fi
   done
 
+  # 0.18.0 helix-020 G2: also expose the EXPLICIT-OVERRIDE subset so
+  # `rea_path_is_protected` can prioritize override matches over the
+  # extension-surface allow-list. Only entries that came from a
+  # `protected_writes:` declaration land here — kill-switch invariants
+  # added defensively in step 2 above are NOT included (they get the
+  # historical "extension surface relaxes them" treatment, since the
+  # user did NOT explicitly opt in to protecting husky fragments).
+  if [ "$protected_writes_set" = "1" ]; then
+    local ow ow_lc rentry_lc2 relaxed2
+    for ow in "${writes_list[@]+"${writes_list[@]}"}"; do
+      ow_lc=$(printf '%s' "$ow" | tr '[:upper:]' '[:lower:]')
+      relaxed2=0
+      for rentry in "${relaxed_set[@]+"${relaxed_set[@]}"}"; do
+        rentry_lc2=$(printf '%s' "$rentry" | tr '[:upper:]' '[:lower:]')
+        if [[ "$ow_lc" == "$rentry_lc2" ]]; then
+          relaxed2=1
+          break
+        fi
+      done
+      if [ "$relaxed2" = "0" ]; then
+        REA_PROTECTED_OVERRIDE_PATTERNS+=("$ow")
+      fi
+    done
+  fi
+
   _REA_PROTECTED_PATTERNS_LOADED=1
 }
 
@@ -243,18 +275,57 @@ rea_path_is_extension_surface() {
 #
 # 0.16.4 helix-018 Option B: paths inside the documented husky
 # extension surface (`.husky/{commit-msg,pre-push,pre-commit}.d/*`)
-# return 1 (not protected) BEFORE the prefix-pattern check so they
-# don't get caught by `.husky/`'s prefix block. This mirrors the
-# §5b allow-list that has been in settings-protection.sh since 0.13.2.
+# return 1 (not protected) by default so they don't get caught by
+# `.husky/`'s prefix block. This mirrors the §5b allow-list that has
+# been in settings-protection.sh since 0.13.2.
+#
+# 0.18.0 helix-020 G2 fix: ORDER MATTERS. The pre-fix function checked
+# the extension-surface allow-list FIRST and short-circuited "not
+# protected" unconditionally. That made the `protected_writes` /
+# `protected_paths` override silently ineffective for any path inside
+# the extension surface — a consumer who wanted `.husky/pre-push.d/`
+# hardened could not opt in. The fix: explicit overrides win FIRST
+# (the consumer asked for this), then the extension-surface
+# short-circuit applies to anything else, then the default protected
+# list. Pseudocode is the canonical version from helix-020 Interactive
+# Finding 1.
 rea_path_is_protected() {
   _rea_load_protected_patterns
-  # Extension-surface allow-list — short-circuit before pattern match.
-  if rea_path_is_extension_surface "$1"; then
-    return 1
-  fi
   local p_lc
   p_lc=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
   local pattern pattern_lc
+
+  # 1. Explicit `protected_writes` overrides win. If the consumer
+  #    listed this path (or its parent prefix) in `protected_writes`,
+  #    we honor that intent even when the path is on the extension
+  #    surface. This is what lets a consumer harden their managed
+  #    `.husky/pre-push.d/` fragments — the carve-out for unmanaged
+  #    consumer fragments is the default, but it can be undone.
+  for pattern in "${REA_PROTECTED_OVERRIDE_PATTERNS[@]+"${REA_PROTECTED_OVERRIDE_PATTERNS[@]}"}"; do
+    pattern_lc=$(printf '%s' "$pattern" | tr '[:upper:]' '[:lower:]')
+    if [[ "$p_lc" == "$pattern_lc" ]]; then
+      return 0
+    fi
+    if [[ "$pattern_lc" == */ ]] && [[ "$p_lc" == "$pattern_lc"* ]]; then
+      return 0
+    fi
+  done
+
+  # 2. Extension-surface allow-list. Paths inside the documented
+  #    husky extension surface (`.husky/{commit-msg,pre-push,pre-commit}.d/*`)
+  #    are NOT protected by default — the consumer manages those
+  #    fragments freely; settings-protection.sh §5b has the same
+  #    carve-out on the Write/Edit side. Step 1 above is what lets a
+  #    consumer override that default per-path.
+  if rea_path_is_extension_surface "$1"; then
+    return 1
+  fi
+
+  # 3. Default protected list (kill-switch invariants + `.husky/`
+  #    prefix block + `.claude/settings*` + `.rea/policy.yaml`). When
+  #    `protected_writes` was set, kill-switch invariants are still
+  #    enforced via this branch because they were added back into
+  #    REA_PROTECTED_PATTERNS during `_rea_load_protected_patterns`.
   for pattern in "${REA_PROTECTED_PATTERNS[@]+"${REA_PROTECTED_PATTERNS[@]}"}"; do
     pattern_lc=$(printf '%s' "$pattern" | tr '[:upper:]' '[:lower:]')
     if [[ "$p_lc" == "$pattern_lc" ]]; then

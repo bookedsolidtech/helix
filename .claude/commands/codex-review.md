@@ -55,17 +55,21 @@ Invoke the `codex-adversarial` agent with:
 
 The agent wraps `/codex:adversarial-review` and returns structured findings.
 
-## Step 3 — (Optional) verify audit entry
+## Step 3 — Verify audit entry — REQUIRED
 
-Audit emission is **optional** in 0.11.0+. The pre-push gate is stateless and does not consult audit records to decide pass/fail; the agent's structured findings ARE the review. The agent will append an audit entry when it helps forensic traceability (intermittent verdicts, review-history audits) but its absence is not a failure.
+The `codex-adversarial` agent **MUST** emit an audit entry for every invocation. This is the same contract documented in `agents/codex-adversarial.md` Step 4 and matches the runtime behavior of `rea hook push-gate` (which always calls `appendAuditRecord` on a completed review — see `src/hooks/push-gate/index.ts`'s `EVT_REVIEWED` path).
 
-If you want to confirm an entry was written for this run:
+Verify the entry was written:
 
 ```bash
 tail -n 1 .rea/audit.jsonl
 ```
 
-A `codex-adversarial-review` entry with `head_sha`, `target`, `finding_count`, and `verdict` fields is informative — but DO NOT treat its absence as a failure. The review happened if the agent returned text. (Pre-0.15.0 this step was a hard verification gate that contradicted the agent's "audit optional" contract — see Helix Finding 3, 2026-05-03.)
+The expected entry has `tool_name: "codex.review"`, `server_name: "codex"`, and `metadata` containing `head_sha`, `target`, `finding_count`, and `verdict`. If the entry is missing, the review **did not complete its contract** — surface that to the user as a failure.
+
+**Why audit emission is required even though the pre-push gate is stateless:** the 0.11.0 push-gate decides pass/fail on Codex's live verdict, not on a receipt in the audit log — but the audit record is still the operator's only forensic trail for an interactive `/codex-review` run. Without it, "did this review actually happen" becomes unanswerable, which is exactly the failure mode helixir flagged across rounds 65/66/73 in the 0.13–0.17 cycle. Runtime always emits; the agent always emits; the slash command verifies. Three checkpoints, one contract.
+
+(Earlier docs in 0.15+ said this step was "optional"; that wording contradicted both the agent's Step 4 and the runtime behavior of `safeAppend` in `src/hooks/push-gate/index.ts`. Reconciled in 0.18.0 — helixir Finding #6 across cycles 1–7.)
 
 ## Step 4 — Report
 
