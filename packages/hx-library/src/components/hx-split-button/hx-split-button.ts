@@ -9,6 +9,7 @@ import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
 import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
+import { findClosestMenuAncestor } from '../../utils/menu-tree.js';
 import {
   installAriaIdrefMirror,
   resolveIdrefTokens,
@@ -515,6 +516,62 @@ export class HelixSplitButton extends HelixElement {
     );
   }
 
+  /**
+   * Bubbled `hx-item-submenu-open` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: when slotted `hx-menu-item`s open / close
+   * a nested submenu inside this menu panel (no enclosing `hx-menu`), the
+   * events fly past with no handler. Match the round-4
+   * `hx-menu._handleSubmenuOpen` shape so APG behaviour holds. Defer to
+   * an inner `hx-menu` when present (it owns the toggle). Otherwise this
+   * panel is the enclosing menu surface — call `setSubmenuOpen(true)` on
+   * the dispatching item and focus its first nested child.
+   * @internal
+   */
+  private _handleMenuSubmenuOpen = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HelixMenuItem }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    if (findClosestMenuAncestor(item) !== null) return;
+    queueMicrotask(() => {
+      if (e.defaultPrevented) return;
+      item.setSubmenuOpen(true);
+      void item.updateComplete
+        .then(() => {
+          const submenuSlot =
+            item.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="submenu"]');
+          const nested = submenuSlot
+            ?.assignedElements({ flatten: true })
+            .find((el) => el.tagName.toLowerCase() === 'hx-menu') as
+            | (HTMLElement & { focusFirst?: () => void })
+            | undefined;
+          nested?.focusFirst?.();
+        })
+        .catch(() => undefined);
+    });
+  };
+
+  /**
+   * Bubbled `hx-item-submenu-close` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: when an inner `hx-menu` (a nested
+   * submenu) handles its own close, the event still bubbles through this
+   * panel — defer in that case so the panel stays open. When the
+   * dispatching item is top-level inside this panel (no enclosing
+   * `hx-menu`), there is no parent submenu to collapse, so close the
+   * composite's menu and return focus to the trigger button.
+   * @internal
+   */
+  private _handleMenuSubmenuClose = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HelixMenuItem }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    if (findClosestMenuAncestor(item) !== null) return;
+    if (e.defaultPrevented) return;
+    this._closeMenu();
+    this._triggerButton?.focus();
+  };
+
   // ─── Menu Helpers ───
 
   /** @internal */
@@ -642,6 +699,8 @@ export class HelixSplitButton extends HelixElement {
           aria-label=${this.labelMenu}
           @keydown=${this._handleMenuKeydown}
           @hx-item-select=${this._handleMenuItemSelect}
+          @hx-item-submenu-open=${this._handleMenuSubmenuOpen}
+          @hx-item-submenu-close=${this._handleMenuSubmenuClose}
         >
           <slot name="menu"></slot>
         </div>

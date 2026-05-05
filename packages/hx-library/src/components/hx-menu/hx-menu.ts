@@ -14,71 +14,34 @@ import {
 } from '../../utils/aria-idref.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
 import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
+import {
+  findClosestMenuAncestor as findClosestMenuAncestorElement,
+  findOwningMenuItem as findOwningMenuItemElement,
+} from '../../utils/menu-tree.js';
 
 /**
- * Walks the composed tree from `start` outward and returns the closest
- * enclosing `<hx-menu>` element, or `null` if none exists. Crosses both
- * shadow boundaries (`getRootNode().host`) and slot boundaries
- * (`assignedSlot`) so an item nested inside a submenu resolves to the
- * inner menu, not the outer one. Codex push-gate round-4 P1.
- *
+ * Typed wrapper around the shared `findClosestMenuAncestor` walker that
+ * narrows the result to `HelixMenu` for in-file consumers. Codex push-gate
+ * round-4 (logic) + round-9 (extraction).
  * @internal
  */
 function findClosestMenuAncestor(start: Element): HelixMenu | null {
-  // The dispatching `hx-menu-item` is itself an Element; an ancestor
-  // `hx-menu` may live above it via `parentNode` (light DOM), via
-  // `assignedSlot` (slotted into a menu's default slot — the common case),
-  // or via `getRootNode().host` (the menu hosts a shadow root that contains
-  // it — not used in this codebase but defended for completeness).
-  let node: Node | null = start;
-  while (node) {
-    if (node instanceof Element && node.tagName.toLowerCase() === 'hx-menu') {
-      return node as HelixMenu;
-    }
-    // Prefer `assignedSlot` when the node is light-DOM-slotted into another
-    // shadow tree — that is exactly how `hx-menu-item` lives inside
-    // `hx-menu`. After hopping into the slot, continue from the slot itself
-    // so we keep climbing through that owner's shadow root.
-    if (node instanceof Element && node.assignedSlot) {
-      node = node.assignedSlot;
-      continue;
-    }
-    const parentNode: Node | null = node.parentNode;
-    if (parentNode) {
-      node = parentNode;
-      continue;
-    }
-    // Reached the top of a tree (Document or ShadowRoot). For a ShadowRoot,
-    // hop to its host and continue climbing in the outer tree.
-    if (node instanceof ShadowRoot) {
-      node = node.host;
-      continue;
-    }
-    break;
-  }
-  return null;
+  const found = findClosestMenuAncestorElement(start);
+  return found instanceof Element && found.tagName.toLowerCase() === 'hx-menu'
+    ? (found as HelixMenu)
+    : null;
 }
 
 /**
- * Returns the `hx-menu-item` that owns `menu` as a nested submenu, or
- * `null` if `menu` is a top-level menu (not slotted into a parent item's
- * `slot="submenu"`). Used by ArrowLeft handling to close the correct
- * submenu and return focus to the right parent. Codex push-gate round-4
- * P1.
- *
+ * Typed wrapper around the shared `findOwningMenuItem` walker. Codex
+ * push-gate round-4 (logic) + round-9 (extraction).
  * @internal
  */
 function findOwningMenuItem(menu: HelixMenu): HelixMenuItem | null {
-  const slot = menu.assignedSlot;
-  if (!slot || slot.name !== 'submenu') return null;
-  // The slot lives in the owning menu-item's shadow root. Hop to the host.
-  const root = slot.getRootNode();
-  if (!(root instanceof ShadowRoot)) return null;
-  const host = root.host;
-  if (host instanceof Element && host.tagName.toLowerCase() === 'hx-menu-item') {
-    return host as HelixMenuItem;
-  }
-  return null;
+  const found = findOwningMenuItemElement(menu);
+  return found instanceof Element && found.tagName.toLowerCase() === 'hx-menu-item'
+    ? (found as HelixMenuItem)
+    : null;
 }
 
 /**

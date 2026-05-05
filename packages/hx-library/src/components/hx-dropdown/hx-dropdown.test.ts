@@ -267,6 +267,59 @@ describe('hx-dropdown', () => {
     });
   });
 
+  // ─── Nested submenu routing (codex push-gate round-9) ───
+
+  describe('Nested submenu open/close routing (codex push-gate round-9 P1)', () => {
+    it('ArrowLeft on a child of a nested submenu closes the parent submenu and keeps the dropdown panel open', async () => {
+      // Regression: previously, hx-item-submenu-close events bubbled up to
+      // the dropdown panel with no handler — the inner hx-menu's own
+      // round-4 handler did the right thing, but the bug was that without
+      // the panel-level guard, follow-up rounds risked the panel either
+      // (a) ignoring the event and leaving stale state in newly added
+      // composite handling, or (b) treating the nested close as a
+      // top-level close and collapsing the entire dropdown. This test
+      // pins the contract: nested closes leave the panel open and focus
+      // the parent item (via the inner menu's handler).
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="parent" submenu-open>
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      // ArrowLeft on the Child fires hx-item-submenu-close. Inner
+      // hx-menu handles it (closes parent, focuses parent). Dropdown
+      // panel must stay open.
+      child.focus();
+      child.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      // Allow the queued microtask in hx-menu's submenu close handler to
+      // run.
+      await new Promise((r) => setTimeout(r, 0));
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      const parentInternals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(parentInternals.ariaExpanded).toBe('false');
+      expect(el.open).toBe(true);
+      // Focus returned to Parent (host-canonical or legacy inner-element
+      // focus targeting both count).
+      expect(document.activeElement === parent || parent.matches(':focus-within')).toBe(true);
+    });
+  });
+
   // ─── Typeahead — submenu-aware label extractor (codex round-7) ───
 
   describe('Typeahead with nested submenus (codex push-gate round-7 finding 3)', () => {

@@ -588,6 +588,47 @@ describe('hx-split-button', () => {
     });
   });
 
+  // ─── Nested submenu routing (codex push-gate round-9) ───
+
+  describe('Nested submenu open/close routing (codex push-gate round-9 P1)', () => {
+    it('ArrowLeft on a child of a nested submenu closes the parent submenu and keeps the split-button menu open', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="parent" submenu-open>
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      child.focus();
+      child.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 0));
+      await parent.updateComplete;
+      await child.updateComplete;
+      await el.updateComplete;
+
+      const parentInternals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(parentInternals.ariaExpanded).toBe('false');
+      // Split-button menu must stay open (close belongs to the inner menu).
+      const menu = shadowQuery(el, '.split-button__menu');
+      expect(menu?.classList.contains('split-button__menu--open')).toBe(true);
+      // Focus returned to Parent.
+      expect(document.activeElement === parent || parent.matches(':focus-within')).toBe(true);
+    });
+  });
+
   // ─── Menu behavior ───
 
   describe('Menu behavior', () => {

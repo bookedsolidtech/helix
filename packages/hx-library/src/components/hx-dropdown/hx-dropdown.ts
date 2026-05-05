@@ -10,6 +10,7 @@ import { helixDropdownStyles } from './hx-dropdown.styles.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
 import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
 import { writeMenuItemRovingTabIndex } from '../../utils/menu-roving.js';
+import { findClosestMenuAncestor } from '../../utils/menu-tree.js';
 import {
   installAriaIdrefMirror,
   resolveIdrefTokens,
@@ -597,6 +598,77 @@ export class HelixDropdown extends HelixElement {
     this._hide();
   }
 
+  /**
+   * Bubbled `hx-item-submenu-open` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: when slotted `hx-menu-item`s open / close
+   * a nested submenu inside this composite's panel (no enclosing
+   * `hx-menu`), the events fly past with no handler. Match the round-4
+   * `hx-menu._handleSubmenuOpen` shape so APG behaviour holds.
+   *
+   * If the dispatching item is enclosed by an inner `hx-menu` (a true
+   * nested submenu inside the panel), that menu owns the toggle — defer.
+   * Otherwise this composite's panel is the enclosing menu surface, so
+   * call `setSubmenuOpen(true)` on the item and focus the first child.
+   * @internal
+   */
+  private _handlePanelSubmenuOpen = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HTMLElement }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    // Defer to a closer enclosing `hx-menu` (a nested submenu) when one
+    // exists — that menu's own handler will own the toggle.
+    if (findClosestMenuAncestor(item) !== null) return;
+    queueMicrotask(() => {
+      if (e.defaultPrevented) return;
+      const setter = (item as HTMLElement & { setSubmenuOpen?: (v: boolean) => void })
+        .setSubmenuOpen;
+      if (typeof setter !== 'function') return;
+      setter.call(item, true);
+      const updateComplete = (item as HTMLElement & { updateComplete?: Promise<unknown> })
+        .updateComplete;
+      if (updateComplete) {
+        void updateComplete
+          .then(() => {
+            const submenuSlot = (
+              item as HTMLElement & { shadowRoot?: ShadowRoot | null }
+            ).shadowRoot?.querySelector<HTMLSlotElement>('slot[name="submenu"]');
+            const nested = submenuSlot
+              ?.assignedElements({ flatten: true })
+              .find((el) => el.tagName.toLowerCase() === 'hx-menu') as
+              | (HTMLElement & { focusFirst?: () => void })
+              | undefined;
+            nested?.focusFirst?.();
+          })
+          .catch(() => undefined);
+      }
+    });
+  };
+
+  /**
+   * Bubbled `hx-item-submenu-close` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: routes the close to the right surface.
+   *
+   * - Nested submenu close (the dispatching item lives inside an inner
+   *   `hx-menu` slotted into a parent's `slot="submenu"`): defer to that
+   *   inner menu's own handler. The composite's panel must NOT close.
+   * - Top-level item ArrowLeft (no enclosing `hx-menu` between the item
+   *   and this composite): there is no parent submenu to close, so
+   *   collapse the composite's panel and return focus to the trigger,
+   *   matching APG menu-button behaviour.
+   * @internal
+   */
+  private _handlePanelSubmenuClose = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HTMLElement }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    // A closer enclosing `hx-menu` owns the close — defer.
+    if (findClosestMenuAncestor(item) !== null) return;
+    if (e.defaultPrevented) return;
+    this._hide(true);
+  };
+
   // ─── Render ───
 
   override render() {
@@ -618,6 +690,8 @@ export class HelixDropdown extends HelixElement {
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
         @hx-item-select=${this._handlePanelItemSelect}
+        @hx-item-submenu-open=${this._handlePanelSubmenuOpen}
+        @hx-item-submenu-close=${this._handlePanelSubmenuClose}
       >
         <slot @slotchange=${this._onPanelSlotChange}></slot>
       </div>

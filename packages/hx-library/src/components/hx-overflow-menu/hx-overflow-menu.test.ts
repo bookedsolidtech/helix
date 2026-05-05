@@ -506,6 +506,45 @@ describe('hx-overflow-menu', () => {
     });
   });
 
+  // ─── Nested submenu routing (codex push-gate round-9) ───
+
+  describe('Nested submenu open/close routing (codex push-gate round-9 P1)', () => {
+    it('ArrowLeft on a child of a nested submenu closes the parent submenu and keeps the overflow panel open', async () => {
+      const el = await fixture<HelixOverflowMenu>(`
+        <hx-overflow-menu>
+          <hx-menu-item value="parent" submenu-open>
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-overflow-menu>
+      `);
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]')!;
+      btn.click();
+      await el.updateComplete;
+
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      child.focus();
+      child.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 0));
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      const parentInternals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(parentInternals.ariaExpanded).toBe('false');
+      // Overflow panel must stay open (close belongs to the inner menu).
+      const panel = shadowQuery(el, '[part~="panel"]');
+      expect(panel).toBeTruthy();
+      // Focus returned to Parent.
+      expect(document.activeElement === parent || parent.matches(':focus-within')).toBe(true);
+    });
+  });
+
   // ─── Slots (1) ───
 
   describe('Slots', () => {

@@ -9,6 +9,7 @@ import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
 import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
 import { writeMenuItemRovingTabIndex } from '../../utils/menu-roving.js';
+import { findClosestMenuAncestor } from '../../utils/menu-tree.js';
 import {
   installAriaIdrefMirror,
   resolveIdrefTokens,
@@ -510,6 +511,69 @@ export class HelixOverflowMenu extends HelixElement {
     this._hide();
   };
 
+  /**
+   * Bubbled `hx-item-submenu-open` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: when slotted `hx-menu-item`s open / close
+   * a nested submenu inside this panel (no enclosing `hx-menu`), the
+   * events fly past with no handler. Match the round-4
+   * `hx-menu._handleSubmenuOpen` shape so APG behaviour holds. Defer to
+   * an inner `hx-menu` when present (it owns the toggle). Otherwise this
+   * panel is the enclosing menu surface — call `setSubmenuOpen(true)` on
+   * the dispatching item and focus its first nested child.
+   * @internal
+   */
+  private readonly _handleSlotSubmenuOpen = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HTMLElement }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    if (findClosestMenuAncestor(item) !== null) return;
+    queueMicrotask(() => {
+      if (e.defaultPrevented) return;
+      const setter = (item as HTMLElement & { setSubmenuOpen?: (v: boolean) => void })
+        .setSubmenuOpen;
+      if (typeof setter !== 'function') return;
+      setter.call(item, true);
+      const updateComplete = (item as HTMLElement & { updateComplete?: Promise<unknown> })
+        .updateComplete;
+      if (updateComplete) {
+        void updateComplete
+          .then(() => {
+            const submenuSlot = (
+              item as HTMLElement & { shadowRoot?: ShadowRoot | null }
+            ).shadowRoot?.querySelector<HTMLSlotElement>('slot[name="submenu"]');
+            const nested = submenuSlot
+              ?.assignedElements({ flatten: true })
+              .find((el) => el.tagName.toLowerCase() === 'hx-menu') as
+              | (HTMLElement & { focusFirst?: () => void })
+              | undefined;
+            nested?.focusFirst?.();
+          })
+          .catch(() => undefined);
+      }
+    });
+  };
+
+  /**
+   * Bubbled `hx-item-submenu-close` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: when an inner `hx-menu` (a nested
+   * submenu) handles its own close, the event still bubbles through this
+   * panel — defer in that case so the panel stays open. When the
+   * dispatching item is top-level inside this panel (no enclosing
+   * `hx-menu`), there is no parent submenu to collapse, so close the
+   * composite's panel and return focus to the trigger.
+   * @internal
+   */
+  private readonly _handleSlotSubmenuClose = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HTMLElement }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    if (findClosestMenuAncestor(item) !== null) return;
+    if (e.defaultPrevented) return;
+    this._hide();
+  };
+
   /** @internal */
   private readonly _handleSlotChange = (): void => {
     if (this._open) {
@@ -626,6 +690,8 @@ export class HelixOverflowMenu extends HelixElement {
               class="panel"
               @click=${this._handleSlotClick}
               @hx-item-select=${this._handleSlotItemSelect}
+              @hx-item-submenu-open=${this._handleSlotSubmenuOpen}
+              @hx-item-submenu-close=${this._handleSlotSubmenuClose}
             >
               <slot @slotchange=${this._handleSlotChange}></slot>
             </div>
