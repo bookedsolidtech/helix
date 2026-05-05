@@ -33,9 +33,13 @@ a `data-hx-owns-label="true"` ownership marker.
 Consumers have two ways to keep their value safe from hx-field's writes:
   (a) **Suspend** all ARIA bridging by setting `data-aria-managed` on the
       control. While present, hx-field skips every aria-* mutation and
-      leaves any existing marker/snapshot in place — removing
-      `data-aria-managed` later may resume host ownership of an `aria-label`
-      value that still matches the snapshot.
+      captures a snapshot of `aria-label` at the moment suspend begins.
+      When `data-aria-managed` is removed, hx-field compares the live
+      `aria-label` to that snapshot: if they still match it resumes
+      bridging normally; if the consumer mutated `aria-label` during the
+      suspend window (changed value, removed the attribute) hx-field
+      treats it as a permanent takeover and stops mirroring `label`
+      to the control.
   (b) **Release** ownership permanently by overwriting `aria-label` to a
       different value than the one hx-field last wrote. The mismatch
       triggers `_releaseHostOwnedAriaLabel`, which strips the marker and
