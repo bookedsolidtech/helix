@@ -899,3 +899,74 @@ describe('Accessibility (axe-core)', () => {
     expect(violations).toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-1 finding 3: keep host out of the tab order on
+// the legacy fallback path so there's only ONE focusable surface per
+// item (the inner `.menu-item`). The test seam pattern from hx-select
+// (`__testSupportsIdrefRefsOverride`) lets us deterministically enter
+// the fallback branch on engines that natively expose the IDL element-
+// references API.
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-menu-item host tabindex (fallback path)', () => {
+  type HelixMenuItemCtor = typeof HelixMenuItem & {
+    __testSupportsIdrefRefsOverride: boolean | null;
+  };
+
+  afterEach(() => {
+    // Reset the static seam so subsequent tests see the platform default.
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('host.tabIndex stays -1 when fallback path renders inner element as the Tab stop', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="a">Item A</hx-menu-item>
+        <hx-menu-item value="b">Item B</hx-menu-item>
+      </hx-menu>
+    `);
+    const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+    // Roving tabindex should land on the first item; force the assignment
+    // explicitly to mirror what hx-menu does internally.
+    items[0]!.setRovingTabIndex(0);
+    items[1]!.setRovingTabIndex(-1);
+    await items[0]!.updateComplete;
+    await items[1]!.updateComplete;
+
+    // Host MUST stay out of the tab order on the fallback path.
+    expect(items[0]!.tabIndex).toBe(-1);
+    expect(items[1]!.tabIndex).toBe(-1);
+
+    // Inner `.menu-item` carries the roving tabindex on the fallback path.
+    const inner0 = shadowQuery<HTMLElement>(items[0]!, '.menu-item')!;
+    const inner1 = shadowQuery<HTMLElement>(items[1]!, '.menu-item')!;
+    expect(inner0.getAttribute('tabindex')).toBe('0');
+    expect(inner1.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('host.tabIndex receives roving value on the modern host-canonical path', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="a">Item A</hx-menu-item>
+        <hx-menu-item value="b">Item B</hx-menu-item>
+      </hx-menu>
+    `);
+    const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+    items[0]!.setRovingTabIndex(0);
+    items[1]!.setRovingTabIndex(-1);
+    await items[0]!.updateComplete;
+    await items[1]!.updateComplete;
+
+    // Modern path: host is the focusable surface.
+    expect(items[0]!.tabIndex).toBe(0);
+    expect(items[1]!.tabIndex).toBe(-1);
+  });
+});

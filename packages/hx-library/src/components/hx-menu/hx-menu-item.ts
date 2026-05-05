@@ -61,6 +61,20 @@ export class HelixMenuItem extends HelixElement {
   static override styles = [helixMenuItemStyles, forcedColorsInteractive];
 
   /**
+   * Test seam (codex push-gate round-1 finding 3 mirror of hx-select
+   * pattern): when set to `true` or `false`, overrides the platform
+   * `supportsIdrefElementReferences` probe before `connectedCallback`
+   * seeds `_supportsIdrefRefs`. Tests that need to exercise the fallback
+   * path must select it BEFORE the host connects so tabindex / role
+   * placement matches a legacy engine for the entire lifecycle.
+   *
+   * Production code MUST NOT touch this field. It is `static` so the test
+   * stub cleanup is global and obvious.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
+  /**
    * @internal Managed by parent hx-menu for roving tabindex.
    * Only the active item in the menu has tabindex=0; all others have -1.
    */
@@ -150,7 +164,15 @@ export class HelixMenuItem extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
+    // Honour the static test override so synthetic environments choose the
+    // path BEFORE connect runs (mirrors hx-select's seam — codex push-gate
+    // round-1 finding 3 needs deterministic fallback-path entry to assert
+    // host.tabIndex stays out of the tab order).
+    const ctor = this.constructor as typeof HelixMenuItem;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
     // WCAG 4.1.2: menuitem role is only valid inside a role="menu" or role="menubar" container.
     // Check the closest ancestor with a menu role.
     const menuHost = this.closest('hx-menu, hx-split-button, [role="menu"], [role="menubar"]');
@@ -205,13 +227,25 @@ export class HelixMenuItem extends HelixElement {
 
   /**
    * Apply the roving tabindex to the host (modern path) so the host is the
-   * Tab stop. Disabled items are non-tabbable. The legacy path also writes
-   * to the host because focus delegation still ends up on the inner
-   * element via `focus()` override; carrying tabindex on the host keeps
-   * the AT walk correct on both paths.
+   * Tab stop. Disabled items are non-tabbable.
+   *
+   * Codex push-gate round-1 finding 3: on the fallback path
+   * (`_supportsIdrefRefs === false`), the inner `.menu-item` element
+   * carries `role="menuitem"` and the roving tabindex via the template
+   * (see `render()`'s legacy branch). If we ALSO assign a non-negative
+   * tabindex to the host, the user gets two focusable surfaces per item —
+   * Tab can land on the host even though the AT-announced role/aria-* live
+   * on the inner element. The host MUST be removed from the tab order on
+   * the fallback path; the inner element is the canonical Tab stop.
    * @internal
    */
   private _applyHostTabIndex(): void {
+    if (!this._supportsIdrefRefs) {
+      // Fallback path: inner `.menu-item` is the focusable surface. Keep
+      // the host out of the sequential focus order entirely.
+      this.tabIndex = -1;
+      return;
+    }
     if (this.disabled) {
       this.tabIndex = -1;
     } else {

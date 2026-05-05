@@ -95,11 +95,21 @@ export function resolveIdrefTokens(host: Element, tokens: string | null): Elemen
  *
  * Both pathways are followed because either may apply at any level. A
  * light-DOM custom element slotted into a shadow component has
- * `getRootNode() === document` AND `assignedSlot !== null`, so the loop
- * picks up document first, then crosses into the slot owner's shadow root
- * via `assignedSlot`. From inside any shadow root we follow `root.host`
- * outward AND, on every hop, check whether that host is itself slotted into
- * yet another shadow tree. De-duplication is by reference identity.
+ * `getRootNode() === document` AND `assignedSlot !== null`. Codex push-gate
+ * round-1 finding 1: the slot-owner shadow root MUST be searched BEFORE the
+ * document fallback. Element ids are unique per-tree, not globally, so the
+ * same id may legally exist in BOTH the document and a slot-owner shadow
+ * root. If the document is searched first, the resolver binds to the wrong
+ * element and the slotted control gets the wrong accessible name. The
+ * solution is to walk the slot chain (assignedSlot → slot-owner shadow root
+ * → its host's chain) before falling through to the owner document.
+ *
+ * The slot-walk is transitive: a slot owner that is itself slotted into
+ * another shadow tree contributes its own slot chain too, all of which is
+ * searched ahead of the document. From inside any shadow root we follow
+ * `root.host` outward AND, on every hop, check whether that host is itself
+ * slotted into yet another shadow tree. De-duplication is by reference
+ * identity.
  *
  * @internal
  */
@@ -112,25 +122,26 @@ function collectIdrefSearchRoots(start: Element, roots: Array<Document | ShadowR
     roots.push(root);
   };
 
-  // Worklist of nodes whose composed-tree ancestry still needs to be walked.
-  // Each entry represents an entry point into a tree we haven't fully
-  // explored yet (the original host, plus any hosts we discover via the
-  // assignedSlot branch from inside a shadow ancestor).
-  const queue: Element[] = [start];
-  const queued = new Set<Element>([start]);
+  // Walk a single ancestor chain starting from `entry`, pushing every
+  // ShadowRoot encountered (closest first) and queuing any slot-owner
+  // shadow roots we cross via assignedSlot for separate exploration. The
+  // owner document encountered at the end of a chain is NOT pushed here —
+  // the caller controls when to fall through to the document so the
+  // slot-owner trees can be searched first (codex push-gate round-1 #1).
+  const visitedEntries = new Set<Element>([start]);
+  const slotEntries: Element[] = [];
+  let documentSeen = false;
 
-  while (queue.length > 0) {
-    const startNode = queue.shift() as Element;
-    let currentNode: Element = startNode;
+  const walkChain = (entry: Element): void => {
+    let currentNode: Element = entry;
     let currentRoot: Node | null = currentNode.getRootNode();
 
-    // First, if currentNode is in document scope but is slotted into a
-    // shadow root somewhere, queue the slot for separate exploration
-    // (its tree may contain IDREF targets we need to see).
-    const slotFromStart = (currentNode as HTMLElement).assignedSlot ?? null;
-    if (slotFromStart && !queued.has(slotFromStart)) {
-      queued.add(slotFromStart);
-      queue.push(slotFromStart);
+    // If the entry is itself in document scope and is slotted into a
+    // shadow tree, queue the slot for slot-owner-first exploration.
+    const slotFromEntry = (currentNode as HTMLElement).assignedSlot ?? null;
+    if (slotFromEntry && !visitedEntries.has(slotFromEntry)) {
+      visitedEntries.add(slotFromEntry);
+      slotEntries.push(slotFromEntry);
     }
 
     while (currentRoot instanceof ShadowRoot) {
@@ -138,19 +149,36 @@ function collectIdrefSearchRoots(start: Element, roots: Array<Document | ShadowR
       const shadowHost: Element | null = currentRoot.host ?? null;
       if (!shadowHost) break;
       // The shadow host itself may be slotted into yet another component.
-      // Queue that branch so its tree is searched too.
+      // Queue that branch for slot-owner-first exploration.
       const hostSlot = (shadowHost as HTMLElement).assignedSlot ?? null;
-      if (hostSlot && !queued.has(hostSlot)) {
-        queued.add(hostSlot);
-        queue.push(hostSlot);
+      if (hostSlot && !visitedEntries.has(hostSlot)) {
+        visitedEntries.add(hostSlot);
+        slotEntries.push(hostSlot);
       }
       currentNode = shadowHost;
       currentRoot = shadowHost.getRootNode();
     }
 
     if (currentRoot instanceof Document) {
-      pushRoot(currentRoot);
+      // Defer the document push: slot-owner shadow roots queued during
+      // this walk must be searched BEFORE the document so duplicate ids
+      // resolve in the correct (slot-owner) scope first.
+      documentSeen = true;
     }
+  };
+
+  walkChain(start);
+  // Drain the slot-entry queue. Each slot entry contributes its own
+  // ancestor chain, whose shadow roots are pushed ahead of the owner
+  // document. Slot entries are processed in discovery order (FIFO) so
+  // closer slot owners are searched before more distant ones.
+  while (slotEntries.length > 0) {
+    walkChain(slotEntries.shift() as Element);
+  }
+
+  if (documentSeen) {
+    const ownerDoc = start.ownerDocument;
+    if (ownerDoc) pushRoot(ownerDoc);
   }
 }
 
@@ -338,6 +366,24 @@ export function installAriaIdrefMirror(
     attributeFilter: [...observedAttributes],
   });
 
+  // Codex push-gate round-1 finding 2: when the host's `slot` attribute
+  // changes, the host may have just been re-assigned into a different slot
+  // owner's shadow tree — and therefore the set of reachable IDREF roots
+  // has changed. The shared root observer's callback runs `sync()` (not
+  // `resync()`), so observers stay attached to the OLD roots; later id /
+  // childList mutations in the NEW slot owner shadow tree never fire
+  // resync. A separate observer scoped to the host's `slot` attribute
+  // triggers a full reattach via `resync()`.
+  const slotAttrObserver = new MutationObserver(() => {
+    // Reattach observers to the new reachable-roots set, then sync.
+    attachRootObservers();
+    sync();
+  });
+  slotAttrObserver.observe(host, {
+    attributes: true,
+    attributeFilter: ['slot'],
+  });
+
   // Subscribe to the shared per-root observer so late-inserted targets and id
   // renames re-resolve through the IDREF path. Round-7 #11 collapses N
   // per-instance subtree observers into one per root, so on pages with many
@@ -400,6 +446,7 @@ export function installAriaIdrefMirror(
     },
     disconnect(): void {
       hostObserver.disconnect();
+      slotAttrObserver.disconnect();
       for (const unsub of rootSubscriptions.values()) {
         unsub();
       }
