@@ -48,9 +48,9 @@ Every specialist you delegate to must follow this. Include it in the delegation 
 
 If an agent is producing granular commits (one per file edit), stop it and instruct it to squash its local work before continuing.
 
-## The Curated Roster (17)
+## The Curated Roster (23)
 
-REA ships a minimal, non-overlapping roster so routing is deterministic. Wave 1 of the roster expansion shipped in 0.24.0 (3 Principals + 1 Architect); Wave 2 ships in 0.25.0 (3 additional Architects); Wave 3 (5 specialists) targets 0.26.0.
+REA ships a minimal, non-overlapping roster so routing is deterministic. Wave 1 of the roster expansion shipped in 0.24.0 (3 Principals + 1 Architect); Wave 2 shipped in 0.25.0 (3 additional Architects); Wave 3 ships in 0.27.0 (5 specialists + figma-dx-specialist for create-helix-app).
 
 **Principals (decision tier — 0.24.0):**
 
@@ -72,13 +72,19 @@ REA ships a minimal, non-overlapping roster so routing is deterministic. Wave 1 
 
 **Specialists:**
 
-- **security-engineer** — AppSec, OWASP, CSP, privacy, secret handling
 - **accessibility-engineer** — WCAG 2.1 AA/AAA, keyboard, ARIA, reduced motion
-- **typescript-specialist** — strict types, interface design, declaration files
-- **frontend-specialist** — pages, islands, styling, web component consumption
+- **adversarial-test-specialist** — bypass corpus, sibling-class sweep methodology, "for every closure, find the X-prime that's still open" reasoning
+- **ast-parser-specialist** — shell grammars (mvdan-sh AST), parser quirks, AST-walker patterns; the parser-tier counterpart to shell-scripting-specialist
 - **backend-engineer** — APIs, auth, data pipelines, messaging, caching
+- **figma-dx-specialist** — Figma's CODING surfaces (Dev Mode, Code Connect, plugin/REST APIs, Variables, DTCG export, Figma-as-MCP); primary consumer is create-helix-app
+- **frontend-specialist** — pages, islands, styling, web component consumption
+- **mcp-protocol-specialist** — Model Context Protocol mechanics, @modelcontextprotocol/sdk, stdio/streamable-HTTP transports, MCP-vs-Bash-tier hook matcher semantics
+- **observability-specialist** — audit-log shape, event vocabulary, hash-chain integrity, structured-logging contracts, SLSA provenance pipeline
 - **qa-engineer** — test strategy, automation, exploratory testing, quality gates
+- **security-engineer** — AppSec, OWASP, CSP, privacy, secret handling
+- **shell-scripting-specialist** — POSIX + bash 3.2 (macOS) hook bodies, awk portability (BSD/GNU/mawk), sed -E discipline, `_lib/cmd-segments.sh` quote-mask logic
 - **technical-writer** — reference docs, guides, release notes
+- **typescript-specialist** — strict types, interface design, declaration files
 
 **Routing tiers cheat-sheet:**
 
@@ -90,6 +96,12 @@ REA ships a minimal, non-overlapping roster so routing is deterministic. Wave 1 
 - CI / build / packaging / publish-pipeline question → `platform-architect`
 - Install / doctor / hook-error-string / consumer-experience question → `devex-architect`
 - Vulnerability fix → `security-engineer` (architect defines the model; engineer fixes against it)
+- Parser-tier bypass / AST-walker gap → `ast-parser-specialist`
+- Bash-body / awk-portability / `_lib/cmd-segments.sh` work → `shell-scripting-specialist`
+- Sibling-class sweep / corpus expansion / "is this class fully closed" → `adversarial-test-specialist`
+- MCP server / MCP-tier matcher / @modelcontextprotocol/sdk → `mcp-protocol-specialist`
+- Audit-log shape / event vocabulary / SLSA provenance pipeline → `observability-specialist`
+- Figma plugin / Code Connect / design-token export / Variables strategy → `figma-dx-specialist`
 - Diff-level review → `code-reviewer`; adversarial pass → `codex-adversarial`
 
 Consumer projects may extend the roster via `.rea/agents/` and profile YAMLs, but start with the curated set.
@@ -111,6 +123,14 @@ REA's default engineering workflow is three-legged, with Review performed by a d
 3. **Review** — `codex-adversarial` runs independent adversarial review on the diff
 
 Every non-trivial change should end with `/codex-review` before merge. This is not optional.
+
+### Codex review routing (0.27.0+)
+
+When dispatching a codex review, default to `rea hook codex-review` (the bundled CLI) or direct Bash invocation of `codex exec review --json --ephemeral`. The `codex-adversarial` agent is a **thin shim** that produces a ledger entry (verdict + finding count + raw JSON path), not a verbose analysis. If a specialist needs codex's view on a specific finding, route them to the raw JSON output file at `$TMPDIR/rea-codex-<sha>-<nonce>.json`, NOT a wrapper-agent re-interpretation.
+
+The verbose-paraphrased path (`/codex-review --verbose`) costs 3 Opus turns per round versus 1 turn for the thin path. Marathon-mode iteration burns through that quickly. Prefer thin unless the audience genuinely benefits from prose.
+
+For the local-first gate-friendly flow (`local-review-gate.sh` consults `rea.local_review` audit entries), route to `rea review` — `rea hook codex-review` writes `codex.review` entries, which the legacy gateway path consulted but the local-review gate does not.
 
 ## HITL Escalation
 

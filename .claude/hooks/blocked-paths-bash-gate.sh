@@ -105,6 +105,18 @@ if [ "$sandbox_status" -ne 0 ] || [ "$sandbox_check" != "ok" ]; then
   exit 2
 fi
 
+# 0.28.0 helix-027 (bash total-lockout postmortem) — version-probe per
+# shim. See protected-paths-bash-gate.sh for the full rationale; this
+# shim mirrors the behavior to detect a stale CLI before payload reach.
+probe_out=$("${REA_ARGV[@]}" hook scan-bash --help 2>&1)
+probe_status=$?
+if [ "$probe_status" -ne 0 ] || ! printf '%s' "$probe_out" | grep -q -e 'scan-bash' -e '--mode'; then
+  printf 'rea: this shim requires the `rea hook scan-bash` subcommand (introduced in 0.23.0).\n' >&2
+  printf 'The resolved CLI at %s does not implement it.\n' "$RESOLVED_CLI_PATH" >&2
+  printf 'Run `pnpm install` (or `npm install`) to sync the CLI to the version this shim expects.\n' >&2
+  exit 2
+fi
+
 payload=$(cat)
 if [ -z "$payload" ]; then
   exit 0

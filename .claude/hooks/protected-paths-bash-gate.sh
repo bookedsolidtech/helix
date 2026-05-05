@@ -183,6 +183,27 @@ if [ "$sandbox_status" -ne 0 ] || [ "$sandbox_check" != "ok" ]; then
   exit 2
 fi
 
+# 0.28.0 helix-027 (bash total-lockout postmortem) — version-probe per
+# shim. The 0.23.0+ scan-bash subcommand is required; if the resolved
+# CLI is older than 0.23.0 it will refuse with "unknown command" and the
+# shim's exit-code dispatch lands on the catch-all "exit 2" branch
+# WITHOUT explaining why. That was the symptom that locked Jake's
+# helix workspace out of every Bash tool until he ran `pnpm install`.
+#
+# The probe runs `rea hook scan-bash --help` once per shim invocation
+# (~30 LOC) and refuses with an actionable message if the subcommand
+# does not exist. Probe failure is fail-closed (exit 2) — same posture
+# the rest of the shim takes — but the message tells the operator
+# exactly what to do (`pnpm install`).
+probe_out=$("${REA_ARGV[@]}" hook scan-bash --help 2>&1)
+probe_status=$?
+if [ "$probe_status" -ne 0 ] || ! printf '%s' "$probe_out" | grep -q -e 'scan-bash' -e '--mode'; then
+  printf 'rea: this shim requires the `rea hook scan-bash` subcommand (introduced in 0.23.0).\n' >&2
+  printf 'The resolved CLI at %s does not implement it.\n' "$RESOLVED_CLI_PATH" >&2
+  printf 'Run `pnpm install` (or `npm install`) to sync the CLI to the version this shim expects.\n' >&2
+  exit 2
+fi
+
 # Capture stdin once and forward it to the CLI.
 payload=$(cat)
 if [ -z "$payload" ]; then
