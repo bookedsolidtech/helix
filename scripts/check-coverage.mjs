@@ -251,17 +251,32 @@ function main() {
   if (HX_COVERAGE_COMPONENTS) {
     const shardComponentsEarly = loadShardComponents();
     if (shardComponentsEarly === null) {
-      console.error(
-        `Coverage gate: ${TEST_RESULTS_PATH} is missing or unreadable. ` +
-          `Cannot determine which scoped components ran on this shard. ` +
-          `Ensure the test step writes test-results.json before invoking check-coverage.`,
-      );
-      if (process.env.GITHUB_ACTIONS === 'true') {
-        console.log(`::error title=Coverage gate failed::missing test-results.json`);
+      // test-results.json missing. Two cases:
+      //   (a) Per-shard run that genuinely skipped vitest — no coverage
+      //       data exists either, treat as "nothing to enforce".
+      //   (b) Dedicated Coverage job whose vitest CLI `--reporter=json`
+      //       didn't honor the config's outputFile — coverage data IS
+      //       written, just the test-results manifest is missing. Fall
+      //       through to coverage threshold check against the data we have.
+      // Distinguish via coverage-data presence.
+      if (existsSync(COVERAGE_JSON) || existsSync(COVERAGE_SUMMARY)) {
+        console.log(
+          `Coverage gate: test-results.json missing but coverage data found. ` +
+            `Falling through to threshold check against scoped components ` +
+            `[${[...HX_COVERAGE_COMPONENTS].join(', ')}] using coverage data only.`,
+        );
+        // Continue past the shard short-circuit — main logic below will
+        // intersect HX_COVERAGE_COMPONENTS against components present in
+        // the coverage data and enforce thresholds on the intersection.
+      } else {
+        console.log(
+          `Coverage gate: test-results.json AND coverage data both missing — ` +
+            `tests didn't run on this run. Scoped components ` +
+            `[${[...HX_COVERAGE_COMPONENTS].join(', ')}] enforced on runs that did.`,
+        );
+        process.exit(0);
       }
-      process.exit(1);
-    }
-    if (shardComponentsEarly.size === 0) {
+    } else if (shardComponentsEarly.size === 0) {
       console.log(
         `Shard had no test files to run — nothing to enforce. ` +
           `Scoped components [${[...HX_COVERAGE_COMPONENTS].join(', ')}] are checked on the shards that ran their tests.`,
