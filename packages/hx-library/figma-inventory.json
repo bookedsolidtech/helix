@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-03T13:42:50.577Z",
+  "generatedAt": "2026-05-05T12:23:03.148Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -17071,6 +17071,13 @@
             "text": "CustomEvent<{value: string}>"
           },
           "description": "Dispatched when the selected option changes."
+        },
+        {
+          "type": {
+            "text": "Event"
+          },
+          "description": "Platform constraint-validation event fired when checkValidity() / reportValidity() determine the value is invalid (form-associated component contract via ElementInternals.setValidity).",
+          "name": "invalid"
         }
       ],
       "cssProperties": [
@@ -24138,30 +24145,45 @@
       ],
       "cssParts": [
         {
-          "description": "The inner slot wrapper element. `display: contents` — no layout effect.",
+          "description": "The inner slot wrapper element. `display: contents` — no layout effect. Theme-injected CSS custom properties (semantic surface — full token catalog lives in `@helixui/tokens`; the wildcard `--hx-*` was previously documented here but the CEM cssProperties[] surface requires explicit names).",
           "name": "base"
         }
       ],
       "events": [],
       "cssProperties": [
         {
-          "description": "All design tokens for the selected theme are injected as CSS custom properties on the host element.",
-          "name": "--hx-*",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
+          "description": "Primary text color (theme-injected).",
           "name": "--hx-color-text-primary",
           "figmaBinding": null
         },
         {
-          "description": "Spacing token.",
+          "description": "Base surface background (theme-injected).",
+          "name": "--hx-color-surface-base",
+          "figmaBinding": null
+        },
+        {
+          "description": "Default border color (theme-injected).",
+          "name": "--hx-color-border-default",
+          "figmaBinding": null
+        },
+        {
+          "description": "Spacing token (theme-injected).",
           "name": "--hx-space-4",
           "figmaBinding": null
         },
         {
-          "description": "Animation duration.",
+          "description": "Animation duration (theme-injected).",
           "name": "--hx-duration-fast",
+          "figmaBinding": null
+        },
+        {
+          "description": "Medium border-radius (theme-injected).",
+          "name": "--hx-radius-md",
+          "figmaBinding": null
+        },
+        {
+          "description": "Body font family (theme-injected).",
+          "name": "--hx-font-family-body",
           "figmaBinding": null
         }
       ],
