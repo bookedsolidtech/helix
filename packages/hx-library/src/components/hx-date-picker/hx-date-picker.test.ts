@@ -186,8 +186,12 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker error="Error" help-text="Pick a date"></hx-date-picker>',
       );
+      // Persistent help-text container stays in the DOM so aria-describedby
+      // ids never dangle (WCAG 4.1.2). It's hidden via the boolean `hidden`
+      // attribute when an error is present.
       const helpText = shadowQuery(el, '.field__help-text');
-      expect(helpText).toBeNull();
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -207,8 +211,11 @@ describe('hx-date-picker', () => {
       const el = await fixture<HelixDatePicker>(
         '<hx-date-picker help-text="Select a date" error="Required"></hx-date-picker>',
       );
+      // Persistent help-text container stays in the DOM but is hidden via
+      // the boolean `hidden` attribute when an error is present.
       const helpText = shadowQuery(el, '.field__help-text');
-      expect(helpText).toBeNull();
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 

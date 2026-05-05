@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T11:40:20.313Z",
+  "generatedAt": "2026-05-05T12:24:24.560Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -7865,6 +7865,12 @@
           "cemAttribute": "next-month-label",
           "type": "text",
           "defaultValue": "Next month"
+        },
+        {
+          "figmaPropertyName": "accessibleLabel",
+          "cemAttribute": "accessible-label",
+          "type": "text",
+          "defaultValue": "null"
         }
       ],
       "slots": [
