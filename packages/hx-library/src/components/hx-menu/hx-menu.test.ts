@@ -15,34 +15,6 @@ afterEach(cleanup);
 // remains exercised on any engine without IDL ARIA element references.
 // ─────────────────────────────────────────────────────────────
 
-function getMenuRole(el: HTMLElement): string | null {
-  // Modern path: host carries role; legacy: inner [role="menu"]
-  return (
-    el.getAttribute('role') ??
-    (el as HTMLElement & { _internals?: ElementInternals })._internals?.role ??
-    el.shadowRoot?.querySelector('[role="menu"]')?.getAttribute('role') ??
-    null
-  );
-}
-
-function getItemRole(el: HelixMenuItem): string | null {
-  return (
-    el.getAttribute('role') ??
-    el.shadowRoot?.querySelector('[role^="menuitem"]')?.getAttribute('role') ??
-    null
-  );
-}
-
-function getItemAriaState(el: HelixMenuItem, attr: string): string | null {
-  // Try host attribute first; fall back to inner element. ElementInternals
-  // does not project to attributes, so on the modern path inspect via
-  // accessibility tree if available.
-  const host = el.getAttribute(attr);
-  if (host !== null) return host;
-  const inner = el.shadowRoot?.querySelector('.menu-item');
-  return inner?.getAttribute(attr) ?? null;
-}
-
 function isItemFocused(el: HelixMenuItem): boolean {
   if (document.activeElement === el) return true;
   const inner = el.shadowRoot?.querySelector<HTMLElement>('.menu-item');
