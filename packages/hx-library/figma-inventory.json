@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T15:18:53.136Z",
+  "generatedAt": "2026-05-05T07:16:04.957Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -5520,30 +5520,6 @@
           "defaultValue": ""
         },
         {
-          "figmaPropertyName": "label",
-          "cemAttribute": "label",
-          "type": "text",
-          "defaultValue": "undefined"
-        },
-        {
-          "figmaPropertyName": "accessibleLabel",
-          "cemAttribute": "accessible-label",
-          "type": "text",
-          "defaultValue": "undefined"
-        },
-        {
-          "figmaPropertyName": "helpText",
-          "cemAttribute": "help-text",
-          "type": "text",
-          "defaultValue": "undefined"
-        },
-        {
-          "figmaPropertyName": "error",
-          "cemAttribute": "error",
-          "type": "text",
-          "defaultValue": "undefined"
-        },
-        {
           "figmaPropertyName": "labelGradient",
           "cemAttribute": "label-gradient",
           "type": "text",
@@ -5593,27 +5569,6 @@
           "type": "instance-swap",
           "default": null,
           "description": "Custom trigger element. Default: a color swatch button."
-        },
-        {
-          "figmaPropertyName": "label",
-          "cemSlot": "label",
-          "type": "instance-swap",
-          "default": null,
-          "description": "Visible label projected above the trigger; aggregated text contributes to the host's accessible name when no stronger naming source (aria-labelledby/aria-label/accessible-label/label) is supplied."
-        },
-        {
-          "figmaPropertyName": "help-text",
-          "cemSlot": "help-text",
-          "type": "instance-swap",
-          "default": null,
-          "description": "Help text rendered below the trigger and joined into the host's announced description channel."
-        },
-        {
-          "figmaPropertyName": "error",
-          "cemSlot": "error",
-          "type": "instance-swap",
-          "default": null,
-          "description": "Error message rendered below help text. When present, marks the trigger as aria-invalid and is announced via a polite live region."
         }
       ],
       "cssParts": [
@@ -5644,18 +5599,6 @@
         {
           "description": "The text input area.",
           "name": "input"
-        },
-        {
-          "description": "The visible label container above the trigger.",
-          "name": "label"
-        },
-        {
-          "description": "The help-text container rendered below the trigger.",
-          "name": "help-text"
-        },
-        {
-          "description": "The error-message container rendered below help text.",
-          "name": "error"
         }
       ],
       "events": [
@@ -7865,12 +7808,6 @@
           "cemAttribute": "next-month-label",
           "type": "text",
           "defaultValue": "Next month"
-        },
-        {
-          "figmaPropertyName": "accessibleLabel",
-          "cemAttribute": "accessible-label",
-          "type": "text",
-          "defaultValue": "null"
         }
       ],
       "slots": [
@@ -24318,6 +24255,12 @@
           "cemAttribute": "error",
           "type": "text",
           "defaultValue": ""
+        },
+        {
+          "figmaPropertyName": "accessibleLabel",
+          "cemAttribute": "accessible-label",
+          "type": "text",
+          "defaultValue": "null"
         }
       ],
       "slots": [
@@ -25150,7 +25093,7 @@
       "events": [],
       "cssProperties": [
         {
-          "description": "Z-index for the fixed stack. ─── ARIA scope (group-6 §3.2 / §5.9) ───────────────────────────────────── `hx-toast-stack` deliberately has NO `role`, `aria-live`, `aria-atomic`, or `aria-relevant` on its host or inner container. Each child `hx-toast` is its own live region (role=alert/status via ElementInternals). Wrapping those toasts in a second live region (e.g. `role=\"log\"` on the stack) would create nested live regions, which causes older NVDA/JAWS to announce every toast TWICE — once for the toast's own role, once for the surrounding log region. The stack is purely a positional/z-index container; it is invisible to the AT tree. Do NOT add a container role unless this entire architecture is rewritten so individual toasts no longer carry their own roles.",
+          "description": "Z-index for the fixed stack.",
           "name": "--hx-z-index-toast",
           "default": "9000",
           "figmaBinding": {

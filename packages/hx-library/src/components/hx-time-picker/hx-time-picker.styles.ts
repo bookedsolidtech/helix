@@ -190,6 +190,17 @@ export const helixTimePickerStyles = css`
   .field__error {
     color: var(--hx-time-picker-error-color, var(--hx-color-error-text, #c92a2a));
   }
+  .field__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   @media (forced-colors: active) {
     .field__combobox {
       border-color: ButtonText;
