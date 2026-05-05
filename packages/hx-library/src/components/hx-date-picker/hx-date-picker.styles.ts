@@ -337,7 +337,8 @@ export const helixDatePickerStyles = css`
      Live region (screen reader announcements)
      ============================================================ */
 
-  .calendar__live-region {
+  .calendar__live-region,
+  .field__sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
