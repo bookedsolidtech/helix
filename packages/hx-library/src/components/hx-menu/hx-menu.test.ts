@@ -1330,3 +1330,150 @@ describe('hx-menu-item fallback path AccName precedence (codex push-gate round-3
     document.getElementById('round3-item-lbl')?.remove();
   });
 });
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-6 finding 2: on the legacy fallback path
+// the inner `.menu-item` carries role="menuitem*" + aria-* state. The
+// host MUST NOT additionally expose those via ElementInternals — that
+// would create two announced surfaces per logical option, which is the
+// exact duplicate-surface problem host-canonical migration eliminates.
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-menu-item host role suppression on fallback path (round-6 finding 2)', () => {
+  type HelixMenuItemCtor = typeof HelixMenuItem & {
+    __testSupportsIdrefRefsOverride: boolean | null;
+  };
+
+  afterEach(() => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('does NOT set internals.role on the host when fallback path is active', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="a">Item A</hx-menu-item>
+      </hx-menu>
+    `);
+    const item = el.querySelector('hx-menu-item') as HelixMenuItem;
+    await item.updateComplete;
+
+    // Host internals.role MUST be null on the fallback path. The inner
+    // element is the canonical announced surface.
+    const internals = (item as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.role).toBeNull();
+
+    // Inner `.menu-item` carries role="menuitem".
+    const inner = shadowQuery<HTMLElement>(item, '.menu-item')!;
+    expect(inner.getAttribute('role')).toBe('menuitem');
+  });
+
+  it('suppresses internals.ariaChecked / ariaDisabled / ariaHasPopup / ariaExpanded / ariaBusy on fallback', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="a" type="checkbox" checked disabled loading>
+          Item A
+          <hx-menu slot="submenu">
+            <hx-menu-item value="a1">Child</hx-menu-item>
+          </hx-menu>
+        </hx-menu-item>
+      </hx-menu>
+    `);
+    const item = el.querySelector('hx-menu-item') as HelixMenuItem;
+    await item.updateComplete;
+
+    const internals = (item as unknown as { _internals: ElementInternals })._internals;
+    // None of the state fields should be set on the host on fallback —
+    // the inner element carries them via the template.
+    expect(internals.role).toBeNull();
+    expect(internals.ariaDisabled).toBeNull();
+    expect(internals.ariaChecked).toBeNull();
+    expect(internals.ariaHasPopup).toBeNull();
+    expect(internals.ariaExpanded).toBeNull();
+    expect(internals.ariaBusy).toBeNull();
+  });
+
+  it('still sets internals.role on the modern host-canonical path', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="a">Item A</hx-menu-item>
+      </hx-menu>
+    `);
+    const item = el.querySelector('hx-menu-item') as HelixMenuItem;
+    await item.updateComplete;
+
+    const internals = (item as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.role).toBe('menuitem');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-6 finding 3: typeahead must read the item's OWN
+// label, not its slotted submenu subtree. Typing a letter that occurs
+// only in a child item MUST NOT match the parent item.
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-menu typeahead ignores slotted submenu subtree (round-6 finding 3)', () => {
+  it('does not match a parent item by text inside its slotted submenu', async () => {
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="file">
+          File
+          <hx-menu slot="submenu">
+            <hx-menu-item value="file-edit">Edit</hx-menu-item>
+          </hx-menu>
+        </hx-menu-item>
+        <hx-menu-item value="open">Open</hx-menu-item>
+      </hx-menu>
+    `);
+    const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+    // Top-level items: File (with submenu containing Edit) + Open.
+    const fileItem = items.find((i) => i.value === 'file')!;
+    const openItem = items.find((i) => i.value === 'open')!;
+
+    // Start focused on Open so we can assert that typing "e" does NOT
+    // pull focus to File via the slotted Edit subtree.
+    openItem.focus();
+    expect(isItemFocused(openItem)).toBe(true);
+
+    // Pre-round-6, item.textContent on File included "Edit" (slotted
+    // submenu), so "e" matched File and focus moved. Post-fix, the
+    // typeahead reads only File's own label, which starts with "F" —
+    // no match for "e". Focus stays on Open.
+    await userEvent.keyboard('e');
+    expect(isItemFocused(openItem)).toBe(true);
+    expect(isItemFocused(fileItem)).toBe(false);
+  });
+
+  it('still matches a top-level parent item by its own label text', async () => {
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="open">Open</hx-menu-item>
+        <hx-menu-item value="file">
+          File
+          <hx-menu slot="submenu">
+            <hx-menu-item value="file-edit">Edit</hx-menu-item>
+          </hx-menu>
+        </hx-menu-item>
+      </hx-menu>
+    `);
+    const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
+    const openItem = items.find((i) => i.value === 'open')!;
+    const fileItem = items.find((i) => i.value === 'file')!;
+
+    openItem.focus();
+    // "f" matches File's own label — typeahead must still work for
+    // labels of items that have submenus.
+    await userEvent.keyboard('f');
+    expect(isItemFocused(fileItem)).toBe(true);
+  });
+});

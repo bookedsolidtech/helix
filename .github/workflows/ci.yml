@@ -371,6 +371,11 @@ jobs:
               echo "tests_ran=true" >> "$GITHUB_OUTPUT"
               mkdir -p .cache
               echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              # Codex push-gate round-6 finding 1: write the empty-shard
+              # sentinel so check-coverage.mjs can distinguish an
+              # intentionally-empty shard from a crashed vitest run.
+              mkdir -p .cache/coverage
+              echo "intentionally-empty shard ${VITEST_SHARD}" > .cache/coverage/empty-shard.flag
               exit 0
             fi
             if [[ "$SHARD_INDEX" -ne 1 ]]; then
@@ -380,6 +385,11 @@ jobs:
               # something to find and does not warn.
               mkdir -p .cache
               echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              # Codex push-gate round-6 finding 1: write the empty-shard
+              # sentinel so check-coverage.mjs can distinguish an
+              # intentionally-empty shard from a crashed vitest run.
+              mkdir -p .cache/coverage
+              echo "intentionally-empty shard ${VITEST_SHARD}" > .cache/coverage/empty-shard.flag
               exit 0
             fi
             echo "[ci-shard-${VITEST_SHARD}] only $TEST_FILE_COUNT test files — running all on shard 1 without --shard"

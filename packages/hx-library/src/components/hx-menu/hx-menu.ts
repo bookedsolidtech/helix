@@ -191,10 +191,26 @@ export class HelixMenu extends HelixElement {
    */
   private _resolvedAccessibleName = '';
 
-  /** @internal */
+  /**
+   * Return the menu's enabled, top-level `hx-menu-item` children.
+   *
+   * Codex push-gate round-6 finding 3: `querySelectorAll('hx-menu-item')`
+   * walks the entire descendant tree, which on a parent menuitem
+   * includes the slotted nested `<hx-menu>` and ITS items. Treating
+   * those as top-level options corrupts roving tabindex, ArrowUp/Down
+   * navigation, and typeahead matching (typing the first letter of a
+   * grandchild item lands focus there instead of on the next sibling).
+   * Restrict to direct children of `this` so each menu owns only its
+   * own items.
+   *
+   * @internal
+   */
   private _getItems(): HelixMenuItem[] {
-    return Array.from(this.querySelectorAll<HelixMenuItem>('hx-menu-item')).filter(
-      (item) => !item.disabled && !item.loading,
+    return Array.from(this.children).filter(
+      (el): el is HelixMenuItem =>
+        el.tagName.toLowerCase() === 'hx-menu-item' &&
+        !(el as HelixMenuItem).disabled &&
+        !(el as HelixMenuItem).loading,
     );
   }
 
@@ -300,13 +316,38 @@ export class HelixMenu extends HelixElement {
 
     const match = items.findIndex((item) => {
       if (item.disabled || item.hasAttribute('disabled')) return false;
-      const text = item.textContent?.trim().toLowerCase() ?? '';
+      const text = this._getTypeaheadLabel(item).toLowerCase();
       return text.startsWith(this._typeaheadBuffer);
     });
 
     if (match !== -1) {
       this._focusItem(match);
     }
+  }
+
+  /**
+   * Read the typeahead label for an item — the item's OWN text content
+   * EXCLUDING any nested submenu subtree projected through
+   * `slot="submenu"`.
+   *
+   * Codex push-gate round-6 finding 3: a naive `item.textContent` walks
+   * the entire light-DOM tree, which on a parent menuitem includes the
+   * slotted nested `<hx-menu>` and its descendants. Typing the first
+   * letter of a child item then matches the parent (because the parent's
+   * subtree contains that text), causing first-character nav to focus
+   * the parent instead of the next sibling. Filter slot="submenu" out.
+   *
+   * @internal
+   */
+  private _getTypeaheadLabel(item: HelixMenuItem): string {
+    let text = '';
+    for (const node of item.childNodes) {
+      if (node instanceof Element && node.getAttribute('slot') === 'submenu') {
+        continue;
+      }
+      text += node.textContent ?? '';
+    }
+    return text.trim();
   }
 
   /** @internal */

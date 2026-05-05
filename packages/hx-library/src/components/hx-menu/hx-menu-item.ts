@@ -278,15 +278,34 @@ export class HelixMenuItem extends HelixElement {
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
     const role = this._getRole();
-    internals.role = role;
-    internals.ariaDisabled = this.disabled ? 'true' : null;
 
-    const hasCheckableRole = this.type === 'checkbox' || this.type === 'radio';
-    internals.ariaChecked = hasCheckableRole ? (this.checked ? 'true' : 'false') : null;
+    // Codex push-gate round-6 finding 2: on the legacy fallback path
+    // (`_supportsIdrefRefs === false`) the inner `.menu-item` element
+    // already exposes role="menuitem*" + aria-disabled / aria-checked /
+    // aria-haspopup / aria-expanded / aria-busy via the template. If we
+    // ALSO write those onto the host's ElementInternals, AT sees TWO
+    // menuitems for one logical option — the duplicate-surface problem
+    // host-canonical migration is meant to eliminate. Suppress all of
+    // these state writes on the host when the fallback path is in
+    // effect; the inner element is the canonical announced surface.
+    if (!this._supportsIdrefRefs) {
+      internals.role = null;
+      internals.ariaDisabled = null;
+      internals.ariaChecked = null;
+      internals.ariaHasPopup = null;
+      internals.ariaExpanded = null;
+      internals.ariaBusy = null;
+    } else {
+      internals.role = role;
+      internals.ariaDisabled = this.disabled ? 'true' : null;
 
-    internals.ariaHasPopup = this._hasSubmenu ? 'menu' : null;
-    internals.ariaExpanded = this._hasSubmenu ? (this._submenuOpen ? 'true' : 'false') : null;
-    internals.ariaBusy = this.loading ? 'true' : null;
+      const hasCheckableRole = this.type === 'checkbox' || this.type === 'radio';
+      internals.ariaChecked = hasCheckableRole ? (this.checked ? 'true' : 'false') : null;
+
+      internals.ariaHasPopup = this._hasSubmenu ? 'menu' : null;
+      internals.ariaExpanded = this._hasSubmenu ? (this._submenuOpen ? 'true' : 'false') : null;
+      internals.ariaBusy = this.loading ? 'true' : null;
+    }
 
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
     const consumerLabelledBy = this.getAttribute('aria-labelledby');

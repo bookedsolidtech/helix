@@ -24,8 +24,12 @@
  *
  * Exit codes:
  *   0 — all non-exempt components meet threshold
- *   0 — scoped run (HX_COVERAGE_COMPONENTS) with missing coverage artifacts (skip)
- *   1 — one or more non-exempt components below threshold, or missing artifacts in unscoped runs
+ *   0 — scoped run (HX_COVERAGE_COMPONENTS) with missing artifacts AND
+ *       coverage/empty-shard.flag sentinel present (intentionally empty shard)
+ *   1 — one or more non-exempt components below threshold
+ *   1 — missing coverage artifacts in unscoped runs
+ *   1 — scoped run with missing artifacts and NO empty-shard sentinel
+ *       (treated as a crashed/killed vitest run, not a passing skip)
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -39,6 +43,14 @@ const COVERAGE_JSON = resolve(COVERAGE_DIR, 'coverage-final.json');
 const COVERAGE_SUMMARY = resolve(COVERAGE_DIR, 'coverage-summary.json');
 const TEST_RESULTS_PATH = resolve(ROOT, 'packages/hx-library/.cache/test-results.json');
 const CONFIG_PATH = resolve(ROOT, 'packages/hx-library/coverage-config.json');
+
+// Codex push-gate round-6 finding 1: explicit empty-shard sentinel.
+// Written by the test runner when a scoped run produces no targets to
+// execute (e.g. an empty shard or a deliberately-skipped run). When this
+// file is present alongside missing coverage artifacts, the gate may
+// pass without enforcement. When it is ABSENT and artifacts are also
+// missing, the run is treated as a crash and the gate fails.
+const EMPTY_SHARD_FLAG = resolve(COVERAGE_DIR, 'empty-shard.flag');
 
 const THRESHOLD = 80;
 
@@ -269,12 +281,37 @@ function main() {
         // intersect HX_COVERAGE_COMPONENTS against components present in
         // the coverage data and enforce thresholds on the intersection.
       } else {
-        console.log(
-          `Coverage gate: test-results.json AND coverage data both missing — ` +
-            `tests didn't run on this run. Scoped components ` +
-            `[${[...HX_COVERAGE_COMPONENTS].join(', ')}] enforced on runs that did.`,
-        );
-        process.exit(0);
+        // Both test-results.json AND coverage artifacts are missing.
+        // Two cases:
+        //   (a) Intentionally empty shard — runner wrote EMPTY_SHARD_FLAG to
+        //       signal "scope produced no work". Pass through.
+        //   (b) Scoped vitest CRASHED or was watchdog-killed before writing
+        //       any output. Without the sentinel we cannot tell (a) from (b),
+        //       and silently passing (b) hides real coverage regressions.
+        // Codex push-gate round-6 finding 1: require the sentinel for (a);
+        // fail loudly for (b).
+        if (existsSync(EMPTY_SHARD_FLAG)) {
+          console.log(
+            `Coverage gate: empty-shard sentinel present (${EMPTY_SHARD_FLAG}) — ` +
+              `scoped run produced no targets. Scoped components ` +
+              `[${[...HX_COVERAGE_COMPONENTS].join(', ')}] enforced on runs that did.`,
+          );
+          process.exit(0);
+        }
+        const crashMsg =
+          `Coverage gate FAILED: missing coverage artifacts in ${COVERAGE_DIR}. ` +
+          `test-results.json AND coverage data are BOTH missing AND no ` +
+          `empty-shard sentinel (${EMPTY_SHARD_FLAG}) was written. ` +
+          `The scoped vitest run for [${[...HX_COVERAGE_COMPONENTS].join(', ')}] ` +
+          `most likely CRASHED or was watchdog-killed before writing output. ` +
+          `Diagnose the failed shard (rerun, raise the watchdog timeout, or ` +
+          `fix the underlying teardown). If this run was intentionally empty, ` +
+          `the test runner must write the sentinel file.`;
+        if (process.env.GITHUB_ACTIONS === 'true') {
+          console.log(`::error title=Coverage gate failed::${crashMsg}`);
+        }
+        console.error(crashMsg);
+        process.exit(1);
       }
     } else if (shardComponentsEarly.size === 0) {
       console.log(
