@@ -920,5 +920,32 @@ describe('hx-dropdown', () => {
       await el.updateComplete;
       expect(count).toBe(1);
     });
+
+    // Codex round-3: descendant-target click bypass. If a consumer slots a
+    // `[data-value]` descendant inside an `hx-menu-item`, `closest()` on the
+    // legacy selector would resolve to the inner span (nearest match) and the
+    // localName guard misses — triggering BOTH the legacy panel-click dispatch
+    // AND the bubbled `hx-item-select` -> `_handlePanelItemSelect` dispatch.
+    // The host-canonical bail must run FIRST, independent of legacy selectors.
+    it('does not double-fire hx-select when clicking a [data-value] descendant inside hx-menu-item', async () => {
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="edit"><span data-value="inner">Edit</span></hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      let count = 0;
+      el.addEventListener('hx-select', () => {
+        count += 1;
+      });
+      const inner = el.querySelector<HTMLElement>('span[data-value="inner"]')!;
+      inner.click();
+      await el.updateComplete;
+      expect(count).toBe(1);
+    });
   });
 });

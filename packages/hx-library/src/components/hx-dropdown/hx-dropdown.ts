@@ -534,18 +534,17 @@ export class HelixDropdown extends HelixElement {
   private _handlePanelClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
     // P2-06: Narrow selector — bare 'li' and 'button' cause spurious hx-select events.
-    // Group 5b: also match `hx-menu-item` directly. Its `role="menuitem"`
-    // lives on `_internals.role` (AT-only) and would not match
-    // `[role="menuitem"]`. The host emits `hx-item-select` from its own
-    // click handler, but we still route the click here to keep `hx-select`
-    // dispatch on the public composite contract — the dedicated
-    // `_handlePanelItemSelect` handler de-duplicates the host-canonical path.
-    const item = target.closest<HTMLElement>('hx-menu-item, [role="menuitem"], [data-value]');
+    // Group 5b round-3 (codex): bail FIRST on host-canonical `hx-menu-item`,
+    // independently of what `closest()` resolves with the legacy selectors.
+    // If a consumer slots `<hx-menu-item><span data-value="…">…</span></hx-menu-item>`
+    // and the click lands on the inner span, `closest('hx-menu-item, …, [data-value]')`
+    // resolves to the inner span (nearest match) — the legacy localName guard
+    // misses, and we'd dispatch `hx-select` here AND again from
+    // `_handlePanelItemSelect` when the host's bubbled `hx-item-select` arrives.
+    // The host owns its own dispatch path; descendants of the host must defer.
+    if (target.closest('hx-menu-item')) return;
+    const item = target.closest<HTMLElement>('[role="menuitem"], [data-value]');
     if (!item) return;
-    // `hx-menu-item` already emits `hx-item-select` and that path owns
-    // dispatch via `_handlePanelItemSelect` below — return early to avoid
-    // double-firing `hx-select`.
-    if (item.localName === 'hx-menu-item') return;
 
     const value = item.dataset['value'] ?? item.getAttribute('value') ?? null;
     const label = item.textContent?.trim() ?? '';

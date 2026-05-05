@@ -557,6 +557,30 @@ describe('hx-overflow-menu', () => {
       expect(count).toBe(1);
     });
 
+    // Codex round-3: descendant-target click bypass. If a consumer slots a
+    // `[role="menuitem"]` descendant inside an `hx-menu-item`, `closest()` on
+    // the legacy selector resolves to the inner element (nearest match) and
+    // the localName guard misses — dispatching twice (here AND from the
+    // bubbled `hx-item-select` -> `_handleSlotItemSelect`). The host-canonical
+    // bail must run FIRST, independent of legacy selectors.
+    it('does not double-fire hx-select when clicking a [role="menuitem"] descendant inside hx-menu-item', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit"><button role="menuitem" type="button">Edit</button></hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      let count = 0;
+      el.addEventListener('hx-select', () => {
+        count += 1;
+      });
+      const inner = el.querySelector<HTMLElement>('button[role="menuitem"]')!;
+      inner.click();
+      await el.updateComplete;
+      expect(count).toBe(1);
+    });
+
     it('skips hx-menu-divider when collecting menu items (APG separator stays non-focusable)', async () => {
       const el = await fixture<HelixOverflowMenu>(
         '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item><hx-menu-divider></hx-menu-divider><hx-menu-item value="delete">Delete</hx-menu-item></hx-overflow-menu>',

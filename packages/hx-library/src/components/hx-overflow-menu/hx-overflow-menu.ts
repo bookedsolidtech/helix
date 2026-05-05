@@ -437,21 +437,19 @@ export class HelixOverflowMenu extends HelixElement {
   /** @internal */
   private readonly _handleSlotClick = (e: Event): void => {
     const target = e.target as HTMLElement;
-    // Match BOTH the host-canonical `hx-menu-item` (whose `role` lives on
-    // `_internals.role` — invisible to attribute selectors) and the legacy
-    // `[role="menuitem*"]` shapes used by plain slotted markup. Without
-    // the `hx-menu-item` token, slotted Helix items would still emit their
-    // own `hx-item-select` (covered by `_handleSlotItemSelect`), but their
-    // raw click would also hit this handler and silently no-op.
+    // Group 5b round-3 (codex): bail FIRST on host-canonical `hx-menu-item`,
+    // independently of what `closest()` resolves with the legacy selectors.
+    // If a consumer slots a `[role="menuitem*"]` descendant inside an
+    // `hx-menu-item`, `closest()` would resolve to the descendant first
+    // (nearest match) and the legacy localName guard would miss, double-firing
+    // `hx-select` (once here, once from `_handleSlotItemSelect`). The host
+    // owns its own dispatch path; descendants of the host must defer.
+    if (target.closest('hx-menu-item')) return;
     const menuItem = target.closest(
-      'hx-menu-item, [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
+      '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
     ) as HTMLElement | null;
     if (!menuItem) return;
     if (menuItem.hasAttribute('disabled') || (menuItem as HTMLButtonElement).disabled) return;
-    // `hx-menu-item` already emits `hx-item-select` from its own click
-    // handler — let `_handleSlotItemSelect` own that path so we don't
-    // double-fire `hx-select`. The legacy plain-markup path stays here.
-    if (menuItem.localName === 'hx-menu-item') return;
     const value = menuItem.getAttribute('data-value') ?? menuItem.textContent?.trim() ?? '';
     this.dispatchEvent(
       new CustomEvent<{ value: string }>('hx-select', {
