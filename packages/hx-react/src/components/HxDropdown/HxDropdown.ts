@@ -15,6 +15,41 @@ export type { HxDropdownProps };
 
 /**
  * A dropdown component — a button that opens a floating panel on click.
+
+## Architecture Note: Host-Attribute Label Mirror (group-4 round-1)
+
+The announced surface is the inner `[part="panel"]` element, which carries
+`role="menu"`. The host wraps a slotted trigger and the floating panel and
+does NOT claim a role itself (apart from the round-35-style host
+`aria-expanded` fallback used only when the trigger slot is empty).
+
+Because the panel lives in shadow DOM and `ElementInternals` IDL refs on
+the host project semantics OUTWARD (host → AT) rather than INWARD
+(host → shadow descendant), we use the **host-attribute mirror** pattern:
+resolve consumer `aria-labelledby` IDREFs against the host's composed-tree
+roots, text-flatten via `flattenAccName`, and write the result to the
+panel's `aria-label`. Host `aria-label` outranks the `label` property in
+the same precedence used by every host-canonical hx-* control.
+
+Naming precedence (W3C AccName 1.2 §4.3.1):
+  1. Host `aria-labelledby` (resolved IDREFs, text-flattened)
+  2. Host `aria-label`
+  3. `label` property
+  4. Hard-coded literal `"Menu"` (last-resort accessible name)
+
+**Group 5 boundary (intentional):** This round is **additive only** — the
+host-label pipeline is the entire change. The panel's `role="menu"` and
+the menuitem-roving keyboard pattern are already implemented per APG and
+are NOT touched here. Group 5 (composite navigation: menu, menubar,
+menuitem, tabs, tree) will own any broader refactor of the menu role and
+roving-tabindex semantics. Codex reviewers: please scope findings to the
+host-label pipeline; do not flag missing roving-focus / typeahead /
+`aria-orientation` work here.
+
+`aria-controls` is intentionally omitted on the trigger: the panel lives
+in shadow DOM and IDREF values cannot be resolved across shadow
+boundaries by assistive technology (axe-core flags this as a critical
+violation if attempted). See `_setupTriggerAria` for the inline note.
  *
  * @example
  * ```tsx

@@ -11,6 +11,37 @@ const _nextTooltipId = createIdCounter('hx-tooltip');
 /**
  * A tooltip that displays contextual help text on hover or focus.
  *
+ * ## Architecture Note: Light-DOM Description Shim (group-4 round-1)
+ *
+ * `aria-describedby` IDREFs cannot resolve across the Shadow DOM boundary —
+ * the trigger lives in the consumer's light DOM and references a tooltip
+ * whose body is in this component's shadow root. The tooltip text must
+ * therefore be exposed in DOCUMENT scope.
+ *
+ * The shim is a single visually-hidden `<span>` appended to `document.body`
+ * with the `_tooltipId` as its `id`. The trigger's `aria-describedby` points
+ * at this span. The text content is mirrored from the slotted `content`
+ * slot on every relevant signal:
+ *
+ *   1. `firstUpdated` (initial wiring)
+ *   2. `slotchange` on the default slot AND the `content` slot (the slotted
+ *      element list changes)
+ *   3. **Text-content mutations on the assigned `content` slot elements**
+ *      (round-23 P2 pattern). Without this observer a framework that
+ *      rewrites the slotted `<span slot="content">` `textContent` IN PLACE
+ *      (Vue / React keyed text rerender) would leave the shim stale.
+ *
+ * Cleanup: `disconnectedCallback` removes the shim from `document.body`,
+ * disconnects the slot-text observer, and clears the timers. SSR is
+ * sidestepped by guarding `document` access — the shim is created lazily
+ * the first time `_setupTriggerAria()` runs in a browser environment.
+ *
+ * `role="tooltip"` is the correct APG role and is NEVER promoted to
+ * `role="dialog"` — APG explicitly forbids tooltips from holding focus and
+ * the tooltip body is not a focus target. No host-canonical `_internals`
+ * work is owed: the trigger is the announced surface, and it correctly
+ * references the tooltip via `aria-describedby`.
+ *
  * @summary Contextual help text and abbreviations with smart positioning.
  *
  * @tag hx-tooltip
@@ -132,6 +163,20 @@ export class HelixTooltip extends HelixElement {
    */
   private _lightDomDescription: HTMLSpanElement | null = null;
 
+  /**
+   * Watches in-place text mutations on the elements assigned to the
+   * `<slot name="content">`. Without this observer, a framework that
+   * rewrites the slotted `<span slot="content">` `textContent` in place
+   * would leave the document-scope shim stale — the `slotchange` event
+   * does NOT fire on descendant text mutations.
+   *
+   * The observer is reinstalled on every `_setupTriggerAria()` call against
+   * the deduped current set of assigned elements; it is fully torn down in
+   * `disconnectedCallback` to prevent leaks on SSR teardown.
+   * @internal
+   */
+  private _contentSlotTextObserver: MutationObserver | null = null;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -150,6 +195,11 @@ export class HelixTooltip extends HelixElement {
     this._clearTimers();
     this._lightDomDescription?.remove();
     this._lightDomDescription = null;
+    // Round-23 P2: tear down the slotted-content text observer so a
+    // disconnect-then-reconnect cycle never leaks observers and the
+    // observed light-DOM nodes do not retain a reference to this host.
+    this._contentSlotTextObserver?.disconnect();
+    this._contentSlotTextObserver = null;
   }
 
   override firstUpdated(): void {
@@ -168,12 +218,11 @@ export class HelixTooltip extends HelixElement {
     // aria-describedby cannot cross Shadow DOM boundaries, so the referenced element
     // must live in the document scope (light DOM), not inside the shadow root.
     const contentSlot = this._contentSlot;
-    const contentText =
-      contentSlot
-        ?.assignedElements()
-        .map((el) => el.textContent)
-        .join(' ')
-        .trim() ?? '';
+    const contentEls = contentSlot?.assignedElements() ?? [];
+    const contentText = contentEls
+      .map((el) => el.textContent)
+      .join(' ')
+      .trim();
 
     // Guard for SSR — document is unavailable server-side
     if (!this._lightDomDescription && typeof document !== 'undefined') {
@@ -194,6 +243,55 @@ export class HelixTooltip extends HelixElement {
     if (trigger) {
       trigger.setAttribute('aria-describedby', this._tooltipId);
     }
+
+    // Round-23 P2 pattern: observe in-place text mutations on the assigned
+    // content elements so a framework-driven `textContent` rewrite re-syncs
+    // the document-scope shim. `slotchange` fires only on the assignment
+    // list itself, never on descendant text/attribute mutations.
+    this._installContentSlotTextObserver(contentEls);
+  }
+
+  /**
+   * (Re-)installs the slotted-content text observer over the deduped union
+   * of assigned `content` slot elements. Disconnects any previous observer
+   * before re-attaching so observer count is bounded by component lifetime,
+   * not by `slotchange` event count.
+   * @internal
+   */
+  private _installContentSlotTextObserver(elements: Element[]): void {
+    if (this._contentSlotTextObserver) {
+      this._contentSlotTextObserver.disconnect();
+      this._contentSlotTextObserver = null;
+    }
+    if (elements.length === 0) return;
+    if (typeof MutationObserver === 'undefined') return;
+    const unique = new Set<Element>(elements);
+    const observer = new MutationObserver(() => {
+      // Re-flatten the current assignment and write the fresh text into the
+      // shim. We deliberately do NOT call `_setupTriggerAria()` here — that
+      // would reinstall this very observer in a tight loop. The trigger's
+      // `aria-describedby` and the shim element are already wired; only the
+      // text mirror needs to be refreshed.
+      if (!this._lightDomDescription) return;
+      const contentSlot = this._contentSlot;
+      const fresh =
+        contentSlot
+          ?.assignedElements()
+          .map((el) => el.textContent)
+          .join(' ')
+          .trim() ?? '';
+      if (this._lightDomDescription.textContent !== fresh) {
+        this._lightDomDescription.textContent = fresh;
+      }
+    });
+    for (const el of unique) {
+      observer.observe(el, {
+        characterData: true,
+        subtree: true,
+        childList: true,
+      });
+    }
+    this._contentSlotTextObserver = observer;
   }
 
   // ─── Show/Hide ───
