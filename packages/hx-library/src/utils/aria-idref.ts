@@ -37,6 +37,16 @@
  * element-references API accepts any element regardless of root, so widening
  * the search closes that gap.
  *
+ * Codex round-16 P1: when the host is **slotted into** another component
+ * (light-DOM child of a shadow-root-bearing element), `host.getRootNode()`
+ * is still the document, so IDREF targets declared in the slot owner's
+ * shadow root are unreachable through the ancestor-shadow-host chain. We
+ * additionally walk `host.assignedSlot.getRootNode()` — that resolves to
+ * the slot owner's shadow root — and continue up that root's host chain so
+ * cross-shadow IDREF resolution works for the composed-tree slotting
+ * pattern. The walk is recursive: a slot owner that is itself slotted into
+ * another shadow tree contributes its own ancestor chain too.
+ *
  * Tokens that fail to resolve at every level are silently dropped — matching
  * native attribute-string platform behaviour where unresolved tokens are
  * ignored.
@@ -51,15 +61,7 @@ export function resolveIdrefTokens(host: Element, tokens: string | null): Elemen
   // then the top-level Document. Each id resolves at the first root that
   // owns it, mirroring how shadow-encapsulation-aware AT walks the tree.
   const roots: Array<Document | ShadowRoot> = [];
-  let current: Node | null = host.getRootNode();
-  while (current instanceof ShadowRoot) {
-    roots.push(current);
-    const shadowHost: Element | null = current.host ?? null;
-    current = shadowHost ? shadowHost.getRootNode() : null;
-  }
-  if (current instanceof Document) {
-    roots.push(current);
-  }
+  collectIdrefSearchRoots(host, roots);
   // If host is detached or in an unusual root, also try the top-level
   // ownerDocument as a defensive last resort.
   const ownerDoc = host.ownerDocument;
@@ -78,6 +80,78 @@ export function resolveIdrefTokens(host: Element, tokens: string | null): Elemen
     }
   }
   return out;
+}
+
+/**
+ * Walks the composed-tree ancestry of `start` and pushes every Document or
+ * ShadowRoot that could legitimately own an IDREF target into `roots` in the
+ * order they should be searched (closest scope first). The walk crosses two
+ * kinds of boundary:
+ *
+ *   1. A node sitting inside a ShadowRoot escapes via `root.host`.
+ *   2. A node assigned to a `<slot>` in another shadow tree escapes via
+ *      `node.assignedSlot` — the slot lives in the slot-owner's shadow root,
+ *      so we hop into that root and keep climbing from there.
+ *
+ * Both pathways are followed because either may apply at any level. A
+ * light-DOM custom element slotted into a shadow component has
+ * `getRootNode() === document` AND `assignedSlot !== null`, so the loop
+ * picks up document first, then crosses into the slot owner's shadow root
+ * via `assignedSlot`. From inside any shadow root we follow `root.host`
+ * outward AND, on every hop, check whether that host is itself slotted into
+ * yet another shadow tree. De-duplication is by reference identity.
+ *
+ * @internal
+ */
+function collectIdrefSearchRoots(start: Element, roots: Array<Document | ShadowRoot>): void {
+  const visited = new Set<Document | ShadowRoot>();
+
+  const pushRoot = (root: Document | ShadowRoot): void => {
+    if (visited.has(root)) return;
+    visited.add(root);
+    roots.push(root);
+  };
+
+  // Worklist of nodes whose composed-tree ancestry still needs to be walked.
+  // Each entry represents an entry point into a tree we haven't fully
+  // explored yet (the original host, plus any hosts we discover via the
+  // assignedSlot branch from inside a shadow ancestor).
+  const queue: Element[] = [start];
+  const queued = new Set<Element>([start]);
+
+  while (queue.length > 0) {
+    const startNode = queue.shift() as Element;
+    let currentNode: Element = startNode;
+    let currentRoot: Node | null = currentNode.getRootNode();
+
+    // First, if currentNode is in document scope but is slotted into a
+    // shadow root somewhere, queue the slot for separate exploration
+    // (its tree may contain IDREF targets we need to see).
+    const slotFromStart = (currentNode as HTMLElement).assignedSlot ?? null;
+    if (slotFromStart && !queued.has(slotFromStart)) {
+      queued.add(slotFromStart);
+      queue.push(slotFromStart);
+    }
+
+    while (currentRoot instanceof ShadowRoot) {
+      pushRoot(currentRoot);
+      const shadowHost: Element | null = currentRoot.host ?? null;
+      if (!shadowHost) break;
+      // The shadow host itself may be slotted into yet another component.
+      // Queue that branch so its tree is searched too.
+      const hostSlot = (shadowHost as HTMLElement).assignedSlot ?? null;
+      if (hostSlot && !queued.has(hostSlot)) {
+        queued.add(hostSlot);
+        queue.push(hostSlot);
+      }
+      currentNode = shadowHost;
+      currentRoot = shadowHost.getRootNode();
+    }
+
+    if (currentRoot instanceof Document) {
+      pushRoot(currentRoot);
+    }
+  }
 }
 
 /**
@@ -281,15 +355,12 @@ export function installAriaIdrefMirror(
 
   const computeRootsToObserve = (): Array<Document | ShadowRoot> => {
     const roots: Array<Document | ShadowRoot> = [];
-    let current: Node | null = host.getRootNode();
-    while (current instanceof ShadowRoot) {
-      roots.push(current);
-      const shadowHost: Element | null = current.host ?? null;
-      current = shadowHost ? shadowHost.getRootNode() : null;
-    }
-    if (current instanceof Document && !roots.includes(current)) {
-      roots.push(current);
-    }
+    // Use the same composed-tree walk as `resolveIdrefTokens` so the
+    // observer subscribes to every root the resolver can match — including
+    // slot-owner shadow roots when the host is light-DOM-slotted into
+    // another component (codex round-17 P1). Without this, a late id
+    // mutation inside the slot owner's shadow tree never fires resync.
+    collectIdrefSearchRoots(host, roots);
     const ownerDoc = host.ownerDocument;
     if (ownerDoc && !roots.includes(ownerDoc)) {
       roots.push(ownerDoc);
