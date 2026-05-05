@@ -496,9 +496,13 @@ describe('Keyboard Navigation Integration', () => {
   // hx-tabs
   // ---------------------------------------------------------------------------
   describe('hx-tabs', () => {
-    it('ArrowRight moves to the next tab and dispatches hx-tab-change', async () => {
+    // Group 5a host-canonical: focus targets the host (the inner [part="tab"]
+    // is presentational on the modern path). Activation defaults to "manual";
+    // these integration tests pin `activation="automatic"` because they
+    // assert that arrow keys both move focus AND fire `hx-tab-change`.
+    it('ArrowRight moves to the next tab and dispatches hx-tab-change (automatic)', async () => {
       const el = await fixture<HelixTabs>(`
-        <hx-tabs>
+        <hx-tabs activation="automatic">
           <hx-tab slot="tab" panel="one">Tab 1</hx-tab>
           <hx-tab slot="tab" panel="two">Tab 2</hx-tab>
           <hx-tab-panel name="one">Panel 1</hx-tab-panel>
@@ -507,9 +511,7 @@ describe('Keyboard Navigation Integration', () => {
       `);
       await el.updateComplete;
       const firstTab = el.querySelector<HTMLElement>('hx-tab')!;
-      const firstTabBtn = firstTab.shadowRoot?.querySelector<HTMLButtonElement>('button');
-      expect(firstTabBtn).toBeTruthy();
-      firstTabBtn!.focus();
+      firstTab.focus();
       const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(
         el,
         'hx-tab-change',
@@ -520,9 +522,9 @@ describe('Keyboard Navigation Integration', () => {
       expect(event.detail.index).toBe(1);
     });
 
-    it('ArrowLeft wraps back to previous tab', async () => {
+    it('ArrowLeft wraps back to previous tab (automatic)', async () => {
       const el = await fixture<HelixTabs>(`
-        <hx-tabs>
+        <hx-tabs activation="automatic">
           <hx-tab slot="tab" panel="one">Tab 1</hx-tab>
           <hx-tab slot="tab" panel="two">Tab 2</hx-tab>
           <hx-tab-panel name="one">Panel 1</hx-tab-panel>
@@ -532,11 +534,11 @@ describe('Keyboard Navigation Integration', () => {
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll<HTMLElement>('hx-tab'));
       // Activate second tab first so ArrowLeft has somewhere to go back to
-      const secondTabBtn = tabs[1].shadowRoot?.querySelector<HTMLButtonElement>('button');
-      expect(secondTabBtn).toBeTruthy();
-      secondTabBtn!.click();
+      const secondPart = tabs[1].shadowRoot?.querySelector<HTMLElement>('[part="tab"]');
+      expect(secondPart).toBeTruthy();
+      secondPart!.click();
       await el.updateComplete;
-      secondTabBtn!.focus();
+      tabs[1].focus();
       const eventPromise = oneEvent<CustomEvent<{ tabId: string; index: number }>>(
         el,
         'hx-tab-change',

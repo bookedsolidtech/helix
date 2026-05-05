@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-06T01:02:37.141Z",
+  "generatedAt": "2026-05-05T15:36:21.392Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -11459,17 +11459,6 @@
             "true"
           ],
           "default": "false"
-        },
-        {
-          "figmaAxisName": "loading",
-          "cemAttribute": "loading",
-          "cemFieldName": "loading",
-          "type": "boolean",
-          "values": [
-            "false",
-            "true"
-          ],
-          "default": "false"
         }
       ],
       "textProperties": [
@@ -11516,10 +11505,6 @@
         {
           "description": "The icon container span wrapping the default slot.",
           "name": "icon"
-        },
-        {
-          "description": "The loading spinner SVG element shown when `loading` is true.",
-          "name": "spinner"
         }
       ],
       "events": [
@@ -11996,12 +11981,6 @@
           "cemAttribute": "rel",
           "type": "text",
           "defaultValue": "undefined"
-        },
-        {
-          "figmaPropertyName": "externalLabel",
-          "cemAttribute": "external-label",
-          "type": "text",
-          "defaultValue": "(opens in new tab)"
         }
       ],
       "slots": [
@@ -12769,7 +12748,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-menu-item",
       "figmaPagePlacement": "4a",
-      "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting.",
+      "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting. Use `aria-label` on the parent `hx-menu` to…",
       "tier": "atom",
       "variantAxes": [
         {
@@ -12891,18 +12870,18 @@
           "description": "Dispatched when the item is activated via click, Enter, or Space."
         },
         {
+          "name": "hx-item-submenu-open",
           "type": {
             "text": "CustomEvent<{item: HelixMenuItem}>"
           },
-          "description": "Dispatched when ArrowRight is pressed on an item with a submenu.",
-          "name": "hx-item-submenu-open"
+          "description": "Dispatched when ArrowRight is pressed on an item with a submenu."
         },
         {
+          "name": "hx-item-submenu-close",
           "type": {
             "text": "CustomEvent<{item: HelixMenuItem}>"
           },
-          "description": "Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus.",
-          "name": "hx-item-submenu-close"
+          "description": "Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus."
         }
       ],
       "cssProperties": [
@@ -21725,7 +21704,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-tab-panel",
       "figmaPagePlacement": "4a",
-      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`.",
+      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`. Group 5a host-canonical: `role=\"tabpanel\"` lives on the host via `_internals.role`. The host carries the canonical AT…",
       "tier": "atom",
       "variantAxes": [],
       "textProperties": [
@@ -22064,7 +22043,7 @@
             "manual",
             "automatic"
           ],
-          "default": "automatic"
+          "default": "manual"
         }
       ],
       "textProperties": [
@@ -26289,7 +26268,7 @@
           "name": "item"
         },
         {
-          "description": "The interactive item row (presentational on the modern path; carries role=\"treeitem\" + aria-* on the legacy fallback).",
+          "description": "The interactive item row (contains expand icon, icon slot, and label).",
           "name": "row"
         },
         {
@@ -26301,7 +26280,7 @@
           "name": "label"
         },
         {
-          "description": "The children container (always carries role=\"group\").",
+          "description": "The children container.",
           "name": "children"
         }
       ],
@@ -26445,7 +26424,7 @@
       ],
       "cssParts": [
         {
-          "description": "The tree container element with role=\"tree\" (legacy fallback path) or the inner shadow surface (modern path; role lives on the host).",
+          "description": "The tree container element with role=\"tree\".",
           "name": "tree"
         }
       ],
