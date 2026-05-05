@@ -802,6 +802,112 @@ describe('hx-menu-item', () => {
     });
   });
 
+  describe('Nested submenu origin guard (codex push-gate round-5 P1)', () => {
+    // Regression: clicks/keys on a nested submenu's child item bubble through
+    // the parent hx-menu-item host. Without an origin guard, the parent's
+    // host-bound click/keydown handlers activated on Child events too —
+    // double `hx-item-select` (wrong value) and wrong-level submenu re-open.
+    // Fix: `_isOwnEvent()` walks composedPath and returns true only when the
+    // closest hx-menu-item ancestor of the original target is `this`.
+
+    it('click on a nested child item emits a single hx-item-select with the child value', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-menu>
+      `);
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      const events: CustomEvent<{ value: string }>[] = [];
+      el.addEventListener('hx-item-select', (e) =>
+        events.push(e as CustomEvent<{ value: string }>),
+      );
+
+      // Click the inner element of the child host directly. Pre-fix this
+      // would bubble to Parent's click handler and emit a SECOND
+      // hx-item-select with detail.value === 'parent'.
+      const childInner = shadowQuery<HTMLElement>(child, '.menu-item')!;
+      childInner.click();
+      await child.updateComplete;
+      await parent.updateComplete;
+
+      expect(events).toHaveLength(1);
+      expect(events[0].detail.value).toBe('child');
+    });
+
+    it('Enter on a focused nested child item emits a single hx-item-select with the child value', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-menu>
+      `);
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      // Open the submenu and move focus to the child.
+      parent.focus();
+      await userEvent.keyboard('{ArrowRight}');
+      await parent.updateComplete;
+      child.focus();
+      await child.updateComplete;
+
+      const events: CustomEvent<{ value: string }>[] = [];
+      el.addEventListener('hx-item-select', (e) =>
+        events.push(e as CustomEvent<{ value: string }>),
+      );
+
+      await userEvent.keyboard('{Enter}');
+      await child.updateComplete;
+      await parent.updateComplete;
+
+      // Pre-fix Parent would re-handle Enter via the bubbled keydown and
+      // emit a second hx-item-select with detail.value === 'parent'.
+      expect(events).toHaveLength(1);
+      expect(events[0].detail.value).toBe('child');
+    });
+
+    it('does not regress standalone activation (single hx-menu-item)', async () => {
+      const el = await fixture<HelixMenuItem>(
+        '<hx-menu-item value="solo">Solo</hx-menu-item>',
+      );
+      const events: CustomEvent<{ value: string }>[] = [];
+      el.addEventListener('hx-item-select', (e) =>
+        events.push(e as CustomEvent<{ value: string }>),
+      );
+
+      // Click the inner element — its composedPath walks up through the
+      // host's own shadow tree to `this`, so `_isOwnEvent` returns true.
+      const inner = shadowQuery<HTMLElement>(el, '.menu-item')!;
+      inner.click();
+      await el.updateComplete;
+
+      expect(events).toHaveLength(1);
+      expect(events[0].detail.value).toBe('solo');
+
+      // Keyboard activation must also still work.
+      el.focus();
+      await userEvent.keyboard('{Enter}');
+      await el.updateComplete;
+      expect(events).toHaveLength(2);
+      expect(events[1].detail.value).toBe('solo');
+    });
+  });
+
   describe('Slots', () => {
     it('default slot renders label text', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item>Edit Record</hx-menu-item>');

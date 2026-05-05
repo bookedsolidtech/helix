@@ -382,8 +382,43 @@ export class HelixMenuItem extends HelixElement {
     );
   }
 
+  /**
+   * Origin guard for host-bound click/keydown handlers. Returns `true` only
+   * when the event originated on THIS host (its shadow tree) and not on a
+   * nested `hx-menu-item` projected into the `submenu` slot.
+   *
+   * Codex push-gate round-5 P1: nested submenu items are slotted descendants
+   * in the parent's light DOM. Click/keydown events from a Child item bubble
+   * through the parent host's listeners — without this guard, selecting Child
+   * also activates Parent (double `hx-item-select`) and Enter/Space/ArrowRight
+   * on Child re-trigger Parent's handlers (wrong-level activation, second
+   * submenu reopen).
+   *
+   * Walks `composedPath()` and returns the closest `hx-menu-item` ancestor of
+   * the original target; the event is "ours" iff that ancestor is `this`.
+   * Mirrors the inner-vs-host origin discipline used by `hx-checkbox`,
+   * `hx-switch`, and `hx-toggle-button`'s host handlers (`path[0] !== this`)
+   * but adapts for hx-menu-item's nested-host case where path[0] is the
+   * deepest inner element of a slotted child's own shadow tree.
+   * @internal
+   */
+  private _isOwnEvent(e: Event): boolean {
+    const path = e.composedPath();
+    for (const node of path) {
+      if (!(node instanceof Element)) continue;
+      if (node.tagName === 'HX-MENU-ITEM') {
+        return node === this;
+      }
+    }
+    return false;
+  }
+
   /** @internal */
   private _handleClick = (e: MouseEvent): void => {
+    // Codex push-gate round-5 finding 1 (P1): clicks on a nested submenu's
+    // child item bubble through this host. Without an origin guard, both
+    // Child and Parent activate — wrong value emitted, possibly closes menu.
+    if (!this._isOwnEvent(e)) return;
     if (this.disabled || this.loading) {
       e.preventDefault();
       e.stopPropagation();
@@ -394,6 +429,13 @@ export class HelixMenuItem extends HelixElement {
 
   /** @internal */
   private _handleKeyDown = (e: KeyboardEvent): void => {
+    // Codex push-gate round-5 finding 2 (P1): Enter / Space / ArrowRight
+    // dispatched at a focused Child item inside an open submenu bubble
+    // through this host. Without an origin guard, Parent treats them as its
+    // own — double activation and wrong-level submenu reopen. The original
+    // JSDoc on this handler described this guard but never enforced it.
+    if (!this._isOwnEvent(e)) return;
+
     // Only handle keys whose target is THIS host (or its shadow). The
     // parent hx-menu's keydown handler runs first via bubbling and may
     // already have moved focus; we ignore events that aren't aimed at us.
