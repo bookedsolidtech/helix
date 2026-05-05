@@ -577,4 +577,144 @@ describe('hx-tooltip', () => {
       el.remove();
     });
   });
+
+  // ─── Slotted content text observer (group-4 round-1) ───
+
+  describe('Slotted content text observer', () => {
+    it('in-place text mutation on the slotted content updates the document-scope shim', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button id="tt-trigger-1">T</button><span slot="content" id="tt-content-1">Initial tip</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+
+      const trigger = el.querySelector<HTMLElement>('#tt-trigger-1')!;
+      const descId = trigger.getAttribute('aria-describedby');
+      expect(descId).toBeTruthy();
+      let descSpan = descId ? document.getElementById(descId) : null;
+      expect(descSpan?.textContent).toBe('Initial tip');
+
+      // Simulate framework-style in-place text rewrite (Vue / React keyed text rerender).
+      const slotted = el.querySelector<HTMLElement>('#tt-content-1')!;
+      slotted.textContent = 'Updated tip';
+      // MutationObserver runs in the next microtask.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      descSpan = descId ? document.getElementById(descId) : null;
+      expect(descSpan?.textContent).toBe('Updated tip');
+    });
+
+    it('subtree text mutation (nested element) re-syncs the shim', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>T</button><span slot="content"><strong id="tt-nested-1">Bold</strong> rest</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+
+      const trigger = el.querySelector<HTMLElement>('button')!;
+      const descId = trigger.getAttribute('aria-describedby');
+      const initialDescSpan = descId ? document.getElementById(descId) : null;
+      expect(initialDescSpan?.textContent).toContain('Bold');
+
+      const nested = el.querySelector<HTMLElement>('#tt-nested-1')!;
+      nested.textContent = 'Heavy';
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      const descSpan = descId ? document.getElementById(descId) : null;
+      expect(descSpan?.textContent).toContain('Heavy');
+    });
+
+    it('shim is removed from document.body on disconnect', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>T</button><span slot="content" id="tt-content-2">Cleanup tip</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+
+      const trigger = el.querySelector<HTMLElement>('button')!;
+      const descId = trigger.getAttribute('aria-describedby')!;
+      // Shim must exist BEFORE disconnect.
+      expect(document.getElementById(descId)).toBeTruthy();
+
+      el.remove();
+      // Disconnect cleanup runs synchronously inside `disconnectedCallback`.
+      expect(document.getElementById(descId)).toBeNull();
+    });
+
+    it('multiple tooltips have unique shim ids', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <hx-tooltip><button>A</button><span slot="content">Tip A</span></hx-tooltip>
+        <hx-tooltip><button>B</button><span slot="content">Tip B</span></hx-tooltip>
+      `;
+      document.body.appendChild(wrapper);
+      const tooltips = wrapper.querySelectorAll<HelixTooltip>('hx-tooltip');
+      for (const t of tooltips) {
+        await t.updateComplete;
+      }
+      const triggers = wrapper.querySelectorAll<HTMLButtonElement>('button');
+      const idA = triggers[0]?.getAttribute('aria-describedby');
+      const idB = triggers[1]?.getAttribute('aria-describedby');
+      expect(idA).toBeTruthy();
+      expect(idB).toBeTruthy();
+      expect(idA).not.toBe(idB);
+      // Each shim is unique in document.body.
+      expect(document.getElementById(idA!)?.textContent).toBe('Tip A');
+      expect(document.getElementById(idB!)?.textContent).toBe('Tip B');
+      wrapper.remove();
+    });
+
+    it('cross-shadow hosting: tooltip inside a host shadow root still creates a document-scope shim', async () => {
+      // Define a one-off host element with a shadow root that contains hx-tooltip.
+      class TooltipHost extends HTMLElement {
+        connectedCallback(): void {
+          if (this.shadowRoot) return;
+          const root = this.attachShadow({ mode: 'open' });
+          root.innerHTML =
+            '<hx-tooltip><button>Inner</button><span slot="content">Nested tip</span></hx-tooltip>';
+        }
+      }
+      if (!customElements.get('tooltip-host-x')) {
+        customElements.define('tooltip-host-x', TooltipHost);
+      }
+      const host = document.createElement('tooltip-host-x');
+      document.body.appendChild(host);
+      const tooltip = host.shadowRoot!.querySelector<HelixTooltip>('hx-tooltip')!;
+      await tooltip.updateComplete;
+      const trigger = host.shadowRoot!.querySelector<HTMLElement>('button')!;
+      const descId = trigger.getAttribute('aria-describedby')!;
+      // Shim lives in document.body even when the tooltip is nested in a shadow root.
+      const descSpan = document.getElementById(descId);
+      expect(descSpan).toBeTruthy();
+      expect(descSpan?.textContent).toBe('Nested tip');
+      host.remove();
+      // After disconnect, the shim is gone.
+      expect(document.getElementById(descId)).toBeNull();
+    });
+
+    it('observer is reinstalled on slotchange — replaced content still tracked', async () => {
+      const el = await fixture<HelixTooltip>(
+        '<hx-tooltip><button>T</button><span slot="content">Original</span></hx-tooltip>',
+      );
+      await el.updateComplete;
+      const trigger = el.querySelector<HTMLElement>('button')!;
+      const descId = trigger.getAttribute('aria-describedby')!;
+
+      // Replace the slotted content element entirely (slotchange fires).
+      const oldContent = el.querySelector<HTMLElement>('span[slot="content"]')!;
+      oldContent.remove();
+      const newContent = document.createElement('span');
+      newContent.setAttribute('slot', 'content');
+      newContent.textContent = 'Replaced';
+      el.appendChild(newContent);
+      // Allow slotchange + sync to settle.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+      let descSpan = document.getElementById(descId);
+      expect(descSpan?.textContent).toBe('Replaced');
+
+      // Now mutate the NEW content's text in place — the observer must follow the new node.
+      newContent.textContent = 'Replaced again';
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      descSpan = document.getElementById(descId);
+      expect(descSpan?.textContent).toBe('Replaced again');
+    });
+  });
 });

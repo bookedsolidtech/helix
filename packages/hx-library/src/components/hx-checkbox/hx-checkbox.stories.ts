@@ -956,29 +956,42 @@ export const KeyboardToggle: Story = {
   },
   play: async ({ canvasElement }) => {
     const { host } = getCheckboxParts(canvasElement);
-    // Get the native checkbox input inside shadow DOM; focus it directly
-    // so keyboard events (Space) are dispatched to the correct element
-    const nativeInput = host.shadowRoot?.querySelector('.checkbox__input') as HTMLInputElement;
-    if (!nativeInput) throw new Error('.checkbox__input not found');
+    const innerInput = host.shadowRoot?.querySelector<HTMLInputElement>('input.checkbox__input');
+    if (!innerInput) throw new Error('input.checkbox__input not found in shadow root');
 
-    // Focus the native input directly
-    nativeInput.focus();
-    await nextFrame();
+    // Round-12 host-canonical contract: on engines with IDL ref support
+    // (Chromium 134+, the storybook test runner) the host owns role=checkbox
+    // and tabindex=0; the inner <input> is aria-hidden + tabindex=-1 with its
+    // native click + change suppressed. Focus the host so the assertion proves
+    // the host is the real keyboard target, dispatch keydown to exercise
+    // `_handleHostKeyDown`, and assert dispatch returned false to confirm
+    // the handler called preventDefault (scroll-suppression contract).
+    host.focus();
+    await expect(document.activeElement).toBe(host);
 
-    // Initially unchecked
+    // Inner-input invariants backing the host-canonical claim above.
+    await expect(innerInput.getAttribute('aria-hidden')).toBe('true');
+    await expect(innerInput.tabIndex).toBe(-1);
+
+    const dispatchSpace = (): boolean =>
+      host.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }),
+      );
+
     await expect(host.checked).toBe(false);
+    await expect(innerInput.checked).toBe(false);
 
-    // Press Space to toggle — fires on the native input which has keyboard focus
-    await userEvent.keyboard(' ');
+    await expect(dispatchSpace()).toBe(false);
     await nextFrame();
 
     await expect(host.checked).toBe(true);
+    await expect(innerInput.checked).toBe(true);
 
-    // Press Space again to uncheck
-    await userEvent.keyboard(' ');
+    await expect(dispatchSpace()).toBe(false);
     await nextFrame();
 
     await expect(host.checked).toBe(false);
+    await expect(innerInput.checked).toBe(false);
   },
 };
 

@@ -1,10 +1,22 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HxRadioGroup } from './hx-radio-group.js';
 import type { HxRadio } from './hx-radio.js';
 import './index.js';
 
 afterEach(cleanup);
+
+/**
+ * Strongly-typed harness for the private internals the suite reaches into.
+ * Codex round-7 finding `#4` replaced scattered `as any` casts with this
+ * single seam — TypeScript strict mode keeps holding the line on the rest
+ * of the suite.
+ */
+type RadioGroupTestHarness = HxRadioGroup & {
+  _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
+};
 
 describe('hx-radio-group', () => {
   // ─── Rendering: Group (5) ───
@@ -49,14 +61,18 @@ describe('hx-radio-group', () => {
       expect(legend).toBeNull();
     });
 
-    it('has role="radiogroup" on shadow fieldset', async () => {
+    it('exposes role="radiogroup" on host via ElementInternals (codex aria-group-2)', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('radiogroup');
+      // Inner fieldset is presentation-only; its role attribute is removed
+      // so AT does not see two stacked radiogroup roles.
       const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.getAttribute('role')).toBe('radiogroup');
+      expect(fieldset?.getAttribute('role')).toBe('presentation');
     });
   });
 
@@ -240,14 +256,17 @@ describe('hx-radio-group', () => {
       expect(helpText?.textContent?.trim()).toBe('Select one option');
     });
 
-    it('error hides help text', async () => {
+    it('error hides help text (visually hidden, kept in DOM for stable describedBy)', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" error="Error" help-text="Help">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const helpText = shadowQuery(el, '.fieldset__help-text');
-      expect(helpText).toBeNull();
+      const helpText = shadowQuery<HTMLElement>(el, '.fieldset__help-text');
+      // Persistent in the DOM so the describedBy chain remains stable across
+      // error transitions, but visually hidden via the `hidden` attribute.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -598,19 +617,69 @@ describe('hx-radio-group', () => {
       `);
       expect(el.validity.valueMissing).toBe(true);
     });
+
+    // Codex round-35 (CR major + Low #4) + round-36 (Low #4): the
+    // setValidity() anchor must be a focusable interactive radio so the UA
+    // can route validation UI / error recovery to the actual control surface.
+    // The presentational .fieldset__group (role="none") is not focusable; a
+    // disabled radio is not focusable either. These tests capture the third
+    // argument to setValidity() directly so the chain order is locked in
+    // (round-35 fix would have regressed silently if we only asserted
+    // `checkValidity()`).
+    it('setValidity anchor falls through to the first enabled radio when nothing is checked', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Pick" required>
+          <hx-radio value="a" label="A" disabled></hx-radio>
+          <hx-radio value="b" label="B"></hx-radio>
+        </hx-radio-group>
+      `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const setValiditySpy = vi.spyOn(internals, 'setValidity');
+      // Trigger a fresh setValidity by re-asserting required.
+      el.required = false;
+      await el.updateComplete;
+      el.required = true;
+      await el.updateComplete;
+      const lastCall = setValiditySpy.mock.calls.at(-1);
+      expect(lastCall?.[0]).toEqual({ valueMissing: true });
+      // First radio is disabled — anchor must skip it and pick the second.
+      expect(lastCall?.[2]).toBe(el.querySelector('hx-radio[value="b"]'));
+      expect(lastCall?.[2]).not.toBe(el.querySelector('hx-radio[value="a"]'));
+    });
+
+    it('setValidity anchor never falls through to the presentational group when an enabled radio exists', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Pick" required>
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const setValiditySpy = vi.spyOn(internals, 'setValidity');
+      el.required = false;
+      await el.updateComplete;
+      el.required = true;
+      await el.updateComplete;
+      const lastCall = setValiditySpy.mock.calls.at(-1);
+      expect(lastCall?.[2]).toBe(el.querySelector('hx-radio[value="a"]'));
+      // The presentational group div carries role="none" and is unfocusable.
+      const groupDiv = (el.shadowRoot as ShadowRoot).querySelector('.fieldset__group');
+      expect(lastCall?.[2]).not.toBe(groupDiv);
+    });
   });
 
   // ─── Accessibility (4) ───
 
   describe('Accessibility', () => {
-    it('shadow fieldset has role="radiogroup"', async () => {
+    it('host carries role="radiogroup" via ElementInternals; inner fieldset is presentation', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('radiogroup');
       const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.getAttribute('role')).toBe('radiogroup');
+      expect(fieldset?.getAttribute('role')).toBe('presentation');
     });
 
     it('legend renders label text for accessible grouping', async () => {
@@ -635,66 +704,124 @@ describe('hx-radio-group', () => {
       expect(input?.getAttribute('aria-hidden')).toBe('true');
     });
 
-    it('sets aria-required on radiogroup when required', async () => {
+    it('sets host ariaRequired via internals when required', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" required>
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.getAttribute('aria-required')).toBe('true');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).toBe('true');
     });
 
-    it('does not set aria-required when not required', async () => {
+    it('does not set host ariaRequired="true" when not required', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      expect(fieldset?.hasAttribute('aria-required')).toBe(false);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).not.toBe('true');
     });
 
-    it('sets aria-labelledby pointing to legend id', async () => {
+    // Codex round-35 (medium) follow-up (Low #5): hasEffectiveLabelledBy
+    // contract. Broken aria-labelledby tokens must NOT erase the visible
+    // legend on either render path — they should fall through to `label`.
+    it('keeps the legend accessible name when aria-labelledby points to a missing id', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Topics" aria-labelledby="rg-missing-target">
+          <hx-radio value="a" label="A"></hx-radio>
+        </hx-radio-group>
+      `);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs) {
+        const legend = shadowQuery(el, 'legend');
+        expect(refs).toContain(legend);
+      } else {
+        expect(internals.ariaLabel).toBe('Topics');
+        expect(el.getAttribute('aria-labelledby')).toBeNull();
+      }
+    });
+
+    it('host ariaLabelledByElements points to the visible legend (when no consumer aria-labelledby)', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="My Group">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
       const legend = shadowQuery(el, 'legend');
-      const labelledBy = fieldset?.getAttribute('aria-labelledby');
-      expect(labelledBy).toBeTruthy();
-      expect(legend?.id).toBe(labelledBy);
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs) {
+        // IDL element references — modern browsers.
+        expect(refs).toContain(legend);
+      } else {
+        // No-IDL-ref fallback: host ariaLabel mirrors the label property.
+        expect(internals.ariaLabel).toContain('My Group');
+      }
     });
 
-    it('sets aria-describedby to error id when error is present', async () => {
+    it('host ariaDescribedByElements references error wrapper when error is set', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" error="Required field">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby');
-      // WCAG 1.3.1: the _errorId is on the persistent wrapper div surrounding the error
-      // slot, not on the inner .fieldset__error element, so the ID stays stable whether
-      // error content comes from the slot or the property.
-      const errorWrapper = describedBy ? el.shadowRoot?.getElementById(describedBy) : null;
-      expect(describedBy).toBeTruthy();
-      expect(errorWrapper).toBeTruthy();
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const errorWrapper = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(errorWrapper);
+      } else {
+        // No-IDL-ref fallback (round-19 contract): help/error TEXT mirrors
+        // through `internals.ariaDescription`; the host `aria-describedby`
+        // attribute carries ONLY consumer-supplied tokens, so the shadow
+        // wrapper id MUST NOT appear there.
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Required field');
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).not.toContain(errorWrapper.id);
+      }
     });
 
-    it('sets aria-describedby to help-text id when help text is present', async () => {
+    it('host ariaDescribedByElements references help-text wrapper when help text is set', async () => {
       const el = await fixture<HxRadioGroup>(`
         <hx-radio-group label="Test" help-text="Select one">
           <hx-radio value="a" label="A"></hx-radio>
         </hx-radio-group>
       `);
-      const fieldset = shadowQuery(el, 'fieldset');
-      const describedBy = fieldset?.getAttribute('aria-describedby');
-      const helpText = shadowQuery(el, '.fieldset__help-text');
-      expect(describedBy).toBeTruthy();
-      expect(helpText?.id).toBe(describedBy);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const helpText = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(helpText);
+      } else {
+        // No-IDL-ref fallback (round-19 contract): help/error TEXT mirrors
+        // through `internals.ariaDescription`; the host `aria-describedby`
+        // attribute carries ONLY consumer-supplied tokens, so the shadow
+        // wrapper id MUST NOT appear there.
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Select one');
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).not.toContain(helpText.id);
+      }
     });
 
     it('checked radio has checked attribute reflected', async () => {
@@ -1035,6 +1162,465 @@ describe('hx-radio-group', () => {
       const assigned = slot.assignedElements();
       expect(assigned).toHaveLength(1);
       expect((assigned[0] as HTMLElement).textContent).toBe('Choose one');
+    });
+  });
+
+  // ─── ARIA delegation: host-elevated semantics (codex aria-group-2) ───
+
+  describe('ARIA delegation: host semantics', () => {
+    it('host carries role="radiogroup" via ElementInternals', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.role).toBe('radiogroup');
+    });
+
+    it('host ariaLabel mirrors the visible label so cross-shadow naming works', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Notification Channel"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaLabel).toBe('Notification Channel');
+    });
+
+    it('host aria-label attribute wins over the visible label', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Internal" aria-label="Public name"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaLabel).toBe('Public name');
+    });
+
+    it('host ariaOrientation reflects horizontal orientation', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" orientation="horizontal"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaOrientation).toBe('horizontal');
+      // Inner fieldset also exposes the attribute so AT walking the shadow
+      // tree sees a consistent orientation.
+      const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
+      expect(fieldset.getAttribute('aria-orientation')).toBe('horizontal');
+    });
+
+    it('host ariaInvalid is driven by validity, not visible error content', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" required><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaInvalid).toBe('true');
+    });
+
+    it('persistent help-text container renders when only the slot has content', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color"><hx-radio value="a" label="A"></hx-radio><span slot="help-text">Pick wisely</span></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv.hasAttribute('hidden')).toBe(false);
+      // Host carries the describedBy reference via internals; inner fieldset
+      // does not duplicate it.
+      const internals = (el as RadioGroupTestHarness)._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs).toContain(helpDiv);
+      } else {
+        // No-IDL-ref fallback (round-19 contract): help/error TEXT mirrors
+        // through `internals.ariaDescription`; the host `aria-describedby`
+        // attribute carries ONLY consumer-supplied tokens, so the shadow
+        // wrapper id MUST NOT appear there.
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Pick wisely');
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).not.toContain(helpDiv.id);
+      }
+    });
+
+    it('host ariaDescribedByElements references help text in the help-only state', async () => {
+      // Codex round-16 P2: in the help-only state the help element appears
+      // in the describedby chain. The help+error state drops help (covered
+      // by the next test).
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" help-text="Hint"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs.indexOf(helpDiv)).toBeGreaterThanOrEqual(0);
+      } else {
+        // No-IDL-ref fallback (round-19 contract): help/error TEXT mirrors
+        // through `internals.ariaDescription`; the host `aria-describedby`
+        // attribute carries ONLY consumer-supplied tokens, so the shadow
+        // wrapper id MUST NOT appear there.
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Hint');
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).not.toContain(helpDiv.id);
+      }
+    });
+
+    it('drops help-text from describedBy chain when an error is active (round-16 P2)', async () => {
+      // Codex round-16 P2: when both help and error are present, the help
+      // wrapper is hidden — referencing it in host semantics would have AT
+      // announce stale guidance ahead of the validation error.
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color" help-text="Hint" error="Required"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.fieldset__help-text')!;
+      const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error')!;
+      expect(helpDiv.hasAttribute('hidden')).toBe(true);
+      expect(errorDiv.hasAttribute('hidden')).toBe(false);
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs) {
+        expect(refs.indexOf(errorDiv)).toBeGreaterThanOrEqual(0);
+        expect(refs.indexOf(helpDiv)).toBe(-1);
+      } else {
+        // No-IDL-ref fallback (round-19 contract): help/error TEXT mirrors
+        // through `internals.ariaDescription`; the host `aria-describedby`
+        // attribute carries ONLY consumer-supplied tokens, so the shadow
+        // wrapper ids MUST NOT appear there. Help is hidden when error is
+        // active, so its text must be absent from `ariaDescription` too.
+        const ariaDescription =
+          (internals as ElementInternals & { ariaDescription: string | null }).ariaDescription ??
+          '';
+        expect(ariaDescription).toContain('Required');
+        expect(ariaDescription).not.toContain('Hint');
+        const tokens = el.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+        expect(tokens).not.toContain(errorDiv.id);
+        expect(tokens).not.toContain(helpDiv.id);
+      }
+    });
+
+    it('error live region is persistent in the shadow tree', async () => {
+      const el = await fixture<HxRadioGroup>(
+        `<hx-radio-group label="Color"><hx-radio value="a" label="A"></hx-radio></hx-radio-group>`,
+      );
+      const errorDiv = shadowQuery<HTMLElement>(el, '.fieldset__error');
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('hidden')).toBe(true);
+    });
+  });
+
+  // ─── Codex round-2 finding #3: slot reconciliation (3) ───
+
+  describe('Slot mutations: value/formValue/validity reconciliation (round-2 F3)', () => {
+    it('clears value, formValue, and re-validates when the selected radio is removed', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" name="color" required>
+          <hx-radio value="red" label="Red"></hx-radio>
+          <hx-radio value="blue" label="Blue"></hx-radio>
+        </hx-radio-group>
+      `);
+      // Select 'red' through the API.
+      el.value = 'red';
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.validity.valid).toBe(true);
+
+      // Remove the currently-selected radio.
+      const red = el.querySelector('hx-radio[value="red"]') as HxRadio;
+      red.remove();
+      // Wait for slotchange + reactive cycle.
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await el.updateComplete;
+
+      // value clears, validity re-runs (required + no value = invalid).
+      expect(el.value).toBe('');
+      expect(internals.validity.valid).toBe(false);
+      expect(internals.validity.valueMissing).toBe(true);
+    });
+
+    it('adopts a newly-added pre-checked radio (value, formValue, validity)', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" name="color" required>
+          <hx-radio value="red" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      const internals = (el as RadioGroupTestHarness)._internals;
+      // No selection → invalid.
+      expect(el.value).toBe('');
+      expect(internals.validity.valid).toBe(false);
+
+      // Inject a new radio that is already checked.
+      const blue = document.createElement('hx-radio') as HxRadio;
+      blue.setAttribute('value', 'blue');
+      blue.setAttribute('label', 'Blue');
+      blue.checked = true;
+      el.appendChild(blue);
+
+      // Wait for slotchange + reactive cycle.
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await el.updateComplete;
+
+      expect(el.value).toBe('blue');
+      expect(internals.validity.valid).toBe(true);
+    });
+
+    it('treats the currently-selected radio as not-selected when it becomes disabled', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" name="color" required>
+          <hx-radio value="red" label="Red"></hx-radio>
+          <hx-radio value="blue" label="Blue"></hx-radio>
+        </hx-radio-group>
+      `);
+      el.value = 'red';
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.validity.valid).toBe(true);
+
+      // Disable the selected radio, then trigger slotchange by re-inserting
+      // (the F3 reconciler runs on slot mutations — this simulates a parent
+      // template re-render that swaps a now-disabled child back in).
+      const red = el.querySelector('hx-radio[value="red"]') as HxRadio;
+      red.disabled = true;
+      red.remove();
+      el.insertBefore(red, el.firstChild);
+
+      await el.updateComplete;
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      await el.updateComplete;
+
+      // The disabled radio is no longer treated as the selection — the
+      // group's `value` collapses to '' and required-validity fails.
+      expect(el.value).toBe('');
+      expect(internals.validity.valid).toBe(false);
+    });
+  });
+
+  // ─── Codex round-19 P1: single accessible-container invariant (4) ───
+
+  describe('Single accessible-container invariant (round-19 P1)', () => {
+    /**
+     * Forces the no-IDL-ref fallback branch so the assertions below exercise
+     * the same code path a legacy engine (e.g. Firefox today) would take.
+     * Mirrors the `hx-checkbox` test harness pattern.
+     */
+    async function forceFallbackPath(el: HxRadioGroup): Promise<void> {
+      const harness = el as RadioGroupTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('modern path: host owns role="radiogroup", inner fieldset is presentation', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      const internals = (el as RadioGroupTestHarness)._internals;
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(internals.role).toBe('radiogroup');
+      expect(fieldset.getAttribute('role')).toBe('presentation');
+    });
+
+    it('fallback path: host still owns role="radiogroup", inner fieldset stays presentation', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      // Single accessible container — the host. AT must NOT see a nested
+      // host radiogroup → inner group → controls hierarchy.
+      expect(internals.role).toBe('radiogroup');
+      expect(fieldset.getAttribute('role')).toBe('presentation');
+    });
+
+    it('fallback path: inner fieldset has no aria-labelledby / aria-describedby / aria-required / aria-invalid', async () => {
+      // With help text + error + required, prior rounds spliced shadow
+      // help/error ids onto the inner fieldset; round-19 drops that splice
+      // entirely (shadow IDREFs cannot resolve to consumer light DOM, so
+      // merging them was always broken on the fallback path).
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" help-text="Hint" error="Required" required>
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-required')).toBe(false);
+      expect(fieldset.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('fallback path: consumer aria-labelledby / aria-describedby still mirror onto host', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'rg-ext-label';
+      labelHost.textContent = 'External Label';
+      const helpHost = document.createElement('span');
+      helpHost.id = 'rg-ext-help';
+      helpHost.textContent = 'External Help';
+      container.appendChild(labelHost);
+      container.appendChild(helpHost);
+
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group aria-labelledby="rg-ext-label" aria-describedby="rg-ext-help">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      // Consumer-supplied tokens stay on the host (they resolve in the host's
+      // containing root). Inner fieldset is untouched.
+      expect(el.getAttribute('aria-labelledby')).toBe('rg-ext-label');
+      expect(el.getAttribute('aria-describedby')).toBe('rg-ext-help');
+      const fieldset = shadowQuery<HTMLFieldSetElement>(el, 'fieldset')!;
+      expect(fieldset.hasAttribute('aria-labelledby')).toBe(false);
+      expect(fieldset.hasAttribute('aria-describedby')).toBe(false);
+    });
+
+    // ─── Codex round-20 P2 parity: required marker must not pollute fallback ariaLabel ───
+    it('fallback path: required visible marker is excluded from host fallback ariaLabel', async () => {
+      // hx-radio-group renders the visible required marker as a sibling of
+      // the legend's `${this.label}` text node. The fallback `_syncHostAriaSemantics`
+      // path uses `this.label || null` directly (it never reads shadow
+      // `textContent`), so the marker cannot leak into `internals.ariaLabel`.
+      // This parity test locks the invariant in alongside the hx-checkbox-group
+      // round-20 fix.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" required>
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const marker = shadowQuery(el, '.fieldset__required-marker');
+      expect(marker).toBeTruthy();
+      expect(marker?.textContent).toBe('*');
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Color');
+      expect(internals.ariaLabel).not.toContain('*');
+    });
+
+    // ─── Codex round-22 P1 #2: shadow help/error strings reach the host ───
+    it('fallback path: error textContent mirrors into internals.ariaDescription', async () => {
+      // Codex round-22 P1 #2 regression: on the no-IDL-ref fallback path
+      // earlier rounds only mirrored consumer-supplied describedby tokens
+      // onto the host, leaving the internal shadow `error` wrapper
+      // unassociated with the radiogroup on Firefox-class engines. The fix
+      // string-mirrors the wrapper's textContent into `internals.ariaDescription`,
+      // which survives the shadow boundary independently of element references.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" error="This field is required">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('This field is required');
+    });
+
+    it('fallback path: help-text textContent mirrors into internals.ariaDescription', async () => {
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color" help-text="Pick a color">
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaDescription).toBeTruthy();
+      expect(internals.ariaDescription).toContain('Pick a color');
+    });
+
+    // ─── Codex round-23 P2 (Finding C): in-place error/help slot edits resync ariaDescription ───
+    it('fallback path: in-place slotted error textContent edits resync internals.ariaDescription', async () => {
+      // Codex round-23 P2 regression: `internals.ariaDescription` is a
+      // one-shot snapshot. An in-place `textContent` rewrite on an already
+      // assigned `<slot name="error">` node does NOT fire `slotchange`, so a
+      // separate `MutationObserver` over the slot's assigned nodes is
+      // required to replay `_syncHostAriaSemantics()` and refresh the
+      // fallback `internals.ariaDescription` string. Mirrors the round-21 P3
+      // label-slot observer pattern in hx-checkbox-group.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color">
+          <span slot="error">Original error</span>
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaDescription).toContain('Original error');
+
+      const slottedError = el.querySelector('[slot="error"]') as HTMLSpanElement;
+      slottedError.textContent = 'Updated error';
+      // The observer schedules a microtask; await one to flush.
+      await Promise.resolve();
+
+      expect(internals.ariaDescription).toContain('Updated error');
+      expect(internals.ariaDescription).not.toContain('Original error');
+    });
+
+    it('fallback path: in-place slotted help-text textContent edits resync internals.ariaDescription', async () => {
+      // Codex round-24 P3 test gap: parity with the error-slot test above.
+      // The help-text slot has the same `MutationObserver` wired in
+      // commit 1c07237e2 — verify in-place `textContent` edits on an already
+      // assigned `<slot name="help-text">` node replay
+      // `_syncHostAriaSemantics()` and refresh `internals.ariaDescription`.
+      const el = await fixture<HxRadioGroup>(`
+        <hx-radio-group label="Color">
+          <span slot="help-text">Initial help</span>
+          <hx-radio value="r" label="Red"></hx-radio>
+        </hx-radio-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as RadioGroupTestHarness)._internals;
+      expect(internals.ariaDescription).toContain('Initial help');
+
+      const slottedHelp = el.querySelector('[slot="help-text"]') as HTMLSpanElement;
+      slottedHelp.textContent = 'Updated help';
+      // The observer schedules a microtask; await one to flush.
+      await Promise.resolve();
+
+      expect(internals.ariaDescription).toContain('Updated help');
+      expect(internals.ariaDescription).not.toContain('Initial help');
     });
   });
 });

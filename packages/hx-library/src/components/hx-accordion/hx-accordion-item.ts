@@ -35,6 +35,41 @@ export interface HxAccordionToggleDetail {
 /**
  * An individual accordion item with collapsible content.
  *
+ * ## Architecture Note: Slot Projection vs. Host-Canonical (group-4 round-1)
+ *
+ * `hx-accordion-item` deliberately does NOT participate in the
+ * host-canonical / `internals.ariaLabelledByElements` pattern used by every
+ * other group-2/3/4 component. Rationale:
+ *
+ *   1. The trigger label comes from `<slot name="trigger">` — consumer
+ *      light-DOM projected directly into the `<summary>` element. AT reads
+ *      the slot-projected text natively because slot projection preserves
+ *      accessible name (the `<summary>` IS the heading and consumes the
+ *      slotted text in its own accessible name computation).
+ *   2. `aria-labelledby="${_uid}-trigger"` on the inner content region and
+ *      `aria-controls="${_uid}-content"` on the summary BOTH resolve
+ *      same-shadow-root, which works correctly across every AT — these
+ *      IDREFs never cross a shadow boundary.
+ *   3. Pushing these ids through `internals.ariaLabelledByElements` would
+ *      either duplicate the wiring (heading announced twice) or break the
+ *      native `<details>/<summary>` toggle semantics (the host carrying
+ *      `role="heading"` would shadow the summary's own heading projection).
+ *
+ * `role="heading"` on `<summary>` (with `aria-level=N`) is the APG-canonical
+ * Accordion pattern. Per the APG note, `<summary>` MUST be a direct child
+ * of `<details>` for the native toggle to function — wrapping it in an
+ * `<h3>` would forfeit native disclosure. The role-on-summary approach is
+ * the authoritative compromise. NVDA, JAWS, and VoiceOver all announce the
+ * summary as a heading at the configured level when this pattern is used.
+ *
+ * `aria-controls` on the summary points at the shadow-internal content
+ * region; APG marks the relationship as implicit via the heading + region
+ * structure, so AT not following the IDREF still announces correctly. The
+ * IDREF is a hint, not a requirement — and because both ids are in the
+ * same shadow root, it resolves cleanly when AT does follow it. This
+ * matches the popover/dropdown intentional `aria-controls` omission for
+ * the cross-shadow case (see those components' code comments).
+ *
  * @summary Collapsible panel that can be expanded or collapsed.
  *
  * @tag hx-accordion-item

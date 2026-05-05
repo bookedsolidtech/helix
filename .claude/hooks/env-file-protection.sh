@@ -17,6 +17,12 @@
 
 set -uo pipefail
 
+# Source shared shell-segment splitter (0.15.0). Replaces full-command
+# grep that false-positives on commit messages mentioning `.env` (e.g.
+# `git commit -m "stop reading .env via cat"`).
+# shellcheck source=_lib/cmd-segments.sh
+source "$(dirname "$0")/_lib/cmd-segments.sh"
+
 INPUT=$(cat)
 
 # ── Dependency check ──────────────────────────────────────────────────────────
@@ -27,13 +33,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── HALT check ────────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
 CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
 
@@ -61,26 +65,36 @@ truncate_cmd() {
 # The goal is to block casual and accidental reads, not defeat a determined
 # adversary with shell access.
 PATTERN_UTILITY='(cat|head|tail|less|more|grep|sed|awk|bat|strings|printf|xargs|tee|jq|python3?[[:space:]]+-c|ruby[[:space:]]+-e)[[:space:]]'
-# Also catch: source/., cp (reads then writes elsewhere)
+# Also catch: source/., cp (reads then writes elsewhere).
+#
+# 0.16.3 discord-ops Round 9 #4 fix: anchored on segment-start. Pre-fix
+# `any_segment_matches` matched anywhere in the segment, so
+# `git commit -m "fix: don't source .env files"` fired even though no
+# real source-of-.env was happening — the trigger words appeared inside
+# the quoted commit-message body. The patterns are command prefixes
+# (`source PATH`, `. PATH`, `cp X PATH`), so segment-start anchoring is
+# the correct shape.
 PATTERN_SOURCE='(source|\.)[[:space:]]+[^;|&]*\.env'
 PATTERN_CP_ENV='cp[[:space:]]+[^;|&]*\.env'
 # .env* files or .envrc (direnv)
 PATTERN_ENV_FILE='(\.env[a-zA-Z0-9._-]*|\.envrc)([[:space:]]|"|'"'"'|$)'
 
-MATCHES_UTILITY=0
-MATCHES_ENV_FILE=0
-
-if printf '%s' "$CMD" | grep -qE "$PATTERN_UTILITY"; then
-  MATCHES_UTILITY=1
+# 0.16.2 helix-017 P2 #2: utility AND env-filename must co-occur within
+# the SAME shell segment. Pre-fix this set two independent booleans
+# (any segment with utility OR any segment with .env) and AND'd them,
+# which false-positived across multi-segment constructions like
+# `echo "log: cat is broken" ; touch foo.env` (utility in segment 1,
+# .env name in segment 2). Detection is fundamentally a same-segment
+# co-occurrence property.
+MATCHES_BOTH_SAME_SEGMENT=0
+if any_segment_matches_both "$CMD" "$PATTERN_UTILITY" "$PATTERN_ENV_FILE"; then
+  MATCHES_BOTH_SAME_SEGMENT=1
 fi
 
-if printf '%s' "$CMD" | grep -qE "$PATTERN_ENV_FILE"; then
-  MATCHES_ENV_FILE=1
-fi
-
-# Direct source/cp of .env files — always block
-if printf '%s' "$CMD" | grep -qE "$PATTERN_SOURCE" || \
-   printf '%s' "$CMD" | grep -qE "$PATTERN_CP_ENV"; then
+# Direct source/cp of .env files — always block (segment-start anchored
+# per discord-ops Round 9 #4).
+if any_segment_starts_with "$CMD" "$PATTERN_SOURCE" || \
+   any_segment_starts_with "$CMD" "$PATTERN_CP_ENV"; then
   TRUNCATED_CMD=$(truncate_cmd "$CMD")
   {
     printf 'ENV FILE PROTECTION: Direct sourcing or copying of .env files is blocked.\n'
@@ -93,7 +107,7 @@ if printf '%s' "$CMD" | grep -qE "$PATTERN_SOURCE" || \
   exit 2
 fi
 
-if [[ $MATCHES_UTILITY -eq 1 && $MATCHES_ENV_FILE -eq 1 ]]; then
+if [[ $MATCHES_BOTH_SAME_SEGMENT -eq 1 ]]; then
   TRUNCATED_CMD=$(truncate_cmd "$CMD")
   {
     printf 'ENV FILE PROTECTION: Reading .env files via Bash is blocked.\n'

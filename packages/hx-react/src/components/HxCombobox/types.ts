@@ -46,7 +46,7 @@ Note: `mixinDelegatesAria` is not applied to this component because form
 inputs with associated labels delegate accessible naming via `<label>`
 association and `aria-labelledby`, not host-level ARIA delegation. The
 `accessible-label` attribute is a fallback for label-free usage. The value is forwarded to the
-internal input's `aria-label`. */
+host's `internals.ariaLabel` on the modern path. */
   accessibleLabel?: string | null;
   /** Text shown when no options match the current filter. */
   labelNoOptions?: string;

@@ -87,7 +87,12 @@ triage_score() {
   local diff_input
   diff_input=$(cat)
   local line_count
-  line_count=$(printf '%s' "$diff_input" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null || echo "0")
+  # Defect K (rea#62) sibling: see `hooks/commit-review-gate.sh` for the
+  # full bug rationale. `|| echo "0"` captures "0\n0" on no-match, which
+  # breaks arithmetic comparisons downstream. `|| true` + bash default keeps
+  # the branch arithmetic-safe.
+  line_count=$(printf '%s' "$diff_input" | grep -cE '^\+[^+]|^-[^-]' 2>/dev/null || true)
+  line_count="${line_count:-0}"
 
   # Check for sensitive paths
   local sensitive=0
