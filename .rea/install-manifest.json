@@ -1,12 +1,12 @@
 {
-  "version": "0.23.0",
+  "version": "0.26.1",
   "profile": "bst-internal",
   "installed_at": "2026-04-23T15:09:02.547Z",
-  "upgraded_at": "2026-05-04T23:17:20.364Z",
+  "upgraded_at": "2026-05-05T17:35:51.315Z",
   "files": [
     {
       "path": ".claude/hooks/_lib/cmd-segments.sh",
-      "sha256": "32879325d90fc0358049ac05c6fade47029a75cee827310a6b0452c075e21fc7",
+      "sha256": "7ca44ef02937eaf0336ac132269300b86c0c756219a8a3496152b51e4835656b",
       "source": "hook"
     },
     {
@@ -36,7 +36,7 @@
     },
     {
       "path": ".claude/hooks/_lib/policy-read.sh",
-      "sha256": "07a06688f91d8fdde98785c586259d59769a6ed4a0e693ab66db66a24ae967bb",
+      "sha256": "7a2b54f5e4519026ff32db2c4f20af0c758bfd6338353b1fc446ae065a308258",
       "source": "hook"
     },
     {
@@ -85,6 +85,11 @@
       "source": "hook"
     },
     {
+      "path": ".claude/hooks/local-review-gate.sh",
+      "sha256": "6ffc20f0a8b93519d2692aa30af69a6582b9a884ad441932ae650a17bb68087d",
+      "source": "hook"
+    },
+    {
       "path": ".claude/hooks/pr-issue-link-gate.sh",
       "sha256": "a7d92d1c3e5c1f46c8bdc593575f5e1adb4f790485b6aaebdd15910503460e5c",
       "source": "hook"
@@ -126,12 +131,37 @@
     },
     {
       "path": ".claude/agents/codex-adversarial.md",
-      "sha256": "7d30f0040d16eb765abddc73263c5674337e7ffec1a90a00a8448d93f28aded3",
+      "sha256": "8ceb9e2692e90541da8ecd09c75dfc765a01c86676d3a621774b3d94ef8dce07",
+      "source": "agent"
+    },
+    {
+      "path": ".claude/agents/data-architect.md",
+      "sha256": "8b23f6ca1d5b648f1fc98847312a94552ce7e811d412666f66c2175f5f6fae76",
+      "source": "agent"
+    },
+    {
+      "path": ".claude/agents/devex-architect.md",
+      "sha256": "5546c00dab675c9cc3a1ee08cb2947350de421a0d05e191ebe6caf4014f461ce",
       "source": "agent"
     },
     {
       "path": ".claude/agents/frontend-specialist.md",
       "sha256": "6be714dc035b6c73c2d4524ac59f5c4e88e49b2509d6eab4373e5e728e81c408",
+      "source": "agent"
+    },
+    {
+      "path": ".claude/agents/platform-architect.md",
+      "sha256": "9eea80c21bde480bb58462d08dee29a0c345569a4e8c74266d6d00aeb974043f",
+      "source": "agent"
+    },
+    {
+      "path": ".claude/agents/principal-engineer.md",
+      "sha256": "09c4a43580338952a0efd207d16e84c8eaec247121f0122f67de77168ca4125e",
+      "source": "agent"
+    },
+    {
+      "path": ".claude/agents/principal-product-engineer.md",
+      "sha256": "d8aa4329f79d5ef50927cb590e75b7fffce86e10a112c61f855aaec90f8c5c2c",
       "source": "agent"
     },
     {
@@ -141,7 +171,17 @@
     },
     {
       "path": ".claude/agents/rea-orchestrator.md",
-      "sha256": "68db87af7f52c00f8c443c2edf15ac345bef4150e85b3d733c5aa6cd74c310eb",
+      "sha256": "6080805eef9af4f47f255848301c46c9e537fb78933b71a1adc0238fd2b6a117",
+      "source": "agent"
+    },
+    {
+      "path": ".claude/agents/release-captain.md",
+      "sha256": "32c26d70aa5fe5c1107c05bf48bdba0c09edd6cc8b0fb00b9a92255130262b10",
+      "source": "agent"
+    },
+    {
+      "path": ".claude/agents/security-architect.md",
+      "sha256": "7a0528703f8740a53c360fe93f48185da275b5de1bad9dd0a7d940500ffb4777",
       "source": "agent"
     },
     {
@@ -161,7 +201,7 @@
     },
     {
       "path": ".claude/commands/codex-review.md",
-      "sha256": "3a9885edcb838d81d0e299d0e755136acf907eeb228e46f40965b0f085155adb",
+      "sha256": "832a93b78af2cf39b6674667d178f453f5b2cbb5ba0499cdfd18d2639163224c",
       "source": "command"
     },
     {
@@ -196,7 +236,7 @@
     },
     {
       "path": ".claude/settings.json#rea:desired",
-      "sha256": "04939eb3652472695ab23d1fa836e27310b4b256364731a6a44564da8d254aac",
+      "sha256": "864aaf3c6b4d341063d616d695dcdd359a7c8129eb1b9d6fcbca2be46deb410b",
       "source": "settings"
     },
     {
