@@ -1033,10 +1033,7 @@ export class HelixSelect extends FormMixin(HelixElement) {
    * ARIA priority). Round-3 finding 1 + round-2 finding 5.
    * @internal
    */
-  private _writeHostAttributeMirror(args: {
-    hostAriaLabel: string;
-    isInvalid: boolean;
-  }): void {
+  private _writeHostAttributeMirror(args: { hostAriaLabel: string; isInvalid: boolean }): void {
     const { hostAriaLabel } = args;
     if (hostAriaLabel) {
       // Round-8 finding 2 (medium): consumer-authored aria-label path. The
