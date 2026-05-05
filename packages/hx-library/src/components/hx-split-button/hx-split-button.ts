@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -6,6 +6,13 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
+import { devWarn } from '../../utils/dev-warn.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextSplitButtonId = createIdCounter('hx-split-button');
 
@@ -13,6 +20,27 @@ const _nextSplitButtonId = createIdCounter('hx-split-button');
  * A split button combining a primary action button with an attached dropdown
  * menu for secondary actions. Implements the ARIA menu button pattern for
  * full keyboard and screen reader support.
+ *
+ * ## Architecture Note: Composite host with two interactive children (Group 5b)
+ *
+ * The host wraps a primary `<button>`, a dropdown trigger `<button>`, and a
+ * panel `<div role="menu">` — three ARIA-bearing surfaces that cannot all
+ * collapse onto the host. Group 5b keeps role placement on the inner
+ * elements (consistent with `hx-overflow-menu`). The host carries no role.
+ *
+ * What Group 5b adds:
+ * - **Host-attribute label mirror** via `installAriaIdrefMirror`: consumer
+ *   `aria-label` / `aria-labelledby` on the host flow to the inner primary
+ *   button's `aria-label`. Replaces the legacy `accessible-label` shim,
+ *   which was a workaround for ARIAMixin shadowing on the host. The shim
+ *   is preserved with a one-time devWarn for one minor version of back-
+ *   compat; new code should use the standard `aria-label` attribute.
+ * - **Roving tabindex** on slotted `hx-menu-item` children inside the
+ *   panel. Only the focused item carries `tabindex=0`; arrow key
+ *   navigation rewrites the tabindex map via `_applyRovingTabIndex()`.
+ *   `setRovingTabIndex` is the same setter used by `hx-menu` for cross-
+ *   family pattern alignment.
+ * - **First-character typeahead** with 500ms timeout matching `hx-menu`.
  *
  * @summary Primary action button with attached dropdown menu for secondary actions.
  *
@@ -143,14 +171,16 @@ export class HelixSplitButton extends HelixElement {
   label: string | undefined = undefined;
 
   /**
-   * Accessible label for the primary action button. Required for icon-only usage
-   * or when the button label alone is insufficient context.
-   * Uses `accessible-label` attribute instead of `aria-label` to avoid
-   * ARIAMixin shadowing on the host element.
+   * @deprecated Use the standard host `aria-label` attribute instead. Group
+   * 5b replaces the `accessible-label` shim with a host-attribute mirror
+   * driven by `installAriaIdrefMirror` — consumer host `aria-label` /
+   * `aria-labelledby` flow to the inner primary button's `aria-label`,
+   * which is the same composed-tree result as the legacy shim without
+   * the ARIAMixin shadowing concern.
    *
-   * Note: `mixinDelegatesAria` is not applied to this component because the
-   * `accessible-label` attribute approach avoids the ARIAMixin property conflict
-   * without requiring mixin overhead.
+   * The attribute remains observed for one minor version so existing
+   * consumers do not regress; setting it logs a devWarn pointing them to
+   * the standard `aria-label` path.
    * @attr accessible-label
    */
   @property({ type: String, attribute: 'accessible-label' })
@@ -178,19 +208,117 @@ export class HelixSplitButton extends HelixElement {
    */
   private readonly _menuId = `${_nextSplitButtonId()}-menu`;
 
+  // ─── Host-attribute label mirror state ───
+
+  /**
+   * Resolved accessible name for the primary action button — written to
+   * the inner primary button's `aria-label` on render. AccName 1.2 §4.3.1
+   * precedence: host `aria-labelledby` (resolved IDREFs, flattened) >
+   * host `aria-label` > deprecated `accessible-label` (with devWarn) >
+   * `label` property > slotted text content (no aria-label set when this
+   * branch is taken so AT walks the inner content for the name).
+   * @internal
+   */
+  @state() private _resolvedPrimaryLabel: string | null = null;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  // ─── Roving tabindex + typeahead state ───
+
+  /** @internal */
+  private _rovingIndex = -1;
+
+  /** @internal */
+  private _typeaheadBuffer = '';
+
+  /** @internal */
+  private _typeaheadTimer: ReturnType<typeof setTimeout> | null = null;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
     document.addEventListener('click', this._handleOutsideClick);
     document.addEventListener('keydown', this._handleDocumentKeydown);
+    this._syncResolvedPrimaryLabel();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncResolvedPrimaryLabel();
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this._handleOutsideClick);
     document.removeEventListener('keydown', this._handleDocumentKeydown);
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+      this._typeaheadTimer = null;
+    }
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
   }
+
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
+    if (changedProperties.has('label') || changedProperties.has('accessibleLabel')) {
+      this._syncResolvedPrimaryLabel();
+    }
+  }
+
+  /**
+   * Resolve the primary button's accessible name from host attributes
+   * and (deprecated) properties. See `_resolvedPrimaryLabel` jsdoc for
+   * precedence rules.
+   * @internal
+   */
+  private _syncResolvedPrimaryLabel(): void {
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    const consumerLabelEls = resolveIdrefTokens(this, liveLabelledBy);
+
+    const isVisibleForAccName = (el: Element): boolean =>
+      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
+
+    const flattenedFromIdrefs = consumerLabelEls
+      .filter(isVisibleForAccName)
+      .map((el) => flattenAccName(el))
+      .filter((t) => t.length > 0)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() : '';
+
+    let resolved: string | null = null;
+    if (flattenedFromIdrefs) {
+      resolved = flattenedFromIdrefs;
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+    } else if (this.accessibleLabel) {
+      // Deprecated path — emit a one-time devWarn pointing consumers at
+      // the standard aria-label flow.
+      if (!this._deprecatedAccessibleLabelWarned) {
+        this._deprecatedAccessibleLabelWarned = true;
+        devWarn(
+          'hx-split-button',
+          '`accessible-label` is deprecated; use the standard `aria-label` attribute on hx-split-button instead. The shim continues to work in this minor version but will be removed in a future release.',
+        );
+      }
+      resolved = this.accessibleLabel;
+    } else if (this.label) {
+      resolved = this.label;
+    } else {
+      // No explicit name supplied — leave aria-label off the primary
+      // button so AT walks the slotted content for the accessible name.
+      resolved = null;
+    }
+
+    this._resolvedPrimaryLabel = resolved;
+  }
+
+  /** @internal */
+  private _deprecatedAccessibleLabelWarned = false;
 
   // ─── Outside-click / document keydown ───
 
@@ -273,21 +401,24 @@ export class HelixSplitButton extends HelixElement {
     const items = this._getMenuItems();
     if (items.length === 0) return;
 
-    // document.activeElement returns the hx-menu-item host element when its
-    // inner shadow DOM element has focus, which matches items[] directly.
+    // document.activeElement returns the hx-menu-item host element when
+    // host-canonical (post-Group-5b) — matches items[] directly. On the
+    // legacy fallback path, focus delegates to the inner div but
+    // document.activeElement still resolves to the host so the same
+    // index works.
     const currentIndex = items.findIndex((item) => item === document.activeElement);
 
     switch (e.key) {
       case 'ArrowDown': {
         e.preventDefault();
         const next = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
-        items[next]?.focus();
+        this._focusMenuItem(items, next);
         break;
       }
       case 'ArrowUp': {
         e.preventDefault();
         const prev = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
-        items[prev]?.focus();
+        this._focusMenuItem(items, prev);
         break;
       }
       case 'Escape': {
@@ -298,14 +429,61 @@ export class HelixSplitButton extends HelixElement {
       }
       case 'Home': {
         e.preventDefault();
-        items[0]?.focus();
+        this._focusMenuItem(items, 0);
         break;
       }
       case 'End': {
         e.preventDefault();
-        items[items.length - 1]?.focus();
+        this._focusMenuItem(items, items.length - 1);
         break;
       }
+      default: {
+        if (e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          this._handleTypeahead(e.key, items);
+        }
+        break;
+      }
+    }
+  }
+
+  /** @internal */
+  private _focusMenuItem(items: HelixMenuItem[], index: number): void {
+    this._rovingIndex = index;
+    this._applyRovingTabIndex(items);
+    items[index]?.focus();
+  }
+
+  /**
+   * Roving tabindex: only the focused item carries tabindex=0; the rest
+   * are tabindex=-1. Tab from the panel exits the menu via document
+   * keydown (line ~_handleDocumentKeydown), so the closing-Tab path
+   * remains correct.
+   * @internal
+   */
+  private _applyRovingTabIndex(items: HelixMenuItem[]): void {
+    items.forEach((item, i) => {
+      item.setRovingTabIndex(i === this._rovingIndex ? 0 : -1);
+    });
+  }
+
+  /** @internal */
+  private _handleTypeahead(char: string, items: HelixMenuItem[]): void {
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+    }
+    this._typeaheadBuffer += char.toLowerCase();
+    this._typeaheadTimer = setTimeout(() => {
+      this._typeaheadBuffer = '';
+      this._typeaheadTimer = null;
+    }, 500);
+
+    const match = items.findIndex((item) => {
+      const text = item.textContent?.trim().toLowerCase() ?? '';
+      return text.startsWith(this._typeaheadBuffer);
+    });
+
+    if (match !== -1) {
+      this._focusMenuItem(items, match);
     }
   }
 
@@ -340,10 +518,14 @@ export class HelixSplitButton extends HelixElement {
   private _openMenu(): void {
     if (this._open) return;
     this._open = true;
-    // Focus the first enabled menu item after the panel renders
+    // Focus the first enabled menu item after the panel renders;
+    // initialize roving tabindex so Tab from outside lands on the same
+    // item that has visual focus.
     void this.updateComplete
       .then(() => {
         const items = this._getMenuItems();
+        this._rovingIndex = items.length > 0 ? 0 : -1;
+        this._applyRovingTabIndex(items);
         items[0]?.focus();
       })
       .catch(() => undefined);
@@ -409,7 +591,7 @@ export class HelixSplitButton extends HelixElement {
           class="split-button__primary"
           ?disabled=${this.disabled}
           type="button"
-          aria-label=${this.accessibleLabel ?? (this.label || nothing)}
+          aria-label=${this._resolvedPrimaryLabel ?? nothing}
           @click=${this._handlePrimaryClick}
           @keydown=${this._handlePrimaryKeydown}
         >

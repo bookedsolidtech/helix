@@ -715,12 +715,16 @@ describe('hx-menu-item', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders with role="menuitem"', async () => {
+    it('exposes role="menuitem" (host-canonical or inner)', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="test">Test Item</hx-menu-item>
       `);
-      const item = shadowQuery(el, '.menu-item');
-      expect(item?.getAttribute('role')).toBe('menuitem');
+      // Group 5b host-canonical: role lives on host via internals; the
+      // legacy fallback path keeps role on the inner element. Accept both.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const role =
+        internals.role ?? el.shadowRoot?.querySelector('[role^="menuitem"]')?.getAttribute('role');
+      expect(role).toBe('menuitem');
     });
 
     it('renders slot content', async () => {
