@@ -15,6 +15,15 @@
 
 set -uo pipefail
 
+# Source shared shell-segment splitter (0.15.0). Provides
+# `any_segment_matches "$CMD" PATTERN` which iterates segments split on
+# &&/||/;/| and runs the pattern with `grep -qiE` against each
+# prefix-stripped segment. Replaces full-command grep that
+# false-positives on heredoc bodies and commit messages mentioning
+# trigger words.
+# shellcheck source=_lib/cmd-segments.sh
+source "$(dirname "$0")/_lib/cmd-segments.sh"
+
 # ── 1. Read ALL stdin immediately before doing anything else ──────────────────
 INPUT=$(cat)
 
@@ -26,13 +35,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ─────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
 # ── 4. Parse tool_input.command from the hook payload ─────────────────────────
 CMD=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
@@ -84,26 +91,21 @@ add_medium() {
 }
 
 # ── 7. Per-segment evaluation helper ──────────────────────────────────────────
-# Split on &&, ||, ;, and newlines and test a pattern against each segment.
-# Returns 0 if ANY segment matches the pattern.
-any_segment_matches() {
-  local PATTERN="$1"
-  while IFS= read -r SEG; do
-    if printf '%s' "$SEG" | grep -qiE "$PATTERN"; then
-      return 0
-    fi
-  done < <(printf '%s' "$CMD" | sed 's/&&/\n/g; s/||/\n/g; s/;/\n/g')
-  return 1
-}
+# (Migrated to `_lib/cmd-segments.sh::any_segment_matches` as of 0.15.0.
+# The previous inline helper was defined here but never called — H3-H17
+# all greped the WHOLE command, which false-positived on heredoc bodies
+# and commit messages mentioning trigger words. Migration: every check
+# now uses `any_segment_matches "$CMD" PATTERN` with the helper sourced
+# at the top of this file.)
 
 # ── 8. Smart exclusion flags ──────────────────────────────────────────────────
 CMD_IS_REBASE_SAFE=0
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+(rebase)[[:space:]].*(--abort|--continue)'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+(rebase)[[:space:]].*(--abort|--continue)'; then
   CMD_IS_REBASE_SAFE=1
 fi
 
 CMD_IS_CLEAN_DRY=0
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+clean.*([ \t]-n|--dry-run)'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+clean.*([ \t]-n|--dry-run)'; then
   CMD_IS_CLEAN_DRY=1
 fi
 
@@ -111,26 +113,41 @@ fi
 
 # H1: git push --force or -f (per-segment — prevents --force-with-lease poisoning)
 # A segment containing --force-with-lease is excluded; other segments are not.
-while IFS= read -r SEGMENT; do
-  SEGMENT=$(printf '%s' "$SEGMENT" | sed 's/^[[:space:]]*//')
-  [[ -z "$SEGMENT" ]] && continue
-  # Skip segments that use the safe --force-with-lease
-  if printf '%s' "$SEGMENT" | grep -qiE 'git[[:space:]]+push.*--force-with-lease'; then
-    continue
+# 0.15.0: also catches `git push origin +<branch>` (refspec-prefix force-push
+# shorthand) which the previous version missed.
+_h1_check() {
+  local _raw="$1" SEGMENT="$2"
+  [[ -z "$SEGMENT" ]] && return 0
+  # 0.15.0 codex P1 fix: anchor on `^git push`. Pre-fix the unanchored
+  # match meant `echo "git push --force is bad"` triggered H1 even
+  # though no actual push was happening (the segment after prefix-strip
+  # was `echo "..."`, not `git push`). Anchoring scopes detection to
+  # segments whose first token IS git push.
+  printf '%s' "$SEGMENT" | grep -qiE '^git[[:space:]]+push([[:space:]]|$)' || return 0
+  # Skip segments that use the safe --force-with-lease.
+  if printf '%s' "$SEGMENT" | grep -qiE -- '--force-with-lease'; then
+    return 0
   fi
-  if printf '%s' "$SEGMENT" | grep -qiE 'git[[:space:]]+push.*(--force|-f[[:space:]])' || \
-     printf '%s' "$SEGMENT" | grep -qiE 'git[[:space:]]+push.*(--force|-f)$'; then
+  # 0.15.0 codex P1 fix: combined-flag forms (`-fu`, `-uf`, `-Fu`) and
+  # long-form `--force=value` were not caught by the previous
+  # `-f[[:space:]]` shape. The flag-cluster pattern `-[a-zA-Z]*f[a-zA-Z]*`
+  # (followed by space or EOS) mirrors how H11 handles rm flag clusters.
+  # The refspec-prefix `+` on a branch name is git's force-push shorthand.
+  if printf '%s' "$SEGMENT" | grep -qiE -- '--force([[:space:]]|=|$)' || \
+     printf '%s' "$SEGMENT" | grep -qiE -- '(^|[[:space:]])-[a-zA-Z]*f[a-zA-Z]*([[:space:]]|$)' || \
+     printf '%s' "$SEGMENT" | grep -qE -- '[[:space:]]\+[A-Za-z0-9_./-]'; then
     add_high \
       "git push --force — force push detected" \
       "Force-pushing rewrites public history and breaks collaborators' local copies." \
       "Alt: Use 'git push --force-with-lease' — blocks if upstream has new commits you haven't pulled."
-    break
   fi
-done < <(printf '%s' "$CMD" | sed 's/&&/\n/g; s/||/\n/g; s/;/\n/g')
+  return 0
+}
+for_each_segment "$CMD" _h1_check
 
 # H2: git rebase — advisory (MEDIUM)
 if [[ $CMD_IS_REBASE_SAFE -eq 0 ]]; then
-  if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+rebase([[:space:]]|$)'; then
+  if any_segment_starts_with "$CMD" 'git[[:space:]]+rebase([[:space:]]|$)'; then
     add_medium \
       "git rebase — rewrites commit history (advisory)" \
       "Rebase changes commit SHAs. Safe on local feature branches; dangerous on shared/published branches." \
@@ -140,7 +157,7 @@ if [[ $CMD_IS_REBASE_SAFE -eq 0 ]]; then
 fi
 
 # H3: git checkout -- .
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+checkout[[:space:]]+--[[:space:]]+\.'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+checkout[[:space:]]+--[[:space:]]+\.'; then
   add_high \
     "git checkout -- . — discards all uncommitted changes" \
     "Overwrites working tree changes with HEAD. Uncommitted work is lost permanently." \
@@ -148,8 +165,8 @@ if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+checkout[[:space:]]+--[[:space
 fi
 
 # H4: git restore . (any form — with or without --staged flag)
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+restore[[:space:]].*[[:space:]]\.([[:space:]]|$)' || \
-   printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+restore[[:space:]]+\.[[:space:]]*$'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+restore[[:space:]].*[[:space:]]\.([[:space:]]|$)' || \
+   any_segment_starts_with "$CMD" 'git[[:space:]]+restore[[:space:]]+\.[[:space:]]*$'; then
   add_high \
     "git restore . — discards all uncommitted changes" \
     "Restores every tracked file to HEAD, permanently discarding all working tree modifications." \
@@ -158,7 +175,7 @@ fi
 
 # H5: git clean -f
 if [[ $CMD_IS_CLEAN_DRY -eq 0 ]]; then
-  if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*f'; then
+  if any_segment_starts_with "$CMD" 'git[[:space:]]+clean[[:space:]]+-[a-zA-Z]*f'; then
     add_high \
       "git clean -f — removes untracked files" \
       "Permanently deletes untracked files from the working tree. Cannot be undone via git." \
@@ -167,7 +184,7 @@ if [[ $CMD_IS_CLEAN_DRY -eq 0 ]]; then
 fi
 
 # H6: DROP TABLE or DROP DATABASE in psql
-if printf '%s' "$CMD" | grep -qiE '(psql|pgcli)[^|&;]*DROP[[:space:]]+(TABLE|DATABASE|SCHEMA)'; then
+if any_segment_matches "$CMD" '(psql|pgcli)[^|&;]*DROP[[:space:]]+(TABLE|DATABASE|SCHEMA)'; then
   add_high \
     "DROP TABLE/DATABASE via psql — destructive DDL" \
     "Running destructive DDL directly in psql bypasses migration pipeline safety checks." \
@@ -175,7 +192,7 @@ if printf '%s' "$CMD" | grep -qiE '(psql|pgcli)[^|&;]*DROP[[:space:]]+(TABLE|DAT
 fi
 
 # H7: kill -9 with pgrep subshell
-if printf '%s' "$CMD" | grep -qiE 'kill[[:space:]]+-9[[:space:]]+(\$\(|`)'; then
+if any_segment_starts_with "$CMD" 'kill[[:space:]]+-9[[:space:]]+(\$\(|`)'; then
   add_high \
     "kill -9 with pgrep subshell — aggressive process termination" \
     "Sends SIGKILL to processes matched by name, which may kill unintended processes." \
@@ -183,7 +200,7 @@ if printf '%s' "$CMD" | grep -qiE 'kill[[:space:]]+-9[[:space:]]+(\$\(|`)'; then
 fi
 
 # H8: killall -9
-if printf '%s' "$CMD" | grep -qiE 'killall[[:space:]]+-9[[:space:]]+\S'; then
+if any_segment_starts_with "$CMD" 'killall[[:space:]]+-9[[:space:]]+\S'; then
   add_high \
     "killall -9 — SIGKILL all matching processes" \
     "Immediately terminates all processes with the given name without cleanup." \
@@ -191,7 +208,7 @@ if printf '%s' "$CMD" | grep -qiE 'killall[[:space:]]+-9[[:space:]]+\S'; then
 fi
 
 # H9: git commit --no-verify
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+commit.*--no-verify'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+commit.*--no-verify'; then
   add_high \
     "git commit --no-verify — skipping pre-commit hooks" \
     "Bypasses all pre-commit safety gates including secret scanning and linting." \
@@ -199,7 +216,7 @@ if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+commit.*--no-verify'; then
 fi
 
 # H10: HUSKY=0 bypass — suppresses all git hooks without --no-verify
-if printf '%s' "$CMD" | grep -qiE '(^|[[:space:];]|&&|\|\|)HUSKY=0[[:space:]]+git[[:space:]]+(commit|push|tag)'; then
+if any_segment_raw_matches "$CMD" '^HUSKY=0[[:space:]]+git[[:space:]]+(commit|push|tag)'; then
   add_high \
     "HUSKY=0 — bypasses all husky git hooks" \
     "Setting HUSKY=0 disables pre-commit, commit-msg, and pre-push safety gates without --no-verify." \
@@ -208,21 +225,53 @@ fi
 
 # H11: rm -rf with broad targets
 # Covers combined flags (rm -rf, rm -fr), split flags (rm -r -f), and long flags (rm --recursive --force)
-BROAD_TARGETS='(\/|~\/|\.\/\*|\*|\.|src|dist|build|node_modules)'
-if printf '%s' "$CMD" | grep -qiE "rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f[[:space:]]+${BROAD_TARGETS}" || \
-   printf '%s' "$CMD" | grep -qiE "rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r[[:space:]]+${BROAD_TARGETS}" || \
-   printf '%s' "$CMD" | grep -qiE "rm[[:space:]]+-[a-zA-Z]*r[[:space:]]+-[a-zA-Z]*f[[:space:]]+${BROAD_TARGETS}" || \
-   printf '%s' "$CMD" | grep -qiE "rm[[:space:]]+-[a-zA-Z]*f[[:space:]]+-[a-zA-Z]*r[[:space:]]+${BROAD_TARGETS}" || \
-   printf '%s' "$CMD" | grep -qiE "rm[[:space:]]+--recursive[[:space:]]+--force[[:space:]]+${BROAD_TARGETS}" || \
-   printf '%s' "$CMD" | grep -qiE "rm[[:space:]]+--force[[:space:]]+--recursive[[:space:]]+${BROAD_TARGETS}"; then
+# 0.15.0 fix: anchored each target on word boundary (whitespace-or-EOS).
+# The previous form had a bare `\.` which matched `rm -rf .git/foo`
+# (legitimate `.git/`-tree cleanup). Each token now requires either
+# end-of-string or whitespace after — so `.` alone matches `rm -rf .`
+# (the cwd, dangerous) but NOT `rm -rf .git/foo`.
+BROAD_TARGETS='(\/|~\/|\.\/\*|\*|\.|src|dist|build|node_modules)([[:space:]]|$)'
+if any_segment_starts_with "$CMD" "rm[[:space:]]+-[a-zA-Z]*r[a-zA-Z]*f[[:space:]]+${BROAD_TARGETS}" || \
+   any_segment_starts_with "$CMD" "rm[[:space:]]+-[a-zA-Z]*f[a-zA-Z]*r[[:space:]]+${BROAD_TARGETS}" || \
+   any_segment_starts_with "$CMD" "rm[[:space:]]+-[a-zA-Z]*r[[:space:]]+-[a-zA-Z]*f[[:space:]]+${BROAD_TARGETS}" || \
+   any_segment_starts_with "$CMD" "rm[[:space:]]+-[a-zA-Z]*f[[:space:]]+-[a-zA-Z]*r[[:space:]]+${BROAD_TARGETS}" || \
+   any_segment_starts_with "$CMD" "rm[[:space:]]+--recursive[[:space:]]+--force[[:space:]]+${BROAD_TARGETS}" || \
+   any_segment_starts_with "$CMD" "rm[[:space:]]+--force[[:space:]]+--recursive[[:space:]]+${BROAD_TARGETS}"; then
   add_high \
     "rm -rf with broad target — mass file deletion" \
     "Permanently deletes files and directories. Cannot be undone." \
     "Alt: Move to a temp location first, or use 'rm -ri' for interactive deletion."
 fi
 
-# H12: curl/wget piped directly to shell (supply chain attack vector)
-if printf '%s' "$CMD" | grep -qiE '(curl|wget)[^|]*\|[[:space:]]*(bash|sh|zsh|fish)'; then
+# H12: curl/wget piped directly to shell (supply chain attack vector).
+# 0.16.1 helix-016 P1 fix: this check requires BOTH the curl/wget call
+# AND the `| sh` to appear in the same shell pipeline. Pipe-RCE is
+# fundamentally a multi-segment property — splitting on `|` would
+# decompose `curl https://x | sh` into two unrelated segments — so the
+# detection must run against the un-split command.
+#
+# 0.16.3 helix-016.1 #2 sibling fix: pre-fix the check ran against the
+# raw `$CMD`, which false-positived on `git commit -m "...curl|sh..."`
+# (literal pipe inside the commit-message body). The fix is to scan
+# the QUOTE-MASKED form of the command — same un-split shape, but
+# in-quote pipes are replaced with a sentinel that the regex doesn't
+# match. Real curl-pipe-shell still matches because the pipe between
+# `curl https://x` and `sh` is outside any quote span.
+# 0.17.0 helix-017 #1 fix: also scan inner payloads of nested-shell
+# wrappers (`zsh -c "curl https://x | sh"`). The unwrap helper emits
+# the original command + each inner payload as separate lines; we
+# quote-mask each line independently and grep. If ANY emitted line
+# contains a real curl-pipe-shell, fire H12.
+H12_HIT=0
+while IFS= read -r _h12_line; do
+  [ -z "$_h12_line" ] && continue
+  _h12_masked=$(quote_masked_cmd "$_h12_line")
+  if printf '%s' "$_h12_masked" | grep -qiE '(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh|zsh|fish)'; then
+    H12_HIT=1
+    break
+  fi
+done < <(_rea_unwrap_nested_shells "$CMD")
+if [ "$H12_HIT" = "1" ]; then
   add_high \
     "curl/wget piped to shell — remote code execution" \
     "Executing remote scripts without inspection is a major supply chain risk." \
@@ -230,7 +279,7 @@ if printf '%s' "$CMD" | grep -qiE '(curl|wget)[^|]*\|[[:space:]]*(bash|sh|zsh|fi
 fi
 
 # H13: git push --no-verify — bypasses pre-push hooks
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+push.*--no-verify'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+push.*--no-verify'; then
   add_high \
     "git push --no-verify — skipping pre-push hooks" \
     "Bypasses all pre-push safety gates including CI checks." \
@@ -238,7 +287,7 @@ if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+push.*--no-verify'; then
 fi
 
 # H14: git -c core.hooksPath= — redirects or disables hook execution
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+-c[[:space:]]+core\.hookspath'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+-c[[:space:]]+core\.hookspath'; then
   add_high \
     "git -c core.hooksPath — overriding hooks directory" \
     "Redirecting the hooks path can disable all safety hooks." \
@@ -246,7 +295,7 @@ if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+-c[[:space:]]+core\.hookspath'
 fi
 
 # H15: REA_BYPASS env var — attempted escape hatch
-if printf '%s' "$CMD" | grep -qiE '(^|[[:space:];]|&&|\|\|)REA_BYPASS[[:space:]]*='; then
+if any_segment_raw_matches "$CMD" '^REA_BYPASS[[:space:]]*='; then
   add_high \
     "REA_BYPASS env var — unauthorized bypass attempt" \
     "Setting REA_BYPASS is not a supported escape mechanism and indicates a bypass attempt." \
@@ -254,60 +303,63 @@ if printf '%s' "$CMD" | grep -qiE '(^|[[:space:];]|&&|\|\|)REA_BYPASS[[:space:]]
 fi
 
 # H16: alias/function definitions containing bypass strings
-if printf '%s' "$CMD" | grep -qiE '(alias|function)[[:space:]]+[a-zA-Z_]+.*(--(no-verify|force)|HUSKY=0|core\.hookspath)'; then
+if any_segment_raw_matches "$CMD" '^(alias|function)[[:space:]]+[a-zA-Z_]+.*(--(no-verify|force)|HUSKY=0|core\.hookspath)'; then
   add_high \
     "Alias/function definition with bypass — circumventing safety gates" \
     "Defining aliases or functions that embed bypass flags defeats safety hooks." \
     "Alt: Do not wrap bypass patterns in aliases or functions."
 fi
 
-# H17: context_protection — block commands that should be delegated to subagents
+# H17: context_protection — block commands that should be delegated to subagents.
 # Reads context_protection.delegate_to_subagent from .rea/policy.yaml.
 # These commands produce excessive output that exhausts coordinator context windows.
-POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
-if [[ -f "$POLICY_FILE" ]]; then
-  DELEGATE_PATTERNS=()
-  IN_DELEGATE_BLOCK=0
-  while IFS= read -r line; do
-    if printf '%s' "$line" | grep -qE '^[[:space:]]*delegate_to_subagent:'; then
-      # Check for inline empty array
-      if printf '%s' "$line" | grep -qE 'delegate_to_subagent:[[:space:]]*\[\]'; then
-        break
-      fi
-      IN_DELEGATE_BLOCK=1
-      continue
-    fi
-    if [[ $IN_DELEGATE_BLOCK -eq 1 ]]; then
-      # Block sequence items start with "  - "
-      if printf '%s' "$line" | grep -qE '^[[:space:]]*-[[:space:]]'; then
-        pattern=$(printf '%s' "$line" | sed "s/^[[:space:]]*-[[:space:]]*//; s/^[\"']//; s/[\"']$//")
-        if [[ -n "$pattern" ]]; then
-          DELEGATE_PATTERNS+=("$pattern")
-        fi
-      else
-        # Non-continuation line = end of block
-        break
-      fi
-    fi
-  done < "$POLICY_FILE"
+#
+# 0.16.0 fix J.2: replaced the inline YAML parser (40+ lines reimplementing
+# block-sequence walking) with `policy_list` from `_lib/policy-read.sh`.
+# Same parser shape as every other rea hook now reads policy via the shared
+# helper; drift between hooks is structurally impossible.
+# shellcheck source=_lib/policy-read.sh
+source "$(dirname "$0")/_lib/policy-read.sh"
 
-  for pattern in "${DELEGATE_PATTERNS[@]+"${DELEGATE_PATTERNS[@]}"}"; do
-    # Use fixed-string match — these are command prefixes, not regex
-    if printf '%s' "$CMD" | grep -qF "$pattern"; then
-      add_high \
-        "Context protection — command must run in a subagent" \
-        "This command produces excessive output that will exhaust the coordinator context window. Delegate it to a subagent instead of running it directly." \
-        "Alt: Use the Agent tool to delegate: Agent(subagent_type: 'qa-engineer-automation', prompt: 'Run $pattern and report pass/fail summary only.')" \
-        "Alt: The context_protection policy in .rea/policy.yaml lists commands that must be delegated."
-      break
-    fi
-  done
-fi
+DELEGATE_PATTERNS=()
+while IFS= read -r pattern; do
+  [[ -z "$pattern" ]] && continue
+  DELEGATE_PATTERNS+=("$pattern")
+done < <(policy_list "delegate_to_subagent")
+
+# 0.16.3 discord-ops Round 9 #3 fix: anchor the match on segment-start
+# instead of unanchored substring search. The patterns from
+# `policy_list "delegate_to_subagent"` are command prefixes
+# (`pnpm run build`, `pnpm test`, `pnpm run lint`); a substring search
+# fired on commit messages and prose mentioning those prefixes
+# (`git commit -m "doc: when to delegate pnpm test to subagent"`).
+# `any_segment_starts_with` regexes against the prefix-stripped form of
+# each segment, so patterns now only match when the command segment
+# actually invokes the named tool.
+#
+# `grep -qF` was fixed-string; `any_segment_starts_with` runs grep -E.
+# The patterns from policy.yaml are literal prefixes — escape ERE
+# metacharacters before passing them through.
+_escape_ere() {
+  printf '%s' "$1" | sed 's/[][\\.*^$(){}+?|]/\\&/g'
+}
+
+for pattern in "${DELEGATE_PATTERNS[@]+"${DELEGATE_PATTERNS[@]}"}"; do
+  pattern_re=$(_escape_ere "$pattern")
+  if any_segment_starts_with "$CMD" "${pattern_re}([[:space:]]|$)"; then
+    add_high \
+      "Context protection — command must run in a subagent" \
+      "This command produces excessive output that will exhaust the coordinator context window. Delegate it to a subagent instead of running it directly." \
+      "Alt: Use the Agent tool to delegate: Agent(subagent_type: 'qa-engineer-automation', prompt: 'Run $pattern and report pass/fail summary only.')" \
+      "Alt: The context_protection policy in .rea/policy.yaml lists commands that must be delegated."
+    break
+  fi
+done
 
 # ── 10. MEDIUM severity checks ────────────────────────────────────────────────
 
 # M1: npm install --force
-if printf '%s' "$CMD" | grep -qiE 'npm[[:space:]]+(install|i)[[:space:]].*--force'; then
+if any_segment_matches "$CMD" 'npm[[:space:]]+(install|i)[[:space:]].*--force'; then
   add_medium \
     "npm install --force — bypasses dependency resolution" \
     "--force skips conflict checks and can install incompatible package versions." \

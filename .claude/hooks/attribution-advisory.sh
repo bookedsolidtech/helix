@@ -26,13 +26,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ─────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
 # ── 4. Check if attribution blocking is enabled ──────────────────────────────
 POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
@@ -50,14 +48,34 @@ if [[ -z "$CMD" ]]; then
   exit 0
 fi
 
+# 0.15.0: source the shared shell-segment splitter. Pre-fix, the
+# attribution patterns greped the FULL command — `git commit -m "Note:
+# Co-Authored-By with AI was removed in 0.14"` matched and the commit
+# was blocked even though the message was COMMENTING on attribution
+# rather than including it. Per-segment anchoring scopes detection to
+# segments whose first token is `git commit` / `gh pr create|edit`.
+# shellcheck source=_lib/cmd-segments.sh
+source "$(dirname "$0")/_lib/cmd-segments.sh"
+
 # ── 6. Check if this is a relevant command ────────────────────────────────────
+# 0.18.0 helix-020 / discord-ops Round 10 #2 fix (G4.A): use
+# `any_segment_starts_with`, not `any_segment_matches`. The pre-fix
+# matcher used the unanchored form, so a segment like
+#   gh pr edit --body "tracked: gh pr create earlier in the run"
+# triggered IS_RELEVANT=1 because the substring `gh pr create` was
+# anywhere in the segment. The downstream attribution check then
+# scanned the body for the markdown-link / Co-Authored-By patterns,
+# and ANY mention of those terms in the body's prose got blocked
+# even though the actual command was a `gh pr edit` whose intent had
+# nothing to do with structural attribution. The same anchoring fix
+# `dangerous-bash-interceptor.sh` got in 0.16.3 F5 finally lands here.
 IS_RELEVANT=0
 
-if printf '%s' "$CMD" | grep -qiE 'gh[[:space:]]+pr[[:space:]]+(create|edit)'; then
+if any_segment_starts_with "$CMD" 'gh[[:space:]]+pr[[:space:]]+(create|edit)'; then
   IS_RELEVANT=1
 fi
 
-if printf '%s' "$CMD" | grep -qiE 'git[[:space:]]+commit'; then
+if any_segment_starts_with "$CMD" 'git[[:space:]]+commit'; then
   IS_RELEVANT=1
 fi
 
@@ -70,27 +88,45 @@ fi
 FOUND=0
 
 # Co-Authored-By with noreply@ email
-if printf '%s' "$CMD" | grep -qiE 'Co-Authored-By:.*noreply@'; then
+# 0.18.0 helix-020 / discord-ops Round 10 #3 fix (G4.B): exclude
+# GitHub's legitimate `<user>@users.noreply.github.com` collaborator
+# footers from the noreply match. Pre-fix the regex `Co-Authored-By:.*noreply@`
+# matched both AI-tool noreply addresses (anthropic.com, openai.com,
+# github-copilot, etc.) AND GitHub's per-user noreply form, blocking
+# legitimate human collaborator credits. The new regex requires
+# `noreply@` to be followed by something that ISN'T `users.noreply.github.com`
+# — covered via a negative-lookahead simulation: match `noreply@` then
+# either end-of-line, whitespace, `>`, or a domain that does NOT begin
+# with `users.noreply.github.com`. Posix ERE has no lookarounds, so we
+# enumerate the allowed-prefix shapes explicitly. The "AI names" branch
+# below catches Co-Authored-By with named tools regardless of the email
+# domain, so dropping `users.noreply.github.com` from the noreply
+# pattern only relaxes the check for human collaborators — never for AI.
+if any_segment_matches "$CMD" 'Co-Authored-By:.*noreply@(anthropic\.com|openai\.com|github-copilot|github\.com|claude\.ai|chatgpt\.com|googlemail\.com|google\.com|cursor\.com|codeium\.com|tabnine\.com|amazon\.com|amazonaws\.com|amazon-q\.amazonaws\.com|cody\.dev|sourcegraph\.com|mistral\.ai|xai-org|x\.ai|inflection\.ai|perplexity\.ai|replit\.com|jetbrains\.com|bito\.ai|pieces\.app|phind\.com|you\.com)'; then
   FOUND=1
 fi
 
 # Co-Authored-By with known AI names
-if printf '%s' "$CMD" | grep -qiE 'Co-Authored-By:.*\b(Claude|Sonnet|Opus|Haiku|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|Amazon Q|CodeWhisperer|Devin|Windsurf|Cline|Aider|Anthropic|OpenAI|GitHub Copilot)\b'; then
+if any_segment_matches "$CMD" 'Co-Authored-By:.*\b(Claude|Sonnet|Opus|Haiku|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|Amazon Q|CodeWhisperer|Devin|Windsurf|Cline|Aider|Anthropic|OpenAI|GitHub Copilot)\b'; then
   FOUND=1
 fi
 
 # "Generated/Built/Powered with/by [AI Tool]" lines
-if printf '%s' "$CMD" | grep -qiE '(Generated|Created|Built|Powered|Authored|Written|Produced)[[:space:]]+(with|by)[[:space:]]+(Claude|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|CodeWhisperer|Devin|Windsurf|Cline|Aider|AI|an? AI)\b'; then
+if any_segment_matches "$CMD" '(Generated|Created|Built|Powered|Authored|Written|Produced)[[:space:]]+(with|by)[[:space:]]+(Claude|Copilot|GPT|ChatGPT|Gemini|Cursor|Codeium|Tabnine|CodeWhisperer|Devin|Windsurf|Cline|Aider|AI|an? AI)\b'; then
   FOUND=1
 fi
 
 # Markdown-linked attribution
-if printf '%s' "$CMD" | grep -qiE '\[Claude Code\]|\[GitHub Copilot\]|\[ChatGPT\]|\[Gemini\]|\[Cursor\]'; then
+# 0.16.2 helix-017 P3 #4: anchor on `[Text](` (markdown link shape) so
+# legitimate bracketed mentions like `gh pr edit --body "support [Claude
+# Code] hook output"` don't false-positive. The actual attribution we
+# care about is structural — `Generated with [Claude Code](https://...)`.
+if any_segment_matches "$CMD" '\[Claude Code\]\(|\[GitHub Copilot\]\(|\[ChatGPT\]\(|\[Gemini\]\(|\[Cursor\]\('; then
   FOUND=1
 fi
 
 # Emoji attribution
-if printf '%s' "$CMD" | grep -qE '🤖.*[Gg]enerated'; then
+if any_segment_matches "$CMD" '🤖.*[Gg]enerated'; then
   FOUND=1
 fi
 

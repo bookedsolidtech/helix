@@ -6,6 +6,17 @@ import './index.js';
 
 afterEach(cleanup);
 
+/**
+ * Strongly-typed harness for the private internals the fallback-path tests
+ * reach into. Codex round-7 finding `#8` replaced scattered `as any` casts
+ * with this single seam — TypeScript strict mode keeps holding the line.
+ */
+type ToggleButtonTestHarness = HelixToggleButton & {
+  _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
+};
+
 describe('hx-toggle-button', () => {
   // ─── Rendering (6) ───
 
@@ -66,6 +77,48 @@ describe('hx-toggle-button', () => {
       await el.updateComplete;
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('aria-pressed')).toBe('true');
+    });
+
+    // Codex round-35 follow-up (Low #5) + round-36 (medium): hasEffective-
+    // LabelledBy contract. A typo or missing target in `aria-labelledby` must
+    // NOT erase the accessible name on EITHER render path — the modern path
+    // falls through to internals.ariaLabel = slot text; the legacy fallback
+    // clears the inner button's aria-labelledby so the inner aria-label wins.
+    it('keeps the slot accessible name when aria-labelledby points to a missing id', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-labelledby="does-not-exist">Save</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const innerBtn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      // Modern path: host owns the name via internals.ariaLabel (= slot text).
+      // Legacy path: internals.ariaLabel is null (host role cleared); the
+      // inner native button is the announced surface and must NOT carry the
+      // broken aria-labelledby — its aria-label carries the slot text.
+      if (internals.role === 'button') {
+        expect(internals.ariaLabel).toBe('Save');
+      } else {
+        expect(innerBtn.getAttribute('aria-labelledby')).toBeNull();
+        expect(innerBtn.getAttribute('aria-label')).toBe('Save');
+      }
+    });
+
+    it('uses aria-labelledby when at least one referenced element exists', async () => {
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<span id="external-label-tb">External label</span>',
+      );
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-labelledby="external-label-tb">Save</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const innerBtn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      if (internals.role === 'button') {
+        expect(internals.ariaLabel).toBeNull();
+      } else {
+        // Legacy path: inner button mirrors the resolved labelledby tokens.
+        expect(innerBtn.getAttribute('aria-labelledby')).toBe('external-label-tb');
+      }
+      document.getElementById('external-label-tb')?.remove();
     });
   });
 
@@ -413,12 +466,16 @@ describe('hx-toggle-button', () => {
     });
 
     it('checkValidity returns false when required and not pressed', async () => {
-      const el = await fixture<HelixToggleButton>('<hx-toggle-button required>Toggle</hx-toggle-button>');
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required>Toggle</hx-toggle-button>',
+      );
       expect(el.checkValidity()).toBe(false);
     });
 
     it('checkValidity returns true when required and pressed', async () => {
-      const el = await fixture<HelixToggleButton>('<hx-toggle-button required pressed>Toggle</hx-toggle-button>');
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required pressed>Toggle</hx-toggle-button>',
+      );
       expect(el.checkValidity()).toBe(true);
     });
 
@@ -428,8 +485,10 @@ describe('hx-toggle-button', () => {
     });
 
     it('validity.valueMissing is true when required and not pressed', async () => {
-      const el = await fixture<HelixToggleButton>('<hx-toggle-button required>Toggle</hx-toggle-button>');
-      expect(el.validity.valueMissing).toBe(true)
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required>Toggle</hx-toggle-button>',
+      );
+      expect(el.validity.valueMissing).toBe(true);
     });
   });
 
@@ -570,9 +629,7 @@ describe('hx-toggle-button', () => {
         const el = await fixture<HelixToggleButton>('<hx-toggle-button></hx-toggle-button>');
         await el.updateComplete;
         const relevantCalls = warnSpy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('No accessible label found'),
+          (call) => typeof call[0] === 'string' && call[0].includes('No accessible label found'),
         );
         expect(relevantCalls.length).toBeGreaterThan(0);
       } finally {
@@ -586,9 +643,7 @@ describe('hx-toggle-button', () => {
         const el = await fixture<HelixToggleButton>('<hx-toggle-button>Mute</hx-toggle-button>');
         await el.updateComplete;
         const relevantCalls = warnSpy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('No accessible label found'),
+          (call) => typeof call[0] === 'string' && call[0].includes('No accessible label found'),
         );
         expect(relevantCalls).toHaveLength(0);
       } finally {
@@ -604,9 +659,7 @@ describe('hx-toggle-button', () => {
         );
         await el.updateComplete;
         const relevantCalls = warnSpy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('No accessible label found'),
+          (call) => typeof call[0] === 'string' && call[0].includes('No accessible label found'),
         );
         expect(relevantCalls).toHaveLength(0);
       } finally {
@@ -677,6 +730,281 @@ describe('hx-toggle-button', () => {
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--lg')).toBe(true);
       expect(btn.classList.contains('button--sm')).toBe(false);
+    });
+  });
+
+  // ─── ARIA delegation: host semantics ───
+  //
+  // Codex aria-group-2 finding: APG toggle-button semantics must reach the
+  // host so consumer-supplied aria-label / aria-labelledby / aria-describedby
+  // on <hx-toggle-button> aren't trapped behind the shadow boundary.
+
+  describe('ARIA delegation: host semantics', () => {
+    it('exposes role="button" via ElementInternals on the host', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('button');
+    });
+
+    it('mirrors ariaPressed on host as pressed toggles', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaPressed).toBe('false');
+      el.pressed = true;
+      await el.updateComplete;
+      expect(internals.ariaPressed).toBe('true');
+    });
+
+    it('mirrors disabled to host ariaDisabled', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute" disabled></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDisabled).toBe('true');
+      el.disabled = false;
+      await el.updateComplete;
+      expect(internals.ariaDisabled).toBe('false');
+    });
+
+    it('mirrors label property to host ariaLabel when no aria-labelledby is set', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Mute"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Mute');
+    });
+
+    it('prefers consumer-supplied aria-label over the label property', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Ignored" aria-label="Custom"></hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Custom');
+    });
+  });
+
+  // ─── Codex round-1 finding #1: host-canonical announced surface ───
+  //
+  // The host carries role/state via ElementInternals; the inner <button> is
+  // demoted with `aria-hidden + tabindex=-1` so AT only sees one widget. Host
+  // tabindex flips with disabled to keep tab order correct.
+
+  describe('Host-canonical surface (codex round-1 #1)', () => {
+    it('host has tabindex="0" when not disabled', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host has tabindex="-1" when disabled', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button disabled>Toggle</hx-toggle-button>',
+      );
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host tabindex flips when disabled toggles', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      expect(el.getAttribute('tabindex')).toBe('0');
+      el.disabled = true;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+      el.disabled = false;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('inner <button> is aria-hidden and tabindex=-1 (demoted)', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-hidden')).toBe('true');
+      expect(btn.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host Space activates toggle (host is the focus target)', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      el.focus();
+      const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
+      await userEvent.keyboard('{Space}');
+      const event = await eventPromise;
+      expect(event.detail.pressed).toBe(true);
+    });
+
+    it('host Enter activates toggle (host is the focus target)', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      el.focus();
+      const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
+      await userEvent.keyboard('{Enter}');
+      const event = await eventPromise;
+      expect(event.detail.pressed).toBe(true);
+    });
+  });
+
+  // ─── Codex round-1 finding #5: host semantics seeded in connectedCallback ───
+  //
+  // Without this, AT scanning the page between connect and the first
+  // updated() cycle would see an unannounced surface. Verifies the
+  // role/state is present immediately after construction.
+
+  describe('Host semantics seeded in connectedCallback (codex round-1 #5)', () => {
+    it('host carries role="button" before first render completes', async () => {
+      const el = document.createElement('hx-toggle-button') as HelixToggleButton;
+      el.label = 'Mute';
+      document.body.appendChild(el);
+      // Synchronously after connect — no awaits — internals must already be
+      // populated. Without the connectedCallback seed this would be null/empty.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('button');
+      expect(internals.ariaPressed).toBe('false');
+      el.remove();
+    });
+  });
+
+  // ─── Codex round-1 finding #9: default-slot text as accessible name ───
+  //
+  // When no explicit `label`/`aria-label`/`aria-labelledby` is set, the
+  // default-slot text content becomes the host's ariaLabel so AT announces
+  // the slotted label rather than an unnamed widget.
+
+  describe('Default-slot text as accessible name (codex round-1 #9)', () => {
+    it('uses default-slot text when no label/aria-label is provided', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button>Mute notifications</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Mute notifications');
+    });
+
+    it('label property takes precedence over default-slot text', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Explicit">Slotted</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Explicit');
+    });
+
+    it('aria-label takes precedence over default-slot text', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-label="Custom">Slotted</hx-toggle-button>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Custom');
+    });
+
+    it('updates ariaLabel when slot text changes (slotchange resync)', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Initial</hx-toggle-button>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Initial');
+      el.textContent = 'Changed';
+      // slotchange → _captureSlotLabelText → _syncHostAriaSemantics
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      await el.updateComplete;
+      expect(internals.ariaLabel).toBe('Changed');
+    });
+  });
+
+  // ─── Codex round-1 finding #6: aria-invalid ordered after validity ───
+
+  describe('aria-invalid ordered after validity (codex round-1 #6)', () => {
+    it('host ariaInvalid reflects required+unpressed validity', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button required label="Accept">Accept</hx-toggle-button>',
+      );
+      // _updateValidity() runs through _syncFormValue() in firstUpdated,
+      // which calls _syncHostAriaSemantics() AFTER setValidity(). The host
+      // should report invalid synchronously.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.validity.valueMissing).toBe(true);
+      expect(internals.ariaInvalid).toBe('true');
+      el.pressed = true;
+      await el.updateComplete;
+      expect(internals.validity.valueMissing).toBe(false);
+      expect(internals.ariaInvalid).toBe('false');
+    });
+  });
+
+  // ─── Codex round-2 finding #2: no-IDL-ref fallback render path (4) ───
+
+  describe('No-IDL-ref fallback render (round-2 F2)', () => {
+    async function forceFallbackPath(el: HelixToggleButton): Promise<void> {
+      const harness = el as ToggleButtonTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('inner button is NOT aria-hidden and is in tab order on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button[part="button"]')!;
+      expect(btn.hasAttribute('aria-hidden')).toBe(false);
+      expect(btn.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host is demoted to tabindex=-1 on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host activation handlers do NOT fire on Space/Enter on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const startPressed = el.pressed;
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      // Round-2 finding #2: on fallback the inner button receives native
+      // activation; host handlers are no-ops.
+      expect(el.pressed).toBe(startPressed);
+    });
+
+    it('host internals.role is cleared on the fallback path', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      const internals = (el as ToggleButtonTestHarness)._internals;
+      expect(internals.role).toBe('button');
+
+      await forceFallbackPath(el);
+      expect(internals.role).toBe(null);
+      expect(internals.ariaPressed).toBe(null);
+    });
+
+    // ─── Codex round-3 finding #2 (1) ───
+
+    it('clicking the inner button on the fallback path toggles host.pressed and fires hx-toggle', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button label="Bold"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button[part="button"]')!;
+      expect(el.pressed).toBe(false);
+
+      const eventPromise = oneEvent<CustomEvent<{ pressed: boolean }>>(el, 'hx-toggle');
+      // Round-3 F2: AT activation lands on the announced inner button. The
+      // inner click handler must produce a real toggle and emit `hx-toggle`.
+      btn.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+      expect(el.pressed).toBe(true);
+      expect(event.detail.pressed).toBe(true);
     });
   });
 });

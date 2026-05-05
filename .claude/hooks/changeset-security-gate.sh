@@ -23,27 +23,32 @@ check_halt
 INPUT="$(cat)"
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // ""')
 
-# Only handle Write and Edit
-if [[ "$TOOL_NAME" != "Write" && "$TOOL_NAME" != "Edit" ]]; then
+# 0.15.0 fix: MultiEdit was not in the allowed tool_name set, so the gate
+# silently exited 0 on every MultiEdit call against `.changeset/*.md` —
+# letting GHSA / CVE pre-disclosure through and skipping frontmatter
+# validation. 0.16.0: NotebookEdit added too (changesets are .md files
+# but a malicious agent could in principle route a .md write through
+# NotebookEdit's new_source path; cheap to allow, free to test).
+if [[ "$TOOL_NAME" != "Write" && "$TOOL_NAME" != "Edit" && "$TOOL_NAME" != "MultiEdit" && "$TOOL_NAME" != "NotebookEdit" ]]; then
   exit 0
 fi
 
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // ""')
+require_jq
+
+# 0.16.0: payload extraction migrated to `_lib/payload-read.sh`. Shared
+# helpers handle every write-tier tool with the same defensive
+# coercion. Adding the next write-tier tool is a one-line edit there.
+# shellcheck source=_lib/payload-read.sh
+source "$(dirname "$0")/_lib/payload-read.sh"
+
+FILE_PATH=$(extract_file_path "$INPUT")
 
 # Only care about .changeset/*.md files — exclude README.md (changeset tool metadata)
 if ! echo "$FILE_PATH" | grep -qE '\.changeset/[^/]+\.md$' || echo "$FILE_PATH" | grep -qE '\.changeset/README\.md$'; then
   exit 0
 fi
 
-require_jq
-
-# Extract the content being written
-if [[ "$TOOL_NAME" == "Write" ]]; then
-  CONTENT=$(echo "$INPUT" | jq -r '.tool_input.content // ""')
-else
-  # For Edit: check the new_string being inserted
-  CONTENT=$(echo "$INPUT" | jq -r '.tool_input.new_string // ""')
-fi
+CONTENT=$(extract_write_content "$INPUT")
 
 # ─── 1. SECURITY DISCLOSURE CHECK ───────────────────────────────────────────
 #
@@ -90,6 +95,19 @@ fi
 #
 # A changeset without valid frontmatter is silently ignored by the changesets
 # tool — the package bump and CHANGELOG entry never appear in the release.
+#
+# 0.15.0 fix: skip frontmatter validation for MultiEdit. MultiEdit's
+# `tool_input.edits[].new_string` payload is a list of partial string
+# replacements, not the full file body — running the frontmatter
+# validator against the concatenation of new_strings would reject every
+# legitimate MultiEdit on an existing changeset (none of the edit
+# fragments individually contains a frontmatter block, even though the
+# resulting file does). The disclosure scan above still runs on
+# MultiEdit content because GHSA/CVE patterns match per-fragment without
+# any structural assumption.
+if [[ "$TOOL_NAME" == "MultiEdit" ]]; then
+  exit 0
+fi
 
 # Must start with ---
 if ! echo "$CONTENT" | head -1 | grep -qE '^---'; then
@@ -107,9 +125,20 @@ Brief description of what changed and why (close #N if applicable).
 Bump types: patch (bug fix/security), minor (new feature), major (breaking change)"
 fi
 
-# Must have at least one package bump entry and a closing ---
+# Must have at least one package bump entry and a closing ---.
+# 0.15.0 fix: accept single-quoted, double-quoted, AND unquoted package
+# names (all three are valid YAML for the same string). Pre-fix the
+# regex required single quotes, so a tool or human authoring the
+# changeset with `"@scope/name": patch` was rejected as malformed even
+# though the Changesets tool itself accepts every form.
+#
+# Codex round-1 P2-1 fix: explicit-alternation form (no backref) so
+# the unquoted variant matches on BSD grep too. The earlier
+# `^([\"']?)[^\"']+\1: ...` shape relied on backref-with-empty-capture
+# semantics that BSD's grep rejects when the capture group's `?` made
+# it absent — quoted forms matched on macOS but unquoted did not.
 FRONTMATTER=$(echo "$CONTENT" | awk '/^---/{count++; if(count==2){exit} next} count==1{print}')
-if ! echo "$FRONTMATTER" | grep -qE "^'.+': (patch|minor|major)"; then
+if ! echo "$FRONTMATTER" | grep -qE "^(\"[^\"]+\"|'[^']+'|[^\"'[:space:]]+): (patch|minor|major)"; then
   json_output "block" \
     "CHANGESET FORMAT GATE: Frontmatter does not contain a valid package bump entry.
 

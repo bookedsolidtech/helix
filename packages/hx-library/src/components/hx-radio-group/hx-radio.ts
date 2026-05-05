@@ -62,6 +62,25 @@ export class HelixRadio extends HelixElement {
   @property({ type: Boolean, reflect: true })
   checked = false;
 
+  /**
+   * Set by `hx-radio-group` to mark this child as group-managed. `hx-radio` is
+   * not form-associated (the group is the sole form participant), so this
+   * flag is currently inert on this element. It exists for symmetry with
+   * `hx-checkbox._groupedSuppress` so the group/child contract is identical
+   * across both selection-control families and any future form-association
+   * change on `hx-radio` is automatically suppressed inside a group. Codex
+   * round-3 finding #1 (defense-in-depth).
+   * @internal
+   */
+  set _groupedSuppress(value: boolean) {
+    this.__groupedSuppress = value;
+  }
+  get _groupedSuppress(): boolean {
+    return this.__groupedSuppress;
+  }
+  /** @internal */
+  private __groupedSuppress = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {

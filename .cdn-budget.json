@@ -1,22 +1,22 @@
 {
   "comment": "CDN bundle size budgets for @helixui/library (gzipped bytes). Enforced in CI by scripts/check-cdn-size.mjs. Changes require code review and a justification in the PR description. The CDN build emits several artifacts with different size profiles — this file tracks per-artifact budgets rather than a single aggregate ceiling so drift in one strategy (A vs B) is surfaced precisely.",
-  "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2 (full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A=229.7 KB). Re-baselined 2026-04-25 after the 3.2.0 component-tier + palette expansion landed (full JS climbed to ~200.4 KB gz with the 3.2.1 token-cascade remediation). Ceilings give ~5-15% headroom for near-term component additions without being a floor. Warnings trigger at roughly half that headroom for early-signal drift.",
+  "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2 (full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A=229.7 KB). Re-baselined 2026-04-25 after the 3.2.0 component-tier + palette expansion landed (full JS climbed to ~200.4 KB gz with the 3.2.1 token-cascade remediation). Re-baselined 2026-05-04 for ARIA Group 2 (selection controls): host-canonical ElementInternals refactor across hx-checkbox, hx-checkbox-group, hx-radio, hx-radio-group, hx-switch, hx-toggle-button added IDREF feature detection and branched render paths, taking full JS to ~210.3 KB gz and full CSS to ~53.3 KB gz (forced-colors blocks). Headroom is intentionally tight per artifact — fullBundleJs ~2.2%, fullBundleCss ~12.6%, coreBundleJs ~42.9%, strategyATotal ~2.4%. The fullBundleJs / strategyATotal envelope is sized to fail one Group 3-10 component shy of needing another bump: each remaining ARIA group is expected to add ~5-10 KB and will require its own re-baseline commit with attribution. Warn thresholds sit approximately halfway between current and ceiling (rounded for readability — fullBundleCss and coreBundleJs warns predate this convention and are left unchanged) so drift is surfaced before the hard fail.",
   "budgets": {
     "fullBundleJs": {
       "file": "helix-{version}.min.js",
       "description": "Strategy A full self-contained JS bundle (all 81 components + Lit).",
-      "ceilingBytes": 215040,
-      "warnBytes": 204800,
-      "currentBytes": 205210,
-      "currentNote": "200.4 KB gz at 3.2.1 head (was 183.4 KB at v2.1.2; 3.2.0 added the component-tier expansion, palette refresh, and forced-colors mixin family)"
+      "ceilingBytes": 220160,
+      "warnBytes": 217600,
+      "currentBytes": 215347,
+      "currentNote": "210.3 KB gz at ARIA Group 2 head (was 200.4 KB at 3.2.1; Group 2 host-canonical ElementInternals refactor added ~10 KB across 6 components — hx-checkbox, hx-checkbox-group, hx-radio, hx-radio-group, hx-switch, hx-toggle-button — IDREF feature detection + branched modern/fallback render paths)"
     },
     "fullBundleCss": {
       "file": "helix-{version}.min.css",
       "description": "Strategy A full CSS bundle (all component shadow-root-adoptable CSS).",
       "ceilingBytes": 61440,
       "warnBytes": 56320,
-      "currentBytes": 52224,
-      "currentNote": "51.0 KB gz at 3.2.1 head (was 46.3 KB at v2.1.2; 3.2.0 palette refresh + forced-colors mixin set added ~5 KB)"
+      "currentBytes": 54579,
+      "currentNote": "53.3 KB gz at ARIA Group 2 head (was 51.0 KB at 3.2.1; Group 2 added forced-colors blocks across 6 components (hx-checkbox, hx-checkbox-group, hx-radio, hx-radio-group, hx-switch, hx-toggle-button) — ~2.3 KB)"
     },
     "coreBundleJs": {
       "file": "helix-core-{version}.min.js",
@@ -29,9 +29,9 @@
     "strategyATotal": {
       "description": "Aggregate Strategy A consumer payload (full JS + full CSS). This is what a page that loads the full bundle actually downloads.",
       "ceilingBytes": 276480,
-      "warnBytes": 261120,
-      "currentBytes": 257434,
-      "currentNote": "251.4 KB gz at 3.2.1 head (was 229.7 KB at v2.1.2; tracks fullBundleJs + fullBundleCss growth from the 3.2.0 expansion)"
+      "warnBytes": 273203,
+      "currentBytes": 269926,
+      "currentNote": "263.6 KB gz at ARIA Group 2 head (was 251.4 KB at 3.2.1; tracks fullBundleJs + fullBundleCss growth — Group 2 added ~10 KB JS + ~2.3 KB CSS across 6 components — hx-checkbox, hx-checkbox-group, hx-radio, hx-radio-group, hx-switch, hx-toggle-button)"
     }
   }
 }

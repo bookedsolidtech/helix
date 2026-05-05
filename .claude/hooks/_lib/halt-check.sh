@@ -7,7 +7,13 @@
 # call with a clear error that surfaces the file's contents so the operator
 # knows why the system was frozen.
 
-set -euo pipefail
+# NOTE: do NOT set `-e` here. This file is sourced by hooks that
+# intentionally tolerate non-zero exits (e.g. secret-scanner.sh runs
+# multiple grep passes that may legitimately produce non-zero from
+# patterns that don't match). Setting -e in the sourced lib would
+# propagate to the caller and cause spurious exit-1s on any benign
+# non-zero return. Only set the safer subset.
+set -uo pipefail
 
 # Find the .rea/ directory by walking up from CLAUDE_PROJECT_DIR or cwd.
 # Falls back to CLAUDE_PROJECT_DIR or the current working directory when no
