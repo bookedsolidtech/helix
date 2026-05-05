@@ -550,7 +550,22 @@ export class HelixMenu extends HelixElement {
    */
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
-    internals.role = 'menu';
+
+    // Codex push-gate round-8 finding 1 (mirrors round-6 finding 2 in
+    // hx-menu-item): on the legacy fallback path the inner
+    // `<div role="menu" aria-label="…">` is the announced surface. If we
+    // ALSO write `internals.role = 'menu'` (and ariaLabel) onto the host,
+    // AT sees TWO menus for one logical surface — the duplicate-surface
+    // problem host-canonical migration is meant to eliminate. Suppress
+    // host role + label writes on the fallback path; the inner element
+    // is the canonical announced surface there. Modern path keeps the
+    // host as the canonical surface and clears the inner role.
+    if (!this._supportsIdrefRefs) {
+      internals.role = null;
+      internals.ariaLabel = null;
+    } else {
+      internals.role = 'menu';
+    }
 
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
     const consumerLabelledBy = this.getAttribute('aria-labelledby');
@@ -585,17 +600,20 @@ export class HelixMenu extends HelixElement {
       if (this._supportsIdrefRefs) {
         // Modern path: element refs win; clear ariaLabel so they aren't
         // shadowed by a stale string. Fallback branch reads
-        // `_resolvedAccessibleName` for its inner-div mirror.
+        // `_resolvedAccessibleName` for its inner-div mirror — host
+        // ariaLabel is already cleared above on the fallback path.
         internals.ariaLabel = null;
-      } else {
-        internals.ariaLabel = flattened;
       }
     } else if (hostAriaLabel) {
       resolved = hostAriaLabel;
-      internals.ariaLabel = hostAriaLabel;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = hostAriaLabel;
+      }
     } else {
       resolved = this.label || 'Menu';
-      internals.ariaLabel = resolved;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = resolved;
+      }
     }
 
     // Codex push-gate round-2 finding 1: keep the resolved name available

@@ -9,6 +9,7 @@ import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
 import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
+import { writeMenuItemRovingTabIndex } from '../../utils/menu-roving.js';
 import {
   installAriaIdrefMirror,
   resolveIdrefTokens,
@@ -440,11 +441,19 @@ export class HelixDropdown extends HelixElement {
    * with hx-menu / hx-overflow-menu / hx-split-button. Group 4b only
    * added the host-attribute label mirror (additive); this is the
    * keyboard portion deferred until Group 5.
+   *
+   * Codex push-gate round-8 finding 2: route through
+   * `writeMenuItemRovingTabIndex` so host-canonical `hx-menu-item` items
+   * land their roving tabindex on the correct surface (host on the
+   * modern path, inner `.menu-item` on the fallback path). A direct
+   * `item.tabIndex = value` write on the host fails on the fallback
+   * path because the host is forced to `tabindex=-1` to keep exactly
+   * one focusable surface per item.
    * @internal
    */
   private _applyRovingTabIndex(items: HTMLElement[]): void {
     items.forEach((item, i) => {
-      item.tabIndex = i === this._rovingIndex ? 0 : -1;
+      writeMenuItemRovingTabIndex(item, i === this._rovingIndex ? 0 : -1);
     });
   }
 

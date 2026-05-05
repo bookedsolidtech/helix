@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixDropdown } from './hx-dropdown.js';
+import { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 import './index.js';
 import '../hx-menu/index.js';
 
@@ -975,6 +976,85 @@ describe('hx-dropdown', () => {
       inner.click();
       await el.updateComplete;
       expect(count).toBe(1);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Codex push-gate round-8 finding 2: roving tabindex on host-canonical
+  // `hx-menu-item` slotted into hx-dropdown's panel must be routed via
+  // `setRovingTabIndex` (shared `writeMenuItemRovingTabIndex` util) so the
+  // value lands on the inner `.menu-item` on the fallback path. A direct
+  // `item.tabIndex = value` write on the host fails because the host is
+  // forced to `tabindex=-1` to keep one focusable surface per item.
+  // ─────────────────────────────────────────────────────────────
+
+  describe('roving tabindex routing on host-canonical hx-menu-item (codex push-gate round-8 finding 2)', () => {
+    type HelixMenuItemCtor = typeof HelixMenuItem & {
+      __testSupportsIdrefRefsOverride: boolean | null;
+    };
+
+    afterEach(() => {
+      const ctor = customElements.get('hx-menu-item') as unknown as
+        | HelixMenuItemCtor
+        | undefined;
+      if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+    });
+
+    it('lands roving tabindex on inner .menu-item on the fallback path; host stays tabIndex=-1', async () => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+      ctor.__testSupportsIdrefRefsOverride = false;
+
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="edit">Edit</hx-menu-item>
+          <hx-menu-item value="delete">Delete</hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HelixMenuItem>('hx-menu-item'));
+      // Focus first to seed the roving index, then advance.
+      items[0]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+
+      // Host MUST stay out of the tab order on the fallback path.
+      expect(items[1].tabIndex).toBe(-1);
+
+      // Inner `.menu-item` of the focused item carries the roving 0;
+      // the previously focused item's inner element should be -1.
+      const focusedInner = items[1].shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      const blurredInner = items[0].shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      expect(focusedInner.tabIndex).toBe(0);
+      expect(blurredInner.tabIndex).toBe(-1);
+    });
+
+    it('lands roving tabindex on the host on the modern path (regression guard)', async () => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+      ctor.__testSupportsIdrefRefsOverride = true;
+
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="edit">Edit</hx-menu-item>
+          <hx-menu-item value="delete">Delete</hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HelixMenuItem>('hx-menu-item'));
+      items[0]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+
+      // Modern path: host is the canonical Tab stop.
+      expect(items[1].tabIndex).toBe(0);
+      expect(items[0].tabIndex).toBe(-1);
     });
   });
 });

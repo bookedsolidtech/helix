@@ -1612,3 +1612,74 @@ describe('hx-menu typeahead ignores slotted submenu subtree (round-6 finding 3)'
     expect(isItemFocused(fileItem)).toBe(true);
   });
 });
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-8 finding 1: on the legacy fallback path
+// (`_supportsIdrefRefs === false`), the inner `<div role="menu">` is the
+// announced surface. The host MUST NOT also carry `internals.role = "menu"`
+// (or `internals.ariaLabel`) — that produces TWO menus for one logical
+// surface, the duplicate-surface problem host-canonical migration is meant
+// to eliminate. Mirrors round-6 finding 2 in `hx-menu-item`.
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-menu host role suppression on fallback path (codex push-gate round-8 finding 1)', () => {
+  type HelixMenuCtor = typeof HelixMenu & {
+    __testSupportsIdrefRefsOverride: boolean | null;
+  };
+
+  afterEach(() => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('clears host internals.role + ariaLabel on fallback path; inner [role="menu"] is the only announced surface', async () => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(
+      '<hx-menu aria-label="Actions"><hx-menu-item value="a">Item A</hx-menu-item></hx-menu>',
+    );
+    await el.updateComplete;
+
+    const internals = (el as unknown as { _internals: ElementInternals })._internals;
+
+    // Host must NOT carry the menu role on the fallback path — inner div has it.
+    expect(internals.role).toBeNull();
+    // Host must NOT carry ariaLabel either; inner div mirrors the resolved name.
+    expect(internals.ariaLabel).toBeNull();
+
+    const inner = shadowQuery<HTMLElement>(el, '[role="menu"]')!;
+    expect(inner).toBeTruthy();
+    expect(inner.getAttribute('role')).toBe('menu');
+    expect(inner.getAttribute('aria-label')).toBe('Actions');
+  });
+
+  it('keeps host internals.role = "menu" on the modern path (regression guard)', async () => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+
+    const el = await fixture<HelixMenu>(
+      '<hx-menu aria-label="Actions"><hx-menu-item value="a">Item A</hx-menu-item></hx-menu>',
+    );
+    await el.updateComplete;
+
+    const internals = (el as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.role).toBe('menu');
+    // Modern path: inner div is roleless.
+    const innerRoled = shadowQuery<HTMLElement>(el, '[role="menu"]');
+    expect(innerRoled).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-8 finding 2: `hx-dropdown` (and any other menu-
+// bearing composite) MUST route the roving tabindex through
+// `hx-menu-item.setRovingTabIndex(value)` for host-canonical items so
+// the value lands on the host (modern path) or the inner `.menu-item`
+// (fallback path). A direct `item.tabIndex = value` write on the host
+// fails on the fallback path because the host is forced to `tabindex=-1`
+// and the inner element never picks up the roving value.
+// ─────────────────────────────────────────────────────────────
+
+// (Cross-component test for hx-dropdown lives in hx-dropdown.test.ts;
+// this file's coverage is the host-suppression assertion above.)
