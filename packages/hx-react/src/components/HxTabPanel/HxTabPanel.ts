@@ -15,6 +15,12 @@ export type { HxTabPanelProps };
 
 /**
  * A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`.
+Group 5a host-canonical: `role="tabpanel"` lives on the host via
+`_internals.role`. The host carries the canonical AT surface — consumer
+`aria-labelledby` / `aria-describedby` on the host resolve through the
+shared IDREF mirror. The parent `hx-tabs` writes `internals.ariaLabelledByElements`
+referencing the corresponding `<hx-tab>` host so cross-shadow naming works
+via IDL element references (the modern path) without serializing tab text.
  *
  * @example
  * ```tsx

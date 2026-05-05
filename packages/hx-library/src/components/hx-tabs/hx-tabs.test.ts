@@ -15,6 +15,12 @@ function assertEl<T extends Element>(el: T | null | undefined, label: string): T
   return el;
 }
 
+/** Reads `_internals` off a host that elevates ARIA semantics via ElementInternals. */
+function getInternals(el: HTMLElement): ElementInternals {
+  return (el as unknown as { _internals: ElementInternals })._internals;
+}
+
+
 // ─── Fixture Helpers ───────────────────────────────────────────────────────────
 
 const DEFAULT_TABS_HTML = `
@@ -37,6 +43,23 @@ const TWO_TABS_HTML = `
   </hx-tabs>
 `;
 
+/**
+ * Fixture HTML with `activation="automatic"` for keyboard tests that exercise
+ * focus-follows-selection semantics. The library default flipped to `manual`
+ * in Group 5a; tests covering automatic-mode behaviour pin the activation
+ * mode explicitly.
+ */
+const AUTO_TABS_HTML = `
+  <hx-tabs activation="automatic">
+    <hx-tab slot="tab" panel="alpha">Alpha</hx-tab>
+    <hx-tab slot="tab" panel="beta">Beta</hx-tab>
+    <hx-tab slot="tab" panel="gamma">Gamma</hx-tab>
+    <hx-tab-panel name="alpha">Alpha content</hx-tab-panel>
+    <hx-tab-panel name="beta">Beta content</hx-tab-panel>
+    <hx-tab-panel name="gamma">Gamma content</hx-tab-panel>
+  </hx-tabs>
+`;
+
 // ─── Rendering ────────────────────────────────────────────────────────────────
 
 describe('hx-tabs', () => {
@@ -46,10 +69,9 @@ describe('hx-tabs', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders a tablist with role="tablist"', async () => {
+    it('renders a tablist with role="tablist" on the host (host-canonical)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
-      const tablist = shadowQuery(el, '[role="tablist"]');
-      expect(tablist).toBeTruthy();
+      expect(getInternals(el).role).toBe('tablist');
     });
 
     it('renders tablist with part="tablist"', async () => {
@@ -64,20 +86,19 @@ describe('hx-tabs', () => {
       expect(panels).toBeTruthy();
     });
 
-    it('light-DOM hx-tab children have role="tab" via shadow button', async () => {
+    it('hx-tab hosts carry role="tab" via ElementInternals (host-canonical)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       for (const tab of tabs) {
-        const btn = shadowQuery<HTMLButtonElement>(tab, 'button[role="tab"]');
-        expect(btn).toBeTruthy();
+        expect(getInternals(tab).role).toBe('tab');
       }
     });
 
-    it('hx-tab-panel children have role="tabpanel"', async () => {
+    it('hx-tab-panel hosts carry role="tabpanel" via ElementInternals', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const panelEls = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
       for (const panel of panelEls) {
-        expect(panel.getAttribute('role')).toBe('tabpanel');
+        expect(getInternals(panel).role).toBe('tabpanel');
       }
     });
 
@@ -115,22 +136,21 @@ describe('hx-tabs', () => {
   // ─── Tab Selection ────────────────────────────────────────────────────────────
 
   describe('Tab Selection', () => {
-    it('clicking a tab activates it (aria-selected="true")', async () => {
+    it('clicking a tab activates it (aria-selected="true" on host internals)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       await el.updateComplete;
-      const btnBetaAfter = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      expect(btnBetaAfter?.getAttribute('aria-selected')).toBe('true');
+      expect(getInternals(tabs[1]).ariaSelected).toBe('true');
     });
 
     it('clicking a tab shows its panel', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       await el.updateComplete;
       expect(panels[1].hasAttribute('hidden')).toBe(false);
     });
@@ -139,8 +159,8 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       await el.updateComplete;
       expect(panels[0].hasAttribute('hidden')).toBe(true);
       expect(panels[2].hasAttribute('hidden')).toBe(true);
@@ -150,8 +170,8 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -160,8 +180,8 @@ describe('hx-tabs', () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       const event = await eventPromise;
       expect(event.bubbles).toBe(true);
       expect(event.composed).toBe(true);
@@ -174,8 +194,8 @@ describe('hx-tabs', () => {
         el,
         'hx-tab-change',
       );
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       const event = await eventPromise;
       expect(event.detail.index).toBe(1);
     });
@@ -187,8 +207,8 @@ describe('hx-tabs', () => {
         el,
         'hx-tab-change',
       );
-      const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      assertEl(btnGamma, 'button').click();
+      const btnGamma = shadowQuery<HTMLElement>(tabs[2], '[part="tab"]');
+      assertEl(btnGamma, '[part=tab]').click();
       const event = await eventPromise;
       expect(event.detail.tabId).toBe(tabs[2].id);
     });
@@ -200,8 +220,8 @@ describe('hx-tabs', () => {
       el.addEventListener('hx-tab-change', () => {
         eventFired = true;
       });
-      const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnAlpha, 'button').click();
+      const btnAlpha = shadowQuery<HTMLElement>(tabs[0], '[part="tab"]');
+      assertEl(btnAlpha, '[part=tab]').click();
       await el.updateComplete;
       expect(eventFired).toBe(false);
     });
@@ -209,70 +229,68 @@ describe('hx-tabs', () => {
 
   // ─── Keyboard Navigation — Horizontal / Automatic (default) ──────────────────
 
-  describe('Keyboard Navigation — Horizontal Automatic (default)', () => {
+  describe('Keyboard Navigation — Horizontal Automatic', () => {
+    // Note: focus the HOST (host-canonical Path A) — the tab host is the
+    // single roving-tabindex surface; the inner [part="tab"] is presentational
+    // (tabindex=-1) on the modern path.
     it('ArrowRight moves focus to the next tab and activates it', async () => {
-      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const el = await fixture<HelixTabs>(AUTO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnAlpha, 'button').focus();
+      tabs[0].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       expect(tabs[1].selected).toBe(true);
     });
 
     it('ArrowLeft moves focus to the previous tab and activates it', async () => {
-      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const el = await fixture<HelixTabs>(AUTO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      // First activate beta so focus is on it
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       await el.updateComplete;
-      assertEl(btnBeta, 'button').focus();
+      tabs[1].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
     });
 
     it('Home key moves focus to the first tab', async () => {
-      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const el = await fixture<HelixTabs>(AUTO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      // Activate last tab first
-      const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      assertEl(btnGamma, 'button').click();
+      const btnGamma = shadowQuery<HTMLElement>(tabs[2], '[part="tab"]');
+      assertEl(btnGamma, '[part=tab]').click();
       await el.updateComplete;
-      assertEl(btnGamma, 'button').focus();
+      tabs[2].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
     });
 
     it('End key moves focus to the last tab', async () => {
-      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const el = await fixture<HelixTabs>(AUTO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnAlpha, 'button').focus();
+      tabs[0].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
       await el.updateComplete;
       expect(tabs[2].selected).toBe(true);
     });
 
     it('ArrowRight wraps from last tab to first tab', async () => {
-      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const el = await fixture<HelixTabs>(AUTO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      assertEl(btnGamma, 'button').click();
+      const btnGamma = shadowQuery<HTMLElement>(tabs[2], '[part="tab"]');
+      assertEl(btnGamma, '[part=tab]').click();
       await el.updateComplete;
-      assertEl(btnGamma, 'button').focus();
+      tabs[2].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
     });
 
     it('ArrowLeft wraps from first tab to last tab', async () => {
-      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const el = await fixture<HelixTabs>(AUTO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnAlpha = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnAlpha, 'button').focus();
+      tabs[0].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       await el.updateComplete;
       expect(tabs[2].selected).toBe(true);
@@ -294,8 +312,8 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnOne, 'button').focus();
+      const btnOne = shadowQuery<HTMLElement>(tabs[0], '[part="tab"]');
+      assertEl(btnOne, '[part=tab]').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Tab 0 should still be selected since activation is manual
@@ -314,13 +332,13 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       // Navigate to tab two with ArrowRight (no activation)
-      const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnOne, 'button').focus();
+      const btnOne = shadowQuery<HTMLElement>(tabs[0], '[part="tab"]');
+      assertEl(btnOne, '[part=tab]').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Now the button for tab two should be focused — press Space
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').focus();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
       el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       const event = await eventPromise;
@@ -339,8 +357,8 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').focus();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tab-change');
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       const event = await eventPromise;
@@ -353,9 +371,9 @@ describe('hx-tabs', () => {
   // ─── Keyboard Navigation — Vertical Orientation ───────────────────────────────
 
   describe('Keyboard Navigation — Vertical Orientation', () => {
-    it('ArrowDown navigates to the next tab in vertical mode', async () => {
+    it('ArrowDown navigates to the next tab in vertical mode (automatic)', async () => {
       const el = await fixture<HelixTabs>(`
-        <hx-tabs orientation="vertical">
+        <hx-tabs orientation="vertical" activation="automatic">
           <hx-tab slot="tab" panel="one">One</hx-tab>
           <hx-tab slot="tab" panel="two">Two</hx-tab>
           <hx-tab slot="tab" panel="three">Three</hx-tab>
@@ -365,16 +383,15 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnOne, 'button').focus();
+      tabs[0].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       expect(tabs[1].selected).toBe(true);
     });
 
-    it('ArrowUp navigates to the previous tab in vertical mode', async () => {
+    it('ArrowUp navigates to the previous tab in vertical mode (automatic)', async () => {
       const el = await fixture<HelixTabs>(`
-        <hx-tabs orientation="vertical">
+        <hx-tabs orientation="vertical" activation="automatic">
           <hx-tab slot="tab" panel="one">One</hx-tab>
           <hx-tab slot="tab" panel="two">Two</hx-tab>
           <hx-tab-panel name="one">Panel One</hx-tab-panel>
@@ -382,10 +399,10 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').click();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').click();
       await el.updateComplete;
-      assertEl(btnTwo, 'button').focus();
+      tabs[1].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
       await el.updateComplete;
       expect(tabs[0].selected).toBe(true);
@@ -401,10 +418,10 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').click();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').click();
       await el.updateComplete;
-      assertEl(btnTwo, 'button').focus();
+      assertEl(btnTwo, '[part=tab]').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
       await el.updateComplete;
       // Tab two should still be active because ArrowLeft does not apply in vertical
@@ -421,8 +438,8 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnOne, 'button').focus();
+      const btnOne = shadowQuery<HTMLElement>(tabs[0], '[part="tab"]');
+      assertEl(btnOne, '[part=tab]').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Tab one should still be active because ArrowRight does not apply in vertical
@@ -447,8 +464,8 @@ describe('hx-tabs', () => {
       el.addEventListener('hx-tab-change', () => {
         eventFired = true;
       });
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').click();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').click();
       await el.updateComplete;
       expect(eventFired).toBe(false);
       expect(tabs[0].selected).toBe(true);
@@ -467,8 +484,8 @@ describe('hx-tabs', () => {
         </hx-tabs>
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnOne = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      assertEl(btnOne, 'button').focus();
+      const btnOne = shadowQuery<HTMLElement>(tabs[0], '[part="tab"]');
+      assertEl(btnOne, '[part=tab]').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Disabled tab two receives focus but is NOT activated — tab one stays selected
@@ -477,9 +494,9 @@ describe('hx-tabs', () => {
       expect(document.activeElement).toBe(tabs[1]);
     });
 
-    it('ArrowRight past a disabled tab continues to the next enabled tab', async () => {
+    it('ArrowRight past a disabled tab continues to the next enabled tab (automatic)', async () => {
       const el = await fixture<HelixTabs>(`
-        <hx-tabs>
+        <hx-tabs activation="automatic">
           <hx-tab slot="tab" panel="one">One</hx-tab>
           <hx-tab slot="tab" panel="two" disabled>Two</hx-tab>
           <hx-tab slot="tab" panel="three">Three</hx-tab>
@@ -490,8 +507,7 @@ describe('hx-tabs', () => {
       `);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       // Focus disabled tab two, then press ArrowRight
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').focus();
+      tabs[1].focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
       await el.updateComplete;
       // Tab three is enabled so it gets focus and activated
@@ -513,8 +529,8 @@ describe('hx-tabs', () => {
         eventFired = true;
       });
       // Focus disabled tab two
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').focus();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
       await el.updateComplete;
       expect(eventFired).toBe(false);
@@ -535,8 +551,8 @@ describe('hx-tabs', () => {
       el.addEventListener('hx-tab-change', () => {
         eventFired = true;
       });
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').focus();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').focus();
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
       await el.updateComplete;
       expect(eventFired).toBe(false);
@@ -575,55 +591,55 @@ describe('hx-tabs', () => {
   // ─── ARIA ─────────────────────────────────────────────────────────────────────
 
   describe('ARIA', () => {
-    it('tablist has aria-orientation="horizontal" by default', async () => {
+    it('host has aria-orientation="horizontal" by default (host-canonical)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
-      const tablist = shadowQuery(el, '[role="tablist"]');
-      expect(tablist?.getAttribute('aria-orientation')).toBe('horizontal');
+      expect(getInternals(el).ariaOrientation).toBe('horizontal');
     });
 
-    it('tablist has aria-orientation="vertical" when orientation is vertical', async () => {
+    it('host has aria-orientation="vertical" when orientation is vertical', async () => {
       const el = await fixture<HelixTabs>(`
         <hx-tabs orientation="vertical">
           <hx-tab slot="tab" panel="one">One</hx-tab>
           <hx-tab-panel name="one">Panel One</hx-tab-panel>
         </hx-tabs>
       `);
-      const tablist = shadowQuery(el, '[role="tablist"]');
-      expect(tablist?.getAttribute('aria-orientation')).toBe('vertical');
+      expect(getInternals(el).ariaOrientation).toBe('vertical');
     });
 
-    it('tab button has aria-selected="true" when selected', async () => {
+    it('tab host has aria-selected="true" when selected (host-canonical)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btn = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      expect(btn?.getAttribute('aria-selected')).toBe('true');
+      expect(getInternals(tabs[0]).ariaSelected).toBe('true');
     });
 
-    it('tab button has aria-selected="false" when not selected', async () => {
+    it('tab host has aria-selected="false" when not selected', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btn = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      expect(btn?.getAttribute('aria-selected')).toBe('false');
+      expect(getInternals(tabs[1]).ariaSelected).toBe('false');
     });
 
-    it('tab button has aria-controls referencing its panel id', async () => {
+    it('tab host references its panel via internals.ariaControlsElements (modern path)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      // aria-controls belongs on the button (role="tab"), not the host element
-      const btn = shadowQuery<HTMLButtonElement>(tabs[0], 'button');
-      const controlsAttr = btn?.getAttribute('aria-controls');
-      expect(controlsAttr).toBeTruthy();
-      expect(controlsAttr).toBe(panels[0].id);
+      type RefsInternals = ElementInternals & {
+        ariaControlsElements: Element[] | null;
+      };
+      const refs = (getInternals(tabs[0]) as RefsInternals).ariaControlsElements;
+      expect(refs).toBeTruthy();
+      expect(refs?.[0]).toBe(panels[0]);
     });
 
-    it('panel has aria-label matching its tab text content', async () => {
+    it('panel host references its tab via internals.ariaLabelledByElements (modern path)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
-      const ariaLabel = panels[0].getAttribute('aria-label');
-      expect(ariaLabel).toBeTruthy();
-      expect(ariaLabel).toBe(tabs[0].textContent?.trim());
+      type RefsInternals = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (getInternals(panels[0]) as RefsInternals).ariaLabelledByElements;
+      expect(refs).toBeTruthy();
+      expect(refs?.[0]).toBe(tabs[0]);
     });
 
     it('panel has tabindex="0" for keyboard accessibility', async () => {
@@ -643,11 +659,25 @@ describe('hx-tabs', () => {
     it('tabindex updates on tabs when selection changes', async () => {
       const el = await fixture<HelixTabs>(TWO_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnTwo = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnTwo, 'button').click();
+      const btnTwo = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnTwo, '[part=tab]').click();
       await el.updateComplete;
       expect(tabs[0].tabIndex).toBe(-1);
       expect(tabs[1].tabIndex).toBe(0);
+    });
+
+    // Cross-AT smoke test: validates the role-on-host with inner-button
+    // activation pattern. Confirms `document.activeElement` matches the host
+    // (not an inner shadow node) when focus lands on a tab, and that the
+    // host's `internals.role` / `ariaSelected` reflect the announced surface.
+    it('host owns focus + ARIA when a tab is focused (cross-AT smoke)', async () => {
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      tabs[0].focus();
+      expect(document.activeElement).toBe(tabs[0]);
+      const internals = getInternals(tabs[0]);
+      expect(internals.role).toBe('tab');
+      expect(internals.ariaSelected).toBe('true');
     });
   });
 
@@ -669,8 +699,18 @@ describe('hx-tabs', () => {
       expect(el.getAttribute('orientation')).toBe('vertical');
     });
 
-    it('activation defaults to "automatic"', async () => {
+    it('activation defaults to "manual" (Group 5a healthcare default)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      expect(el.activation).toBe('manual');
+    });
+
+    it('activation="automatic" is settable via attribute', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs activation="automatic">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+        </hx-tabs>
+      `);
       expect(el.activation).toBe('automatic');
     });
 
@@ -738,8 +778,8 @@ describe('hx-tabs', () => {
       el.appendChild(newPanel);
       await el.updateComplete;
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btn = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      assertEl(btn, 'button').click();
+      const btn = shadowQuery<HTMLElement>(tabs[2], '[part="tab"]');
+      assertEl(btn, '[part=tab]').click();
       await el.updateComplete;
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
       expect(panels[2].hasAttribute('hidden')).toBe(false);
@@ -788,21 +828,51 @@ describe('hx-tabs', () => {
   // ─── Label Property ──────────────────────────────────────────────────────────
 
   describe('Label Property', () => {
-    it('tablist has aria-label="Tabs" by default', async () => {
+    it('host has no internals.ariaLabel by default (no `label` set)', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
-      const tablist = shadowQuery(el, '[role="tablist"]');
-      expect(tablist?.getAttribute('aria-label')).toBe('Tabs');
+      // Group 5a host-canonical: when `label` is empty and no consumer
+      // aria-label/aria-labelledby is supplied, internals.ariaLabel is null.
+      // The dev warning at firstUpdated still surfaces the WCAG concern.
+      expect(getInternals(el).ariaLabel).toBeFalsy();
     });
 
-    it('tablist has aria-label when label is set', async () => {
+    it('host carries internals.ariaLabel when `label` is set', async () => {
       const el = await fixture<HelixTabs>(`
         <hx-tabs label="Patient record sections">
           <hx-tab slot="tab" panel="one">One</hx-tab>
           <hx-tab-panel name="one">Panel One</hx-tab-panel>
         </hx-tabs>
       `);
-      const tablist = shadowQuery(el, '[role="tablist"]');
-      expect(tablist?.getAttribute('aria-label')).toBe('Patient record sections');
+      expect(getInternals(el).ariaLabel).toBe('Patient record sections');
+    });
+
+    it('host aria-label attribute overrides `label` property via internals', async () => {
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs label="Property label" aria-label="Attribute label">
+          <hx-tab slot="tab" panel="one">One</hx-tab>
+          <hx-tab-panel name="one">Panel One</hx-tab-panel>
+        </hx-tabs>
+      `);
+      expect(getInternals(el).ariaLabel).toBe('Attribute label');
+    });
+
+    it('host aria-labelledby resolves to internals.ariaLabelledByElements (modern path)', async () => {
+      const el = await fixture<HelixTabs>(`
+        <div>
+          <h2 id="tabs-heading">Patient sections</h2>
+          <hx-tabs aria-labelledby="tabs-heading">
+            <hx-tab slot="tab" panel="one">One</hx-tab>
+            <hx-tab-panel name="one">Panel One</hx-tab-panel>
+          </hx-tabs>
+        </div>
+      `);
+      const tabs = el.querySelector('hx-tabs') as HelixTabs;
+      type RefsInternals = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (getInternals(tabs) as RefsInternals).ariaLabelledByElements;
+      expect(refs).toBeTruthy();
+      expect(refs?.[0]).toBe(el.querySelector('#tabs-heading'));
     });
 
     it('label property reflects as attribute', async () => {
@@ -827,8 +897,8 @@ describe('hx-tabs', () => {
     it('selectedIndex returns correct index after clicking second tab', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnBeta = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnBeta, 'button').click();
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
       await el.updateComplete;
       expect(el.selectedIndex).toBe(1);
     });
@@ -965,8 +1035,8 @@ describe('hx-tabs', () => {
     it('tab activated by click updates selectedIndex correctly', async () => {
       const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
-      const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      assertEl(btnGamma, 'button').click();
+      const btnGamma = shadowQuery<HTMLElement>(tabs[2], '[part="tab"]');
+      assertEl(btnGamma, '[part=tab]').click();
       await el.updateComplete;
       expect(el.selectedIndex).toBe(2);
     });
@@ -978,8 +1048,8 @@ describe('hx-tabs', () => {
         el,
         'hx-tab-change',
       );
-      const btnAlphaSecond = shadowQuery<HTMLButtonElement>(tabs[1], 'button');
-      assertEl(btnAlphaSecond, 'button').click();
+      const btnAlphaSecond = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnAlphaSecond, '[part=tab]').click();
       const event = await eventPromise;
       expect(event.detail.tabId).toBeTruthy();
       expect(event.detail.index).toBe(1);
@@ -994,8 +1064,8 @@ describe('hx-tabs', () => {
       const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
       const panels = Array.from(el.querySelectorAll('hx-tab-panel')) as HelixTabPanel[];
       // Select gamma (index 2)
-      const btnGamma = shadowQuery<HTMLButtonElement>(tabs[2], 'button');
-      assertEl(btnGamma, 'button').click();
+      const btnGamma = shadowQuery<HTMLElement>(tabs[2], '[part="tab"]');
+      assertEl(btnGamma, '[part=tab]').click();
       await el.updateComplete;
       expect(panels[2].hasAttribute('hidden')).toBe(false);
       expect(panels[0].hasAttribute('hidden')).toBe(true);

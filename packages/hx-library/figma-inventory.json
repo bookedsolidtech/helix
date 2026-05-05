@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T12:24:24.560Z",
+  "generatedAt": "2026-05-05T15:36:21.392Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -21704,7 +21704,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-tab-panel",
       "figmaPagePlacement": "4a",
-      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`.",
+      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`. Group 5a host-canonical: `role=\"tabpanel\"` lives on the host via `_internals.role`. The host carries the canonical AT…",
       "tier": "atom",
       "variantAxes": [],
       "textProperties": [
@@ -22043,7 +22043,7 @@
             "manual",
             "automatic"
           ],
-          "default": "automatic"
+          "default": "manual"
         }
       ],
       "textProperties": [
