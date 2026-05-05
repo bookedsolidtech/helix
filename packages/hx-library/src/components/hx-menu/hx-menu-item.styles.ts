@@ -3,11 +3,27 @@ import { css } from 'lit';
 export const helixMenuItemStyles = css`
   :host {
     display: block;
+    /* Host carries the roving tabindex on the modern host-canonical path,
+       so it becomes the focusable surface. Strip the default focus outline
+       from the host so the inner .menu-item:focus-visible (and the host
+       :focus-visible rule below) own the visual treatment. */
+    outline: none;
   }
 
   :host([disabled]) {
     pointer-events: none;
     opacity: var(--hx-opacity-disabled, 0.5);
+  }
+
+  /* Host is the Tab stop on the modern path; mirror the inner focus-ring
+     onto the host so keyboard focus is visible on whichever surface the
+     UA paints. The inner-element rule below still applies on the legacy
+     fallback path (where the inner div carries the role + tabindex). */
+  :host(:focus-visible) .menu-item {
+    background-color: var(--hx-menu-item-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-menu-item-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-menu-item-focus-ring-offset, 0px);
   }
 
   .menu-item {
@@ -117,6 +133,14 @@ export const helixMenuItemStyles = css`
     }
 
     .menu-item:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    /* Host-canonical focus parity in forced-colors mode. */
+    :host(:focus-visible) .menu-item {
+      background-color: Highlight;
+      color: HighlightText;
       outline: 2px solid Highlight;
       outline-offset: -2px;
     }

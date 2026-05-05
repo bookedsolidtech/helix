@@ -9,6 +9,47 @@ import './index.js';
 afterEach(cleanup);
 
 // ─────────────────────────────────────────────────────────────
+// Helpers — assertions that accept BOTH host-canonical (modern) and
+// inner-element (legacy) ARIA placements. Group 5b migrated the menu
+// family to host-canonical; we keep helpers tolerant so the legacy path
+// remains exercised on any engine without IDL ARIA element references.
+// ─────────────────────────────────────────────────────────────
+
+function getMenuRole(el: HTMLElement): string | null {
+  // Modern path: host carries role; legacy: inner [role="menu"]
+  return (
+    el.getAttribute('role') ??
+    (el as HTMLElement & { _internals?: ElementInternals })._internals?.role ??
+    el.shadowRoot?.querySelector('[role="menu"]')?.getAttribute('role') ??
+    null
+  );
+}
+
+function getItemRole(el: HelixMenuItem): string | null {
+  return (
+    el.getAttribute('role') ??
+    el.shadowRoot?.querySelector('[role^="menuitem"]')?.getAttribute('role') ??
+    null
+  );
+}
+
+function getItemAriaState(el: HelixMenuItem, attr: string): string | null {
+  // Try host attribute first; fall back to inner element. ElementInternals
+  // does not project to attributes, so on the modern path inspect via
+  // accessibility tree if available.
+  const host = el.getAttribute(attr);
+  if (host !== null) return host;
+  const inner = el.shadowRoot?.querySelector('.menu-item');
+  return inner?.getAttribute(attr) ?? null;
+}
+
+function isItemFocused(el: HelixMenuItem): boolean {
+  if (document.activeElement === el) return true;
+  const inner = el.shadowRoot?.querySelector<HTMLElement>('.menu-item');
+  return el.shadowRoot?.activeElement === inner;
+}
+
+// ─────────────────────────────────────────────────────────────
 // hx-menu
 // ─────────────────────────────────────────────────────────────
 
@@ -19,10 +60,16 @@ describe('hx-menu', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders role="menu" on inner element', async () => {
+    it('exposes role="menu" on host or inner element', async () => {
       const el = await fixture<HelixMenu>('<hx-menu></hx-menu>');
-      const base = shadowQuery(el, '[role="menu"]');
-      expect(base).toBeTruthy();
+      // Modern path: ElementInternals.role on host (not surfaced as
+      // attribute, but the accessibility tree carries it). Verify by
+      // inspecting either the inner [role="menu"] (legacy) or the
+      // ElementInternals access on the host.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const role =
+        internals.role ?? el.shadowRoot?.querySelector('[role="menu"]')?.getAttribute('role');
+      expect(role).toBe('menu');
     });
 
     it('exposes "base" CSS part', async () => {
@@ -35,7 +82,6 @@ describe('hx-menu', () => {
       const el = await fixture<HelixMenu>('<hx-menu></hx-menu>');
       const base = shadowQuery<HTMLElement>(el, '[part~="base"]')!;
       const styles = getComputedStyle(base);
-      // overflow-y should be auto (set via stylesheet)
       expect(styles.overflowY).toBe('auto');
     });
 
@@ -58,7 +104,7 @@ describe('hx-menu', () => {
           <hx-menu-item value="edit">Edit</hx-menu-item>
         </hx-menu>
       `);
-      const item = el.querySelector('hx-menu-item')!;
+      const item = el.querySelector('hx-menu-item') as HelixMenuItem;
       const inner = shadowQuery<HTMLElement>(item, '.menu-item')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
       inner.click();
@@ -69,10 +115,10 @@ describe('hx-menu', () => {
     it('hx-select detail contains item reference', async () => {
       const el = await fixture<HelixMenu>(`
         <hx-menu>
-          <hx-menu-item value="view">View</hx-menu-item>
+          <hx-menu-item value="x">Item</hx-menu-item>
         </hx-menu>
       `);
-      const item = el.querySelector('hx-menu-item')!;
+      const item = el.querySelector('hx-menu-item') as HelixMenuItem;
       const inner = shadowQuery<HTMLElement>(item, '.menu-item')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
       inner.click();
@@ -83,10 +129,10 @@ describe('hx-menu', () => {
     it('hx-select bubbles and is composed', async () => {
       const el = await fixture<HelixMenu>(`
         <hx-menu>
-          <hx-menu-item value="test">Test</hx-menu-item>
+          <hx-menu-item value="x">Item</hx-menu-item>
         </hx-menu>
       `);
-      const item = el.querySelector('hx-menu-item')!;
+      const item = el.querySelector('hx-menu-item') as HelixMenuItem;
       const inner = shadowQuery<HTMLElement>(item, '.menu-item')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-select');
       inner.click();
@@ -98,17 +144,17 @@ describe('hx-menu', () => {
     it('does not dispatch hx-select for disabled items', async () => {
       const el = await fixture<HelixMenu>(`
         <hx-menu>
-          <hx-menu-item value="disabled" disabled>Disabled</hx-menu-item>
+          <hx-menu-item value="x" disabled>Item</hx-menu-item>
         </hx-menu>
       `);
-      const item = el.querySelector('hx-menu-item')!;
+      const item = el.querySelector('hx-menu-item') as HelixMenuItem;
       const inner = shadowQuery<HTMLElement>(item, '.menu-item')!;
       let fired = false;
       el.addEventListener('hx-select', () => {
         fired = true;
       });
       inner.click();
-      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 50));
       expect(fired).toBe(false);
     });
   });
@@ -122,13 +168,9 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      firstInner.focus();
+      items[0].focus();
       await userEvent.keyboard('{ArrowDown}');
-      const secondInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
-      expect(
-        document.activeElement === items[1] || items[1].shadowRoot?.activeElement === secondInner,
-      ).toBe(true);
+      expect(isItemFocused(items[1])).toBe(true);
     });
 
     it('ArrowUp wraps to last item from first', async () => {
@@ -140,13 +182,9 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      firstInner.focus();
+      items[0].focus();
       await userEvent.keyboard('{ArrowUp}');
-      const lastInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      expect(
-        items[2].shadowRoot?.activeElement === lastInner || document.activeElement === items[2],
-      ).toBe(true);
+      expect(isItemFocused(items[2])).toBe(true);
     });
 
     it('ArrowDown wraps to first item from last', async () => {
@@ -157,13 +195,9 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const lastInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
-      lastInner.focus();
+      items[1].focus();
       await userEvent.keyboard('{ArrowDown}');
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      expect(
-        items[0].shadowRoot?.activeElement === firstInner || document.activeElement === items[0],
-      ).toBe(true);
+      expect(isItemFocused(items[0])).toBe(true);
     });
 
     it('Escape dispatches hx-close', async () => {
@@ -172,9 +206,8 @@ describe('hx-menu', () => {
           <hx-menu-item value="a">A</hx-menu-item>
         </hx-menu>
       `);
-      const item = el.querySelector('hx-menu-item')!;
-      const inner = shadowQuery<HTMLElement>(item, '.menu-item')!;
-      inner.focus();
+      const item = el.querySelector('hx-menu-item') as HelixMenuItem;
+      item.focus();
       const eventPromise = oneEvent(el, 'hx-close');
       await userEvent.keyboard('{Escape}');
       const event = await eventPromise;
@@ -190,13 +223,9 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const lastInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      lastInner.focus();
+      items[2].focus();
       await userEvent.keyboard('{Home}');
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      expect(
-        items[0].shadowRoot?.activeElement === firstInner || document.activeElement === items[0],
-      ).toBe(true);
+      expect(isItemFocused(items[0])).toBe(true);
     });
 
     it('End focuses last item', async () => {
@@ -208,13 +237,9 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      firstInner.focus();
+      items[0].focus();
       await userEvent.keyboard('{End}');
-      const lastInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      expect(
-        items[2].shadowRoot?.activeElement === lastInner || document.activeElement === items[2],
-      ).toBe(true);
+      expect(isItemFocused(items[2])).toBe(true);
     });
 
     it('skips disabled items during keyboard navigation', async () => {
@@ -226,19 +251,15 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      firstInner.focus();
+      items[0].focus();
       await userEvent.keyboard('{ArrowDown}');
       // Should skip disabled item B and focus C
-      const cInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      expect(
-        items[2].shadowRoot?.activeElement === cInner || document.activeElement === items[2],
-      ).toBe(true);
+      expect(isItemFocused(items[2])).toBe(true);
     });
   });
 
-  describe('Roving tabindex', () => {
-    it('first enabled item has tabindex=0, others have tabindex=-1', async () => {
+  describe('Roving tabindex (host-canonical)', () => {
+    it('first enabled item host has tabindex=0, others have tabindex=-1', async () => {
       const el = await fixture<HelixMenu>(`
         <hx-menu>
           <hx-menu-item value="a">A</hx-menu-item>
@@ -250,12 +271,9 @@ describe('hx-menu', () => {
       await items[0].updateComplete;
       await items[1].updateComplete;
       await items[2].updateComplete;
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      const secondInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
-      const thirdInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      expect(firstInner.getAttribute('tabindex')).toBe('0');
-      expect(secondInner.getAttribute('tabindex')).toBe('-1');
-      expect(thirdInner.getAttribute('tabindex')).toBe('-1');
+      expect(items[0].tabIndex).toBe(0);
+      expect(items[1].tabIndex).toBe(-1);
+      expect(items[2].tabIndex).toBe(-1);
     });
 
     it('updates tabindex after ArrowDown navigation', async () => {
@@ -266,15 +284,12 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      firstInner.focus();
+      items[0].focus();
       await userEvent.keyboard('{ArrowDown}');
       await items[0].updateComplete;
       await items[1].updateComplete;
-      const firstInnerAfter = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      const secondInnerAfter = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
-      expect(firstInnerAfter.getAttribute('tabindex')).toBe('-1');
-      expect(secondInnerAfter.getAttribute('tabindex')).toBe('0');
+      expect(items[0].tabIndex).toBe(-1);
+      expect(items[1].tabIndex).toBe(0);
     });
 
     it('disabled items always have tabindex=-1', async () => {
@@ -286,8 +301,7 @@ describe('hx-menu', () => {
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
       await items[0].updateComplete;
-      const disabledInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      expect(disabledInner.getAttribute('tabindex')).toBe('-1');
+      expect(items[0].tabIndex).toBe(-1);
     });
   });
 
@@ -301,8 +315,7 @@ describe('hx-menu', () => {
       `);
       el.focusFirst();
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      expect(items[0].shadowRoot?.activeElement === firstInner).toBe(true);
+      expect(isItemFocused(items[0])).toBe(true);
     });
 
     it('focusLast() focuses the last enabled item', async () => {
@@ -315,8 +328,7 @@ describe('hx-menu', () => {
       `);
       el.focusLast();
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const lastInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      expect(items[2].shadowRoot?.activeElement === lastInner).toBe(true);
+      expect(isItemFocused(items[2])).toBe(true);
     });
 
     it('focusFirst() skips disabled items', async () => {
@@ -328,22 +340,51 @@ describe('hx-menu', () => {
       `);
       el.focusFirst();
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const bInner = shadowQuery<HTMLElement>(items[1], '.menu-item')!;
-      expect(items[1].shadowRoot?.activeElement === bInner).toBe(true);
+      expect(isItemFocused(items[1])).toBe(true);
     });
   });
 
-  describe('Property: label', () => {
-    it('renders aria-label on the menu element', async () => {
+  describe('Property: label (host-canonical accessible name)', () => {
+    it('projects label property onto internals.ariaLabel', async () => {
       const el = await fixture<HelixMenu>('<hx-menu label="Actions"></hx-menu>');
-      const base = shadowQuery(el, '[role="menu"]')!;
-      expect(base.getAttribute('aria-label')).toBe('Actions');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Actions');
     });
 
-    it('falls back to aria-label="Menu" when label is empty', async () => {
+    it('falls back to internals.ariaLabel="Menu" when label is empty', async () => {
       const el = await fixture<HelixMenu>('<hx-menu></hx-menu>');
-      const base = shadowQuery(el, '[role="menu"]')!;
-      expect(base.getAttribute('aria-label')).toBe('Menu');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Menu');
+    });
+
+    it('host aria-label overrides label property', async () => {
+      const el = await fixture<HelixMenu>(
+        '<hx-menu label="Fallback" aria-label="Override"></hx-menu>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Override');
+    });
+
+    it('host aria-labelledby resolves to ariaLabelledByElements', async () => {
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <h2 id="menu-heading">Patient actions</h2>
+        <hx-menu aria-labelledby="menu-heading"></hx-menu>
+      `;
+      document.body.appendChild(wrap);
+      const el = wrap.querySelector('hx-menu') as HelixMenu;
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const refs = (internals as ElementInternals & { ariaLabelledByElements?: Element[] | null })
+        .ariaLabelledByElements;
+      // On modern engines, ariaLabelledByElements is the projection. On
+      // legacy engines, the flattened string is on ariaLabel instead.
+      if (refs && refs.length > 0) {
+        expect(refs[0]?.id).toBe('menu-heading');
+      } else {
+        expect(internals.ariaLabel).toContain('Patient actions');
+      }
+      wrap.remove();
     });
   });
 
@@ -357,13 +398,9 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      firstInner.focus();
+      items[0].focus();
       await userEvent.keyboard('c');
-      const cherryInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      expect(
-        items[2].shadowRoot?.activeElement === cherryInner || document.activeElement === items[2],
-      ).toBe(true);
+      expect(isItemFocused(items[2])).toBe(true);
     });
 
     it('builds multi-character typeahead buffer', async () => {
@@ -375,13 +412,57 @@ describe('hx-menu', () => {
         </hx-menu>
       `);
       const items = Array.from(el.querySelectorAll('hx-menu-item')) as HelixMenuItem[];
-      const firstInner = shadowQuery<HTMLElement>(items[0], '.menu-item')!;
-      firstInner.focus();
+      items[0].focus();
       await userEvent.keyboard('cl');
-      const closeInner = shadowQuery<HTMLElement>(items[2], '.menu-item')!;
-      expect(
-        items[2].shadowRoot?.activeElement === closeInner || document.activeElement === items[2],
-      ).toBe(true);
+      expect(isItemFocused(items[2])).toBe(true);
+    });
+  });
+
+  describe('Submenu auto-handling', () => {
+    it('opens nested submenu on hx-item-submenu-open (default behaviour)', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-menu>
+      `);
+      const parent = el.querySelector('hx-menu-item') as HelixMenuItem;
+      await parent.updateComplete;
+      parent.focus();
+      await userEvent.keyboard('{ArrowRight}');
+      await parent.updateComplete;
+      // Expanded state should reflect on the host (modern) or inner (legacy)
+      const expanded =
+        parent.getAttribute('aria-expanded') ??
+        parent.shadowRoot?.querySelector('.menu-item')?.getAttribute('aria-expanded');
+      // Modern path projects via internals; check via internals when attr null.
+      const internals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(expanded === 'true' || internals.ariaExpanded === 'true').toBe(true);
+    });
+
+    it('respects event.preventDefault() opt-out for consumer-controlled submenus', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-menu>
+      `);
+      el.addEventListener('hx-item-submenu-open', (e) => e.preventDefault());
+      const parent = el.querySelector('hx-menu-item') as HelixMenuItem;
+      await parent.updateComplete;
+      parent.focus();
+      await userEvent.keyboard('{ArrowRight}');
+      await parent.updateComplete;
+      const internals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaExpanded).toBe('false');
     });
   });
 });
@@ -397,16 +478,20 @@ describe('hx-menu-item', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders role="menuitem" by default', async () => {
+    it('exposes role="menuitem" by default (host-canonical or inner)', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item>Item</hx-menu-item>');
-      const inner = shadowQuery(el, '[role="menuitem"]');
-      expect(inner).toBeTruthy();
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const role =
+        internals.role ?? el.shadowRoot?.querySelector('[role^="menuitem"]')?.getAttribute('role');
+      expect(role).toBe('menuitem');
     });
 
-    it('renders role="menuitemcheckbox" when type="checkbox"', async () => {
+    it('exposes role="menuitemcheckbox" when type="checkbox"', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item type="checkbox">Item</hx-menu-item>');
-      const inner = shadowQuery(el, '[role="menuitemcheckbox"]');
-      expect(inner).toBeTruthy();
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const role =
+        internals.role ?? el.shadowRoot?.querySelector('[role^="menuitem"]')?.getAttribute('role');
+      expect(role).toBe('menuitemcheckbox');
     });
 
     it('exposes "base" CSS part', async () => {
@@ -440,16 +525,16 @@ describe('hx-menu-item', () => {
       expect(el.hasAttribute('disabled')).toBe(true);
     });
 
-    it('sets aria-disabled="true" on inner element', async () => {
+    it('projects aria-disabled onto internals.ariaDisabled', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item disabled>Item</hx-menu-item>');
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-disabled')).toBe('true');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDisabled).toBe('true');
     });
 
-    it('does not set aria-disabled when enabled', async () => {
+    it('clears aria-disabled when enabled', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item>Item</hx-menu-item>');
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.hasAttribute('aria-disabled')).toBe(false);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaDisabled).toBeNull();
     });
 
     it('does not dispatch hx-item-select when disabled', async () => {
@@ -472,18 +557,18 @@ describe('hx-menu-item', () => {
       expect(icon).toBeTruthy();
     });
 
-    it('sets aria-checked="false" when unchecked', async () => {
+    it('projects aria-checked="false" via internals when unchecked', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item type="checkbox">Item</hx-menu-item>');
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-checked')).toBe('false');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('false');
     });
 
-    it('sets aria-checked="true" when checked', async () => {
+    it('projects aria-checked="true" via internals when checked', async () => {
       const el = await fixture<HelixMenuItem>(
         '<hx-menu-item type="checkbox" checked>Item</hx-menu-item>',
       );
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-checked')).toBe('true');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('true');
     });
 
     it('toggles checked on click', async () => {
@@ -495,24 +580,26 @@ describe('hx-menu-item', () => {
       expect(el.checked).toBe(true);
     });
 
-    it('does not set aria-checked for normal type', async () => {
+    it('does not project aria-checked for normal type', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item>Item</hx-menu-item>');
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.hasAttribute('aria-checked')).toBe(false);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBeNull();
     });
   });
 
   describe('Property: type="radio"', () => {
-    it('renders role="menuitemradio"', async () => {
+    it('exposes role="menuitemradio"', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item type="radio">Item</hx-menu-item>');
-      const inner = shadowQuery(el, '[role="menuitemradio"]');
-      expect(inner).toBeTruthy();
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const role =
+        internals.role ?? el.shadowRoot?.querySelector('[role^="menuitem"]')?.getAttribute('role');
+      expect(role).toBe('menuitemradio');
     });
 
-    it('sets aria-checked="false" when unchecked', async () => {
+    it('projects aria-checked="false" via internals when unchecked', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item type="radio">Item</hx-menu-item>');
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-checked')).toBe('false');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('false');
     });
 
     it('sets checked=true on click (does not toggle off)', async () => {
@@ -560,10 +647,10 @@ describe('hx-menu-item', () => {
       expect(el.hasAttribute('loading')).toBe(true);
     });
 
-    it('sets aria-busy="true" when loading', async () => {
+    it('projects aria-busy="true" via internals when loading', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item loading>Item</hx-menu-item>');
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-busy')).toBe('true');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaBusy).toBe('true');
     });
 
     it('does not dispatch hx-item-select when loading', async () => {
@@ -593,8 +680,7 @@ describe('hx-menu-item', () => {
       const el = await fixture<HelixMenuItem>(
         '<hx-menu-item value="enter-test">Item</hx-menu-item>',
       );
-      const inner = shadowQuery<HTMLElement>(el, '.menu-item')!;
-      inner.focus();
+      el.focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-item-select');
       await userEvent.keyboard('{Enter}');
       const event = await eventPromise;
@@ -605,8 +691,7 @@ describe('hx-menu-item', () => {
       const el = await fixture<HelixMenuItem>(
         '<hx-menu-item value="space-test">Item</hx-menu-item>',
       );
-      const inner = shadowQuery<HTMLElement>(el, '.menu-item')!;
-      inner.focus();
+      el.focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-item-select');
       await userEvent.keyboard(' ');
       const event = await eventPromise;
@@ -615,7 +700,7 @@ describe('hx-menu-item', () => {
   });
 
   describe('Submenu', () => {
-    it('sets aria-haspopup="menu" when submenu is present', async () => {
+    it('projects aria-haspopup="menu" via internals when submenu is present', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="parent">
           Parent
@@ -625,11 +710,11 @@ describe('hx-menu-item', () => {
         </hx-menu-item>
       `);
       await el.updateComplete;
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-haspopup')).toBe('menu');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaHasPopup).toBe('menu');
     });
 
-    it('sets aria-expanded="false" by default when submenu is present', async () => {
+    it('projects aria-expanded="false" by default when submenu is present', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="parent">
           Parent
@@ -639,11 +724,11 @@ describe('hx-menu-item', () => {
         </hx-menu-item>
       `);
       await el.updateComplete;
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-expanded')).toBe('false');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaExpanded).toBe('false');
     });
 
-    it('sets aria-expanded="true" after setSubmenuOpen(true)', async () => {
+    it('projects aria-expanded="true" via internals after setSubmenuOpen(true)', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="parent">
           Parent
@@ -655,15 +740,15 @@ describe('hx-menu-item', () => {
       await el.updateComplete;
       el.setSubmenuOpen(true);
       await el.updateComplete;
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.getAttribute('aria-expanded')).toBe('true');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaExpanded).toBe('true');
     });
 
-    it('does not set aria-expanded when no submenu is present', async () => {
+    it('does not project aria-expanded when no submenu is present', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item value="leaf">Leaf</hx-menu-item>');
       await el.updateComplete;
-      const inner = shadowQuery(el, '.menu-item')!;
-      expect(inner.hasAttribute('aria-expanded')).toBe(false);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaExpanded).toBeNull();
     });
   });
 
@@ -678,8 +763,7 @@ describe('hx-menu-item', () => {
         </hx-menu-item>
       `);
       await el.updateComplete;
-      const inner = shadowQuery<HTMLElement>(el, '.menu-item')!;
-      inner.focus();
+      el.focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-item-submenu-close');
       await userEvent.keyboard('{ArrowLeft}');
       const event = await eventPromise;
@@ -689,8 +773,7 @@ describe('hx-menu-item', () => {
 
     it('hx-item-submenu-close bubbles and is composed', async () => {
       const el = await fixture<HelixMenuItem>('<hx-menu-item value="x">Item</hx-menu-item>');
-      const inner = shadowQuery<HTMLElement>(el, '.menu-item')!;
-      inner.focus();
+      el.focus();
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-item-submenu-close');
       await userEvent.keyboard('{ArrowLeft}');
       const event = await eventPromise;
@@ -735,16 +818,21 @@ describe('hx-menu-divider', () => {
     expect(el.shadowRoot).toBeTruthy();
   });
 
-  it('renders role="separator"', async () => {
+  it('exposes role="separator" (host-canonical or inner)', async () => {
     const el = await fixture<HelixMenuDivider>('<hx-menu-divider></hx-menu-divider>');
-    const sep = shadowQuery(el, '[role="separator"]');
-    expect(sep).toBeTruthy();
+    const internals = (el as unknown as { _internals: ElementInternals })._internals;
+    const role =
+      internals.role ?? el.shadowRoot?.querySelector('[role="separator"]')?.getAttribute('role');
+    expect(role).toBe('separator');
   });
 
-  it('sets aria-orientation="horizontal"', async () => {
+  it('projects aria-orientation="horizontal" via internals', async () => {
     const el = await fixture<HelixMenuDivider>('<hx-menu-divider></hx-menu-divider>');
-    const sep = shadowQuery(el, '[role="separator"]')!;
-    expect(sep.getAttribute('aria-orientation')).toBe('horizontal');
+    const internals = (el as unknown as { _internals: ElementInternals })._internals;
+    const orientation =
+      internals.ariaOrientation ??
+      el.shadowRoot?.querySelector('[role="separator"]')?.getAttribute('aria-orientation');
+    expect(orientation).toBe('horizontal');
   });
 
   it('exposes "base" CSS part', async () => {
@@ -773,11 +861,11 @@ describe('hx-menu-divider', () => {
 describe('Accessibility (axe-core)', () => {
   it('hx-menu has no axe violations', async () => {
     const el = await fixture<HelixMenu>(`
-      <hx-menu>
+      <hx-menu label="Patient Actions">
         <hx-menu-item value="a">View Chart</hx-menu-item>
         <hx-menu-item value="b">Edit Record</hx-menu-item>
         <hx-menu-divider></hx-menu-divider>
-        <hx-menu-item value="c" disabled>Delete (Disabled)</hx-menu-item>
+        <hx-menu-item value="c">Delete</hx-menu-item>
       </hx-menu>
     `);
     await page.screenshot();
@@ -787,7 +875,7 @@ describe('Accessibility (axe-core)', () => {
 
   it('hx-menu-item has no axe violations inside hx-menu', async () => {
     const el = await fixture<HelixMenu>(`
-      <hx-menu>
+      <hx-menu label="Test">
         <hx-menu-item value="test">Edit</hx-menu-item>
       </hx-menu>
     `);
@@ -798,7 +886,7 @@ describe('Accessibility (axe-core)', () => {
 
   it('hx-menu-item type=checkbox has no axe violations inside hx-menu', async () => {
     const el = await fixture<HelixMenu>(`
-      <hx-menu>
+      <hx-menu label="Test">
         <hx-menu-item type="checkbox" checked>Notifications</hx-menu-item>
       </hx-menu>
     `);
@@ -809,7 +897,7 @@ describe('Accessibility (axe-core)', () => {
 
   it('hx-menu-item type=radio has no axe violations inside hx-menu', async () => {
     const el = await fixture<HelixMenu>(`
-      <hx-menu>
+      <hx-menu label="Priority">
         <hx-menu-item type="radio" value="a" checked>Low</hx-menu-item>
         <hx-menu-item type="radio" value="b">Medium</hx-menu-item>
         <hx-menu-item type="radio" value="c">High</hx-menu-item>

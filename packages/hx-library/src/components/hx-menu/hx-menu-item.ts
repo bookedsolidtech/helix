@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -6,11 +6,32 @@ import { HelixElement } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixMenuItemStyles } from './hx-menu-item.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 /**
  * A single interactive item for use inside `hx-menu`. Supports normal, checkbox,
  * and radio types, loading state, prefix/suffix slots, and submenu nesting.
- * Use `aria-label` on the parent `hx-menu` to provide an accessible name.
+ *
+ * Group 5b host-canonical: `role="menuitem"` (or `menuitemcheckbox` /
+ * `menuitemradio` based on `type`) lives on the **host** via
+ * `_internals.role`. The roving tabindex is written to the host, so the host
+ * is the focusable surface and lands directly under the parent `<hx-menu>`
+ * (which carries `role="menu"`) in the AT walked tree. The inner element is
+ * presentational on the modern path — no role, no aria-* attributes — and
+ * carries only click/keyboard event handlers. Keyboard activation
+ * (Enter/Space) is owned by the host's `keydown` handler.
+ *
+ * Cross-shadow naming: consumer-supplied `aria-label` / `aria-labelledby` on
+ * the host project to `internals.ariaLabel` / `internals.ariaLabelledByElements`
+ * via the shared IDREF mirror. The slotted text content is used as the default
+ * accessible name when no override is set (AT walks slotted children
+ * automatically through the host's role).
  *
  * @summary Interactive item within an hx-menu.
  *
@@ -49,6 +70,7 @@ export class HelixMenuItem extends HelixElement {
   /** @internal Set the roving tabindex value. Called by parent hx-menu. */
   setRovingTabIndex(value: number): void {
     this._rovingTabIndex = value;
+    this._applyHostTabIndex();
   }
 
   /** Set whether the nested submenu is open. Called by the component managing submenu visibility. */
@@ -103,13 +125,32 @@ export class HelixMenuItem extends HelixElement {
   /** @internal */
   @query('.menu-item') private _menuItemEl!: HTMLElement | null;
 
-  /** Focus the inner interactive element. */
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Focus the menu item. On the modern host-canonical path, focus lands on
+   * the host (which carries the roving tabindex and announced role). On the
+   * legacy fallback path, focus delegates to the inner element which still
+   * carries the role.
+   */
   override focus(options?: FocusOptions): void {
-    this._menuItemEl?.focus(options);
+    if (this._supportsIdrefRefs) {
+      // Host is the canonical Tab stop on the modern path.
+      HTMLElement.prototype.focus.call(this, options);
+    } else {
+      this._menuItemEl?.focus(options);
+    }
   }
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
     // WCAG 4.1.2: menuitem role is only valid inside a role="menu" or role="menubar" container.
     // Check the closest ancestor with a menu role.
     const menuHost = this.closest('hx-menu, hx-split-button, [role="menu"], [role="menubar"]');
@@ -119,6 +160,115 @@ export class HelixMenuItem extends HelixElement {
         'hx-menu-item must be used inside an hx-menu or an element with role="menu". ' +
           'An orphaned menuitem violates WCAG 1.3.1 (Info and Relationships).',
       );
+    }
+    // Keyboard handling lives on the HOST so the active surface (the host
+    // on the modern path; either the host or the inner div in delegating
+    // engines) receives keydown events. Activation (Enter/Space) and
+    // submenu navigation (ArrowLeft/ArrowRight) are routed here; the
+    // parent hx-menu owns ArrowUp/ArrowDown/Home/End/typeahead.
+    this.addEventListener('keydown', this._handleKeyDown);
+    this.addEventListener('click', this._handleClick);
+    this._syncHostAriaSemantics();
+    this._applyHostTabIndex();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this._handleKeyDown);
+    this.removeEventListener('click', this._handleClick);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    if (
+      changedProperties.has('disabled') ||
+      changedProperties.has('checked') ||
+      changedProperties.has('type') ||
+      changedProperties.has('loading') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_hasSubmenu') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_submenuOpen')
+    ) {
+      this._syncHostAriaSemantics();
+    }
+    if (
+      (changedProperties as Map<PropertyKey, unknown>).has('_rovingTabIndex') ||
+      changedProperties.has('disabled')
+    ) {
+      this._applyHostTabIndex();
+    }
+  }
+
+  /**
+   * Apply the roving tabindex to the host (modern path) so the host is the
+   * Tab stop. Disabled items are non-tabbable. The legacy path also writes
+   * to the host because focus delegation still ends up on the inner
+   * element via `focus()` override; carrying tabindex on the host keeps
+   * the AT walk correct on both paths.
+   * @internal
+   */
+  private _applyHostTabIndex(): void {
+    if (this.disabled) {
+      this.tabIndex = -1;
+    } else {
+      this.tabIndex = this._rovingTabIndex;
+    }
+  }
+
+  /**
+   * Mirror menuitem semantics onto the host via ElementInternals. Role is
+   * derived from `type` (normal → menuitem, checkbox → menuitemcheckbox,
+   * radio → menuitemradio). aria-disabled, aria-checked, aria-haspopup,
+   * aria-expanded, and aria-busy reactively follow component state.
+   * Consumer-supplied `aria-label` / `aria-labelledby` on the host project
+   * onto `internals.ariaLabel` / `internals.ariaLabelledByElements`.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    const role = this._getRole();
+    internals.role = role;
+    internals.ariaDisabled = this.disabled ? 'true' : null;
+
+    const hasCheckableRole = this.type === 'checkbox' || this.type === 'radio';
+    internals.ariaChecked = hasCheckableRole ? (this.checked ? 'true' : 'false') : null;
+
+    internals.ariaHasPopup = this._hasSubmenu ? 'menu' : null;
+    internals.ariaExpanded = this._hasSubmenu ? (this._submenuOpen ? 'true' : 'false') : null;
+    internals.ariaBusy = this.loading ? 'true' : null;
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    // Precedence: consumer aria-label > consumer aria-labelledby (resolved) >
+    // implicit slotted text (left to AccName computation through the host's
+    // role). When neither override is supplied, ariaLabel is cleared so AT
+    // walks slotted children for the accessible name.
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (hasEffectiveLabelledBy && !this._supportsIdrefRefs) {
+      internals.ariaLabel =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') || null;
+    } else {
+      internals.ariaLabel = null;
     }
   }
 
@@ -157,17 +307,20 @@ export class HelixMenuItem extends HelixElement {
   }
 
   /** @internal */
-  private _handleClick(e: MouseEvent): void {
+  private _handleClick = (e: MouseEvent): void => {
     if (this.disabled || this.loading) {
       e.preventDefault();
       e.stopPropagation();
       return;
     }
     this._activate();
-  }
+  };
 
   /** @internal */
-  private _handleKeyDown(e: KeyboardEvent): void {
+  private _handleKeyDown = (e: KeyboardEvent): void => {
+    // Only handle keys whose target is THIS host (or its shadow). The
+    // parent hx-menu's keydown handler runs first via bubbling and may
+    // already have moved focus; we ignore events that aren't aimed at us.
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       this._activate();
@@ -180,6 +333,7 @@ export class HelixMenuItem extends HelixElement {
         new CustomEvent<{ item: HelixMenuItem }>('hx-item-submenu-open', {
           bubbles: true,
           composed: true,
+          cancelable: true,
           detail: { item: this },
         }),
       );
@@ -192,11 +346,12 @@ export class HelixMenuItem extends HelixElement {
         new CustomEvent<{ item: HelixMenuItem }>('hx-item-submenu-close', {
           bubbles: true,
           composed: true,
+          cancelable: true,
           detail: { item: this },
         }),
       );
     }
-  }
+  };
 
   /** @internal */
   private _renderCheckedIcon() {
@@ -254,7 +409,7 @@ export class HelixMenuItem extends HelixElement {
   }
 
   /** @internal */
-  private _getRole(): string {
+  private _getRole(): 'menuitem' | 'menuitemcheckbox' | 'menuitemradio' {
     switch (this.type) {
       case 'checkbox':
         return 'menuitemcheckbox';
@@ -273,6 +428,40 @@ export class HelixMenuItem extends HelixElement {
       'menu-item--checked': this.checked,
     };
 
+    // Modern host-canonical path: role/aria-* and tabindex live on the
+    // host via `_internals` and the `_applyHostTabIndex()` helper. The
+    // inner element is a presentational div (ARIA 1.2 forbids
+    // role="presentation" on focusable elements; non-focusable plain div
+    // is the cleanest strip). Click + keydown handlers stay on the host
+    // via the wrapper div for delegation; this preserves keyboard
+    // activation while leaving the host as the AT-announced surface.
+    if (this._supportsIdrefRefs) {
+      // Click + keydown handlers are bound on the host in
+      // connectedCallback() — keydown does not propagate INTO shadow
+      // DOM, so binding inside the template would miss host-focused
+      // events on the modern path.
+      return html`
+        <div part="base" class=${classMap(classes)}>
+          ${this.loading ? this._renderSpinner() : nothing}
+          ${hasCheckableRole ? this._renderCheckedIcon() : nothing}
+          <span part="prefix" class="menu-item__prefix">
+            <slot name="prefix"></slot>
+          </span>
+          <span part="label" class="menu-item__label">
+            <slot></slot>
+          </span>
+          <span part="suffix" class="menu-item__suffix">
+            <slot name="suffix"></slot>
+          </span>
+          ${this._hasSubmenu ? this._renderSubmenuIcon() : nothing}
+          <slot name="submenu" @slotchange=${this._handleSubmenuSlotChange}></slot>
+        </div>
+      `;
+    }
+
+    // Legacy fallback: keep role/aria-* on inner div for AT without IDL
+    // element references on ElementInternals. Click + keydown still
+    // listen on the host (see connectedCallback) so behaviour is uniform.
     return html`
       <div
         part="base"
@@ -284,8 +473,6 @@ export class HelixMenuItem extends HelixElement {
         aria-haspopup=${this._hasSubmenu ? 'menu' : nothing}
         aria-expanded=${this._hasSubmenu ? (this._submenuOpen ? 'true' : 'false') : nothing}
         aria-busy=${this.loading ? 'true' : nothing}
-        @click=${this._handleClick}
-        @keydown=${this._handleKeyDown}
       >
         ${this.loading ? this._renderSpinner() : nothing}
         ${hasCheckableRole ? this._renderCheckedIcon() : nothing}

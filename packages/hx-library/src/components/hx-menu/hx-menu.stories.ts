@@ -423,7 +423,10 @@ export const HealthcareContextMenu: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   render: () => html`
     <hx-menu>
       <hx-menu-item value="view">View Chart</hx-menu-item>

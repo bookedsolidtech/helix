@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
@@ -6,10 +6,32 @@ import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixMenuStyles } from './hx-menu.styles.js';
 import type { HelixMenuItem } from './hx-menu-item.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 /**
  * A menu container that manages keyboard navigation over a list of menu items.
  * Use with `hx-menu-item` and `hx-menu-divider`.
+ *
+ * Group 5b host-canonical: `role="menu"` lives on the **host** via
+ * `_internals.role`. The host carries the announced surface so AT walks
+ * `<hx-menu>` (role=menu) → slotted `<hx-menu-item>` (role=menuitem on host)
+ * directly without two layers of indirection. Consumer-supplied
+ * `aria-label` / `aria-labelledby` on the host are resolved via the shared
+ * IDREF mirror; cross-shadow naming uses `ariaLabelledByElements` (modern)
+ * with a flattened-string fallback (legacy).
+ *
+ * Submenu coordination: when an `hx-menu-item` emits `hx-item-submenu-open`
+ * or `hx-item-submenu-close`, the parent menu auto-handles the toggle by
+ * calling `setSubmenuOpen()` on the item — UNLESS the consumer has called
+ * `event.preventDefault()` on the bubbled event, signaling that they own the
+ * submenu lifecycle. This matches APG-mandated behaviour while leaving an
+ * opt-out for advanced consumers.
  *
  * @summary Context/action menu with keyboard-navigable items.
  *
@@ -40,8 +62,10 @@ export class HelixMenu extends HelixElement {
   static override styles = [helixMenuStyles, forcedColorsInteractive];
 
   /**
-   * Accessible label for the menu. Rendered as `aria-label` on the inner
-   * `role="menu"` element when set.
+   * Accessible label for the menu. Used as a fallback when no consumer-supplied
+   * `aria-label` / `aria-labelledby` is present on the host. On the modern
+   * host-canonical path this projects onto `internals.ariaLabel`; on the
+   * legacy fallback path it appears as `aria-label` on the inner div.
    * @attr label
    */
   @property({ type: String, reflect: true })
@@ -64,6 +88,14 @@ export class HelixMenu extends HelixElement {
    * @internal
    */
   private _typeaheadTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
 
   /** @internal */
   private _getItems(): HelixMenuItem[] {
@@ -217,33 +249,188 @@ export class HelixMenu extends HelixElement {
     );
   }
 
+  /**
+   * Auto-handle submenu open/close events emitted by child `hx-menu-item`
+   * children. APG-mandated behaviour: ArrowRight on a parent item opens the
+   * nested submenu and focuses its first item; ArrowLeft closes the submenu
+   * and returns focus to the parent item. Consumers that own submenu
+   * lifecycle themselves can `event.preventDefault()` to opt out.
+   * @internal
+   */
+  private _handleSubmenuOpen = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HelixMenuItem }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    // Defer to a microtask so consumer listeners (which may be registered
+    // AFTER the menu's auto-handler in event order) get a chance to call
+    // `event.preventDefault()` and opt out of default submenu lifecycle
+    // handling. APG-mandated default: open the nested submenu and focus
+    // its first item; consumers that own this themselves cancel the
+    // default by calling preventDefault on the event.
+    queueMicrotask(() => {
+      if (e.defaultPrevented) return;
+      item.setSubmenuOpen(true);
+      void item.updateComplete
+        .then(() => {
+          const submenuSlot =
+            item.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="submenu"]');
+          const nested = submenuSlot
+            ?.assignedElements({ flatten: true })
+            .find((el) => el.tagName.toLowerCase() === 'hx-menu') as HelixMenu | undefined;
+          nested?.focusFirst();
+        })
+        .catch(() => undefined);
+    });
+  };
+
+  /** @internal */
+  private _handleSubmenuClose = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HelixMenuItem }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    queueMicrotask(() => {
+      if (e.defaultPrevented) return;
+      item.setSubmenuOpen(false);
+      item.focus();
+    });
+  };
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
+    // Keydown is bound on the HOST so events from focused host-canonical
+    // menu items (which keep keydown out of this menu's shadow DOM)
+    // still reach the navigation handler. hx-item-select bubbles
+    // through the composed path and is caught here as well.
+    this.addEventListener('keydown', this._handleHostKeyDown);
+    this.addEventListener('hx-item-select', this._handleItemSelectHost);
+    this.addEventListener('hx-item-submenu-open', this._handleSubmenuOpen);
+    this.addEventListener('hx-item-submenu-close', this._handleSubmenuClose);
+    // Seed host-canonical semantics so role/label appear before first paint.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     if (this._typeaheadTimer !== null) {
       clearTimeout(this._typeaheadTimer);
       this._typeaheadTimer = null;
     }
+    this.removeEventListener('keydown', this._handleHostKeyDown);
+    this.removeEventListener('hx-item-select', this._handleItemSelectHost);
+    this.removeEventListener('hx-item-submenu-open', this._handleSubmenuOpen);
+    this.removeEventListener('hx-item-submenu-close', this._handleSubmenuClose);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  /** @internal */
+  private _handleHostKeyDown = (e: KeyboardEvent): void => {
+    this._handleKeyDown(e);
+  };
+
+  /** @internal */
+  private _handleItemSelectHost = (e: Event): void => {
+    this._handleItemSelect(e);
+  };
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('label')) {
+      this._syncHostAriaSemantics();
+    }
   }
 
   override firstUpdated(): void {
-    if (!this.label) {
+    const hasEffectiveLabel =
+      this.hasAttribute('aria-label') ||
+      this.hasAttribute('aria-labelledby') ||
+      Boolean(this.label);
+    if (!hasEffectiveLabel) {
       devWarn(
         'hx-menu',
-        'No accessible label provided. Set the `label` attribute on hx-menu so screen readers can identify this menu (WCAG 4.1.2).',
+        'No accessible label provided. Set the `label` attribute, or supply `aria-label` / `aria-labelledby` on hx-menu so screen readers can identify this menu (WCAG 4.1.2).',
       );
     }
   }
 
+  /**
+   * Mirror menu semantics onto the host via ElementInternals so consumer-
+   * supplied `aria-label`, `aria-labelledby`, and the `label` property all
+   * reach the announced control. Falls back to a flattened-string label on
+   * engines that do not implement `ariaLabelledByElements`.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'menu';
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    // Precedence: consumer aria-label > consumer aria-labelledby (resolved) >
+    // `label` property > literal "Menu" (last-resort).
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (hasEffectiveLabelledBy) {
+      if (this._supportsIdrefRefs) {
+        // Modern path: element refs win; clear ariaLabel so they aren't
+        // shadowed by a stale string.
+        internals.ariaLabel = null;
+      } else {
+        internals.ariaLabel =
+          labelEls
+            .map((el) => flattenAccName(el))
+            .filter(Boolean)
+            .join(' ') ||
+          this.label ||
+          'Menu';
+      }
+    } else {
+      internals.ariaLabel = this.label || 'Menu';
+    }
+  }
+
   override render() {
+    // Host-canonical Path A: `role="menu"` and the resolved label live on
+    // the host via `_internals`. The inner div is roleless on the modern
+    // path so AT does not see a duplicated container role nested inside
+    // the host. Legacy fallback keeps the inner role + aria-label so AT
+    // without IDL element references still announces the menu.
+    // Keydown + hx-item-select listeners are bound on the host in
+    // connectedCallback() — keydown does not propagate INTO this menu's
+    // shadow DOM, so events from focused host-canonical menu items
+    // would never fire on inner-div bindings. hx-item-select bubbles
+    // composed through the host either way; we listen on the host for
+    // symmetry.
+    if (this._supportsIdrefRefs) {
+      return html`
+        <div part="base" class="menu">
+          <slot @slotchange=${this._handleSlotChange}></slot>
+        </div>
+      `;
+    }
+
     return html`
-      <div
-        part="base"
-        class="menu"
-        role="menu"
-        aria-label=${this.label || 'Menu'}
-        @keydown=${this._handleKeyDown}
-        @hx-item-select=${this._handleItemSelect}
-      >
+      <div part="base" class="menu" role="menu" aria-label=${this.label || nothing}>
         <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;
