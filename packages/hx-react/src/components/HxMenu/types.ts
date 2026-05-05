@@ -12,8 +12,10 @@ export interface HxMenuProps {
   className?: string;
   /** Inline styles */
   style?: React.CSSProperties;
-  /** Accessible label for the menu. Rendered as `aria-label` on the inner
-`role="menu"` element when set. */
+  /** Accessible label for the menu. Used as a fallback when no consumer-supplied
+`aria-label` / `aria-labelledby` is present on the host. On the modern
+host-canonical path this projects onto `internals.ariaLabel`; on the
+legacy fallback path it appears as `aria-label` on the inner div. */
   label?: string;
 
   // Event callbacks

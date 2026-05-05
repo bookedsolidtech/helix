@@ -37,14 +37,24 @@ Naming precedence (W3C AccName 1.2 §4.3.1):
   3. `label` property
   4. Hard-coded literal `"Menu"` (last-resort accessible name)
 
-**Group 5 boundary (intentional):** This round is **additive only** — the
-host-label pipeline is the entire change. The panel's `role="menu"` and
-the menuitem-roving keyboard pattern are already implemented per APG and
-are NOT touched here. Group 5 (composite navigation: menu, menubar,
-menuitem, tabs, tree) will own any broader refactor of the menu role and
-roving-tabindex semantics. Codex reviewers: please scope findings to the
-host-label pipeline; do not flag missing roving-focus / typeahead /
-`aria-orientation` work here.
+**Group 4b → Group 5b boundary:** Group 4b added the host-attribute
+label mirror **only** — additive on top of the existing dropdown
+behaviour. Group 5b (this commit) adds the composite-navigation
+portion that 4b explicitly deferred:
+  - **Roving tabindex** inside the panel (`_applyRovingTabIndex` +
+    `_rovingIndex`). Only the focused item carries `tabindex=0`.
+  - **First-character typeahead** with 500ms timeout (`_handleTypeahead`)
+    matching `hx-menu`, `hx-overflow-menu`, `hx-split-button`.
+  - Submenu auto-handling is delegated to slotted `hx-menu` /
+    `hx-menu-item` (whose `hx-item-submenu-open` / `hx-item-submenu-close`
+    events are auto-handled by the parent `hx-menu` after Group 5b).
+
+The panel's inner-div `role="menu"` is intentionally NOT migrated to
+the host: the host wraps a slotted consumer trigger AND the panel,
+so it cannot canonically carry the menu role. Slotted `hx-menu-item`
+children carry `role="menuitem"` on their HOST after Group 5b's menu
+migration, which fixes the cross-shadow walk concern from the
+consumer's perspective.
 
 `aria-controls` is intentionally omitted on the trigger: the panel lives
 in shadow DOM and IDREF values cannot be resolved across shadow

@@ -17,6 +17,27 @@ export type { HxSplitButtonProps };
  * A split button combining a primary action button with an attached dropdown
 menu for secondary actions. Implements the ARIA menu button pattern for
 full keyboard and screen reader support.
+
+## Architecture Note: Composite host with two interactive children (Group 5b)
+
+The host wraps a primary `<button>`, a dropdown trigger `<button>`, and a
+panel `<div role="menu">` — three ARIA-bearing surfaces that cannot all
+collapse onto the host. Group 5b keeps role placement on the inner
+elements (consistent with `hx-overflow-menu`). The host carries no role.
+
+What Group 5b adds:
+- **Host-attribute label mirror** via `installAriaIdrefMirror`: consumer
+  `aria-label` / `aria-labelledby` on the host flow to the inner primary
+  button's `aria-label`. Replaces the legacy `accessible-label` shim,
+  which was a workaround for ARIAMixin shadowing on the host. The shim
+  is preserved with a one-time devWarn for one minor version of back-
+  compat; new code should use the standard `aria-label` attribute.
+- **Roving tabindex** on slotted `hx-menu-item` children inside the
+  panel. Only the focused item carries `tabindex=0`; arrow key
+  navigation rewrites the tabindex map via `_applyRovingTabIndex()`.
+  `setRovingTabIndex` is the same setter used by `hx-menu` for cross-
+  family pattern alignment.
+- **First-character typeahead** with 500ms timeout matching `hx-menu`.
  *
  * @example
  * ```tsx

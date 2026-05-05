@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T12:24:24.560Z",
+  "generatedAt": "2026-05-05T18:50:41.793Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -12748,7 +12748,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-menu-item",
       "figmaPagePlacement": "4a",
-      "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting. Use `aria-label` on the parent `hx-menu` to…",
+      "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting.",
       "tier": "atom",
       "variantAxes": [
         {
@@ -12870,18 +12870,18 @@
           "description": "Dispatched when the item is activated via click, Enter, or Space."
         },
         {
-          "name": "hx-item-submenu-open",
           "type": {
             "text": "CustomEvent<{item: HelixMenuItem}>"
           },
-          "description": "Dispatched when ArrowRight is pressed on an item with a submenu."
+          "description": "Dispatched when ArrowRight is pressed on an item with a submenu.",
+          "name": "hx-item-submenu-open"
         },
         {
-          "name": "hx-item-submenu-close",
           "type": {
             "text": "CustomEvent<{item: HelixMenuItem}>"
           },
-          "description": "Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus."
+          "description": "Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus.",
+          "name": "hx-item-submenu-close"
         }
       ],
       "cssProperties": [

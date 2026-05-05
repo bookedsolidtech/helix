@@ -33,7 +33,9 @@ export interface HxOverflowMenuProps {
   disabled?: boolean;
   /** Icon orientation: vertical (kebab ⋮) or horizontal (meatball ···). */
   icon?: 'vertical' | 'horizontal';
-  /** Accessible label for the trigger button. */
+  /** Accessible label for the trigger button. Used as a fallback when no
+consumer-supplied `aria-label` / `aria-labelledby` is present on the
+host. Consumer host attributes win in the AccName 1.2 §4.3.1 cascade. */
   label?: string;
   /** Accessible label for the menu panel. Reflected as `label-menu`. */
   labelMenu?: string;
