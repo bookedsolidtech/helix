@@ -13,6 +13,24 @@ export type BannerVariant = 'info' | 'success' | 'warning' | 'error';
 /** Banner position determines CSS positioning behavior. */
 export type BannerPosition = 'sticky' | 'fixed';
 
+// ─── ARIA naming disambiguation (group-6) ───
+//
+// IMPORTANT: the component name `hx-banner` refers to the visual UX pattern
+// (full-width page-level notification surface). It is NOT a semantic mapping
+// to the HTML5 LANDMARK role `role="banner"` (which marks the page-level
+// header/masthead).
+//
+// The ARIA role this component sets on its host is `alert` or `status`,
+// derived from `variant`. A regression test in `hx-banner.test.ts` asserts
+// that `role="banner"` (the LANDMARK role) is NEVER applied. Do NOT "fix"
+// this by adding the LANDMARK role.
+//
+// APG caveat: NVDA + JAWS do not announce alerts that are present in the DOM
+// at page-load. A `<hx-banner open>` rendered server-side will not be
+// announced on first paint. Consumers needing first-paint announcement
+// should mount with `open=false` and flip to `open=true` after window load,
+// or use a sticky `hx-alert` instead.
+
 /**
  * A full-width page-level banner for persistent notifications and announcements.
  * Designed for healthcare applications requiring prominent system-level messaging.
@@ -165,10 +183,18 @@ export class HelixBanner extends HelixElement {
     return this.severityLabel ?? this._defaultSeverityLabel();
   }
 
-  /** Returns true when the variant requires assertive announcement. */
+  /**
+   * Returns true when the variant requires assertive announcement.
+   *
+   * (group-6) Harmonized with `hx-alert` and `hx-toast`: only `error` is
+   * assertive. Previous behavior also escalated `warning` to assertive on
+   * `hx-banner`, which diverged from the rest of the live-region surface.
+   * Warnings are non-urgent and use a polite live region (role="status").
+   * Critical/error messages remain assertive (role="alert").
+   */
   /** @internal */
   private get _isAssertive(): boolean {
-    return this.variant === 'error' || this.variant === 'warning';
+    return this.variant === 'error';
   }
 
   /**
@@ -188,6 +214,13 @@ export class HelixBanner extends HelixElement {
     // Apply ARIA role to the host element for reliable screen reader support across
     // Shadow DOM boundaries. Placing role on a shadow-internal element has inconsistent
     // AT support in JAWS+Chrome and VoiceOver+Safari combinations (particularly pre-2024).
+    //
+    // (group-6) Dual-write: `internals.role` is the modern IDL-based source of
+    // truth; the `role` attribute is retained as a legacy fallback for older AT
+    // that don't yet honour ElementInternals ARIA reflection. Per ARIA spec,
+    // role implies aria-live (`alert`→assertive, `status`→polite); we therefore
+    // do NOT set an explicit `aria-live` attribute (avoids §5.1 double-announce).
+    this._internals.role = this._role;
     this.setAttribute('role', this._role);
     if (!this.open) {
       this.setAttribute('aria-hidden', 'true');
@@ -198,6 +231,7 @@ export class HelixBanner extends HelixElement {
     super.updated(changedProperties);
     if (changedProperties.has('variant')) {
       // Keep host ARIA role in sync with variant (assertive vs. polite).
+      this._internals.role = this._role;
       this.setAttribute('role', this._role);
     }
     if (changedProperties.has('open')) {

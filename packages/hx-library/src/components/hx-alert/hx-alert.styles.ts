@@ -121,6 +121,15 @@ export const helixAlertStyles = css`
     min-width: 0;
   }
 
+  /* (group-6 5.1) Wrapper around the default slot. Carries aria-hidden=true
+     so the visible message text is not double-announced alongside the
+     sr-only announcer. display:contents keeps the wrapper visually
+     transparent so children participate in the parent flex layout as if
+     the wrapper were not there. */
+  .alert__default-slot {
+    display: contents;
+  }
+
   /* ─── Actions ─── */
   /* Hidden by default; shown via JS slotchange detection to avoid invisible  */
   /* margin-top spacing when no actions are slotted.                          */

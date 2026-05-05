@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T15:36:21.392Z",
+  "generatedAt": "2026-05-05T15:18:53.136Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -21704,7 +21704,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-tab-panel",
       "figmaPagePlacement": "4a",
-      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`. Group 5a host-canonical: `role=\"tabpanel\"` lives on the host via `_internals.role`. The host carries the canonical AT…",
+      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`.",
       "tier": "atom",
       "variantAxes": [],
       "textProperties": [
@@ -22043,7 +22043,7 @@
             "manual",
             "automatic"
           ],
-          "default": "manual"
+          "default": "automatic"
         }
       ],
       "textProperties": [
@@ -25150,7 +25150,7 @@
       "events": [],
       "cssProperties": [
         {
-          "description": "Z-index for the fixed stack.",
+          "description": "Z-index for the fixed stack. ─── ARIA scope (group-6 §3.2 / §5.9) ───────────────────────────────────── `hx-toast-stack` deliberately has NO `role`, `aria-live`, `aria-atomic`, or `aria-relevant` on its host or inner container. Each child `hx-toast` is its own live region (role=alert/status via ElementInternals). Wrapping those toasts in a second live region (e.g. `role=\"log\"` on the stack) would create nested live regions, which causes older NVDA/JAWS to announce every toast TWICE — once for the toast's own role, once for the surrounding log region. The stack is purely a positional/z-index container; it is invisible to the AT tree. Do NOT add a container role unless this entire architecture is rewritten so individual toasts no longer carry their own roles.",
           "name": "--hx-z-index-toast",
           "default": "9000",
           "figmaBinding": {
