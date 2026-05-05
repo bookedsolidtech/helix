@@ -148,6 +148,19 @@ export class HelixMenuItem extends HelixElement {
   private _ariaMirror: AriaIdrefMirrorHandle | null = null;
 
   /**
+   * Resolved accessible name for the menu item — read by both
+   * `_syncHostAriaSemantics()` (modern path: host `internals.ariaLabel`)
+   * and the fallback `render()` branch (legacy path: inner
+   * `div[role="menuitem*"]` `aria-label`). Empty string means "no
+   * override" — slotted text content provides the implicit name through
+   * the announced surface (host on modern; inner div on fallback). AccName
+   * precedence: consumer host `aria-label` > consumer host
+   * `aria-labelledby` (flattened) > implicit slotted text.
+   * @internal
+   */
+  private _resolvedAccessibleName = '';
+
+  /**
    * Focus the menu item. On the modern host-canonical path, focus lands on
    * the host (which carries the roving tabindex and announced role). On the
    * legacy fallback path, focus delegates to the inner element which still
@@ -292,17 +305,43 @@ export class HelixMenuItem extends HelixElement {
     // Precedence: consumer aria-label > consumer aria-labelledby (resolved) >
     // implicit slotted text (left to AccName computation through the host's
     // role). When neither override is supplied, ariaLabel is cleared so AT
-    // walks slotted children for the accessible name.
+    // walks slotted children for the accessible name. The resolved string
+    // is cached on `_resolvedAccessibleName` so the fallback render branch
+    // (legacy path: AT reads inner div) can mirror the same override
+    // without duplicating the precedence ladder.
+    let resolved = '';
     if (hostAriaLabel) {
+      resolved = hostAriaLabel;
       internals.ariaLabel = hostAriaLabel;
-    } else if (hasEffectiveLabelledBy && !this._supportsIdrefRefs) {
-      internals.ariaLabel =
+    } else if (hasEffectiveLabelledBy) {
+      const flattened =
         labelEls
           .map((el) => flattenAccName(el))
           .filter(Boolean)
-          .join(' ') || null;
+          .join(' ') || '';
+      resolved = flattened;
+      if (this._supportsIdrefRefs) {
+        // Modern path: element refs win; clear ariaLabel so they aren't
+        // shadowed by a stale string. Fallback branch reads
+        // `_resolvedAccessibleName` for its inner-div mirror.
+        internals.ariaLabel = null;
+      } else {
+        internals.ariaLabel = flattened || null;
+      }
     } else {
+      // No override — leave the announced surface to walk slotted text.
       internals.ariaLabel = null;
+    }
+
+    // Codex push-gate round-2 finding 2: keep the resolved override
+    // available for the legacy render branch. Request a re-render so the
+    // fallback `<div role="menuitem*" aria-label=...>` picks up the new
+    // value when host aria-* changes after first paint.
+    if (this._resolvedAccessibleName !== resolved) {
+      this._resolvedAccessibleName = resolved;
+      if (!this._supportsIdrefRefs) {
+        this.requestUpdate();
+      }
     }
   }
 
@@ -496,12 +535,20 @@ export class HelixMenuItem extends HelixElement {
     // Legacy fallback: keep role/aria-* on inner div for AT without IDL
     // element references on ElementInternals. Click + keydown still
     // listen on the host (see connectedCallback) so behaviour is uniform.
+    //
+    // Codex push-gate round-2 finding 2: AT on the fallback path
+    // announces the inner div, so it MUST mirror the same accessible name
+    // resolved by `_syncHostAriaSemantics()` (consumer host aria-label /
+    // aria-labelledby flatten). Empty string means "no override" — let AT
+    // walk slotted text content for the implicit name.
+    const fallbackAriaLabel = this._resolvedAccessibleName || nothing;
     return html`
       <div
         part="base"
         class=${classMap(classes)}
         role=${role}
         tabindex=${this.disabled ? '-1' : String(this._rovingTabIndex)}
+        aria-label=${fallbackAriaLabel}
         aria-disabled=${this.disabled ? 'true' : nothing}
         aria-checked=${hasCheckableRole ? (this.checked ? 'true' : 'false') : nothing}
         aria-haspopup=${this._hasSubmenu ? 'menu' : nothing}

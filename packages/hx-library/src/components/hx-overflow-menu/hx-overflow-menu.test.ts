@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixOverflowMenu } from './hx-overflow-menu.js';
+import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 import './index.js';
 import '../hx-menu/index.js';
 
@@ -644,6 +645,83 @@ describe('hx-overflow-menu', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Codex push-gate round-2 finding 3: roving tabindex must reach the
+  // canonical focusable surface for each item shape. On the host-canonical
+  // hx-menu-item fallback path (`_supportsIdrefRefs === false`), the host
+  // is forced to `tabindex=-1` and the inner `.menu-item` is the Tab stop.
+  // Direct host-tabIndex writes from hx-overflow-menu would never reach
+  // that inner element — `setRovingTabIndex()` is the routing seam.
+  // ─────────────────────────────────────────────────────────────
+
+  describe('roving tabindex routing for slotted hx-menu-item (codex push-gate round-2 finding 3)', () => {
+    type HelixMenuItemCtor = typeof HelixMenuItem & {
+      __testSupportsIdrefRefsOverride: boolean | null;
+    };
+
+    afterEach(() => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor | undefined;
+      if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+    });
+
+    it('routes roving tabindex to inner .menu-item on the fallback path', async () => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+      ctor.__testSupportsIdrefRefsOverride = false;
+
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item><hx-menu-item value="delete">Delete</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('hx-menu-item') as NodeListOf<HelixMenuItem>;
+      await items[0]!.updateComplete;
+      await items[1]!.updateComplete;
+
+      // Host MUST stay out of the tab order on the fallback path —
+      // direct host-tabIndex writes would have left this at 0 here.
+      expect(items[0]!.tabIndex).toBe(-1);
+      expect(items[1]!.tabIndex).toBe(-1);
+
+      // Inner `.menu-item` carries the active roving tabindex.
+      const inner0 = items[0]!.shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      const inner1 = items[1]!.shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      expect(inner0.getAttribute('tabindex')).toBe('0');
+      expect(inner1.getAttribute('tabindex')).toBe('-1');
+
+      // Land focus on item[0] before ArrowDown — `_focusFirstItem` runs
+      // inside the async `_show()` chain so it may not have settled by the
+      // time we dispatch. Without an active item, the keydown handler
+      // resets the roving target back to 0 (focused index = -1 fall-back).
+      items[0]!.focus();
+
+      // ArrowDown advances the roving target through the inner surface.
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      // Lit re-render flush — both items had _rovingTabIndex change.
+      await el.updateComplete;
+      await items[0]!.updateComplete;
+      await items[1]!.updateComplete;
+
+      expect(inner0.getAttribute('tabindex')).toBe('-1');
+      expect(inner1.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('keeps direct tabIndex write for plain [role="menuitem"] children', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><button role="menuitem">Edit</button><button role="menuitem">Delete</button></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('button[role="menuitem"]') as NodeListOf<HTMLElement>;
+      // Plain children keep the legacy direct-write semantics.
+      expect(items[0]!.tabIndex).toBe(0);
+      expect(items[1]!.tabIndex).toBe(-1);
     });
   });
 });

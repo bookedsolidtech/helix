@@ -970,3 +970,124 @@ describe('hx-menu-item host tabindex (fallback path)', () => {
     expect(items[1]!.tabIndex).toBe(-1);
   });
 });
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-2 finding 1: on the legacy fallback path
+// (`_supportsIdrefRefs === false`), AT reads the inner `[role="menu"]`
+// rather than the host. The host's resolved accessible name (consumer
+// `aria-label` / `aria-labelledby` / `label` property cascade) MUST be
+// mirrored onto that inner element — otherwise menus named via the new
+// host API announce unnamed on legacy engines.
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-menu fallback path label mirror (codex push-gate round-2 finding 1)', () => {
+  type HelixMenuCtor = typeof HelixMenu & {
+    __testSupportsIdrefRefsOverride: boolean | null;
+  };
+
+  afterEach(() => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('mirrors host aria-label onto inner [role="menu"] on the fallback path', async () => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(
+      '<hx-menu aria-label="Actions"><hx-menu-item value="a">Item A</hx-menu-item></hx-menu>',
+    );
+    await el.updateComplete;
+
+    const inner = shadowQuery<HTMLElement>(el, '[role="menu"]')!;
+    expect(inner).toBeTruthy();
+    expect(inner.getAttribute('aria-label')).toBe('Actions');
+  });
+
+  it('falls back to label property when host aria-label is absent on the fallback path', async () => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(
+      '<hx-menu label="File menu"><hx-menu-item value="a">Item A</hx-menu-item></hx-menu>',
+    );
+    await el.updateComplete;
+
+    const inner = shadowQuery<HTMLElement>(el, '[role="menu"]')!;
+    expect(inner.getAttribute('aria-label')).toBe('File menu');
+  });
+
+  it('resolves aria-labelledby through flatten on the fallback path', async () => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<span id="round2-menu-lbl">Recent files</span>',
+    );
+
+    const el = await fixture<HelixMenu>(
+      '<hx-menu aria-labelledby="round2-menu-lbl"><hx-menu-item value="a">Item A</hx-menu-item></hx-menu>',
+    );
+    await el.updateComplete;
+
+    const inner = shadowQuery<HTMLElement>(el, '[role="menu"]')!;
+    expect(inner.getAttribute('aria-label')).toBe('Recent files');
+
+    document.getElementById('round2-menu-lbl')?.remove();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-2 finding 2: on the legacy fallback path
+// (`_supportsIdrefRefs === false`), AT reads the inner
+// `[role="menuitem*"]` rather than the host. Consumer-supplied
+// `aria-label` / `aria-labelledby` on the host MUST be mirrored onto
+// that inner element — otherwise icon-only or override-named items
+// announce without a name on legacy engines.
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-menu-item fallback path label mirror (codex push-gate round-2 finding 2)', () => {
+  type HelixMenuItemCtor = typeof HelixMenuItem & {
+    __testSupportsIdrefRefsOverride: boolean | null;
+  };
+
+  afterEach(() => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('mirrors host aria-label onto inner [role="menuitem"] on the fallback path', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="edit" aria-label="Edit"></hx-menu-item>
+      </hx-menu>
+    `);
+    const item = el.querySelector('hx-menu-item') as HelixMenuItem;
+    await item.updateComplete;
+
+    const inner = shadowQuery<HTMLElement>(item, '[role="menuitem"]')!;
+    expect(inner).toBeTruthy();
+    expect(inner.getAttribute('aria-label')).toBe('Edit');
+  });
+
+  it('leaves inner element unnamed when no host override is set (slotted text wins)', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item value="edit">Edit</hx-menu-item>
+      </hx-menu>
+    `);
+    const item = el.querySelector('hx-menu-item') as HelixMenuItem;
+    await item.updateComplete;
+
+    const inner = shadowQuery<HTMLElement>(item, '[role="menuitem"]')!;
+    // No override -> no aria-label -> AT walks slotted text "Edit".
+    expect(inner.hasAttribute('aria-label')).toBe(false);
+  });
+});

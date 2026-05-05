@@ -91,11 +91,39 @@ export class HelixMenu extends HelixElement {
 
   // ─── Host-canonical ARIA bookkeeping ───
 
+  /**
+   * Test seam (codex push-gate round-2 finding 1): when set to `true` or
+   * `false`, overrides the platform `supportsIdrefElementReferences` probe
+   * before `connectedCallback` seeds `_supportsIdrefRefs`. Mirrors the
+   * hx-select / hx-menu-item seam — required so tests can deterministically
+   * exercise the legacy fallback render branch (where the inner
+   * `div[role="menu"]` is the announced surface and must mirror the
+   * resolved accessible name).
+   *
+   * Production code MUST NOT touch this field. It is `static` so the test
+   * stub cleanup is global and obvious.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
   /** @internal */
   private _supportsIdrefRefs = true;
 
   /** @internal */
   private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Resolved accessible name for the menu — the single source of truth that
+   * both `_syncHostAriaSemantics()` (modern path: writes to
+   * `internals.ariaLabel`) and the fallback `render()` branch (legacy path:
+   * writes to inner `div[role="menu"]` `aria-label`) read. Recomputed by
+   * `_syncHostAriaSemantics()` whenever host aria-* or `label` changes via
+   * the shared IDREF mirror. AccName precedence: consumer host `aria-label`
+   * > consumer host `aria-labelledby` (flattened) > `label` property >
+   * literal "Menu".
+   * @internal
+   */
+  private _resolvedAccessibleName = '';
 
   /** @internal */
   private _getItems(): HelixMenuItem[] {
@@ -301,7 +329,15 @@ export class HelixMenu extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
+    // Honour the static test override so synthetic environments choose the
+    // path BEFORE connect runs — the fallback render branch needs to be
+    // selected at first paint so the inner `[role="menu"]` carries the
+    // resolved accessible name without a mid-life flag flip.
+    const ctor = this.constructor as typeof HelixMenu;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
     // Keydown is bound on the HOST so events from focused host-canonical
     // menu items (which keep keydown out of this menu's shadow DOM)
     // still reach the navigation handler. hx-item-select bubbles
@@ -387,25 +423,45 @@ export class HelixMenu extends HelixElement {
     }
 
     // Precedence: consumer aria-label > consumer aria-labelledby (resolved) >
-    // `label` property > literal "Menu" (last-resort).
+    // `label` property > literal "Menu" (last-resort). The resolved string
+    // is cached on `_resolvedAccessibleName` so the fallback render branch
+    // (legacy path: AT reads inner div) can mirror the same name without
+    // duplicating the precedence ladder.
+    let resolved = '';
     if (hostAriaLabel) {
+      resolved = hostAriaLabel;
       internals.ariaLabel = hostAriaLabel;
     } else if (hasEffectiveLabelledBy) {
+      const flattened =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        this.label ||
+        'Menu';
+      resolved = flattened;
       if (this._supportsIdrefRefs) {
         // Modern path: element refs win; clear ariaLabel so they aren't
-        // shadowed by a stale string.
+        // shadowed by a stale string. Fallback branch reads
+        // `_resolvedAccessibleName` for its inner-div mirror.
         internals.ariaLabel = null;
       } else {
-        internals.ariaLabel =
-          labelEls
-            .map((el) => flattenAccName(el))
-            .filter(Boolean)
-            .join(' ') ||
-          this.label ||
-          'Menu';
+        internals.ariaLabel = flattened;
       }
     } else {
-      internals.ariaLabel = this.label || 'Menu';
+      resolved = this.label || 'Menu';
+      internals.ariaLabel = resolved;
+    }
+
+    // Codex push-gate round-2 finding 1: keep the resolved name available
+    // for the legacy render branch. Request a re-render so the fallback
+    // `<div role="menu" aria-label=...>` picks up the new value when host
+    // aria-* changes after first paint.
+    if (this._resolvedAccessibleName !== resolved) {
+      this._resolvedAccessibleName = resolved;
+      if (!this._supportsIdrefRefs) {
+        this.requestUpdate();
+      }
     }
   }
 
@@ -429,8 +485,14 @@ export class HelixMenu extends HelixElement {
       `;
     }
 
+    // Codex push-gate round-2 finding 1: AT on the fallback path announces
+    // the inner div, so it MUST mirror the same accessible name resolved
+    // by `_syncHostAriaSemantics()` (consumer host aria-label / aria-
+    // labelledby flatten / `label` property). Fall back to `this.label`
+    // if the mirror has not run yet (pre-connect render).
+    const fallbackLabel = this._resolvedAccessibleName || this.label || nothing;
     return html`
-      <div part="base" class="menu" role="menu" aria-label=${this.label || nothing}>
+      <div part="base" class="menu" role="menu" aria-label=${fallbackLabel}>
         <slot @slotchange=${this._handleSlotChange}></slot>
       </div>
     `;

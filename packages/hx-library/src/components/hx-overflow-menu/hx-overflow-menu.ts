@@ -302,6 +302,37 @@ export class HelixOverflowMenu extends HelixElement {
   }
 
   /**
+   * Codex push-gate round-2 finding 3: write the roving tabindex through
+   * the right surface for each item shape.
+   *
+   * - `hx-menu-item` is host-canonical: on the modern path the roving
+   *   tabindex must land on the host (it carries the announced role +
+   *   IDL ARIA), and on the fallback path it must land on the inner
+   *   `.menu-item` (the host is forced to `tabindex=-1` so there is
+   *   exactly one focusable surface per item). `setRovingTabIndex(value)`
+   *   on the item routes to the correct surface internally.
+   * - Plain slotted `[role="menuitem"]` elements (legacy `<button>`-style
+   *   children) keep the direct `item.tabIndex = value` write.
+   *
+   * Without this routing, host-canonical items on the fallback path stay
+   * at `tabindex=-1` because the host write never reaches the inner
+   * focusable surface — Tab would land on a non-focusable host and arrow
+   * navigation would fail to advance the announced item.
+   * @internal
+   */
+  private _writeRovingTabIndex(item: HTMLElement, value: number): void {
+    if (item.localName === 'hx-menu-item') {
+      const setter = (item as HTMLElement & { setRovingTabIndex?: (v: number) => void })
+        .setRovingTabIndex;
+      if (typeof setter === 'function') {
+        setter.call(item, value);
+        return;
+      }
+    }
+    item.tabIndex = value;
+  }
+
+  /**
    * Initialize roving tabindex on all enabled menu items: only the first
    * receives tabindex=0; the rest are tabindex=-1. Maintains the closing-
    * Tab semantics required by APG (tabbing past the menu closes it via
@@ -311,7 +342,7 @@ export class HelixOverflowMenu extends HelixElement {
   private _initRovingTabIndex(): void {
     const items = this._getMenuItems();
     items.forEach((item, i) => {
-      item.tabIndex = i === 0 ? 0 : -1;
+      this._writeRovingTabIndex(item, i === 0 ? 0 : -1);
     });
     this._rovingIndex = items.length > 0 ? 0 : -1;
   }
@@ -320,7 +351,7 @@ export class HelixOverflowMenu extends HelixElement {
   private _applyRovingTabIndex(): void {
     const items = this._getMenuItems();
     items.forEach((item, i) => {
-      item.tabIndex = i === this._rovingIndex ? 0 : -1;
+      this._writeRovingTabIndex(item, i === this._rovingIndex ? 0 : -1);
     });
   }
 
