@@ -7,6 +7,14 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
+import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 // PERF: hx-date-picker exceeds 5KB budget (7.98kb gzipped) -- calendar grid, date parsing, keyboard navigation, localization
 
@@ -114,6 +122,15 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
    * @internal
    */
   static override formAssociated = true;
+
+  /**
+   * Test seam: when set to `true` or `false`, overrides the platform
+   * `supportsIdrefElementReferences` probe before `connectedCallback` seeds
+   * `_supportsIdrefRefs`. Production code MUST NOT touch this field. It is a
+   * `static` so the test stub cleanup is global and obvious.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
 
   // ─── Properties ───
 
@@ -236,6 +253,15 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
   @property({ type: String, attribute: 'next-month-label' })
   nextMonthLabel = 'Next month';
 
+  /**
+   * Accessible name for screen readers, if different from the visible label.
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element. Highest-precedence naming source.
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | null = null;
+
   // ─── Internal State ───
 
   /**
@@ -280,122 +306,193 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
 
   // ─── Memoized formatters ───
 
-  /**
-   * Cached Intl.DateTimeFormat for weekday-short labels; keyed on locale.
-   * Recreated only when locale changes.
-   * @internal
-   */
+  /** @internal */
   private _weekdayFormatter: Intl.DateTimeFormat | null = null;
-  /**
-   * Cached Intl.DateTimeFormat for month-long labels; keyed on locale.
-   * Recreated only when locale changes.
-   * @internal
-   */
+  /** @internal */
   private _monthFormatter: Intl.DateTimeFormat | null = null;
-  /**
-   * Locale used when the cached formatters were last built.
-   * @internal
-   */
+  /** @internal */
   private _formatterLocale = '';
-  /**
-   * Cached array of 7 weekday header strings.
-   * Depends only on locale — recomputed lazily when locale changes.
-   * @internal
-   */
+  /** @internal */
   private _cachedWeekdayNames: string[] | null = null;
 
   // ─── Internal References ───
 
-  /**
-   * Reference to the readonly text input element displaying the formatted date.
-   * @internal
-   */
+  /** @internal */
   @query('.field__input')
   private _input: HTMLInputElement | undefined;
 
-  /**
-   * Reference to the calendar icon button that opens and closes the popup.
-   * @internal
-   */
+  /** @internal */
   @query('.field__trigger')
   private _trigger: HTMLButtonElement | undefined;
 
-  /**
-   * Reference to the calendar popup dialog element.
-   * @internal
-   */
+  /** @internal */
   @query('.calendar')
   private _calendar: HTMLDialogElement | undefined;
 
   // ─── Unique IDs ───
 
-  /**
-   * Unique base ID for this component instance, used to generate all child element IDs.
-   * @internal
-   */
+  /** @internal */
   private _id = _nextDatePickerId();
-  /**
-   * Unique ID for the text input element, used for label association.
-   * @internal
-   */
+  /** @internal */
   private _inputId = `${this._id}-input`;
-  /**
-   * Unique ID for the help text element, used for aria-describedby association.
-   * @internal
-   */
+  /** @internal */
   private _helpTextId = `${this._id}-help`;
-  /**
-   * Unique ID for the error message element, used for aria-describedby association.
-   * @internal
-   */
+  /** @internal */
   private _errorId = `${this._id}-error`;
-  /**
-   * Unique ID for the calendar popup dialog element, used for aria-controls association.
-   * @internal
-   */
+  /** @internal */
   private _calendarId = `${this._id}-calendar`;
+  /** @internal */
+  private _liveRegionId = `${this._id}-live`;
+  /** @internal */
+  private _labelId = `${this._id}-label`;
   /**
-   * Unique ID for the ARIA live region element that announces month navigation changes.
+   * Id of the synthesized in-shadow span that mirrors the consumer-resolved
+   * description text. Appended to the inner input's `aria-describedby` so AT
+   * picks the consumer description up through the standard described-by
+   * channel — `aria-description` is intentionally NOT written, because the
+   * W3C AccName algorithm ignores `aria-description` whenever
+   * `aria-describedby` is also present.
    * @internal
    */
-  private _liveRegionId = `${this._id}-live`;
+  private _consumerDescId = `${this._id}-consumer-desc`;
 
-  // ─── Slot Tracking ───
+  // ─── Slot Tracking (host-canonical naming) ───
 
   /**
-   * Whether the label slot has any assigned elements, used to switch between slotted and property-based label rendering.
+   * Whether the label slot has any assigned elements with a useful name.
+   * Per AccName 1.2 §4.3.10, an empty/whitespace-only slot does NOT count.
    * @internal
    */
   @state() private _hasLabelSlot = false;
   /**
-   * Whether the error slot has any assigned elements, used to switch between slotted and property-based error rendering.
+   * Whether the error slot has any meaningful (non-empty, non-hidden) content.
    * @internal
    */
   @state() private _hasErrorSlot = false;
+  /**
+   * Whether the help-text slot has any meaningful (non-empty, non-hidden) content.
+   * @internal
+   */
+  @state() private _hasHelpSlot = false;
+  /**
+   * Discriminated label source — drives precedence between slotted label,
+   * `label` property, and unnamed.
+   * @internal
+   */
+  @state() private _labelSource: 'string' | 'slot' | 'none' = 'none';
+  /**
+   * Flattened, trimmed text content from all label-slot nodes — used to drive
+   * the inner input's `aria-label` on the no-IDL-ref fallback path and to
+   * gate `_hasLabelSlot` per AccName 1.2.
+   * @internal
+   */
+  @state() private _labelSlotText = '';
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the cross-shadow naming strategy for the inner `<input>`.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+  /**
+   * Cached invalidity flag derived from `internals.validity.valid`, the
+   * `error` property, and the slotted error content. Drives `aria-invalid`
+   * on the inner input.
+   * @internal
+   */
+  @state() private _invalid = false;
+  /**
+   * Deferred copy of `error` driven through reactive state so the persistent
+   * live region can re-announce on transitions without direct DOM mutation.
+   * @internal
+   */
+  @state() private _announcedError = '';
 
-  /** @internal */
-  private _handleLabelSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    this._hasLabelSlot = slot.assignedElements().length > 0;
-    if (this._hasLabelSlot) {
-      const slottedLabel = slot.assignedElements()[0];
-      if (slottedLabel && !slottedLabel.id) {
-        slottedLabel.id = `${this._inputId}-slotted-label`;
-      }
-    }
-  }
+  // ─── Host-canonical ARIA bookkeeping ───
 
+  /** Handle for the shared IDREF observer. @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
   /** @internal */
-  private _handleErrorSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedElements().length > 0;
-  }
+  private _helpSlotTextObserver: MutationObserver | null = null;
+  /** @internal */
+  private _errorSlotTextObserver: MutationObserver | null = null;
+  /** @internal */
+  private _hostDescribedByObserver: MutationObserver | null = null;
+  /** @internal */
+  private _consumerLabelledBy: string | null = null;
+  /** @internal */
+  private _consumerDescribedBy: string | null = null;
+  /**
+   * Direct references to ALL labellable elements projected into
+   * `<slot name="label">`. Aggregating every assigned element preserves
+   * composed labels such as
+   * `<svg slot="label" aria-hidden="true">…</svg><span slot="label">Date</span>`.
+   * @internal
+   */
+  private _slottedLabelEls: Element[] = [];
+  /** @internal */
+  private _labelSlotTextObserver: MutationObserver | null = null;
+  /** @internal */
+  private _externalRefsObserver: MutationObserver | null = null;
 
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+
+    // Honour the static test override so synthetic environments choose the
+    // path BEFORE connect runs.
+    const ctor = this.constructor as typeof HelixDatePicker;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+
+    // Install the dedicated `aria-describedby` retraction observer BEFORE
+    // the seeded `_syncHostAriaSemantics()` call below.
+    this._hostDescribedByObserver = new MutationObserver((records) => {
+      let consumerCleared = false;
+      for (const record of records) {
+        if (record.attributeName !== 'aria-describedby') continue;
+        const oldValue = record.oldValue;
+        const newValue = this.getAttribute('aria-describedby');
+        if (oldValue !== null && newValue === null) {
+          this._consumerDescribedBy = null;
+          consumerCleared = true;
+        }
+      }
+      if (consumerCleared) {
+        this._syncHostAriaSemantics();
+      }
+    });
+    this._hostDescribedByObserver.observe(this, {
+      attributes: true,
+      attributeFilter: ['aria-describedby'],
+      attributeOldValue: true,
+    });
+
+    // Seed root-independent semantics from connect so the inner input
+    // resolves naming before first paint.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this._handleDocumentClick, true);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    this._helpSlotTextObserver?.disconnect();
+    this._helpSlotTextObserver = null;
+    this._errorSlotTextObserver?.disconnect();
+    this._errorSlotTextObserver = null;
+    this._labelSlotTextObserver?.disconnect();
+    this._labelSlotTextObserver = null;
+    this._hostDescribedByObserver?.disconnect();
+    this._hostDescribedByObserver = null;
+    this._externalRefsObserver?.disconnect();
+    this._externalRefsObserver = null;
   }
 
   override willUpdate(changedProperties: PropertyValues<this>): void {
@@ -405,6 +502,17 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     // always up-to-date without causing an extra render cycle.
     if (changedProperties.has('value')) {
       this._internals.setFormValue(this.value);
+    }
+
+    // Seed `_announcedError` BEFORE render so the persistent live region
+    // renders with the error text in the SAME frame that the alert container
+    // appears. Covers first paint AND runtime transitions to a non-empty error.
+    if (changedProperties.has('error') || !this.hasUpdated) {
+      this._announcedError = this.error ?? '';
+    }
+
+    if (changedProperties.has('label')) {
+      this._refreshLabelSource();
     }
 
     // Recompute the day grid and aria-labels only when the viewed month/year
@@ -436,18 +544,22 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
-    // FormMixin calls _updateValidity() automatically after updated().
-    // Force screen reader re-announcement when error text changes (a11y-v3-005)
-    if (changedProperties.has('error') && this.error) {
-      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
-      if (errorEl) {
-        const msg = this.error;
+    // Host-elevated ARIA semantics — runs after every render so the inner
+    // input's announced name/description follow consumer-IDREF / slot /
+    // property changes within the same frame.
+    this._syncHostAriaSemantics();
+
+    // Drive re-announcement from reactive state on error→error transitions
+    // (rAF clear-and-re-set forces AT to re-read role="alert" content).
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string | undefined;
+      if (previousError && this.error) {
+        this._announcedError = '';
         requestAnimationFrame(() => {
-          errorEl.textContent = '';
-          requestAnimationFrame(() => {
-            errorEl.textContent = msg;
-          });
+          this._announcedError = this.error;
         });
+      } else {
+        this._announcedError = this.error;
       }
     }
 
@@ -485,6 +597,563 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     }
   }
 
+  override firstUpdated(changed: PropertyValues<this>): void {
+    super.firstUpdated(changed);
+    // `slotchange` fires as a microtask after the initial synchronous render.
+    // Without proactive seeding, the first `_syncHostAriaSemantics()` call
+    // (driven from `updated()`) observes stale empty slot state. Seed
+    // synchronously here so first paint announces the correct name/description.
+    this._seedSlotStateSync();
+    this._syncHostAriaSemantics();
+
+    // WCAG 4.1.2: warn when no accessible name is available.
+    if (
+      !this.label &&
+      !this.accessibleLabel &&
+      !this._hasLabelSlot &&
+      !this.getAttribute('aria-label') &&
+      !this.getAttribute('aria-labelledby')
+    ) {
+      devWarn(
+        'hx-date-picker',
+        'No accessible label provided. Set the `label` attribute, `accessible-label`, `aria-label`, `aria-labelledby`, or project a `<slot name="label">` child. An unlabeled date picker violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      );
+    }
+  }
+
+  /**
+   * Synchronous slot-state seed. Mirrors the side effects of the three
+   * `_handle*SlotChange` handlers (label / help-text / error) but is driven by
+   * direct `slot.assignedNodes()` reads so we can populate state BEFORE the
+   * microtask `slotchange` events fire after the first render.
+   * @internal
+   */
+  private _seedSlotStateSync(): void {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const labelSlot = root.querySelector<HTMLSlotElement>('slot[name="label"]');
+    if (labelSlot) {
+      const state = this._readLabelSlotState(labelSlot);
+      this._hasLabelSlot = state.hasUsefulName;
+      this._slottedLabelEls = state.elements;
+      this._labelSlotText = state.text;
+      this._installLabelSlotTextObserver(state.elements);
+      this._refreshLabelSource();
+    }
+    const helpSlot = root.querySelector<HTMLSlotElement>('slot[name="help-text"]');
+    if (helpSlot) {
+      this._hasHelpSlot = this._readHelpSlotStateSync(helpSlot);
+      this._installHelpSlotTextObserver(helpSlot);
+    }
+    const errorSlot = root.querySelector<HTMLSlotElement>('slot[name="error"]');
+    if (errorSlot) {
+      this._hasErrorSlot = this._readErrorSlotStateSync(errorSlot);
+      this._installErrorSlotTextObserver(errorSlot);
+    }
+  }
+
+  /**
+   * Reads the label slot's assigned nodes and computes the discriminated
+   * naming state. An empty whitespace-only slot does NOT count as a useful
+   * name. Per AccName 1.2 §4.3.10, `aria-hidden="true"` and `[hidden]`
+   * elements contribute zero to the accessible name.
+   * @internal
+   */
+  private _readLabelSlotState(slot: HTMLSlotElement): {
+    hasUsefulName: boolean;
+    elements: Element[];
+    text: string;
+  } {
+    // Use `assignedNodes()` WITHOUT `flatten: true` so we read only consumer-
+    // projected nodes — never the slot's fallback content (the rendered
+    // internal `<label>` element when `this.label` is set). Conflating
+    // fallback content with consumer slot content makes `_hasLabelSlot`
+    // truthy in the label-only case.
+    const nodes = slot.assignedNodes();
+    const elements: Element[] = [];
+    const fragments: string[] = [];
+    for (const node of nodes) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        elements.push(el);
+        if (el.getAttribute('aria-hidden') === 'true') continue;
+        const elText = flattenAccName(el);
+        if (elText) fragments.push(elText);
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        const txt = (node.textContent ?? '').trim();
+        if (txt) fragments.push(txt);
+      }
+    }
+    const trimmedText = fragments.join(' ').replace(/\s+/g, ' ').trim();
+    return {
+      hasUsefulName: trimmedText.length > 0,
+      elements,
+      text: trimmedText,
+    };
+  }
+
+  /**
+   * Re-evaluate the help-text slot's "has meaningful content" state from its
+   * current effective text. AccName-aware so descendants carrying
+   * `aria-hidden="true"` or `hidden` do NOT count.
+   * @internal
+   */
+  private _readHelpSlotStateSync(slot: HTMLSlotElement): boolean {
+    const nodes = slot.assignedNodes({ flatten: true });
+    for (const node of nodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if ((node.textContent ?? '').trim().length > 0) return true;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (flattenAccName(node as Element).length > 0) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Re-evaluate the error slot's "has meaningful content" state from its
+   * current effective text.
+   * @internal
+   */
+  private _readErrorSlotStateSync(slot: HTMLSlotElement): boolean {
+    const nodes = slot.assignedNodes({ flatten: true });
+    for (const node of nodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if ((node.textContent ?? '').trim().length > 0) return true;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (flattenAccName(node as Element).length > 0) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Recomputes the discriminated label source. Slot takes precedence over
+   * the `label` property because the render path suppresses the internal
+   * `<label>` when slotted content is present.
+   * @internal
+   */
+  private _refreshLabelSource(): void {
+    if (this._hasLabelSlot) {
+      this._labelSource = 'slot';
+    } else if (this.label) {
+      this._labelSource = 'string';
+    } else {
+      this._labelSource = 'none';
+    }
+  }
+
+  /**
+   * (Re-)installs a `MutationObserver` against the deduped union of
+   * consumer-resolved label/description elements.
+   * @internal
+   */
+  private _installExternalRefsObserver(elements: Element[]): void {
+    if (this._externalRefsObserver) {
+      this._externalRefsObserver.disconnect();
+      this._externalRefsObserver = null;
+    }
+    if (elements.length === 0) return;
+    const unique = new Set<Element>(elements);
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    for (const el of unique) {
+      observer.observe(el, {
+        characterData: true,
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._externalRefsObserver = observer;
+  }
+
+  /**
+   * Resolves consumer-supplied label/description IDREFs on the host and
+   * writes the canonical ARIA onto the **inner readonly `<input>`** for the
+   * W3C APG date-picker dialog pattern.
+   *
+   * The inner input is INTENTIONALLY NOT a `role="combobox"` — it is a
+   * readonly text input with `aria-haspopup="dialog"` per W3C APG date picker
+   * dialog. A separate trigger button owns `aria-expanded` /
+   * `aria-controls=${calendarId}` for the dialog. (Cross-shadow `aria-controls`
+   * referencing an in-shadow id is a documented limitation, mirrored from
+   * hx-popover and hx-dropdown.)
+   *
+   * Cross-shadow naming uses a belt-and-suspenders strategy:
+   *
+   *   1. **Modern path** (`_supportsIdrefRefs === true`): consumer-resolved
+   *      label/description elements are written onto
+   *      `internals.ariaLabelledByElements` / `ariaDescribedByElements` on
+   *      the host. Host-level `aria-labelledby` / `aria-describedby`
+   *      attributes are LEFT IN PLACE so AT walking up the DOM also sees them.
+   *      Resolved-element text is also flattened onto the inner input as
+   *      `aria-label` so AT that does NOT walk up still announces the right
+   *      name.
+   *
+   *   2. **Legacy fallback** (`_supportsIdrefRefs === false`): the resolved-
+   *      element text is flattened onto the inner input as `aria-label` and
+   *      mirrored into a synthesized in-shadow span pointed at by the inner
+   *      input's `aria-describedby`.
+   *
+   * Writing `aria-labelledby="<light-DOM id>"` directly on the shadow-DOM
+   * inner input is INTENTIONALLY avoided: light-DOM ids do not resolve from
+   * inside a shadow root.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+
+    const input = this._input;
+    if (!input) {
+      // Inner input not yet rendered; defer. Still derive `_invalid` so
+      // `aria-invalid` first-paint is correct once the input renders.
+      const isInvalidEarly = !internals.validity.valid || !!(this.error || this._hasErrorSlot);
+      if (this._invalid !== isInvalidEarly) this._invalid = isInvalidEarly;
+      return;
+    }
+
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() || '' : '';
+
+    const internalLabel = this.shadowRoot?.getElementById(this._labelId) ?? null;
+    const slottedLabelEls = this._slottedLabelEls;
+    const helpEl = this.shadowRoot?.getElementById(this._helpTextId) ?? null;
+    const errorEl = this.shadowRoot?.getElementById(this._errorId) ?? null;
+
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    this._consumerLabelledBy = liveLabelledBy;
+    const liveDescribedBy = this.getAttribute('aria-describedby');
+    this._consumerDescribedBy = liveDescribedBy;
+
+    const consumerLabelEls = resolveIdrefTokens(this, this._consumerLabelledBy);
+    const hasEffectiveLabelledBy = consumerLabelEls.length > 0;
+
+    const consumerDescEls = resolveIdrefTokens(this, this._consumerDescribedBy);
+
+    // Observe in-place text mutations on the resolved external IDREF targets.
+    this._installExternalRefsObserver([...consumerLabelEls, ...consumerDescEls]);
+
+    const hasError = !!(this.error || this._hasErrorSlot);
+
+    // `aria-invalid` reflects EVERY signal the consumer can use to express
+    // invalidity: `setValidity()` (required-empty), explicit `error` property,
+    // and slotted error content.
+    const isInvalid = !internals.validity.valid || hasError;
+    if (this._invalid !== isInvalid) this._invalid = isInvalid;
+
+    // `accessibleLabel` is the canonical AT name when explicitly set; it
+    // outranks visible label / aria-labelledby per the helix override.
+    const explicitAccessibleLabel =
+      typeof this.accessibleLabel === 'string' && this.accessibleLabel.trim().length > 0
+        ? this.accessibleLabel
+        : null;
+
+    // Top-level `aria-hidden="true"` / `hidden` elements MUST NOT be forwarded
+    // to `internals.ariaLabelledByElements` / `ariaDescribedByElements`.
+    const isVisibleForAccName = (el: Element): boolean =>
+      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
+
+    // Build the augmented element lists used by the modern (IDL-refs) path.
+    const labelElsForInternals: Element[] = [];
+    if (!explicitAccessibleLabel) {
+      labelElsForInternals.push(...consumerLabelEls.filter(isVisibleForAccName));
+      if (!hasEffectiveLabelledBy && !hostAriaLabel) {
+        if (this._labelSource === 'slot' && slottedLabelEls.length > 0) {
+          labelElsForInternals.push(...slottedLabelEls.filter(isVisibleForAccName));
+        } else if (this._labelSource === 'string' && internalLabel) {
+          labelElsForInternals.push(internalLabel);
+        }
+      }
+    }
+
+    const descElsForInternals: Element[] = [...consumerDescEls.filter(isVisibleForAccName)];
+    if (helpEl && !hasError && this._hasHelpSlot) {
+      descElsForInternals.push(helpEl);
+    }
+    if (errorEl && hasError) {
+      descElsForInternals.push(errorEl);
+    }
+
+    // ─── Modern-path: ElementInternals IDL element references ───
+    type InternalsWithIdrefRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+      ariaDescribedByElements: Element[] | null;
+    };
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithIdrefRefs;
+      refsInternals.ariaLabelledByElements =
+        labelElsForInternals.length > 0 ? labelElsForInternals : null;
+      refsInternals.ariaDescribedByElements =
+        descElsForInternals.length > 0 ? descElsForInternals : null;
+      // Forward `accessibleLabel` to `internals.ariaLabel` when set; CLEAR
+      // with `null` (NOT `''`) when absent, because per W3C AccName an empty
+      // `aria-label` STILL outranks `aria-labelledby` and would erase the
+      // name resolved from element references / fallbacks.
+      if (explicitAccessibleLabel) {
+        internals.ariaLabel = explicitAccessibleLabel;
+      } else {
+        internals.ariaLabel = null;
+      }
+    }
+
+    // ─── Compute the inner input's accessible name (text-flatten path) ───
+    const flattenText = (els: Element[]): string =>
+      els
+        .filter(isVisibleForAccName)
+        .map((el) => flattenAccName(el))
+        .filter((t) => t.length > 0)
+        .join(' ');
+
+    let inputAriaLabel: string | null = null;
+    let inputAriaLabelledBy: string | null = null;
+
+    // Precedence (per AccName 1.2 §4.3.1 with helix override):
+    //   1. accessibleLabel (helix-specific override)
+    //   2. consumer aria-labelledby resolves → text-flatten
+    //   3. consumer aria-label on the host
+    //   4. slotted label → text content (NEVER cross-shadow id reference)
+    //   5. label property → internal `<label>` id (same shadow root)
+    //   6. else: unnamed
+    let labelledByFlat = '';
+    if (!explicitAccessibleLabel && hasEffectiveLabelledBy) {
+      labelledByFlat = flattenText(consumerLabelEls);
+    }
+    if (explicitAccessibleLabel) {
+      inputAriaLabel = explicitAccessibleLabel;
+    } else if (labelledByFlat) {
+      inputAriaLabel = labelledByFlat;
+    } else if (hostAriaLabel) {
+      inputAriaLabel = hostAriaLabel;
+    } else if (this._labelSource === 'slot') {
+      // Light-DOM ids do not resolve from inside a shadow root, so we MUST
+      // text-flatten on the legacy/fallback path.
+      if (this._labelSlotText) {
+        inputAriaLabel = this._labelSlotText;
+      } else if (slottedLabelEls.length > 0) {
+        const flat = flattenText(slottedLabelEls);
+        if (flat) inputAriaLabel = flat;
+      }
+    } else if (this._labelSource === 'string') {
+      if (internalLabel?.id) {
+        inputAriaLabelledBy = internalLabel.id;
+      } else if (this.label) {
+        inputAriaLabel = this.label;
+      }
+    }
+
+    if (inputAriaLabelledBy) {
+      if (input.getAttribute('aria-labelledby') !== inputAriaLabelledBy) {
+        input.setAttribute('aria-labelledby', inputAriaLabelledBy);
+      }
+      if (input.hasAttribute('aria-label')) input.removeAttribute('aria-label');
+    } else if (inputAriaLabel) {
+      if (input.getAttribute('aria-label') !== inputAriaLabel) {
+        input.setAttribute('aria-label', inputAriaLabel);
+      }
+      if (input.hasAttribute('aria-labelledby')) input.removeAttribute('aria-labelledby');
+    } else {
+      if (input.hasAttribute('aria-label')) input.removeAttribute('aria-label');
+      if (input.hasAttribute('aria-labelledby')) input.removeAttribute('aria-labelledby');
+    }
+
+    // ─── Write the inner input's aria-describedby chain ───
+    // Unify ALL descriptions through a single `aria-describedby` channel.
+    // The W3C AccName algorithm ignores `aria-description` whenever
+    // `aria-describedby` is also present, so consumer descriptions are
+    // mirrored into a synthesized in-shadow span and that same-root id is
+    // added to the chain.
+    const consumerDescSpan = this.shadowRoot?.getElementById(this._consumerDescId) ?? null;
+    const consumerDescText = flattenText(consumerDescEls);
+    if (consumerDescSpan && consumerDescSpan.textContent !== consumerDescText) {
+      consumerDescSpan.textContent = consumerDescText;
+    }
+
+    const describedByIds: string[] = [];
+    if (consumerDescText && consumerDescSpan) {
+      describedByIds.push(this._consumerDescId);
+    }
+    if (helpEl && !hasError && this._hasHelpSlot) {
+      describedByIds.push(this._helpTextId);
+    }
+    if (errorEl && hasError) {
+      describedByIds.push(this._errorId);
+    }
+    // The component's own helpText property renders an in-shadow help div;
+    // chain that id when no slotted help is present (it's the same id and
+    // the fallback content lives in the same div).
+    if (
+      !this._hasHelpSlot &&
+      this.helpText &&
+      !hasError &&
+      helpEl &&
+      !describedByIds.includes(this._helpTextId)
+    ) {
+      describedByIds.push(this._helpTextId);
+    }
+    if (describedByIds.length > 0) {
+      const value = describedByIds.join(' ');
+      if (input.getAttribute('aria-describedby') !== value) {
+        input.setAttribute('aria-describedby', value);
+      }
+    } else if (input.hasAttribute('aria-describedby')) {
+      input.removeAttribute('aria-describedby');
+    }
+
+    // Never write `aria-description` on the inner input — silently dropped by
+    // AccName whenever `aria-describedby` is also present. Strip defensively.
+    if (input.hasAttribute('aria-description')) {
+      input.removeAttribute('aria-description');
+    }
+  }
+
+  /**
+   * (Re-)installs the help-text slot text/visibility observer.
+   * @internal
+   */
+  private _installHelpSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._helpSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._helpSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._hasHelpSlot = this._readHelpSlotStateSync(slot);
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        observer.observe(node, {
+          characterData: true,
+          childList: true,
+          subtree: true,
+        });
+        return;
+      }
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._helpSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the error slot text/visibility observer.
+   * @internal
+   */
+  private _installErrorSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._errorSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._errorSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._hasErrorSlot = this._readErrorSlotStateSync(slot);
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        observer.observe(node, {
+          characterData: true,
+          childList: true,
+          subtree: true,
+        });
+        return;
+      }
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._errorSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the label slot text/visibility observer over the current
+   * set of slotted label elements.
+   * @internal
+   */
+  private _installLabelSlotTextObserver(elements: Element[]): void {
+    this._labelSlotTextObserver?.disconnect();
+    if (elements.length === 0) {
+      this._labelSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      const fragments: string[] = [];
+      for (const el of elements) {
+        if (el.getAttribute('aria-hidden') === 'true') continue;
+        const t = flattenAccName(el);
+        if (t) fragments.push(t);
+      }
+      const trimmed = fragments.join(' ').replace(/\s+/g, ' ').trim();
+      this._labelSlotText = trimmed;
+      this._hasLabelSlot = trimmed.length > 0;
+      this._refreshLabelSource();
+      this._syncHostAriaSemantics();
+    });
+    for (const el of elements) {
+      observer.observe(el, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._labelSlotTextObserver = observer;
+  }
+
+  // ─── Slot Change Handlers ───
+
+  /** @internal */
+  private _handleLabelSlotChange(e: Event): void {
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    const state = this._readLabelSlotState(e.target);
+    this._hasLabelSlot = state.hasUsefulName;
+    this._slottedLabelEls = state.elements;
+    this._labelSlotText = state.text;
+    // Preserve back-compat: if the first slotted label element lacks an id,
+    // assign a stable one — earlier callers relied on this for `for=…`-style
+    // associations.
+    if (state.elements.length > 0) {
+      const slottedLabel = state.elements[0];
+      if (slottedLabel && !slottedLabel.id) {
+        slottedLabel.id = `${this._inputId}-slotted-label`;
+      }
+    }
+    this._installLabelSlotTextObserver(state.elements);
+    this._refreshLabelSource();
+    this._syncHostAriaSemantics();
+  }
+
+  /** @internal */
+  private _handleErrorSlotChange(e: Event): void {
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasErrorSlot = this._readErrorSlotStateSync(e.target);
+    this._installErrorSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
+  }
+
+  /** @internal */
+  private _handleHelpSlotChange(e: Event): void {
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasHelpSlot = this._readHelpSlotStateSync(e.target);
+    this._installHelpSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
+  }
+
+  // ─── Document Click ───
+
   private readonly _handleDocumentClick = (e: MouseEvent): void => {
     if (!this._isOpen) return;
     const path = e.composedPath();
@@ -506,6 +1175,9 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     } else {
       this._internals.setValidity({});
     }
+    // Re-sync ARIA after every setValidity() so `aria-invalid` reflects
+    // freshly computed validity.
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -587,11 +1259,7 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     return this._isSameDay(date, new Date());
   }
 
-  /**
-   * Ensure memoized Intl.DateTimeFormat instances exist and match the current locale.
-   * Rebuilds only when locale changes; also clears the cached weekday names.
-   * @internal
-   */
+  /** @internal */
   private _ensureFormatters(): void {
     if (this._formatterLocale === this.locale && this._weekdayFormatter && this._monthFormatter) {
       return;
@@ -605,26 +1273,19 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
   /** @internal */
   private _getMonthName(month: number): string {
     this._ensureFormatters();
-    // _monthFormatter is guaranteed non-null after _ensureFormatters()
     const fmt = this._monthFormatter ?? new Intl.DateTimeFormat(this.locale, { month: 'long' });
     return fmt.format(new Date(2000, month, 1));
   }
 
   /** @internal */
   private _getDayName(dayIndex: number): string {
-    // dayIndex: 0=Sun, 1=Mon, ...
     this._ensureFormatters();
-    // _weekdayFormatter is guaranteed non-null after _ensureFormatters()
     const fmt =
       this._weekdayFormatter ?? new Intl.DateTimeFormat(this.locale, { weekday: 'short' });
     return fmt.format(new Date(2000, 0, 2 + dayIndex));
   }
 
-  /**
-   * Returns the 7 cached weekday header strings for the current locale.
-   * Computed once per locale and reused across all renders.
-   * @internal
-   */
+  /** @internal */
   private _getWeekdayNames(): string[] {
     this._ensureFormatters();
     if (!this._cachedWeekdayNames) {
@@ -635,10 +1296,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
 
   // ─── Calendar Grid ───
 
-  /**
-   * Returns an array of Date objects (or null for padding cells) representing
-   * the 6-week grid for the current view month.
-   */
   /** @internal */
   private _getDaysInGrid(): (Date | null)[] {
     const firstOfMonth = new Date(this._viewYear, this._viewMonth, 1);
@@ -647,17 +1304,14 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
 
     const cells: (Date | null)[] = [];
 
-    // Leading blank cells for days before the 1st
     for (let i = 0; i < leadingBlanks; i++) {
       cells.push(null);
     }
 
-    // Days of current month
     for (let d = 1; d <= daysInMonth; d++) {
       cells.push(new Date(this._viewYear, this._viewMonth, d));
     }
 
-    // Trailing blank cells to complete a full 7-column row
     const remainder = cells.length % 7;
     if (remainder !== 0) {
       for (let i = 0; i < 7 - remainder; i++) {
@@ -679,7 +1333,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
   /** @internal */
   private _closeCalendar(): void {
     this._isOpen = false;
-    // Return focus to trigger after calendar closes.
     void this.updateComplete.then(() => {
       this._trigger?.focus();
     });
@@ -703,7 +1356,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     const selectedISO = this.value;
     const selected = this._parseISODate(selectedISO);
 
-    // Try to focus: selected day > today (if in view) > first enabled day
     let targetDay: number | null = null;
 
     if (
@@ -723,7 +1375,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     }
 
     if (targetDay === null) {
-      // Find first enabled day in the month
       const daysInMonth = new Date(this._viewYear, this._viewMonth + 1, 0).getDate();
       for (let d = 1; d <= daysInMonth; d++) {
         const date = new Date(this._viewYear, this._viewMonth, d);
@@ -788,12 +1439,7 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     this._closeCalendar();
   }
 
-  /**
-   * Delegated click handler for the calendar day grid.
-   * A single handler on the grid container replaces per-cell closures,
-   * eliminating 42 inline function allocations per render.
-   * @internal
-   */
+  /** @internal */
   private readonly _handleGridClick = (e: Event): void => {
     const target = (e.target as Element).closest<HTMLElement>('[data-date]');
     if (!target) return;
@@ -816,7 +1462,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
       return;
     }
 
-    // Handle Escape to call _closeCalendar() with focus-restore.
     if (key === 'Escape') {
       e.stopPropagation();
       this._closeCalendar();
@@ -862,7 +1507,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     }
 
     if (key === 'Home') {
-      // Move to start of current week (Sunday)
       const currentDate = new Date(this._viewYear, this._viewMonth, currentFocused);
       const dayOfWeek = currentDate.getDay();
       const newDay = currentFocused - dayOfWeek;
@@ -876,7 +1520,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     }
 
     if (key === 'End') {
-      // Move to end of current week (Saturday)
       const currentDate = new Date(this._viewYear, this._viewMonth, currentFocused);
       const dayOfWeek = currentDate.getDay();
       const daysToSaturday = 6 - dayOfWeek;
@@ -898,7 +1541,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     if (key === 'ArrowDown') newDay = currentFocused + 7;
 
     if (newDay < 1) {
-      // Wrap to previous month
       this._prevMonth();
       const prevDaysInMonth = new Date(this._viewYear, this._viewMonth + 1, 0).getDate();
       this._focusedDay = prevDaysInMonth + newDay;
@@ -910,7 +1552,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
     }
 
     if (newDay > daysInMonth) {
-      // Wrap to next month
       const overflow = newDay - daysInMonth;
       this._nextMonth();
       this._focusedDay = overflow;
@@ -983,7 +1624,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
 
   /** @internal */
   private _renderWeekdayHeaders() {
-    // Use pre-cached weekday names (only locale-dependent, never changes within a session)
     const names = this._getWeekdayNames();
     const headers = names.map(
       (name) =>
@@ -996,10 +1636,8 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
 
   /** @internal */
   private _renderDayGrid() {
-    // Use the memoized grid — recomputed in willUpdate() only on month/year/locale change.
     const cells = this._dayGrid;
     const selectedDate = this._parseISODate(this.value);
-    // Cache today once per render — avoids 42 new Date() allocations per keyboard navigation event.
     const today = new Date();
 
     const rows: ReturnType<typeof html>[] = [];
@@ -1016,7 +1654,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
         const isFocused = this._focusedDay === date.getDate();
         const dayNumber = date.getDate();
         const iso = this._toISO(date);
-        // Read from the pre-computed aria-label map — no per-render toLocaleDateString calls.
         const ariaLabel = this._dayAriaLabels.get(iso) ?? iso;
 
         const dayClasses = {
@@ -1026,11 +1663,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
           'calendar__day--disabled': isDisabled,
         };
 
-        // data-date carries the ISO string so the delegated grid click handler
-        // (_handleGridClick) can identify the clicked day without any closure.
-        // role="gridcell" belongs on the cell container (ARIA 1.2 grid ownership rules),
-        // not the inner <button>. aria-selected/aria-disabled/aria-current describe
-        // the cell state and live on the gridcell element.
         return html`<div
           class="calendar__day-cell"
           role="gridcell"
@@ -1073,11 +1705,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
       'field--required': this.required,
     };
 
-    const describedBy =
-      [hasError ? this._errorId : null, this.helpText ? this._helpTextId : null]
-        .filter(Boolean)
-        .join(' ') || undefined;
-
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
         <!-- Label -->
@@ -1085,7 +1712,7 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
           <slot name="label" @slotchange=${this._handleLabelSlotChange}>
             ${this.label
               ? html`
-                  <label part="label" class="field__label" for=${this._inputId}>
+                  <label part="label" id=${this._labelId} class="field__label" for=${this._inputId}>
                     ${this.label}
                     ${this.required
                       ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
@@ -1097,6 +1724,15 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
         </div>
 
         <!-- Input + Trigger -->
+        <!--
+          W3C APG date picker dialog pattern: the inner input is a readonly
+          text input, NOT a combobox. Users do not type — they open the dialog
+          via the trigger button (or by clicking the input). The trigger button
+          owns aria-expanded and aria-controls (pointed at the in-shadow
+          calendar id) for the dialog. Cross-shadow aria-controls referencing
+          an in-shadow id is a documented limitation and matches the precedent
+          set by hx-popover and hx-dropdown.
+        -->
         <div part="input-wrapper" class="field__input-wrapper">
           <input
             part="input"
@@ -1107,12 +1743,9 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
             .value=${displayValue}
             placeholder=${ifDefined(this.format || undefined)}
             ?disabled=${this.disabled}
-            aria-labelledby=${ifDefined(
-              this._hasLabelSlot ? `${this._inputId}-slotted-label` : undefined,
-            )}
-            aria-invalid=${hasError ? 'true' : nothing}
-            aria-describedby=${ifDefined(describedBy)}
-            aria-required=${this.required ? 'true' : nothing}
+            aria-invalid=${this._invalid ? 'true' : 'false'}
+            aria-required=${this.required ? 'true' : 'false'}
+            aria-disabled=${this.disabled ? 'true' : nothing}
             aria-haspopup="dialog"
             @click=${this._openCalendar}
           />
@@ -1192,7 +1825,6 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
           </div>
 
           <!-- Day Grid -->
-          <!-- Single delegated click handler on the grid replaces per-cell closures. -->
           <div
             class="calendar__grid"
             role="grid"
@@ -1203,25 +1835,40 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
           </div>
         </dialog>
 
-        <!-- Error -->
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${this.error
-            ? html`
-                <div part="error" class="field__error" id=${this._errorId} role="alert">
-                  ${this.error}
-                </div>
-              `
-            : nothing}
-        </slot>
+        <!--
+          Persistent error live region. role="alert" is set from first paint
+          so the WAI-ARIA contract for live updates is honoured.
+        -->
+        <div
+          part="error"
+          class="field__error"
+          id=${this._errorId}
+          role="alert"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}
+            >${this._announcedError}</slot
+          >
+        </div>
 
         <!-- Help Text -->
-        ${this.helpText && !hasError
-          ? html`
-              <div part="help-text" class="field__help-text" id=${this._helpTextId}>
-                <slot name="help-text">${this.helpText}</slot>
-              </div>
-            `
-          : nothing}
+        <div
+          part="help-text"
+          class="field__help-text"
+          id=${this._helpTextId}
+          ?hidden=${(!this.helpText && !this._hasHelpSlot) || hasError}
+        >
+          <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText}</slot>
+        </div>
+
+        <!--
+          Synthesized in-shadow mirror of the consumer-resolved description
+          text. Its id is appended to the inner input's aria-describedby chain
+          so AT picks the consumer description up through the standard
+          described-by channel without needing aria-description (which W3C
+          AccName drops whenever aria-describedby is also present).
+        -->
+        <span id=${this._consumerDescId} class="field__sr-only" aria-hidden="false"></span>
       </div>
     `;
   }

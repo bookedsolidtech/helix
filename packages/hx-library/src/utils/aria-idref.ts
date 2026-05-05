@@ -354,12 +354,12 @@ export function installAriaIdrefMirror(
   const rootSubscriptions = new Map<Document | ShadowRoot, () => void>();
 
   const computeRootsToObserve = (): Array<Document | ShadowRoot> => {
+    const roots: Array<Document | ShadowRoot> = [];
     // Use the same composed-tree walk as `resolveIdrefTokens` so the
     // observer subscribes to every root the resolver can match — including
     // slot-owner shadow roots when the host is light-DOM-slotted into
     // another component (codex round-17 P1). Without this, a late id
     // mutation inside the slot owner's shadow tree never fires resync.
-    const roots: Array<Document | ShadowRoot> = [];
     collectIdrefSearchRoots(host, roots);
     const ownerDoc = host.ownerDocument;
     if (ownerDoc && !roots.includes(ownerDoc)) {

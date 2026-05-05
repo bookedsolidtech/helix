@@ -46,6 +46,10 @@ export interface HxDatePickerProps {
   previousMonthLabel?: string;
   /** Accessible label for the next month navigation button. */
   nextMonthLabel?: string;
+  /** Accessible name for screen readers, if different from the visible label.
+Uses `accessible-label` attribute instead of `aria-label` to avoid
+ARIAMixin shadowing on the host element. Highest-precedence naming source. */
+  accessibleLabel?: string | null;
 
   // Event callbacks
   /** Emitted when the selected date changes. */
