@@ -327,6 +327,14 @@ export class HelixOverflowMenu extends HelixElement {
   /** @internal */
   private _getMenuItems(): HTMLElement[] {
     const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
+    // Allow-list of host-canonical menu-item shapes — `hx-menu-item` carries
+    // its `role` via `_internals.role` (AT-only, no DOM attribute), so the
+    // role-attribute checks below would miss it. Restrict the wc allow-list
+    // to known menu-item hosts so siblings like `hx-menu-divider`
+    // (`role="separator"`) and decorative `hx-text` / `hx-icon` slotted into
+    // the panel are NOT treated as focus / typeahead targets — APG mandates
+    // separators stay non-focusable.
+    const isHostCanonicalMenuItem = (el: Element): boolean => el.localName === 'hx-menu-item';
     return (
       (slot
         ?.assignedElements({ flatten: true })
@@ -338,7 +346,7 @@ export class HelixOverflowMenu extends HelixElement {
             (el.getAttribute('role') === 'menuitem' ||
               el.getAttribute('role') === 'menuitemcheckbox' ||
               el.getAttribute('role') === 'menuitemradio' ||
-              el.tagName.toLowerCase().startsWith('hx-')),
+              isHostCanonicalMenuItem(el)),
         ) as HTMLElement[]) ?? []
     );
   }
@@ -429,12 +437,43 @@ export class HelixOverflowMenu extends HelixElement {
   /** @internal */
   private readonly _handleSlotClick = (e: Event): void => {
     const target = e.target as HTMLElement;
+    // Match BOTH the host-canonical `hx-menu-item` (whose `role` lives on
+    // `_internals.role` — invisible to attribute selectors) and the legacy
+    // `[role="menuitem*"]` shapes used by plain slotted markup. Without
+    // the `hx-menu-item` token, slotted Helix items would still emit their
+    // own `hx-item-select` (covered by `_handleSlotItemSelect`), but their
+    // raw click would also hit this handler and silently no-op.
     const menuItem = target.closest(
-      '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
+      'hx-menu-item, [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
     ) as HTMLElement | null;
     if (!menuItem) return;
     if (menuItem.hasAttribute('disabled') || (menuItem as HTMLButtonElement).disabled) return;
+    // `hx-menu-item` already emits `hx-item-select` from its own click
+    // handler — let `_handleSlotItemSelect` own that path so we don't
+    // double-fire `hx-select`. The legacy plain-markup path stays here.
+    if (menuItem.localName === 'hx-menu-item') return;
     const value = menuItem.getAttribute('data-value') ?? menuItem.textContent?.trim() ?? '';
+    this.dispatchEvent(
+      new CustomEvent<{ value: string }>('hx-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value },
+      }),
+    );
+    this._hide();
+  };
+
+  /**
+   * Handle `hx-item-select` bubbling from slotted `hx-menu-item` children.
+   * The host-canonical shape owns its own activation (click + Enter/Space),
+   * so route its event through to the composite's `hx-select` contract and
+   * close the panel. Disabled items never emit `hx-item-select`, so no
+   * disabled-guard is needed here.
+   * @internal
+   */
+  private readonly _handleSlotItemSelect = (e: Event): void => {
+    const detail = (e as CustomEvent<{ value: string }>).detail;
+    const value = detail?.value ?? '';
     this.dispatchEvent(
       new CustomEvent<{ value: string }>('hx-select', {
         bubbles: true,
@@ -560,6 +599,7 @@ export class HelixOverflowMenu extends HelixElement {
               aria-label=${this.labelMenu}
               class="panel"
               @click=${this._handleSlotClick}
+              @hx-item-select=${this._handleSlotItemSelect}
             >
               <slot @slotchange=${this._handleSlotChange}></slot>
             </div>

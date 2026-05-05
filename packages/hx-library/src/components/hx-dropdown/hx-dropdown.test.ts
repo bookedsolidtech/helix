@@ -3,6 +3,7 @@ import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixDropdown } from './hx-dropdown.js';
 import './index.js';
+import '../hx-menu/index.js';
 
 afterEach(cleanup);
 
@@ -837,6 +838,87 @@ describe('hx-dropdown', () => {
       const panel = shadowQuery(el, '[part="panel"]');
       // Confirm Group 4 work did NOT touch the menu role — Group 5 owns that refactor.
       expect(panel?.getAttribute('role')).toBe('menu');
+    });
+  });
+
+  // ─── Host-canonical hx-menu-item integration (codex round-2) ───
+
+  describe('Host-canonical hx-menu-item integration', () => {
+    const hxMenuItemHtml = `
+      <hx-dropdown>
+        <button slot="trigger" type="button">Open</button>
+        <hx-menu-item value="edit">Edit</hx-menu-item>
+        <hx-menu-item value="delete">Delete</hx-menu-item>
+      </hx-dropdown>
+    `;
+
+    it('finds slotted hx-menu-item children for first-focus on open', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const triggerWrapper = shadowQuery(el, '[part="trigger"]')!;
+      triggerWrapper.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      await el.updateComplete;
+
+      const items = el.querySelectorAll<HTMLElement>('hx-menu-item');
+      expect(items.length).toBe(2);
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('walks hx-menu-item children for ArrowDown traversal', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll<HTMLElement>('hx-menu-item');
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('routes hx-item-select from hx-menu-item through hx-select', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(
+        el,
+        'hx-select',
+      );
+      const item = el.querySelector<HTMLElement>('hx-menu-item')!;
+      item.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('edit');
+      expect(event.detail.label).toBe('Edit');
+    });
+
+    it('closes the panel after hx-menu-item activation', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const item = el.querySelector<HTMLElement>('hx-menu-item')!;
+      item.click();
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+
+    it('does not double-fire hx-select for a single hx-menu-item click', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      let count = 0;
+      el.addEventListener('hx-select', () => {
+        count += 1;
+      });
+      const item = el.querySelector<HTMLElement>('hx-menu-item')!;
+      item.click();
+      await el.updateComplete;
+      expect(count).toBe(1);
     });
   });
 });

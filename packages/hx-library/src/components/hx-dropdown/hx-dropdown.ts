@@ -479,12 +479,23 @@ export class HelixDropdown extends HelixElement {
     const slot = panel.querySelector<HTMLSlotElement>('slot');
     const assignedNodes = slot?.assignedElements({ flatten: true }) ?? [];
     const items: HTMLElement[] = [];
+    // `hx-menu-item` carries `role="menuitem"` (or menuitemcheckbox /
+    // menuitemradio) via `_internals.role` — AT-only, not a DOM attribute —
+    // so `[role="menuitem"]` selectors miss the host. Match the tag name in
+    // tandem with the legacy attribute selector so both shapes traverse.
+    const isHostCanonicalMenuItem = (el: Element): boolean => el.localName === 'hx-menu-item';
+    const collectFrom = (root: ParentNode): HTMLElement[] => {
+      const found: HTMLElement[] = [];
+      root.querySelectorAll<HTMLElement>('[role="menuitem"]').forEach((item) => found.push(item));
+      root.querySelectorAll<HTMLElement>('hx-menu-item').forEach((item) => found.push(item));
+      return found;
+    };
     for (const node of assignedNodes) {
       if (!(node instanceof HTMLElement)) continue;
-      if (node.matches('[role="menuitem"]')) {
+      if (node.matches('[role="menuitem"]') || isHostCanonicalMenuItem(node)) {
         items.push(node);
       } else {
-        node.querySelectorAll<HTMLElement>('[role="menuitem"]').forEach((item) => items.push(item));
+        collectFrom(node).forEach((item) => items.push(item));
       }
     }
     return items;
@@ -497,8 +508,11 @@ export class HelixDropdown extends HelixElement {
     if (!panel) return null;
     const slot = panel.querySelector<HTMLSlotElement>('slot');
     const assignedNodes = slot?.assignedElements({ flatten: true }) ?? [];
+    // `hx-menu-item` host carries `role="menuitem"` via `_internals.role`
+    // (invisible to attribute selectors). Add the literal tag name to the
+    // focusable selector so the host-canonical menu-item is found.
     const focusableSelector =
-      '[role="menuitem"], button, [tabindex]:not([tabindex="-1"]), a[href], input, select, textarea';
+      'hx-menu-item, [role="menuitem"], button, [tabindex]:not([tabindex="-1"]), a[href], input, select, textarea';
     for (const node of assignedNodes) {
       if (!(node instanceof HTMLElement)) continue;
       if (node.matches(focusableSelector)) return node;
@@ -520,8 +534,18 @@ export class HelixDropdown extends HelixElement {
   private _handlePanelClick(e: MouseEvent): void {
     const target = e.target as HTMLElement;
     // P2-06: Narrow selector — bare 'li' and 'button' cause spurious hx-select events.
-    const item = target.closest<HTMLElement>('[role="menuitem"], [data-value]');
+    // Group 5b: also match `hx-menu-item` directly. Its `role="menuitem"`
+    // lives on `_internals.role` (AT-only) and would not match
+    // `[role="menuitem"]`. The host emits `hx-item-select` from its own
+    // click handler, but we still route the click here to keep `hx-select`
+    // dispatch on the public composite contract — the dedicated
+    // `_handlePanelItemSelect` handler de-duplicates the host-canonical path.
+    const item = target.closest<HTMLElement>('hx-menu-item, [role="menuitem"], [data-value]');
     if (!item) return;
+    // `hx-menu-item` already emits `hx-item-select` and that path owns
+    // dispatch via `_handlePanelItemSelect` below — return early to avoid
+    // double-firing `hx-select`.
+    if (item.localName === 'hx-menu-item') return;
 
     const value = item.dataset['value'] ?? item.getAttribute('value') ?? null;
     const label = item.textContent?.trim() ?? '';
@@ -534,6 +558,28 @@ export class HelixDropdown extends HelixElement {
       }),
     );
 
+    this._hide();
+  }
+
+  /**
+   * Bubbled `hx-item-select` from a slotted `hx-menu-item` host. Forwards
+   * the activation through the composite's `hx-select` contract using the
+   * item's `value` property and label text. Disabled items never emit
+   * `hx-item-select`, so no disabled-guard is needed here.
+   * @internal
+   */
+  private _handlePanelItemSelect(e: Event): void {
+    const detail = (e as CustomEvent<{ item: HTMLElement; value: string }>).detail;
+    const item = detail?.item;
+    const value = detail?.value ?? null;
+    const label = item?.textContent?.trim() ?? '';
+    this.dispatchEvent(
+      new CustomEvent<{ value: string | null; label: string }>('hx-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value, label },
+      }),
+    );
     this._hide();
   }
 
@@ -557,6 +603,7 @@ export class HelixDropdown extends HelixElement {
         aria-label=${this._resolvedLabel}
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
+        @hx-item-select=${this._handlePanelItemSelect}
       >
         <slot @slotchange=${this._onPanelSlotChange}></slot>
       </div>
