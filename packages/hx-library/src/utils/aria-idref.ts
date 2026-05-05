@@ -297,19 +297,49 @@ function subscribeToRoot(root: Document | ShadowRoot, sync: () => void): () => v
   let entry = sharedRootObservers.get(root);
   if (!entry) {
     const subscribers = new Set<() => void>();
-    const observer = new MutationObserver(() => {
+    // Codex push-gate round-4 P2: components that flatten `aria-labelledby`
+    // to a fallback string (legacy engines without `ariaLabelledByElements`,
+    // and string-mirroring callers like hx-menu / hx-menu-item /
+    // hx-overflow-menu / hx-split-button) must resync when:
+    //   - the referenced label's text content mutates in place
+    //     (`characterData`)
+    //   - the referenced target is hidden / unhidden via attributes
+    //     (`hidden`, `aria-hidden`, `style`, `class` — visibility affects
+    //     accessible-name computation per accname §4.3.2)
+    // Without these triggers the mirrored `aria-label` stays stale.
+    //
+    // Widening the observer surface produces noisier callbacks, so the
+    // shared subscriber fan-out is coalesced through a single
+    // `requestAnimationFrame` (with a setTimeout fallback for environments
+    // where rAF is unavailable, e.g. test-stubbed roots). Subscribers see
+    // at most one resync per frame regardless of mutation density.
+    let pendingFrame = 0;
+    const flush = (): void => {
+      pendingFrame = 0;
       // Snapshot subscribers before invocation: a sync() callback may itself
       // resubscribe (e.g. component reattach), and Set iteration over a live
       // collection during mutation is undefined.
       Array.from(subscribers).forEach((fn) => {
         fn();
       });
+    };
+    const scheduleFlush = (): void => {
+      if (pendingFrame !== 0) return;
+      const raf =
+        typeof globalThis.requestAnimationFrame === 'function'
+          ? globalThis.requestAnimationFrame
+          : (cb: FrameRequestCallback) => globalThis.setTimeout(() => cb(performance.now()), 0);
+      pendingFrame = raf(flush) as unknown as number;
+    };
+    const observer = new MutationObserver(() => {
+      scheduleFlush();
     });
     observer.observe(root, {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['id'],
+      attributeFilter: ['id', 'hidden', 'aria-hidden', 'style', 'class'],
+      characterData: true,
     });
     entry = { observer, subscribers };
     sharedRootObservers.set(root, entry);

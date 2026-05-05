@@ -185,6 +185,9 @@ describe('installAriaIdrefMirror — reattach on slot change (codex push-gate fi
       // Wait for the slot-attr MutationObserver to fire (microtask) plus a
       // task tick so resync's reattach completes before we mutate rootB.
       await new Promise((r) => setTimeout(r, 0));
+      // Codex push-gate round-4 P2: shared root observer now coalesces
+      // subscriber fan-out through rAF. Wait one frame so the resync lands.
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
 
       // Now insert the IDREF target into rootB. If observers properly
       // reattached to rootB, the shared root observer fires sync() and
@@ -197,6 +200,7 @@ describe('installAriaIdrefMirror — reattach on slot change (codex push-gate fi
 
       // Wait one more tick for the shared root observer to fan out.
       await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
 
       expect(resolved.length).toBe(1);
       expect(resolved[0]).toBe(targetB);
@@ -206,6 +210,143 @@ describe('installAriaIdrefMirror — reattach on slot change (codex push-gate fi
       handle?.disconnect();
       // Suppress unused-var lint for the closure variable.
       void ownerA;
+    }
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-4 P2 — shared root observer must resync on
+// label-target text mutations and visibility-affecting attribute changes.
+//
+// Components that flatten `aria-labelledby` to a fallback string (legacy
+// engines without `ariaLabelledByElements`, plus string-mirroring callers
+// like hx-menu / hx-menu-item / hx-overflow-menu / hx-split-button) must
+// receive a resync when:
+//   1. The referenced label's text content mutates in place
+//      (`characterData`).
+//   2. The referenced target is hidden/unhidden via `hidden`,
+//      `aria-hidden`, `style`, or `class` — visibility affects accessible
+//      name computation per accname §4.3.2.
+// ─────────────────────────────────────────────────────────────
+
+describe('installAriaIdrefMirror — observe characterData + visibility (codex push-gate round-4 P2)', () => {
+  function buildLabelFixture(): { host: HTMLElement; label: HTMLElement } {
+    const label = document.createElement('span');
+    label.id = 'lbl';
+    label.textContent = 'initial';
+    document.body.appendChild(label);
+    cleanupNodes.push(label);
+
+    const host = document.createElement('div');
+    host.setAttribute('aria-labelledby', 'lbl');
+    document.body.appendChild(host);
+    cleanupNodes.push(host);
+
+    return { host, label };
+  }
+
+  async function flushSharedObserver(): Promise<void> {
+    // Allow the MutationObserver microtask to drain, then wait for the
+    // rAF-coalesced fan-out to fire.
+    await new Promise((r) => setTimeout(r, 0));
+    await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+  }
+
+  it('resyncs when the referenced label text mutates in place (characterData)', async () => {
+    const { host, label } = buildLabelFixture();
+
+    let mirrored = '';
+    const handle = installAriaIdrefMirror(host, () => {
+      const tokens = host.getAttribute('aria-labelledby');
+      const els = resolveIdrefTokens(host, tokens);
+      mirrored = els.map((el) => el.textContent ?? '').join(' ');
+    });
+
+    try {
+      expect(mirrored).toBe('initial');
+
+      // Mutate the label text in place. characterData triggers must resync
+      // the mirror so string-mirroring callers see the new value.
+      label.textContent = 'updated';
+      await flushSharedObserver();
+
+      expect(mirrored).toBe('updated');
+    } finally {
+      handle.disconnect();
+    }
+  });
+
+  it('resyncs when the referenced label is hidden via the `hidden` attribute', async () => {
+    const { host, label } = buildLabelFixture();
+
+    let resyncCount = 0;
+    const handle = installAriaIdrefMirror(host, () => {
+      resyncCount += 1;
+    });
+
+    try {
+      // Initial install fires sync once synchronously.
+      const baseline = resyncCount;
+
+      label.setAttribute('hidden', '');
+      await flushSharedObserver();
+
+      expect(resyncCount).toBeGreaterThan(baseline);
+    } finally {
+      handle.disconnect();
+    }
+  });
+
+  it('resyncs when the referenced label is hidden via aria-hidden', async () => {
+    const { host, label } = buildLabelFixture();
+
+    let resyncCount = 0;
+    const handle = installAriaIdrefMirror(host, () => {
+      resyncCount += 1;
+    });
+
+    try {
+      const baseline = resyncCount;
+
+      label.setAttribute('aria-hidden', 'true');
+      await flushSharedObserver();
+
+      expect(resyncCount).toBeGreaterThan(baseline);
+    } finally {
+      handle.disconnect();
+    }
+  });
+
+  it('coalesces a burst of mutations into a single resync per frame', async () => {
+    const { host, label } = buildLabelFixture();
+
+    let resyncCount = 0;
+    const handle = installAriaIdrefMirror(host, () => {
+      resyncCount += 1;
+    });
+
+    try {
+      // Drain initial synchronous sync.
+      await flushSharedObserver();
+      const baseline = resyncCount;
+
+      // Burst of mutations within a single frame should trigger a single
+      // coalesced fan-out, not one resync per mutation.
+      label.textContent = 'a';
+      label.setAttribute('hidden', '');
+      label.removeAttribute('hidden');
+      label.textContent = 'b';
+      label.setAttribute('aria-hidden', 'true');
+      label.removeAttribute('aria-hidden');
+
+      await flushSharedObserver();
+
+      // Exactly one fan-out beyond the baseline. Allow up to 2 to absorb any
+      // platform-driven rAF jitter; >2 indicates coalescing is broken.
+      expect(resyncCount - baseline).toBeGreaterThanOrEqual(1);
+      expect(resyncCount - baseline).toBeLessThanOrEqual(2);
+    } finally {
+      handle.disconnect();
     }
   });
 });

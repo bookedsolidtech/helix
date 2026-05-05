@@ -416,6 +416,54 @@ describe('hx-menu', () => {
       expect(expanded === 'true' || internals.ariaExpanded === 'true').toBe(true);
     });
 
+    it('closes nested submenu and returns focus to parent item on ArrowLeft from a child (codex push-gate round-4 P1)', async () => {
+      // Regression: ArrowLeft on a Child item inside a nested submenu used
+      // to be handled by the OUTER menu treating `detail.item` (the Child)
+      // as the submenu owner — `child.setSubmenuOpen(false)` is a no-op
+      // and `child.focus()` re-focuses the child. The submenu stayed open
+      // and focus was stuck on the child. The fix walks the composed tree
+      // to find the menu-item that owns the inner menu (the Parent) and
+      // closes / focuses it.
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-menu>
+      `);
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      // Open the submenu via ArrowRight on Parent.
+      parent.focus();
+      await userEvent.keyboard('{ArrowRight}');
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      const parentInternals = (parent as unknown as { _internals: ElementInternals })._internals;
+      // Sanity: submenu opened.
+      expect(parentInternals.ariaExpanded).toBe('true');
+
+      // ArrowLeft on the Child should close Parent's submenu and return
+      // focus to Parent.
+      await userEvent.keyboard('{ArrowLeft}');
+      // Allow the queued microtask to run.
+      await new Promise((r) => setTimeout(r, 0));
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      // Submenu closed.
+      expect(parentInternals.ariaExpanded).toBe('false');
+      // Focus returned to Parent (host-canonical or legacy inner-element
+      // focus targeting both count).
+      expect(isItemFocused(parent)).toBe(true);
+    });
+
     it('respects event.preventDefault() opt-out for consumer-controlled submenus', async () => {
       const el = await fixture<HelixMenu>(`
         <hx-menu>
