@@ -1459,6 +1459,11 @@ describe('hx-field', () => {
         const second = document.createElement('input');
         second.id = 'second';
         el.appendChild(second);
+        // Wait for slotchange + microtask + render so the new control is
+        // rebound by `_handleDefaultSlotChange()` before asserting on it.
+        // `updateComplete` alone races slot adoption.
+        await el.updateComplete;
+        await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
         await el.updateComplete;
         expect(second.getAttribute('aria-label')).toBe('Name');
 

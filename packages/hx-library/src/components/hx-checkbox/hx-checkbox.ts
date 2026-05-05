@@ -1076,9 +1076,6 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
         .join(' ') || undefined;
 
     const hostAriaLabel = this._effectiveLabel || undefined;
-    // Only point the inner input at `_labelId` when there is actual visible
-    // label content; otherwise the input would reference an empty container.
-    const useInternalLabelId = !hostAriaLabel && hasVisibleLabel;
 
     // Codex round-1 finding #7 (post push-gate F1, 2026-05-05): on no-IDL-ref
     // browsers the inner input is the announced surface. Consumer-supplied
@@ -1089,6 +1086,14 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // shape symmetry and future-proofing but it is not consumed here.
     const fallbackAriaLabel = this._fallbackAriaLabel;
     const fallbackDescribedBy = this._fallbackAriaDescribedBy;
+
+    // Only point the inner input at `_labelId` when there is actual visible
+    // label content AND no consumer-supplied flattened name has won. If the
+    // consumer's external `aria-labelledby` text-flattened into
+    // `_fallbackAriaLabel`, the internal label id would still take
+    // precedence over `aria-label` per AccName, drowning out the consumer-
+    // supplied name on no-IDL-ref browsers (CodeRabbit 2026-05-05).
+    const useInternalLabelId = !hostAriaLabel && !fallbackAriaLabel && hasVisibleLabel;
 
     // Merge internal describedBy chain with consumer fallback tokens.
     const innerDescribedBy =

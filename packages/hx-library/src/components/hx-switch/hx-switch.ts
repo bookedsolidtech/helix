@@ -349,6 +349,15 @@ export class HelixSwitch extends FormMixin(HelixElement) {
     this._ariaMirror = null;
     this._hostTabindexObserver?.disconnect();
     this._hostTabindexObserver = null;
+    // Reset the pending-mutation counter — any records queued before
+    // disconnect were dropped from the observer's queue per the WHATWG
+    // MutationObserver spec, so the next observer instance must start from
+    // a clean slate. Without this, a synchronous `_setOwnTabindex` call
+    // immediately before disconnect leaves the counter > 0, causing the
+    // first genuine consumer tabindex mutation post-reconnect to be
+    // misclassified as self-driven and silently skipped (CodeRabbit
+    // 2026-05-05).
+    this._pendingOwnTabindexMutations = 0;
     this._externalRefsObserver?.disconnect();
     this._externalRefsObserver = null;
   }

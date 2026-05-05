@@ -338,10 +338,30 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
    */
   @state() private _inputDisplayValue = '';
   /**
-   * Whether the label slot has slotted content assigned to it.
+   * Whether the label slot contributes a useful accessible name (per AccName
+   * 1.2 §4.3.10 — `aria-hidden="true"` and `[hidden]` content is excluded).
+   * Drives `_labelSource` and the inner-input naming strategy.
    * @internal
    */
   @state() private _hasLabelSlot = false;
+
+  /**
+   * Whether the label slot has ANY assigned nodes (including decorative-only
+   * content like `<svg slot="label" aria-hidden="true">`). Distinct from
+   * `_hasLabelSlot`, which excludes hidden/decorative content per AccName.
+   *
+   * Codex push-gate (2026-05-05) follow-up: native `<slot>` fallback is
+   * suppressed whenever ANY node is assigned, regardless of whether the
+   * assigned content is decorative. So a consumer who slots a decorative
+   * icon alongside `label="Time"` would lose the visible internal `<label>`
+   * (the slot-fallback label is hidden by the assigned icon, and
+   * `_hasLabelSlot` correctly reports `false` for naming, but the visible
+   * label was still suppressed). The render path uses this flag to decide
+   * whether to emit the internal `<label>` outside the slot-fallback branch
+   * so the visible label survives decorative-only slot content.
+   * @internal
+   */
+  @state() private _hasAnyLabelSlotNodes = false;
   /**
    * Whether the error slot has slotted content assigned to it.
    * @internal
@@ -701,6 +721,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     if (labelSlot) {
       const state = this._readLabelSlotState(labelSlot);
       this._hasLabelSlot = state.hasUsefulName;
+      this._hasAnyLabelSlotNodes = state.hasAnyNodes;
       this._slottedLabelEls = state.elements;
       this._labelSlotText = state.text;
       this._installLabelSlotTextObserver(state.elements);
@@ -728,6 +749,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
    */
   private _readLabelSlotState(slot: HTMLSlotElement): {
     hasUsefulName: boolean;
+    hasAnyNodes: boolean;
     elements: Element[];
     text: string;
   } {
@@ -759,6 +781,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     const trimmedText = fragments.join(' ').replace(/\s+/g, ' ').trim();
     return {
       hasUsefulName: trimmedText.length > 0,
+      hasAnyNodes: nodes.length > 0,
       elements,
       text: trimmedText,
     };
@@ -1285,6 +1308,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     if (!(e.target instanceof HTMLSlotElement)) return;
     const state = this._readLabelSlotState(e.target);
     this._hasLabelSlot = state.hasUsefulName;
+    this._hasAnyLabelSlotNodes = state.hasAnyNodes;
     this._slottedLabelEls = state.elements;
     this._labelSlotText = state.text;
     this._installLabelSlotTextObserver(state.elements);
@@ -1483,20 +1507,34 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     // aria-disabled — is bound on the input via Lit. aria-label /
     // aria-labelledby / aria-describedby are written imperatively by
     // _syncHostAriaSemantics after consumer-IDREF resolution.
+    // Decorative-only slot recovery (codex push-gate F2 follow-up,
+    // 2026-05-05): native `<slot>` fallback is suppressed whenever ANY node
+    // is assigned to the slot, even decorative content (e.g.
+    // `<svg slot="label" aria-hidden="true">`). Without this branch, a
+    // consumer who slots a decorative icon alongside `label="Time"` ends up
+    // with no visible label at all — the icon shadows the slot fallback,
+    // and `_hasLabelSlot` correctly resolves to `false` for naming, so the
+    // inner input falls through to other naming sources but the visible
+    // `<label>` never renders. Emit the internal `<label>` outside the slot
+    // fallback when this case is detected so the visible label survives.
+    const showInternalLabel = !!this.label && !this._hasLabelSlot;
+    const renderInternalLabelFallback = showInternalLabel && this._hasAnyLabelSlotNodes;
+    const internalLabel = showInternalLabel
+      ? html`
+          <label part="label" id=${this._labelId} class="field__label" for=${this._id}>
+            ${this.label}
+            ${this.required
+              ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
+              : nothing}
+          </label>
+        `
+      : nothing;
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
         <!-- Label -->
+        ${renderInternalLabelFallback ? internalLabel : nothing}
         <slot name="label" @slotchange=${this._handleLabelSlotChange}>
-          ${this.label
-            ? html`
-                <label part="label" id=${this._labelId} class="field__label" for=${this._id}>
-                  ${this.label}
-                  ${this.required
-                    ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
-                    : nothing}
-                </label>
-              `
-            : nothing}
+          ${renderInternalLabelFallback ? nothing : internalLabel}
         </slot>
 
         <!-- Combobox wrapper; role="combobox" lives on the input per ARIA 1.2 -->

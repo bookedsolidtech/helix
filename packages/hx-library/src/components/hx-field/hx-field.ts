@@ -251,6 +251,26 @@ export class HelixField extends HelixElement {
   private static readonly _ARIA_LABEL_OWNED_ATTR = 'data-hx-owns-label';
 
   /**
+   * Ownership markers for the non-label ARIA attributes hx-field bridges
+   * (`aria-required`, `aria-invalid`, `aria-describedby`). Same semantics as
+   * `_ARIA_LABEL_OWNED_ATTR`: presence indicates host wrote the value, absence
+   * means the consumer (or a prior context) owns it. We stamp them whenever
+   * we write the corresponding aria-* attribute and consult them on teardown
+   * so a consumer who took over during a `data-aria-managed` suspend window
+   * (or pre-mounted their own value) keeps that value when the slotted
+   * control is replaced or hx-field disconnects.
+   *
+   * Codex round (2026-05-05) follow-up: previous iterations only tracked
+   * label ownership; the other three were stripped unconditionally on
+   * teardown. That broke the suspend contract for consumers who managed
+   * required/invalid/describedby themselves.
+   * @internal
+   */
+  private static readonly _ARIA_REQUIRED_OWNED_ATTR = 'data-hx-owns-required';
+  private static readonly _ARIA_INVALID_OWNED_ATTR = 'data-hx-owns-invalid';
+  private static readonly _ARIA_DESCRIBEDBY_OWNED_ATTR = 'data-hx-owns-describedby';
+
+  /**
    * Last `aria-label` value written by hx-field to the currently adopted
    * control. Used in combination with the ownership marker to detect a
    * consumer overwrite: if the marker is present but the live value no
@@ -355,14 +375,28 @@ export class HelixField extends HelixElement {
     // we make during teardown below don't bounce back through the callback.
     this._slottedControlObserver?.disconnect();
     this._slottedControlObserver = null;
-    // Remove aria attributes we set on the slotted control. We only remove
-    // `aria-label` if hx-field owns it (marker present) — otherwise the
-    // value belongs to the consumer and removing would clobber their input.
+    // Remove aria attributes we set on the slotted control — but only the
+    // ones hx-field actually stamped (marker present). Without ownership
+    // tracking, a consumer who wrote `aria-required` / `aria-invalid` /
+    // `aria-describedby` themselves during a `data-aria-managed` suspend
+    // window would lose those values on disconnect.
     if (this._slottedControl) {
       this._releaseHostOwnedAriaLabelOnTeardown(this._slottedControl);
-      this._slottedControl.removeAttribute('aria-required');
-      this._slottedControl.removeAttribute('aria-invalid');
-      this._slottedControl.removeAttribute('aria-describedby');
+      this._releaseHostOwnedAriaAttr(
+        this._slottedControl,
+        'aria-required',
+        HelixField._ARIA_REQUIRED_OWNED_ATTR,
+      );
+      this._releaseHostOwnedAriaAttr(
+        this._slottedControl,
+        'aria-invalid',
+        HelixField._ARIA_INVALID_OWNED_ATTR,
+      );
+      this._releaseHostOwnedAriaAttr(
+        this._slottedControl,
+        'aria-describedby',
+        HelixField._ARIA_DESCRIBEDBY_OWNED_ATTR,
+      );
       this._slottedControl = null;
     }
     this._competingLabelWarned = false;
@@ -456,9 +490,13 @@ export class HelixField extends HelixElement {
     // two are orthogonal at teardown).
     if (prev) {
       this._releaseHostOwnedAriaLabelOnTeardown(prev);
-      prev.removeAttribute('aria-required');
-      prev.removeAttribute('aria-invalid');
-      prev.removeAttribute('aria-describedby');
+      this._releaseHostOwnedAriaAttr(prev, 'aria-required', HelixField._ARIA_REQUIRED_OWNED_ATTR);
+      this._releaseHostOwnedAriaAttr(prev, 'aria-invalid', HelixField._ARIA_INVALID_OWNED_ATTR);
+      this._releaseHostOwnedAriaAttr(
+        prev,
+        'aria-describedby',
+        HelixField._ARIA_DESCRIBEDBY_OWNED_ATTR,
+      );
     }
 
     this._slottedControl = next;
@@ -692,11 +730,20 @@ export class HelixField extends HelixElement {
     const ariaManaged = control.hasAttribute('data-aria-managed');
     if (ariaManaged) {
       // Capture the snapshot the first time we observe suspend. While
-      // suspended we MUST NOT touch any aria-* attribute or the marker —
-      // that's the contract.
+      // suspended we MUST NOT touch any `aria-*` attribute — that's the
+      // consumer-facing contract. We DO release our internal bookkeeping
+      // markers (`data-hx-owns-required` etc.) on suspend entry so any
+      // value the consumer writes during the suspend window is treated as
+      // consumer-owned by absence of marker. This protects the consumer's
+      // write from being clobbered by a teardown that happens while still
+      // in (or just after) the suspend window — the teardown helpers only
+      // remove attributes whose marker is present.
       if (!this._lastSeenAriaManaged) {
         this._ariaLabelSnapshotAtSuspend = control.getAttribute('aria-label');
         this._lastSeenAriaManaged = true;
+        control.removeAttribute(HelixField._ARIA_REQUIRED_OWNED_ATTR);
+        control.removeAttribute(HelixField._ARIA_INVALID_OWNED_ATTR);
+        control.removeAttribute(HelixField._ARIA_DESCRIBEDBY_OWNED_ATTR);
       }
       return;
     }
@@ -802,26 +849,57 @@ export class HelixField extends HelixElement {
       this._releaseHostOwnedAriaLabel(control);
     }
 
-    // Required state
+    // Required state — stamp ownership marker on every write so teardown
+    // can distinguish a host-stamped value from a consumer-managed one
+    // (e.g. consumer wrote it during a `data-aria-managed` suspend window).
     if (this.required) {
       control.setAttribute('aria-required', 'true');
+      control.setAttribute(HelixField._ARIA_REQUIRED_OWNED_ATTR, 'true');
     } else {
-      control.removeAttribute('aria-required');
+      this._releaseHostOwnedAriaAttr(
+        control,
+        'aria-required',
+        HelixField._ARIA_REQUIRED_OWNED_ATTR,
+      );
     }
 
     // Invalid state
     if (hasError) {
       control.setAttribute('aria-invalid', 'true');
+      control.setAttribute(HelixField._ARIA_INVALID_OWNED_ATTR, 'true');
     } else {
-      control.removeAttribute('aria-invalid');
+      this._releaseHostOwnedAriaAttr(control, 'aria-invalid', HelixField._ARIA_INVALID_OWNED_ATTR);
     }
 
     // Description (error or help text) via light-DOM span
     if (hasDesc) {
       control.setAttribute('aria-describedby', this._a11yDescId);
+      control.setAttribute(HelixField._ARIA_DESCRIBEDBY_OWNED_ATTR, 'true');
     } else {
-      control.removeAttribute('aria-describedby');
+      this._releaseHostOwnedAriaAttr(
+        control,
+        'aria-describedby',
+        HelixField._ARIA_DESCRIBEDBY_OWNED_ATTR,
+      );
     }
+  }
+
+  /**
+   * Removes a bridged ARIA attribute on the slotted control — but only if
+   * hx-field stamped its ownership marker. If the marker is absent, the
+   * value is consumer-owned and we leave both attribute and (non-existent)
+   * marker alone. Used by both the active sync and teardown paths so a
+   * consumer-managed value survives slot replacement and disconnect.
+   * @internal
+   */
+  private _releaseHostOwnedAriaAttr(
+    control: HTMLElement,
+    ariaAttr: string,
+    ownedMarker: string,
+  ): void {
+    if (!control.hasAttribute(ownedMarker)) return;
+    control.removeAttribute(ariaAttr);
+    control.removeAttribute(ownedMarker);
   }
 
   // ─── Render ───
