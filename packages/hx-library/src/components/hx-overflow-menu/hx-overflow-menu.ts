@@ -470,7 +470,7 @@ export class HelixOverflowMenu extends HelixElement {
    * @internal
    */
   private readonly _handleSlotItemSelect = (e: Event): void => {
-    const detail = (e as CustomEvent<{ value: string }>).detail;
+    const detail = (e as CustomEvent<{ item: HTMLElement; value: string }>).detail;
     const value = detail?.value ?? '';
     this.dispatchEvent(
       new CustomEvent<{ value: string }>('hx-select', {
