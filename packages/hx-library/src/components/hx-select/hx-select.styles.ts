@@ -85,6 +85,12 @@ export const helixSelectStyles = css`
   }
 
   .field__trigger {
+    /* Round-3 finding 1 / CodeRabbit F1: trigger is a <button type="button">
+       (labelable) so native <label for> click activation works for mouse
+       users. Reset native button chrome before applying field styles. */
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -95,6 +101,7 @@ export const helixSelectStyles = css`
     border-radius: var(--_border-radius);
     background-color: var(--_bg);
     color: var(--_color);
+    font: inherit;
     font-family: inherit;
     font-size: var(--hx-font-size-md, 1rem);
     line-height: var(--hx-line-height-normal, 1.5);

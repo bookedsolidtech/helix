@@ -1287,13 +1287,21 @@ export class HelixSelect extends FormMixin(HelixElement) {
 
   /**
    * Recomputes the discriminated label source. Round-3 finding 8.
+   *
+   * CodeRabbit F2: slotted label wins over the `label` prop. When a
+   * consumer provides BOTH a `<span slot="label">` AND a `label="..."`
+   * attribute the visible label is the slotted node (rendered by the
+   * named slot's default content branch never firing). Preferring the
+   * string form here would route the accessible name through the prop
+   * and diverge from the rendered text. The slot is the canonical
+   * source whenever it has useful content.
    * @internal
    */
   private _refreshLabelSource(): void {
-    if (this.label) {
-      this._labelSource = 'string';
-    } else if (this._hasLabelSlot) {
+    if (this._hasLabelSlot) {
       this._labelSource = 'slot';
+    } else if (this.label) {
+      this._labelSource = 'string';
     } else {
       this._labelSource = 'none';
     }
@@ -1347,11 +1355,23 @@ export class HelixSelect extends FormMixin(HelixElement) {
    * @internal
    */
   private _handleHostClick = (e: MouseEvent): void => {
+    const path = e.composedPath();
     // Ignore clicks that originated inside the open listbox panel — the
     // option's own `@click` handler already routed selection.
-    const path = e.composedPath();
     const listbox = this.shadowRoot?.querySelector('.field__listbox') ?? null;
     if (listbox && path.includes(listbox)) {
+      return;
+    }
+    // CodeRabbit F3: only toggle when the click traverses the trigger
+    // element. Clicks on the slotted label, help text, error text, or
+    // any other host-light-DOM content must NOT toggle the dropdown —
+    // they are consumer-owned regions that happen to live inside the
+    // host. The `<label for=${selectId}>` we render in shadow DOM
+    // forwards label clicks to the <button> trigger natively, so those
+    // clicks reach this handler with the trigger in their composedPath
+    // and toggle correctly.
+    const trigger = this._trigger ?? this.shadowRoot?.querySelector('.field__trigger') ?? null;
+    if (!trigger || !path.includes(trigger)) {
       return;
     }
     this._toggleDropdown();
@@ -1618,21 +1638,29 @@ export class HelixSelect extends FormMixin(HelixElement) {
         <!-- Select Wrapper: trigger + listbox -->
         <div part="select-wrapper" class="field__select-wrapper">
           <!--
-            Visual trigger surface only. Round-3 finding 1: role, tabindex,
+            Visual trigger surface. Round-3 finding 1: role, tabindex,
             and combobox ARIA all live on the host so AT sees a single
-            announced + focused surface. The trigger keeps its id so the
-            internal label[for] association still targets the visible
-            label-anchored area for click forwarding (the host's for=
-            target is irrelevant to AT — internals.ariaLabel* carries the
-            real association). The trigger has no role and no ARIA, so AT
-            walks its subtree text as the combobox's value content.
+            announced + focused surface. The trigger is rendered as a
+            <button type="button"> (a labelable element) so the visible
+            label[for=selectId] performs native click activation —
+            mouse users clicking the label focus the trigger which
+            bubbles to the host click handler and toggles the dropdown.
+            type="button" prevents implicit form submission. The trigger
+            has no role and no ARIA, so AT walks its subtree text as
+            the combobox's value content (host carries the real
+            association via internals.ariaLabel*).
           -->
-          <div part="trigger" id=${this._selectId} class=${classMap(triggerClasses)}>
+          <button
+            type="button"
+            part="trigger"
+            id=${this._selectId}
+            class=${classMap(triggerClasses)}
+          >
             <span class="field__trigger-value"
               >${this._displayValue || this.placeholder || nothing}</span
             >
             <span class="field__chevron" aria-hidden="true"></span>
-          </div>
+          </button>
 
           <!-- Custom Listbox Panel -->
           <div
