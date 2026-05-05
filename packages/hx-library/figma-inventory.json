@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T12:23:03.148Z",
+  "generatedAt": "2026-05-05T12:25:22.816Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -5520,6 +5520,30 @@
           "defaultValue": ""
         },
         {
+          "figmaPropertyName": "label",
+          "cemAttribute": "label",
+          "type": "text",
+          "defaultValue": "undefined"
+        },
+        {
+          "figmaPropertyName": "accessibleLabel",
+          "cemAttribute": "accessible-label",
+          "type": "text",
+          "defaultValue": "undefined"
+        },
+        {
+          "figmaPropertyName": "helpText",
+          "cemAttribute": "help-text",
+          "type": "text",
+          "defaultValue": "undefined"
+        },
+        {
+          "figmaPropertyName": "error",
+          "cemAttribute": "error",
+          "type": "text",
+          "defaultValue": "undefined"
+        },
+        {
           "figmaPropertyName": "labelGradient",
           "cemAttribute": "label-gradient",
           "type": "text",
@@ -5569,6 +5593,27 @@
           "type": "instance-swap",
           "default": null,
           "description": "Custom trigger element. Default: a color swatch button."
+        },
+        {
+          "figmaPropertyName": "label",
+          "cemSlot": "label",
+          "type": "instance-swap",
+          "default": null,
+          "description": "Visible label projected above the trigger; aggregated text contributes to the host's accessible name when no stronger naming source (aria-labelledby/aria-label/accessible-label/label) is supplied."
+        },
+        {
+          "figmaPropertyName": "help-text",
+          "cemSlot": "help-text",
+          "type": "instance-swap",
+          "default": null,
+          "description": "Help text rendered below the trigger and joined into the host's announced description channel."
+        },
+        {
+          "figmaPropertyName": "error",
+          "cemSlot": "error",
+          "type": "instance-swap",
+          "default": null,
+          "description": "Error message rendered below help text. When present, marks the trigger as aria-invalid and is announced via a polite live region."
         }
       ],
       "cssParts": [
@@ -5599,6 +5644,18 @@
         {
           "description": "The text input area.",
           "name": "input"
+        },
+        {
+          "description": "The visible label container above the trigger.",
+          "name": "label"
+        },
+        {
+          "description": "The help-text container rendered below the trigger.",
+          "name": "help-text"
+        },
+        {
+          "description": "The error-message container rendered below help text.",
+          "name": "error"
         }
       ],
       "events": [
