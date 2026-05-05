@@ -590,7 +590,10 @@ describe('hx-dropdown', () => {
       trigger.click();
       await el.updateComplete;
 
-      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(el, 'hx-select');
+      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(
+        el,
+        'hx-select',
+      );
       const item = el.querySelector<HTMLElement>('[data-value="edit"]')!;
       item.click();
       const event = await eventPromise;
@@ -653,7 +656,10 @@ describe('hx-dropdown', () => {
       newItem.textContent = 'Archive';
       ul.appendChild(newItem);
 
-      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(el, 'hx-select');
+      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(
+        el,
+        'hx-select',
+      );
       newItem.click();
       const event = await eventPromise;
       expect(event.detail.value).toBe('archive');

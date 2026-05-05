@@ -51,14 +51,24 @@ const _nextDropdownId = createIdCounter('hx-dropdown');
  *   3. `label` property
  *   4. Hard-coded literal `"Menu"` (last-resort accessible name)
  *
- * **Group 5 boundary (intentional):** This round is **additive only** — the
- * host-label pipeline is the entire change. The panel's `role="menu"` and
- * the menuitem-roving keyboard pattern are already implemented per APG and
- * are NOT touched here. Group 5 (composite navigation: menu, menubar,
- * menuitem, tabs, tree) will own any broader refactor of the menu role and
- * roving-tabindex semantics. Codex reviewers: please scope findings to the
- * host-label pipeline; do not flag missing roving-focus / typeahead /
- * `aria-orientation` work here.
+ * **Group 4b → Group 5b boundary:** Group 4b added the host-attribute
+ * label mirror **only** — additive on top of the existing dropdown
+ * behaviour. Group 5b (this commit) adds the composite-navigation
+ * portion that 4b explicitly deferred:
+ *   - **Roving tabindex** inside the panel (`_applyRovingTabIndex` +
+ *     `_rovingIndex`). Only the focused item carries `tabindex=0`.
+ *   - **First-character typeahead** with 500ms timeout (`_handleTypeahead`)
+ *     matching `hx-menu`, `hx-overflow-menu`, `hx-split-button`.
+ *   - Submenu auto-handling is delegated to slotted `hx-menu` /
+ *     `hx-menu-item` (whose `hx-item-submenu-open` / `hx-item-submenu-close`
+ *     events are auto-handled by the parent `hx-menu` after Group 5b).
+ *
+ * The panel's inner-div `role="menu"` is intentionally NOT migrated to
+ * the host: the host wraps a slotted consumer trigger AND the panel,
+ * so it cannot canonically carry the menu role. Slotted `hx-menu-item`
+ * children carry `role="menuitem"` on their HOST after Group 5b's menu
+ * migration, which fixes the cross-shadow walk concern from the
+ * consumer's perspective.
  *
  * `aria-controls` is intentionally omitted on the trigger: the panel lives
  * in shadow DOM and IDREF values cannot be resolved across shadow
@@ -160,6 +170,27 @@ export class HelixDropdown extends HelixElement {
   @state() private _panelVisible = false;
 
   /**
+   * Index within the panel's focusable menu items of the item currently
+   * holding the roving tabindex (and thus visual focus). −1 means the
+   * panel has not been keyboard-focused yet.
+   * @internal
+   */
+  private _rovingIndex = -1;
+
+  /**
+   * Accumulated character buffer for typeahead search within the panel's
+   * menu items. Cleared after 500ms of inactivity.
+   * @internal
+   */
+  private _typeaheadBuffer = '';
+
+  /**
+   * Timer handle that clears the typeahead buffer after a period of inactivity.
+   * @internal
+   */
+  private _typeaheadTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /**
    * Resolved accessible name for the menu panel — the value written to the
    * inner `[part="panel"]` `aria-label`. Recomputed on every sync per
    * AccName 1.2 §4.3.1 precedence: host `aria-labelledby` (flattened) >
@@ -233,6 +264,10 @@ export class HelixDropdown extends HelixElement {
       document.removeEventListener('click', this._handleOutsideClick, { capture: true });
       this._documentListenerAttached = false;
     }
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+      this._typeaheadTimer = null;
+    }
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
     this._externalRefsObserver?.disconnect();
@@ -258,6 +293,14 @@ export class HelixDropdown extends HelixElement {
     // it executes in the same microtask as the test's await-continuation.
     const panel = this._panel;
     if (panel) {
+      // Group 5b: initialize roving tabindex on slotted menu items
+      // before focusing the first one. Tab from outside lands on the
+      // same item that has visual focus.
+      const items = this._getFocusableMenuItems();
+      if (items.length > 0) {
+        this._rovingIndex = 0;
+        this._applyRovingTabIndex(items);
+      }
       const firstFocusable = this._getFirstFocusableItem();
       firstFocusable?.focus();
     }
@@ -271,6 +314,12 @@ export class HelixDropdown extends HelixElement {
     if (!this.open) return;
     this.open = false;
     this._panelVisible = false;
+    this._rovingIndex = -1;
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+      this._typeaheadTimer = null;
+    }
+    this._typeaheadBuffer = '';
     if (this._documentListenerAttached) {
       document.removeEventListener('click', this._handleOutsideClick, { capture: true });
       this._documentListenerAttached = false;
@@ -344,6 +393,17 @@ export class HelixDropdown extends HelixElement {
       // P2-01: Arrow key roving within panel per APG Menu Button pattern.
       e.preventDefault();
       this._handleMenuNavigation(e.key);
+    } else if (
+      this.open &&
+      e.key.length === 1 &&
+      e.key !== ' ' &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      !e.altKey
+    ) {
+      // Group 5b: first-character typeahead within the panel's menu
+      // items. 500ms timeout matching hx-menu / hx-overflow-menu.
+      this._handleTypeahead(e.key);
     }
   };
 
@@ -363,7 +423,52 @@ export class HelixDropdown extends HelixElement {
     } else {
       nextIndex = items.length - 1;
     }
+    this._rovingIndex = nextIndex;
+    this._applyRovingTabIndex(items);
     items[nextIndex]?.focus();
+  }
+
+  /**
+   * Roving tabindex inside the panel: only the focused item carries
+   * tabindex=0; the rest are tabindex=-1. APG-compliant for the menu
+   * button pattern. Closing-Tab semantics are preserved by the
+   * `_handleKeydown` Tab branch above (which lets focus advance
+   * naturally and closes the panel).
+   *
+   * Group 5b: introduced to align hx-dropdown's panel keyboard contract
+   * with hx-menu / hx-overflow-menu / hx-split-button. Group 4b only
+   * added the host-attribute label mirror (additive); this is the
+   * keyboard portion deferred until Group 5.
+   * @internal
+   */
+  private _applyRovingTabIndex(items: HTMLElement[]): void {
+    items.forEach((item, i) => {
+      item.tabIndex = i === this._rovingIndex ? 0 : -1;
+    });
+  }
+
+  /** @internal */
+  private _handleTypeahead(char: string): void {
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+    }
+    this._typeaheadBuffer += char.toLowerCase();
+    this._typeaheadTimer = setTimeout(() => {
+      this._typeaheadBuffer = '';
+      this._typeaheadTimer = null;
+    }, 500);
+
+    const items = this._getFocusableMenuItems();
+    const match = items.findIndex((item) => {
+      const text = item.textContent?.trim().toLowerCase() ?? '';
+      return text.startsWith(this._typeaheadBuffer);
+    });
+
+    if (match !== -1) {
+      this._rovingIndex = match;
+      this._applyRovingTabIndex(items);
+      items[match]?.focus();
+    }
   }
 
   // P0-01 / P2-01: Get focusable menu items from slotted content.
