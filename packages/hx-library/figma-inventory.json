@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T18:50:41.793Z",
+  "generatedAt": "2026-05-05T23:44:52.313Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -26268,7 +26268,7 @@
           "name": "item"
         },
         {
-          "description": "The interactive item row (contains expand icon, icon slot, and label).",
+          "description": "The interactive item row (presentational on the modern path; carries role=\"treeitem\" + aria-* on the legacy fallback).",
           "name": "row"
         },
         {
@@ -26280,7 +26280,7 @@
           "name": "label"
         },
         {
-          "description": "The children container.",
+          "description": "The children container (always carries role=\"group\").",
           "name": "children"
         }
       ],
@@ -26424,7 +26424,7 @@
       ],
       "cssParts": [
         {
-          "description": "The tree container element with role=\"tree\".",
+          "description": "The tree container element with role=\"tree\" (legacy fallback path) or the inner shadow surface (modern path; role lives on the host).",
           "name": "tree"
         }
       ],
