@@ -167,6 +167,20 @@ export class HelixSelect extends FormMixin(HelixElement) {
   /** Marks this element as form-associated for ElementInternals support. @internal */
   static override formAssociated = true;
 
+  /**
+   * Test seam (round-3 finding 4): when set to `true` or `false`, overrides
+   * the platform `supportsIdrefElementReferences` probe before
+   * `connectedCallback` seeds `_supportsIdrefRefs`. Mid-life flag flips on a
+   * connected instance allowed stale modern internals (set during connect)
+   * to leak into the fallback branch — tests must select the path BEFORE
+   * the host connects so the synthetic environment matches a legacy engine.
+   *
+   * Production code MUST NOT touch this field. It is a `static` so the test
+   * stub cleanup is global and obvious.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
   // ─── Stable IDs ───
 
   /** @internal */
@@ -285,36 +299,72 @@ export class HelixSelect extends FormMixin(HelixElement) {
   @state() private _options: SelectOption[] = [];
   /** Whether the named error slot contains projected content. @internal */
   @state() private _hasErrorSlot = false;
-  /** Whether the named label slot contains projected content. @internal */
+  /**
+   * Whether the named label slot contributes a useful name. Round-3 finding 3:
+   * the previous boolean tracked `assignedNodes().length > 0`, which is `true`
+   * for whitespace-only slot content. That suppressed the unlabeled devWarn
+   * even when the slot only carried a stray newline. This flag now requires
+   * either a labellable element OR non-empty trimmed text content.
+   * @internal
+   */
   @state() private _hasLabelSlot = false;
+  /**
+   * Source of the accessible name. Round-3 finding 8 replaces the magic
+   * sentinel `'*slotted*'` with a discriminated union so a future caller
+   * setting `label="*slotted*"` literally cannot be confused with a slotted
+   * label.
+   * @internal
+   */
+  @state() private _labelSource: 'string' | 'slot' | 'none' = 'none';
+  /**
+   * Flattened, trimmed text content of any text nodes in the label slot —
+   * used to drive `internals.ariaLabel` when the consumer projects only a
+   * text node (no element to add to `labelEls`). Round-3 finding 3.
+   * @internal
+   */
+  @state() private _labelSlotText = '';
   /** Whether the help-text slot contains projected content. @internal */
   @state() private _hasHelpSlot = false;
   /**
-   * The id assigned to the first slotted label node so it can join the
-   * accessible-name chain (parity with `hx-time-picker`). The slot's projected
-   * light-DOM elements stay in the light tree, so we attach a stable id and
-   * resolve the element directly into `labelEls` for the modern path. Round-2
-   * finding 3.
+   * Direct reference to the first labellable element projected into the
+   * `<slot name="label">`. Round-3 finding 5 replaces the previous round-trip
+   * through `document.getElementById(this._slottedLabelId)` so we no longer
+   * mutate consumer light-DOM (assigning ids) and the lookup is robust under
+   * nested shadow roots (round-3 finding 6).
    * @internal
    */
-  @state() private _slottedLabelId = '';
+  private _slottedLabelEl: Element | null = null;
   /** Zero-based index of the keyboard-focused option in the listbox; -1 means none. @internal */
   @state() private _focusedOptionIndex = -1;
   /**
    * Whether the platform supports IDL element references on `ElementInternals`.
-   * Drives the render-time branch between modern (host-canonical via internals
-   * element references) and fallback (host-attribute mirror only). Aligned
-   * with Group 2 round-17 P1.
+   * Drives the cross-shadow naming strategy: modern path uses
+   * `internals.ariaLabelledByElements` / `internals.ariaDescribedByElements`
+   * to bridge consumer light-DOM IDREFs into the host accessible node;
+   * fallback path mirrors the consumer's `aria-labelledby` / `aria-describedby`
+   * tokens onto host attributes and text-mirrors shadow help/error wrappers
+   * via `internals.ariaDescription`.
    *
-   * ARCHITECTURE — Path A (host-as-form-field, inner-as-combobox):
-   * The host owns `internals.ariaLabel`, `internals.ariaLabelledByElements`,
-   * `internals.ariaDescribedByElements`, `internals.ariaRequired`,
-   * `internals.ariaInvalid`, `internals.ariaDisabled`. The host does NOT own
-   * `internals.role` — `role="combobox"` stays on the inner trigger element
-   * per the APG combobox pattern (ARIA 1.2 places `combobox` semantics on
-   * the editable text field, not its container). Promoting the host to
-   * `combobox` would conflict with the inner trigger's role and produce a
-   * doubled accessible.
+   * ARCHITECTURE — Round-3 host-canonical (overturns scope doc Path A).
+   * Codex round-2 finding 1 demonstrated that the dual-channel approach
+   * (host roleless on modern, host-announced on fallback) creates a "named
+   * surface ≠ focused surface" gap on legacy engines. Round-3 commits to a
+   * single canonical surface — the HOST — on BOTH paths:
+   *
+   * - `internals.role = 'combobox'` on both paths (and `role="combobox"`
+   *   attribute mirror so CSS / `getAttribute` / AT inspecting the DOM see it).
+   * - `tabindex="0"` on the host (so it is the focusable surface).
+   * - Click + keydown listeners on the host (so user input lands on the
+   *   announced surface).
+   * - `focus()` routes to the host (so programmatic focus matches AT focus).
+   * - `setValidity()` anchor = host (so UA validation UI routes to the
+   *   focusable announced surface).
+   * - Inner trigger drops `role`, `tabindex`, and the combobox ARIA mirror
+   *   on both paths so AT does not see a doubled accessible.
+   *
+   * This matches Group 2's host-canonical pattern (PR #1625, validated for
+   * `hx-radio-group` and `hx-checkbox-group`). The scope doc's APG concern
+   * about doubled comboboxes is moot once the inner role is dropped.
    * @internal
    */
   @state() private _supportsIdrefRefs = true;
@@ -333,19 +383,6 @@ export class HelixSelect extends FormMixin(HelixElement) {
    * @internal
    */
   @state() private _invalid = false;
-  /**
-   * Whether to render fallback host-canonical ARIA. On the fallback path the
-   * host carries `role="combobox"` and the consumer-facing ARIA attributes
-   * (label, describedby, required, invalid, expanded, haspopup, controls,
-   * activedescendant, disabled), and the inner trigger drops its role + ARIA
-   * mirror so AT does not see a doubled accessible. Round-2 finding 1
-   * (Option B parity with Group 2 round-36). Tracks `!_supportsIdrefRefs`.
-   * @internal
-   */
-  private get _useFallbackHostRole(): boolean {
-    return !this._supportsIdrefRefs;
-  }
-
   // ─── Queries ───
 
   /** Reference to the hidden native select element used for form participation. @internal */
@@ -386,6 +423,42 @@ export class HelixSelect extends FormMixin(HelixElement) {
    */
   private _errorSlotTextObserver: MutationObserver | null = null;
   /**
+   * Round-10 finding 1 (supersedes round-8 counter): dedicated host observer
+   * scoped to `aria-describedby` with `attributeOldValue: true`. The fallback
+   * path strips the host `aria-describedby` attribute on every sync (per
+   * round-6 single-channel design). Once stripped, a subsequent consumer
+   * `removeAttribute('aria-describedby')` causes NO DOM mutation (the
+   * attribute is already absent), so the post-sync `getAttribute()` baseline
+   * diff at the top of `_syncHostAriaSemantics` cannot detect the retraction
+   * — `_consumerDescribedBy` would remain pinned to the originally-cached
+   * string forever and the consumer's external help text would keep
+   * concatenating into `internals.ariaDescription` indefinitely.
+   *
+   * Round-10 architectural lockdown (`.reports/aria-group-3-architecture-
+   * decision-r10.md` section 7.1): the observer is governed by the
+   * **disconnect-during-strip** discipline. Before the fallback strip
+   * `removeAttribute('aria-describedby')` runs, this observer is
+   * `disconnect()`ed; immediately after the strip, it is re-`observe()`d.
+   * Self-mutations are therefore never delivered to the callback, so the
+   * observer only sees consumer-driven mutations. This eliminates the
+   * round-8 pending-strip counter / discriminator entirely and the lockstep
+   * invariant it depended on.
+   *
+   * The observer detects `oldValue !== null && newValue === null`
+   * (consumer authentically retracted the attribute) and clears
+   * `_consumerDescribedBy`. Framework-batched attach-then-detach (Vue /
+   * React / Lit reconciliation flipping `aria-describedby` from a string to
+   * null in one render commit) produces two records in the same callback
+   * batch — the second record's `oldValue` is observable. The bare
+   * `removeAttribute` no-op on an already-absent attribute is unobservable
+   * by design (a null → null DOM operation is not a mutation); see
+   * `hx-select.test.ts` round-10 contract block for the three documented
+   * retraction sequences.
+   *
+   * @internal
+   */
+  private _hostDescribedByObserver: MutationObserver | null = null;
+  /**
    * Last value of `aria-labelledby` we wrote to the host. Used to distinguish
    * external (consumer) attribute mutations from our own internal augmentation
    * writes. Aligned with Group 2 round-10 P2.
@@ -394,6 +467,19 @@ export class HelixSelect extends FormMixin(HelixElement) {
   private _lastWrittenLabelledBy: string | null = null;
   /** @internal — see `_lastWrittenLabelledBy`. */
   private _lastWrittenDescribedBy: string | null = null;
+  /**
+   * Last value of `aria-label` we wrote to the host. Used to distinguish
+   * external (consumer) attribute mutations from our own internal mirror
+   * writes on the fallback path. Round-5 finding 1: without this snapshot
+   * the round-3 fallback `aria-label` mirror was self-sealing — sync N
+   * wrote `aria-label="Country"`, sync N+1 read that same string back via
+   * `getAttribute('aria-label')` and treated it as a consumer override,
+   * caching it into `internals.ariaLabel` and short-circuiting
+   * `_writeHostAttributeMirror`. Subsequent label/accessibleLabel/slot
+   * mutations never propagated.
+   * @internal
+   */
+  private _lastWrittenAriaLabel: string | null = null;
   /**
    * Most recently observed *consumer-supplied* `aria-labelledby` baseline.
    * Refreshed only when the host attribute changes via an external write —
@@ -410,11 +496,61 @@ export class HelixSelect extends FormMixin(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback();
     // Group 2 round-17 P1 parity: detect IDL element-references API support
-    // so render() can branch between modern (host-canonical via internals
-    // element references) and fallback (host-attribute mirror) treatments.
-    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
+    // so the cross-shadow naming strategy can branch between modern (host
+    // `internals.aria*Elements`) and fallback (host-attribute mirror).
+    //
+    // Round-3 finding 4: honour the static test override so synthetic
+    // environments choose the path BEFORE connect runs. Without this seam,
+    // tests had to flip the `_supportsIdrefRefs` flag mid-life — by then,
+    // the modern branch had already written `internals.ariaLabelledByElements`
+    // and the fallback branch never cleared it, so stale modern artifacts
+    // leaked into "fallback" assertions.
+    const ctor = this.constructor as typeof HelixSelect;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    // Round-3 finding 1: host is the canonical combobox surface, so user
+    // input listeners attach to the host (not the inner trigger).
+    this.addEventListener('click', this._handleHostClick);
+    this.addEventListener('keydown', this._handleKeydown);
+    // Round-10 finding 1 (supersedes round-8 counter): install the dedicated
+    // `aria-describedby` retraction observer BEFORE the seeded
+    // `_syncHostAriaSemantics()` call below, then govern its lifetime with
+    // the disconnect-during-strip discipline (see `_syncHostAriaSemantics`
+    // fallback branch). The observer therefore sees only consumer-driven
+    // mutations; self-strips never reach the callback. No counter, no
+    // discriminator, no lockstep invariant.
+    this._hostDescribedByObserver = new MutationObserver((records) => {
+      let consumerCleared = false;
+      for (const record of records) {
+        if (record.attributeName !== 'aria-describedby') continue;
+        const oldValue = record.oldValue;
+        const newValue = this.getAttribute('aria-describedby');
+        if (oldValue !== null && newValue === null) {
+          // Consumer authentically retracted `aria-describedby`. Clear the
+          // cached baseline so the next sync's description recompute drops
+          // the external help text.
+          this._consumerDescribedBy = null;
+          consumerCleared = true;
+        }
+      }
+      if (consumerCleared) {
+        // Resync so `internals.ariaDescription` rebuilds without the
+        // stale external description text on the fallback path.
+        this._syncHostAriaSemantics();
+      }
+    });
+    this._hostDescribedByObserver.observe(this, {
+      attributes: true,
+      attributeFilter: ['aria-describedby'],
+      attributeOldValue: true,
+    });
     // Seed root-independent semantics from connect so the host announces the
-    // form-field semantics before first paint.
+    // combobox role before first paint. Per round-10 finding 1, the
+    // dedicated `aria-describedby` observer is wired above so the
+    // disconnect-during-strip helper inside the sync method has a live
+    // observer to disconnect/reconnect against.
     this._syncHostAriaSemantics();
     this._ariaMirror = installAriaIdrefMirror(this, () => {
       this._syncHostAriaSemantics();
@@ -425,6 +561,8 @@ export class HelixSelect extends FormMixin(HelixElement) {
     super.disconnectedCallback();
     // Safety net: remove listener if component is removed while dropdown is open
     document.removeEventListener('click', this._handleOutsideClick);
+    this.removeEventListener('click', this._handleHostClick);
+    this.removeEventListener('keydown', this._handleKeydown);
     // Reset open state to prevent persisted open state on reconnect
     if (this.open) {
       this.open = false;
@@ -436,6 +574,8 @@ export class HelixSelect extends FormMixin(HelixElement) {
     this._helpSlotTextObserver = null;
     this._errorSlotTextObserver?.disconnect();
     this._errorSlotTextObserver = null;
+    this._hostDescribedByObserver?.disconnect();
+    this._hostDescribedByObserver = null;
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -450,6 +590,11 @@ export class HelixSelect extends FormMixin(HelixElement) {
     if (changedProperties.has('value')) {
       this._syncNativeSelect();
       this._updateFormValue();
+    }
+    if (changedProperties.has('label')) {
+      // Round-3 finding 8: keep the discriminated label-source state in sync
+      // when the `label` property toggles between empty and non-empty.
+      this._refreshLabelSource();
     }
     if (changedProperties.has('size')) {
       const validSizes: string[] = ['sm', 'md', 'lg'];
@@ -483,14 +628,23 @@ export class HelixSelect extends FormMixin(HelixElement) {
 
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
-    // WCAG 4.1.2: warn when no accessible name is available. The trigger
-    // needs either a `label` prop, an `accessible-label` attribute, or a
-    // host-level `aria-label` / `aria-labelledby` so AT can identify the
-    // form field.
+    // Round-3 finding 3: `slotchange` fires as a microtask after the
+    // initial synchronous render, so reading the lazily-tracked
+    // `_hasLabelSlot` here would observe its stale `false` seed. Read the
+    // slot's assigned nodes directly so the unlabeled devWarn observes the
+    // real first-paint state.
+    const labelSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="label"]');
+    const hasLabellableSlotContent = labelSlot
+      ? this._readLabelSlotState(labelSlot).hasUsefulName
+      : false;
+    // WCAG 4.1.2: warn when no accessible name is available. The host (the
+    // canonical announced surface) needs either a `label` prop, an
+    // `accessible-label` attribute, or a host-level `aria-label` /
+    // `aria-labelledby` so AT can identify the form field.
     if (
       !this.label &&
       !this.accessibleLabel &&
-      !this._hasLabelSlot &&
+      !hasLabellableSlotContent &&
       !this.getAttribute('aria-label') &&
       !this.getAttribute('aria-labelledby')
     ) {
@@ -501,54 +655,117 @@ export class HelixSelect extends FormMixin(HelixElement) {
     }
   }
 
+  /**
+   * Reads the label slot's assigned nodes and computes the discriminated
+   * naming state. Round-3 finding 3 + 5 + 8: an empty whitespace-only slot
+   * does NOT count as a useful name; the first labellable element is
+   * captured by reference (no consumer-DOM mutation); the result drives a
+   * discriminated `_labelSource` rather than a magic `'*slotted*'` string.
+   * @internal
+   */
+  private _readLabelSlotState(slot: HTMLSlotElement): {
+    hasUsefulName: boolean;
+    element: Element | null;
+    text: string;
+  } {
+    const nodes = slot.assignedNodes({ flatten: true });
+    let element: Element | null = null;
+    let text = '';
+    for (const node of nodes) {
+      if (node.nodeType === Node.ELEMENT_NODE && !element) {
+        element = node as Element;
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent ?? '';
+      }
+    }
+    const trimmedText = text.trim();
+    return {
+      hasUsefulName: element !== null || trimmedText.length > 0,
+      element,
+      text: trimmedText,
+    };
+  }
+
   // ─── Host-canonical ARIA sync ───
 
   /**
-   * Mirrors form-field semantics onto the host via ElementInternals so that
-   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
-   * on `<hx-select>` reach the announced control. The Group 3 scope identified
-   * that the inner combobox `<div>` was the announced node and the host's
-   * external IDREF tokens could not cross the shadow boundary.
+   * Mirrors combobox semantics onto the host via ElementInternals so that the
+   * host IS the canonical announced surface on BOTH the modern (IDL element
+   * references) and fallback paths. Round-3 finding 1: codex round-2
+   * demonstrated that putting `role="combobox"` on the host on fallback while
+   * leaving focus/click/keyboard/validity anchored to the inner trigger
+   * created a "named surface ≠ focused surface" gap. Round-3 collapses both
+   * paths to the host-canonical model used by Group 2's `hx-radio-group` /
+   * `hx-checkbox-group` (PR #1625):
    *
-   * Path A: host owns label/describedby/required/invalid/disabled. Host does
-   * NOT own role — `role="combobox"` stays on the inner trigger per APG.
+   * - `internals.role = 'combobox'` so AT advertises the combobox role.
+   * - Host attribute `role="combobox"` mirror so legacy engines, axe-core,
+   *   and `getAttribute('role')` agree with the internals default.
+   * - Host attribute `tabindex="0"` so the host is the focusable surface.
+   * - Host attributes `aria-expanded`, `aria-haspopup`, `aria-controls`,
+   *   `aria-activedescendant`, `aria-required`, `aria-invalid`,
+   *   `aria-disabled` so AT walking the host's attribute graph sees the
+   *   combobox state without depending on internals defaults.
+   * - Modern path additionally sets `internals.ariaLabelledByElements` /
+   *   `internals.ariaDescribedByElements` so consumer light-DOM IDREFs cross
+   *   the shadow boundary into the host's accessible node.
+   * - Fallback path mirrors consumer label/desc tokens onto the host
+   *   attribute and text-mirrors shadow help/error wrappers via
+   *   `internals.ariaDescription`.
    * @internal
    */
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
-    // Path A: explicitly leave host roleless so the inner combobox/listbox
-    // surface stays canonical. Setting `internals.role = 'combobox'` here
-    // would conflict with the inner trigger and produce a doubled accessible.
-    internals.role = null;
+    // Round-3 finding 1: host IS the canonical combobox on both paths.
+    internals.role = 'combobox';
     internals.ariaRequired = this.required ? 'true' : 'false';
-    // Round-2 finding 2: read `internals.validity.valid` once and cache the
-    // derived flag in reactive state so the modern (`internals.ariaInvalid`)
-    // and fallback (inner-trigger / host-mirror attribute) writes both read
-    // from the same source. Decoupling `aria-invalid` from `hasError` was the
-    // round-1 defect — required+empty with no `error` prop was announced
-    // valid on fallback but invalid on modern.
+    // Round-2 finding 2 (preserved): read `internals.validity.valid` once and
+    // cache the derived flag in reactive state so both the IDREF-elements
+    // path and the host-attribute mirror read from the same source.
     const isInvalid = !internals.validity.valid;
     this._invalid = isInvalid;
     internals.ariaInvalid = isInvalid ? 'true' : 'false';
     internals.ariaDisabled = this.disabled ? 'true' : 'false';
+    internals.ariaExpanded = this.open ? 'true' : 'false';
+    internals.ariaHasPopup = 'listbox';
 
-    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    // Round-5 finding 1: the live `aria-label` attribute may be either a
+    // consumer-authored override OR our own previous mirror write. Compare
+    // against `_lastWrittenAriaLabel` to distinguish — if the live value
+    // matches what we wrote last sync, treat as component-owned (empty
+    // string here) so the recompute pass below picks fresh values from
+    // `label` / `accessibleLabel` / slotted text. Only a divergent live
+    // value is treated as a consumer override.
+    //
+    // Round-8 finding 4 (low — deliberate behaviour): the `.trim() || ''`
+    // collapse means a whitespace-only consumer override (e.g.
+    // `aria-label=" "`) is treated as no consumer override at all — the
+    // internal candidate (`label` / `accessibleLabel` / slotted text) wins
+    // and overwrites the host attribute on the fallback path. This is a
+    // deliberate choice: whitespace-only `aria-label` is a code smell
+    // pattern that is hard to author intentionally, the AT-suppression
+    // behaviour it sometimes produces is not part of the documented
+    // hx-select contract, and silently erasing the consumer's intended
+    // name would be the worse failure mode. A positive regression test in
+    // `hx-select.test.ts` (`whitespace-only consumer aria-label is treated
+    // as no override on fallback`) locks this intent.
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel =
+      liveAriaLabel !== null && liveAriaLabel !== this._lastWrittenAriaLabel
+        ? liveAriaLabel.trim() || ''
+        : '';
 
     // Resolve the candidate label/desc element references once — the IDL-ref
     // path consumes them as `Element[]`, the fallback path mirrors consumer
     // tokens onto the host attribute.
-    const internalLabel = this.shadowRoot?.getElementById(this._labelId);
-    // Round-2 finding 3: the `<slot name="label">` projects light-DOM nodes,
-    // so the visible-label element lives outside the shadow tree and cannot
-    // be looked up via shadowRoot.getElementById. Resolve the slotted-label
-    // element via its tracked id so the accessible-name chain includes the
-    // consumer's slotted label even when the `label` property is empty.
-    const slottedLabelEl =
-      this._slottedLabelId && this._hasLabelSlot
-        ? (document.getElementById(this._slottedLabelId) ?? this.querySelector(`#${this._slottedLabelId}`))
-        : null;
-    const helpEl = this.shadowRoot?.getElementById(this._helpTextId);
-    const errorEl = this.shadowRoot?.getElementById(this._errorId);
+    const internalLabel = this.shadowRoot?.getElementById(this._labelId) ?? null;
+    // Round-3 finding 5 + 6: hold the slotted label element by direct
+    // reference (captured in `_handleLabelSlotChange`) so we no longer
+    // mutate consumer light DOM with a tracked id and the lookup survives
+    // nested shadow roots without a fragile `getElementById` chain.
+    const slottedLabelEl = this._slottedLabelEl;
+    const helpEl = this.shadowRoot?.getElementById(this._helpTextId) ?? null;
+    const errorEl = this.shadowRoot?.getElementById(this._errorId) ?? null;
 
     // Group 2 round-10 P2: refresh the consumer baseline only when the host
     // attribute moved due to an *external* write. Compare the live attribute
@@ -565,46 +782,44 @@ export class HelixSelect extends FormMixin(HelixElement) {
     const externalDescTokens = this._consumerDescribedBy;
 
     const labelEls = resolveIdrefTokens(this, externalLabelTokens);
-    // Group 2 round-35 (CR major + codex follow-up): `aria-labelledby` is
-    // only "effective" when at least one IDREF resolves. A typo or
-    // transiently-missing target must NOT erase the visible label — fall back
-    // to `label` / `accessibleLabel` / slotted label so the field keeps a name
-    // on both paths.
+    // Group 2 round-35: `aria-labelledby` is only "effective" when at least
+    // one IDREF resolves. A typo or transiently-missing target must NOT erase
+    // the visible label.
     const hasEffectiveLabelledBy = labelEls.length > 0;
-    // Round-2 finding 3: when the consumer projects a `<span slot="label">`
-    // they expect that element to contribute to the accessible name with
-    // zero additional API. Treat it equivalently to `this.label` — and like
-    // any other non-resolving labelledby, it must not erase the visible
-    // label when missing.
-    const effectiveLabelText = this.label || (this._hasLabelSlot ? '*slotted*' : '');
+
+    // Round-3 finding 8: discriminated union replaces the magic
+    // `'*slotted*'` sentinel. The state name drives both the modern
+    // `internals.ariaLabel` decision and the labelEls fallback append.
     if (hostAriaLabel) {
       internals.ariaLabel = hostAriaLabel;
-    } else if (!hasEffectiveLabelledBy) {
-      // Prefer the slotted label element via labelledByElements over a string
-      // mirror so AT walks the visible label node directly.
-      if (this._hasLabelSlot && slottedLabelEl) {
-        internals.ariaLabel = null;
-      } else if (effectiveLabelText && effectiveLabelText !== '*slotted*') {
-        internals.ariaLabel = this.label || this.accessibleLabel || null;
-      } else {
-        internals.ariaLabel = this.accessibleLabel || null;
-      }
-    } else {
+    } else if (hasEffectiveLabelledBy) {
+      // labelledby chain wins — ariaLabel must be null so it does not
+      // shadow the chain.
       internals.ariaLabel = null;
+    } else if (this._labelSource === 'slot') {
+      if (slottedLabelEl) {
+        // labelEls path will append the slotted element below; no string.
+        internals.ariaLabel = null;
+      } else {
+        // Text-only slot — no element to add to labelEls. Mirror the
+        // flattened text into ariaLabel so AT still announces the name.
+        internals.ariaLabel = this._labelSlotText || this.accessibleLabel || null;
+      }
+    } else if (this._labelSource === 'string') {
+      internals.ariaLabel = this.label || this.accessibleLabel || null;
+    } else {
+      internals.ariaLabel = this.accessibleLabel || null;
     }
-    if (labelEls.length === 0 && !hostAriaLabel) {
-      if (this._hasLabelSlot && slottedLabelEl) {
+    if (!hasEffectiveLabelledBy && !hostAriaLabel) {
+      if (this._labelSource === 'slot' && slottedLabelEl) {
         labelEls.push(slottedLabelEl);
-      } else if (this.label && internalLabel) {
+      } else if (this._labelSource === 'string' && internalLabel) {
         labelEls.push(internalLabel);
       }
     }
 
     const descEls = resolveIdrefTokens(this, externalDescTokens);
     const hasError = !!(this.error || this._hasErrorSlot);
-    // Group 2 round-16 P2: drop help text from the describedby chain while an
-    // error is active so AT does not announce stale guidance ahead of the
-    // validation error.
     if (helpEl && !hasError && (this.helpText || this._hasHelpSlot)) {
       descEls.push(helpEl);
     }
@@ -620,14 +835,9 @@ export class HelixSelect extends FormMixin(HelixElement) {
       const refsInternals = internals as InternalsWithRefs;
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
-      // Clear stale fallback ariaDescription string if a prior sync ran on
-      // the fallback path (e.g. tests flipping `_supportsIdrefRefs`).
+      // Clear stale fallback ariaDescription string in case a prior sync ran
+      // on the fallback path (e.g. tests using the static override seam).
       internals.ariaDescription = null;
-      // Round-2 finding 1: ensure host fallback role/ARIA attributes are not
-      // lingering from a previous fallback-path sync (e.g. tests that flip
-      // `_supportsIdrefRefs`). The modern path keeps the host roleless so
-      // the inner trigger remains the announced combobox.
-      this._clearHostFallbackAria();
     } else {
       // ─── No-IDL-ref fallback (Group 2 round-19 P1 parity) ───
       // The IDL element-references API is unavailable, so internal shadow
@@ -636,18 +846,30 @@ export class HelixSelect extends FormMixin(HelixElement) {
       // ARIA strings (via `internals.ariaLabel`, `internals.ariaDescription`)
       // and we mirror only consumer-supplied tokens onto the host attribute
       // (shadow ids cannot resolve across the boundary).
-      const consumerLabelIds = new Set((externalLabelTokens?.split(/\s+/) ?? []).filter(Boolean));
-      const consumerDescIds = new Set((externalDescTokens?.split(/\s+/) ?? []).filter(Boolean));
+      //
+      // Round-3 finding 4 (symmetric clear): explicitly null the modern
+      // IDL element-reference fields so a stub-flipped fallback test cannot
+      // inherit modern artifacts seeded on a previous sync. Production code
+      // never hits this branch with non-null modern refs (the platform
+      // probe is once-per-connect), but the symmetric clear hardens the
+      // contract for tests using the static override seam.
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = null;
+      refsInternals.ariaDescribedByElements = null;
 
-      // Group 2 round-35 (medium) + round-36 (medium): mirror consumer tokens
-      // to the host attribute ONLY when at least one resolves. Otherwise
-      // actively clear the host attribute — per ARIA priority a broken
-      // `aria-labelledby` would otherwise erase the accessible name on
-      // legacy engines. The original tokens stay cached in
-      // `_consumerLabelledBy` so they replay if the target later attaches.
-      const hostLabel = hasEffectiveLabelledBy
-        ? [...consumerLabelIds].filter(Boolean).join(' ')
-        : '';
+      // Round-3 finding 7: build the host `aria-labelledby` mirror from
+      // *resolved* token ids only — `labelEls.map(e => e.id).filter(Boolean)`.
+      // The previous round-2 implementation ran the consumer token strings
+      // through `filter(Boolean)`, which only stripped empty strings, not
+      // unresolved ids. A consumer `aria-labelledby="resolved missing"` was
+      // written back wholesale, so MutationObservers and legacy AT saw a
+      // persistent broken IDREF on the host.
+      const resolvedLabelIds = labelEls.map((el) => el.id).filter((id): id is string => !!id);
+      const hostLabel = hasEffectiveLabelledBy ? resolvedLabelIds.join(' ') : '';
       const liveLabel = this.getAttribute('aria-labelledby');
       if (hostLabel) {
         if (liveLabel !== hostLabel) {
@@ -659,84 +881,118 @@ export class HelixSelect extends FormMixin(HelixElement) {
         this._lastWrittenLabelledBy = null;
       }
 
-      const hostDesc = [...consumerDescIds].filter(Boolean).join(' ') || '';
-      const liveDesc = this.getAttribute('aria-describedby');
-      // Round-2 finding 4: symmetric clears — both describedby and labelledby
-      // drop the host attribute when the consumer's tokens are unresolvable
-      // / empty. The previous `_lastWrittenDescribedBy !== null` guard left a
-      // consumer-set `aria-describedby="missing-id"` on initial paint
-      // un-cleared, so legacy engines saw a broken IDREF that erased the
-      // accessible description. Cache replay via `_consumerDescribedBy` is
-      // unaffected — the original tokens stay cached for future resolution.
-      if (hostDesc) {
-        if (liveDesc !== hostDesc) {
-          this.setAttribute('aria-describedby', hostDesc);
-        }
-        this._lastWrittenDescribedBy = hostDesc;
-      } else if (liveDesc !== null) {
+      // Round-6 (option b — single-channel fallback): per W3C AccName 1.2,
+      // an `aria-describedby` token list — even one authored by the
+      // consumer — takes precedence over `internals.ariaDescription`. When
+      // a consumer authors any working `aria-describedby` token on the
+      // host, AT may announce only the consumer text and never reach the
+      // internal help/error strings the component renders in its shadow
+      // root. Cross-shadow id splice (option a) does not portably resolve
+      // on Firefox / VoiceOver, so we collapse to a single channel:
+      // concatenate the consumer-described text with internal help/error
+      // text into `internals.ariaDescription` (below) and strip the host
+      // `aria-describedby` attribute on this path regardless of authorship.
+      // The consumer's intended description text is preserved (it surfaces
+      // through `internals.ariaDescription`); only the attribute mirror is
+      // removed. `_consumerDescribedBy` retains the consumer's original
+      // token list (see baseline diff at lines 691-694) so the modern path
+      // continues to work if the platform later upgrades and re-syncs.
+      // Modern path is unchanged (it uses `ariaDescribedByElements` which
+      // the platform concatenates correctly across shadow roots).
+      if (this.hasAttribute('aria-describedby')) {
+        // Round-10 finding 1 (supersedes round-8 counter): disconnect the
+        // dedicated host observer, perform our self-mutation strip, then
+        // reconnect. The observer therefore never delivers our own write
+        // to the callback, eliminating the round-8 counter / discriminator
+        // and the lockstep invariant it depended on. See architecture
+        // decision `.reports/aria-group-3-architecture-decision-r10.md`
+        // section 7.1. Genuine consumer-driven mutations (set / set-empty
+        // / framework attach-then-detach) continue to be observed because
+        // we reconnect immediately, with no microtask boundary inside the
+        // strip block where a consumer mutation could slip through.
+        this._hostDescribedByObserver?.disconnect();
         this.removeAttribute('aria-describedby');
-        this._lastWrittenDescribedBy = null;
+        this._hostDescribedByObserver?.observe(this, {
+          attributes: true,
+          attributeFilter: ['aria-describedby'],
+          attributeOldValue: true,
+        });
       }
+      this._lastWrittenDescribedBy = null;
 
-      // Group 2 round-22 P1 #2 + round-23 P2 (Finding C): mirror shadow
-      // help/error textContent into `internals.ariaDescription` so the host's
-      // accessible description still surfaces the live help/error strings on
-      // legacy engines. Slot-aware text read crosses the shadow → light-DOM
-      // boundary; the slot text observers replay this on in-place edits.
+      // Resolve consumer-described elements through the same idref helper
+      // the modern path uses, then concatenate their text with internal
+      // shadow help/error text. Tokens that fail to resolve are dropped by
+      // `resolveIdrefTokens` (matching native AT behaviour) so unresolved
+      // ids do not leak into the description as literal strings. Broken
+      // consumer tokens stay cached in `_consumerDescribedBy` and replay
+      // when their target later attaches.
+      const consumerDescEls = resolveIdrefTokens(this, externalDescTokens);
+      const consumerDescText = consumerDescEls
+        .map((el) => (el.textContent ?? '').trim())
+        .filter(Boolean)
+        .join(' ');
       const helpText =
         helpEl && !hasError && (this.helpText || this._hasHelpSlot)
           ? readSlottedOrShadowText(helpEl)
           : '';
       const errorText = errorEl && hasError ? readSlottedOrShadowText(errorEl) : '';
-      const internalDescriptionText = [helpText, errorText].filter(Boolean).join(' ');
-      internals.ariaDescription = internalDescriptionText || null;
+      const combinedDescription = [consumerDescText, helpText, errorText]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
+      internals.ariaDescription = combinedDescription || null;
 
-      // Round-2 finding 1 (Option B parity with Group 2 round-36): on the
-      // fallback path, promote the *host* to the announced combobox surface.
-      // Without IDL element references the consumer's `aria-label` /
-      // `aria-labelledby` / `aria-describedby` cannot reach the inner trigger
-      // across the shadow boundary, so the trigger announces only the host
-      // attribute mirror. Move `role="combobox"` and the ARIA mirror to the
-      // host so AT walks the consumer-authored naming chain. The inner
-      // trigger drops its role + ARIA on fallback (see render()) to avoid a
-      // doubled accessible.
-      this._writeHostFallbackAria({
-        hostAriaLabel,
-        isInvalid,
-      });
+      // Round-3 finding 1 (host-canonical): on the fallback path the host
+      // attributes carry the combobox state in addition to the internals
+      // defaults. CSS / `getAttribute` / axe-core read these attributes
+      // (internals defaults are not exposed to either).
+      this._writeHostAttributeMirror({ hostAriaLabel, isInvalid });
+    }
+
+    // Round-3 finding 1: host attributes for the canonical combobox state.
+    // Always written on BOTH paths (the modern path's internals defaults
+    // are invisible to CSS/getAttribute, so attribute writes are required
+    // to match `expect(el.getAttribute('role')).toBe('combobox')` and to
+    // make `:host(:focus-visible)` paint a focus ring).
+    this._writeHostRoleAndTabindex();
+    this._writeHostComboboxStateAttributes();
+  }
+
+  /**
+   * Writes host `role="combobox"` and `tabindex` so the host is the
+   * focusable, AT-visible canonical surface. Round-3 finding 1.
+   * @internal
+   */
+  private _writeHostRoleAndTabindex(): void {
+    if (this.getAttribute('role') !== 'combobox') {
+      this.setAttribute('role', 'combobox');
+    }
+    const tab = this.disabled ? '-1' : '0';
+    if (this.getAttribute('tabindex') !== tab) {
+      this.setAttribute('tabindex', tab);
     }
   }
 
   /**
-   * Writes host-level fallback ARIA attributes when the platform lacks IDL
-   * element-reference support. Pairs with the render-time branch that drops
-   * the inner trigger's role + ARIA mirror on fallback. Round-2 finding 1
-   * (Option B). Internal writes are tracked so we do not double-process them
-   * via the IDREF mirror.
+   * Writes the host's combobox state attributes (`aria-expanded`,
+   * `aria-haspopup`, `aria-controls`, `aria-activedescendant`,
+   * `aria-required`, `aria-invalid`, `aria-disabled`) on every sync. CSS
+   * selectors and AT inspecting the live attribute graph read these — the
+   * `internals.aria*` defaults are invisible. Round-3 finding 1.
    * @internal
    */
-  private _writeHostFallbackAria(args: {
-    hostAriaLabel: string;
-    isInvalid: boolean;
-  }): void {
-    const { hostAriaLabel, isInvalid } = args;
-
-    // Combobox role + popup wiring lives on the host so AT consumes it.
-    if (this.getAttribute('role') !== 'combobox') {
-      this.setAttribute('role', 'combobox');
-    }
+  private _writeHostComboboxStateAttributes(): void {
     if (this.getAttribute('aria-haspopup') !== 'listbox') {
       this.setAttribute('aria-haspopup', 'listbox');
     }
     if (this.getAttribute('aria-controls') !== this._listboxId) {
       this.setAttribute('aria-controls', this._listboxId);
     }
-    // aria-expanded mirrors `open`.
     const expanded = this.open ? 'true' : 'false';
     if (this.getAttribute('aria-expanded') !== expanded) {
       this.setAttribute('aria-expanded', expanded);
     }
-    // aria-activedescendant mirrors the keyboard-focused option.
     const activeDescendant =
       this.open && this._focusedOptionIndex >= 0 ? this._optionId(this._focusedOptionIndex) : null;
     if (activeDescendant) {
@@ -746,66 +1002,94 @@ export class HelixSelect extends FormMixin(HelixElement) {
     } else if (this.hasAttribute('aria-activedescendant')) {
       this.removeAttribute('aria-activedescendant');
     }
-    // aria-required / aria-invalid / aria-disabled mirror the boolean state.
-    const requiredAttr = this.required ? 'true' : null;
-    if (requiredAttr) {
-      if (this.getAttribute('aria-required') !== requiredAttr) {
-        this.setAttribute('aria-required', requiredAttr);
+    if (this.required) {
+      if (this.getAttribute('aria-required') !== 'true') {
+        this.setAttribute('aria-required', 'true');
       }
     } else if (this.hasAttribute('aria-required')) {
       this.removeAttribute('aria-required');
     }
-    const invalidAttr = isInvalid ? 'true' : null;
-    if (invalidAttr) {
-      if (this.getAttribute('aria-invalid') !== invalidAttr) {
-        this.setAttribute('aria-invalid', invalidAttr);
+    if (this._invalid) {
+      if (this.getAttribute('aria-invalid') !== 'true') {
+        this.setAttribute('aria-invalid', 'true');
       }
     } else if (this.hasAttribute('aria-invalid')) {
       this.removeAttribute('aria-invalid');
     }
-    const disabledAttr = this.disabled ? 'true' : null;
-    if (disabledAttr) {
-      if (this.getAttribute('aria-disabled') !== disabledAttr) {
-        this.setAttribute('aria-disabled', disabledAttr);
+    if (this.disabled) {
+      if (this.getAttribute('aria-disabled') !== 'true') {
+        this.setAttribute('aria-disabled', 'true');
       }
     } else if (this.hasAttribute('aria-disabled')) {
       this.removeAttribute('aria-disabled');
     }
-    // aria-label mirrors consumer `aria-label`, then `accessibleLabel`, then
-    // `label`. Skip when an effective `aria-labelledby` or slotted-label
-    // resolves — labelledby has higher ARIA priority.
-    if (!hostAriaLabel) {
-      const candidate = this.accessibleLabel || this.label || '';
-      // Only set a label string when there is no labelledby chain; otherwise
-      // the label string would shadow the labelledby reference.
-      const hasLabelledBy = this.hasAttribute('aria-labelledby');
-      if (!hasLabelledBy && candidate) {
-        if (this.getAttribute('aria-label') !== candidate) {
-          this.setAttribute('aria-label', candidate);
-        }
-      } else if (this.hasAttribute('aria-label') && !this.getAttribute('aria-label')?.trim()) {
-        this.removeAttribute('aria-label');
-      }
-    }
   }
 
   /**
-   * Removes any host-level fallback ARIA attributes the component may have
-   * written on a previous sync. Used when the platform supports IDL element
-   * references — the host stays roleless on the modern path so the inner
-   * trigger keeps its `role="combobox"` and AT does not see two announced
-   * surfaces. Round-2 finding 1.
+   * Writes a host `aria-label` attribute mirror on the fallback path so AT
+   * inspecting the live attribute graph sees the resolved name even when
+   * the platform lacks IDL element references. Skip when an effective
+   * `aria-labelledby` is already set on the host (labelledby > label by
+   * ARIA priority). Round-3 finding 1 + round-2 finding 5.
    * @internal
    */
-  private _clearHostFallbackAria(): void {
-    if (this.getAttribute('role') === 'combobox') this.removeAttribute('role');
-    if (this.hasAttribute('aria-haspopup')) this.removeAttribute('aria-haspopup');
-    if (this.hasAttribute('aria-controls')) this.removeAttribute('aria-controls');
-    if (this.hasAttribute('aria-expanded')) this.removeAttribute('aria-expanded');
-    if (this.hasAttribute('aria-activedescendant')) this.removeAttribute('aria-activedescendant');
-    if (this.hasAttribute('aria-required')) this.removeAttribute('aria-required');
-    if (this.hasAttribute('aria-invalid')) this.removeAttribute('aria-invalid');
-    if (this.hasAttribute('aria-disabled')) this.removeAttribute('aria-disabled');
+  private _writeHostAttributeMirror(args: {
+    hostAriaLabel: string;
+    isInvalid: boolean;
+  }): void {
+    const { hostAriaLabel } = args;
+    if (hostAriaLabel) {
+      // Round-8 finding 2 (medium): consumer-authored aria-label path. The
+      // caller already disambiguated against `_lastWrittenAriaLabel` (see
+      // `_syncHostAriaSemantics` line ~668) — `hostAriaLabel` is non-empty
+      // ONLY when the live attribute diverges from our last write. We must
+      // null the snapshot here so the next sync's disambiguation correctly
+      // classifies the consumer string as external on every subsequent pass.
+      //
+      // Without this null, the snapshot stays pinned to the value WE wrote
+      // last. If the consumer subsequently rewrites `aria-label` to a string
+      // that happens to equal our prior write, the disambiguation would see
+      // `liveAttr === _lastWrittenAriaLabel` and treat the consumer string
+      // as component-owned — a later internal `label = ''` would then
+      // silently delete the consumer's attribute. The sentinel `null` means
+      // "we did NOT author the live attr," which makes a coincident-string
+      // round-trip still differ from `null` and correctly classify the
+      // consumer string as external.
+      this._lastWrittenAriaLabel = null;
+      return;
+    }
+    const candidate =
+      this.accessibleLabel ||
+      this.label ||
+      (this._labelSource === 'slot' ? this._labelSlotText : '') ||
+      '';
+    const hasLabelledBy = this.hasAttribute('aria-labelledby');
+    const liveAttr = this.getAttribute('aria-label');
+    if (!hasLabelledBy && candidate) {
+      if (liveAttr !== candidate) {
+        this.setAttribute('aria-label', candidate);
+      }
+      // Round-5 finding 1: record what we just wrote so the next sync can
+      // distinguish "I wrote this" from "consumer overrode this."
+      this._lastWrittenAriaLabel = candidate;
+    } else {
+      // No candidate (label/accessibleLabel cleared) OR labelledby chain
+      // wins. Round-5 finding 1: if the live attribute matches our last
+      // mirror write, it is component-owned and must be removed now that
+      // the source has emptied. Otherwise (whitespace-only attribute or no
+      // attribute at all) keep historical behaviour.
+      if (liveAttr !== null && liveAttr === this._lastWrittenAriaLabel) {
+        this.removeAttribute('aria-label');
+        this._lastWrittenAriaLabel = null;
+      } else if (this.hasAttribute('aria-label') && !liveAttr?.trim()) {
+        this.removeAttribute('aria-label');
+        this._lastWrittenAriaLabel = null;
+      } else if (!this.hasAttribute('aria-label')) {
+        // No mirror present — clear the snapshot so a future consumer
+        // write starts from a clean slate.
+        this._lastWrittenAriaLabel = null;
+      }
+    }
   }
 
   /**
@@ -866,18 +1150,14 @@ export class HelixSelect extends FormMixin(HelixElement) {
   /** @internal */
   override _updateValidity(): void {
     if (this.required && !this.value) {
-      // Group 2 round-35 finding (CR major): anchor `setValidity()` to a
-      // focusable, interactive element so the UA can route validation UI /
-      // error recovery to the actual control surface. The visible trigger
-      // div is the `role="combobox"` focus target; prefer it. The hidden
-      // native `<select>` is `tabindex="-1"` and aria-hidden so it cannot
-      // host UA validation UI — only fall through to it when the trigger
-      // has not yet rendered (defensive; should not happen post-firstUpdated).
-      this._internals.setValidity(
-        { valueMissing: true },
-        this.error || this.labelRequired,
-        this._trigger ?? this._select,
-      );
+      // Round-3 finding 1: the host is now the canonical announced + focused
+      // combobox surface, so anchor `setValidity()` to the host. The UA
+      // routes validation UI / error recovery to a focusable element with
+      // a stable accessible name — that is the host (which carries
+      // `role="combobox"`, `tabindex="0"`, and the resolved name via
+      // `internals.ariaLabel*`). Anchoring to the inner trigger would route
+      // recovery into the shadow tree, where the consumer cannot intercept.
+      this._internals.setValidity({ valueMissing: true }, this.error || this.labelRequired, this);
     } else {
       this._internals.setValidity({});
     }
@@ -984,35 +1264,42 @@ export class HelixSelect extends FormMixin(HelixElement) {
   // ─── Slot Change Handlers ───
 
   /**
-   * Round-2 finding 3: tracks the slotted label so projected `<span slot="label">`
-   * content joins the accessible-name chain without forcing the consumer to
-   * also pass the `label` property. Mirrors the `hx-time-picker` pattern:
-   * assign a stable id, expose it as `_slottedLabelId`, and re-resolve the
-   * label element in `_syncHostAriaSemantics`. `slotchange` fires once on
-   * connect for any initially projected children, so the ARIA chain is
-   * primed before `firstUpdated`.
+   * Tracks the slotted label so projected `<span slot="label">` content joins
+   * the accessible-name chain without forcing the consumer to also pass the
+   * `label` property.
+   *
+   * Round-3 findings 3, 5, 6, 8:
+   * - 3: count whitespace-only text as "no useful name" (devWarn must fire).
+   * - 5: hold the slotted element by direct reference instead of mutating
+   *   consumer light DOM with a tracked id.
+   * - 6: lookup is by reference, so it survives nested shadow roots without
+   *   the fragile `getElementById` chain.
+   * - 8: discriminated `_labelSource` replaces the magic `'*slotted*'`
+   *   sentinel string.
    * @internal
    */
   private _handleLabelSlotChange(e: Event): void {
     if (!(e.target instanceof HTMLSlotElement)) return;
-    const nodes = e.target.assignedNodes({ flatten: true });
-    this._hasLabelSlot = nodes.length > 0;
-    if (this._hasLabelSlot) {
-      const labelEl = nodes.find((n) => n.nodeType === Node.ELEMENT_NODE) as HTMLElement | undefined;
-      if (labelEl) {
-        if (!labelEl.id) {
-          labelEl.id = `${this._selectId}-slotted-label`;
-        }
-        this._slottedLabelId = labelEl.id;
-      } else {
-        // Slot has only text nodes — no element to id, fall through to
-        // text-only naming via internals.ariaLabel.
-        this._slottedLabelId = '';
-      }
-    } else {
-      this._slottedLabelId = '';
-    }
+    const state = this._readLabelSlotState(e.target);
+    this._hasLabelSlot = state.hasUsefulName;
+    this._slottedLabelEl = state.element;
+    this._labelSlotText = state.text;
+    this._refreshLabelSource();
     this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Recomputes the discriminated label source. Round-3 finding 8.
+   * @internal
+   */
+  private _refreshLabelSource(): void {
+    if (this.label) {
+      this._labelSource = 'string';
+    } else if (this._hasLabelSlot) {
+      this._labelSource = 'slot';
+    } else {
+      this._labelSource = 'none';
+    }
   }
 
   /** @internal */
@@ -1051,10 +1338,32 @@ export class HelixSelect extends FormMixin(HelixElement) {
     }
   }
 
+  // ─── Host Click ───
+
+  /**
+   * Click handler attached to the host. Round-3 finding 1: the host is the
+   * canonical combobox surface, so user input listeners live here. Clicks
+   * inside the open listbox are handled by the per-option `@click` binding
+   * in `_renderOptions()` and stop here only if `composedPath` indicates
+   * the original click target was the open listbox panel (so option clicks
+   * don't double-toggle the dropdown).
+   * @internal
+   */
+  private _handleHostClick = (e: MouseEvent): void => {
+    // Ignore clicks that originated inside the open listbox panel — the
+    // option's own `@click` handler already routed selection.
+    const path = e.composedPath();
+    const listbox = this.shadowRoot?.querySelector('.field__listbox') ?? null;
+    if (listbox && path.includes(listbox)) {
+      return;
+    }
+    this._toggleDropdown();
+  };
+
   // ─── Keyboard Navigation ───
 
   /** @internal */
-  private _handleKeydown(e: KeyboardEvent): void {
+  private _handleKeydown = (e: KeyboardEvent): void => {
     if (this.disabled) return;
 
     const enabledIndices = this._options
@@ -1125,7 +1434,8 @@ export class HelixSelect extends FormMixin(HelixElement) {
         e.preventDefault();
         this.open = false;
         this._focusedOptionIndex = -1;
-        this._trigger?.focus();
+        // Round-3 finding 1: refocus the host (the canonical combobox).
+        this.focus();
         break;
       }
       case 'Tab': {
@@ -1157,7 +1467,7 @@ export class HelixSelect extends FormMixin(HelixElement) {
         break;
       }
     }
-  }
+  };
 
   // ─── Selection ───
 
@@ -1204,9 +1514,14 @@ export class HelixSelect extends FormMixin(HelixElement) {
 
   // ─── Public Methods ───
 
-  /** Moves focus to the visible trigger button. */
+  /**
+   * Moves focus to the host. Round-3 finding 1: the host is the canonical
+   * combobox surface (`role="combobox"`, `tabindex="0"`), so programmatic
+   * focus must land there to match where AT routes focus and where
+   * `setValidity()` anchors recovery.
+   */
   override focus(options?: FocusOptions): void {
-    this._trigger?.focus(options);
+    HTMLElement.prototype.focus.call(this, options);
   }
 
   // ─── Render Helpers ───
@@ -1276,13 +1591,13 @@ export class HelixSelect extends FormMixin(HelixElement) {
       [`field__select--${this.size}`]: true,
     };
 
-    // Round-2 finding 1: both paths drop the inner-trigger and hidden-native
-    // ARIA mirror. Modern path: host owns labelledby/describedby/required/
-    // invalid via ElementInternals. Fallback path: the host carries the
-    // combobox role + ARIA mirror as an attribute (see `_writeHostFallbackAria`),
-    // and the inner trigger drops its role so AT does not announce a doubled
-    // accessible. The hidden native `<select>` is `aria-hidden="true"`, so it
-    // is never the announced surface and needs no ARIA either way.
+    // Round-3 finding 1: the host is the canonical announced + focused
+    // combobox surface on BOTH paths. The inner trigger is a presentational
+    // visual surface only — it carries no role, no tabindex, and no ARIA
+    // attributes. User input listeners (click, keydown) live on the host so
+    // the focused surface IS the announced surface; programmatic `focus()`
+    // and `setValidity()` anchor to the host for the same reason. The hidden
+    // native `<select>` is `aria-hidden="true"`, never the announced surface.
 
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
@@ -1306,41 +1621,16 @@ export class HelixSelect extends FormMixin(HelixElement) {
         <!-- Select Wrapper: trigger + listbox -->
         <div part="select-wrapper" class="field__select-wrapper">
           <!--
-            Custom trigger — div carries role=combobox per the APG combobox
-            pattern. Path A: the host stays roleless via internals so the inner
-            combobox role remains canonical and AT does not see a doubled
-            accessible. On the modern path (_supportsIdrefRefs) the host owns
-            labelledby/describedby/required/invalid via ElementInternals, so
-            we omit those attributes here.
+            Visual trigger surface only. Round-3 finding 1: role, tabindex,
+            and combobox ARIA all live on the host so AT sees a single
+            announced + focused surface. The trigger keeps its id so the
+            internal label[for] association still targets the visible
+            label-anchored area for click forwarding (the host's for=
+            target is irrelevant to AT — internals.ariaLabel* carries the
+            real association). The trigger has no role and no ARIA, so AT
+            walks its subtree text as the combobox's value content.
           -->
-          <div
-            part="trigger"
-            id=${this._selectId}
-            class=${classMap(triggerClasses)}
-            role=${this._useFallbackHostRole ? nothing : 'combobox'}
-            tabindex=${this.disabled ? '-1' : '0'}
-            aria-expanded=${this._useFallbackHostRole ? nothing : this.open ? 'true' : 'false'}
-            aria-haspopup=${this._useFallbackHostRole ? nothing : 'listbox'}
-            aria-controls=${this._useFallbackHostRole ? nothing : this._listboxId}
-            aria-activedescendant=${this._useFallbackHostRole
-              ? nothing
-              : this.open && this._focusedOptionIndex >= 0
-                ? this._optionId(this._focusedOptionIndex)
-                : nothing}
-            aria-invalid=${nothing}
-            aria-describedby=${nothing}
-            aria-required=${nothing}
-            aria-disabled=${this._useFallbackHostRole ? nothing : this.disabled ? 'true' : nothing}
-            aria-labelledby=${nothing}
-            aria-label=${this._useFallbackHostRole
-              ? nothing
-              : (this.getAttribute('aria-label')?.trim() ||
-                  this.label ||
-                  this.accessibleLabel ||
-                  nothing)}
-            @click=${this._toggleDropdown}
-            @keydown=${this._handleKeydown}
-          >
+          <div part="trigger" id=${this._selectId} class=${classMap(triggerClasses)}>
             <span class="field__trigger-value"
               >${this._displayValue || this.placeholder || nothing}</span
             >

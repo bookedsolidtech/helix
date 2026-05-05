@@ -4,6 +4,11 @@ export const helixSelectStyles = css`
   /* ─── 3-tier token cascade: component → semantic → hardcoded fallback ─── */
   :host {
     display: block;
+    /* Round-3 finding 1: host is the canonical combobox surface, so it owns
+       keyboard focus. Suppress the UA default outline; the custom focus ring
+       is painted on the inner trigger via :host(:focus-visible)
+       .field__trigger so visual feedback follows the host's focus state. */
+    outline: none;
 
     /* Background & foreground */
     --_bg: var(--hx-select-bg, var(--hx-color-surface-default, #ffffff));
@@ -102,6 +107,11 @@ export const helixSelectStyles = css`
     outline: none;
   }
 
+  /* Round-3 finding 1: host is the canonical focusable surface. Both the
+     :host(:focus-visible) descendant selector AND the legacy
+     .field__trigger:focus-visible (kept for forced-colors regression test
+     parity) paint the focus ring on the visual trigger. */
+  :host(:focus-visible) .field__trigger,
   .field__trigger:focus-visible {
     border-color: var(--_focus-ring-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
@@ -170,6 +180,7 @@ export const helixSelectStyles = css`
     border-color: var(--_error-color);
   }
 
+  :host(:focus-visible) .field--error .field__trigger,
   .field--error .field__trigger:focus-visible {
     border-color: var(--_error-color);
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
@@ -303,6 +314,7 @@ export const helixSelectStyles = css`
       border: 2px solid ButtonText;
     }
 
+    :host(:focus-visible) .field__trigger,
     .field__trigger:focus-visible {
       outline: 3px solid Highlight;
       outline-offset: 2px;
