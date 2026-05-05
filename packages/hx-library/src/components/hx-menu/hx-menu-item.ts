@@ -154,8 +154,8 @@ export class HelixMenuItem extends HelixElement {
    * `div[role="menuitem*"]` `aria-label`). Empty string means "no
    * override" — slotted text content provides the implicit name through
    * the announced surface (host on modern; inner div on fallback). AccName
-   * precedence: consumer host `aria-label` > consumer host
-   * `aria-labelledby` (flattened) > implicit slotted text.
+   * 1.2 §4.3.1 precedence: consumer host `aria-labelledby` (flattened) >
+   * consumer host `aria-label` > implicit slotted text.
    * @internal
    */
   private _resolvedAccessibleName = '';
@@ -302,23 +302,23 @@ export class HelixMenuItem extends HelixElement {
       refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
     }
 
-    // Precedence: consumer aria-label > consumer aria-labelledby (resolved) >
-    // implicit slotted text (left to AccName computation through the host's
-    // role). When neither override is supplied, ariaLabel is cleared so AT
-    // walks slotted children for the accessible name. The resolved string
-    // is cached on `_resolvedAccessibleName` so the fallback render branch
-    // (legacy path: AT reads inner div) can mirror the same override
-    // without duplicating the precedence ladder.
+    // AccName 1.2 §4.3.1 precedence: consumer aria-labelledby (resolved) >
+    // consumer aria-label > implicit slotted text (left to AccName
+    // computation through the host's role). When neither override is
+    // supplied, ariaLabel is cleared so AT walks slotted children for the
+    // accessible name. The resolved string is cached on
+    // `_resolvedAccessibleName` so the fallback render branch (legacy path:
+    // AT reads inner div) can mirror the same override without duplicating
+    // the precedence ladder.
     let resolved = '';
-    if (hostAriaLabel) {
-      resolved = hostAriaLabel;
-      internals.ariaLabel = hostAriaLabel;
-    } else if (hasEffectiveLabelledBy) {
+    if (hasEffectiveLabelledBy) {
       const flattened =
         labelEls
           .map((el) => flattenAccName(el))
           .filter(Boolean)
-          .join(' ') || '';
+          .join(' ') ||
+        hostAriaLabel ||
+        '';
       resolved = flattened;
       if (this._supportsIdrefRefs) {
         // Modern path: element refs win; clear ariaLabel so they aren't
@@ -328,6 +328,9 @@ export class HelixMenuItem extends HelixElement {
       } else {
         internals.ariaLabel = flattened || null;
       }
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+      internals.ariaLabel = hostAriaLabel;
     } else {
       // No override — leave the announced surface to walk slotted text.
       internals.ariaLabel = null;

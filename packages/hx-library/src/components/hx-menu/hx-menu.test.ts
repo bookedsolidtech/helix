@@ -1091,3 +1091,88 @@ describe('hx-menu-item fallback path label mirror (codex push-gate round-2 findi
     expect(inner.hasAttribute('aria-label')).toBe(false);
   });
 });
+
+// ─────────────────────────────────────────────────────────────
+// Codex push-gate round-3: AccName 1.2 §4.3.1 precedence — when BOTH
+// `aria-labelledby` and `aria-label` are present on the host, the
+// labelledby reference MUST win. Prior implementation ordered the
+// fallback ladder as `aria-label` first, which inverts the spec on the
+// legacy fallback path (where AT reads the inner [role="..."] mirror).
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-menu fallback path AccName precedence (codex push-gate round-3 finding 1)', () => {
+  type HelixMenuCtor = typeof HelixMenu & {
+    __testSupportsIdrefRefsOverride: boolean | null;
+  };
+
+  afterEach(() => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('honors aria-labelledby over aria-label on the fallback path (§4.3.1)', async () => {
+    const ctor = customElements.get('hx-menu') as unknown as HelixMenuCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<span id="round3-menu-lbl">Recent files</span>',
+    );
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu aria-labelledby="round3-menu-lbl" aria-label="ignored">
+        <hx-menu-item value="a">Item A</hx-menu-item>
+      </hx-menu>
+    `);
+    await el.updateComplete;
+
+    const inner = shadowQuery<HTMLElement>(el, '[role="menu"]')!;
+    expect(inner).toBeTruthy();
+    // aria-labelledby resolves to "Recent files"; aria-label="ignored"
+    // MUST NOT win.
+    expect(inner.getAttribute('aria-label')).toBe('Recent files');
+
+    document.getElementById('round3-menu-lbl')?.remove();
+  });
+});
+
+describe('hx-menu-item fallback path AccName precedence (codex push-gate round-3 finding 2)', () => {
+  type HelixMenuItemCtor = typeof HelixMenuItem & {
+    __testSupportsIdrefRefsOverride: boolean | null;
+  };
+
+  afterEach(() => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('honors aria-labelledby over aria-label on the fallback path (§4.3.1)', async () => {
+    const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<span id="round3-item-lbl">Edit document</span>',
+    );
+
+    const el = await fixture<HelixMenu>(`
+      <hx-menu>
+        <hx-menu-item
+          value="edit"
+          aria-labelledby="round3-item-lbl"
+          aria-label="ignored"
+        ></hx-menu-item>
+      </hx-menu>
+    `);
+    const item = el.querySelector('hx-menu-item') as HelixMenuItem;
+    await item.updateComplete;
+
+    const inner = shadowQuery<HTMLElement>(item, '[role="menuitem"]')!;
+    expect(inner).toBeTruthy();
+    // aria-labelledby resolves to "Edit document"; aria-label="ignored"
+    // MUST NOT win.
+    expect(inner.getAttribute('aria-label')).toBe('Edit document');
+
+    document.getElementById('round3-item-lbl')?.remove();
+  });
+});

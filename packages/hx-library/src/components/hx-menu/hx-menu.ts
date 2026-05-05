@@ -118,9 +118,9 @@ export class HelixMenu extends HelixElement {
    * `internals.ariaLabel`) and the fallback `render()` branch (legacy path:
    * writes to inner `div[role="menu"]` `aria-label`) read. Recomputed by
    * `_syncHostAriaSemantics()` whenever host aria-* or `label` changes via
-   * the shared IDREF mirror. AccName precedence: consumer host `aria-label`
-   * > consumer host `aria-labelledby` (flattened) > `label` property >
-   * literal "Menu".
+   * the shared IDREF mirror. AccName 1.2 §4.3.1 precedence: consumer host
+   * `aria-labelledby` (flattened) > consumer host `aria-label` > `label`
+   * property > literal "Menu".
    * @internal
    */
   private _resolvedAccessibleName = '';
@@ -422,21 +422,19 @@ export class HelixMenu extends HelixElement {
       refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
     }
 
-    // Precedence: consumer aria-label > consumer aria-labelledby (resolved) >
-    // `label` property > literal "Menu" (last-resort). The resolved string
-    // is cached on `_resolvedAccessibleName` so the fallback render branch
-    // (legacy path: AT reads inner div) can mirror the same name without
-    // duplicating the precedence ladder.
+    // AccName 1.2 §4.3.1 precedence: consumer aria-labelledby (resolved) >
+    // consumer aria-label > `label` property > literal "Menu" (last-resort).
+    // The resolved string is cached on `_resolvedAccessibleName` so the
+    // fallback render branch (legacy path: AT reads inner div) can mirror
+    // the same name without duplicating the precedence ladder.
     let resolved = '';
-    if (hostAriaLabel) {
-      resolved = hostAriaLabel;
-      internals.ariaLabel = hostAriaLabel;
-    } else if (hasEffectiveLabelledBy) {
+    if (hasEffectiveLabelledBy) {
       const flattened =
         labelEls
           .map((el) => flattenAccName(el))
           .filter(Boolean)
           .join(' ') ||
+        hostAriaLabel ||
         this.label ||
         'Menu';
       resolved = flattened;
@@ -448,6 +446,9 @@ export class HelixMenu extends HelixElement {
       } else {
         internals.ariaLabel = flattened;
       }
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+      internals.ariaLabel = hostAriaLabel;
     } else {
       resolved = this.label || 'Menu';
       internals.ariaLabel = resolved;
