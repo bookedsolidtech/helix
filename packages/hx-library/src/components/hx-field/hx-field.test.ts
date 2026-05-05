@@ -1199,5 +1199,307 @@ describe('hx-field', () => {
         container.remove();
       }
     });
+
+    // ─── Round-14 F1: suspend-window snapshot semantics ────────────────
+    //
+    // When a consumer toggles `data-aria-managed` ON, mutates `aria-label`,
+    // then toggles it OFF, the host must respect the mutation as a
+    // permanent takeover and NOT re-stamp `this.label`. Conversely, when
+    // the consumer suspends and resumes WITHOUT mutating anything, the
+    // host must resume bridging normally.
+
+    it('does not re-stamp label when consumer changes aria-label during suspend window', async () => {
+      // Failure mode for round-14 F1: removal of `data-aria-managed`
+      // immediately fell into the `else if (this.label && ...)` branch
+      // and overwrote the consumer's value, defeating the documented
+      // "resume only if the snapshot still matches" contract.
+      const el = await fixture<HelixField>(
+        '<hx-field label="Original"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('Original');
+      expect(input.getAttribute('data-hx-owns-label')).toBe('true');
+
+      // Consumer suspends bridging, swaps the value, then resumes.
+      input.setAttribute('data-aria-managed', '');
+      el.label = 'Will-not-apply';
+      await el.updateComplete;
+      // Mutation happens during the suspend window.
+      input.setAttribute('aria-label', 'Custom');
+      input.removeAttribute('data-aria-managed');
+
+      // Force another sync.
+      el.required = true;
+      await el.updateComplete;
+
+      // The consumer's value must survive — host must not re-stamp.
+      expect(input.getAttribute('aria-label')).toBe('Custom');
+      expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+    });
+
+    it('does not re-stamp label when consumer removes aria-label during suspend window', async () => {
+      // The "remove the attribute" variant of the suspend-window takeover.
+      // Without the F1 fix the resume edge would reach the
+      // `else if (this.label)` branch and re-stamp because
+      // `consumerHasLabel` is false (no attribute present).
+      const el = await fixture<HelixField>(
+        '<hx-field label="Original"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('Original');
+
+      input.setAttribute('data-aria-managed', '');
+      await el.updateComplete;
+      input.removeAttribute('aria-label');
+      input.removeAttribute('data-aria-managed');
+
+      el.required = true;
+      await el.updateComplete;
+
+      expect(input.hasAttribute('aria-label')).toBe(false);
+      expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+    });
+
+    it('resumes bridging normally when consumer suspends and resumes without changes', async () => {
+      // The complement to the takeover tests: if the consumer suspends
+      // and resumes without modifying `aria-label`, the snapshot still
+      // matches and the host continues to mirror `this.label` normally
+      // (including re-stamping when the prop changes during suspend).
+      const el = await fixture<HelixField>(
+        '<hx-field label="First"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('First');
+
+      input.setAttribute('data-aria-managed', '');
+      await el.updateComplete;
+      // No consumer mutation while suspended.
+      input.removeAttribute('data-aria-managed');
+
+      // Trigger a sync. Host should resume ownership and mirror the
+      // current label prop.
+      el.label = 'Second';
+      await el.updateComplete;
+
+      expect(input.getAttribute('aria-label')).toBe('Second');
+      expect(input.getAttribute('data-hx-owns-label')).toBe('true');
+    });
+
+    // ─── Round-14 F2: teardown cleans up host-owned metadata even if ───
+    //                  the consumer suspended bridging mid-life.
+    it('strips host-owned aria-label and marker on slot replacement even when control has data-aria-managed', async () => {
+      // Failure mode for round-14 F2: when hx-field wrote the label
+      // before the consumer added `data-aria-managed`, the active-bridging
+      // release helper short-circuited on the suspend attribute and the
+      // outgoing control left the field carrying a stale `aria-label`
+      // and `data-hx-owns-label` marker. Teardown must always clean up
+      // a marker that hx-field stamped.
+      const el = await fixture<HelixField>(
+        '<hx-field label="Visible"><input id="a" type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const first = el.querySelector('input') as HTMLInputElement;
+      expect(first.getAttribute('aria-label')).toBe('Visible');
+      expect(first.getAttribute('data-hx-owns-label')).toBe('true');
+
+      // Consumer suspends bridging on the existing control AFTER the
+      // host has already written the label and marker.
+      first.setAttribute('data-aria-managed', '');
+      await el.updateComplete;
+
+      // Replace the control. The outgoing control must be cleaned up.
+      first.remove();
+      const replacement = document.createElement('input');
+      replacement.type = 'text';
+      replacement.id = 'b';
+      el.appendChild(replacement);
+
+      await el.updateComplete;
+      await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
+      await el.updateComplete;
+
+      expect(first.hasAttribute('aria-label')).toBe(false);
+      expect(first.hasAttribute('data-hx-owns-label')).toBe(false);
+    });
+
+    it('strips host-owned aria-label on disconnect even when control has data-aria-managed', async () => {
+      // The disconnect-time variant of round-14 F2.
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Visible"><input type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+        expect(input.getAttribute('aria-label')).toBe('Visible');
+        expect(input.getAttribute('data-hx-owns-label')).toBe('true');
+
+        // Consumer suspends bridging after the host has already written.
+        input.setAttribute('data-aria-managed', '');
+        await el.updateComplete;
+
+        el.remove();
+
+        expect(input.hasAttribute('aria-label')).toBe(false);
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+      } finally {
+        document.body.removeChild(container);
+      }
+    });
+
+    // Codex round-17 F2: runtime mutations of `data-aria-managed` and
+    // `aria-label` must reactively drive `_syncSlottedControl()`. Without
+    // a MutationObserver on the slotted control, a consumer adding the
+    // suspend marker post-mount left stale `aria-required` / `aria-invalid`
+    // / `aria-describedby` in place until some unrelated host update
+    // happened to flush them.
+    describe('runtime data-aria-managed reactivity (F2)', () => {
+      it('reactively clears bridged ARIA when data-aria-managed is added at runtime', async () => {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Name" required error="Bad"><input type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+        // Initial bridged state: host wrote everything.
+        expect(input.getAttribute('aria-label')).toBe('Name');
+        expect(input.getAttribute('aria-required')).toBe('true');
+        expect(input.getAttribute('aria-invalid')).toBe('true');
+        expect(input.hasAttribute('aria-describedby')).toBe(true);
+
+        // Consumer takes over ARIA at runtime — without changing any
+        // hx-field property. The OLD code path stayed stale until the
+        // next unrelated host render. The observer on the slotted control
+        // must run _syncSlottedControl() now and short-circuit.
+        input.setAttribute('data-aria-managed', '');
+        // Wait one microtask for the MutationObserver to fire.
+        await Promise.resolve();
+        await el.updateComplete;
+
+        // Suspend semantics: bridging is OFF. Host must not have written
+        // any new attribute since suspend started. Existing host-written
+        // values are intentionally left in place (the contract says the
+        // consumer takes over from this point — they can mutate or clear
+        // them themselves).
+        // The reactivity guarantee we are testing is that the *next*
+        // _syncSlottedControl() call (which in the old code would
+        // overwrite stale state) does not run. Confirm by mutating a host
+        // prop and verifying the change is NOT bridged.
+        el.error = '';
+        el.required = false;
+        await el.updateComplete;
+
+        // Because the suspend marker is now present, the post-update sync
+        // also bails — the previously-written `aria-required` and
+        // `aria-invalid` must remain untouched (they are the consumer's
+        // problem now).
+        expect(input.getAttribute('aria-required')).toBe('true');
+        expect(input.getAttribute('aria-invalid')).toBe('true');
+      });
+
+      it('reactively re-bridges ARIA when data-aria-managed is removed at runtime', async () => {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Name"><input type="text" data-aria-managed /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+        // Initially suspended — host wrote nothing.
+        expect(input.hasAttribute('aria-label')).toBe(false);
+        expect(input.hasAttribute('aria-required')).toBe(false);
+
+        // Consumer hands ARIA back to hx-field at runtime — no host prop
+        // changes. The observer must fire a resync that re-bridges.
+        input.removeAttribute('data-aria-managed');
+        await Promise.resolve();
+        await el.updateComplete;
+
+        expect(input.getAttribute('aria-label')).toBe('Name');
+      });
+
+      it('reactively detects consumer-takeover via runtime aria-label mutation', async () => {
+        // Round-13 F2: a consumer overwriting host-owned `aria-label`
+        // releases ownership. Without the observer this only fired on the
+        // next unrelated host update; with it, the takeover is honored
+        // immediately.
+        const el = await fixture<HelixField>(
+          '<hx-field label="Name"><input type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+        expect(input.getAttribute('aria-label')).toBe('Name');
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(true);
+
+        // Consumer rewrites under us — no host prop change.
+        input.setAttribute('aria-label', 'Consumer Label');
+        await Promise.resolve();
+        await el.updateComplete;
+
+        // Ownership marker should be released by the resync the observer
+        // triggered, leaving the consumer's value intact.
+        expect(input.getAttribute('aria-label')).toBe('Consumer Label');
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+      });
+
+      it('disconnects the runtime observer when the slotted control is replaced', async () => {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Name"><input id="first" type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        const first = el.querySelector('#first') as HTMLInputElement;
+        expect(first.getAttribute('aria-label')).toBe('Name');
+
+        // Replace the slotted control. The observer for `first` must be
+        // disconnected — otherwise mutations to the orphan control would
+        // re-trigger _syncSlottedControl on the (now-different) bound
+        // control and produce stale writes.
+        first.remove();
+        const second = document.createElement('input');
+        second.id = 'second';
+        el.appendChild(second);
+        await el.updateComplete;
+        expect(second.getAttribute('aria-label')).toBe('Name');
+
+        // Mutate the orphaned `first` after detachment. The host must
+        // ignore it — the new control's state remains untouched.
+        first.setAttribute('data-aria-managed', '');
+        first.setAttribute('aria-label', 'Stale');
+        await Promise.resolve();
+        await el.updateComplete;
+        expect(second.getAttribute('aria-label')).toBe('Name');
+      });
+    });
+
+    it('strips marker but preserves consumer value on disconnect when consumer overwrote during suspend', async () => {
+      // Defense-in-depth: if the consumer overwrote `aria-label` during a
+      // suspend window AND we tear down before they release the suspend,
+      // we must strip the stale `data-hx-owns-label` marker (we are no
+      // longer the owner) but leave the consumer's value intact.
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Original"><input type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+        expect(input.getAttribute('aria-label')).toBe('Original');
+
+        // Consumer suspends, overwrites — never resumes.
+        input.setAttribute('data-aria-managed', '');
+        await el.updateComplete;
+        input.setAttribute('aria-label', 'Consumer Custom');
+
+        el.remove();
+
+        // The consumer's value survives, but our marker is gone.
+        expect(input.getAttribute('aria-label')).toBe('Consumer Custom');
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+      } finally {
+        document.body.removeChild(container);
+      }
+    });
   });
 });

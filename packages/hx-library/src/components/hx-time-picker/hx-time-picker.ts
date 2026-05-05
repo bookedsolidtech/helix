@@ -16,6 +16,7 @@ import {
   supportsIdrefElementReferences,
   type AriaIdrefMirrorHandle,
 } from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 // ─── Time Slot ───────────────────────────────────────────────────────────────
 
@@ -133,50 +134,6 @@ function parseUserInput(raw: string): string | null {
   }
 
   return null;
-}
-
-/**
- * AccName-aware text flattener. Walks the subtree of `root` and concatenates
- * text-node content, REJECTING any element subtree carrying `aria-hidden="true"`
- * or the `hidden` attribute per W3C AccName 1.2 §4.3.10. Used by hx-time-picker
- * for both external IDREF flatten (host aria-labelledby/aria-describedby
- * targets) and slotted-label aggregation, so nested decorative content like
- * `<svg aria-hidden="true"><title>icon</title></svg>` does not leak into the
- * inner input's announced name/description.
- *
- * The TreeWalker filter only inspects elements VISITED during the walk — it
- * never tests the root itself, so a hidden ROOT (e.g. `<span slot="label" hidden>`)
- * would still contribute its descendants' text. Per AccName 1.2 §4.3.10, a
- * hidden root contributes the empty string. Gate the walk here so every caller
- * (slotted label/help/error and external IDREF flatten) honors the rule
- * symmetrically.
- */
-function flattenAccName(root: Element): string {
-  if (root.getAttribute('aria-hidden') === 'true' || root.hasAttribute('hidden')) {
-    return '';
-  }
-  let result = '';
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
-    acceptNode(node) {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        const el = node as Element;
-        if (el.getAttribute('aria-hidden') === 'true') {
-          return NodeFilter.FILTER_REJECT;
-        }
-        if (el.hasAttribute('hidden')) {
-          return NodeFilter.FILTER_REJECT;
-        }
-        return NodeFilter.FILTER_SKIP;
-      }
-      return NodeFilter.FILTER_ACCEPT;
-    },
-  });
-  let textNode: Node | null = walker.nextNode();
-  while (textNode) {
-    result += textNode.textContent ?? '';
-    textNode = walker.nextNode();
-  }
-  return result.replace(/\s+/g, ' ').trim();
 }
 
 const _nextTimePickerId = createIdCounter('hx-time-picker');
@@ -426,6 +383,20 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
    * @internal
    */
   @state() private _announcedError = '';
+
+  /**
+   * Resolved listbox accessible name. Tracks the same precedence chain as the
+   * inner input's announced name so AT sees a single, consistent name across
+   * the combobox/popup pair.
+   *
+   * Push-gate codex round-5 P2 (F2): the listbox previously used
+   * `this.label || this.accessibleLabel`, which inverted precedence relative
+   * to the input — `<hx-time-picker label="Time" accessible-label="Appointment time">`
+   * announced "Appointment time" on the input but "Time" on the open
+   * listbox, so AT saw two different names for the same combobox/popup.
+   * @internal
+   */
+  @state() private _resolvedListboxLabel = 'Time options';
 
   // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
 
@@ -760,7 +731,17 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     elements: Element[];
     text: string;
   } {
-    const nodes = slot.assignedNodes({ flatten: true });
+    // Push-gate F2 follow-up (codex 2026-05-05): use `assignedNodes()`
+    // WITHOUT `flatten: true` here so we read only consumer-projected nodes —
+    // never the slot's fallback content (the rendered internal `<label>`
+    // element when `this.label` is set). Conflating fallback content with
+    // consumer slot content makes `_hasLabelSlot` truthy in the label-only
+    // case, which then shadows the internal-label `aria-labelledby`
+    // association on the inner input. The slot-precedence fix in
+    // `_refreshLabelSource()` only behaves correctly when this signal
+    // distinguishes "consumer slotted something" from "we're seeing the
+    // shadow fallback".
+    const nodes = slot.assignedNodes();
     const elements: Element[] = [];
     const fragments: string[] = [];
     for (const node of nodes) {
@@ -1038,6 +1019,25 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
       if (input.hasAttribute('aria-labelledby')) input.removeAttribute('aria-labelledby');
     }
 
+    // Push-gate codex round-5 P2 (F2): the popup listbox is part of the same
+    // combobox/popup pair as the input, so its accessible name MUST match
+    // the input's resolved name. Reuse the same precedence chain:
+    //   1. accessibleLabel (helix override) — already in inputAriaLabel
+    //   2. consumer aria-labelledby (flattened) — already in inputAriaLabel
+    //   3. consumer aria-label (host) — already in inputAriaLabel
+    //   4. slotted label text — already in inputAriaLabel
+    //   5. label property (text — listboxes can't reference an in-shadow id
+    //      from outside the listbox itself, so we use the property text)
+    //   6. fallback string "Time options"
+    // When `inputAriaLabel` is null because precedence resolved to a same-root
+    // IDREF (`inputAriaLabelledBy`), use the underlying `this.label` text —
+    // listboxes get a plain string, not a cross-element id.
+    const resolvedListboxLabel =
+      inputAriaLabel ?? (this.label && this.label.length > 0 ? this.label : 'Time options');
+    if (this._resolvedListboxLabel !== resolvedListboxLabel) {
+      this._resolvedListboxLabel = resolvedListboxLabel;
+    }
+
     // ─── Write the inner input's aria-describedby chain ───
     // Unify ALL descriptions through a single `aria-describedby` channel.
     // The W3C AccName algorithm ignores `aria-description` whenever
@@ -1181,13 +1181,22 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
   }
 
   /**
-   * Recomputes the discriminated label source. @internal
+   * Recomputes the discriminated label source.
+   *
+   * Push-gate F2 (P2, codex 2026-05-05): the slot must take precedence over
+   * the `label` property. The render path already suppresses the internal
+   * `<label>` element when `_hasLabelSlot` is truthy (via the slot fallback
+   * pattern), so if `_labelSource === 'string'` while a slot is present, the
+   * modern-path `ariaLabelledByElements` reference target is never rendered
+   * and the announced name diverges from the visible label. Mirrors the
+   * precedence fix already applied to hx-select in PR #1630.
+   * @internal
    */
   private _refreshLabelSource(): void {
-    if (this.label) {
-      this._labelSource = 'string';
-    } else if (this._hasLabelSlot) {
+    if (this._hasLabelSlot) {
       this._labelSource = 'slot';
+    } else if (this.label) {
+      this._labelSource = 'string';
     } else {
       this._labelSource = 'none';
     }
@@ -1556,7 +1565,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
             class="field__listbox"
             id=${this._listboxId}
             role="listbox"
-            aria-label=${this.label || this.accessibleLabel || 'Time options'}
+            aria-label=${this._resolvedListboxLabel}
             ?hidden=${!this._open}
           >
             ${this._open

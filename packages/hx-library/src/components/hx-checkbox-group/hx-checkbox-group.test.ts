@@ -1238,6 +1238,31 @@ describe('hx-checkbox-group', () => {
       expect(internals.ariaLabel).not.toContain('*');
     });
 
+    // ─── Push-gate codex round-5 P2 (F1): hidden subtrees in slotted label ───
+    it('fallback path: aria-hidden subtree in slotted label is excluded from internals.ariaLabel', async () => {
+      // Push-gate codex round-5 P2 (F1): the no-IDL-ref fallback previously
+      // built `slottedLabelText` from raw `textContent`, so a decorative
+      // `<svg aria-hidden="true"><title>icon</title></svg>` inside the
+      // slotted label was announced as "icon Topics" on Firefox / older
+      // Safari (the modern path uses `ariaLabelledByElements` and the AT
+      // accname computation honors hidden subtrees natively, so the bug
+      // was limited to the fallback branch). Routing through
+      // `flattenAccName` (W3C AccName 1.2 §4.3.10) keeps both paths in
+      // sync.
+      const el = await fixture<HelixCheckboxGroup>(`
+        <hx-checkbox-group>
+          <span slot="label"><svg aria-hidden="true"><title>icon</title></svg>Topics</span>
+          <hx-checkbox value="a" label="A"></hx-checkbox>
+        </hx-checkbox-group>
+      `);
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Topics');
+      expect(internals.ariaLabel).not.toContain('icon');
+    });
+
     // ─── Codex round-21 P3: in-place slotted label textContent edits ───
     it('fallback path: in-place slotted label textContent edits resync host ariaLabel', async () => {
       // Codex round-21 P3 regression: an in-place rewrite such as

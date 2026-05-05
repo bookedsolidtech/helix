@@ -113,10 +113,17 @@ describe('hx-toggle-button', () => {
       const internals = (el as unknown as { _internals: ElementInternals })._internals;
       const innerBtn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       if (internals.role === 'button') {
+        // Modern path: host carries the IDL element references; aria-label
+        // is null because labelledby wins per ARIA spec.
         expect(internals.ariaLabel).toBeNull();
       } else {
-        // Legacy path: inner button mirrors the resolved labelledby tokens.
-        expect(innerBtn.getAttribute('aria-labelledby')).toBe('external-label-tb');
+        // Legacy / fallback path (push-gate F1, codex 2026-05-05): inner
+        // button receives the AccName-flattened text of the resolved IDREF
+        // target as `aria-label`. The raw light-DOM token list is NOT
+        // mirrored as `aria-labelledby` because those IDs are unreachable
+        // from inside the shadow root on engines without IDL element refs.
+        expect(innerBtn.getAttribute('aria-labelledby')).toBeNull();
+        expect(innerBtn.getAttribute('aria-label')).toBe('External label');
       }
       document.getElementById('external-label-tb')?.remove();
     });
@@ -1005,6 +1012,162 @@ describe('hx-toggle-button', () => {
       await el.updateComplete;
       expect(el.pressed).toBe(true);
       expect(event.detail.pressed).toBe(true);
+    });
+
+    // Push-gate F1 (P1, codex 2026-05-05): on the fallback path, light-DOM
+    // IDREFs from host `aria-labelledby` cannot resolve from inside the shadow
+    // root on engines without IDL element refs. The inner button must
+    // therefore receive the AccName-flattened text of the resolved targets as
+    // `aria-label`, NOT the raw token list as `aria-labelledby`.
+    it('flattens host aria-labelledby IDREFs into inner aria-label on the fallback path', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'tb-ext-label';
+      labelHost.textContent = 'External Toggle Label';
+      container.appendChild(labelHost);
+
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-labelledby="tb-ext-label"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button[part="button"]')!;
+      // Inner button must NOT carry the unresolvable light-DOM token list.
+      expect(btn.getAttribute('aria-labelledby')).toBeNull();
+      // It must carry the flattened text instead so AT names the control.
+      expect(btn.getAttribute('aria-label')).toBe('External Toggle Label');
+    });
+
+    // ─── Push-gate round-3 F1 (P1): consumer aria-describedby cross-shadow ───
+
+    it('mirrors consumer-resolved description text into the synth span on the fallback path (round-3 F1)', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const hint = document.createElement('span');
+      hint.id = 'tb-r3-hint';
+      hint.textContent = 'External hint';
+      container.appendChild(hint);
+
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-describedby="tb-r3-hint">Save</hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button[part="button"]')!;
+      const synthSpan = el.shadowRoot?.querySelector<HTMLElement>(
+        'span[id$="-consumer-desc"]',
+      );
+      expect(synthSpan).toBeTruthy();
+      expect(synthSpan!.textContent).toBe('External hint');
+
+      const tokens = (btn.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+      expect(tokens).toContain(synthSpan!.id);
+      // The raw consumer id must not appear — it is unresolvable from
+      // inside the shadow root.
+      expect(tokens).not.toContain('tb-r3-hint');
+    });
+
+    // ─── Push-gate round-3 F2 (P2): external label textContent resync ───
+
+    it('resyncs fallback inner aria-label when external label textContent mutates (round-3 F2)', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'tb-r3-label';
+      labelHost.textContent = 'Mute';
+      container.appendChild(labelHost);
+
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button aria-labelledby="tb-r3-label"></hx-toggle-button>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button[part="button"]')!;
+      expect(btn.getAttribute('aria-label')).toBe('Mute');
+
+      // Consumer mutates the external label text in place (i18n locale flip).
+      labelHost.textContent = 'Unmute';
+
+      // MutationObserver callbacks land as microtasks; let them flush.
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      await el.updateComplete;
+
+      expect(btn.getAttribute('aria-label')).toBe('Unmute');
+    });
+  });
+
+  // ─── Tabindex Ownership Latch (push-gate F1) ───
+  //
+  // Codex round-15 P2 (push-gate F1): observe consumer mutations to the host's
+  // `tabindex` attribute so the latch releases on set and reclaims on remove.
+  describe('Tabindex Ownership Latch', () => {
+    it('reclaims default tabindex when consumer removes their tabindex attribute', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button tabindex="-1">Toggle</hx-toggle-button>',
+      );
+      expect(el.getAttribute('tabindex')).toBe('-1');
+
+      el.removeAttribute('tabindex');
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(el.hasAttribute('tabindex')).toBe(true);
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('releases ownership when consumer SETS tabindex after connect', async () => {
+      const el = await fixture<HelixToggleButton>('<hx-toggle-button>Toggle</hx-toggle-button>');
+      expect(el.getAttribute('tabindex')).toBe('0');
+
+      el.setAttribute('tabindex', '-1');
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 0));
+
+      el.disabled = true;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+
+      el.disabled = false;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+  });
+
+  // ─── Slotted Label Accessible-Name Flatten (push-gate F2) ───
+  //
+  // Codex round-15 P2 (push-gate F2): `_captureSlotLabelText` previously
+  // concatenated raw `textContent` from every assigned node, pulling in text
+  // from `aria-hidden="true"` and `[hidden]` descendants. Rich labels with
+  // decorative icons were announced with the icon's hidden text. The fix uses
+  // `flattenAccName` (W3C AccName 1.2 §4.3.10) so hidden subtrees are rejected.
+  describe('Slotted Label Accessible-Name Flatten', () => {
+    it('excludes aria-hidden subtree text from the host accessible name', async () => {
+      const el = await fixture<HelixToggleButton>(
+        `<hx-toggle-button>
+          <svg aria-hidden="true"><title>icon</title></svg>Save
+        </hx-toggle-button>`,
+      );
+      await el.updateComplete;
+      // The icon's <title> text must NOT leak into the announced name.
+      const internals = (el as HelixToggleButton & { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Save');
+      expect(internals.ariaLabel).not.toContain('icon');
+    });
+
+    it('excludes [hidden] subtree text from the host accessible name', async () => {
+      const el = await fixture<HelixToggleButton>(
+        `<hx-toggle-button>
+          <span hidden>visually hidden</span>Mute
+        </hx-toggle-button>`,
+      );
+      await el.updateComplete;
+      const internals = (el as HelixToggleButton & { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Mute');
+      expect(internals.ariaLabel).not.toContain('visually hidden');
     });
   });
 });

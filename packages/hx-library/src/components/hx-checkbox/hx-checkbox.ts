@@ -16,6 +16,7 @@ import {
   supportsIdrefElementReferences,
   type AriaIdrefMirrorHandle,
 } from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 // P2-05: monotonic counter — collision-free, deterministic, SSR-safe
 const _nextCheckboxId = createIdCounter('hx-checkbox');
@@ -260,6 +261,18 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    */
   private _ariaMirror: AriaIdrefMirrorHandle | null = null;
 
+  /**
+   * MutationObserver watching the resolved consumer-supplied
+   * `aria-labelledby` / `aria-describedby` target elements for in-place text,
+   * subtree, and visibility mutations. Without this, an i18n locale change
+   * that flips `label.textContent = 'Unmute'` on an external label would
+   * leave the checkbox announcing the stale name on the no-IDL-ref fallback
+   * path until some unrelated structural mutation triggered another sync.
+   * Push-gate round-3 F2 (P2, codex 2026-05-05).
+   * @internal
+   */
+  private _externalRefsObserver: MutationObserver | null = null;
+
   // ─── Slot Handlers ───
 
   /** @internal */
@@ -312,10 +325,43 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // clobbered on every disabled flip. Note we still claim ownership when
     // disabled — the initial value is `-1` to keep the host out of tab order
     // and `updated()` re-asserts the appropriate value when disabled flips.
+    // Codex round-15 P2 (push-gate F1): install the host-tabindex observer
+    // BEFORE the connect-time `_setOwnTabindex()` write so the observer sees
+    // and properly accounts for that mutation via the pending-counter. If the
+    // observer were installed afterwards, the counter would be incremented for
+    // a write the observer never sees, and the next consumer mutation would
+    // be silently ignored.
+    //
+    // Without this, the latch was a one-way switch — once a consumer set
+    // `tabindex="-1"` (e.g. roving-tabindex toolbar) and later cleared it, the
+    // host stayed tabindex-less and the control became unreachable by Tab.
+    this._hostTabindexObserver = new MutationObserver((records) => {
+      for (const record of records) {
+        if (record.type !== 'attributes' || record.attributeName !== 'tabindex') continue;
+        if (this._pendingOwnTabindexMutations > 0) {
+          this._pendingOwnTabindexMutations--;
+          continue;
+        }
+        if (this.hasAttribute('tabindex')) {
+          // Consumer set or kept a value — release ownership.
+          this._internalTabindexManaged = false;
+        } else {
+          // Consumer removed the attribute — reclaim ownership and re-apply
+          // the default for the current path/disabled state.
+          this._internalTabindexManaged = true;
+          this._applyDefaultTabindex();
+        }
+      }
+    });
+    this._hostTabindexObserver.observe(this, {
+      attributes: true,
+      attributeFilter: ['tabindex'],
+      attributeOldValue: true,
+    });
     if (!this.hasAttribute('tabindex')) {
       this._internalTabindexManaged = true;
       const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
-      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
+      this._setOwnTabindex(this.disabled ? '-1' : enabledTabIndex);
     }
     this.addEventListener('keydown', this._handleHostKeyDown);
     this.addEventListener('click', this._handleHostClick);
@@ -334,6 +380,40 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     this.removeEventListener('click', this._handleHostClick);
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
+    this._hostTabindexObserver?.disconnect();
+    this._hostTabindexObserver = null;
+    this._externalRefsObserver?.disconnect();
+    this._externalRefsObserver = null;
+  }
+
+  /**
+   * (Re-)installs a `MutationObserver` against the deduped union of
+   * consumer-resolved label/description elements. Watches `characterData`,
+   * `childList`, `subtree`, and aria-hidden/hidden attribute toggles so any
+   * in-place text or visibility mutation triggers a fresh sync. Push-gate
+   * round-3 F2 (P2, codex 2026-05-05) — mirrors the hx-time-picker pattern.
+   * @internal
+   */
+  private _installExternalRefsObserver(elements: Element[]): void {
+    if (this._externalRefsObserver) {
+      this._externalRefsObserver.disconnect();
+      this._externalRefsObserver = null;
+    }
+    if (elements.length === 0) return;
+    const unique = new Set<Element>(elements);
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    for (const el of unique) {
+      observer.observe(el, {
+        characterData: true,
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._externalRefsObserver = observer;
   }
 
   /**
@@ -397,9 +477,9 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     ) {
       if (this._internalTabindexManaged) {
         if (this.disabled) {
-          this.setAttribute('tabindex', '-1');
+          this._setOwnTabindex('-1');
         } else {
-          this.setAttribute('tabindex', this._supportsIdrefRefs ? '0' : '-1');
+          this._setOwnTabindex(this._supportsIdrefRefs ? '0' : '-1');
         }
       }
     }
@@ -678,6 +758,21 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // older browsers the inner `<input>` is the announced surface, so the
     // host's role/state are cleared and the consumer-supplied IDREFs are
     // mirrored to the inner input via render-time fallback state.
+    // Resolve consumer-supplied IDREF targets ONCE so we can both populate the
+    // modern-path element-reference arrays and install the external-refs
+    // observer (push-gate round-3 F2) regardless of which branch we take.
+    const externalLabelTokens = this.getAttribute('data-aria-labelledby');
+    const externalDescTokens = this.getAttribute('data-aria-describedby');
+    const consumerLabelEls = resolveIdrefTokens(this, externalLabelTokens);
+    const consumerDescEls = resolveIdrefTokens(this, externalDescTokens);
+
+    // Push-gate round-3 F2 (P2): observe in-place text/visibility mutations on
+    // the resolved external IDREF targets. When `label.textContent` flips
+    // (e.g. i18n locale change) the observer triggers a fresh sync so the
+    // flattened fallback `aria-label` and the consumer-desc synth span text
+    // both refresh — without waiting on an unrelated structural mutation.
+    this._installExternalRefsObserver([...consumerLabelEls, ...consumerDescEls]);
+
     if (this._supportsIdrefRefs) {
       // ─── Modern path: host is the announced surface ───
       internals.role = 'checkbox';
@@ -697,10 +792,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       };
       const refsInternals = internals as InternalsWithRefs;
 
-      const externalLabelTokens = this.getAttribute('data-aria-labelledby');
-      const externalDescTokens = this.getAttribute('data-aria-describedby');
-
-      const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+      const labelEls = [...consumerLabelEls];
       // Append the internal label element when the visible label has content
       // and no external labelling source already names the host.
       const internalLabel = this.shadowRoot?.getElementById(this._labelId);
@@ -710,7 +802,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       }
       refsInternals.ariaLabelledByElements = labelEls.length > 0 ? labelEls : null;
 
-      const descEls = resolveIdrefTokens(this, externalDescTokens);
+      const descEls = [...consumerDescEls];
       // Codex round-13 P2: while an error is active, drop help text from the
       // described-by chain. The visible help node is suppressed in the render
       // tree, but referenced descriptions are announced even when their nodes
@@ -727,9 +819,17 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
         descEls.push(errorEl);
       }
       refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
-      // Clear fallbacks — IDL refs path is the canonical surface.
+      // Clear fallbacks — IDL refs path is the canonical surface. Also clear
+      // the consumer-desc synth span text so it does not double-announce when
+      // the modern path is active and `ariaDescribedByElements` already
+      // carries the resolved consumer description elements directly.
+      const consumerDescSpanModern = this.shadowRoot?.getElementById(this._consumerDescId);
+      if (consumerDescSpanModern && consumerDescSpanModern.textContent !== '') {
+        consumerDescSpanModern.textContent = '';
+      }
       this._fallbackAriaLabelledBy = null;
       this._fallbackAriaDescribedBy = null;
+      this._fallbackAriaLabel = null;
     } else {
       // ─── Fallback path: inner <input> is the announced surface ───
       // Codex round-2 finding #2: in round-1 we set host role/state via
@@ -738,10 +838,32 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       // mirrored attributes inert — the control had no accessible name on
       // older browsers. The fix is to demote the host (clear its role/state
       // on internals so AT does not double-announce) and let the inner native
-      // `<input type=checkbox>` be the announced surface, with consumer
-      // IDREFs mirrored as real `aria-*` attributes that resolve through the
-      // shadow root for shadow-internal IDs (cross-boundary IDREFs remain
-      // unreachable on these engines — same baseline as the pre-fix code).
+      // `<input type=checkbox>` be the announced surface.
+      //
+      // Push-gate F1 (P1, codex 2026-05-05): on this fallback path the
+      // announced node lives inside the shadow root. Mirroring the consumer's
+      // light-DOM `aria-labelledby` token list verbatim onto the inner input
+      // produces unresolvable IDREFs on engines without IDL element refs
+      // (Firefox, older Safari) — the checkbox becomes anonymous to AT. The
+      // fix: resolve the consumer's IDREFs into real elements via
+      // `resolveIdrefTokens()` (which crawls outward from the host's root and
+      // therefore reaches light-DOM targets), text-flatten those elements
+      // with `flattenAccName()` (W3C AccName 1.2 §4.3.10) and write the
+      // result as `aria-label` on the inner input. When NO consumer IDREFs
+      // are supplied (or none resolve), the inner input keeps its shadow-
+      // internal `_labelId` association — that path always resolves because
+      // the target lives in the same shadow root.
+      //
+      // Push-gate round-3 F1 (P1, codex 2026-05-05): the original fallback
+      // wrote `externalDescTokens` (the raw light-DOM ID list) directly to
+      // the inner input's `aria-describedby`. Same cross-shadow-resolution
+      // defect as labelledby — light-DOM ids are not reachable from inside
+      // the shadow root. The fix mirrors hx-time-picker: text-flatten the
+      // resolved description elements and mirror the result into a
+      // synthesized in-shadow `<span id=_consumerDescId>` whose id is
+      // appended to the inner input's aria-describedby chain. AT picks the
+      // description up through the standard described-by channel without any
+      // cross-shadow IDREF resolution.
       internals.role = null;
       internals.ariaChecked = null;
       internals.ariaRequired = null;
@@ -749,10 +871,46 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
       internals.ariaDisabled = null;
       internals.ariaLabel = null;
 
-      const externalLabelTokens = this.getAttribute('data-aria-labelledby');
-      const externalDescTokens = this.getAttribute('data-aria-describedby');
-      this._fallbackAriaLabelledBy = externalLabelTokens || null;
-      this._fallbackAriaDescribedBy = externalDescTokens || null;
+      if (consumerLabelEls.length > 0) {
+        const flattened = consumerLabelEls
+          .map((el) => flattenAccName(el))
+          .filter((t) => t.length > 0)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        this._fallbackAriaLabel = flattened || null;
+      } else {
+        this._fallbackAriaLabel = null;
+      }
+      // Never write the consumer's light-DOM token list onto the shadow-
+      // internal inner input — those IDs are not reachable from inside the
+      // shadow tree on engines without IDL element refs.
+      this._fallbackAriaLabelledBy = null;
+
+      // Push-gate round-3 F1: mirror the AccName-flattened consumer
+      // description text into the same-root synth span. The span's id is
+      // composed into the inner input's `aria-describedby` chain at render
+      // time (see render() — `innerDescribedBy`). When no consumer
+      // descriptions resolve, blank the span and clear the fallback id so
+      // the chain does not reference an empty node.
+      const consumerDescSpan = this.shadowRoot?.getElementById(this._consumerDescId);
+      if (consumerDescEls.length > 0) {
+        const flattenedDesc = consumerDescEls
+          .map((el) => flattenAccName(el))
+          .filter((t) => t.length > 0)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (consumerDescSpan && consumerDescSpan.textContent !== flattenedDesc) {
+          consumerDescSpan.textContent = flattenedDesc;
+        }
+        this._fallbackAriaDescribedBy = flattenedDesc ? this._consumerDescId : null;
+      } else {
+        if (consumerDescSpan && consumerDescSpan.textContent !== '') {
+          consumerDescSpan.textContent = '';
+        }
+        this._fallbackAriaDescribedBy = null;
+      }
     }
   }
 
@@ -765,11 +923,26 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   @state() private _fallbackAriaLabelledBy: string | null = null;
 
   /**
-   * Fallback `aria-describedby` token list applied to the inner input on
-   * browsers that lack IDL element references.
+   * Fallback `aria-describedby` token applied to the inner input on browsers
+   * that lack IDL element references. Push-gate round-3 F1 (P1, codex
+   * 2026-05-05): no longer the consumer's raw light-DOM token list — those
+   * IDs are not reachable from inside the shadow root. Instead, holds the id
+   * of the synthesized in-shadow `<span id=_consumerDescId>` whose text
+   * content is the AccName-flattened consumer description, or `null` when no
+   * consumer descriptions resolve.
    * @internal
    */
   @state() private _fallbackAriaDescribedBy: string | null = null;
+
+  /**
+   * Fallback `aria-label` text applied to the inner input on browsers that
+   * lack IDL element references. Push-gate F1 (codex 2026-05-05): stores the
+   * AccName-flattened text from light-DOM IDREFs the consumer set on host
+   * `aria-labelledby`, since those raw IDs are not reachable from inside the
+   * shadow root on engines without IDL element refs.
+   * @internal
+   */
+  @state() private _fallbackAriaLabel: string | null = null;
 
   /**
    * Whether the platform supports IDL element references on `ElementInternals`.
@@ -791,9 +964,61 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    * `tabindex` (e.g. roving-tabindex toolbar pattern with `tabindex="-1"`)
    * must survive disabled flips and re-renders. Only re-assert tabindex in
    * `updated()` when the component originally claimed it.
+   *
+   * Codex round-15 P2 (push-gate F1): observe `tabindex` mutations on the host
+   * via `_hostTabindexObserver` so the latch flips back to component-managed
+   * when a consumer REMOVES the attribute they previously set. Without this,
+   * a roving-tabindex toolbar that sets `tabindex="-1"` and later clears it
+   * would leave the host permanently tabindex-less on the modern path — the
+   * inner input is `tabindex=-1`, leaving the control unreachable by Tab and
+   * breaking `reportValidity()` focus recovery.
    * @internal
    */
   private _internalTabindexManaged = false;
+
+  /**
+   * Observer for the host's `tabindex` attribute. Watches consumer mutations
+   * so the component can release ownership when the consumer sets `tabindex`
+   * and reclaim ownership (re-applying the default value) when the consumer
+   * removes it. Codex round-15 P2 (push-gate F1).
+   * @internal
+   */
+  private _hostTabindexObserver: MutationObserver | null = null;
+
+  /**
+   * Counter of pending self-driven `tabindex` mutations. Incremented before
+   * each component-internal `setAttribute('tabindex', ...)` and decremented
+   * inside the `MutationObserver` callback. MutationObserver records arrive as
+   * microtasks AFTER `setAttribute` returns, so a synchronous boolean flag is
+   * already false by the time the callback runs — a counter survives the gap.
+   * Codex round-15 P2 (push-gate F1).
+   * @internal
+   */
+  private _pendingOwnTabindexMutations = 0;
+
+  /**
+   * Re-applies the component's default `tabindex` after reclaiming ownership.
+   * Mirrors the value chosen at connect/disabled-flip time so the announced
+   * surface returns to its expected tab order. Codex round-15 P2 (push-gate F1).
+   * @internal
+   */
+  private _applyDefaultTabindex(): void {
+    const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+    this._setOwnTabindex(this.disabled ? '-1' : enabledTabIndex);
+  }
+
+  /**
+   * Component-internal `tabindex` setter that tags the mutation as self-driven
+   * so `_hostTabindexObserver` ignores it. No-op when the attribute is already
+   * at the requested value (avoids generating a mutation record at all).
+   * Codex round-15 P2 (push-gate F1).
+   * @internal
+   */
+  private _setOwnTabindex(value: string): void {
+    if (this.getAttribute('tabindex') === value) return;
+    this._pendingOwnTabindexMutations++;
+    this.setAttribute('tabindex', value);
+  }
 
   // ─── Render ───
 
@@ -806,6 +1031,16 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
   private _errorId = `${this._id}-error`;
   /** @internal */
   private _labelId = `${this._id}-label`;
+  /**
+   * Synthesized in-shadow span id mirroring consumer-supplied descriptions on
+   * the no-IDL-ref fallback path. Light-DOM IDREFs from `aria-describedby` are
+   * unreachable from inside the shadow root on engines without IDL element
+   * refs (Firefox, older Safari), so we text-flatten the resolved elements
+   * into this same-root span and append its id to the inner input's
+   * aria-describedby chain. Push-gate round-3 F1 (P1, codex 2026-05-05).
+   * @internal
+   */
+  private _consumerDescId = `${this._id}-consumer-desc`;
 
   override render() {
     const hasError = !!this.error || this._hasErrorSlot;
@@ -845,19 +1080,26 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // label content; otherwise the input would reference an empty container.
     const useInternalLabelId = !hostAriaLabel && hasVisibleLabel;
 
-    // Codex round-1 finding #7: on no-IDL-ref browsers, mirror consumer
-    // tokens (stored as `data-aria-*`) onto the inner input so cross-shadow
-    // labelling still resolves for shadow-internal IDs. The render fallbacks
-    // are tracked as reactive state from `_syncHostAriaSemantics()`.
-    const fallbackLabelledBy = this._fallbackAriaLabelledBy;
+    // Codex round-1 finding #7 (post push-gate F1, 2026-05-05): on no-IDL-ref
+    // browsers the inner input is the announced surface. Consumer-supplied
+    // host `aria-labelledby` is text-flattened into `_fallbackAriaLabel`
+    // because raw light-DOM IDs are not reachable from inside the shadow root
+    // on those engines (Firefox / older Safari). The fallback labelledby
+    // state is therefore always null on this path; we keep the field for the
+    // shape symmetry and future-proofing but it is not consumed here.
+    const fallbackAriaLabel = this._fallbackAriaLabel;
     const fallbackDescribedBy = this._fallbackAriaDescribedBy;
 
     // Merge internal describedBy chain with consumer fallback tokens.
     const innerDescribedBy =
       [describedBy ?? null, fallbackDescribedBy].filter(Boolean).join(' ') || undefined;
-    // For labelledby, prefer consumer fallback tokens; otherwise keep the
-    // internal label association.
-    const innerLabelledBy = fallbackLabelledBy ?? (useInternalLabelId ? this._labelId : undefined);
+    // For labelledby on the fallback path, only the shadow-internal label id
+    // is referenced — light-DOM IDREFs from the consumer are flattened into
+    // `aria-label` instead so they actually resolve.
+    const innerLabelledBy = useInternalLabelId ? this._labelId : undefined;
+    // The inner input's `aria-label`: prefer consumer-supplied flattened
+    // light-DOM labelledby (fallback path), then host aria-label/property.
+    const innerAriaLabel = fallbackAriaLabel ?? hostAriaLabel;
 
     // Codex round-2 finding #2: branch the inner input on platform support.
     // Modern path — host is announced, inner input is `aria-hidden + tabindex=-1`.
@@ -918,7 +1160,7 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
             aria-checked=${this.indeterminate ? 'mixed' : nothing}
             aria-invalid=${isInvalid ? 'true' : nothing}
             aria-describedby=${ifDefined(innerDescribedBy)}
-            aria-label=${ifDefined(hostAriaLabel)}
+            aria-label=${ifDefined(innerAriaLabel)}
             aria-labelledby=${ifDefined(innerLabelledBy)}
             aria-hidden=${innerIsAnnounced ? nothing : 'true'}
             @keydown=${ifDefined(innerKeyDownHandler)}
@@ -986,6 +1228,20 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
             >${this.helpText}</slot
           >
         </div>
+
+        <!--
+          Push-gate round-3 F1 (P1, codex 2026-05-05): synthesized in-shadow
+          mirror of the consumer-resolved description text. On the no-IDL-ref
+          fallback path, raw light-DOM aria-describedby IDs cannot resolve
+          from inside the shadow root, so _syncHostAriaSemantics() flattens
+          the resolved elements via flattenAccName() and writes the result
+          here. Its id is appended to the inner input's aria-describedby chain
+          at render time so AT picks the consumer description up through the
+          standard described-by channel without any cross-shadow IDREF
+          resolution. On the modern path, internals.ariaDescribedByElements
+          carries the elements directly and this span is blanked.
+        -->
+        <span id=${this._consumerDescId} class="checkbox__sr-only" aria-hidden="false"></span>
       </div>
     `;
   }

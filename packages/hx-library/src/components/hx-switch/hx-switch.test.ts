@@ -955,5 +955,128 @@ describe('hx-switch', () => {
       expect(el.checked).toBe(true);
       expect(event.detail.checked).toBe(true);
     });
+
+    // Push-gate F1 (P1, codex 2026-05-05): on the fallback path, light-DOM
+    // IDREFs from host `aria-labelledby` cannot resolve from inside the shadow
+    // root on engines without IDL element refs (Firefox, older Safari). The
+    // inner button must therefore receive the AccName-flattened text of the
+    // resolved targets as `aria-label`, NOT the raw token list as
+    // `aria-labelledby`.
+    it('flattens host aria-labelledby IDREFs into inner aria-label on the fallback path', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'sw-ext-label';
+      labelHost.textContent = 'External Switch Label';
+      container.appendChild(labelHost);
+
+      const el = await fixture<HxSwitch>(
+        '<hx-switch aria-labelledby="sw-ext-label"></hx-switch>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button.switch__track')!;
+      // Inner button must NOT carry the unresolvable light-DOM token list.
+      expect(btn.getAttribute('aria-labelledby')).toBeNull();
+      // It must carry the flattened text instead so AT names the control.
+      expect(btn.getAttribute('aria-label')).toBe('External Switch Label');
+    });
+
+    // ─── Push-gate round-3 F1 (P1): consumer aria-describedby cross-shadow ───
+
+    it('mirrors consumer-resolved description text into the synth span on the fallback path (round-3 F1)', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const hint = document.createElement('span');
+      hint.id = 'sw-r3-hint';
+      hint.textContent = 'External hint';
+      container.appendChild(hint);
+
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Notifications" aria-describedby="sw-r3-hint"></hx-switch>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button.switch__track')!;
+      const synthSpan = el.shadowRoot?.querySelector<HTMLElement>(
+        'span[id$="-consumer-desc"]',
+      );
+      expect(synthSpan).toBeTruthy();
+      expect(synthSpan!.textContent).toBe('External hint');
+
+      const tokens = (btn.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+      expect(tokens).toContain(synthSpan!.id);
+      // The raw consumer id must not appear — it is unresolvable from
+      // inside the shadow root.
+      expect(tokens).not.toContain('sw-r3-hint');
+    });
+
+    // ─── Push-gate round-3 F2 (P2): external label textContent resync ───
+
+    it('resyncs fallback inner aria-label when external label textContent mutates (round-3 F2)', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'sw-r3-label';
+      labelHost.textContent = 'Mute';
+      container.appendChild(labelHost);
+
+      const el = await fixture<HxSwitch>(
+        '<hx-switch aria-labelledby="sw-r3-label"></hx-switch>',
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button.switch__track')!;
+      expect(btn.getAttribute('aria-label')).toBe('Mute');
+
+      // Consumer mutates the external label text in place (i18n locale flip).
+      labelHost.textContent = 'Unmute';
+
+      // MutationObserver callbacks land as microtasks; let them flush.
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      await el.updateComplete;
+
+      expect(btn.getAttribute('aria-label')).toBe('Unmute');
+    });
+  });
+
+  // ─── Tabindex Ownership Latch (push-gate F1) ───
+  //
+  // Codex round-15 P2 (push-gate F1): observe consumer mutations to the host's
+  // `tabindex` attribute so the latch releases on set and reclaims on remove.
+  // Without this, a roving-tabindex toolbar that sets `tabindex="-1"` and
+  // later clears it leaves the host permanently tabindex-less.
+  describe('Tabindex Ownership Latch', () => {
+    it('reclaims default tabindex when consumer removes their tabindex attribute', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch tabindex="-1"></hx-switch>');
+      expect(el.getAttribute('tabindex')).toBe('-1');
+
+      el.removeAttribute('tabindex');
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(el.hasAttribute('tabindex')).toBe(true);
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('releases ownership when consumer SETS tabindex after connect', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
+      expect(el.getAttribute('tabindex')).toBe('0');
+
+      el.setAttribute('tabindex', '-1');
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 0));
+
+      el.disabled = true;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+
+      el.disabled = false;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
   });
 });

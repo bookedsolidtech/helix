@@ -21,6 +21,21 @@ export const helixCheckboxStyles = css`
     font-family: var(--hx-checkbox-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
+  /* Visually-hidden span used to mirror consumer-supplied description text
+     into the shadow root on the no-IDL-ref fallback path (push-gate round-3
+     F1). Removed from layout, kept in the accessibility tree. */
+  .checkbox__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* ─── Control (checkbox + label row) ─── */
 
   .checkbox__control {

@@ -8,6 +8,7 @@ import { helixCheckboxGroupStyles } from './hx-checkbox-group.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import type { HelixCheckbox } from '../hx-checkbox/hx-checkbox.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 import {
   installAriaIdrefMirror,
   resolveIdrefTokens,
@@ -500,12 +501,27 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
     const labelSlot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="label"]');
     const labelSlotHasAssignedNodes = (labelSlot?.assignedNodes().length ?? 0) > 0;
-    const slottedLabelText =
-      labelSlot
-        ?.assignedNodes()
-        .map((node) => node.textContent ?? '')
-        .join('')
-        .trim() || '';
+    // Codex round-5 P2 (F1): route slotted label aggregation through
+    // `flattenAccName` (W3C AccName 1.2 §4.3.10) so `aria-hidden="true"` and
+    // `hidden` subtrees are excluded. Raw `textContent` would announce
+    // `<svg aria-hidden="true"><title>icon</title></svg>Topics` as
+    // "icon Topics" on the no-IDL-ref fallback path — the modern path uses
+    // `ariaLabelledByElements` and the AT accname computation honors hidden
+    // subtrees natively, so the bug was limited to fallback browsers
+    // (Firefox / older Safari). Flatten symmetrically here so both paths
+    // produce identical announced names.
+    const slottedLabelText = labelSlot
+      ? labelSlot
+          .assignedNodes({ flatten: true })
+          .map((node) =>
+            node.nodeType === Node.ELEMENT_NODE
+              ? flattenAccName(node as Element)
+              : (node.textContent ?? '').replace(/\s+/g, ' ').trim(),
+          )
+          .filter((t) => t.length > 0)
+          .join(' ')
+          .trim()
+      : '';
     // Codex round-22 P2: documented contract — `@slot label - Rich HTML group
     // label (overrides the label property when used)`. Slot wins. When a
     // consumer supplies BOTH `label="..."` AND `<span slot="label">...</span>`,

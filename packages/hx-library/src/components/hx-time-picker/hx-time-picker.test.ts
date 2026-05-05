@@ -634,6 +634,7 @@ describe('hx-time-picker', () => {
         expect(opt.getAttribute('aria-selected')).toBe('false');
       });
     });
+
   });
 
   // ─── Error State (3) ───
@@ -723,6 +724,52 @@ describe('hx-time-picker', () => {
       const slottedLabel = el.querySelector('[slot="label"]');
       expect(slottedLabel).toBeTruthy();
       expect(slottedLabel?.textContent).toBe('Custom Label');
+    });
+
+    // Push-gate F2 (P2, codex 2026-05-05): when a `slot="label"` and a
+    // `label="..."` property are BOTH present, the slot must win — the
+    // render path suppresses the internal `<label>` element when a slot is
+    // provided, so a `_labelSource === 'string'` decision would leave the
+    // accessible name divergent from the visible label and (on the modern
+    // path) `internals.ariaLabelledByElements` empty. Mirrors the precedence
+    // fix already applied to hx-select in PR #1630.
+    it('slot wins over label property when both are present (slot-precedence)', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="Default"><span slot="label">Custom</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const harness = el as unknown as { _labelSource: 'string' | 'slot' | 'none' };
+      expect(harness._labelSource).toBe('slot');
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Visible (slotted) label and the announced name must agree.
+      const slottedLabel = el.querySelector('[slot="label"]')!;
+      expect(slottedLabel.textContent?.trim()).toBe('Custom');
+      // On the fallback (text-flatten) path the inner input carries the
+      // slotted text directly. On the modern path the host's
+      // ariaLabelledByElements references the slotted element.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const supportsRefs = 'ariaLabelledByElements' in internals;
+      if (supportsRefs) {
+        const refs = (
+          internals as ElementInternals & { ariaLabelledByElements: Element[] | null }
+        ).ariaLabelledByElements;
+        // When the modern path resolves labels, the slotted element appears
+        // in the host's element-references list — never the internal
+        // `<label>` (which is suppressed when a slot is provided).
+        if (refs && refs.length > 0) {
+          expect(refs.some((r) => r === slottedLabel)).toBe(true);
+        }
+      }
+      // Inner input carries the flattened slot text (legacy path) OR
+      // references the slot via aria-labelledby (legacy path through internal
+      // label id is suppressed when slot wins).
+      const ariaLabel = input.getAttribute('aria-label');
+      const ariaLabelledBy = input.getAttribute('aria-labelledby');
+      // One of the two must carry the visible name.
+      expect(ariaLabel === 'Custom' || (ariaLabelledBy?.length ?? 0) > 0).toBe(true);
+      // CRITICAL: the announced name must NOT be the obsolete `label="Default"`.
+      expect(ariaLabel).not.toBe('Default');
     });
 
     it('help slot renders help content', async () => {
@@ -1220,6 +1267,29 @@ describe('hx-time-picker', () => {
       await el.updateComplete;
       const listbox = shadowQuery(el, '[role="listbox"]')!;
       expect(listbox.getAttribute('aria-label')).toBe('Time options');
+    });
+
+    // ─── Push-gate codex round-5 P2 (F2): listbox aria-label precedence ───
+    it('listbox aria-label honors accessible-label precedence over label property', async () => {
+      // Push-gate codex round-5 P2 (F2): the popup listbox previously used
+      // `this.label || this.accessibleLabel`, inverting the input's
+      // precedence chain. With `<hx-time-picker label="Time"
+      // accessible-label="Appointment time">`, the input announced
+      // "Appointment time" (correct) but the listbox announced "Time"
+      // (wrong) — AT then sees two different names for the same
+      // combobox/popup pair. The listbox name now follows the same
+      // precedence chain as the inner input.
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="Time" accessible-label="Appointment time"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      input.click();
+      await el.updateComplete;
+      const listbox = shadowQuery(el, '[role="listbox"]')!;
+      // Both surfaces resolve to the same accessible name for AT.
+      expect(input.getAttribute('aria-label')).toBe('Appointment time');
+      expect(listbox.getAttribute('aria-label')).toBe('Appointment time');
     });
   });
 

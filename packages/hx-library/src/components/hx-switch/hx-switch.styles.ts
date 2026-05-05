@@ -23,6 +23,21 @@ export const helixSwitchStyles = css`
     font-family: var(--hx-switch-font-family, var(--hx-font-family-sans, sans-serif));
   }
 
+  /* Visually-hidden span used to mirror consumer-supplied description text
+     into the shadow root on the no-IDL-ref fallback path (push-gate round-3
+     F1). Removed from layout, kept in the accessibility tree. */
+  .switch__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* WCAG 2.5.5 (healthcare mandate): minimum 44px touch target height.
      The track itself is smaller visually, but the row must meet the
      interactive touch target threshold for all size variants. */

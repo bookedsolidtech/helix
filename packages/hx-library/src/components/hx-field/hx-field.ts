@@ -36,9 +36,13 @@ function isFormControl(el: Element): el is HTMLElement {
  * Consumers have two ways to keep their value safe from hx-field's writes:
  *   (a) **Suspend** all ARIA bridging by setting `data-aria-managed` on the
  *       control. While present, hx-field skips every aria-* mutation and
- *       leaves any existing marker/snapshot in place — removing
- *       `data-aria-managed` later may resume host ownership of an `aria-label`
- *       value that still matches the snapshot.
+ *       captures a snapshot of `aria-label` at the moment suspend begins.
+ *       When `data-aria-managed` is removed, hx-field compares the live
+ *       `aria-label` to that snapshot: if they still match it resumes
+ *       bridging normally; if the consumer mutated `aria-label` during the
+ *       suspend window (changed value, removed the attribute) hx-field
+ *       treats it as a permanent takeover and stops mirroring `label`
+ *       to the control.
  *   (b) **Release** ownership permanently by overwriting `aria-label` to a
  *       different value than the one hx-field last wrote. The mismatch
  *       triggers `_releaseHostOwnedAriaLabel`, which strips the marker and
@@ -258,6 +262,50 @@ export class HelixField extends HelixElement {
   private _lastWrittenAriaLabel: string | null = null;
 
   /**
+   * Tracks whether `data-aria-managed` was observed on the slotted control
+   * during the previous sync. Combined with `_ariaLabelSnapshotAtSuspend`
+   * this lets us detect a suspend → modify → resume sequence: when a
+   * consumer adds `data-aria-managed`, mutates `aria-label`, then removes
+   * `data-aria-managed`, the resume branch must NOT re-stamp `this.label`
+   * because the mutation during the suspend window represents consumer
+   * takeover.
+   * @internal
+   */
+  private _lastSeenAriaManaged = false;
+
+  /**
+   * The `aria-label` value present on the slotted control at the moment
+   * `data-aria-managed` was first observed (the suspend snapshot). When
+   * suspend ends, we compare the live value to this snapshot — if the
+   * consumer changed it during the suspend window we treat the change as a
+   * permanent takeover and skip re-stamping `this.label`.
+   * @internal
+   */
+  private _ariaLabelSnapshotAtSuspend: string | null = null;
+
+  /**
+   * Set on the resume edge when the consumer either removed `aria-label`
+   * outright OR cleared its value during a suspend window (i.e. the live
+   * value diverged from the snapshot AND no new attribute is present after
+   * resume). The host treats this as a permanent "owned-by-absence"
+   * takeover and refuses to re-stamp `this.label` on subsequent syncs
+   * until the latch is reset. The latch is reset on adoption change, on
+   * `aria-label` returning to the DOM (whether by host or consumer write),
+   * or on disconnect.
+   *
+   * Codex round-17 F2 introduced a runtime MutationObserver on the slotted
+   * control. That observer flushes the resume edge in its own microtask,
+   * separate from any subsequent host-prop update — so the in-call local
+   * `consumerTookOverDuringSuspend` flag would no longer survive long
+   * enough to suppress a re-stamp on the next host sync. This persistent
+   * latch is what carries that suppression forward. The latch is held on
+   * the field rather than on the control because it represents host
+   * intent ("we have surrendered ownership"), not control state.
+   * @internal
+   */
+  private _consumerOwnsByAbsence = false;
+
+  /**
    * Tracks whether the dev-time competing-label warning has already been
    * emitted for the currently adopted slotted control.
    *
@@ -270,6 +318,30 @@ export class HelixField extends HelixElement {
    */
   private _competingLabelWarned = false;
 
+  /**
+   * MutationObserver watching the currently adopted slotted control for
+   * runtime changes to `data-aria-managed` and `aria-label`.
+   *
+   * Codex round-17 F2: `_syncSlottedControl()` was previously only invoked
+   * from slot/host property updates. If a consumer added or removed
+   * `data-aria-managed` on an already-mounted control AT RUNTIME (without
+   * changing any hx-field property) the field kept the old bridged
+   * `aria-required` / `aria-invalid` / `aria-describedby` state until some
+   * unrelated render flushed it. The advertised suspend/resume API was
+   * therefore non-reactive. This observer makes it reactive: any mutation
+   * to either attribute schedules a resync.
+   *
+   * Lifecycle: created in `_installSlottedControlObserver()` whenever a
+   * control is bound, disconnected in `_resolveSlottedControl()` (when the
+   * control changes) and `disconnectedCallback()`. Reentry-safe: at the
+   * end of every `_syncSlottedControl()` call we drain pending mutation
+   * records via `observer.takeRecords()` so the host's own writes in this
+   * cycle do not bounce back through the callback. Consumer mutations made
+   * after the cycle flushes still flow through normally.
+   * @internal
+   */
+  private _slottedControlObserver: MutationObserver | null = null;
+
   override connectedCallback(): void {
     super.connectedCallback();
     this._ensureA11yDescEl();
@@ -279,17 +351,24 @@ export class HelixField extends HelixElement {
     super.disconnectedCallback();
     this._a11yDescEl?.remove();
     this._a11yDescEl = null;
+    // Tear down the runtime control observer first so any aria-* mutations
+    // we make during teardown below don't bounce back through the callback.
+    this._slottedControlObserver?.disconnect();
+    this._slottedControlObserver = null;
     // Remove aria attributes we set on the slotted control. We only remove
     // `aria-label` if hx-field owns it (marker present) — otherwise the
     // value belongs to the consumer and removing would clobber their input.
     if (this._slottedControl) {
-      this._releaseHostOwnedAriaLabel(this._slottedControl);
+      this._releaseHostOwnedAriaLabelOnTeardown(this._slottedControl);
       this._slottedControl.removeAttribute('aria-required');
       this._slottedControl.removeAttribute('aria-invalid');
       this._slottedControl.removeAttribute('aria-describedby');
       this._slottedControl = null;
     }
     this._competingLabelWarned = false;
+    this._lastSeenAriaManaged = false;
+    this._ariaLabelSnapshotAtSuspend = null;
+    this._consumerOwnsByAbsence = false;
   }
 
   override updated(changedProps: PropertyValues<this>): void {
@@ -362,12 +441,21 @@ export class HelixField extends HelixElement {
     const prev = this._slottedControl;
     if (prev === next) return;
 
+    // Tear down the runtime observer for the previous control before we
+    // mutate any attributes — otherwise our own teardown writes would
+    // bounce back through the callback as if a consumer made them.
+    this._slottedControlObserver?.disconnect();
+    this._slottedControlObserver = null;
+
     // If we are leaving a previous control, strip the aria attributes we own
     // so the host doesn't leave stale wiring on a control that is no longer
-    // associated. We only remove `aria-label` if hx-field owns it
-    // (round-13 F2 — respect consumer overrides).
+    // associated. We use the teardown variant so a stale `data-hx-owns-label`
+    // marker is always cleaned up — even if the consumer added
+    // `data-aria-managed` between when we wrote the label and now (round-14
+    // F2: marker tracks WHO wrote, suspend is about CURRENT bridging; the
+    // two are orthogonal at teardown).
     if (prev) {
-      this._releaseHostOwnedAriaLabel(prev);
+      this._releaseHostOwnedAriaLabelOnTeardown(prev);
       prev.removeAttribute('aria-required');
       prev.removeAttribute('aria-invalid');
       prev.removeAttribute('aria-describedby');
@@ -379,8 +467,53 @@ export class HelixField extends HelixElement {
     this._competingLabelWarned = false;
     // Drop the value snapshot from any previous adoption.
     this._lastWrittenAriaLabel = null;
+    // Drop the suspend-window tracking — fresh control, fresh state.
+    this._lastSeenAriaManaged = false;
+    this._ariaLabelSnapshotAtSuspend = null;
+    // Drop the absence-takeover latch — it tracks consumer intent for the
+    // PREVIOUS control, not this fresh adoption.
+    this._consumerOwnsByAbsence = false;
+
+    // Install the runtime observer on the new control so post-mount
+    // mutations of `data-aria-managed` and `aria-label` reactively trigger
+    // a resync (codex round-17 F2). The observer is wired BEFORE the
+    // initial sync so subsequent consumer mutations are picked up; the
+    // initial sync itself is filtered by the callback's reentry guard.
+    if (next) {
+      this._installSlottedControlObserver(next);
+    }
 
     this._syncSlottedControl();
+  }
+
+  /**
+   * Wires a `MutationObserver` on the slotted control that reacts to
+   * runtime changes to `data-aria-managed` and `aria-label`. See the field
+   * doc on `_slottedControlObserver` for context.
+   *
+   * Reentry safety: `_syncSlottedControl()` mutates the control's aria-*
+   * attributes itself, which would normally trigger the observer in a loop.
+   * We avoid that by filtering on the attribute name (`aria-required`,
+   * `aria-invalid`, `aria-describedby`, and the ownership marker are not
+   * in the watched set, so they never bounce) AND by calling
+   * `observer.takeRecords()` at the tail of every sync cycle to drop the
+   * `aria-label` mutation our own write produced.
+   * @internal
+   */
+  private _installSlottedControlObserver(control: Element): void {
+    this._slottedControlObserver?.disconnect();
+    if (typeof MutationObserver === 'undefined') return;
+    this._slottedControlObserver = new MutationObserver(() => {
+      // The control may have been replaced between mutation queue and
+      // microtask flush. Defend against syncing a stale control by checking
+      // identity against the current binding.
+      if (this._slottedControl !== control) return;
+      this._syncSlottedControl();
+    });
+    this._slottedControlObserver.observe(control, {
+      attributes: true,
+      attributeFilter: ['data-aria-managed', 'aria-label'],
+    });
   }
 
   /**
@@ -433,6 +566,13 @@ export class HelixField extends HelixElement {
   /**
    * Removes the host-owned `aria-label` and its ownership marker if (and only
    * if) hx-field still owns them. Consumer-set values are left untouched.
+   *
+   * **Active-bridging semantics.** This helper honors `data-aria-managed` —
+   * if the consumer is currently suspending bridging we leave everything
+   * alone. Use this from inside `_syncSlottedControl()` where active
+   * bridging is the contract. For control-detachment cleanup (slot
+   * replacement, disconnect) call `_releaseHostOwnedAriaLabelOnTeardown()`
+   * instead, which always cleans up a stale ownership marker.
    * @internal
    */
   private _releaseHostOwnedAriaLabel(control: HTMLElement): void {
@@ -441,6 +581,50 @@ export class HelixField extends HelixElement {
       control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
       this._lastWrittenAriaLabel = null;
     }
+  }
+
+  /**
+   * Teardown variant of `_releaseHostOwnedAriaLabel`. Always cleans up a
+   * stale `data-hx-owns-label` marker (and the value it points at) when the
+   * control is leaving this hx-field — slot replacement or
+   * `disconnectedCallback`. Unlike the active-bridging variant this DOES
+   * NOT honor `data-aria-managed`: the marker tracks WHO wrote the label,
+   * suspend tracks CURRENT bridging behavior, and the two are orthogonal at
+   * teardown.
+   *
+   * Behavior:
+   *   - No marker → nothing to clean up.
+   *   - Marker present, snapshot null (orphan from a prior host or
+   *     pre-mounted by a consumer) → strip marker only.
+   *   - Marker present, value still equals the snapshot we last wrote →
+   *     strip both `aria-label` and the marker.
+   *   - Marker present, value differs from the snapshot (consumer changed
+   *     it during a suspend window or via direct overwrite) → strip marker
+   *     only and leave the consumer's value in place.
+   * @internal
+   */
+  private _releaseHostOwnedAriaLabelOnTeardown(control: HTMLElement): void {
+    if (!control.hasAttribute(HelixField._ARIA_LABEL_OWNED_ATTR)) return;
+
+    if (this._lastWrittenAriaLabel === null) {
+      // Orphan marker — we never wrote, so we cannot claim ownership of
+      // whatever value (if any) is in `aria-label`. Strip the marker only.
+      control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+      return;
+    }
+
+    const liveValue = control.getAttribute('aria-label');
+    if (liveValue === this._lastWrittenAriaLabel) {
+      // Still our value — clean up both.
+      control.removeAttribute('aria-label');
+      control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+    } else {
+      // Consumer overwrote (possibly during a suspend window). Strip the
+      // stale marker so the control doesn't carry our metadata away, but
+      // leave the consumer's value untouched.
+      control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+    }
+    this._lastWrittenAriaLabel = null;
   }
 
   /**
@@ -482,12 +666,70 @@ export class HelixField extends HelixElement {
     // hx-* elements manage their own ARIA attributes; skip bridging for them
     if (control.tagName.startsWith('HX-')) return;
 
-    // Elements that declare data-aria-managed opt out of ARIA mutation
-    // entirely — including any host-owned aria-label we may have written
-    // before the attribute was added. We do NOT remove a host-owned label
-    // here because doing so would silently strip the visible label simply
-    // because the consumer toggled the opt-out.
-    if (control.hasAttribute('data-aria-managed')) return;
+    this._syncSlottedControlInner(control);
+
+    // Drop any MutationRecord queued by our own attribute writes above
+    // (round-17 F2). The runtime observer is wired to `aria-label`, which
+    // we may have just set/removed; without `takeRecords()` the next
+    // microtask would re-deliver our own writes back into the callback,
+    // triggering a redundant resync (and, for same-value rewrites, an
+    // unbounded loop). Consumer mutations made AFTER this call still
+    // arrive normally because they generate their own records post-flush.
+    this._slottedControlObserver?.takeRecords();
+  }
+
+  /** @internal */
+  private _syncSlottedControlInner(control: HTMLElement): void {
+    // ── Suspend-window tracking (round-14 F1) ──────────────────────────
+    // `data-aria-managed` opts the control out of ARIA mutation. We need
+    // to know two things across the suspend window so the resume branch
+    // can decide whether to re-stamp `this.label`:
+    //   1. Was suspend active on the previous sync? (`_lastSeenAriaManaged`)
+    //   2. What was `aria-label` when the suspend started? (the snapshot.)
+    // If the consumer mutates `aria-label` while suspended (clears it,
+    // changes it, removes the attribute) we treat that as a permanent
+    // takeover and skip the re-stamp on resume.
+    const ariaManaged = control.hasAttribute('data-aria-managed');
+    if (ariaManaged) {
+      // Capture the snapshot the first time we observe suspend. While
+      // suspended we MUST NOT touch any aria-* attribute or the marker —
+      // that's the contract.
+      if (!this._lastSeenAriaManaged) {
+        this._ariaLabelSnapshotAtSuspend = control.getAttribute('aria-label');
+        this._lastSeenAriaManaged = true;
+      }
+      return;
+    }
+
+    // We are not suspended. If the previous sync was suspended, we are on
+    // the resume edge — check whether the consumer mutated `aria-label`
+    // during the suspend window. If yes, treat the change as permanent
+    // takeover: strip our ownership marker (we are no longer the owner)
+    // and skip re-stamping `this.label` for this cycle. When the consumer
+    // *removed* the attribute (or cleared it), set the persistent
+    // `_consumerOwnsByAbsence` latch so future syncs won't re-stamp either
+    // — see the field doc for why this latch is necessary alongside the
+    // in-call local flag (round-17 F2).
+    let consumerTookOverDuringSuspend = false;
+    if (this._lastSeenAriaManaged) {
+      const liveValue = control.getAttribute('aria-label');
+      if (liveValue !== this._ariaLabelSnapshotAtSuspend) {
+        consumerTookOverDuringSuspend = true;
+        // Release any stale ownership marker — the value isn't ours
+        // anymore (or the attribute is gone entirely).
+        if (control.hasAttribute(HelixField._ARIA_LABEL_OWNED_ATTR)) {
+          control.removeAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+        }
+        this._lastWrittenAriaLabel = null;
+        // If the consumer's takeover left no `aria-label` on the control,
+        // latch the absence so subsequent host syncs don't re-stamp.
+        if (!control.hasAttribute('aria-label')) {
+          this._consumerOwnsByAbsence = true;
+        }
+      }
+      this._lastSeenAriaManaged = false;
+      this._ariaLabelSnapshotAtSuspend = null;
+    }
 
     const hasError = !!this.error || this._hasErrorSlot;
     const hasDesc = !!(this.error || this.helpText || this._hasErrorSlot || this._hasHelpSlot);
@@ -496,8 +738,33 @@ export class HelixField extends HelixElement {
     //
     // Round-13 F2: ownership is decided by the marker on the control, not a
     // cached flag. A consumer-owned value is always left intact.
+    //
+    // Round-14 F1 (no-suspend-observed variant): if the consumer toggled
+    // `data-aria-managed` on and off without giving us a chance to sync
+    // (or modified `aria-label` directly without the suspend dance), the
+    // ownership-marker mismatch check inside `_hostOwnsAriaLabel` releases
+    // ownership. In that case the consumer's intent is clear (they
+    // changed our value) and we must respect it as a takeover even if
+    // they cleared the attribute entirely. We capture the pre-call state
+    // so we can detect that release-from-mismatch case and avoid
+    // re-stamping below.
+    const hadOwnershipMarker = control.hasAttribute(HelixField._ARIA_LABEL_OWNED_ATTR);
+    const hadSnapshot = this._lastWrittenAriaLabel !== null;
     const hostOwnsLabel = this._hostOwnsAriaLabel(control);
+    const ownershipReleasedByMismatch = hadOwnershipMarker && hadSnapshot && !hostOwnsLabel;
+    if (ownershipReleasedByMismatch) {
+      consumerTookOverDuringSuspend = true;
+    }
     const consumerHasLabel = control.hasAttribute('aria-label') && !hostOwnsLabel;
+
+    // If the consumer set `aria-label` again on the control (after a
+    // prior absence-takeover), the latch is no longer accurate — they
+    // own a real value now, which the consumer-precedence branch handles.
+    // Clear the latch so a future host write (e.g. consumer eventually
+    // removes their own value) can resume normally.
+    if (this._consumerOwnsByAbsence && consumerHasLabel) {
+      this._consumerOwnsByAbsence = false;
+    }
 
     if (consumerHasLabel) {
       // Consumer owns the value — never touch it.
@@ -513,6 +780,15 @@ export class HelixField extends HelixElement {
         );
         this._competingLabelWarned = true;
       }
+    } else if (consumerTookOverDuringSuspend || this._consumerOwnsByAbsence) {
+      // The consumer mutated `aria-label` while bridging was suspended.
+      // Per the documented "resume only if the snapshot still matches"
+      // contract we honor that change and do NOT re-stamp `this.label`.
+      // The consumer's value (or its absence) stays as they left it. The
+      // `_consumerOwnsByAbsence` latch carries this suppression forward
+      // across syncs that didn't see the resume edge themselves
+      // (round-17 F2: the runtime observer flushes resume in its own
+      // microtask, separate from any host-prop update that follows).
     } else if (this.label && !this._hasLabelSlot) {
       // Host writes the label and stamps the ownership marker so a future
       // sync can tell its own value apart from a consumer override.

@@ -1106,10 +1106,14 @@ describe('hx-checkbox', () => {
       expect(el.getAttribute('tabindex')).toBe('-1');
     });
 
-    it('inner input mirrors data-aria-labelledby/describedby from host on the fallback path', async () => {
+    it('flattens host aria-labelledby IDREFs into inner aria-label on the fallback path', async () => {
+      // Push-gate F1 (P1, codex 2026-05-05): on engines without IDL element
+      // refs, raw light-DOM IDREFs cannot be resolved from inside the shadow
+      // root. The inner input must therefore receive the AccName-flattened
+      // text of the resolved targets as `aria-label`, NOT the raw token list
+      // as `aria-labelledby`.
       const container = document.getElementById('test-fixture-container');
       if (!container) throw new Error('test-fixture-container not found');
-      // Light-DOM IDREF targets in the same root.
       const labelHost = document.createElement('span');
       labelHost.id = 'cbx-ext-label';
       labelHost.textContent = 'External Label';
@@ -1130,10 +1134,45 @@ describe('hx-checkbox', () => {
       await forceFallbackPath(el);
 
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      // The inner input gets the mirrored tokens so AT can resolve them.
-      expect(input.getAttribute('aria-labelledby')).toBe('cbx-ext-label');
+      // Inner input must NOT carry the unresolvable light-DOM token list.
+      expect(input.getAttribute('aria-labelledby')).toBeNull();
+      // It must carry the flattened text instead so AT names the control.
+      expect(input.getAttribute('aria-label')).toBe('External Label');
+      // Push-gate round-3 F1: describedby points at the synth span (NOT the
+      // raw light-DOM id), and the synth span carries the flattened text.
       const innerDesc = input.getAttribute('aria-describedby') ?? '';
-      expect(innerDesc.split(/\s+/)).toContain('cbx-ext-help');
+      const tokens = innerDesc.split(/\s+/).filter(Boolean);
+      // The raw consumer id must not appear — it is unresolvable from
+      // inside the shadow root.
+      expect(tokens).not.toContain('cbx-ext-help');
+      // A same-root synth span id is referenced.
+      const consumerDescSpan = el.shadowRoot?.querySelector<HTMLElement>(
+        'span[id$="-consumer-desc"]',
+      );
+      expect(consumerDescSpan).toBeTruthy();
+      expect(consumerDescSpan!.id).toBeTruthy();
+      expect(tokens).toContain(consumerDescSpan!.id);
+      // The synth span carries the AccName-flattened external description.
+      expect(consumerDescSpan!.textContent).toBe('External Help');
+    });
+
+    it('preserves shadow-internal labelId association when no host aria-labelledby is set (fallback path)', async () => {
+      // Push-gate F1 follow-up: when the consumer does NOT supply host
+      // aria-labelledby, the fallback path must keep the shadow-internal
+      // `_labelId` association so visible label text continues to name the
+      // control.
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const labelEl = shadowQuery<HTMLElement>(el, '[part="label"]')!;
+      expect(labelEl.id).toBeTruthy();
+      // labelledby points to the shadow-internal label element (same root —
+      // resolves on every engine).
+      expect(input.getAttribute('aria-labelledby')).toBe(labelEl.id);
+      // No flattened external text leaks into aria-label.
+      expect(input.getAttribute('aria-label')).toBeNull();
     });
 
     it('host activation handlers do NOT fire on Space/Enter on the fallback path', async () => {
@@ -1255,6 +1294,70 @@ describe('hx-checkbox', () => {
       input.dispatchEvent(new MouseEvent('click', { bubbles: false, cancelable: true }));
       await el.updateComplete;
       expect(el.checked).toBe(startChecked);
+    });
+
+    // ─── Push-gate round-3 F1 (P1): consumer aria-describedby cross-shadow ───
+
+    it('mirrors consumer-resolved description text into the synth span on the fallback path (round-3 F1)', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const hint = document.createElement('span');
+      hint.id = 'cbx-r3-hint';
+      hint.textContent = 'External hint';
+      container.appendChild(hint);
+
+      const el = await fixture<HelixCheckbox>(
+        `<hx-checkbox label="Accept" aria-describedby="cbx-r3-hint"></hx-checkbox>`,
+      );
+      await el.updateComplete;
+      // mixinDelegatesAria mirrors aria-* to data-aria-* on the host.
+      expect(el.getAttribute('data-aria-describedby')).toBe('cbx-r3-hint');
+
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const synthSpan = el.shadowRoot?.querySelector<HTMLElement>(
+        'span[id$="-consumer-desc"]',
+      );
+      expect(synthSpan).toBeTruthy();
+      // Synth span carries the flattened external description text.
+      expect(synthSpan!.textContent).toBe('External hint');
+      // Inner input describedby chain references the same-root synth span,
+      // NOT the unresolvable light-DOM id.
+      const tokens = (input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+      expect(tokens).toContain(synthSpan!.id);
+      expect(tokens).not.toContain('cbx-r3-hint');
+    });
+
+    // ─── Push-gate round-3 F2 (P2): external label textContent resync ───
+
+    it('resyncs fallback inner aria-label when external label textContent mutates (round-3 F2)', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      const labelHost = document.createElement('span');
+      labelHost.id = 'cbx-r3-label';
+      labelHost.textContent = 'Mute';
+      container.appendChild(labelHost);
+
+      const el = await fixture<HelixCheckbox>(
+        `<hx-checkbox aria-labelledby="cbx-r3-label"></hx-checkbox>`,
+      );
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Mute');
+
+      // Consumer mutates the external label text in place (i18n locale flip).
+      // Without the round-3 F2 observer, the fallback inner aria-label
+      // remained stale until some unrelated mutation triggered a sync.
+      labelHost.textContent = 'Unmute';
+
+      // MutationObserver callbacks land as microtasks; let them flush.
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      await el.updateComplete;
+
+      expect(input.getAttribute('aria-label')).toBe('Unmute');
     });
   });
 
@@ -1386,5 +1489,53 @@ describe('hx-checkbox', () => {
       await el.updateComplete;
       return { form, el };
     }
+  });
+
+  // ─── Tabindex Ownership Latch (push-gate F1) ───
+  //
+  // Codex round-15 P2 (push-gate F1): when a consumer renders
+  // `<hx-checkbox tabindex="-1">` (common roving-tabindex pattern), the
+  // component releases ownership of the attribute. When the consumer LATER
+  // removes that attribute, the component must reclaim ownership and re-apply
+  // its default value — otherwise the host stays tabindex-less, the inner
+  // input is `tabindex=-1`, and the control becomes unreachable by Tab.
+  describe('Tabindex Ownership Latch', () => {
+    it('reclaims default tabindex when consumer removes their tabindex attribute', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox tabindex="-1"></hx-checkbox>');
+      // Sanity: consumer-supplied tabindex is preserved on connect.
+      expect(el.getAttribute('tabindex')).toBe('-1');
+
+      // Consumer removes the tabindex attribute (roving-tabindex hand-off).
+      el.removeAttribute('tabindex');
+      // Allow the MutationObserver microtask to drain.
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 0));
+
+      // Component reclaims ownership and re-applies the default tabindex.
+      // Modern path is the default in this environment (IDL-ref-supported),
+      // so the enabled host should carry `tabindex=0`.
+      expect(el.hasAttribute('tabindex')).toBe(true);
+      expect(el.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('releases ownership when consumer SETS tabindex after connect', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
+      // Component-managed default on connect.
+      expect(el.getAttribute('tabindex')).toBe('0');
+
+      // Consumer takes over.
+      el.setAttribute('tabindex', '-1');
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 0));
+
+      // Disabled flips must NOT clobber the consumer-supplied value.
+      el.disabled = true;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+
+      el.disabled = false;
+      await el.updateComplete;
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
   });
 });
