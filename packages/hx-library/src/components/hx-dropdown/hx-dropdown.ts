@@ -8,6 +8,7 @@ import { createIdCounter } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
+import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
 import {
   installAriaIdrefMirror,
   resolveIdrefTokens,
@@ -459,8 +460,13 @@ export class HelixDropdown extends HelixElement {
     }, 500);
 
     const items = this._getFocusableMenuItems();
+    // Codex push-gate round-7 finding 3: read item label via the shared
+    // submenu-aware extractor so a parent menuitem with a nested
+    // `<hx-menu slot="submenu">` does not match grandchild text and steal
+    // focus from a sibling. Single source of truth across hx-menu /
+    // hx-dropdown / hx-overflow-menu / hx-split-button.
     const match = items.findIndex((item) => {
-      const text = item.textContent?.trim().toLowerCase() ?? '';
+      const text = getMenuItemTypeaheadLabel(item).toLowerCase();
       return text.startsWith(this._typeaheadBuffer);
     });
 

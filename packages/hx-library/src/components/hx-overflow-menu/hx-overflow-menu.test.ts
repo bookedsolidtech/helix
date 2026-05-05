@@ -472,6 +472,40 @@ describe('hx-overflow-menu', () => {
     });
   });
 
+  // ─── Typeahead — submenu-aware label extractor (codex round-7) ───
+
+  describe('Typeahead with nested submenus (codex push-gate round-7 finding 3)', () => {
+    it('parent item with submenu-only-text does not match its grandchild prefix', async () => {
+      // Parent has NO own-text — only a nested submenu containing "Apple".
+      // Pre-fix: textContent walks into submenu and returns "Apple", so
+      // typing "a" matches the parent. Post-fix: parent's own label is "",
+      // so "a" matches the legitimate sibling "Apricot".
+      const el = await fixture<HelixOverflowMenu>(`
+        <hx-overflow-menu>
+          <hx-menu-item value="parent"><hx-menu slot="submenu"><hx-menu-item value="apple">Apple</hx-menu-item></hx-menu></hx-menu-item>
+          <hx-menu-item value="apricot">Apricot</hx-menu-item>
+        </hx-overflow-menu>
+      `);
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const parentItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const apricotItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="apricot"]')!;
+      // Focus a known-not-target item first so we can detect movement.
+      apricotItem.focus();
+      parentItem.focus();
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      // Pre-fix: parent matches first ("Apple" via grandchild text) → focus
+      // stays on parent. Post-fix: parent has empty effective label → only
+      // Apricot starts with "a" → focus moves to Apricot.
+      expect(document.activeElement === apricotItem || apricotItem.matches(':focus-within')).toBe(
+        true,
+      );
+    });
+  });
+
   // ─── Slots (1) ───
 
   describe('Slots', () => {

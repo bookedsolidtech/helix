@@ -7,6 +7,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
+import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
 import {
   installAriaIdrefMirror,
   resolveIdrefTokens,
@@ -453,8 +454,10 @@ export class HelixOverflowMenu extends HelixElement {
     }, 500);
 
     const items = this._getMenuItems();
+    // Codex push-gate round-7 finding 3: shared submenu-aware label
+    // extractor — see hx-menu / hx-dropdown for rationale.
     const match = items.findIndex((item) => {
-      const text = item.textContent?.trim().toLowerCase() ?? '';
+      const text = getMenuItemTypeaheadLabel(item).toLowerCase();
       return text.startsWith(this._typeaheadBuffer);
     });
 

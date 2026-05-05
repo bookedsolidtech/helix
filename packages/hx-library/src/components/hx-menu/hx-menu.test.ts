@@ -485,6 +485,141 @@ describe('hx-menu', () => {
       expect(internals.ariaExpanded).toBe('false');
     });
   });
+
+  describe('Nested-submenu bubbling guards (codex push-gate round-7)', () => {
+    // Helper: open a parent menu's submenu and resolve to the inner items.
+    async function openSubmenu(outer: HelixMenu) {
+      const parent = outer.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      await parent.updateComplete;
+      parent.focus();
+      await userEvent.keyboard('{ArrowRight}');
+      await parent.updateComplete;
+      // Allow the queued microtask in `_handleSubmenuOpen` to run so the
+      // nested menu's `focusFirst()` settles.
+      await new Promise((r) => setTimeout(r, 0));
+      const inner = outer.querySelector<HelixMenu>('hx-menu[slot="submenu"]')!;
+      const childItems = Array.from(inner.children).filter(
+        (el): el is HelixMenuItem => el.tagName.toLowerCase() === 'hx-menu-item',
+      );
+      return { parent, inner, childItems };
+    }
+
+    it('outer menu ignores ArrowDown / ArrowUp / Home / End from descendant submenu (finding 1)', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child-a">Alpha</hx-menu-item>
+              <hx-menu-item value="child-b">Beta</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+          <hx-menu-item value="other">Other</hx-menu-item>
+        </hx-menu>
+      `);
+      const { childItems } = await openSubmenu(el);
+      // Capture outer menu's focused index before the inner keypresses.
+      const outerFocusedIndexBefore = (el as unknown as { _focusedIndex: number })._focusedIndex;
+      // Focus is in the inner submenu on its first child after openSubmenu.
+      expect(isItemFocused(childItems[0])).toBe(true);
+
+      await userEvent.keyboard('{ArrowDown}');
+      await userEvent.keyboard('{ArrowUp}');
+      await userEvent.keyboard('{End}');
+      await userEvent.keyboard('{Home}');
+
+      const outerFocusedIndexAfter = (el as unknown as { _focusedIndex: number })._focusedIndex;
+      expect(outerFocusedIndexAfter).toBe(outerFocusedIndexBefore);
+      // Inner submenu still owns focus (ArrowDown/Up/End/Home moved between
+      // child items but never escaped to the outer menu's items).
+      const stillInside = childItems.some((i) => isItemFocused(i));
+      expect(stillInside).toBe(true);
+    });
+
+    it('outer menu emits at most one hx-close on Escape from descendant submenu (finding 1)', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-menu>
+      `);
+      const { inner } = await openSubmenu(el);
+      let outerCloses = 0;
+      let innerCloses = 0;
+      el.addEventListener('hx-close', (e) => {
+        // Discriminate by composedPath: the inner menu sits earlier than outer.
+        const path = e.composedPath();
+        if (path[0] === inner) innerCloses += 1;
+        else if (path[0] === el) outerCloses += 1;
+      });
+      await userEvent.keyboard('{Escape}');
+      // Inner menu owns the Escape; outer must NOT re-fire its own close.
+      expect(innerCloses).toBeGreaterThanOrEqual(1);
+      expect(outerCloses).toBe(0);
+    });
+
+    it('outer menu does not corrupt _focusedIndex or re-emit hx-select on bubbled child select (finding 2)', async () => {
+      const el = await fixture<HelixMenu>(`
+        <hx-menu>
+          <hx-menu-item value="parent">
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+          <hx-menu-item value="other">Other</hx-menu-item>
+        </hx-menu>
+      `);
+      const { inner, childItems } = await openSubmenu(el);
+      const outerFocusedBefore = (el as unknown as { _focusedIndex: number })._focusedIndex;
+
+      let outerHostSelects = 0;
+      let innerHostSelects = 0;
+      el.addEventListener('hx-select', (e) => {
+        const path = e.composedPath();
+        // Order: child item → inner menu → ... → outer menu.
+        const innerIdx = path.indexOf(inner);
+        const outerIdx = path.indexOf(el);
+        // Each menu re-dispatches hx-select from its own host. We can
+        // distinguish: the inner menu's redispatched event has `inner`
+        // earlier in the path; an outer-only re-dispatch would NOT have
+        // `inner` (since the redispatch starts at outer host). The bug
+        // manifested as TWO outer-host `hx-select` events.
+        if (innerIdx !== -1 && outerIdx !== -1 && innerIdx < outerIdx) {
+          // This is the inner menu's redispatch bubbling through outer.
+          innerHostSelects += 1;
+        } else {
+          outerHostSelects += 1;
+        }
+      });
+
+      // Trigger select on the child item (composed bubbling).
+      childItems[0].dispatchEvent(
+        new CustomEvent('hx-item-select', {
+          bubbles: true,
+          composed: true,
+          detail: { item: childItems[0], value: 'child' },
+        }),
+      );
+      // Allow handlers to settle.
+      await new Promise((r) => setTimeout(r, 0));
+
+      // Inner re-dispatch reaches outer once. Outer must NOT emit its own
+      // duplicate `hx-select` from `_handleItemSelect`.
+      expect(innerHostSelects).toBe(1);
+      expect(outerHostSelects).toBe(0);
+
+      // _focusedIndex on outer menu must NOT be corrupted to -1
+      // (which would have happened from `items.indexOf(childItem)` returning
+      // -1 in the un-guarded path).
+      const outerFocusedAfter = (el as unknown as { _focusedIndex: number })._focusedIndex;
+      expect(outerFocusedAfter).toBe(outerFocusedBefore);
+    });
+  });
 });
 
 // ─────────────────────────────────────────────────────────────

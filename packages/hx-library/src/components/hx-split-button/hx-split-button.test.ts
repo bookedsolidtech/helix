@@ -554,6 +554,40 @@ describe('hx-split-button', () => {
     });
   });
 
+  // ─── Typeahead — submenu-aware label extractor (codex round-7) ───
+
+  describe('Typeahead with nested submenus (codex push-gate round-7 finding 3)', () => {
+    it('parent item with submenu-only-text does not match its grandchild prefix', async () => {
+      // Parent has NO own-text — only a nested submenu containing "Apple".
+      // Pre-fix: textContent walks into submenu and returns "Apple", so
+      // typing "a" matches the parent. Post-fix: parent's own label is "",
+      // so "a" matches the legitimate sibling "Apricot".
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="parent"><hx-menu slot="submenu"><hx-menu-item value="apple">Apple</hx-menu-item></hx-menu></hx-menu-item>
+          <hx-menu-item slot="menu" value="apricot">Apricot</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+
+      const parentItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const apricotItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="apricot"]')!;
+      parentItem.focus();
+      await el.updateComplete;
+
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      await el.updateComplete;
+
+      expect(document.activeElement === apricotItem || apricotItem.matches(':focus-within')).toBe(
+        true,
+      );
+    });
+  });
+
   // ─── Menu behavior ───
 
   describe('Menu behavior', () => {

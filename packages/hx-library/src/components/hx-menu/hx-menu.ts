@@ -13,6 +13,7 @@ import {
   type AriaIdrefMirrorHandle,
 } from '../../utils/aria-idref.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
+import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
 
 /**
  * Walks the composed tree from `start` outward and returns the closest
@@ -326,28 +327,16 @@ export class HelixMenu extends HelixElement {
   }
 
   /**
-   * Read the typeahead label for an item — the item's OWN text content
-   * EXCLUDING any nested submenu subtree projected through
-   * `slot="submenu"`.
-   *
-   * Codex push-gate round-6 finding 3: a naive `item.textContent` walks
-   * the entire light-DOM tree, which on a parent menuitem includes the
-   * slotted nested `<hx-menu>` and its descendants. Typing the first
-   * letter of a child item then matches the parent (because the parent's
-   * subtree contains that text), causing first-character nav to focus
-   * the parent instead of the next sibling. Filter slot="submenu" out.
+   * Read the typeahead label for an item — delegates to the shared
+   * `getMenuItemTypeaheadLabel` util so all four menu-bearing components
+   * (`hx-menu`, `hx-dropdown`, `hx-overflow-menu`, `hx-split-button`)
+   * share one submenu-aware extractor. Codex push-gate round-7 finding 3
+   * extracted this helper from its original home here in `hx-menu.ts`.
    *
    * @internal
    */
   private _getTypeaheadLabel(item: HelixMenuItem): string {
-    let text = '';
-    for (const node of item.childNodes) {
-      if (node instanceof Element && node.getAttribute('slot') === 'submenu') {
-        continue;
-      }
-      text += node.textContent ?? '';
-    }
-    return text.trim();
+    return getMenuItemTypeaheadLabel(item);
   }
 
   /** @internal */
@@ -493,13 +482,42 @@ export class HelixMenu extends HelixElement {
     this._ariaMirror = null;
   }
 
-  /** @internal */
+  /**
+   * Codex push-gate round-7 finding 1: keydown bound on the HOST receives
+   * events that bubble out of nested submenus. When a child submenu is
+   * open and focus lives inside it, ArrowUp/Down/Home/End/Escape on the
+   * inner item bubbles to EVERY enclosing `hx-menu`. Without this guard
+   * the outer menu would run `_focusItem(...)` against its OWN top-level
+   * items and steal focus back out of the child submenu, and Escape would
+   * dispatch one `hx-close` per enclosing menu. Mirrors the
+   * `findClosestMenuAncestor` pattern already used by the submenu
+   * open/close handlers.
+   * @internal
+   */
   private _handleHostKeyDown = (e: KeyboardEvent): void => {
+    const target = e.target;
+    if (target instanceof Element && findClosestMenuAncestor(target) !== this) {
+      return;
+    }
     this._handleKeyDown(e);
   };
 
-  /** @internal */
+  /**
+   * Codex push-gate round-7 finding 2: `hx-item-select` bubbles composed
+   * through every enclosing `hx-menu`. The outer menu would otherwise
+   * (a) corrupt `_focusedIndex` to `-1` because the bubbled item is not
+   * a member of the outer menu's items, and (b) re-emit a duplicate
+   * `hx-select`. Only act when THIS menu is the closest enclosing menu
+   * of the dispatching item.
+   * @internal
+   */
   private _handleItemSelectHost = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HelixMenuItem; value: string }>).detail;
+    const item = detail?.item;
+    if (item && findClosestMenuAncestor(item) !== this) {
+      return;
+    }
     this._handleItemSelect(e);
   };
 
