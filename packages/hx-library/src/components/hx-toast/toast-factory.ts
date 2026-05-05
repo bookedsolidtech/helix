@@ -15,6 +15,18 @@ export interface ToastOptions {
 }
 
 /**
+ * (group-6 §5.5) Minimum on-screen lifetime for any toast created via the
+ * factory, regardless of `stackLimit`-driven displacement. Prevents
+ * AT-clipping when rapid-fire `toast()` calls (e.g. during a Drupal
+ * BigPipe re-attach burst) would otherwise hide a toast before NVDA/JAWS
+ * finished reading it.
+ */
+const MIN_DISPLAY_MS = 1500;
+
+/** @internal Tracks `show()` timestamps so the factory can defer displacement. */
+const _shownAt = new WeakMap<HelixToast, number>();
+
+/**
  * Imperatively create and display a toast notification.
  *
  * Creates a shared `hx-toast-stack` on `document.body` if one does not exist,
@@ -46,11 +58,27 @@ export function toast(options: ToastOptions): HelixToast {
     document.body.appendChild(stack);
   }
 
-  // Enforce stack limit: hide oldest open toast if at capacity
+  // Enforce stack limit: hide oldest open toast if at capacity.
+  // (group-6 §5.5) Minimum display time prevents AT-clipping under rapid-fire
+  // bursts. If the oldest toast has not yet been on screen for MIN_DISPLAY_MS,
+  // defer its hide until the remainder elapses; otherwise hide immediately.
   if (stack.stackLimit > 0) {
     const openToasts = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
     if (openToasts.length >= stack.stackLimit) {
-      openToasts[0]?.hide();
+      const oldest = openToasts[0];
+      if (oldest) {
+        const shownAt = _shownAt.get(oldest);
+        const elapsed = shownAt === undefined ? Number.POSITIVE_INFINITY : Date.now() - shownAt;
+        if (elapsed >= MIN_DISPLAY_MS) {
+          oldest.hide();
+        } else {
+          const remaining = MIN_DISPLAY_MS - elapsed;
+          setTimeout(() => {
+            // Guard: only hide if still open (consumer may have hidden it manually)
+            if (oldest.open) oldest.hide();
+          }, remaining);
+        }
+      }
     }
   }
 
@@ -63,11 +91,13 @@ export function toast(options: ToastOptions): HelixToast {
 
   // Remove from DOM after hiding
   toastEl.addEventListener('hx-after-hide', () => {
+    _shownAt.delete(toastEl);
     toastEl.remove();
   });
 
   stack.appendChild(toastEl);
   toastEl.show();
+  _shownAt.set(toastEl, Date.now());
 
   return toastEl;
 }

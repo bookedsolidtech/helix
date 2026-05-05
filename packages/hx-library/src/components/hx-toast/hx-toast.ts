@@ -3,9 +3,23 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
+import { devWarn } from '../../utils/dev-warn.js';
 import { helixToastStyles } from './hx-toast.styles.js';
 
 export type ToastVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
+
+// (group-6) WCAG 2.2.3 minimum display times by variant. When `duration > 0`
+// and shorter than the role-implied minimum, a devWarn fires recommending the
+// caller either lengthen `duration` or set `duration=0` for persistent
+// toasts. AT cannot reliably finish reading a danger announcement in less
+// than ~6 seconds; success/info polite announcements need at least ~3s.
+const MIN_DISPLAY_MS_BY_VARIANT: Record<ToastVariant, number> = {
+  default: 3000,
+  info: 3000,
+  success: 3000,
+  warning: 4000,
+  danger: 6000,
+};
 
 /**
  * A transient notification message that auto-dismisses after a configurable duration.
@@ -139,8 +153,25 @@ export class HelixToast extends HelixElement {
 
   // ─── Lifecycle ───
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // (group-6) Host-canonical role + aria-atomic via ElementInternals.
+    // role implies aria-live per ARIA spec (alert→assertive, status→polite),
+    // so we do NOT also set explicit aria-live (avoids §5.1 double-announce
+    // on older NVDA/JAWS).
+    this._internals.role = this._role;
+    this._internals.ariaAtomic = 'true';
+  }
+
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
+    if (changedProperties.has('variant')) {
+      // Keep host role in sync with variant (alert vs status).
+      this._internals.role = this._role;
+    }
+    if (changedProperties.has('open') || changedProperties.has('duration')) {
+      this._auditWcag223();
+    }
     if (changedProperties.has('open')) {
       if (this.open) {
         this.removeAttribute('aria-hidden');
@@ -159,6 +190,29 @@ export class HelixToast extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._clearTimer();
+  }
+
+  /**
+   * (group-6 §5.3) WCAG 2.2.3 (Level AA — No Time Limits) audit. When
+   * `duration` is shorter than the role-implied minimum-display-time for the
+   * current variant, surface a developer warning recommending a longer
+   * duration or `duration=0` for persistent toasts. Danger toasts in
+   * particular are safety-critical and routinely need more than 5 seconds
+   * for screen readers to finish reading.
+   *
+   * Fires only in DEV builds (Vite tree-shakes the call in production).
+   *
+   * @internal
+   */
+  private _auditWcag223(): void {
+    if (this.duration <= 0) return;
+    const min = MIN_DISPLAY_MS_BY_VARIANT[this.variant] ?? 0;
+    if (this.duration < min) {
+      devWarn(
+        'hx-toast',
+        `duration=${this.duration}ms is shorter than the WCAG 2.2.3 minimum (${min}ms) for variant="${this.variant}". Increase duration or set duration=0 for persistent toasts (recommended for variant="danger").`,
+      );
+    }
   }
 
   // ─── Public API ───
@@ -283,14 +337,16 @@ export class HelixToast extends HelixElement {
 
   // ─── ARIA Helpers ───
 
-  /** @internal */
+  /**
+   * @internal
+   * Variant→role mapping (harmonized with hx-alert/hx-banner per group-6):
+   * only `danger` is assertive (role=alert); all other variants are polite
+   * (role=status). role implies aria-live, so we do NOT also expose an
+   * `_ariaLive` getter — that path was removed when the inner div stopped
+   * carrying explicit aria-live (§5.1 double-announce mitigation).
+   */
   private get _role(): 'alert' | 'status' {
     return this.variant === 'danger' ? 'alert' : 'status';
-  }
-
-  /** @internal */
-  private get _ariaLive(): 'assertive' | 'polite' {
-    return this.variant === 'danger' ? 'assertive' : 'polite';
   }
 
   // ─── WCAG 1.4.1: Default Icons ───
@@ -369,6 +425,14 @@ export class HelixToast extends HelixElement {
   }
 
   // ─── Render ───
+  //
+  // (group-6) Host-canonical live region: role + aria-atomic live on the
+  // host via ElementInternals (set in connectedCallback). The inner base
+  // div is a presentation-only wrapper — it does NOT carry role, aria-live,
+  // or aria-atomic. role implies aria-live per ARIA spec, so the host has
+  // NO explicit aria-live attribute either (avoids §5.1 double-announce on
+  // older NVDA/JAWS that read both role and aria-live as separate live
+  // regions).
 
   override render() {
     const severityLabel = this._severityLabel;
@@ -380,9 +444,6 @@ export class HelixToast extends HelixElement {
           toast: true,
           [`toast--${this.variant}`]: true,
         })}
-        role=${this._role}
-        aria-live=${this._ariaLive}
-        aria-atomic="true"
         @mouseenter=${this._handleMouseEnter}
         @mouseleave=${this._handleMouseLeave}
         @focusin=${this._handleFocusIn}
