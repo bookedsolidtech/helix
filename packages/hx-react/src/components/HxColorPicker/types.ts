@@ -48,7 +48,22 @@ Useful for compact preset-only color selection UIs. */
   labelColorValue?: string;
   /** Accessible label for the color picker dialog/panel. */
   labelPicker?: string;
-  /** Generates the accessible label for the trigger button. */
+  /** Visible label rendered above the trigger. When set this becomes the
+announced name of the trigger surface unless a stronger source
+(`aria-labelledby`, `aria-label`, or `accessible-label`) is supplied. */
+  label?: string | undefined;
+  /** Visually-hidden accessible name. Highest-priority self-naming source —
+outranks `label`, slotted label content, and the generated trigger label,
+but defers to consumer `aria-labelledby` (effective) and `aria-label`. */
+  accessibleLabel?: string | undefined;
+  /** Help text rendered below the trigger and joined into the host's
+announced description channel. */
+  helpText?: string | undefined;
+  /** Error message. When non-empty, marks the trigger surface as `aria-invalid`
+and joins the host's announced description channel via a live alert. */
+  error?: string | undefined;
+  /** Generates the accessible label for the trigger button when no other
+naming source is provided. */
   labelTrigger?: string;
 
   // Event callbacks

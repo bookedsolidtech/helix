@@ -11,6 +11,31 @@ export const helixColorPickerStyles = css`
     pointer-events: none;
     opacity: var(--hx-opacity-disabled, 0.5);
   }
+  /* Slotted label / help / error blocks for cross-shadow naming. */
+  .hx-color-picker__label {
+    display: block;
+    margin-bottom: var(--hx-space-1, 0.25rem);
+    font-weight: var(--hx-font-weight-semibold, 600);
+    color: var(--hx-color-neutral-900, #1a1a1a);
+  }
+  .hx-color-picker__label:empty {
+    display: none;
+  }
+  .hx-color-picker__help {
+    display: block;
+    margin-top: var(--hx-space-1, 0.25rem);
+    font-size: var(--hx-font-size-xs, 0.75rem);
+    color: var(--hx-color-neutral-600, #525252);
+  }
+  .hx-color-picker__error {
+    display: block;
+    margin-top: var(--hx-space-1, 0.25rem);
+    font-size: var(--hx-font-size-xs, 0.75rem);
+    color: var(--hx-color-danger-700, #c43e3e);
+  }
+  [hidden] {
+    display: none !important;
+  }
   .trigger {
     display: inline-flex;
     align-items: center;
