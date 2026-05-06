@@ -7,6 +7,12 @@ import type { Placement as FloatingPlacement } from '@floating-ui/dom';
 import { createIdCounter } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixDropdownStyles } from './hx-dropdown.styles.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 // P2-03: Export so TypeScript consumers can import this type for prop typing.
 export type DropdownPlacement =
@@ -23,6 +29,41 @@ const _nextDropdownId = createIdCounter('hx-dropdown');
 
 /**
  * A dropdown component — a button that opens a floating panel on click.
+ *
+ * ## Architecture Note: Host-Attribute Label Mirror (group-4 round-1)
+ *
+ * The announced surface is the inner `[part="panel"]` element, which carries
+ * `role="menu"`. The host wraps a slotted trigger and the floating panel and
+ * does NOT claim a role itself (apart from the round-35-style host
+ * `aria-expanded` fallback used only when the trigger slot is empty).
+ *
+ * Because the panel lives in shadow DOM and `ElementInternals` IDL refs on
+ * the host project semantics OUTWARD (host → AT) rather than INWARD
+ * (host → shadow descendant), we use the **host-attribute mirror** pattern:
+ * resolve consumer `aria-labelledby` IDREFs against the host's composed-tree
+ * roots, text-flatten via `flattenAccName`, and write the result to the
+ * panel's `aria-label`. Host `aria-label` outranks the `label` property in
+ * the same precedence used by every host-canonical hx-* control.
+ *
+ * Naming precedence (W3C AccName 1.2 §4.3.1):
+ *   1. Host `aria-labelledby` (resolved IDREFs, text-flattened)
+ *   2. Host `aria-label`
+ *   3. `label` property
+ *   4. Hard-coded literal `"Menu"` (last-resort accessible name)
+ *
+ * **Group 5 boundary (intentional):** This round is **additive only** — the
+ * host-label pipeline is the entire change. The panel's `role="menu"` and
+ * the menuitem-roving keyboard pattern are already implemented per APG and
+ * are NOT touched here. Group 5 (composite navigation: menu, menubar,
+ * menuitem, tabs, tree) will own any broader refactor of the menu role and
+ * roving-tabindex semantics. Codex reviewers: please scope findings to the
+ * host-label pipeline; do not flag missing roving-focus / typeahead /
+ * `aria-orientation` work here.
+ *
+ * `aria-controls` is intentionally omitted on the trigger: the panel lives
+ * in shadow DOM and IDREF values cannot be resolved across shadow
+ * boundaries by assistive technology (axe-core flags this as a critical
+ * violation if attempted). See `_setupTriggerAria` for the inline note.
  *
  * @summary Button that opens a floating menu panel on click.
  *
@@ -119,6 +160,35 @@ export class HelixDropdown extends HelixElement {
   @state() private _panelVisible = false;
 
   /**
+   * Resolved accessible name for the menu panel — the value written to the
+   * inner `[part="panel"]` `aria-label`. Recomputed on every sync per
+   * AccName 1.2 §4.3.1 precedence: host `aria-labelledby` (flattened) >
+   * host `aria-label` > `label` property > literal `"Menu"`.
+   * @internal
+   */
+  @state() private _resolvedLabel = '';
+
+  /**
+   * Most recently observed consumer-supplied `aria-labelledby` token list on
+   * the host. Refreshed every sync via `getAttribute()`.
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+
+  /**
+   * Handle for the shared host attribute / root id observer.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Watches in-place text / visibility mutations on consumer light-DOM
+   * elements resolved from the host's `aria-labelledby`.
+   * @internal
+   */
+  private _externalRefsObserver: MutationObserver | null = null;
+
+  /**
    * Guards against accumulating multiple document click listeners when open state
    * changes faster than the microtask queue can process removeEventListener calls.
    * @internal
@@ -148,6 +218,12 @@ export class HelixDropdown extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('keydown', this._handleKeydown);
+    // Seed the host-attribute label mirror BEFORE first paint so the panel's
+    // `aria-label` carries the resolved name on its very first render.
+    this._syncResolvedLabel();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncResolvedLabel();
+    });
   }
 
   override disconnectedCallback(): void {
@@ -157,6 +233,10 @@ export class HelixDropdown extends HelixElement {
       document.removeEventListener('click', this._handleOutsideClick, { capture: true });
       this._documentListenerAttached = false;
     }
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    this._externalRefsObserver?.disconnect();
+    this._externalRefsObserver = null;
   }
 
   // ─── Open/Close ───
@@ -369,7 +449,7 @@ export class HelixDropdown extends HelixElement {
         id=${this._panelId}
         role="menu"
         aria-hidden=${this._panelVisible ? nothing : 'true'}
-        aria-label=${this.label}
+        aria-label=${this._resolvedLabel}
         class=${this._panelVisible ? 'panel panel--visible' : 'panel'}
         @click=${this._handlePanelClick}
       >
@@ -423,6 +503,16 @@ export class HelixDropdown extends HelixElement {
     }
   }
 
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
+    // `label` property changes must flow into the resolved name BEFORE
+    // render so the new fallback is in place on the same paint. See
+    // `hx-popover.willUpdate()` for the same rationale.
+    if (changedProperties.has('label')) {
+      this._syncResolvedLabel();
+    }
+  }
+
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('open')) {
@@ -436,6 +526,82 @@ export class HelixDropdown extends HelixElement {
         this.setAttribute('aria-expanded', String(this.open));
       }
     }
+  }
+
+  // ─── Host-attribute label mirror ───
+
+  /**
+   * (Re-)installs a `MutationObserver` over the deduped union of
+   * consumer-resolved label elements, watching for in-place text /
+   * visibility mutations so the panel's `aria-label` tracks live consumer
+   * text. See `hx-popover._installExternalRefsObserver` for the matching
+   * shape used across the host-attribute-mirror family.
+   * @internal
+   */
+  private _installExternalRefsObserver(elements: Element[]): void {
+    if (this._externalRefsObserver) {
+      this._externalRefsObserver.disconnect();
+      this._externalRefsObserver = null;
+    }
+    if (elements.length === 0) return;
+    const unique = new Set<Element>(elements);
+    const observer = new MutationObserver(() => {
+      this._syncResolvedLabel();
+    });
+    for (const el of unique) {
+      observer.observe(el, {
+        characterData: true,
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._externalRefsObserver = observer;
+  }
+
+  /**
+   * Resolves the menu panel's accessible name from host attributes and the
+   * `label` property. AccName 1.2 §4.3.1 precedence:
+   *   1. Host `aria-labelledby` (resolved IDREFs, flattened)
+   *   2. Host `aria-label`
+   *   3. `label` property
+   *   4. Literal `"Menu"` (last-resort)
+   * @internal
+   */
+  private _syncResolvedLabel(): void {
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    this._consumerLabelledBy = liveLabelledBy;
+    const consumerLabelEls = resolveIdrefTokens(this, liveLabelledBy);
+
+    this._installExternalRefsObserver(consumerLabelEls);
+
+    const isVisibleForAccName = (el: Element): boolean =>
+      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
+
+    const flattenedFromIdrefs = consumerLabelEls
+      .filter(isVisibleForAccName)
+      .map((el) => flattenAccName(el))
+      .filter((t) => t.length > 0)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() : '';
+
+    let resolved = '';
+    if (flattenedFromIdrefs) {
+      resolved = flattenedFromIdrefs;
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+    } else if (this.label) {
+      resolved = this.label;
+    } else {
+      resolved = 'Menu';
+    }
+
+    this._resolvedLabel = resolved;
   }
 }
 

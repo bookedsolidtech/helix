@@ -4,11 +4,57 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixPopoverStyles } from './hx-popover.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextPopoverId = createIdCounter('hx-popover');
 
 /**
  * A popover that displays rich floating content attached to a trigger element.
+ *
+ * ## Architecture Note: Host-Attribute Label Mirror (group-4 round-1)
+ *
+ * Unlike modal dialogs (`hx-dialog` / `hx-drawer`) where the HOST is the
+ * announced surface and `ElementInternals` projects consumer IDREFs across
+ * the shadow boundary, `hx-popover`'s announced surface is the inner
+ * `[part="body"]` element which carries `role="dialog"`. The host does not
+ * claim a role — it is a structural wrapper around an anchor slot and a
+ * separate floating panel.
+ *
+ * IDL element references on `internals.ariaLabelledByElements` therefore
+ * cannot help: AT walks the inner body's accessibility node, and IDL refs
+ * declared on the host are not visible from a shadow-internal descendant
+ * looking up. The viable cross-shadow path is the host-attribute mirror:
+ *
+ *   1. The host observes `aria-label` / `aria-labelledby` mutations.
+ *   2. On every sync, `aria-labelledby` IDREFs are resolved via
+ *      `resolveIdrefTokens` (composed-tree walk: host root → ancestor
+ *      shadow hosts → owner document) and **text-flattened** via
+ *      `flattenAccName` (AccName 1.2 §4.3.10 hidden-aware).
+ *   3. The flattened name is written to the inner body's `aria-label`,
+ *      overriding the `label` property only when consumer naming is set.
+ *
+ * Naming precedence (W3C AccName 1.2 §4.3.1):
+ *
+ *   1. Host `aria-labelledby` (resolved IDREFs, text-flattened)
+ *   2. Host `aria-label`
+ *   3. `label` property
+ *   4. Hard-coded literal `"Popover"` (last-resort accessible name)
+ *
+ * The text-flatten approach forfeits live IDL-ref tracking (mutating a
+ * referenced element's text re-fires through the shared root observer; see
+ * `installAriaIdrefMirror`). `aria-controls` is intentionally omitted on
+ * the trigger — the body lives in shadow DOM and consumer IDREFs cannot
+ * resolve cross-root from light-DOM (axe-core flags this as a critical
+ * violation if attempted; see line documenting this exception below).
+ *
+ * Slotted label support (e.g. `<slot name="title">`) is deliberately NOT
+ * added in this round — it would expand the public API surface and is
+ * tracked as a follow-up enhancement.
  *
  * @summary Rich floating overlay attached to a trigger element.
  *
@@ -134,6 +180,39 @@ export class HelixPopover extends HelixElement {
   @state() private _visible = false;
 
   /**
+   * Resolved accessible name for the popover body — the value written to
+   * the inner `[part="body"]` `aria-label`. Recomputed on every sync per
+   * the AccName 1.2 §4.3.1 precedence: host `aria-labelledby` (flattened)
+   * > host `aria-label` > `label` property > literal `"Popover"`.
+   *
+   * Stored as state so render reads the current resolution synchronously.
+   * @internal
+   */
+  @state() private _resolvedLabel = '';
+
+  /**
+   * Most recently observed consumer-supplied `aria-labelledby` token list on
+   * the host. Refreshed every sync via `getAttribute()`.
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+
+  /**
+   * Handle for the shared host attribute / root id observer.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Watches in-place text / visibility mutations on consumer light-DOM
+   * elements resolved from the host's `aria-labelledby`. Reinstalled on
+   * every sync against the deduped resolved set so an in-place text change
+   * to `<h2 id="x">Patient</h2>` flows into the inner body's `aria-label`.
+   * @internal
+   */
+  private _externalRefsObserver: MutationObserver | null = null;
+
+  /**
    * The element that held focus before the popover opened, used to restore focus on close.
    * @internal
    */
@@ -163,6 +242,18 @@ export class HelixPopover extends HelixElement {
 
   // ─── Lifecycle ───
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Seed the host-attribute label mirror BEFORE first paint so the
+    // resolved label is in place when render() reads `_resolvedLabel`.
+    // The mirror's initial `sync()` fires synchronously inside
+    // `installAriaIdrefMirror`.
+    this._syncResolvedLabel();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncResolvedLabel();
+    });
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     if (this._showTimer !== null) {
@@ -175,6 +266,10 @@ export class HelixPopover extends HelixElement {
     }
     document.removeEventListener('click', this._handleDocumentClick);
     document.removeEventListener('keydown', this._handleDocumentKeydown);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    this._externalRefsObserver?.disconnect();
+    this._externalRefsObserver = null;
   }
 
   override firstUpdated(): void {
@@ -187,6 +282,18 @@ export class HelixPopover extends HelixElement {
     }
   }
 
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
+    // `label` property changes must flow into the resolved name BEFORE
+    // render so the new fallback is in place on the same paint. Running in
+    // `updated()` would schedule a follow-up cycle (state-from-update is
+    // re-render-triggering), making the cross-component contract: "one
+    // updateComplete after `el.label = X` reflects the new aria-label".
+    if (changedProperties.has('label')) {
+      this._syncResolvedLabel();
+    }
+  }
+
   override updated(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('open')) {
       if (this.open) {
@@ -195,6 +302,87 @@ export class HelixPopover extends HelixElement {
         void this._hide();
       }
     }
+  }
+
+  // ─── Host-attribute label mirror ───
+
+  /**
+   * (Re-)installs a `MutationObserver` over the deduped union of
+   * consumer-resolved label elements. Watches `characterData`, `childList`,
+   * `subtree`, and `aria-hidden` / `hidden` attributes so any in-place
+   * mutation on referenced light-DOM nodes triggers a fresh sync — keeping
+   * the flattened `aria-label` aligned with the live consumer text.
+   * @internal
+   */
+  private _installExternalRefsObserver(elements: Element[]): void {
+    if (this._externalRefsObserver) {
+      this._externalRefsObserver.disconnect();
+      this._externalRefsObserver = null;
+    }
+    if (elements.length === 0) return;
+    const unique = new Set<Element>(elements);
+    const observer = new MutationObserver(() => {
+      this._syncResolvedLabel();
+    });
+    for (const el of unique) {
+      observer.observe(el, {
+        characterData: true,
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._externalRefsObserver = observer;
+  }
+
+  /**
+   * Resolves the popover body's accessible name from host attributes and
+   * the `label` property, applying AccName 1.2 §4.3.1 precedence. Writes
+   * the result to `_resolvedLabel` (state) so `render()` projects it onto
+   * the inner body's `aria-label` on the next paint. The text-flatten
+   * filters out top-level `aria-hidden="true"` / `[hidden]` subtrees per
+   * AccName 1.2 §4.3.10 — matching the `flattenAccName` contract used by
+   * every other host-canonical hx-* component.
+   * @internal
+   */
+  private _syncResolvedLabel(): void {
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    this._consumerLabelledBy = liveLabelledBy;
+    const consumerLabelEls = resolveIdrefTokens(this, liveLabelledBy);
+
+    // Observe in-place mutations on the resolved external IDREF targets so
+    // text rewrites in the consumer's light DOM flow into the body's name.
+    this._installExternalRefsObserver(consumerLabelEls);
+
+    const isVisibleForAccName = (el: Element): boolean =>
+      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
+
+    const flattenedFromIdrefs = consumerLabelEls
+      .filter(isVisibleForAccName)
+      .map((el) => flattenAccName(el))
+      .filter((t) => t.length > 0)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() : '';
+
+    let resolved = '';
+    if (flattenedFromIdrefs) {
+      resolved = flattenedFromIdrefs;
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+    } else if (this.label) {
+      resolved = this.label;
+    } else {
+      // Last-resort literal — preserves the pre-mirror default so an
+      // unlabeled popover still has SOME announced name.
+      resolved = 'Popover';
+    }
+
+    this._resolvedLabel = resolved;
   }
 
   // ─── ARIA setup ───
@@ -552,7 +740,7 @@ export class HelixPopover extends HelixElement {
         part="body"
         id=${this._popoverId}
         role="dialog"
-        aria-label=${this.label}
+        aria-label=${this._resolvedLabel}
         aria-hidden=${!this._visible ? 'true' : nothing}
         tabindex="-1"
         ?inert=${!this._visible}

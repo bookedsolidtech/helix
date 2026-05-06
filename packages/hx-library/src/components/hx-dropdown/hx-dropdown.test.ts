@@ -674,4 +674,163 @@ describe('hx-dropdown', () => {
       expect(true).toBe(true);
     });
   });
+
+  // ─── Host-attribute label mirror (group-4 round-1) ───
+
+  describe('Host-attribute label mirror', () => {
+    it('falls back to "Menu" when nothing is set', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown label=""><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Menu');
+    });
+
+    it('uses the label property by default', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown label="Actions"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Actions');
+    });
+
+    it('mirrors host aria-label to the inner panel', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown aria-label="Patient menu"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Patient menu');
+    });
+
+    it('mirrors host aria-labelledby (single token) flattened to text', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="dropdown-label-1">Quick actions</h2>
+        <hx-dropdown aria-labelledby="dropdown-label-1"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixDropdown>('hx-dropdown')!;
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Quick actions');
+      wrapper.remove();
+    });
+
+    it('mirrors host aria-labelledby with multiple tokens joined by space', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <span id="dropdown-label-2a">Patient</span>
+        <span id="dropdown-label-2b">Actions</span>
+        <hx-dropdown aria-labelledby="dropdown-label-2a dropdown-label-2b"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixDropdown>('hx-dropdown')!;
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Patient Actions');
+      wrapper.remove();
+    });
+
+    it('falls back to label property when aria-labelledby tokens do not resolve', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown aria-labelledby="dropdown-typo-nope" label="Local fallback"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Local fallback');
+    });
+
+    it('aria-labelledby outranks aria-label per AccName 1.2 §4.3.1', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="dropdown-label-3">From IDREF</h2>
+        <hx-dropdown aria-labelledby="dropdown-label-3" aria-label="From aria-label"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixDropdown>('hx-dropdown')!;
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('From IDREF');
+      wrapper.remove();
+    });
+
+    it('aria-label outranks the label property', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown aria-label="Host wins" label="Property loses"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Host wins');
+    });
+
+    it('removing host aria-label restores the label property', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown aria-label="Initial" label="Restored"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      el.removeAttribute('aria-label');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Restored');
+    });
+
+    it('label property changes flow into the panel when no host attributes set', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown label="Initial"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      el.label = 'Updated';
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Updated');
+    });
+
+    it('in-place text mutation on the IDREF target re-flows the panel name', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="dropdown-label-4">Initial Name</h2>
+        <hx-dropdown aria-labelledby="dropdown-label-4"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixDropdown>('hx-dropdown')!;
+      const heading = wrapper.querySelector<HTMLElement>('#dropdown-label-4')!;
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Initial Name');
+      heading.textContent = 'Updated Name';
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+      expect(panel?.getAttribute('aria-label')).toBe('Updated Name');
+      wrapper.remove();
+    });
+
+    it('hidden IDREF targets are filtered out per AccName 1.2 §4.3.10', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="dropdown-label-5a" aria-hidden="true">Hidden</h2>
+        <span id="dropdown-label-5b">Visible</span>
+        <hx-dropdown aria-labelledby="dropdown-label-5a dropdown-label-5b"><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixDropdown>('hx-dropdown')!;
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      expect(panel?.getAttribute('aria-label')).toBe('Visible');
+      wrapper.remove();
+    });
+
+    it('Group 5 boundary: panel still carries role="menu" (no role refactor)', async () => {
+      const el = await fixture<HelixDropdown>(
+        '<hx-dropdown><button slot="trigger">Open</button><ul role="menu"><li role="menuitem">Edit</li></ul></hx-dropdown>',
+      );
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part="panel"]');
+      // Confirm Group 4 work did NOT touch the menu role — Group 5 owns that refactor.
+      expect(panel?.getAttribute('role')).toBe('menu');
+    });
+  });
 });

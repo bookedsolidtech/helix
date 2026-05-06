@@ -198,7 +198,12 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
    * @internal
    */
   private get _effectiveLabel(): string {
-    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
+    return (
+      this.accessibleLabel?.trim() ||
+      this.getAttribute('data-aria-label')?.trim() ||
+      this.getAttribute('aria-label')?.trim() ||
+      ''
+    );
   }
 
   /** @internal */
@@ -410,10 +415,14 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
     // current without depending on observer scheduling.
     this._syncHostAriaSemantics();
     // Warn when accessible-label is set alongside a visible label — they are mutually exclusive.
-    // Checked unconditionally (not gated on changedProperties) because ariaLabel is provided by
-    // mixinDelegatesAria via Object.defineProperty and never appears in changedProperties.
+    // Checked unconditionally (not gated on changedProperties) because aria-label is supplied
+    // via data-aria-label by mixinDelegatesAria and never appears in changedProperties.
     {
-      const hasAccessibleLabel = !!(this.accessibleLabel?.trim() || this.ariaLabel?.trim());
+      const hasAccessibleLabel = !!(
+        this.accessibleLabel?.trim() ||
+        this.getAttribute('data-aria-label')?.trim() ||
+        this.getAttribute('aria-label')?.trim()
+      );
       const hasVisibleLabel =
         !!this.label ||
         (this.shadowRoot

@@ -14,6 +14,10 @@ allowed-tools:
 
 Invokes the Codex plugin (`/codex:adversarial-review`) on the current branch's diff, captures the result, and records it to the REA audit log. Adversarial review by an independent model (GPT-5.4) is a **first-class, non-optional step** in the REA engineering process — it is the counterweight to Opus-authored code.
 
+## When to run
+
+**Default: working tree before commit.** As of 0.26.0 (CTO directive 2026-05-05) the local-first guardrail is forceful — the Bash-tier `local-review-gate.sh` + husky pre-push refuse `git push` when no recent `rea.local_review` audit entry covers HEAD. Running `/codex-review` produces structured exploratory feedback but does NOT write the audit entry the gate looks for. For the gate-friendly form, use `rea review` from a Bash invocation — it runs codex on the working tree AND writes the canonical audit entry. `/codex-review` remains the interactive surface; `rea review` is the gate-aligned automation.
+
 ## Why this exists
 
 The default workflow in REA is Plan → Build → Review, with the Review leg handed to a different model than the one that wrote the code. Codex adversarial review is free, fast, and independent — it catches the mistakes the authoring model is most likely to miss: security assumptions, correctness under edge cases, and logical gaps in tests. Treat it with the same weight as a human second set of eyes.

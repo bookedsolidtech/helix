@@ -15,6 +15,37 @@ export type { HxTooltipProps };
 
 /**
  * A tooltip that displays contextual help text on hover or focus.
+
+## Architecture Note: Light-DOM Description Shim (group-4 round-1)
+
+`aria-describedby` IDREFs cannot resolve across the Shadow DOM boundary —
+the trigger lives in the consumer's light DOM and references a tooltip
+whose body is in this component's shadow root. The tooltip text must
+therefore be exposed in DOCUMENT scope.
+
+The shim is a single visually-hidden `<span>` appended to `document.body`
+with the `_tooltipId` as its `id`. The trigger's `aria-describedby` points
+at this span. The text content is mirrored from the slotted `content`
+slot on every relevant signal:
+
+  1. `firstUpdated` (initial wiring)
+  2. `slotchange` on the default slot AND the `content` slot (the slotted
+     element list changes)
+  3. **Text-content mutations on the assigned `content` slot elements**
+     (round-23 P2 pattern). Without this observer a framework that
+     rewrites the slotted `<span slot="content">` `textContent` IN PLACE
+     (Vue / React keyed text rerender) would leave the shim stale.
+
+Cleanup: `disconnectedCallback` removes the shim from `document.body`,
+disconnects the slot-text observer, and clears the timers. SSR is
+sidestepped by guarding `document` access — the shim is created lazily
+the first time `_setupTriggerAria()` runs in a browser environment.
+
+`role="tooltip"` is the correct APG role and is NEVER promoted to
+`role="dialog"` — APG explicitly forbids tooltips from holding focus and
+the tooltip body is not a focus target. No host-canonical `_internals`
+work is owed: the trigger is the announced surface, and it correctly
+references the tooltip via `aria-describedby`.
  *
  * @example
  * ```tsx

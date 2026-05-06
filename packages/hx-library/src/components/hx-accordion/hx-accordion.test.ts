@@ -1863,4 +1863,124 @@ describe('hx-accordion — additional coverage', () => {
       expect(items[0].expanded).toBe(true); // stays expanded since coordinator removed
     });
   });
+
+  // ─── ARIA audit (group-4 round-1) ───
+  // Accordion is audit-only in Group 4: existing impl already follows APG.
+  // These tests ASSERT the documented behavior so future refactors can't
+  // silently regress it (especially: NOT promoting to host-canonical
+  // internals.ariaLabelledByElements, which would fight the native
+  // <details>/<summary> heading projection).
+
+  describe('ARIA audit (group-4 round-1)', () => {
+    it('summary carries role="heading" with the configured aria-level', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item level="2">
+            <span slot="trigger">Q</span><p>A</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      await item.updateComplete;
+      const summary = item.shadowRoot!.querySelector<HTMLElement>('summary[part="trigger"]')!;
+      expect(summary.getAttribute('role')).toBe('heading');
+      expect(summary.getAttribute('aria-level')).toBe('2');
+    });
+
+    it('aria-level clamps below 1 and above 6', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item level="9">
+            <span slot="trigger">High</span><p>x</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      await item.updateComplete;
+      const summary = item.shadowRoot!.querySelector<HTMLElement>('summary[part="trigger"]')!;
+      expect(summary.getAttribute('aria-level')).toBe('6');
+    });
+
+    it('aria-controls / aria-labelledby resolve same-shadow-root (round-trip)', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Trigger text</span><p>Body content</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      await item.updateComplete;
+      const summary = item.shadowRoot!.querySelector<HTMLElement>('summary[part="trigger"]')!;
+      const region = item.shadowRoot!.querySelector<HTMLElement>('[role="region"]')!;
+      const triggerId = summary.id;
+      const contentId = region.id;
+      expect(triggerId).toBeTruthy();
+      expect(contentId).toBeTruthy();
+      // aria-controls on summary points at content id (same shadow root → resolves).
+      expect(summary.getAttribute('aria-controls')).toBe(contentId);
+      // aria-labelledby on region points back at the summary id.
+      expect(region.getAttribute('aria-labelledby')).toBe(triggerId);
+      // Both elements reachable via shadow getElementById (cross-check).
+      expect(item.shadowRoot!.getElementById(triggerId)).toBe(summary);
+      expect(item.shadowRoot!.getElementById(contentId)).toBe(region);
+    });
+
+    it('disabled item has aria-disabled="true" and tabindex="-1"', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item disabled>
+            <span slot="trigger">Disabled</span><p>x</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      await item.updateComplete;
+      const summary = item.shadowRoot!.querySelector<HTMLElement>('summary[part="trigger"]')!;
+      expect(summary.getAttribute('aria-disabled')).toBe('true');
+      expect(summary.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('aria-expanded reflects expanded state', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">T</span><p>x</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      await item.updateComplete;
+      const summary = item.shadowRoot!.querySelector<HTMLElement>('summary[part="trigger"]')!;
+      expect(summary.getAttribute('aria-expanded')).toBe('false');
+      item.expanded = true;
+      await item.updateComplete;
+      expect(summary.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('item host element does NOT carry host-canonical role / aria-label (deviation from group-2)', async () => {
+      const el = await fixture<HelixAccordion>(`
+        <hx-accordion>
+          <hx-accordion-item>
+            <span slot="trigger">Slot label</span><p>Body</p>
+          </hx-accordion-item>
+        </hx-accordion>
+      `);
+      await el.updateComplete;
+      const item = el.querySelector<HelixAccordionItem>('hx-accordion-item')!;
+      await item.updateComplete;
+      // Per the architectural deviation note in hx-accordion-item.ts:
+      // we do NOT push the heading role / labelledby through the host's
+      // ElementInternals. The host stays neutral, the inner <summary>
+      // owns the heading semantics. This test guards that decision.
+      expect(item.getAttribute('role')).toBeNull();
+      expect(item.getAttribute('aria-label')).toBeNull();
+      expect(item.getAttribute('aria-labelledby')).toBeNull();
+    });
+  });
 });

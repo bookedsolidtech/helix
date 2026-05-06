@@ -138,8 +138,32 @@ _rea_unwrap_at_depth() {
   #   \x03 ETX — replaces in-quote `;`
   #   \x05 ENQ — replaces in-quote `&`
   #   \x06 ACK — replaces in-quote `|`
+  #
+  # 0.26.1 helix-028 P1 fix: feed the entire (possibly multiline) `$cmd`
+  # to awk as a SINGLE record using a multi-byte record separator
+  # (`\x1c\x1d` = FS+GS, control bytes that cannot appear in real shell
+  # input). Pre-fix, awk's default RS=`\n` made the masking awk process
+  # each line independently, which (a) dropped the newlines from the
+  # masked output and (b) reset the in-quote `mode` state per-line — so
+  # `bash -lc "printf x > .rea/HALT\ntrue"` had its closing `"` on line 2
+  # treated as an opening quote in plain mode, scrambling the mask. macOS
+  # BSD awk does NOT support NUL as RS (truncates after first record);
+  # `\x1c\x1d` is a portable multi-byte sentinel that awk's RS handles
+  # uniformly across BSD/GNU awk implementations.
+  #
+  # 0.26.1 ANSI-C sibling: also recognize `$'...'` (mode 3) as a quoted
+  # span. Pre-fix, the masker treated `$` as plain text in mode 0, so
+  # the closing `'` of `$'...'` was the only `'` the masker saw and it
+  # entered mode 2 there — flipping the mask state for the rest of the
+  # input. Mode 3 honors `\\`-escape semantics (so `\'` and `\\` inside
+  # the body do not prematurely terminate the span); on exit the closing
+  # `'` is masked to `\x02` (same as mode 2's exit) so the wrapper-scan
+  # can no longer treat in-quote `'` as a payload-opening quote.
+  local _unwrap_sep
+  _unwrap_sep=$'\x1c\x1d'
   local masked
-  masked=$(printf '%s' "$cmd" | awk '
+  masked=$(printf '%s%s' "$cmd" "$_unwrap_sep" | awk '
+    BEGIN { RS = "\034\035" }
     {
       line = $0
       out = ""
@@ -149,8 +173,36 @@ _rea_unwrap_at_depth() {
       while (i <= n) {
         ch = substr(line, i, 1)
         if (mode == 0) {
+          # ANSI-C `$'\''...'\''` introducer: emit `$` and opening quote
+          # literally (so the wrapper-scan can detect the introducer)
+          # and enter mode 3.
+          if (ch == "$" && i < n && substr(line, i + 1, 1) == "'\''") {
+            mode = 3
+            out = out "$" "'\''"
+            i += 2
+            continue
+          }
           if (ch == "\"") { mode = 1; out = out ch; i++; continue }
           if (ch == "'\''") { mode = 2; out = out ch; i++; continue }
+          out = out ch
+          i++
+          continue
+        }
+        if (mode == 3) {
+          # ANSI-C: `\\X` is a literal escape pair (`\\\''`, `\\\\`, `\\n`,
+          # etc.). Preserve the pair so the closing `'\''` detector below
+          # does not exit on `\\\''`.
+          if (ch == "\\" && i < n) {
+            nxt = substr(line, i + 1, 1)
+            out = out ch nxt
+            i += 2
+            continue
+          }
+          if (ch == "'\''") { mode = 0; out = out "\002"; i++; continue }
+          if (ch == ";") { out = out "\003"; i++; continue }
+          if (ch == "&") { out = out "\005"; i++; continue }
+          if (ch == "|") { out = out "\006"; i++; continue }
+          if (ch == "\"") { out = out "\001"; i++; continue }
           out = out ch
           i++
           continue
@@ -183,15 +235,27 @@ _rea_unwrap_at_depth() {
       }
       printf "%s", out
     }')
-  # Pass both raw and masked into awk. Wrapper-regex matches against the
-  # masked form; payload extraction reads the raw form using the same
-  # offsets. Because the mask is byte-for-byte width-preserving, the
-  # same RSTART/RLENGTH applies to both.
+  # Pass both raw and masked into awk via stdin as NUL-region-separated
+  # records — `awk -v raw="$cmd" -v masked="$masked"` errors with
+  # `awk: newline in string` the moment either string contains a literal
+  # newline. RS=`\x1c\x1d` (FS+GS multi-byte sentinel) survives newlines
+  # in either record. (BSD awk does not support NUL-as-RS reliably.)
+  # Wrapper-regex matches against the masked form; payload extraction
+  # reads the raw form using the same offsets. Because the mask is
+  # byte-for-byte width-preserving, the same RSTART/RLENGTH applies to
+  # both.
   #
   # 0.21.2: capture payloads to a local var; iterate to recurse.
+  # 0.26.1 helix-028 P1: switch from `awk -v` to NUL-region stdin.
+  # 0.26.1 ANSI-C sibling: handle `$'\''...'\''` as a third quoted-body
+  # form alongside `'\''...'\''` and `"..."`. Decode common escape
+  # sequences (`\\n`, `\\t`, `\\r`, `\\\\`, `\\\''`, `\\"`) when emitting
+  # the payload so the downstream segment splitter sees real newlines
+  # and splits on them.
   local _unwrap_payloads
-  _unwrap_payloads=$(printf '' | awk -v raw="$cmd" -v masked="$masked" '
+  _unwrap_payloads=$(printf '%s%s%s%s' "$cmd" "$_unwrap_sep" "$masked" "$_unwrap_sep" | awk '
     BEGIN {
+      RS = "\034\035"
       # Wrapper-prefix regex: shell-name + optional flag tokens + -c-style flag.
       # Each flag token is `-` followed by 1+ letters and trailing space.
       # NOTE: matches only OUTSIDE outer quoted spans because in-quote
@@ -207,6 +271,10 @@ _rea_unwrap_at_depth() {
       # NOT covered here. Adding pwsh requires a separate code path
       # because EncodedCommand base64-decodes at runtime.
       WRAP = "(^|[[:space:]&|;])(bash|sh|zsh|dash|ksh|mksh|oksh|posh|yash|csh|tcsh|fish)([[:space:]]+-[a-zA-Z]+)*[[:space:]]+-(c|lc|lic|ic|cl|cli|li|il)[[:space:]]+"
+    }
+    NR == 1 { raw = $0; next }
+    NR == 2 {
+      masked = $0
       # Track the cursor in BOTH raw and masked. Because the mask is
       # byte-for-byte width-preserving, the same RSTART/RLENGTH applies
       # to both — but each iteration of the loop must SLICE both strings
@@ -225,8 +293,120 @@ _rea_unwrap_at_depth() {
         # verbatim only when it was an outer quote.
         first = substr(rtail, 1, 1)
         mfirst = substr(mtail, 1, 1)
+        # ANSI-C: `$'\''...'\''` introducer (raw and masked must both
+        # carry `$` followed by literal `'\''` — the masker preserves the
+        # opening pair when it transitions into mode 3).
+        if (first == "$" && substr(rtail, 2, 1) == "'\''" \
+            && mfirst == "$" && substr(mtail, 2, 1) == "'\''") {
+          body = substr(rtail, 3)
+          n = length(body)
+          j = 1
+          out = ""
+          closed = 0
+          while (j <= n) {
+            c = substr(body, j, 1)
+            if (c == "\\" && j < n) {
+              nxt = substr(body, j + 1, 1)
+              # Decode common ANSI-C escape sequences so the splitter
+              # downstream sees real bytes (e.g. `\n` → newline → segment
+              # boundary at protected/blocked-path detection time).
+              if (nxt == "n") { out = out "\n"; j += 2; continue }
+              if (nxt == "t") { out = out "\t"; j += 2; continue }
+              if (nxt == "r") { out = out "\r"; j += 2; continue }
+              if (nxt == "\\") { out = out "\\"; j += 2; continue }
+              if (nxt == "'\''") { out = out "'\''"; j += 2; continue }
+              if (nxt == "\"") { out = out "\""; j += 2; continue }
+              if (nxt == "a") { out = out "\007"; j += 2; continue }
+              if (nxt == "b") { out = out "\010"; j += 2; continue }
+              if (nxt == "e" || nxt == "E") { out = out "\033"; j += 2; continue }
+              if (nxt == "f") { out = out "\014"; j += 2; continue }
+              if (nxt == "v") { out = out "\013"; j += 2; continue }
+              if (nxt == "?") { out = out "?"; j += 2; continue }
+              # 0.26.1 helix-028 P1-2: `\xHH` (1–2 hex digits). Pre-fix
+              # `bash -lc $'\''echo > .rea/HALT\\x0Atrue'\''` had `\x0A`
+              # preserved as the literal pair `\x0A`, so the segment
+              # splitter never saw the real LF and the second statement
+              # (`true` / arbitrary attacker payload) was hidden in the
+              # same segment as the first. Decode here so the LF reaches
+              # the splitter.
+              if (nxt == "x") {
+                hex = ""
+                k = j + 2
+                while (k <= n && length(hex) < 2 \
+                       && index("0123456789abcdefABCDEF", substr(body, k, 1)) > 0) {
+                  hex = hex substr(body, k, 1)
+                  k++
+                }
+                if (length(hex) > 0) {
+                  # awk has no native hex parser. Walk the digits.
+                  hv = 0
+                  for (h = 1; h <= length(hex); h++) {
+                    hd = substr(hex, h, 1)
+                    di = index("0123456789abcdef", tolower(hd)) - 1
+                    hv = hv * 16 + di
+                  }
+                  out = out sprintf("%c", hv)
+                  j = k
+                  continue
+                }
+                # `\x` with no digits — preserve pair literally.
+                out = out c nxt
+                j += 2
+                continue
+              }
+              # 0.26.1 helix-028 P1-2: `\NNN` octal (1–3 digits). Pre-fix
+              # `\012` (= LF) was preserved as a literal pair, same bypass
+              # class as `\xHH`.
+              if (nxt >= "0" && nxt <= "7") {
+                oct = nxt
+                k = j + 2
+                while (k <= n && length(oct) < 3 \
+                       && substr(body, k, 1) >= "0" \
+                       && substr(body, k, 1) <= "7") {
+                  oct = oct substr(body, k, 1)
+                  k++
+                }
+                ov = 0
+                for (h = 1; h <= length(oct); h++) {
+                  ov = ov * 8 + (substr(oct, h, 1) + 0)
+                }
+                # Bash truncates to 8 bits.
+                ov = ov % 256
+                out = out sprintf("%c", ov)
+                j = k
+                continue
+              }
+              # Default: preserve pair (covers `\u…`, `\U…`, `\cX` — rarer
+              # shapes; the literal pair is still safer than silent decoding
+              # for unsupported escapes in this legacy-gate layer. The Node
+              # scanner — primary enforcement for protected/blocked paths
+              # since 0.23.0 — fails closed on these via decodeAnsiC).
+              out = out c nxt
+              j += 2
+              continue
+            }
+            if (c == "'\''") { closed = j; break }
+            out = out c
+            j++
+          }
+          if (closed == 0) {
+            mrest = substr(mtail, 3)
+            rrest = substr(rtail, 3)
+            continue
+          }
+          print out
+          # Skip past `$` (1) + opening `'\''` (1) + body (closed-1) +
+          # closing `'\''` (1) = 2 + closed bytes from mtail/rtail start.
+          mrest = substr(mtail, 2 + closed + 1)
+          rrest = substr(rtail, 2 + closed + 1)
+          continue
+        }
         if (first == "'\''" && mfirst == "'\''") {
           # Single-quoted body: no escape semantics; runs to next `'\''`.
+          # NOTE: index against the RAW body — the masker replaces the
+          # closing `'\''` of an outer single-quoted span with `\002`, so
+          # `index(mbody, "'\''")` would never find it. The raw body
+          # carries the literal closing `'\''` byte verbatim.
           body = substr(rtail, 2)
           mbody = substr(mtail, 2)
           end = index(body, "'\''")
@@ -278,10 +458,7 @@ _rea_unwrap_at_depth() {
         mrest = mtail
         rrest = rtail
       }
-    }
-    # Empty action with no input rules — explicitly drive the loop from
-    # END so awk does not require any input records.
-    END {}')
+    }')
   # Recurse on each extracted payload with depth+1.
   if [[ -n "$_unwrap_payloads" ]]; then
     while IFS= read -r _unwrap_p; do
@@ -363,12 +540,34 @@ _rea_split_segments() {
           out = ""
           i = 1
           n = length(line)
-          mode = 0  # 0=plain, 1=double, 2=single
+          mode = 0  # 0=plain, 1=double, 2=single, 3=ANSI-C $'\''...'\''
           while (i <= n) {
             ch = substr(line, i, 1)
             if (mode == 0) {
+              # 0.26.1 helix-028 sibling: ANSI-C `$'\''...'\''` introducer.
+              # Pre-fix `echo $'\''a;b'\''` had its in-quote `;` un-masked and
+              # the splitter broke the segment at the `;`. Mode 3 honors
+              # backslash-escape pairs so `\\\''` and `\\\\` do not exit early.
+              if (ch == "$" && i < n && substr(line, i + 1, 1) == "'\''") {
+                mode = 3; out = out "$" "'\''"; i += 2; continue
+              }
               if (ch == "\"") { mode = 1; out = out ch; i++; continue }
               if (ch == "'\''") { mode = 2; out = out ch; i++; continue }
+              out = out ch
+              i++
+              continue
+            }
+            if (mode == 3) {
+              if (ch == "\\" && i < n) {
+                nxt = substr(line, i + 1, 1)
+                out = out ch nxt
+                i += 2
+                continue
+              }
+              if (ch == "'\''") { mode = 0; out = out ch; i++; continue }
+              if (ch == ";")    { out = out SC;   i++; continue }
+              if (ch == "&")    { out = out AMP;  i++; continue }
+              if (ch == "|")    { out = out PIPE; i++; continue }
               out = out ch
               i++
               continue
@@ -423,9 +622,24 @@ _rea_split_segments() {
 # in-quote `|` characters.
 quote_masked_cmd() {
   local cmd="$1"
-  printf '%s' "$cmd" \
+  # 0.26.1 helix-028 sibling: feed the entire (possibly multiline) `$cmd`
+  # to awk as a SINGLE record using a multi-byte record separator
+  # (`\x1c\x1d` = FS+GS). Pre-fix, the default `RS=\n` split a multiline
+  # input across records and reset in-quote `mode` per-line, which both
+  # dropped the newlines AND scrambled the mask (the closing `"` on
+  # line 2 was treated as opening a new quoted span in plain mode).
+  # Also adds ANSI-C `$'\''...'\''` (mode 3) to mirror _rea_unwrap_at_depth's
+  # masker — same scope: in-quote `|`/`;`/`&` get masked, opening-pair
+  # `$'\''` is preserved for downstream detection, closing `'\''` is left
+  # literal here (this helper does not need a mode-exit-mask byte; the
+  # caller pattern-matches against literal `|`/`;`/`&` in the masked
+  # stream and benefits from preserving quote boundaries verbatim).
+  local _qm_sep
+  _qm_sep=$'\x1c\x1d'
+  printf '%s%s' "$cmd" "$_qm_sep" \
     | awk '
         BEGIN {
+          RS       = "\034\035"
           INQ_PIPE = "__REA_INQUOTE_PIPE_a8f2c1__"
           INQ_SC   = "__REA_INQUOTE_SC_a8f2c1__"
           INQ_AMP  = "__REA_INQUOTE_AMP_a8f2c1__"
@@ -439,8 +653,25 @@ quote_masked_cmd() {
           while (i <= n) {
             ch = substr(line, i, 1)
             if (mode == 0) {
+              if (ch == "$" && i < n && substr(line, i + 1, 1) == "'\''") {
+                mode = 3; out = out "$" "'\''"; i += 2; continue
+              }
               if (ch == "\"") { mode = 1; out = out ch; i++; continue }
               if (ch == "'\''") { mode = 2; out = out ch; i++; continue }
+              out = out ch
+              i++
+              continue
+            }
+            if (mode == 3) {
+              if (ch == "\\" && i < n) {
+                out = out ch substr(line, i + 1, 1)
+                i += 2
+                continue
+              }
+              if (ch == "'\''") { mode = 0; out = out ch; i++; continue }
+              if (ch == "|") { out = out INQ_PIPE; i++; continue }
+              if (ch == ";") { out = out INQ_SC;   i++; continue }
+              if (ch == "&") { out = out INQ_AMP;  i++; continue }
               out = out ch
               i++
               continue
@@ -493,8 +724,21 @@ _rea_strip_prefix() {
       *)
         # Env-var assignment prefix (`KEY=value `) — only strip if the
         # token before the first space looks like NAME=value.
-        if [[ "$seg" =~ ^[A-Za-z_][A-Za-z0-9_]*=[^[:space:]]+[[:space:]]+ ]]; then
-          seg="${seg#* }"
+        #
+        # 0.26.0 round-25 P2-A fix: ANSI-C quoting `$'...'` was previously
+        # uncovered. `FOO=$'a b' git push` evaded the env-prefix stripper
+        # (whose value pattern `[^[:space:]]+` bailed at the space inside
+        # the ANSI-C body) AND the local-review-gate's raw-fallback regex.
+        # Add an explicit ANSI-C alternative here so the prefix is stripped
+        # cleanly even when the value carries embedded whitespace inside
+        # `$'...'`. Bash 3.2+ regex doesn't support non-capturing groups,
+        # so we keep the alternation flat.
+        if [[ "$seg" =~ ^[A-Za-z_][A-Za-z0-9_]*=([^[:space:]\"\'$]+|\"[^\"]*\"|\'[^\']*\'|\$\'[^\']*\')[[:space:]]+ ]]; then
+          # Compute prefix length and slice — `seg=${seg#* }` would split
+          # on the first space, which is INSIDE the value for ANSI-C and
+          # quoted forms. Slice by the matched length instead.
+          local _prefix_len=${#BASH_REMATCH[0]}
+          seg="${seg:_prefix_len}"
           seg="${seg#"${seg%%[![:space:]]*}"}"
         else
           break
@@ -620,4 +864,129 @@ any_segment_starts_with() {
     fi
   done < <(_rea_split_segments "$cmd")
   return 1
+}
+
+# Return on stdout the FIRST segment of $1 (RAW form, env-var prefixes
+# preserved) whose prefix-stripped form starts with the extended regex
+# $2. Returns empty stdout and exit 1 if no segment matches.
+#
+# Use this when a downstream check needs to scope further parsing to the
+# specific segment that triggered detection — e.g. local-review-gate's
+# inline-bypass regex must only match `VAR=val git push` shapes inside
+# the SAME segment that contained the `git push`, not anywhere in $CMD.
+# Segment-scoped capture closes the round-24 P1 bypass class where
+# `true VAR=fake git status; git push origin main` had the bypass shape
+# in segment 1 and the real push in segment 2 — the un-scoped regex
+# previously honored the bypass for the unrelated push.
+#
+# 0.26.0 helix-024 round-24 fix.
+find_first_segment_starting_with() {
+  local cmd="$1"
+  local pattern="$2"
+  local segment stripped
+  while IFS= read -r segment; do
+    stripped=$(_rea_strip_prefix "$segment")
+    if printf '%s' "$stripped" | grep -qiE "^${pattern}"; then
+      printf '%s' "$segment"
+      return 0
+    fi
+  done < <(_rea_split_segments "$cmd")
+  return 1
+}
+
+# Return on stdout the FIRST segment of $1 (RAW — no prefix-stripping,
+# but with leading whitespace trimmed for clean anchor matching) that
+# matches the extended regex $2. Returns empty stdout and exit 1 if no
+# segment matches.
+#
+# Companion to `any_segment_raw_matches`. Used by local-review-gate to
+# capture the segment whose RAW shape (env-var prefixes intact) triggered
+# the fallback `^([NAME=...])+git push` detector. The prefix-stripper's
+# regex `NAME=[^[:space:]]+[[:space:]]+` bails on quoted-value-with-spaces,
+# so `any_segment_starts_with` misses `REA_SKIP="urgent fix" git push`;
+# the raw-anchor fallback catches it. Round-24's segment-scoped bypass
+# regex must run against the SAME segment (raw form) that the fallback
+# matched, not against the whole $CMD.
+#
+# 0.26.0 helix-024 round-24 fix.
+find_first_segment_raw_matches() {
+  local cmd="$1"
+  local pattern="$2"
+  local segment
+  while IFS= read -r segment; do
+    segment="${segment#"${segment%%[![:space:]]*}"}"
+    if printf '%s' "$segment" | grep -qiE "$pattern"; then
+      printf '%s' "$segment"
+      return 0
+    fi
+  done < <(_rea_split_segments "$cmd")
+  return 1
+}
+
+# Return on stdout EVERY segment of $1 (RAW form) whose prefix-stripped
+# form starts with the extended regex $2. Each match is a separate line.
+# Returns empty stdout and exit 1 if no segments match.
+#
+# Use this when a downstream check needs to validate EVERY trigger segment
+# — e.g. local-review-gate's per-segment bypass requirement. Pre-round-25
+# fix the gate captured only the FIRST trigger segment via
+# `find_first_segment_starting_with` and scoped the inline-bypass regex
+# there. Multi-push laundering PoCs:
+#
+#   REA_SKIP="x" git push fake --dry-run; git push origin main
+#     → first push has bypass, second does not. Pre-fix: bypass honored
+#       for FIRST segment only, but the gate exited 0 globally; second
+#       (real) push went through ungated.
+#
+# Round-25 P1-B closes that class by sweeping ALL trigger segments and
+# requiring that EVERY one carries its own bypass. Any trigger segment
+# without a bypass forces preflight invocation.
+#
+# 0.26.0 helix-026 round-25 P1-B fix.
+find_all_segments_starting_with() {
+  local cmd="$1"
+  local pattern="$2"
+  local segment stripped
+  local _matched=0
+  while IFS= read -r segment; do
+    stripped=$(_rea_strip_prefix "$segment")
+    if printf '%s' "$stripped" | grep -qiE "^${pattern}"; then
+      printf '%s\n' "$segment"
+      _matched=1
+    fi
+  done < <(_rea_split_segments "$cmd")
+  if [ "$_matched" -eq 0 ]; then
+    return 1
+  fi
+  return 0
+}
+
+# Return on stdout EVERY segment of $1 (RAW — no prefix-stripping, but
+# with leading whitespace trimmed for clean anchor matching) that matches
+# the extended regex $2. Each match is a separate line. Returns empty
+# stdout and exit 1 if no segments match.
+#
+# Companion to `find_all_segments_starting_with`. Used by
+# local-review-gate's round-25 P1-B fix to sweep every trigger segment
+# whose RAW shape (env-var prefixes intact) triggered the
+# `^([NAME=...])+git push` fallback detector — so each can be validated
+# for bypass independently.
+#
+# 0.26.0 helix-026 round-25 P1-B fix.
+find_all_segments_raw_matches() {
+  local cmd="$1"
+  local pattern="$2"
+  local segment
+  local _matched=0
+  while IFS= read -r segment; do
+    segment="${segment#"${segment%%[![:space:]]*}"}"
+    if printf '%s' "$segment" | grep -qiE "$pattern"; then
+      printf '%s\n' "$segment"
+      _matched=1
+    fi
+  done < <(_rea_split_segments "$cmd")
+  if [ "$_matched" -eq 0 ]; then
+    return 1
+  fi
+  return 0
 }
