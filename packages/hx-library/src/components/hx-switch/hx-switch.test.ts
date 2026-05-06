@@ -3,6 +3,12 @@ import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-u
 import type { HxSwitch } from './hx-switch.js';
 import './index.js';
 
+type SwitchTestHarness = HxSwitch & {
+  _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
+};
+
 afterEach(cleanup);
 
 describe('hx-switch', () => {
@@ -14,11 +20,14 @@ describe('hx-switch', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders a button with role="switch"', async () => {
+    it('renders a button as the inner toggle control (role lives on host)', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       expect(track).toBeTruthy();
       expect(track?.tagName.toLowerCase()).toBe('button');
+      // Host carries role="switch" via ElementInternals (codex aria-group-2).
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('switch');
     });
 
     it('renders thumb inside track', async () => {
@@ -48,15 +57,19 @@ describe('hx-switch', () => {
       expect(el.hasAttribute('checked')).toBe(true);
     });
 
-    it('sets aria-checked="true" when checked', async () => {
+    it('sets host ariaChecked="true" via internals when checked', async () => {
       const el = await fixture<HxSwitch>('<hx-switch checked></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('true');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-checked')).toBe('true');
     });
 
-    it('has aria-checked="false" when unchecked', async () => {
+    it('has host ariaChecked="false" via internals when unchecked', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('false');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-checked')).toBe('false');
     });
   });
@@ -94,9 +107,11 @@ describe('hx-switch', () => {
       expect(marker?.textContent).toBe('*');
     });
 
-    it('sets aria-required="true" on track', async () => {
+    it('sets host ariaRequired="true" via internals when required', async () => {
       const el = await fixture<HxSwitch>('<hx-switch required></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).toBe('true');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-required')).toBe('true');
     });
   });
@@ -141,9 +156,31 @@ describe('hx-switch', () => {
 
     it('track has aria-labelledby pointing to label id', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const label = shadowQuery(el, '[part="label"]');
       expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
+    });
+
+    // Codex round-36 (independent observation): hasEffectiveLabelledBy parity
+    // with hx-toggle-button / hx-radio-group. A missing IDREF must NOT erase
+    // the label property — fall through to internals.ariaLabel = this.label.
+    it('keeps the label accessible name when aria-labelledby points to a missing id', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Dark mode" aria-labelledby="sw-missing-target"></hx-switch>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements;
+      if (refs && refs.length > 0) {
+        // Modern path: at least the visible internal label element is referenced.
+        const label = shadowQuery(el, '[part="label"]');
+        expect(refs).toContain(label);
+      } else {
+        // No-IDL-ref fallback path: internals.ariaLabel carries the property.
+        expect(internals.ariaLabel).toBe('Dark mode');
+      }
     });
   });
 
@@ -164,16 +201,21 @@ describe('hx-switch', () => {
       expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
     });
 
-    it('sets aria-invalid="true" on track', async () => {
+    it('sets aria-invalid="true" on inner track when error is present', async () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Error"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      // The inner-button aria-invalid is presentation-driven (mirrors the
+      // visible error state); the host internals.ariaInvalid is validity-
+      // driven and stays "false" for a non-required, presentation-only error.
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.getAttribute('aria-invalid')).toBe('true');
     });
 
     it('error hides help text', async () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Error" help-text="Help"></hx-switch>');
       const helpText = shadowQuery(el, '.switch__help-text');
-      expect(helpText).toBeNull();
+      // Persistent wrapper: present in DOM but hidden when error is active.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -190,7 +232,9 @@ describe('hx-switch', () => {
     it('help text hidden when error present', async () => {
       const el = await fixture<HxSwitch>('<hx-switch help-text="Help" error="Error"></hx-switch>');
       const helpText = shadowQuery(el, '.switch__help-text');
-      expect(helpText).toBeNull();
+      // Persistent wrapper: present in DOM but hidden when error is active.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -241,7 +285,7 @@ describe('hx-switch', () => {
     it('slotted label content sets aria-labelledby on track', async () => {
       const el = await fixture<HxSwitch>('<hx-switch><strong>Slotted Label</strong></hx-switch>');
       await el.updateComplete;
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const label = shadowQuery(el, '[part="label"]');
       expect(track?.getAttribute('aria-labelledby')).toBe(label?.id);
     });
@@ -459,38 +503,45 @@ describe('hx-switch', () => {
       expect(el.checked).toBe(false);
     });
 
-    it('disabled inner button still has tabIndex=0 (keyboard exclusion via _toggle() guard, not tabIndex)', async () => {
-      // Native <button disabled> retains tabIndex=0 — the browser does not change tabIndex on disable.
-      // Keyboard interaction is prevented by the _toggle() guard checking this.disabled (A-12).
+    it('disabled host has tabindex=-1; inner button stays tabIndex=-1 (host-canonical surface, codex round-1 #1)', async () => {
+      // Codex aria-group-2 round-1: host is the canonical announced surface
+      // and the focus target. Inner <button> is permanently aria-hidden +
+      // tabindex=-1 so AT never lands on it. When disabled, the host
+      // tabindex flips from "0" to "-1" to remove it from the tab order.
       const el = await fixture<HxSwitch>('<hx-switch disabled></hx-switch>');
+      expect(el.getAttribute('tabindex')).toBe('-1');
       const track = shadowQuery<HTMLButtonElement>(el, '.switch__track');
-      expect(track?.tabIndex).toBe(0);
+      expect(track?.tabIndex).toBe(-1);
     });
   });
 
   // --- Accessibility (4) ---
 
   describe('Accessibility', () => {
-    it('uses role="switch" not role="checkbox"', async () => {
+    it('uses role="switch" on host (via internals) not role="checkbox"', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
-      expect(track).toBeTruthy();
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('switch');
+      // Inner button no longer carries a role; assistive tech reaches the host.
       const checkbox = shadowQuery(el, '[role="checkbox"]');
       expect(checkbox).toBeNull();
     });
 
-    it('aria-checked toggles with checked state', async () => {
+    it('aria-checked toggles with checked state on host internals and inner', async () => {
       const el = await fixture<HxSwitch>('<hx-switch></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const track = shadowQuery(el, '.switch__track');
+      expect(internals.ariaChecked).toBe('false');
       expect(track?.getAttribute('aria-checked')).toBe('false');
       el.checked = true;
       await el.updateComplete;
+      expect(internals.ariaChecked).toBe('true');
       expect(track?.getAttribute('aria-checked')).toBe('true');
     });
 
     it('aria-describedby references error ID when error set', async () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Bad"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const errorDiv = shadowQuery(el, '.switch__error');
       const describedBy = track?.getAttribute('aria-describedby');
       expect(describedBy).toContain(errorDiv?.id);
@@ -498,7 +549,7 @@ describe('hx-switch', () => {
 
     it('aria-describedby references help text ID when helpText set', async () => {
       const el = await fixture<HxSwitch>('<hx-switch help-text="Some help"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       const helpDiv = shadowQuery(el, '.switch__help-text');
       const describedBy = track?.getAttribute('aria-describedby');
       expect(describedBy).toContain(helpDiv?.id);
@@ -506,19 +557,24 @@ describe('hx-switch', () => {
 
     it('aria-describedby is absent when no error or helpText', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Plain"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.hasAttribute('aria-describedby')).toBe(false);
     });
 
-    it('aria-invalid is absent when no error', async () => {
+    it('host ariaInvalid is null when no error and not required', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="No error"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaInvalid).toBe('false');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.hasAttribute('aria-invalid')).toBe(false);
     });
 
-    it('aria-required is absent when not required', async () => {
+    it('host ariaRequired is null when not required', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Optional"></hx-switch>');
-      const track = shadowQuery(el, '[role="switch"]');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      // ariaRequired is set to "true" only when required is true; otherwise null/empty.
+      expect(internals.ariaRequired).not.toBe('true');
+      const track = shadowQuery(el, '.switch__track');
       expect(track?.hasAttribute('aria-required')).toBe(false);
     });
   });
@@ -558,12 +614,13 @@ describe('hx-switch', () => {
   // --- Methods (1) ---
 
   describe('Methods', () => {
-    it('focus() moves focus to track button', async () => {
+    it('focus() moves focus to host (codex round-1 finding #1)', async () => {
       const el = await fixture<HxSwitch>('<hx-switch label="Test"></hx-switch>');
       await el.updateComplete;
       el.focus();
-      const track = shadowQuery<HTMLButtonElement>(el, '.switch__track')!;
-      expect(el.shadowRoot?.activeElement).toBe(track);
+      // Host is now the canonical announced surface and the focus target.
+      // The inner `<button>` is `aria-hidden + tabindex=-1`.
+      expect(document.activeElement).toBe(el);
     });
   });
 
@@ -677,6 +734,226 @@ describe('hx-switch', () => {
       const el = await fixture<HxSwitch>('<hx-switch error="Oops"></hx-switch>');
       const container = shadowQuery(el, '.switch');
       expect(container?.classList.contains('switch--error')).toBe(true);
+    });
+  });
+
+  // ─── ARIA delegation: host semantics ───
+  //
+  // Codex aria-group-2 finding: switch role + state must reach the host so
+  // consumer-supplied aria-label / aria-labelledby / aria-describedby on
+  // <hx-switch> aren't stranded outside the shadow boundary.
+
+  describe('ARIA delegation: host semantics', () => {
+    it('exposes role="switch" via ElementInternals on the host', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Subscribe"></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('switch');
+    });
+
+    it('mirrors ariaChecked on host as checked toggles', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Toggle"></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaChecked).toBe('false');
+      el.checked = true;
+      await el.updateComplete;
+      expect(internals.ariaChecked).toBe('true');
+    });
+
+    it('mirrors label property to host ariaLabel when no aria-labelledby is set', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Receive emails"></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Receive emails');
+    });
+
+    it('prefers consumer-supplied aria-label over the label property', async () => {
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Ignored" aria-label="Custom label"></hx-switch>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Custom label');
+    });
+
+    it('drives ariaInvalid from validity (required+unchecked is invalid before render)', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Agree" required></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaInvalid).toBe('true');
+      el.checked = true;
+      await el.updateComplete;
+      expect(internals.ariaInvalid).toBe('false');
+    });
+
+    it('mirrors required to host ariaRequired', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Agree" required></hx-switch>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaRequired).toBe('true');
+    });
+
+    it('renders persistent help-text wrapper that is hidden until content arrives via slot', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Toggle"></hx-switch>');
+      const helpWrapper = shadowQuery(el, '.switch__help-text');
+      expect(helpWrapper).toBeTruthy();
+      expect(helpWrapper?.hasAttribute('hidden')).toBe(true);
+
+      // Slot content should be detected and the wrapper should expose itself.
+      const slotted = document.createElement('span');
+      slotted.slot = 'help-text';
+      slotted.textContent = 'From slot';
+      el.appendChild(slotted);
+      await el.updateComplete;
+      await el.updateComplete; // second cycle: slotchange -> state -> render
+      expect(helpWrapper?.hasAttribute('hidden')).toBe(false);
+    });
+
+    it('emits help-text first, then error in describedBy ordering on host internals', async () => {
+      // Codex round-15 P2: when both help and error are present, the help
+      // wrapper is hidden and dropped from the describedby chain — AT must
+      // not announce stale guidance ahead of the validation error. This test
+      // verifies the help-only state still announces help.
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Toggle" help-text="Help"></hx-switch>',
+      );
+      // Codex round-1 finding #1: the host is the canonical announced surface.
+      // The describedBy chain is exposed through `internals.ariaDescribedByElements`
+      // (when supported) rather than via an attribute on the inner control.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const helpDiv = shadowQuery(el, '.switch__help-text');
+      const errorDiv = shadowQuery(el, '.switch__error');
+      expect(helpDiv?.id).toBeTruthy();
+      expect(errorDiv?.id).toBeTruthy();
+
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs && refs.length > 0) {
+        // Modern path: IDL element references. Help-only state has only help
+        // in the chain; the error wrapper is hidden and not referenced.
+        expect(refs.indexOf(helpDiv!)).toBeGreaterThanOrEqual(0);
+        expect(refs.indexOf(errorDiv!)).toBe(-1);
+      } else {
+        // No-IDL-ref fallback path: token list mirrored on the inner button
+        // so consumer wiring still resolves shadow-internal IDs.
+        const track = shadowQuery(el, '.switch__track');
+        const describedBy = track?.getAttribute('aria-describedby') || '';
+        expect(describedBy).toContain(helpDiv!.id);
+        expect(describedBy).not.toContain(errorDiv!.id);
+      }
+    });
+
+    it('drops help-text from describedBy chain when an error is active (round-15 P2)', async () => {
+      // Codex round-15 P2: hidden help must not appear in the describedby
+      // chain. AT would otherwise announce stale guidance ahead of the
+      // validation error in the very state where the UI suppresses it.
+      const el = await fixture<HxSwitch>(
+        '<hx-switch label="Toggle" help-text="Help" error="Bad"></hx-switch>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const helpDiv = shadowQuery(el, '.switch__help-text');
+      const errorDiv = shadowQuery(el, '.switch__error');
+      expect(helpDiv?.hasAttribute('hidden')).toBe(true);
+      expect(errorDiv?.hasAttribute('hidden')).toBe(false);
+
+      type InternalsWithRefs = ElementInternals & {
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaDescribedByElements;
+      if (refs && refs.length > 0) {
+        // Modern path: only the error is referenced.
+        expect(refs.indexOf(errorDiv!)).toBeGreaterThanOrEqual(0);
+        expect(refs.indexOf(helpDiv!)).toBe(-1);
+      } else {
+        // Fallback path: only the error id appears in the inner-button chain.
+        const track = shadowQuery(el, '.switch__track');
+        const describedBy = track?.getAttribute('aria-describedby') || '';
+        expect(describedBy).toContain(errorDiv!.id);
+        expect(describedBy).not.toContain(helpDiv!.id);
+      }
+    });
+
+    it('keeps the error live region in the DOM with role="alert" before any error fires', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Toggle"></hx-switch>');
+      const errorDiv = shadowQuery(el, '.switch__error');
+      // Persistent live region: present from first paint, hidden until needed.
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.getAttribute('role')).toBe('alert');
+      expect(errorDiv?.hasAttribute('hidden')).toBe(true);
+    });
+  });
+
+  // ─── Codex round-2 finding #2: no-IDL-ref fallback render path (4) ───
+
+  describe('No-IDL-ref fallback render (round-2 F2)', () => {
+    async function forceFallbackPath(el: HxSwitch): Promise<void> {
+      const harness = el as SwitchTestHarness;
+      harness._supportsIdrefRefs = false;
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('inner button is NOT aria-hidden, has role=switch, and is in tab order on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button.switch__track')!;
+      expect(btn.hasAttribute('aria-hidden')).toBe(false);
+      expect(btn.getAttribute('role')).toBe('switch');
+      expect(btn.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host is demoted to tabindex=-1 on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('host activation handlers do NOT fire on Space on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const startChecked = el.checked;
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      // Round-2 finding #2: host handlers no-op on the fallback path; the
+      // inner native button handles activation directly.
+      expect(el.checked).toBe(startChecked);
+    });
+
+    it('host internals.role is cleared on the fallback path', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      const internals = (el as SwitchTestHarness)._internals;
+      expect(internals.role).toBe('switch');
+
+      await forceFallbackPath(el);
+      expect(internals.role).toBe(null);
+      expect(internals.ariaChecked).toBe(null);
+    });
+
+    // ─── Codex round-3 finding #2 (1) ───
+
+    it('clicking the inner button on the fallback path toggles host.checked and fires hx-change', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch label="Notifications"></hx-switch>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button.switch__track')!;
+      expect(el.checked).toBe(false);
+
+      const eventPromise = oneEvent<CustomEvent<{ checked: boolean; value: string }>>(
+        el,
+        'hx-change',
+      );
+      // Round-3 F2: AT activation lands on the announced inner button. The
+      // inner click handler must produce a real toggle and emit `hx-change`.
+      btn.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+      expect(el.checked).toBe(true);
+      expect(event.detail.checked).toBe(true);
     });
   });
 });

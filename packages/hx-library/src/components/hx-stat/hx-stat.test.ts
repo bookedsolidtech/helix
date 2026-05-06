@@ -434,4 +434,36 @@ describe('hx-stat', () => {
       expect(unnamedCalls).toHaveLength(0);
     });
   });
+
+  // ─── Group 7 host-canonical migration ───
+
+  describe('Host-canonical (Group 7)', () => {
+    it('mirrors role="group" + label onto host internals on the modern path', async () => {
+      const el = await fixture<HelixStat>('<hx-stat label="Patients" value="42"></hx-stat>');
+      await el.updateComplete;
+      const internals = (
+        el as unknown as { _internals: ElementInternals }
+      )._internals;
+      expect(internals.role).toBe('group');
+      expect(internals.ariaLabel).toBe('42: Patients');
+    });
+
+    it('suppresses host internals.role on the fallback path', async () => {
+      const ctor = customElements.get('hx-stat') as typeof HelixStat;
+      ctor.__testSupportsIdrefRefsOverride = false;
+      try {
+        const el = await fixture<HelixStat>('<hx-stat label="Patients" value="42"></hx-stat>');
+        await el.updateComplete;
+        const internals = (
+          el as unknown as { _internals: ElementInternals }
+        )._internals;
+        expect(internals.role).toBeNull();
+        // Inner role="group" remains the announced surface.
+        const inner = shadowQuery(el, '[part~="container"]');
+        expect(inner?.getAttribute('role')).toBe('group');
+      } finally {
+        ctor.__testSupportsIdrefRefsOverride = null;
+      }
+    });
+  });
 });

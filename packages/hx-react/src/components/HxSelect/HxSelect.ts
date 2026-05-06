@@ -33,6 +33,7 @@ export const HxSelect = createComponent({
   react: React,
   events: {
     onHxChange: 'hx-change',
+    onInvalid: 'invalid',
   },
   displayName: 'HxSelect',
 });

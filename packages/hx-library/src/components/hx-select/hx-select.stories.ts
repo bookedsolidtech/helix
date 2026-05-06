@@ -1171,14 +1171,19 @@ export const KeyboardNavigation: Story = {
     const host = canvasElement.querySelector('hx-select');
     await expect(host).toBeTruthy();
 
-    const trigger = host!.shadowRoot!.querySelector('[role="combobox"]');
+    // Host-canonical: role="combobox" lives on the host (via internals.role +
+    // attribute mirror); the inner trigger is a roleless <button part="trigger">.
+    await expect(host!.getAttribute('role')).toBe('combobox');
+    const trigger = host!.shadowRoot!.querySelector('button[part="trigger"]');
     await expect(trigger).toBeTruthy();
 
-    // Focus the combobox trigger directly (userEvent.tab cannot cross shadow DOM)
+    // Focus the inner trigger directly (userEvent.tab cannot cross shadow DOM).
+    // Shadow-DOM focus delegation makes document.activeElement report the host
+    // (canonical announced surface); shadowRoot.activeElement reports the inner
+    // button. AT announces the host's combobox role in either case.
     (trigger as HTMLElement).focus();
     await new Promise((r) => setTimeout(r, 50));
 
-    // The combobox trigger div should now have focus
     const activeEl = host!.shadowRoot!.activeElement;
     await expect(activeEl).toBe(trigger);
   },

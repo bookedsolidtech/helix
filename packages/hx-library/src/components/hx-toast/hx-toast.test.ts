@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixToast } from './hx-toast.js';
-import type { HelixToastStack } from './hx-toast-stack.js';
+import type { HelixToastStack, ToastStackPlacement } from './hx-toast-stack.js';
 import { toast } from './toast-factory.js';
 import './index.js';
 
@@ -123,28 +123,53 @@ describe('hx-toast', () => {
   // ─── ARIA: roles ───
 
   describe('ARIA', () => {
-    it('uses role="status" for non-danger variants', async () => {
+    it('uses role="status" for non-danger variants (host via internals)', async () => {
+      // (group-6) Role lives on the host via ElementInternals — the inner
+      // base div no longer carries `role` (host-canonical migration).
       const el = await fixture<HelixToast>('<hx-toast variant="success">Test</hx-toast>');
-      const base = shadowQuery(el, '[part~="base"]')!;
-      expect(base.getAttribute('role')).toBe('status');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('status');
     });
 
-    it('uses role="alert" for danger variant', async () => {
+    it('uses role="alert" for danger variant (host via internals)', async () => {
+      const el = await fixture<HelixToast>('<hx-toast variant="danger">Test</hx-toast>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('alert');
+    });
+
+    it('does NOT set explicit aria-live on host or inner base (role implies live)', async () => {
+      // (group-6 §5.1) Avoid double-announce on older NVDA/JAWS. role implies
+      // aria-live; setting both was the primary double-announce risk.
+      const el = await fixture<HelixToast>('<hx-toast variant="danger">Test</hx-toast>');
+      expect(el.hasAttribute('aria-live')).toBe(false);
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.hasAttribute('aria-live')).toBe(false);
+    });
+
+    it('does NOT place role on the inner base div (regression guard)', async () => {
       const el = await fixture<HelixToast>('<hx-toast variant="danger">Test</hx-toast>');
       const base = shadowQuery(el, '[part~="base"]')!;
-      expect(base.getAttribute('role')).toBe('alert');
+      expect(base.hasAttribute('role')).toBe(false);
     });
 
-    it('uses aria-live="polite" for non-danger variants', async () => {
+    it('mirrors role on the host as a legacy attribute fallback (group-6 codex round-1)', async () => {
+      // (group-6 codex round-1) Some AT+browser combos still ignore
+      // ElementInternals-backed ARIA on custom elements; without an attribute
+      // fallback they would stop announcing toasts entirely. role is mirrored
+      // to the host attribute in addition to internals (harmonized with
+      // hx-alert/hx-banner). aria-live is NOT mirrored — role implies it.
+      const status = await fixture<HelixToast>('<hx-toast variant="success">Test</hx-toast>');
+      expect(status.getAttribute('role')).toBe('status');
+      const danger = await fixture<HelixToast>('<hx-toast variant="danger">Test</hx-toast>');
+      expect(danger.getAttribute('role')).toBe('alert');
+    });
+
+    it('keeps host role attribute in sync with variant changes', async () => {
       const el = await fixture<HelixToast>('<hx-toast variant="info">Test</hx-toast>');
-      const base = shadowQuery(el, '[part~="base"]')!;
-      expect(base.getAttribute('aria-live')).toBe('polite');
-    });
-
-    it('uses aria-live="assertive" for danger variant', async () => {
-      const el = await fixture<HelixToast>('<hx-toast variant="danger">Test</hx-toast>');
-      const base = shadowQuery(el, '[part~="base"]')!;
-      expect(base.getAttribute('aria-live')).toBe('assertive');
+      expect(el.getAttribute('role')).toBe('status');
+      el.variant = 'danger';
+      await el.updateComplete;
+      expect(el.getAttribute('role')).toBe('alert');
     });
 
     it('close button has aria-label', async () => {
@@ -153,10 +178,22 @@ describe('hx-toast', () => {
       expect(btn.getAttribute('aria-label')).toBeTruthy();
     });
 
-    it('has aria-atomic="true" on the live region (P1-02)', async () => {
+    it('has aria-atomic on the host live region (P1-02, host-canonical)', async () => {
+      // (group-6) aria-atomic moved to host via internals. role implies
+      // aria-atomic for status/alert per ARIA, but we set it explicitly
+      // for cross-AT consistency.
       const el = await fixture<HelixToast>('<hx-toast open>Test</hx-toast>');
-      const base = shadowQuery(el, '[part~="base"]')!;
-      expect(base.getAttribute('aria-atomic')).toBe('true');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaAtomic).toBe('true');
+    });
+
+    it('updates host role when variant changes', async () => {
+      const el = await fixture<HelixToast>('<hx-toast variant="info">Test</hx-toast>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('status');
+      el.variant = 'danger';
+      await el.updateComplete;
+      expect(internals.role).toBe('alert');
     });
 
     it('sets aria-hidden="true" on host when closed (P1-01)', async () => {
@@ -430,6 +467,82 @@ describe('hx-toast', () => {
       }
     });
   });
+
+  // ─── (group-6 §5.3) WCAG 2.2.3 minimum-display-time devWarn ───
+
+  describe('WCAG 2.2.3 devWarn (group-6 §5.3)', () => {
+    it('warns when danger variant has duration shorter than 6s', async () => {
+      const original = console.warn;
+      let warned = false;
+      let warnMsg = '';
+      console.warn = (...args: unknown[]) => {
+        warned = true;
+        warnMsg = String(args[0] ?? '');
+      };
+      try {
+        const el = await fixture<HelixToast>(
+          '<hx-toast open variant="danger" duration="3000">Critical</hx-toast>',
+        );
+        await el.updateComplete;
+        expect(warned).toBe(true);
+        expect(warnMsg).toContain('hx-toast');
+        expect(warnMsg).toContain('WCAG 2.2.3');
+      } finally {
+        console.warn = original;
+      }
+    });
+
+    it('does NOT warn when danger duration meets the 6s minimum', async () => {
+      const original = console.warn;
+      let warned = false;
+      console.warn = () => {
+        warned = true;
+      };
+      try {
+        const el = await fixture<HelixToast>(
+          '<hx-toast open variant="danger" duration="8000">Critical</hx-toast>',
+        );
+        await el.updateComplete;
+        expect(warned).toBe(false);
+      } finally {
+        console.warn = original;
+      }
+    });
+
+    it('does NOT warn when duration=0 (persistent toast)', async () => {
+      const original = console.warn;
+      let warned = false;
+      console.warn = () => {
+        warned = true;
+      };
+      try {
+        const el = await fixture<HelixToast>(
+          '<hx-toast open variant="danger" duration="0">Persistent critical</hx-toast>',
+        );
+        await el.updateComplete;
+        expect(warned).toBe(false);
+      } finally {
+        console.warn = original;
+      }
+    });
+
+    it('warns when warning variant has duration shorter than 4s', async () => {
+      const original = console.warn;
+      let warned = false;
+      console.warn = () => {
+        warned = true;
+      };
+      try {
+        const el = await fixture<HelixToast>(
+          '<hx-toast open variant="warning" duration="2000">Caution</hx-toast>',
+        );
+        await el.updateComplete;
+        expect(warned).toBe(true);
+      } finally {
+        console.warn = original;
+      }
+    });
+  });
 });
 
 // ─── hx-toast-stack ───
@@ -481,6 +594,44 @@ describe('hx-toast-stack', () => {
     });
   });
 
+  // ─── (group-6 §3.2 / §5.9) No-container-role audit ───
+
+  describe('No container role (group-6 §3.2 / §5.9)', () => {
+    it('host has no role attribute (each child toast is its own live region)', async () => {
+      const placements: ToastStackPlacement[] = [
+        'top-start',
+        'top-center',
+        'top-end',
+        'bottom-start',
+        'bottom-center',
+        'bottom-end',
+      ];
+      for (const placement of placements) {
+        const el = await fixture<HelixToastStack>(
+          `<hx-toast-stack placement="${placement}"></hx-toast-stack>`,
+        );
+        expect(el.hasAttribute('role')).toBe(false);
+        const internals = (el as unknown as { _internals: ElementInternals })._internals;
+        expect(internals.role).toBeNull();
+        el.remove();
+      }
+    });
+
+    it('host has no aria-live, aria-atomic, or aria-relevant', async () => {
+      const el = await fixture<HelixToastStack>('<hx-toast-stack></hx-toast-stack>');
+      expect(el.hasAttribute('aria-live')).toBe(false);
+      expect(el.hasAttribute('aria-atomic')).toBe(false);
+      expect(el.hasAttribute('aria-relevant')).toBe(false);
+    });
+
+    it('inner base div has no role or aria-live attributes', async () => {
+      const el = await fixture<HelixToastStack>('<hx-toast-stack></hx-toast-stack>');
+      const base = shadowQuery(el, '[part~="base"]')!;
+      expect(base.hasAttribute('role')).toBe(false);
+      expect(base.hasAttribute('aria-live')).toBe(false);
+    });
+  });
+
   // ─── Stack limit enforcement (P2-02) ───
 
   describe('Stack limit enforcement', () => {
@@ -505,8 +656,13 @@ describe('hx-toast-stack', () => {
       await third.updateComplete;
 
       // Stack is now at capacity (3). Next call should hide the oldest.
+      // (group-6 §5.5) MIN_DISPLAY_MS=1500 may defer the hide if the oldest
+      // hasn't been on screen long enough. Wait the full minimum-display
+      // window plus a small buffer before asserting displacement.
       const fourth = toast({ message: 'Fourth', placement });
       await fourth.updateComplete;
+      await new Promise((r) => setTimeout(r, 1700));
+      await first.updateComplete;
 
       // First toast should now be hidden
       expect(first.open).toBe(false);
@@ -594,12 +750,65 @@ describe('toast() utility', () => {
     expect(t2.open).toBe(true);
     expect(t3.open).toBe(true);
 
-    // Fourth call exceeds limit — oldest (t1) should be hidden
+    // Fourth call exceeds limit — oldest (t1) should be hidden.
+    // (group-6 §5.5) Wait MIN_DISPLAY_MS+buffer for the deferred hide so AT
+    // has finished announcing the displaced toast before it is removed.
     const t4 = toast({ message: 'Toast 4', placement });
     await t4.updateComplete;
+    await new Promise((r) => setTimeout(r, 1700));
+    await t1.updateComplete;
 
     expect(t1.open).toBe(false);
     expect(t4.open).toBe(true);
+  });
+
+  it('enforces stack limit under a rapid burst within MIN_DISPLAY_MS (group-6 codex round-1)', async () => {
+    // (group-6 codex round-1 burst-fix) When more than one toast() call
+    // arrives inside the 1500ms minimum-display window after the stack is
+    // at capacity, every call must hide a DIFFERENT successive oldest —
+    // not pile multiple deferred hides on the same target. Previously the
+    // factory only inspected the single oldest toast, so a 5-call burst
+    // against a limit-3 stack settled at 4 visible toasts after the
+    // deferred hide fired.
+    const placement = 'top-end';
+    document
+      .querySelectorAll(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    // Fill to capacity (default stackLimit = 3).
+    const t1 = toast({ message: 'Burst 1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Burst 2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Burst 3', placement });
+    await t3.updateComplete;
+
+    // Burst two more in quick succession, well inside MIN_DISPLAY_MS.
+    const t4 = toast({ message: 'Burst 4', placement });
+    await t4.updateComplete;
+    const t5 = toast({ message: 'Burst 5', placement });
+    await t5.updateComplete;
+
+    // Wait for the deferred displacement window to elapse.
+    // (need MIN_DISPLAY_MS + buffer for both deferred hides scheduled at
+    // call 4 and call 5, where call 5's elapsed is slightly higher)
+    await new Promise((r) => setTimeout(r, 1900));
+    await t1.updateComplete;
+    await t2.updateComplete;
+
+    // The two oldest must be displaced (one per overflow slot), leaving
+    // exactly stackLimit (3) toasts visible.
+    expect(t1.open).toBe(false);
+    expect(t2.open).toBe(false);
+    expect(t3.open).toBe(true);
+    expect(t4.open).toBe(true);
+    expect(t5.open).toBe(true);
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const stillOpen = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
+    expect(stillOpen.length).toBeLessThanOrEqual(3);
   });
 
   it('removes the toast element from DOM after hx-after-hide fires', async () => {

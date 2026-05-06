@@ -1,10 +1,17 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixToggleButtonStyles } from './hx-toggle-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 /** Detail for the hx-toggle event dispatched by hx-toggle-button. */
 export interface HxToggleDetail {
@@ -172,10 +179,175 @@ export class HelixToggleButton extends HelixElement {
     return this._internals.reportValidity();
   }
 
+  /**
+   * Handle for the shared IDREF observer. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Default-slot text content captured for use as the host's accessible name
+   * when no explicit `label`/`aria-label`/`aria-labelledby` is supplied.
+   * Codex round-1 finding #9.
+   * @internal
+   */
+  @state() private _slotLabelText: string = '';
+
+  /** No-IDL-ref fallback tokens applied to the inner button. @internal */
+  @state() private _fallbackAriaLabelledBy: string | null = null;
+  /** @internal */
+  @state() private _fallbackAriaDescribedBy: string | null = null;
+  /** @internal */
+  @state() private _fallbackAriaLabel: string | null = null;
+
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the render-time branch between the modern path (host is the
+   * announced surface, inner button is `aria-hidden + tabindex=-1`) and the
+   * fallback path (inner button is the announced surface, host is demoted).
+   * Codex round-2 finding #2.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+
+  /**
+   * Tracks whether the host's `tabindex` is managed by the component itself
+   * (vs. set explicitly by a consumer). Codex round-14 P2: a consumer-supplied
+   * `tabindex` (e.g. roving-tabindex toolbar pattern with `tabindex="-1"`)
+   * must survive disabled flips and re-renders. Only re-assert tabindex in
+   * `updated()` when the component originally claimed it.
+   * @internal
+   */
+  private _internalTabindexManaged = false;
+
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Detect platform support for IDL element references. Codex round-2
+    // finding #2: drives the render-time branch between modern (host
+    // announced) and fallback (inner button announced) paths.
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
+    // Seed root-independent semantics from the moment of connection so AT
+    // sees the toggle role + pressed state before the first paint.
+    this._syncHostAriaSemantics();
+    // Codex round-1 finding #1: host is the canonical announced surface on
+    // modern browsers, so the inner `<button>` is demoted via
+    // `aria-hidden + tabindex=-1`.
+    // Codex round-2 finding #2: on no-IDL-ref browsers the inner button is
+    // the announced surface (it carries native button + aria-pressed), so
+    // the host is demoted to `tabindex=-1` and lets the inner button own
+    // tab order + activation.
+    // Codex round-14 P2: only claim ownership of `tabindex` when no consumer
+    // value is present. Consumers using roving-tabindex toolbar patterns
+    // must be able to set `tabindex="-1"` on the host without it being
+    // clobbered on every disabled flip. Note we still claim ownership when
+    // disabled — the initial value is `-1` to keep the host out of tab order
+    // and `updated()` re-asserts the appropriate value when disabled flips.
+    if (!this.hasAttribute('tabindex')) {
+      this._internalTabindexManaged = true;
+      const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+      this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
+    }
+    this.addEventListener('keydown', this._handleHostKeyDown);
+    this.addEventListener('click', this._handleHostClickRouted);
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this._handleHostKeyDown);
+    this.removeEventListener('click', this._handleHostClickRouted);
+    // Codex round-13 P2: tear down the assigned-node text observer so a
+    // detached host does not receive mutation callbacks from nodes that may
+    // outlive it (e.g. lifted out of the slot but kept in the document).
+    this._slotTextObserver?.disconnect();
+    this._slotTextObserver = null;
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  /**
+   * Host-level keydown handler. Active only on the modern path; on the
+   * no-IDL-ref fallback the inner `<button>` owns native Space/Enter
+   * activation. Codex round-2 finding #2.
+   * @internal
+   */
+  private _handleHostKeyDown = (e: KeyboardEvent): void => {
+    if (this.disabled) return;
+    if (!this._supportsIdrefRefs) return;
+    if (e.target !== this) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      this._invokeToggle();
+    }
+  };
+
+  /**
+   * Host-level click router. The inner `<button>` is `aria-hidden + tabindex=-1`
+   * on modern browsers but still receives clicks via mouse activation; toggling
+   * is handled by the inner `_handleClick`. Host-level clicks (composed path
+   * origin === host) only come from AT activation or programmatic triggers,
+   * so we route those to the toggle pipeline.
+   *
+   * Codex round-2 finding #2: on no-IDL-ref browsers the inner button is the
+   * announced surface so this host-level routing is a no-op — AT activation
+   * lands on the inner button directly.
+   * @internal
+   */
+  private _handleHostClickRouted = (e: MouseEvent): void => {
+    if (this.disabled) return;
+    if (!this._supportsIdrefRefs) return;
+    // Only fire when the host itself originated the click — inner-button
+    // clicks bubble through here too but are handled by `_handleClick`.
+    const path = e.composedPath();
+    if (path[0] !== this) return;
+    this._invokeToggle();
+  };
+
+  /** @internal */
+  private _invokeToggle(): void {
+    this.pressed = !this.pressed;
+    this._syncFormValue();
+    this.dispatchEvent(
+      new CustomEvent<{ pressed: boolean }>('hx-toggle', {
+        bubbles: true,
+        composed: true,
+        detail: { pressed: this.pressed },
+      }),
+    );
+  }
+
+  /**
+   * Moves focus to the announced toggle-button surface. Codex round-1 finding
+   * `#1` made the host the canonical focus target on modern engines so AT
+   * announces a single widget. Round-7 finding `#9` extends that contract to
+   * the no-IDL-ref fallback: when the host is demoted (`tabindex=-1`,
+   * role/state cleared on `internals`) the inner `<button>` owns the announced
+   * semantics and tab order, so programmatic `focus()` must redirect there —
+   * otherwise scripted focus and error recovery land on the demoted host on
+   * unsupported engines.
+   */
+  override focus(options?: FocusOptions): void {
+    if (this._supportsIdrefRefs) {
+      super.focus(options);
+      return;
+    }
+    this.shadowRoot?.querySelector<HTMLButtonElement>('[part="button"]')?.focus(options);
+  }
 
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);
+
+    // Track default-slot text content so it can serve as the accessible
+    // name when no explicit label is set. Codex round-1 finding #9.
+    this._captureSlotLabelText();
+    // Codex round-13 P2: also observe in-place text mutations on assigned
+    // nodes so framework-driven `Mute` → `Unmute` rewrites refresh the
+    // cached label without requiring the consumer to swap the node.
+    this._installSlotTextObserver();
 
     if (!this.label) {
       const slot = this._defaultSlot;
@@ -199,6 +371,184 @@ export class HelixToggleButton extends HelixElement {
       changedProperties.has('required')
     ) {
       this._syncFormValue();
+    }
+
+    if (
+      changedProperties.has('disabled') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('_supportsIdrefRefs')
+    ) {
+      // Codex round-2 finding #2: align host tabindex with the chosen
+      // announced surface. On no-IDL-ref browsers the inner button owns
+      // tab order, so re-enabling the host should leave it `tabindex=-1`.
+      // Codex round-14 P2: only re-assert when the component owns tabindex.
+      // Consumer-managed values (e.g. roving-tabindex toolbar with `-1`) must
+      // not be overwritten on disabled flips or supports-flag transitions.
+      if (this._internalTabindexManaged) {
+        const enabledTabIndex = this._supportsIdrefRefs ? '0' : '-1';
+        this.setAttribute('tabindex', this.disabled ? '-1' : enabledTabIndex);
+      }
+    }
+
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+  }
+
+  /**
+   * Reads the default slot's flattened text content into `_slotLabelText`.
+   * Called from `firstUpdated()` and `slotchange` so host-canonical semantics
+   * pick up slotted label text. Codex round-1 finding #9.
+   * @internal
+   */
+  private _captureSlotLabelText(): void {
+    const slot = this._defaultSlot;
+    if (!slot) {
+      this._slotLabelText = '';
+      return;
+    }
+    const text = slot
+      .assignedNodes({ flatten: true })
+      .map((n) => n.textContent ?? '')
+      .join(' ')
+      .trim();
+    this._slotLabelText = text;
+  }
+
+  /**
+   * Watches assigned default-slot nodes for in-place text mutations so the
+   * cached `_slotLabelText` (and thus `internals.ariaLabel`) stays in sync
+   * when a framework rewrites textContent of an already-assigned node without
+   * replacing it. `slotchange` does NOT fire for those mutations, so a
+   * separate observer is required. Codex round-13 P2.
+   * @internal
+   */
+  private _slotTextObserver: MutationObserver | null = null;
+
+  /**
+   * (Re-)installs the mutation observer over the current set of assigned
+   * default-slot nodes. Disconnects any prior observer first so detached
+   * nodes stop firing into a torn-down host.
+   * @internal
+   */
+  private _installSlotTextObserver(): void {
+    this._slotTextObserver?.disconnect();
+    const slot = this._defaultSlot;
+    if (!slot) {
+      this._slotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._captureSlotLabelText();
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes({ flatten: true }).forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+      });
+    });
+    this._slotTextObserver = observer;
+  }
+
+  /** @internal */
+  private _handleDefaultSlotChange(): void {
+    this._captureSlotLabelText();
+    this._syncHostAriaSemantics();
+    // Re-tune the in-place text observer over the new assigned-node set
+    // (codex round-13 P2).
+    this._installSlotTextObserver();
+  }
+
+  /**
+   * Mirrors toggle-button semantics onto the host via ElementInternals so that
+   * consumer-supplied `aria-label`, `aria-labelledby`, and `aria-describedby`
+   * on `<hx-toggle-button>` reach the announced control. The codex aria-group-2
+   * finding identified that the inner shadow `<button>` was the only carrier of
+   * the toggle role + pressed state, leaving host-level IDREF tokens stranded
+   * across the shadow boundary.
+   *
+   * The shadow `<button>` keeps `aria-pressed`/`aria-label` mirrored for
+   * backwards-compat with existing tests and for browsers without IDL element
+   * references; the host is the canonical announced surface.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const externalLabelTokens = this.getAttribute('aria-labelledby');
+    const externalDescTokens = this.getAttribute('aria-describedby');
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    const descEls = resolveIdrefTokens(this, externalDescTokens);
+    // Codex round-35 finding (CR major): `aria-labelledby` is only "effective"
+    // when at least one IDREF resolves. A typo or transiently-missing target
+    // must NOT erase the visible label — fall back to label/slot text so a
+    // visibly-labeled toggle never becomes unnamed.
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+    let resolvedLabel: string | null;
+    if (hostAriaLabel) {
+      resolvedLabel = hostAriaLabel;
+    } else if (hasEffectiveLabelledBy) {
+      resolvedLabel = null;
+    } else if (this.label) {
+      resolvedLabel = this.label;
+    } else {
+      // Codex round-1 finding #9: default-slot text becomes the accessible
+      // name when no explicit label is provided. Without this, slotted text
+      // never reaches the host's announced surface.
+      resolvedLabel = this._slotLabelText || null;
+    }
+
+    // Codex round-2 finding #2: branch on platform support. Modern path —
+    // host carries `role=button` + aria-pressed via ElementInternals.
+    // Fallback path — inner native `<button>` is the announced surface; clear
+    // host role/state on internals so AT does not double-announce.
+    if (this._supportsIdrefRefs) {
+      // ─── Modern path ───
+      internals.role = 'button';
+      internals.ariaPressed = this.pressed ? 'true' : 'false';
+      internals.ariaDisabled = this.disabled ? 'true' : 'false';
+      // Codex round-1 finding #6: drive aria-invalid from the live ValidityState
+      // so a required-but-unpressed toggle is announced as invalid even before
+      // any visible affordance renders. `_updateValidity()` calls this method
+      // synchronously after every `setValidity()`.
+      internals.ariaInvalid = !internals.validity.valid ? 'true' : 'false';
+      internals.ariaLabel = resolvedLabel;
+
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+      // Clear fallbacks when IDL refs are available.
+      this._fallbackAriaLabelledBy = null;
+      this._fallbackAriaDescribedBy = null;
+      this._fallbackAriaLabel = null;
+    } else {
+      // ─── Fallback path: inner button is the announced surface ───
+      // Round-2 finding #2: round-1 set host role/state via internals AND
+      // mirrored aria-* onto the `aria-hidden` inner button — making the
+      // mirrored attributes inert. The fix is to clear host role/state and
+      // let the inner native `<button>` (rendered without aria-hidden, with
+      // `tabindex=0`, with aria-pressed) carry semantics natively.
+      internals.role = null;
+      internals.ariaPressed = null;
+      internals.ariaDisabled = null;
+      internals.ariaInvalid = null;
+      internals.ariaLabel = null;
+
+      // Codex round-36 (medium): gate the fallback label tokens on the
+      // *effective* labelledby contract. Mirroring broken consumer tokens to
+      // the inner button on legacy engines erases the accessible name —
+      // exactly the bug the modern path now defends against. When tokens
+      // don't resolve, fall through to `_fallbackAriaLabel` (resolvedLabel)
+      // so the slot/property still names the announced surface.
+      this._fallbackAriaLabelledBy = hasEffectiveLabelledBy ? externalLabelTokens : null;
+      this._fallbackAriaDescribedBy = externalDescTokens || null;
+      this._fallbackAriaLabel = resolvedLabel;
     }
   }
 
@@ -233,14 +583,25 @@ export class HelixToggleButton extends HelixElement {
   /** @internal */
   private _updateValidity(): void {
     if (this.required && !this.pressed) {
+      // Codex round-17 P2: anchor validity UI to the announced surface. On
+      // the modern path the host is the canonical announced/focus surface
+      // (the inner button is `aria-hidden + tabindex=-1`), so passing the
+      // host avoids `reportValidity()` landing focus on a hidden node. On
+      // the fallback path the inner button is the announced surface.
+      const anchor: HTMLElement | undefined = this._supportsIdrefRefs
+        ? this
+        : (this.shadowRoot?.querySelector<HTMLElement>('[part="button"]') ?? undefined);
       this._internals.setValidity(
         { valueMissing: true },
         'Please activate this toggle button.',
-        this.shadowRoot?.querySelector<HTMLElement>('[part="button"]') ?? undefined,
+        anchor,
       );
     } else {
       this._internals.setValidity({});
     }
+    // Codex round-1 finding #6: keep `internals.ariaInvalid` aligned with the
+    // current `ValidityState`.
+    this._syncHostAriaSemantics();
   }
 
   // ─── Event Handling ───
@@ -267,6 +628,15 @@ export class HelixToggleButton extends HelixElement {
         detail: { pressed: this.pressed },
       }),
     );
+
+    // Codex round-12 P2: on the modern path the host owns role="button" and
+    // tabindex=0; the inner <button tabindex="-1"> is aria-hidden. Native
+    // click activation on a `<button>` still focuses it, which would leave
+    // `document.activeElement` and AT focus on a hidden node. Move focus to
+    // the host so the announced surface is also the focus target.
+    if (this._supportsIdrefRefs) {
+      this.focus();
+    }
   }
 
   // ─── Render Helpers ───
@@ -278,7 +648,7 @@ export class HelixToggleButton extends HelixElement {
         <slot name="prefix"></slot>
       </span>
       <span part="label" class="button__label">
-        <slot></slot>
+        <slot @slotchange=${this._handleDefaultSlotChange}></slot>
       </span>
       <span part="suffix" class="button__suffix">
         <slot name="suffix"></slot>
@@ -296,14 +666,33 @@ export class HelixToggleButton extends HelixElement {
       'button--pressed': this.pressed,
     };
 
+    // Codex round-2 finding #2: branch the inner button on platform support.
+    // Modern path — host announced, inner button is `aria-hidden + tabindex=-1`.
+    // Fallback path — inner native `<button>` is announced (NO aria-hidden,
+    // tabindex=0) so consumer-mirrored aria-* attributes resolve through a
+    // visible accessibility-tree node and AT can name + activate it natively.
+    const innerIsAnnounced = !this._supportsIdrefRefs;
+    const innerTabIndex = innerIsAnnounced && !this.disabled ? '0' : '-1';
+    // Round-1 finding #8: on no-IDL-ref browsers mirror host aria tokens onto
+    // the inner button so it carries an accessible name. On modern browsers
+    // we still mirror `label` onto the inner button for non-AT consumers
+    // (testing, devtools) — does not affect announced semantics.
+    const innerAriaLabel = this._fallbackAriaLabel ?? this.label ?? undefined;
+    const innerAriaLabelledBy = this._fallbackAriaLabelledBy ?? undefined;
+    const innerAriaDescribedBy = this._fallbackAriaDescribedBy ?? undefined;
+
     return html`
       <button
         part="button"
         class=${classMap(classes)}
         ?disabled=${this.disabled}
         type="button"
+        tabindex=${innerTabIndex}
         aria-pressed=${this.pressed ? 'true' : 'false'}
-        aria-label=${this.label ?? nothing}
+        aria-label=${ifDefined(innerAriaLabel)}
+        aria-labelledby=${ifDefined(innerAriaLabelledBy)}
+        aria-describedby=${ifDefined(innerAriaDescribedBy)}
+        aria-hidden=${innerIsAnnounced ? nothing : 'true'}
         @click=${this._handleClick}
       >
         ${this._renderInner()}

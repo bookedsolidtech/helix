@@ -25,6 +25,11 @@ Has no effect when `href` is set. */
   type?: 'button' | 'submit' | 'reset';
   /** Whether the button is disabled. */
   disabled?: boolean;
+  /** Whether the button is in a loading state. Shows the spinner, prevents
+activation, and sets `aria-busy="true"` on the inner element. Does NOT
+set the native `disabled` attribute (loading is transient; disabled is
+persistent, and AT announces them differently). */
+  loading?: boolean;
   /** When set, renders an `<a>` element instead of a `<button>`. */
   href?: string | undefined;
   /** Name submitted with form data. Only applicable when rendering as a button. */

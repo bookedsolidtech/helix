@@ -1,22 +1,22 @@
 {
   "comment": "CDN bundle size budgets for @helixui/library (gzipped bytes). Enforced in CI by scripts/check-cdn-size.mjs. Changes require code review and a justification in the PR description. The CDN build emits several artifacts with different size profiles — this file tracks per-artifact budgets rather than a single aggregate ceiling so drift in one strategy (A vs B) is surfaced precisely.",
-  "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2 (full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A=229.7 KB). Re-baselined 2026-04-25 after the 3.2.0 component-tier + palette expansion landed (full JS climbed to ~200.4 KB gz with the 3.2.1 token-cascade remediation). Ceilings give ~5-15% headroom for near-term component additions without being a floor. Warnings trigger at roughly half that headroom for early-signal drift.",
+  "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2 (full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A=229.7 KB). Re-baselined 2026-04-25 after the 3.2.0 component-tier + palette expansion landed. Re-baselined 2026-05-04 for ARIA Group 2 (selection controls). Re-baselined 2026-05-05 for ARIA Group 3 (selects/combos/pickers). Re-baselined 2026-05-05 (late) for the ARIA epic PR #1649 covering Groups 5b + 5c + 7 + 8 + 9 + 10 — host-canonical migration across 16+ components plus four shared utils (menu-label, menu-roving, menu-tree, tree-walk), per-variant forced-colors fallbacks (hx-badge / hx-tag), AccName 1.2 §4.3.1 precedence ladders in fallback paths, origin guards on host-bound click+keydown handlers, idref characterData + visibility observation, mixin adoption for hx-icon-button / hx-link, hx-button-group host-canonical role, hx-tree-view + hx-tree-item host-canonical migration, hx-spinner host-canonical role mirror. Full JS measured at 236.0 KB gz / strategyATotal 291.1 KB gz at the epic head. New ceiling 245 KB / strategyATotal 310 KB / fullBundleCss 65 KB sized with ~9 KB headroom for any post-merge cleanup. Warn thresholds sit approximately halfway between current and ceiling.",
   "budgets": {
     "fullBundleJs": {
       "file": "helix-{version}.min.js",
       "description": "Strategy A full self-contained JS bundle (all 81 components + Lit).",
-      "ceilingBytes": 215040,
-      "warnBytes": 204800,
-      "currentBytes": 205210,
-      "currentNote": "200.4 KB gz at 3.2.1 head (was 183.4 KB at v2.1.2; 3.2.0 added the component-tier expansion, palette refresh, and forced-colors mixin family)"
+      "ceilingBytes": 250880,
+      "warnBytes": 241664,
+      "currentBytes": 241664,
+      "currentNote": "236.0 KB gz at ARIA epic head (PR #1649 — Groups 5b + 5c + 7 + 8 + 9 + 10; was 216.7 KB at Group 3 partial-head). Epic adds ~19.3 KB across 16+ host-canonical migrations + 4 shared utils + per-variant HCM fallbacks + AccName ladders + origin guards."
     },
     "fullBundleCss": {
       "file": "helix-{version}.min.css",
       "description": "Strategy A full CSS bundle (all component shadow-root-adoptable CSS).",
-      "ceilingBytes": 61440,
-      "warnBytes": 56320,
-      "currentBytes": 52224,
-      "currentNote": "51.0 KB gz at 3.2.1 head (was 46.3 KB at v2.1.2; 3.2.0 palette refresh + forced-colors mixin set added ~5 KB)"
+      "ceilingBytes": 66560,
+      "warnBytes": 60416,
+      "currentBytes": 56422,
+      "currentNote": "55.1 KB gz at ARIA epic head (was 54.0 KB at Group 3 partial-head; epic adds ~1.1 KB for per-variant HCM blocks + spinner/icon-button styles)."
     },
     "coreBundleJs": {
       "file": "helix-core-{version}.min.js",
@@ -28,10 +28,10 @@
     },
     "strategyATotal": {
       "description": "Aggregate Strategy A consumer payload (full JS + full CSS). This is what a page that loads the full bundle actually downloads.",
-      "ceilingBytes": 276480,
-      "warnBytes": 261120,
-      "currentBytes": 257434,
-      "currentNote": "251.4 KB gz at 3.2.1 head (was 229.7 KB at v2.1.2; tracks fullBundleJs + fullBundleCss growth from the 3.2.0 expansion)"
+      "ceilingBytes": 317440,
+      "warnBytes": 307200,
+      "currentBytes": 298086,
+      "currentNote": "291.1 KB gz at ARIA epic head (was 270.7 KB at Group 3 partial-head; tracks fullBundleJs + fullBundleCss growth)."
     }
   }
 }

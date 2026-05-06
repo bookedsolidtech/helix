@@ -371,6 +371,11 @@ jobs:
               echo "tests_ran=true" >> "$GITHUB_OUTPUT"
               mkdir -p .cache
               echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              # Codex push-gate round-6 finding 1: write the empty-shard
+              # sentinel so check-coverage.mjs can distinguish an
+              # intentionally-empty shard from a crashed vitest run.
+              mkdir -p .cache/coverage
+              echo "intentionally-empty shard ${VITEST_SHARD}" > .cache/coverage/empty-shard.flag
               exit 0
             fi
             if [[ "$SHARD_INDEX" -ne 1 ]]; then
@@ -380,6 +385,11 @@ jobs:
               # something to find and does not warn.
               mkdir -p .cache
               echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+              # Codex push-gate round-6 finding 1: write the empty-shard
+              # sentinel so check-coverage.mjs can distinguish an
+              # intentionally-empty shard from a crashed vitest run.
+              mkdir -p .cache/coverage
+              echo "intentionally-empty shard ${VITEST_SHARD}" > .cache/coverage/empty-shard.flag
               exit 0
             fi
             echo "[ci-shard-${VITEST_SHARD}] only $TEST_FILE_COUNT test files — running all on shard 1 without --shard"
@@ -400,6 +410,18 @@ jobs:
               "${SHARD_ARGS[@]}" \
               --reporter=verbose \
               --reporter=json || rc=$?
+          # When TEST_FILE_COUNT > SHARD_TOTAL we run with --shard, but vitest's
+          # internal sharder can still hand a high-index shard zero files
+          # (uneven distribution). Treat "No test files found" as a pass —
+          # the empty-shard sentinel is written so check-coverage.mjs can
+          # distinguish it from a crashed run.
+          if [[ $rc -ne 0 ]] && grep -q "No test files found" "$LOGFILE" 2>/dev/null; then
+            echo "[ci-shard-${VITEST_SHARD}] vitest reports no test files in this shard's slice — treating as pass"
+            mkdir -p .cache .cache/coverage
+            echo '{"testResults":[],"numTotalTests":0,"numPassedTests":0,"numFailedTests":0}' > .cache/test-results.json
+            echo "intentionally-empty shard ${VITEST_SHARD} (vitest sharder distribution)" > .cache/coverage/empty-shard.flag
+            rc=0
+          fi
           # On failure, surface only failed test lines + tail of log.
           # On success, suppress the log entirely — passing ticks are noise.
           if [[ $rc -ne 0 ]]; then

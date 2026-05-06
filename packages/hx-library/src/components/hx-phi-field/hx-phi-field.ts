@@ -55,7 +55,6 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-phi-field-toggle-color=var(--hx-color-primary-500,#429797)] - Toggle button color.
  * @cssprop [--hx-phi-field-focus-ring-color=var(--hx-focus-ring-color,var(--hx-color-primary-500,#429797))] - Focus ring color.
  * @cssprop [--hx-phi-field-disabled-opacity=var(--hx-opacity-50,0.5)] - Opacity applied when the field is disabled.
- * @cssprop [--hx-phi-field-auto-hide-warning-color=var(--hx-color-warning-500,#C2711C)] - Color for auto-hide countdown warning (future use).
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-font-family-mono] - Font family.
  * @cssprop [--hx-color-neutral-500] - Color.

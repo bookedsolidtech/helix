@@ -17,6 +17,84 @@ export type { HxDialogProps };
  * A modal and non-modal dialog component built on the native HTML `<dialog>` element.
 Provides focus trapping, backdrop interaction, keyboard navigation, and full
 ARIA labelling for enterprise healthcare accessibility requirements.
+
+## Architecture Note: Host-Canonical ARIA (group-4a round-1, Path A — native-dialog adaptation)
+
+Unlike `hx-drawer` (which uses an inner `<div role="dialog">` and can fully
+host-canonicalize the role), `hx-dialog` is built on the native
+`<dialog>` HTMLDialogElement. The native element has an **implicit
+`role="dialog"`** baked in by the browser that **cannot be stripped**, so
+full host-canonical role takeover would create nested-dialog announcements.
+
+**Path A (adopted):** the host owns label / description projection via
+`ElementInternals` (`internals.ariaLabelledByElements`,
+`internals.ariaDescribedByElements`, `internals.ariaLabel`) but **does NOT**
+set `internals.role`. The native inner `<dialog>` continues to be the
+announced surface. Consumer light-DOM IDREFs project across the shadow
+boundary via `internals.aria*Elements` on the host.
+
+**Hybrid fallback (always-on belt-and-suspenders):** because some assistive
+technologies may walk the native `<dialog>` first and ignore host
+`internals.aria*Elements`, the resolved label / description text is **also**
+serialized into `aria-label` / `aria-describedby` on the inner native
+`<dialog>` element. Consumers therefore get name/description on every AT,
+with the IDL-ref path providing live DOM-text-update tracking when the AT
+honours it. This forfeits live-text tracking on the inner-dialog fallback
+(the serialized text is recomputed on every sync, which is good enough since
+mutation observers re-fire `_syncHostAriaSemantics` on consumer text edits).
+
+Why we do NOT set `internals.role = 'alertdialog'` either: setting role on
+the host while the native `<dialog>` keeps `role="dialog"` would announce
+BOTH a host alertdialog AND an inner dialog. Instead, the alertdialog
+variant continues to write `role="alertdialog"` directly on the inner
+`<dialog>` element (the platform allows overriding the implicit `dialog`
+role with the more specific `alertdialog`).
+
+Naming precedence (W3C AccName 1.2 §4.3.1):
+
+  1. Consumer `aria-labelledby` on the host — IDREFs resolved across the
+     shadow boundary via `resolveIdrefTokens` (closest scope first, then
+     ancestor shadow hosts, then owner document).
+  2. Consumer `aria-label` on the host.
+  3. `<slot name="header">` text content (multi-node aggregation per
+     AccName 1.2 §4.3.10 — decorative `aria-hidden` / `[hidden]` subtrees
+     contribute zero to the name).
+  4. `heading` property — explicit author-provided heading text.
+  5. Hard-coded literal `"Dialog"` (last-resort accessible name).
+
+Description channel: the host's `internals.ariaDescribedByElements` carries
+the resolved IDREF chain on the modern path. The inner native `<dialog>` ALSO
+receives a serialized `aria-describedby` chain — when a consumer description
+resolves, a synthesized in-shadow `<span id="${id}-consumer-desc">` is
+appended to the existing `description` span (if any) and the inner
+`<dialog>`'s `aria-describedby` references both same-root ids. `aria-description`
+is intentionally NEVER written — W3C AccName ignores it whenever
+`aria-describedby` is also present.
+
+Slot mutation observers track:
+  1. The header slot's text content (in-place i18n re-renders).
+  2. Consumer-resolved external IDREF targets (so a consumer mutating
+     `<label id="x">Patient</label>` in place re-flows the name).
+  3. Host attribute mutations (delegated to `installAriaIdrefMirror`,
+     which also catches late-inserted IDREF targets and id renames in
+     every relevant root).
+  4. Authentic consumer `aria-describedby` retraction (oldValue !== null &&
+     newValue === null) via a dedicated `attributeOldValue: true` observer.
+
+**First-paint slot state seeding intentionally omitted:** seeding
+`_hasHeaderSlot` / `_headerSlotText` from `firstUpdated()` would schedule an
+extra Lit re-render that subtly reorders the open-dialog promise chain
+(`updateComplete.then(...) → showModal() → updateComplete.then(...) →
+focus first focusable`). On Chromium, that reordering interleaves the
+native dialog's modal activation with the focus-restore step and causes
+focus-trap test failures. The slotchange handler runs one microtask later
+and `_syncHostAriaSemantics()` from `updated()` picks up the resolved state
+on the next paint — close enough that AT never observes the unnamed window.
+Mirrors the same intentional decision documented in hx-drawer round-1.
+
+Focus trap, ESC dismiss with `hx-cancel` BEFORE `hx-close`, focus-restore
+via `_triggerElement`, and native `showModal()` semantics are unchanged
+from the pre-host-canonical implementation.
  *
  * @example
  * ```tsx

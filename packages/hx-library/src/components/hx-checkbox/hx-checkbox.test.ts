@@ -5,6 +5,19 @@ import './index.js';
 
 afterEach(cleanup);
 
+/**
+ * Strongly-typed harness for the private internals the suite reaches into.
+ * Codex round-7 finding `#1` replaced scattered `as any` casts with this
+ * single seam — every private member touched by tests is named here so
+ * TypeScript strict mode keeps holding the line on the rest of the suite.
+ */
+type CheckboxTestHarness = HelixCheckbox & {
+  _internals: ElementInternals;
+  _supportsIdrefRefs: boolean;
+  _syncHostAriaSemantics(): void;
+  _groupedSuppress: boolean;
+};
+
 describe('hx-checkbox', () => {
   // ─── Rendering (4) ───
 
@@ -150,12 +163,15 @@ describe('hx-checkbox', () => {
       expect(input.getAttribute('aria-invalid')).toBe('true');
     });
 
-    it('error hides help text', async () => {
+    it('error hides help text (visually hidden, kept in DOM for stable describedBy)', async () => {
       const el = await fixture<HelixCheckbox>(
         '<hx-checkbox error="Error" help-text="Help"></hx-checkbox>',
       );
-      const helpText = shadowQuery(el, '.checkbox__help-text');
-      expect(helpText).toBeNull();
+      const helpText = shadowQuery<HTMLElement>(el, '.checkbox__help-text');
+      // Persistent in the DOM so the describedBy chain remains stable across
+      // error transitions, but visually hidden via the `hidden` attribute.
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -171,12 +187,13 @@ describe('hx-checkbox', () => {
       expect(helpText?.textContent?.trim()).toContain('Check to agree');
     });
 
-    it('help text hidden when error present', async () => {
+    it('help text hidden (but persistent) when error present', async () => {
       const el = await fixture<HelixCheckbox>(
         '<hx-checkbox help-text="Help" error="Error"></hx-checkbox>',
       );
-      const helpText = shadowQuery(el, '.checkbox__help-text');
-      expect(helpText).toBeNull();
+      const helpText = shadowQuery<HTMLElement>(el, '.checkbox__help-text');
+      expect(helpText).toBeTruthy();
+      expect(helpText?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -541,12 +558,13 @@ describe('hx-checkbox', () => {
   // ─── Methods (1) ───
 
   describe('Methods', () => {
-    it('focus() moves focus to input element', async () => {
+    it('focus() moves focus to host (codex round-1 finding #1)', async () => {
       const el = await fixture<HelixCheckbox>('<hx-checkbox label="Test"></hx-checkbox>');
-      el.focus();
       await el.updateComplete;
-      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(el.shadowRoot?.activeElement).toBe(input);
+      el.focus();
+      // Host is now the canonical announced surface and the focus target.
+      // The inner `<input>` is `aria-hidden + tabindex=-1`.
+      expect(document.activeElement).toBe(el);
     });
   });
 
@@ -748,9 +766,7 @@ describe('hx-checkbox', () => {
 
   describe('CSS class: checkbox--error', () => {
     it('applies checkbox--error class when error is set', async () => {
-      const el = await fixture<HelixCheckbox>(
-        '<hx-checkbox error="Oops"></hx-checkbox>',
-      );
+      const el = await fixture<HelixCheckbox>('<hx-checkbox error="Oops"></hx-checkbox>');
       const container = shadowQuery(el, '.checkbox');
       expect(container?.classList.contains('checkbox--error')).toBe(true);
     });
@@ -828,7 +844,9 @@ describe('hx-checkbox', () => {
 
   describe('hx-change event: detail shape when name is set', () => {
     it('hx-change detail includes checked and value but not name', async () => {
-      const el = await fixture<HelixCheckbox>('<hx-checkbox name="consent" value="yes"></hx-checkbox>');
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox name="consent" value="yes"></hx-checkbox>',
+      );
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-change');
       const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
       control.click();
@@ -945,5 +963,428 @@ describe('hx-checkbox', () => {
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
       expect(input.getAttribute('aria-invalid')).toBe('true');
     });
+  });
+
+  // ─── ARIA delegation: host-elevated semantics (codex aria-group-2) ───
+
+  describe('ARIA delegation: host semantics', () => {
+    it('host carries role="checkbox" via ElementInternals', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Agree"></hx-checkbox>');
+      // ElementInternals reflects the role on the accessibility tree even when
+      // role attribute is absent from the host.
+      const internals = (el as CheckboxTestHarness)._internals;
+      expect(internals.role).toBe('checkbox');
+    });
+
+    it('host ariaChecked tracks checked state', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Agree"></hx-checkbox>');
+      const internals = (el as CheckboxTestHarness)._internals;
+      expect(internals.ariaChecked).toBe('false');
+      el.checked = true;
+      await el.updateComplete;
+      expect(internals.ariaChecked).toBe('true');
+    });
+
+    it('host ariaChecked is "mixed" when indeterminate', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Agree"></hx-checkbox>');
+      el.indeterminate = true;
+      await el.updateComplete;
+      const internals = (el as CheckboxTestHarness)._internals;
+      expect(internals.ariaChecked).toBe('mixed');
+    });
+
+    it('host ariaInvalid is driven by validity, not visible error content', async () => {
+      // A required-but-unchecked checkbox is invalid via setValidity()
+      // even though no error message is rendered yet.
+      const el = await fixture<HelixCheckbox>('<hx-checkbox required label="Agree"></hx-checkbox>');
+      await el.updateComplete;
+      const internals = (el as CheckboxTestHarness)._internals;
+      expect(internals.validity.valid).toBe(false);
+      expect(internals.ariaInvalid).toBe('true');
+    });
+
+    it('host ariaRequired reflects required property', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox required label="Agree"></hx-checkbox>');
+      await el.updateComplete;
+      const internals = (el as CheckboxTestHarness)._internals;
+      expect(internals.ariaRequired).toBe('true');
+    });
+
+    it('host ariaLabel mirrors accessible-label so cross-shadow naming works', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox accessible-label="Confirm consent"></hx-checkbox>',
+      );
+      const internals = (el as CheckboxTestHarness)._internals;
+      expect(internals.ariaLabel).toBe('Confirm consent');
+    });
+
+    it('persistent help-text container renders when only the slot has content', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Agree"><span slot="help-text">Read carefully</span></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const helpDiv = shadowQuery<HTMLElement>(el, '.checkbox__help-text')!;
+      expect(helpDiv).toBeTruthy();
+      expect(helpDiv.hasAttribute('hidden')).toBe(false);
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-describedby')).toContain(helpDiv.id);
+    });
+
+    it('aria-describedby orders help text before error', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox help-text="Hint" error="Required"></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const tokens = input.getAttribute('aria-describedby')?.split(/\s+/) ?? [];
+      const helpDiv = shadowQuery<HTMLElement>(el, '.checkbox__help-text')!;
+      const errorDiv = shadowQuery<HTMLElement>(el, '.checkbox__error')!;
+      expect(tokens.indexOf(helpDiv.id)).toBeLessThan(tokens.indexOf(errorDiv.id));
+    });
+
+    it('inner input does not point at empty label container when no visible label', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox accessible-label="Confirm consent"></hx-checkbox>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // accessible-label takes precedence — the label slot is empty, so no
+      // labelledby on the inner input would resolve to empty content.
+      expect(input.hasAttribute('aria-labelledby')).toBe(false);
+      expect(input.getAttribute('aria-label')).toBe('Confirm consent');
+    });
+  });
+
+  // ─── Codex round-2 finding #2: no-IDL-ref fallback render path (5) ───
+
+  describe('No-IDL-ref fallback render (round-2 F2)', () => {
+    /**
+     * Helper: simulates a browser without ElementInternals IDL element
+     * references. Codex round-7 finding `#2`: just flipping
+     * `_supportsIdrefRefs` after connect skipped the fallback tab-order
+     * branch in `connectedCallback()` (`tabindex=-1` host demotion among
+     * others), so the tabindex assertions below were exercising a hybrid
+     * state instead of the same state a no-IDL-ref browser produces. The
+     * fix flips the flag THEN re-runs the same setup `connectedCallback()`
+     * performs for the fallback branch — host tab-order and ARIA sync —
+     * so the rest of the test sees a coherent fallback state.
+     */
+    async function forceFallbackPath(el: HelixCheckbox): Promise<void> {
+      const harness = el as CheckboxTestHarness;
+      harness._supportsIdrefRefs = false;
+      // Mirror the connect-time fallback branch: host owns `tabindex=-1`
+      // when the inner input is the announced surface (hx-checkbox.ts:289-311).
+      // Disabled hosts always carry `tabindex=-1`; otherwise the IDL-ref-aware
+      // value is `-1` on the fallback path.
+      el.setAttribute('tabindex', '-1');
+      // Re-run the host sync so internals are cleared and fallback state
+      // populates synchronously (the platform IDL-ref check runs once at
+      // connect; this stand-in skips the platform probe).
+      harness._syncHostAriaSemantics();
+      el.requestUpdate();
+      await el.updateComplete;
+    }
+
+    it('inner input is NOT aria-hidden and is in tab order on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // Round-2 finding #2: on no-IDL-ref browsers the inner input must be
+      // the announced surface — NOT aria-hidden, AND it owns tab order.
+      expect(input.hasAttribute('aria-hidden')).toBe(false);
+      expect(input.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('host is demoted to tabindex=-1 on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      // The host must not steal focus; the inner input owns it.
+      expect(el.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('inner input mirrors data-aria-labelledby/describedby from host on the fallback path', async () => {
+      const container = document.getElementById('test-fixture-container');
+      if (!container) throw new Error('test-fixture-container not found');
+      // Light-DOM IDREF targets in the same root.
+      const labelHost = document.createElement('span');
+      labelHost.id = 'cbx-ext-label';
+      labelHost.textContent = 'External Label';
+      const helpHost = document.createElement('span');
+      helpHost.id = 'cbx-ext-help';
+      helpHost.textContent = 'External Help';
+      container.appendChild(labelHost);
+      container.appendChild(helpHost);
+
+      const el = await fixture<HelixCheckbox>(
+        `<hx-checkbox aria-labelledby="cbx-ext-label" aria-describedby="cbx-ext-help"></hx-checkbox>`,
+      );
+      await el.updateComplete;
+      // mixinDelegatesAria mirrors aria-* to data-aria-* on the host.
+      expect(el.getAttribute('data-aria-labelledby')).toBe('cbx-ext-label');
+      expect(el.getAttribute('data-aria-describedby')).toBe('cbx-ext-help');
+
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // The inner input gets the mirrored tokens so AT can resolve them.
+      expect(input.getAttribute('aria-labelledby')).toBe('cbx-ext-label');
+      const innerDesc = input.getAttribute('aria-describedby') ?? '';
+      expect(innerDesc.split(/\s+/)).toContain('cbx-ext-help');
+    });
+
+    it('host activation handlers do NOT fire on Space/Enter on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const startChecked = el.checked;
+      // Dispatch a Space keydown directly on the host — round-1 it would
+      // toggle the checkbox via _handleHostKeyDown. Round-2 finding #2 makes
+      // host handlers no-op on the fallback path; the inner native input
+      // would handle activation natively.
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(startChecked);
+    });
+
+    it('host ariaInternals role is cleared on the fallback path', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      const internals = (el as CheckboxTestHarness)._internals;
+      expect(internals.role).toBe('checkbox');
+
+      await forceFallbackPath(el);
+
+      // Round-2 finding #2: host role/state cleared so AT does not
+      // double-announce alongside the inner native checkbox.
+      expect(internals.role).toBe(null);
+      expect(internals.ariaChecked).toBe(null);
+      expect(internals.ariaLabel).toBe(null);
+    });
+
+    // ─── Codex round-3 finding #2 (3) ───
+
+    it('clicking the inner input on the fallback path toggles host.checked and fires hx-change', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(el.checked).toBe(false);
+
+      const eventPromise = oneEvent<CustomEvent<{ checked: boolean; value: string }>>(
+        el,
+        'hx-change',
+      );
+      // Native click on the announced inner input — must toggle and emit.
+      // Round-3 finding #2: round-2 left `e.preventDefault()` on the inner
+      // input click suppressor, so AT activation could not toggle.
+      input.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+
+      expect(el.checked).toBe(true);
+      expect(input.checked).toBe(true);
+      expect(event.detail.checked).toBe(true);
+      expect(event.detail.value).toBe('on');
+    });
+
+    it('a second inner-input click on the fallback path toggles back to unchecked', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept" checked></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(el.checked).toBe(true);
+
+      const eventPromise = oneEvent<CustomEvent<{ checked: boolean; value: string }>>(
+        el,
+        'hx-change',
+      );
+      input.click();
+      const event = await eventPromise;
+      await el.updateComplete;
+
+      expect(el.checked).toBe(false);
+      expect(input.checked).toBe(false);
+      expect(event.detail.checked).toBe(false);
+    });
+
+    // Codex round-4 F1: label-click activation on the fallback path was
+    // uncovered. Real AT/pointer activation lands on the surrounding <label>
+    // (the `.checkbox__control` element); native label-forward toggles the
+    // inner input which fires `change`, which `_handleInternalChange` mirrors
+    // onto the host. Must produce exactly one `hx-change`.
+    it('clicking the LABEL on the fallback path toggles via native label-forward and fires hx-change exactly once', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+      await forceFallbackPath(el);
+
+      const label = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
+      let count = 0;
+      el.addEventListener('hx-change', () => {
+        count++;
+      });
+      label.click();
+      await el.updateComplete;
+
+      expect(el.checked).toBe(true);
+      expect(count).toBe(1);
+    });
+
+    it('modern path still suppresses inner-input click (no double-toggle from label-click handler)', async () => {
+      // Sanity: on the modern path the inner input click is preventDefault-ed
+      // and the label's @click=${_handleChange} drives the toggle. Clicking
+      // the input directly here lands on the input, but its click handler
+      // suppresses the default + bubble so the label handler never runs.
+      // This guards against regressing the modern path while fixing fallback.
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept"></hx-checkbox>');
+      await el.updateComplete;
+
+      expect((el as CheckboxTestHarness)._supportsIdrefRefs).toBe(true);
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const startChecked = el.checked;
+
+      // Dispatch a click that does NOT bubble through the label (synthetic
+      // direct dispatch). This mimics AT activation routed straight to the
+      // hidden inner input — should be a no-op on the modern path.
+      input.dispatchEvent(new MouseEvent('click', { bubbles: false, cancelable: true }));
+      await el.updateComplete;
+      expect(el.checked).toBe(startChecked);
+    });
+  });
+
+  // ─── Codex round-3 finding #1: groupedSuppress flag (3) ───
+
+  describe('Group-suppression flag (round-3 F1)', () => {
+    it('child remains suppressed in a group even after consumer mutates name post-attach', async () => {
+      const { form, el } = (await formFixtureGroup()) as {
+        form: HTMLFormElement;
+        el: HelixCheckbox;
+      };
+
+      // Pre-condition: only one entry per checked value under group name.
+      let data = new FormData(form);
+      expect(data.getAll('group-name')).toEqual(['a', 'b']);
+      // No stray entries under the (currently null) child name.
+      expect(data.getAll('hijack')).toEqual([]);
+
+      // Consumer/framework mutates the child's `name` post-attach. Round-2
+      // would have re-armed `_updateFormValue()` and double-submitted; round-3
+      // suppression must hold.
+      el.name = 'hijack';
+      await el.updateComplete;
+      data = new FormData(form);
+      expect(data.getAll('group-name')).toEqual(['a', 'b']);
+      expect(data.getAll('hijack')).toEqual([]);
+    });
+
+    // Codex round-4 F2: when the GROUP itself is removed from the DOM (vs.
+    // the child being re-parented), the group's disconnectedCallback must
+    // release `_groupedSuppress` on every tracked child so a still-live child
+    // reference regains stand-alone form participation when re-attached
+    // somewhere else. Round-3 added the cleanup; this test exercises it.
+    it('removing the group from the DOM clears _groupedSuppress on its children so they regain stand-alone form participation', async () => {
+      await import('../hx-checkbox-group/index.js');
+      const container = document.getElementById('test-fixture-container')!;
+
+      // Group with a single named, checked child.
+      const groupHost = document.createElement('div');
+      groupHost.innerHTML = `
+        <hx-checkbox-group name="grp" label="G">
+          <hx-checkbox value="solo" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `;
+      container.appendChild(groupHost);
+      const group = groupHost.querySelector('hx-checkbox-group') as Element & {
+        updateComplete: Promise<boolean>;
+      };
+      await group.updateComplete;
+      const child = groupHost.querySelector('hx-checkbox') as HelixCheckbox;
+      await child.updateComplete;
+
+      // Pre-condition: child is suppressed while inside the group.
+      expect((child as CheckboxTestHarness)._groupedSuppress).toBe(true);
+
+      // Remove the GROUP from the DOM (group disconnectedCallback fires).
+      // The child reference is still live and detached together with the group.
+      groupHost.removeChild(group);
+      // Allow disconnect lifecycle + microtask drain.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      // Group cleanup must have released suppression on the still-live child.
+      expect((child as CheckboxTestHarness)._groupedSuppress).toBe(false);
+
+      // Reattach the child stand-alone inside a real form and confirm it
+      // participates under its own name (real form participation regained).
+      const form = document.createElement('form');
+      form.addEventListener('submit', (e) => e.preventDefault());
+      child.name = 'solo-name';
+      child.value = 'solo-value';
+      child.checked = true;
+      form.appendChild(child);
+      container.appendChild(form);
+      await child.updateComplete;
+
+      const data = new FormData(form);
+      expect(data.getAll('solo-name')).toEqual(['solo-value']);
+    });
+
+    it('removing a child from the group clears _groupedSuppress so it regains stand-alone form participation', async () => {
+      const { form, el } = (await formFixtureGroup()) as {
+        form: HTMLFormElement;
+        el: HelixCheckbox;
+      };
+      const group = el.parentElement!;
+      // While inside group: child is suppressed.
+      expect((el as CheckboxTestHarness)._groupedSuppress).toBe(true);
+
+      // Re-parent: move the checkbox out of the group, give it a name, mark checked.
+      el.name = 'solo-name';
+      el.value = 'solo-value';
+      el.checked = true;
+      group.removeChild(el);
+      // Wait for slotchange to fire on the group.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      // Append back to the form (sibling of the group).
+      form.appendChild(el);
+      await el.updateComplete;
+
+      expect((el as CheckboxTestHarness)._groupedSuppress).toBe(false);
+      const data = new FormData(form);
+      expect(data.getAll('solo-name')).toEqual(['solo-value']);
+    });
+
+    /**
+     * Builds a form containing an `<hx-checkbox-group name="group-name">` with
+     * two checked children for the round-3 F1 tests. Cannot live at module
+     * scope because hx-checkbox-group is imported lazily from the test file
+     * via `await import` to keep the module graph small.
+     */
+    async function formFixtureGroup(): Promise<{ form: HTMLFormElement; el: HelixCheckbox }> {
+      // Side-effect import registers hx-checkbox-group.
+      await import('../hx-checkbox-group/index.js');
+      const container = document.getElementById('test-fixture-container')!;
+      const form = document.createElement('form');
+      form.addEventListener('submit', (e) => e.preventDefault());
+      form.innerHTML = `
+        <hx-checkbox-group name="group-name" label="G">
+          <hx-checkbox value="a" checked></hx-checkbox>
+          <hx-checkbox value="b" checked></hx-checkbox>
+        </hx-checkbox-group>
+      `;
+      container.appendChild(form);
+      const group = form.querySelector('hx-checkbox-group') as Element & {
+        updateComplete: Promise<boolean>;
+      };
+      await group.updateComplete;
+      const el = form.querySelector('hx-checkbox') as HelixCheckbox;
+      await el.updateComplete;
+      return { form, el };
+    }
   });
 });

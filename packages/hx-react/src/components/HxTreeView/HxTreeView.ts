@@ -17,10 +17,20 @@ export type { HxTreeViewProps };
  * A hierarchical tree component for navigating nested data structures.
 Used in healthcare applications for org charts, ICD-10 code hierarchies, and department navigation.
 
-Implements WAI-ARIA tree view pattern with `role="tree"` on the container
-and `role="treeitem"` on each item. Supports `aria-label` via the `label` property
-for screen reader identification. Full keyboard navigation: Arrow keys for movement,
-Enter/Space for selection, Home/End for first/last item.
+Group 5c host-canonical: `role="tree"` lives on the **host** via
+`_internals.role` on the modern path. The host carries the announced
+surface so AT walks `<hx-tree-view>` (role=tree) → slotted
+`<hx-tree-item>` (role=treeitem on host) directly without two layers of
+indirection. Consumer-supplied `aria-label` / `aria-labelledby` on the
+host are resolved via the shared IDREF mirror; cross-shadow naming uses
+`ariaLabelledByElements` (modern) with a flattened-string fallback
+(legacy). On the legacy fallback path the inner `[role="tree"]` carries
+the role + accessible name and the host role is suppressed so AT only
+sees one tree per logical surface (mirrors `hx-menu` round-8).
+
+Full keyboard navigation: Arrow keys for movement, Enter/Space for
+selection, Home/End for first/last item, ArrowRight/Left for
+expand/collapse + parent/child traversal, typeahead.
 
 ## Scale Limits
 

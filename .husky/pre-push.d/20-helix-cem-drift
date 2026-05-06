@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# .husky/pre-push.d/20-helix-cem-drift
+# Helix-local pre-push fragment: Custom Elements Manifest drift gate.
+#
+# Regenerates packages/hx-library/custom-elements.json (and figma-inventory.json)
+# whenever library source has changed in this push range, then refuses the push
+# if the regeneration produced any working-tree delta. Catches the case where a
+# component author edits .ts source but forgets to commit the regenerated CEM.
+#
+# Skip-fast: no library source touched in push range -> exit 0.
+# Bypass: HELIX_SKIP_CEM_DRIFT=1 git push  (escape hatch for emergencies only).
+
+set -euo pipefail
+
+if [ "${HELIX_SKIP_CEM_DRIFT:-0}" = "1" ]; then
+  echo "pre-push: cem-drift -- bypassed via HELIX_SKIP_CEM_DRIFT=1"
+  exit 0
+fi
+
+CEM_PATH="packages/hx-library/custom-elements.json"
+FIGMA_INVENTORY_PATH="packages/hx-library/figma-inventory.json"
+
+BASE_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null \
+  | sed 's|refs/remotes/origin/||' || echo "dev")
+
+COMMON_ANCESTOR=$(git merge-base HEAD "origin/${BASE_BRANCH}" 2>/dev/null || echo "")
+if [ -z "$COMMON_ANCESTOR" ]; then
+  echo "pre-push: cem-drift -- no merge-base with origin/${BASE_BRANCH}, skipping"
+  exit 0
+fi
+
+LIBRARY_SOURCE_CHANGED=$(git diff --name-only "$COMMON_ANCESTOR"...HEAD \
+  | grep '^packages/hx-library/src/' || true)
+
+if [ -z "$LIBRARY_SOURCE_CHANGED" ]; then
+  echo "pre-push: cem-drift -- no library source changes in push range, skipping"
+  exit 0
+fi
+
+if ! git diff --quiet HEAD -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" 2>/dev/null; then
+  echo "pre-push: cem-drift -- refusing to run with uncommitted CEM changes:" >&2
+  git status -s -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" >&2
+  echo "Resolution: commit or stash CEM changes before pushing." >&2
+  exit 1
+fi
+
+echo "pre-push: cem-drift -- regenerating $CEM_PATH..."
+if ! pnpm --filter=@helixui/library run cem >/dev/null 2>&1; then
+  echo "pre-push: cem-drift -- \`pnpm run cem\` FAILED" >&2
+  echo "Run \`pnpm --filter=@helixui/library run cem\` locally to see errors." >&2
+  exit 1
+fi
+
+if ! git diff --quiet HEAD -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH"; then
+  echo "pre-push: cem-drift -- DRIFT DETECTED" >&2
+  git diff --stat HEAD -- "$CEM_PATH" "$FIGMA_INVENTORY_PATH" >&2
+  echo "" >&2
+  echo "The Custom Elements Manifest is out of sync with library source." >&2
+  echo "Resolution:" >&2
+  echo "  pnpm --filter=@helixui/library run cem" >&2
+  echo "  git add $CEM_PATH $FIGMA_INVENTORY_PATH" >&2
+  echo "  git commit --amend --no-edit  # or a fresh commit" >&2
+  exit 1
+fi
+
+echo "  v cem-drift passed"

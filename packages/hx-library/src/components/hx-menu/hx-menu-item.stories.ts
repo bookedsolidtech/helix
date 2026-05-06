@@ -31,7 +31,8 @@ const meta = {
     },
     checked: {
       control: 'boolean',
-      description: 'Whether the item is checked. Only meaningful when type="checkbox" or type="radio".',
+      description:
+        'Whether the item is checked. Only meaningful when type="checkbox" or type="radio".',
       table: {
         category: 'State',
         defaultValue: { summary: 'false' },
@@ -69,7 +70,11 @@ const meta = {
   // role="menuitem" is also set on the host so axe-core can verify aria-required-children
   // on the parent role="menu" container (the inner menuitem role lives in shadow DOM).
   render: (args) => html`
-    <div role="menu" aria-label="Example menu" style="display: inline-flex; flex-direction: column; min-width: 12rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+    <div
+      role="menu"
+      aria-label="Example menu"
+      style="display: inline-flex; flex-direction: column; min-width: 12rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;"
+    >
       <hx-menu-item
         role="menuitem"
         value=${args.value}
@@ -77,7 +82,8 @@ const meta = {
         ?checked=${args.checked}
         type=${args.type}
         ?loading=${args.loading}
-      >Menu Item Label</hx-menu-item>
+        >Menu Item Label</hx-menu-item
+      >
     </div>
   `,
 } satisfies Meta;
@@ -127,7 +133,9 @@ export const Disabled: Story = {
     await expect(item).toBeTruthy();
 
     let fired = false;
-    item!.addEventListener('hx-item-select', () => { fired = true; });
+    item!.addEventListener('hx-item-select', () => {
+      fired = true;
+    });
 
     const inner = item!.shadowRoot!.querySelector('.menu-item') as HTMLElement;
     inner?.click();
@@ -146,7 +154,11 @@ export const Checkbox: Story = {
     value: 'checkbox-item',
   },
   render: () => html`
-    <div role="menu" aria-label="Checkbox menu" style="display: inline-flex; flex-direction: column; min-width: 12rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+    <div
+      role="menu"
+      aria-label="Checkbox menu"
+      style="display: inline-flex; flex-direction: column; min-width: 12rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;"
+    >
       <hx-menu-item type="checkbox" value="option-a">Option A</hx-menu-item>
       <hx-menu-item type="checkbox" value="option-b" checked>Option B (checked)</hx-menu-item>
       <hx-menu-item type="checkbox" value="option-c">Option C</hx-menu-item>
@@ -164,7 +176,11 @@ export const Radio: Story = {
     value: 'radio-item',
   },
   render: () => html`
-    <div role="menu" aria-label="Radio menu" style="display: inline-flex; flex-direction: column; min-width: 12rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+    <div
+      role="menu"
+      aria-label="Radio menu"
+      style="display: inline-flex; flex-direction: column; min-width: 12rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;"
+    >
       <hx-menu-item type="radio" value="size-sm">Small</hx-menu-item>
       <hx-menu-item type="radio" value="size-md" checked>Medium (selected)</hx-menu-item>
       <hx-menu-item type="radio" value="size-lg">Large</hx-menu-item>
@@ -190,7 +206,11 @@ export const Loading: Story = {
 export const WithPrefixSuffix: Story = {
   name: 'With Prefix and Suffix',
   render: () => html`
-    <div role="menu" aria-label="Menu with icons" style="display: inline-flex; flex-direction: column; min-width: 14rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
+    <div
+      role="menu"
+      aria-label="Menu with icons"
+      style="display: inline-flex; flex-direction: column; min-width: 14rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem;"
+    >
       <hx-menu-item value="save">
         <span slot="prefix" aria-hidden="true">💾</span>
         Save
@@ -216,7 +236,11 @@ export const WithPrefixSuffix: Story = {
 export const HealthcareActions: Story = {
   name: 'Healthcare — Patient Record Actions',
   render: () => html`
-    <div role="menu" aria-label="Patient record actions" style="display: inline-flex; flex-direction: column; min-width: 16rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+    <div
+      role="menu"
+      aria-label="Patient record actions"
+      style="display: inline-flex; flex-direction: column; min-width: 16rem; padding: 0.25rem; border: 1px solid #e2e8f0; border-radius: 0.375rem; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);"
+    >
       <hx-menu-item value="view-history">View Visit History</hx-menu-item>
       <hx-menu-item value="print-chart">Print Chart</hx-menu-item>
       <hx-menu-item value="export-fhir">Export as FHIR</hx-menu-item>
@@ -227,7 +251,10 @@ export const HealthcareActions: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     value: 'default',
   },

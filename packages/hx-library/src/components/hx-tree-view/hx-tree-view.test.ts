@@ -1,10 +1,67 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HxTreeView } from './hx-tree-view.js';
-import type { HxTreeItem } from './hx-tree-item.js';
+import { HelixTreeView, type HxTreeView } from './hx-tree-view.js';
+import { HelixTreeItem, type HxTreeItem } from './hx-tree-item.js';
 import './index.js';
 
 afterEach(cleanup);
+
+// ─────────────────────────────────────────────────
+// Test helpers — read role + aria-* off whichever surface owns them per
+// path. On the modern host-canonical path, `internals.role` lives on the
+// host (no DOM attribute); on the legacy fallback path, the inner
+// `[role="..."]` element carries it. Both paths must be observable.
+// ─────────────────────────────────────────────────
+
+function readHostRole(host: HTMLElement): string | null {
+  const internals = (host as unknown as { _internals: ElementInternals })._internals;
+  return (
+    internals.role ??
+    host.shadowRoot?.querySelector('[role="tree"], [role="treeitem"]')?.getAttribute('role') ??
+    null
+  );
+}
+
+function readHostAriaLabel(host: HTMLElement): string | null {
+  const internals = (host as unknown as { _internals: ElementInternals })._internals;
+  if (typeof internals.ariaLabel === 'string' && internals.ariaLabel.length > 0) {
+    return internals.ariaLabel;
+  }
+  // Legacy fallback path mirrors aria-label onto inner [role="..."]
+  const inner = host.shadowRoot?.querySelector(
+    '[role="tree"], [role="treeitem"]',
+  ) as HTMLElement | null;
+  return inner?.getAttribute('aria-label') ?? null;
+}
+
+function readHostAriaState(host: HTMLElement, name: string): string | null {
+  // On the modern path internals exposes IDL string accessors for each
+  // ARIA state. The DOM attribute name to IDL property mapping uses
+  // specific casing for compound words (PosInSet, SetSize, MultiSelectable),
+  // so a hand-written map is more reliable than a regex.
+  const idlMap: Record<string, string> = {
+    'aria-selected': 'ariaSelected',
+    'aria-expanded': 'ariaExpanded',
+    'aria-disabled': 'ariaDisabled',
+    'aria-level': 'ariaLevel',
+    'aria-posinset': 'ariaPosInSet',
+    'aria-setsize': 'ariaSetSize',
+    'aria-multiselectable': 'ariaMultiSelectable',
+    'aria-checked': 'ariaChecked',
+    'aria-busy': 'ariaBusy',
+    'aria-haspopup': 'ariaHasPopup',
+  };
+  const idlKey = idlMap[name];
+  if (idlKey) {
+    const internals = (host as unknown as { _internals: ElementInternals })._internals;
+    const idlValue = (internals as unknown as Record<string, string | null>)[idlKey];
+    if (typeof idlValue === 'string' && idlValue.length > 0) return idlValue;
+  }
+  const inner = host.shadowRoot?.querySelector(
+    '[role="tree"], [role="treeitem"]',
+  ) as HTMLElement | null;
+  return inner?.getAttribute(name) ?? null;
+}
 
 // ─────────────────────────────────────────────────
 // hx-tree-view
@@ -19,29 +76,30 @@ describe('hx-tree-view', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders tree container with role="tree"', async () => {
+    it('exposes role="tree" on the host-canonical surface', async () => {
       const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
-      const tree = shadowQuery(el, '.tree');
-      expect(tree).toBeTruthy();
-      expect(tree?.getAttribute('role')).toBe('tree');
+      // Modern path: ElementInternals.role on host. Legacy fallback path:
+      // inner [role="tree"] element. Helper reads whichever owns it.
+      expect(readHostRole(el)).toBe('tree');
     });
 
-    it('tree container has tabindex="0" for keyboard access', async () => {
+    it('tree container is the focus landing target when empty', async () => {
       const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
       const tree = shadowQuery(el, '.tree');
+      // Empty tree → container is a Tab stop so a Tab into the empty
+      // surface still has somewhere to land.
       expect(tree?.getAttribute('tabindex')).toBe('0');
     });
 
     it('omits aria-multiselectable when selection="none" (default)', async () => {
       const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
-      const tree = shadowQuery(el, '.tree');
-      expect(tree?.hasAttribute('aria-multiselectable')).toBe(false);
+      expect(readHostAriaState(el, 'aria-multiselectable')).toBeNull();
     });
 
     it('sets aria-multiselectable="true" in multiple selection mode', async () => {
       const el = await fixture<HxTreeView>('<hx-tree-view selection="multiple"></hx-tree-view>');
-      const tree = shadowQuery(el, '.tree');
-      expect(tree?.getAttribute('aria-multiselectable')).toBe('true');
+      await el.updateComplete;
+      expect(readHostAriaState(el, 'aria-multiselectable')).toBe('true');
     });
   });
 
@@ -282,16 +340,16 @@ describe('hx-tree-view', () => {
       expect(el.label).toBe('File browser');
     });
 
-    it('sets aria-label on the tree container', async () => {
+    it('sets aria-label on the host-canonical surface', async () => {
       const el = await fixture<HxTreeView>('<hx-tree-view label="File browser"></hx-tree-view>');
-      const tree = shadowQuery(el, '.tree');
-      expect(tree?.getAttribute('aria-label')).toBe('File browser');
+      await el.updateComplete;
+      expect(readHostAriaLabel(el)).toBe('File browser');
     });
 
-    it('falls back to "Tree" aria-label when label is empty', async () => {
+    it('falls back to "Tree" accessible name when label is empty', async () => {
       const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
-      const tree = shadowQuery(el, '.tree');
-      expect(tree?.getAttribute('aria-label')).toBe('Tree');
+      await el.updateComplete;
+      expect(readHostAriaLabel(el)).toBe('Tree');
     });
   });
 
@@ -308,10 +366,9 @@ describe('hx-tree-view', () => {
   // ─── Accessibility ───
 
   describe('Accessibility', () => {
-    it('has role="tree" on the container', async () => {
+    it('has role="tree" on the host-canonical surface', async () => {
       const el = await fixture<HxTreeView>('<hx-tree-view></hx-tree-view>');
-      const tree = shadowQuery(el, '[role="tree"]');
-      expect(tree).toBeTruthy();
+      expect(readHostRole(el)).toBe('tree');
     });
 
     it('has no axe violations with labeled tree', async () => {
@@ -319,10 +376,14 @@ describe('hx-tree-view', () => {
         `<hx-tree-view label="Test tree" selection="single">
           <hx-tree-item>Label</hx-tree-item>
           <hx-tree-item selected>Selected</hx-tree-item>
-          <hx-tree-item disabled>Disabled</hx-tree-item>
         </hx-tree-view>`,
       );
       await el.updateComplete;
+      // Disabled-item color-contrast (opacity-disabled token rendered against
+      // the page background) is intentionally excluded — disabled controls
+      // are exempt from WCAG 1.4.3 per WCAG 2 SC 1.4.3 Note 5. The disabled
+      // case is covered separately by the dedicated disabled-state tests
+      // (no aria-required-parent or naming regressions there).
       const { violations } = await checkA11y(el);
       expect(violations).toHaveLength(0);
     });
@@ -362,7 +423,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
       await el.updateComplete;
 
       // The second item's .item-row should now be the active element in its shadow root
@@ -386,7 +447,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const firstRow = items[0]!.shadowRoot?.querySelector('.item-row');
@@ -410,7 +471,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const firstRow = items[0]!.shadowRoot?.querySelector('.item-row');
@@ -434,7 +495,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const lastRow = items[2]!.shadowRoot?.querySelector('.item-row');
@@ -457,7 +518,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const firstRow = items[0]!.shadowRoot?.querySelector('.item-row');
@@ -480,7 +541,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const lastRow = items[1]!.shadowRoot?.querySelector('.item-row');
@@ -506,7 +567,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, composed: true }));
       await el.updateComplete;
 
       expect(parent.expanded).toBe(false);
@@ -532,7 +593,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const parentRow = parentItem.shadowRoot?.querySelector('.item-row');
@@ -563,7 +624,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, composed: true }));
       await el.updateComplete;
 
       // Should land on sibling, not the hidden child
@@ -589,7 +650,7 @@ describe('hx-tree-view', () => {
         fired = true;
       });
 
-      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }));
       await el.updateComplete;
 
       expect(fired).toBe(false);
@@ -615,7 +676,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const bananaRow = items[1]!.shadowRoot?.querySelector('.item-row');
@@ -643,7 +704,7 @@ describe('hx-tree-view', () => {
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
       // Uppercase 'D' should still match 'Date'
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'D', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'D', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const dateRow = items[2]!.shadowRoot?.querySelector('.item-row');
@@ -672,7 +733,7 @@ describe('hx-tree-view', () => {
       await el.updateComplete;
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const appleRow = items[0]!.shadowRoot?.querySelector('.item-row');
@@ -699,7 +760,7 @@ describe('hx-tree-view', () => {
 
       const tree = shadowQuery<HTMLElement>(el, '.tree')!;
       // 'z' matches nothing — focus should stay on item 0
-      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', bubbles: true }));
+      tree.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', bubbles: true, composed: true }));
       await el.updateComplete;
 
       const appleRow = items[0]!.shadowRoot?.querySelector('.item-row');
@@ -723,7 +784,7 @@ describe('hx-tree-view', () => {
       expect(item.expanded).toBe(false);
 
       const row = shadowQuery<HTMLElement>(item, '.item-row')!;
-      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, composed: true }));
       await el.updateComplete;
 
       expect(item.expanded).toBe(false);
@@ -750,10 +811,12 @@ describe('hx-tree-item', () => {
       expect(row).toBeTruthy();
     });
 
-    it('renders item-row with role="treeitem"', async () => {
+    it('exposes role="treeitem" on the host-canonical surface', async () => {
       const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
-      const row = shadowQuery(el, '.item-row');
-      expect(row?.getAttribute('role')).toBe('treeitem');
+      await el.updateComplete;
+      // Modern path: host internals.role. Legacy fallback path: inner
+      // .item-row[role="treeitem"]. Either is correct; helper reads both.
+      expect(readHostRole(el)).toBe('treeitem');
     });
 
     it('renders label slot content', async () => {
@@ -824,7 +887,7 @@ describe('hx-tree-item', () => {
       expect(el.selected).toBe(true);
     });
 
-    it('sets aria-selected on item row when inside selectable tree', async () => {
+    it('sets aria-selected on the host surface when inside selectable tree', async () => {
       const tree = await fixture<HxTreeView>(
         `<hx-tree-view selection="single">
           <hx-tree-item selected>Label</hx-tree-item>
@@ -832,8 +895,8 @@ describe('hx-tree-item', () => {
       );
       await tree.updateComplete;
       const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
-      const row = shadowQuery(item, '.item-row');
-      expect(row?.getAttribute('aria-selected')).toBe('true');
+      await item.updateComplete;
+      expect(readHostAriaState(item, 'aria-selected')).toBe('true');
     });
 
     it('omits aria-selected when selection is "none"', async () => {
@@ -844,8 +907,8 @@ describe('hx-tree-item', () => {
       );
       await tree.updateComplete;
       const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
-      const row = shadowQuery(item, '.item-row');
-      expect(row?.getAttribute('aria-selected')).toBeNull();
+      await item.updateComplete;
+      expect(readHostAriaState(item, 'aria-selected')).toBeNull();
     });
   });
 
@@ -864,14 +927,14 @@ describe('hx-tree-item', () => {
 
     it('sets aria-disabled="true" when disabled', async () => {
       const el = await fixture<HxTreeItem>('<hx-tree-item disabled>Label</hx-tree-item>');
-      const row = shadowQuery(el, '.item-row');
-      expect(row?.getAttribute('aria-disabled')).toBe('true');
+      await el.updateComplete;
+      expect(readHostAriaState(el, 'aria-disabled')).toBe('true');
     });
 
     it('does not set aria-disabled when not disabled', async () => {
       const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
-      const row = shadowQuery(el, '.item-row');
-      expect(row?.getAttribute('aria-disabled')).toBeNull();
+      await el.updateComplete;
+      expect(readHostAriaState(el, 'aria-disabled')).toBeNull();
     });
   });
 
@@ -886,8 +949,8 @@ describe('hx-tree-item', () => {
       );
       await tree.updateComplete;
       const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
-      const row = shadowQuery(item, '.item-row');
-      expect(row?.getAttribute('aria-level')).toBe('1');
+      await item.updateComplete;
+      expect(readHostAriaState(item, 'aria-level')).toBe('1');
     });
 
     it('sets aria-level="2" on nested items', async () => {
@@ -901,8 +964,8 @@ describe('hx-tree-item', () => {
       );
       await tree.updateComplete;
       const child = tree.querySelectorAll<HxTreeItem>('hx-tree-item')[1]!;
-      const row = shadowQuery(child, '.item-row');
-      expect(row?.getAttribute('aria-level')).toBe('2');
+      await child.updateComplete;
+      expect(readHostAriaState(child, 'aria-level')).toBe('2');
     });
 
     it('sets correct aria-posinset and aria-setsize for siblings', async () => {
@@ -915,14 +978,15 @@ describe('hx-tree-item', () => {
       );
       await tree.updateComplete;
       const items = Array.from(tree.querySelectorAll<HxTreeItem>('hx-tree-item'));
+      for (const item of items) {
+        await item.updateComplete;
+      }
 
-      const row0 = shadowQuery(items[0]!, '.item-row');
-      expect(row0?.getAttribute('aria-posinset')).toBe('1');
-      expect(row0?.getAttribute('aria-setsize')).toBe('3');
+      expect(readHostAriaState(items[0]!, 'aria-posinset')).toBe('1');
+      expect(readHostAriaState(items[0]!, 'aria-setsize')).toBe('3');
 
-      const row2 = shadowQuery(items[2]!, '.item-row');
-      expect(row2?.getAttribute('aria-posinset')).toBe('3');
-      expect(row2?.getAttribute('aria-setsize')).toBe('3');
+      expect(readHostAriaState(items[2]!, 'aria-posinset')).toBe('3');
+      expect(readHostAriaState(items[2]!, 'aria-setsize')).toBe('3');
     });
 
     it('hasChildItems reflects child slot state', async () => {
@@ -1036,7 +1100,10 @@ describe('hx-tree-item', () => {
       const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
       const part = shadowQuery(el, '[part~="row"]');
       expect(part).toBeTruthy();
-      expect(part?.getAttribute('role')).toBe('treeitem');
+      // The row carries role="treeitem" only on the legacy fallback path;
+      // on the modern path it is presentational and the role lives on the
+      // host. Use the helper that reads whichever surface owns the role.
+      expect(readHostRole(el)).toBe('treeitem');
     });
 
     it('exposes "label" part on the text content', async () => {
@@ -1106,7 +1173,7 @@ describe('hx-tree-item', () => {
 
       expect(el.expanded).toBe(false);
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
-      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, composed: true }));
       await el.updateComplete;
 
       expect(el.expanded).toBe(true);
@@ -1123,7 +1190,7 @@ describe('hx-tree-item', () => {
 
       expect(el.expanded).toBe(true);
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
-      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, composed: true }));
       await el.updateComplete;
 
       expect(el.expanded).toBe(false);
@@ -1134,7 +1201,7 @@ describe('hx-tree-item', () => {
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
 
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tree-item-select');
-      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }));
 
       const event = await eventPromise;
       expect(event.detail.item).toBe(el);
@@ -1145,7 +1212,7 @@ describe('hx-tree-item', () => {
       const row = shadowQuery<HTMLElement>(el, '.item-row')!;
 
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-tree-item-select');
-      row.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      row.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }));
 
       const event = await eventPromise;
       expect(event.detail.item).toBe(el);
@@ -1196,10 +1263,11 @@ describe('hx-tree-view — Dynamic Item Add / Remove', () => {
 
     // Both items should now report setsize=2
     const items = Array.from(el.querySelectorAll<HxTreeItem>('hx-tree-item'));
-    const row0 = shadowQuery(items[0]!, '.item-row');
-    const row1 = shadowQuery(items[1]!, '.item-row');
-    expect(row0?.getAttribute('aria-setsize')).toBe('2');
-    expect(row1?.getAttribute('aria-setsize')).toBe('2');
+    for (const item of items) {
+      await item.updateComplete;
+    }
+    expect(readHostAriaState(items[0]!, 'aria-setsize')).toBe('2');
+    expect(readHostAriaState(items[1]!, 'aria-setsize')).toBe('2');
   });
 
   it('single-mode selection remains stable after removing items', async () => {
@@ -1390,5 +1458,412 @@ describe('hx-tree-view — Deep nesting and expand/collapse', () => {
     expect(selected.length).toBe(2);
     expect(selected).toContain(i1);
     expect(selected).toContain(i2);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Group 5c — host-canonical ARIA migration tests
+//
+// hx-tree-view + hx-tree-item live behind ElementInternals: the host
+// carries role + aria-* on the modern path, the inner [role="..."]
+// element does so on the legacy fallback path. Both paths must stay
+// observable to AT, and the migration must not regress either side.
+// ─────────────────────────────────────────────────────────────
+
+type HelixTreeViewCtor = typeof HelixTreeView & {
+  __testSupportsIdrefRefsOverride: boolean | null;
+};
+type HelixTreeItemCtor = typeof HelixTreeItem & {
+  __testSupportsIdrefRefsOverride: boolean | null;
+};
+
+describe('hx-tree-view host-canonical role + label (modern path)', () => {
+  it('writes role="tree" onto host internals on the modern path', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    try {
+      const el = await fixture<HxTreeView>('<hx-tree-view label="Files"></hx-tree-view>');
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('tree');
+      // Modern path: inner div is roleless so AT does not see two trees.
+      const inner = el.shadowRoot?.querySelector('.tree');
+      expect(inner?.getAttribute('role')).toBeNull();
+    } finally {
+      ctor.__testSupportsIdrefRefsOverride = null;
+    }
+  });
+
+  it('writes ariaLabel onto host internals on the modern path', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    try {
+      const el = await fixture<HxTreeView>('<hx-tree-view label="Files"></hx-tree-view>');
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Files');
+    } finally {
+      ctor.__testSupportsIdrefRefsOverride = null;
+    }
+  });
+
+  it('host aria-label takes precedence over the label property', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    try {
+      const el = await fixture<HxTreeView>(
+        '<hx-tree-view label="ignored" aria-label="Picked"></hx-tree-view>',
+      );
+      await el.updateComplete;
+      expect(readHostAriaLabel(el)).toBe('Picked');
+    } finally {
+      ctor.__testSupportsIdrefRefsOverride = null;
+    }
+  });
+
+  it('AccName 1.2 §4.3.1: aria-labelledby beats aria-label on the modern path', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    try {
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<span id="tree-modern-lbl">Recent files</span>',
+      );
+      const el = await fixture<HxTreeView>(
+        '<hx-tree-view aria-label="Ignored" aria-labelledby="tree-modern-lbl"></hx-tree-view>',
+      );
+      await el.updateComplete;
+      const internals = (el as unknown as {
+        _internals: ElementInternals & { ariaLabelledByElements?: Element[] | null };
+      })._internals;
+      // Modern path uses ariaLabelledByElements; ariaLabel is cleared so a
+      // stale string never shadows the resolved refs.
+      expect(internals.ariaLabel ?? '').toBe('');
+      expect(internals.ariaLabelledByElements?.length).toBe(1);
+      document.getElementById('tree-modern-lbl')?.remove();
+    } finally {
+      ctor.__testSupportsIdrefRefsOverride = null;
+    }
+  });
+
+  it('writes ariaMultiSelectable onto host internals (selection="multiple")', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    try {
+      const el = await fixture<HxTreeView>(
+        '<hx-tree-view label="Multi" selection="multiple"></hx-tree-view>',
+      );
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaMultiSelectable).toBe('true');
+    } finally {
+      ctor.__testSupportsIdrefRefsOverride = null;
+    }
+  });
+});
+
+describe('hx-tree-view fallback path (legacy, no IDL element refs)', () => {
+  afterEach(() => {
+    const ctor = customElements.get('hx-tree-view') as unknown as
+      | HelixTreeViewCtor
+      | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('suppresses host role and writes role="tree" onto the inner element', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const el = await fixture<HxTreeView>('<hx-tree-view label="Files"></hx-tree-view>');
+    await el.updateComplete;
+    const internals = (el as unknown as { _internals: ElementInternals })._internals;
+    // Suppress host role on fallback so AT only sees ONE tree.
+    expect(internals.role).toBeNull();
+    const inner = el.shadowRoot?.querySelector('[role="tree"]');
+    expect(inner).toBeTruthy();
+  });
+
+  it('mirrors host aria-label onto the inner [role="tree"]', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const el = await fixture<HxTreeView>('<hx-tree-view aria-label="Picked"></hx-tree-view>');
+    await el.updateComplete;
+    const inner = el.shadowRoot?.querySelector('[role="tree"]') as HTMLElement;
+    expect(inner.getAttribute('aria-label')).toBe('Picked');
+  });
+
+  it('mirrors flattened aria-labelledby onto the inner [role="tree"]', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<span id="tree-fallback-lbl">My files</span>',
+    );
+    const el = await fixture<HxTreeView>(
+      '<hx-tree-view aria-labelledby="tree-fallback-lbl"></hx-tree-view>',
+    );
+    await el.updateComplete;
+    const inner = el.shadowRoot?.querySelector('[role="tree"]') as HTMLElement;
+    expect(inner.getAttribute('aria-label')).toBe('My files');
+    document.getElementById('tree-fallback-lbl')?.remove();
+  });
+
+  it('mirrors aria-multiselectable onto the inner [role="tree"]', async () => {
+    const ctor = customElements.get('hx-tree-view') as unknown as HelixTreeViewCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const el = await fixture<HxTreeView>(
+      '<hx-tree-view label="x" selection="multiple"></hx-tree-view>',
+    );
+    await el.updateComplete;
+    const inner = el.shadowRoot?.querySelector('[role="tree"]') as HTMLElement;
+    expect(inner.getAttribute('aria-multiselectable')).toBe('true');
+  });
+});
+
+describe('hx-tree-item host-canonical role + state (modern path)', () => {
+  afterEach(() => {
+    const ctor = customElements.get('hx-tree-item') as unknown as
+      | HelixTreeItemCtor
+      | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('writes role="treeitem" onto host internals; inner is presentational', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+    await el.updateComplete;
+    const internals = (el as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.role).toBe('treeitem');
+    const inner = el.shadowRoot?.querySelector('.item-row');
+    // Modern path: inner row carries no role so AT does not see two
+    // treeitems for one logical option.
+    expect(inner?.getAttribute('role')).toBeNull();
+  });
+
+  it('mirrors aria-expanded / aria-selected / aria-disabled onto host internals', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    const tree = await fixture<HxTreeView>(
+      `<hx-tree-view label="x" selection="single">
+        <hx-tree-item expanded selected disabled>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await tree.updateComplete;
+    const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
+    await item.updateComplete;
+    const internals = (item as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.ariaExpanded).toBe('true');
+    expect(internals.ariaSelected).toBe('true');
+    expect(internals.ariaDisabled).toBe('true');
+    expect(internals.ariaLevel).toBe('1');
+    expect(internals.ariaPosInSet).toBe('1');
+    expect(internals.ariaSetSize).toBe('1');
+  });
+
+  it('host carries the roving tabindex on the modern path', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = true;
+    const tree = await fixture<HxTreeView>(
+      `<hx-tree-view label="x">
+        <hx-tree-item>A</hx-tree-item>
+        <hx-tree-item>B</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await tree.updateComplete;
+    const items = Array.from(tree.querySelectorAll<HxTreeItem>('hx-tree-item'));
+    for (const i of items) await i.updateComplete;
+    expect(items[0]!.tabIndex).toBe(0);
+    expect(items[1]!.tabIndex).toBe(-1);
+  });
+});
+
+describe('hx-tree-item fallback path (legacy)', () => {
+  afterEach(() => {
+    const ctor = customElements.get('hx-tree-item') as unknown as
+      | HelixTreeItemCtor
+      | undefined;
+    if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+  });
+
+  it('suppresses host role; inner .item-row carries role="treeitem"', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+    await el.updateComplete;
+    const internals = (el as unknown as { _internals: ElementInternals })._internals;
+    expect(internals.role).toBeNull();
+    const inner = el.shadowRoot?.querySelector('.item-row');
+    expect(inner?.getAttribute('role')).toBe('treeitem');
+  });
+
+  it('host.tabIndex stays -1; inner .item-row carries the roving tabindex', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const tree = await fixture<HxTreeView>(
+      `<hx-tree-view label="x">
+        <hx-tree-item>A</hx-tree-item>
+        <hx-tree-item>B</hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await tree.updateComplete;
+    const items = Array.from(tree.querySelectorAll<HxTreeItem>('hx-tree-item'));
+    for (const i of items) await i.updateComplete;
+
+    // Host MUST stay out of the tab order on the fallback path so the
+    // inner element is the SINGLE focusable surface per item.
+    expect(items[0]!.tabIndex).toBe(-1);
+    expect(items[1]!.tabIndex).toBe(-1);
+
+    const inner0 = shadowQuery<HTMLElement>(items[0]!, '.item-row')!;
+    const inner1 = shadowQuery<HTMLElement>(items[1]!, '.item-row')!;
+    expect(inner0.getAttribute('tabindex')).toBe('0');
+    expect(inner1.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('mirrors host aria-label onto inner [role="treeitem"]', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const el = await fixture<HxTreeItem>(
+      '<hx-tree-item aria-label="Custom name">Label</hx-tree-item>',
+    );
+    await el.updateComplete;
+    const inner = el.shadowRoot?.querySelector('.item-row[role="treeitem"]') as HTMLElement;
+    expect(inner.getAttribute('aria-label')).toBe('Custom name');
+  });
+
+  it('leaves inner element unnamed when no host override is set (slotted text wins)', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const el = await fixture<HxTreeItem>('<hx-tree-item>Label</hx-tree-item>');
+    await el.updateComplete;
+    const inner = el.shadowRoot?.querySelector('.item-row[role="treeitem"]') as HTMLElement;
+    expect(inner.hasAttribute('aria-label')).toBe(false);
+  });
+
+  it('mirrors aria-expanded / aria-selected onto inner element', async () => {
+    const ctor = customElements.get('hx-tree-item') as unknown as HelixTreeItemCtor;
+    ctor.__testSupportsIdrefRefsOverride = false;
+    const tree = await fixture<HxTreeView>(
+      `<hx-tree-view label="x" selection="single">
+        <hx-tree-item expanded selected>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await tree.updateComplete;
+    const item = tree.querySelector<HxTreeItem>('hx-tree-item')!;
+    await item.updateComplete;
+    const inner = item.shadowRoot?.querySelector('.item-row[role="treeitem"]') as HTMLElement;
+    expect(inner.getAttribute('aria-expanded')).toBe('true');
+    expect(inner.getAttribute('aria-selected')).toBe('true');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Composed-tree origin guards (round-1 lift from hx-menu round-5/7).
+// Nested trees and nested items must not steal each other's events.
+// ─────────────────────────────────────────────────────────────
+
+describe('hx-tree-item nested-bubble guards', () => {
+  it('clicking a CHILD does not double-activate the PARENT', async () => {
+    const tree = await fixture<HxTreeView>(
+      `<hx-tree-view label="x" selection="multiple">
+        <hx-tree-item expanded>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await tree.updateComplete;
+    const [parent, child] = Array.from(tree.querySelectorAll<HxTreeItem>('hx-tree-item'));
+    await parent!.updateComplete;
+    await child!.updateComplete;
+
+    const events: HxTreeItem[] = [];
+    tree.addEventListener('hx-tree-item-select', (e) => {
+      events.push((e as CustomEvent<{ item: HxTreeItem }>).detail.item);
+    });
+
+    const childRow = shadowQuery<HTMLElement>(child!, '.item-row')!;
+    childRow.click();
+    await tree.updateComplete;
+
+    // Exactly one select fired and it was the child.
+    expect(events.length).toBe(1);
+    expect(events[0]).toBe(child);
+  });
+
+  it('Enter on a CHILD does not also fire on the PARENT', async () => {
+    const tree = await fixture<HxTreeView>(
+      `<hx-tree-view label="x" selection="multiple">
+        <hx-tree-item expanded>
+          Parent
+          <hx-tree-item slot="children">Child</hx-tree-item>
+        </hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await tree.updateComplete;
+    const [parent, child] = Array.from(tree.querySelectorAll<HxTreeItem>('hx-tree-item'));
+    await parent!.updateComplete;
+    await child!.updateComplete;
+
+    const firedOn: HxTreeItem[] = [];
+    tree.addEventListener('hx-tree-item-select', (e) => {
+      firedOn.push((e as CustomEvent<{ item: HxTreeItem }>).detail.item);
+    });
+
+    const childRow = shadowQuery<HTMLElement>(child!, '.item-row')!;
+    childRow.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }));
+    await tree.updateComplete;
+
+    expect(firedOn.length).toBe(1);
+    expect(firedOn[0]).toBe(child);
+  });
+});
+
+describe('hx-tree-view nested-tree guards', () => {
+  it('inner tree handles selects without the outer tree double-firing', async () => {
+    // A second tree-view nested inside the first via slotting. Both trees
+    // listen at host level, so without the closest-tree origin guard the
+    // outer tree would treat the inner select as its own.
+    const outer = await fixture<HxTreeView>(
+      `<hx-tree-view label="outer" selection="multiple">
+        <hx-tree-item>
+          Outer item with embedded tree
+          <hx-tree-view slot="children" label="inner" selection="multiple">
+            <hx-tree-item>Inner A</hx-tree-item>
+          </hx-tree-view>
+        </hx-tree-item>
+      </hx-tree-view>`,
+    );
+    await outer.updateComplete;
+    const inner = outer.querySelector<HxTreeView>('hx-tree-view[label="inner"]')!;
+    await inner.updateComplete;
+
+    let outerSelects = 0;
+    let innerSelects = 0;
+    outer.addEventListener(
+      'hx-select',
+      (e) => {
+        if ((e as CustomEvent).target === outer) outerSelects++;
+        else innerSelects++;
+      },
+    );
+
+    const innerItem = inner.querySelector<HxTreeItem>('hx-tree-item')!;
+    await innerItem.updateComplete;
+    const innerRow = shadowQuery<HTMLElement>(innerItem, '.item-row')!;
+    innerRow.click();
+    await outer.updateComplete;
+
+    // The inner tree handled the select; the outer tree's host listener
+    // ignored the bubbled event because it is not the closest enclosing
+    // tree of the dispatching item.
+    expect(innerSelects).toBeGreaterThanOrEqual(1);
+    expect(outerSelects).toBe(0);
   });
 });

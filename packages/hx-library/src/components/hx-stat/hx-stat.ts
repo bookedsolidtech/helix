@@ -6,12 +6,26 @@ import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import { helixStatStyles } from './hx-stat.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 export type StatSize = 'sm' | 'md' | 'lg';
 export type StatTrend = 'up' | 'down' | 'neutral';
 
 /**
  * A static stat display component for presenting key metrics in a healthcare dashboard.
+ *
+ * Group 7 host-canonical: `role="group"` lives on the **host** via
+ * `_internals.role`. The host carries the resolved accessible name so AT
+ * walks `<hx-stat>` (role=group, label="value: label") directly. The
+ * internal `aria-live="polite"` announcer remains in the shadow tree —
+ * `role="group"` does NOT imply a live region, so the announcer is required
+ * for value/label/trend update announcements.
  *
  * @summary Displays a labeled metric value with optional trend indicator and icon slot.
  *
@@ -74,6 +88,13 @@ export class HelixStat extends HelixElement {
   static override styles = [helixStatStyles, forcedColorsSurface];
 
   /**
+   * Test seam (Group 7 host-canonical migration): see other Group 7 components.
+   * Production code MUST NOT touch this field.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
+  /**
    * The metric label displayed below the value.
    * @attr label
    */
@@ -110,6 +131,17 @@ export class HelixStat extends HelixElement {
   /** @internal tracks whether the "unnamed" devWarn has already fired this lifecycle */
   private _hasWarnedUnnamed = false;
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /** @internal */
+  private _resolvedAccessibleName = '';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -121,6 +153,22 @@ export class HelixStat extends HelixElement {
       devWarn('hx-stat', 'The "size" attribute is deprecated. Use "hx-size" instead.');
       this.size = legacySize as StatSize;
     }
+
+    const ctor = this.constructor as typeof HelixStat;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -137,6 +185,86 @@ export class HelixStat extends HelixElement {
     }
     if (hasValue || hasLabel) {
       this._hasWarnedUnnamed = false;
+    }
+
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('label') ||
+      changedProperties.has('trend') ||
+      changedProperties.has('labelTrend')
+    ) {
+      this._syncHostAriaSemantics();
+    }
+  }
+
+  /**
+   * Mirror group semantics onto the host. The default group label is
+   * `${value}: ${label}` (matching the prior inner-div behaviour). Consumer
+   * `aria-label` / `aria-labelledby` on the host take precedence per AccName
+   * 1.2 §4.3.1.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    const groupLabel =
+      this.value && this.label ? `${this.value}: ${this.label}` : this.value || this.label || '';
+
+    if (!this._supportsIdrefRefs) {
+      internals.role = null;
+      internals.ariaLabel = null;
+    } else {
+      internals.role = 'group';
+    }
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    let resolved = '';
+    if (hasEffectiveLabelledBy) {
+      const flattened =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        hostAriaLabel ||
+        groupLabel;
+      resolved = flattened;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = hostAriaLabel;
+      }
+    } else if (groupLabel) {
+      resolved = groupLabel;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = groupLabel;
+      }
+    } else {
+      resolved = '';
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    }
+
+    if (this._resolvedAccessibleName !== resolved) {
+      this._resolvedAccessibleName = resolved;
+      if (!this._supportsIdrefRefs) {
+        this.requestUpdate();
+      }
     }
   }
 
@@ -219,6 +347,10 @@ export class HelixStat extends HelixElement {
     if (hasTrend) liveParts.push(`${this.labelTrend}: ${this.trend}`);
     const liveText = liveParts.join(', ');
 
+    // Dual-surface (Group 7 hx-progress-ring exemplar): inner div keeps
+    // role="group" + aria-label for legacy AT and consumer queries; host
+    // adds the cross-shadow IDREF wiring via internals.* in
+    // _syncHostAriaSemantics().
     return html`
       <div
         part="container"

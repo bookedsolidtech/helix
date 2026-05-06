@@ -2,7 +2,9 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixOverflowMenu } from './hx-overflow-menu.js';
+import type { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 import './index.js';
+import '../hx-menu/index.js';
 
 afterEach(cleanup);
 
@@ -470,6 +472,79 @@ describe('hx-overflow-menu', () => {
     });
   });
 
+  // ─── Typeahead — submenu-aware label extractor (codex round-7) ───
+
+  describe('Typeahead with nested submenus (codex push-gate round-7 finding 3)', () => {
+    it('parent item with submenu-only-text does not match its grandchild prefix', async () => {
+      // Parent has NO own-text — only a nested submenu containing "Apple".
+      // Pre-fix: textContent walks into submenu and returns "Apple", so
+      // typing "a" matches the parent. Post-fix: parent's own label is "",
+      // so "a" matches the legitimate sibling "Apricot".
+      const el = await fixture<HelixOverflowMenu>(`
+        <hx-overflow-menu>
+          <hx-menu-item value="parent"><hx-menu slot="submenu"><hx-menu-item value="apple">Apple</hx-menu-item></hx-menu></hx-menu-item>
+          <hx-menu-item value="apricot">Apricot</hx-menu-item>
+        </hx-overflow-menu>
+      `);
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const parentItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const apricotItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="apricot"]')!;
+      // Focus a known-not-target item first so we can detect movement.
+      apricotItem.focus();
+      parentItem.focus();
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      // Pre-fix: parent matches first ("Apple" via grandchild text) → focus
+      // stays on parent. Post-fix: parent has empty effective label → only
+      // Apricot starts with "a" → focus moves to Apricot.
+      expect(document.activeElement === apricotItem || apricotItem.matches(':focus-within')).toBe(
+        true,
+      );
+    });
+  });
+
+  // ─── Nested submenu routing (codex push-gate round-9) ───
+
+  describe('Nested submenu open/close routing (codex push-gate round-9 P1)', () => {
+    it('ArrowLeft on a child of a nested submenu closes the parent submenu and keeps the overflow panel open', async () => {
+      const el = await fixture<HelixOverflowMenu>(`
+        <hx-overflow-menu>
+          <hx-menu-item value="parent" submenu-open>
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-overflow-menu>
+      `);
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]')!;
+      btn.click();
+      await el.updateComplete;
+
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      child.focus();
+      child.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 0));
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      const parentInternals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(parentInternals.ariaExpanded).toBe('false');
+      // Overflow panel must stay open (close belongs to the inner menu).
+      const panel = shadowQuery(el, '[part~="panel"]');
+      expect(panel).toBeTruthy();
+      // Focus returned to Parent.
+      expect(document.activeElement === parent || parent.matches(':focus-within')).toBe(true);
+    });
+  });
+
   // ─── Slots (1) ───
 
   describe('Slots', () => {
@@ -479,6 +554,136 @@ describe('hx-overflow-menu', () => {
       );
       const items = el.querySelectorAll('[role="menuitem"]');
       expect(items.length).toBe(2);
+    });
+  });
+
+  // ─── Host-canonical hx-menu-item integration (codex round-2) ───
+
+  describe('Host-canonical hx-menu-item integration', () => {
+    it('walks slotted hx-menu-item children for focus / arrow nav', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item><hx-menu-item value="delete">Delete</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('hx-menu-item') as NodeListOf<HTMLElement>;
+      expect(items.length).toBe(2);
+      // Roving tabindex must hand the first item a tab stop (tabindex=0)
+      // and demote the rest to -1.
+      expect(items[0].tabIndex).toBe(0);
+      expect(items[1].tabIndex).toBe(-1);
+
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('routes hx-item-select from hx-menu-item through hx-select', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item><hx-menu-item value="delete">Delete</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('hx-menu-item') as NodeListOf<HTMLElement>;
+      const eventPromise = oneEvent<CustomEvent<{ value: string }>>(el, 'hx-select');
+      items[0].click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('edit');
+    });
+
+    it('closes the panel after hx-menu-item activation', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const item = el.querySelector('hx-menu-item') as HTMLElement;
+      const hidePromise = oneEvent(el, 'hx-hide');
+      item.click();
+      await hidePromise;
+
+      await el.updateComplete;
+      const panel = shadowQuery(el, '[part~="panel"]');
+      expect(panel).toBeNull();
+    });
+
+    it('does not double-fire hx-select for a single hx-menu-item click', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      let count = 0;
+      el.addEventListener('hx-select', () => {
+        count += 1;
+      });
+      const item = el.querySelector('hx-menu-item') as HTMLElement;
+      item.click();
+      await el.updateComplete;
+      expect(count).toBe(1);
+    });
+
+    // Codex round-3: descendant-target click bypass. If a consumer slots a
+    // `[role="menuitem"]` descendant inside an `hx-menu-item`, `closest()` on
+    // the legacy selector resolves to the inner element (nearest match) and
+    // the localName guard misses — dispatching twice (here AND from the
+    // bubbled `hx-item-select` -> `_handleSlotItemSelect`). The host-canonical
+    // bail must run FIRST, independent of legacy selectors.
+    it('does not double-fire hx-select when clicking a [role="menuitem"] descendant inside hx-menu-item', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit"><button role="menuitem" type="button">Edit</button></hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      let count = 0;
+      el.addEventListener('hx-select', () => {
+        count += 1;
+      });
+      const inner = el.querySelector<HTMLElement>('button[role="menuitem"]')!;
+      inner.click();
+      await el.updateComplete;
+      expect(count).toBe(1);
+    });
+
+    it('skips hx-menu-divider when collecting menu items (APG separator stays non-focusable)', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item><hx-menu-divider></hx-menu-divider><hx-menu-item value="delete">Delete</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('hx-menu-item') as NodeListOf<HTMLElement>;
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      // ArrowDown must move past the divider directly to the next menu-item,
+      // not stop on the separator.
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('skips disabled hx-menu-item children', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item><hx-menu-item value="delete" disabled>Delete</hx-menu-item><hx-menu-item value="archive">Archive</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('hx-menu-item') as NodeListOf<HTMLElement>;
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      // Disabled middle item must be skipped — focus must land on archive.
+      expect(document.activeElement).toBe(items[2]);
     });
   });
 
@@ -513,6 +718,83 @@ describe('hx-overflow-menu', () => {
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Codex push-gate round-2 finding 3: roving tabindex must reach the
+  // canonical focusable surface for each item shape. On the host-canonical
+  // hx-menu-item fallback path (`_supportsIdrefRefs === false`), the host
+  // is forced to `tabindex=-1` and the inner `.menu-item` is the Tab stop.
+  // Direct host-tabIndex writes from hx-overflow-menu would never reach
+  // that inner element — `setRovingTabIndex()` is the routing seam.
+  // ─────────────────────────────────────────────────────────────
+
+  describe('roving tabindex routing for slotted hx-menu-item (codex push-gate round-2 finding 3)', () => {
+    type HelixMenuItemCtor = typeof HelixMenuItem & {
+      __testSupportsIdrefRefsOverride: boolean | null;
+    };
+
+    afterEach(() => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor | undefined;
+      if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+    });
+
+    it('routes roving tabindex to inner .menu-item on the fallback path', async () => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+      ctor.__testSupportsIdrefRefsOverride = false;
+
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><hx-menu-item value="edit">Edit</hx-menu-item><hx-menu-item value="delete">Delete</hx-menu-item></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('hx-menu-item') as NodeListOf<HelixMenuItem>;
+      await items[0]!.updateComplete;
+      await items[1]!.updateComplete;
+
+      // Host MUST stay out of the tab order on the fallback path —
+      // direct host-tabIndex writes would have left this at 0 here.
+      expect(items[0]!.tabIndex).toBe(-1);
+      expect(items[1]!.tabIndex).toBe(-1);
+
+      // Inner `.menu-item` carries the active roving tabindex.
+      const inner0 = items[0]!.shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      const inner1 = items[1]!.shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      expect(inner0.getAttribute('tabindex')).toBe('0');
+      expect(inner1.getAttribute('tabindex')).toBe('-1');
+
+      // Land focus on item[0] before ArrowDown — `_focusFirstItem` runs
+      // inside the async `_show()` chain so it may not have settled by the
+      // time we dispatch. Without an active item, the keydown handler
+      // resets the roving target back to 0 (focused index = -1 fall-back).
+      items[0]!.focus();
+
+      // ArrowDown advances the roving target through the inner surface.
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      // Lit re-render flush — both items had _rovingTabIndex change.
+      await el.updateComplete;
+      await items[0]!.updateComplete;
+      await items[1]!.updateComplete;
+
+      expect(inner0.getAttribute('tabindex')).toBe('-1');
+      expect(inner1.getAttribute('tabindex')).toBe('0');
+    });
+
+    it('keeps direct tabIndex write for plain [role="menuitem"] children', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu><button role="menuitem">Edit</button><button role="menuitem">Delete</button></hx-overflow-menu>',
+      );
+      const btn = shadowQuery<HTMLButtonElement>(el, '[part~="button"]');
+      btn?.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll('button[role="menuitem"]') as NodeListOf<HTMLElement>;
+      // Plain children keep the legacy direct-write semantics.
+      expect(items[0]!.tabIndex).toBe(0);
+      expect(items[1]!.tabIndex).toBe(-1);
     });
   });
 });

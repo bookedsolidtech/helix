@@ -554,6 +554,81 @@ describe('hx-split-button', () => {
     });
   });
 
+  // ─── Typeahead — submenu-aware label extractor (codex round-7) ───
+
+  describe('Typeahead with nested submenus (codex push-gate round-7 finding 3)', () => {
+    it('parent item with submenu-only-text does not match its grandchild prefix', async () => {
+      // Parent has NO own-text — only a nested submenu containing "Apple".
+      // Pre-fix: textContent walks into submenu and returns "Apple", so
+      // typing "a" matches the parent. Post-fix: parent's own label is "",
+      // so "a" matches the legitimate sibling "Apricot".
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="parent"><hx-menu slot="submenu"><hx-menu-item value="apple">Apple</hx-menu-item></hx-menu></hx-menu-item>
+          <hx-menu-item slot="menu" value="apricot">Apricot</hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+
+      const parentItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const apricotItem = el.querySelector<HelixMenuItem>('hx-menu-item[value="apricot"]')!;
+      parentItem.focus();
+      await el.updateComplete;
+
+      const menu = shadowQuery(el, '.split-button__menu');
+      menu?.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      await el.updateComplete;
+
+      expect(document.activeElement === apricotItem || apricotItem.matches(':focus-within')).toBe(
+        true,
+      );
+    });
+  });
+
+  // ─── Nested submenu routing (codex push-gate round-9) ───
+
+  describe('Nested submenu open/close routing (codex push-gate round-9 P1)', () => {
+    it('ArrowLeft on a child of a nested submenu closes the parent submenu and keeps the split-button menu open', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button>
+          Save Record
+          <hx-menu-item slot="menu" value="parent" submenu-open>
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-split-button>
+      `);
+      const trigger = shadowQuery<HTMLButtonElement>(el, '.split-button__trigger');
+      trigger?.click();
+      await el.updateComplete;
+
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      child.focus();
+      child.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      await new Promise((r) => setTimeout(r, 0));
+      await parent.updateComplete;
+      await child.updateComplete;
+      await el.updateComplete;
+
+      const parentInternals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(parentInternals.ariaExpanded).toBe('false');
+      // Split-button menu must stay open (close belongs to the inner menu).
+      const menu = shadowQuery(el, '.split-button__menu');
+      expect(menu?.classList.contains('split-button__menu--open')).toBe(true);
+      // Focus returned to Parent.
+      expect(document.activeElement === parent || parent.matches(':focus-within')).toBe(true);
+    });
+  });
+
   // ─── Menu behavior ───
 
   describe('Menu behavior', () => {
@@ -715,12 +790,16 @@ describe('hx-menu-item', () => {
       expect(el.shadowRoot).toBeTruthy();
     });
 
-    it('renders with role="menuitem"', async () => {
+    it('exposes role="menuitem" (host-canonical or inner)', async () => {
       const el = await fixture<HelixMenuItem>(`
         <hx-menu-item value="test">Test Item</hx-menu-item>
       `);
-      const item = shadowQuery(el, '.menu-item');
-      expect(item?.getAttribute('role')).toBe('menuitem');
+      // Group 5b host-canonical: role lives on host via internals; the
+      // legacy fallback path keeps role on the inner element. Accept both.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      const role =
+        internals.role ?? el.shadowRoot?.querySelector('[role^="menuitem"]')?.getAttribute('role');
+      expect(role).toBe('menuitem');
     });
 
     it('renders slot content', async () => {

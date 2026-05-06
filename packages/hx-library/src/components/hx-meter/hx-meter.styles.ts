@@ -118,6 +118,11 @@ export const helixMeterStyles = css`
   /* ─── Forced Colors (Windows High Contrast) ─── */
 
   @media (forced-colors: active) {
+    .meter:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: var(--hx-focus-ring-offset, 2px);
+    }
+
     .meter__track {
       border: 1px solid CanvasText;
     }

@@ -3,9 +3,17 @@ import '../../utilities/document-token-adoption.js';
 import { HelixElement } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { helixColorPickerStyles } from './hx-color-picker.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 import {
   type ColorFormat,
   type HSV,
@@ -14,6 +22,9 @@ import {
   parseColor,
   formatColor,
 } from './color-utils.js';
+
+/** Internal counter used to mint stable IDs for inner aria-related elements. */
+let _hxColorPickerCounter = 0;
 
 // Re-export ColorFormat so existing consumers using this module path still work
 export type { ColorFormat };
@@ -34,6 +45,9 @@ export interface HxColorPickerDetail {
  * @tag hx-color-picker
  *
  * @slot trigger - Custom trigger element. Default: a color swatch button.
+ * @slot label - Visible label projected above the trigger; aggregated text contributes to the host's accessible name when no stronger naming source (aria-labelledby/aria-label/accessible-label/label) is supplied.
+ * @slot help-text - Help text rendered below the trigger and joined into the host's announced description channel.
+ * @slot error - Error message rendered below help text. When present, marks the trigger as aria-invalid and is announced via a polite live region.
  *
  * @fires {CustomEvent<{value: string}>} hx-input - Dispatched while dragging sliders or grid.
  * @fires {CustomEvent<{value: string}>} hx-change - Dispatched when a color is committed.
@@ -45,6 +59,9 @@ export interface HxColorPickerDetail {
  * @csspart hue-slider - The hue slider track.
  * @csspart opacity-slider - The alpha/opacity slider track.
  * @csspart input - The text input area.
+ * @csspart label - The visible label container above the trigger.
+ * @csspart help-text - The help-text container rendered below the trigger.
+ * @csspart error - The error-message container rendered below help text.
  *
  * @cssprop [--hx-color-picker-z-index=1000] - z-index of the popover panel.
  * @cssprop [--hx-color-picker-width=260px] - Width of the picker panel.
@@ -227,7 +244,42 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
   labelPicker = 'Color picker';
 
   /**
-   * Generates the accessible label for the trigger button.
+   * Visible label rendered above the trigger. When set this becomes the
+   * announced name of the trigger surface unless a stronger source
+   * (`aria-labelledby`, `aria-label`, or `accessible-label`) is supplied.
+   * @attr label
+   */
+  @property({ type: String, reflect: true })
+  label: string | undefined = undefined;
+
+  /**
+   * Visually-hidden accessible name. Highest-priority self-naming source —
+   * outranks `label`, slotted label content, and the generated trigger label,
+   * but defers to consumer `aria-labelledby` (effective) and `aria-label`.
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | undefined = undefined;
+
+  /**
+   * Help text rendered below the trigger and joined into the host's
+   * announced description channel.
+   * @attr help-text
+   */
+  @property({ type: String, attribute: 'help-text' })
+  helpText: string | undefined = undefined;
+
+  /**
+   * Error message. When non-empty, marks the trigger surface as `aria-invalid`
+   * and joins the host's announced description channel via a live alert.
+   * @attr error
+   */
+  @property({ type: String, reflect: true })
+  error: string | undefined = undefined;
+
+  /**
+   * Generates the accessible label for the trigger button when no other
+   * naming source is provided.
    * @param color - current color value string
    */
   @property({ attribute: false })
@@ -250,6 +302,65 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
    * @internal
    */
   @state() private _inputValue = '#000000';
+
+  // ─── Cross-shadow ARIA-delegation infrastructure ─────────────────────────
+
+  /**
+   * Whether the platform supports the IDL element-references API on
+   * `ElementInternals` (`ariaLabelledByElements` / `ariaDescribedByElements`).
+   * Drives the modern (host-canonical) vs. fallback (mirror onto trigger)
+   * branches in `_syncHostAriaSemantics()`.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+
+  /**
+   * Test seam for forcing the no-IDL-ref path in synthetic environments.
+   * Production code MUST NOT touch this. `null` = use platform detection;
+   * `true`/`false` = force the corresponding branch on connect.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
+  /** Slotted label elements (multi-node aggregation). @internal */
+  @state() private _slottedLabelEls: Element[] = [];
+  /** Aggregated text from slotted label, AccName-flattened. @internal */
+  @state() private _labelSlotText: string = '';
+  /** True when the label slot carries useful text. @internal */
+  @state() private _hasLabelSlot = false;
+  /** Aggregated text from slotted help-text, AccName-flattened. @internal */
+  @state() private _helpSlotText: string = '';
+  /** Aggregated text from slotted error, AccName-flattened. @internal */
+  @state() private _errorSlotText: string = '';
+
+  /** Effective error text exposed in the live region. @internal */
+  @state() private _announcedError: string = '';
+
+  /** Stable IDs for inner help / error elements. @internal */
+  private readonly _instanceId = ++_hxColorPickerCounter;
+  /** @internal */ private readonly _helpId = `hx-color-picker-help-${this._instanceId}`;
+  /** @internal */ private readonly _errorId = `hx-color-picker-error-${this._instanceId}`;
+  /** Hidden host-level description span ID (synthesized aria-description channel). @internal */
+  private readonly _hostDescId = `hx-color-picker-host-desc-${this._instanceId}`;
+
+  /** Fallback aria-* for the trigger button when IDL refs are unsupported. @internal */
+  @state() private _fallbackTriggerAriaLabelledBy: string | null = null;
+  /** @internal */ @state() private _fallbackTriggerAriaDescribedBy: string | null = null;
+  /** @internal */ @state() private _fallbackTriggerAriaLabel: string | null = null;
+
+  /** Cached resolved external description text for the synthesized host span. @internal */
+  @state() private _externalDescText: string = '';
+
+  /** Handle for the shared IDREF observer. @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+  /** Mutation observer over the label-slot assigned-node text. @internal */
+  private _labelSlotTextObserver: MutationObserver | null = null;
+  /** Mutation observer over the help-slot assigned-node text. @internal */
+  private _helpSlotTextObserver: MutationObserver | null = null;
+  /** Mutation observer over the error-slot assigned-node text. @internal */
+  private _errorSlotTextObserver: MutationObserver | null = null;
+  /** Mutation observer over external aria-labelledby / aria-describedby targets. @internal */
+  private _externalRefsObserver: MutationObserver | null = null;
 
   // ─── Cached element references ───────────────────────────────────────────
 
@@ -306,6 +417,22 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback();
     this._syncFromValue();
+
+    // Honour the static test override so synthetic environments choose the
+    // path BEFORE connect-time syncs run.
+    const ctor = this.constructor as typeof HelixColorPicker;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+
+    // Seed root-independent semantics from connect so consumer-supplied
+    // aria-labelledby / aria-describedby on the host resolves to live
+    // light-DOM elements before first paint.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
   }
 
   override disconnectedCallback(): void {
@@ -317,12 +444,56 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
       document.removeEventListener('pointermove', this._boundPointerMove);
       document.removeEventListener('pointerup', this._boundPointerUp);
     }
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    this._labelSlotTextObserver?.disconnect();
+    this._labelSlotTextObserver = null;
+    this._helpSlotTextObserver?.disconnect();
+    this._helpSlotTextObserver = null;
+    this._errorSlotTextObserver?.disconnect();
+    this._errorSlotTextObserver = null;
+    this._externalRefsObserver?.disconnect();
+    this._externalRefsObserver = null;
   }
 
   override willUpdate(changedProperties: PropertyValues<this>): void {
     if (changedProperties.has('value')) {
       this._syncFromValue();
     }
+    // Seed `_announcedError` BEFORE render so the persistent live region
+    // renders with the error text in the SAME frame that removes `hidden`
+    // from the alert container. Covers first paint AND runtime transitions
+    // from "" to "Server rejected" via async/server-side validation.
+    if (changedProperties.has('error') || !this.hasUpdated) {
+      this._announcedError = this.error ?? '';
+    }
+  }
+
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+    // `slotchange` fires as a microtask after the initial synchronous render.
+    // Seed slot-derived state synchronously so `_syncHostAriaSemantics()` —
+    // driven by `updated()` in this same cycle — observes a populated state.
+    this._seedSlotStateSync();
+    this._syncHostAriaSemantics();
+  }
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    // Drive re-announcement on error→error transitions (rAF clear-and-re-set
+    // forces AT to re-read `role="alert"` content).
+    if (changedProperties.has('error')) {
+      const previousError = changedProperties.get('error') as string | undefined;
+      if (previousError && this.error) {
+        this._announcedError = '';
+        requestAnimationFrame(() => {
+          this._announcedError = this.error ?? '';
+        });
+      } else {
+        this._announcedError = this.error ?? '';
+      }
+    }
+    this._syncHostAriaSemantics();
   }
 
   // ─── Sync ────────────────────────────────────────────────────────────────
@@ -335,6 +506,337 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
     }
     this._inputValue = formatColor(this._hsv, this.format, this.opacity);
     this._internals.setFormValue(this.value);
+  }
+
+  // ─── Slot state seeding ──────────────────────────────────────────────────
+
+  /**
+   * Synchronous slot-state seed. Mirrors the side effects of the slotchange
+   * handlers but is driven by direct `slot.assignedNodes()` reads so we can
+   * populate state BEFORE the microtask `slotchange` events fire after the
+   * first render.
+   * @internal
+   */
+  private _seedSlotStateSync(): void {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const labelSlot = root.querySelector<HTMLSlotElement>('slot[name="label"]');
+    if (labelSlot) this._captureLabelSlot(labelSlot);
+    const helpSlot = root.querySelector<HTMLSlotElement>('slot[name="help-text"]');
+    if (helpSlot) this._captureHelpSlot(helpSlot);
+    const errorSlot = root.querySelector<HTMLSlotElement>('slot[name="error"]');
+    if (errorSlot) this._captureErrorSlot(errorSlot);
+  }
+
+  /** @internal */
+  private _captureLabelSlot(slot: HTMLSlotElement): void {
+    const assigned = slot
+      .assignedNodes({ flatten: true })
+      .filter((n): n is Element => n.nodeType === Node.ELEMENT_NODE);
+    const elements = assigned.length > 0 ? assigned : [];
+    const text = elements
+      .map((el) => flattenAccName(el))
+      .filter((t) => t.length > 0)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    this._slottedLabelEls = elements;
+    this._labelSlotText = text;
+    this._hasLabelSlot = text.length > 0;
+    this._installLabelSlotTextObserver(elements);
+  }
+
+  /** @internal */
+  private _captureHelpSlot(slot: HTMLSlotElement): void {
+    const text = slot
+      .assignedNodes({ flatten: true })
+      .filter((n): n is Element => n.nodeType === Node.ELEMENT_NODE)
+      .map((el) => flattenAccName(el))
+      .filter((t) => t.length > 0)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    this._helpSlotText = text;
+    this._installHelpSlotTextObserver(slot);
+  }
+
+  /** @internal */
+  private _captureErrorSlot(slot: HTMLSlotElement): void {
+    const text = slot
+      .assignedNodes({ flatten: true })
+      .filter((n): n is Element => n.nodeType === Node.ELEMENT_NODE)
+      .map((el) => flattenAccName(el))
+      .filter((t) => t.length > 0)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    this._errorSlotText = text;
+    this._installErrorSlotTextObserver(slot);
+  }
+
+  /** @internal */
+  private _handleLabelSlotChange(e: Event): void {
+    this._captureLabelSlot(e.target as HTMLSlotElement);
+    this._syncHostAriaSemantics();
+  }
+
+  /** @internal */
+  private _handleHelpSlotChange(e: Event): void {
+    this._captureHelpSlot(e.target as HTMLSlotElement);
+    this._syncHostAriaSemantics();
+  }
+
+  /** @internal */
+  private _handleErrorSlotChange(e: Event): void {
+    this._captureErrorSlot(e.target as HTMLSlotElement);
+    this._syncHostAriaSemantics();
+  }
+
+  /** @internal */
+  private _installLabelSlotTextObserver(nodes: Element[]): void {
+    this._labelSlotTextObserver?.disconnect();
+    if (nodes.length === 0) {
+      this._labelSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      const text = this._slottedLabelEls
+        .map((el) => flattenAccName(el))
+        .filter((t) => t.length > 0)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      this._labelSlotText = text;
+      this._hasLabelSlot = text.length > 0;
+      this._syncHostAriaSemantics();
+    });
+    nodes.forEach((node) => {
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._labelSlotTextObserver = observer;
+  }
+
+  /** @internal */
+  private _installHelpSlotTextObserver(slot: HTMLSlotElement): void {
+    this._helpSlotTextObserver?.disconnect();
+    const observer = new MutationObserver(() => {
+      const text = slot
+        .assignedNodes({ flatten: true })
+        .filter((n): n is Element => n.nodeType === Node.ELEMENT_NODE)
+        .map((el) => flattenAccName(el))
+        .filter((t) => t.length > 0)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      this._helpSlotText = text;
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes({ flatten: true }).forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._helpSlotTextObserver = observer;
+  }
+
+  /** @internal */
+  private _installErrorSlotTextObserver(slot: HTMLSlotElement): void {
+    this._errorSlotTextObserver?.disconnect();
+    const observer = new MutationObserver(() => {
+      const text = slot
+        .assignedNodes({ flatten: true })
+        .filter((n): n is Element => n.nodeType === Node.ELEMENT_NODE)
+        .map((el) => flattenAccName(el))
+        .filter((t) => t.length > 0)
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      this._errorSlotText = text;
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes({ flatten: true }).forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._errorSlotTextObserver = observer;
+  }
+
+  /**
+   * Watches the elements referenced by `aria-labelledby` / `aria-describedby`
+   * for in-place text mutations so the announced name/description stays
+   * accurate when consumers rewrite external label text without swapping the
+   * referenced node.
+   * @internal
+   */
+  private _installExternalRefsObserver(targets: Element[]): void {
+    this._externalRefsObserver?.disconnect();
+    if (targets.length === 0) {
+      this._externalRefsObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    targets.forEach((target) => {
+      observer.observe(target, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._externalRefsObserver = observer;
+  }
+
+  // ─── Host-canonical ARIA-delegation sync ─────────────────────────────────
+
+  /**
+   * Compute and apply the cross-shadow ARIA contract for the trigger surface.
+   *
+   * Naming precedence (highest first):
+   *   1. consumer `aria-labelledby` (when at least one IDREF resolves)
+   *   2. consumer `aria-label`
+   *   3. `accessible-label` property
+   *   4. `label` property
+   *   5. slotted `<slot name="label">` text
+   *   6. `labelTrigger(value)` (default)
+   *
+   * Description channel (joined, deduped):
+   *   - consumer `aria-describedby` resolved text
+   *   - `help-text` property + slotted help-text
+   *   - `error` property + slotted error (when present)
+   *
+   * Modern path (`_supportsIdrefRefs === true`): host owns the announced
+   * surface via `internals.aria*` + IDL refs. Trigger button mirrors only.
+   *
+   * Fallback path (`_supportsIdrefRefs === false`): trigger button carries
+   * the full aria contract via attribute mirrors.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const externalLabelTokens = this.getAttribute('aria-labelledby');
+    const externalDescTokens = this.getAttribute('aria-describedby');
+    const labelEls = resolveIdrefTokens(this, externalLabelTokens);
+    const descEls = resolveIdrefTokens(this, externalDescTokens);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    // Resolve the announced name.
+    let resolvedLabel: string | null;
+    if (hasEffectiveLabelledBy) {
+      // Will be set via IDL refs (modern) or token mirror (fallback). Compute
+      // a flattened text fallback for the IDL-ref-unsupported branch.
+      resolvedLabel =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter((t) => t.length > 0)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim() || null;
+    } else if (hostAriaLabel) {
+      resolvedLabel = hostAriaLabel;
+    } else if (this.accessibleLabel) {
+      resolvedLabel = this.accessibleLabel;
+    } else if (this.label) {
+      resolvedLabel = this.label;
+    } else if (this._hasLabelSlot && this._labelSlotText) {
+      resolvedLabel = this._labelSlotText;
+    } else {
+      resolvedLabel = this.labelTrigger(this._inputValue);
+    }
+
+    // External description text (flattened from consumer-resolved IDREFs).
+    const externalDescText =
+      descEls.length > 0
+        ? descEls
+            .map((el) => flattenAccName(el))
+            .filter((t) => t.length > 0)
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+        : '';
+    this._externalDescText = externalDescText;
+
+    // Re-tune the external-refs observer to the union of resolved targets.
+    this._installExternalRefsObserver([...labelEls, ...descEls]);
+
+    // Validity surface — union: internals.validity ∪ this.error ∪ slotted error.
+    const hasError = !!(this.error || this._errorSlotText);
+    const validityInvalid = !internals.validity.valid;
+    const isInvalid = validityInvalid || hasError;
+
+    if (this._supportsIdrefRefs) {
+      // ─── Modern path: host is canonical ───
+      // Use `null` (not `''`) when no override — `''` removes the attribute
+      // but stamps a stale empty string on `internals.ariaLabel` that some
+      // engines still expose to AT.
+      internals.ariaLabel = resolvedLabel ?? null;
+      internals.ariaInvalid = isInvalid ? 'true' : 'false';
+      internals.ariaDisabled = this.disabled ? 'true' : 'false';
+      internals.ariaRequired = this.required ? 'true' : 'false';
+
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+      refsInternals.ariaDescribedByElements = descEls.length > 0 ? descEls : null;
+
+      // Clear fallbacks so the trigger doesn't double-announce.
+      this._fallbackTriggerAriaLabelledBy = null;
+      this._fallbackTriggerAriaDescribedBy = null;
+      this._fallbackTriggerAriaLabel = null;
+    } else {
+      // ─── Fallback path: trigger carries the full contract ───
+      internals.ariaLabel = null;
+      internals.ariaInvalid = null;
+      internals.ariaDisabled = null;
+      internals.ariaRequired = null;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+        ariaDescribedByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = null;
+      refsInternals.ariaDescribedByElements = null;
+
+      this._fallbackTriggerAriaLabelledBy = hasEffectiveLabelledBy ? externalLabelTokens : null;
+      this._fallbackTriggerAriaDescribedBy = externalDescTokens || null;
+      this._fallbackTriggerAriaLabel = resolvedLabel;
+    }
+  }
+
+  // ─── Effective text helpers (rendered into hidden host-desc span) ────────
+
+  /** @internal */
+  private _effectiveHelpText(): string {
+    return (this.helpText?.trim() || this._helpSlotText || '').trim();
+  }
+
+  /** @internal */
+  private _effectiveErrorText(): string {
+    return (this._announcedError?.trim() || this._errorSlotText || '').trim();
   }
 
   /** @internal */
@@ -361,17 +863,31 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
 
   /** @internal */
   override _updateValidity(): void {
+    // Anchor validity UI to the announced surface — the trigger button on
+    // the popover path, or the grid in inline mode.
+    const anchor: HTMLElement | undefined =
+      this.shadowRoot?.querySelector<HTMLElement>('[part="trigger"]') ??
+      this.shadowRoot?.querySelector<HTMLElement>('[part="grid"]') ??
+      undefined;
+
+    // Union of constraint failures: required + consumer-supplied `error` /
+    // slotted error. The consumer error projects through `customError` so
+    // `validity.valid` reflects the announced state.
+    const consumerError = (this.error || this._errorSlotText || '').trim();
     if (this.required && !this.value) {
       this._internals.setValidity(
-        { valueMissing: true },
-        'Please select a color.',
-        this.shadowRoot?.querySelector<HTMLElement>('[part="trigger"]') ??
-          this.shadowRoot?.querySelector<HTMLElement>('[part="grid"]') ??
-          undefined,
+        { valueMissing: true, customError: !!consumerError },
+        consumerError || 'Please select a color.',
+        anchor,
       );
+    } else if (consumerError) {
+      this._internals.setValidity({ customError: true }, consumerError, anchor);
     } else {
       this._internals.setValidity({});
     }
+    // Re-sync host aria semantics so `internals.ariaInvalid` reflects the
+    // newly-computed `ValidityState`.
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -883,25 +1399,129 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
     `;
   }
 
+  // ─── Description-channel helpers ─────────────────────────────────────────
+
+  /**
+   * Builds the synthesized host-level description span text by joining the
+   * external (consumer-resolved) description text with help and error text.
+   * The hidden span lives in the shadow root so AT can resolve a single
+   * `aria-describedby` token to it without leaving the host's name surface.
+   * @internal
+   */
+  private _hostDescriptionText(): string {
+    const parts = [
+      this._externalDescText,
+      this._effectiveHelpText(),
+      this._effectiveErrorText(),
+    ].filter((p) => p.length > 0);
+    return parts.join(' ').replace(/\s+/g, ' ').trim();
+  }
+
+  /** @internal */
+  private _renderHostDescriptionSpan() {
+    const text = this._hostDescriptionText();
+    if (!text) return nothing;
+    return html`<span
+      id=${this._hostDescId}
+      class="hx-visually-hidden"
+      aria-hidden="true"
+      data-hx-host-desc
+      style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"
+      >${text}</span
+    >`;
+  }
+
+  /** @internal */
+  private _renderLabelSlot() {
+    // The label slot is rendered visually so consumers projecting a `<span
+    // slot="label">` see it above the trigger. AT consumes the same nodes via
+    // aggregated text → `internals.ariaLabel` (modern path). When the consumer
+    // supplies `aria-label` / `aria-labelledby` / `accessible-label` the slot
+    // still renders visibly but is excluded from the announced name by the
+    // precedence in `_syncHostAriaSemantics`.
+    return html`<span class="hx-color-picker__label" part="label">
+      <slot name="label" @slotchange=${this._handleLabelSlotChange}>${this.label ?? ''}</slot>
+    </span>`;
+  }
+
+  /** @internal */
+  private _renderHelpSlot() {
+    const helpText = this._effectiveHelpText();
+    return html`<span
+      id=${this._helpId}
+      class="hx-color-picker__help"
+      part="help-text"
+      ?hidden=${!helpText}
+    >
+      <slot name="help-text" @slotchange=${this._handleHelpSlotChange}>${this.helpText ?? ''}</slot>
+    </span>`;
+  }
+
+  /** @internal */
+  private _renderErrorSlot() {
+    const errorText = this._effectiveErrorText();
+    return html`<span
+      id=${this._errorId}
+      class="hx-color-picker__error"
+      part="error"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      ?hidden=${!errorText}
+    >
+      <slot name="error" @slotchange=${this._handleErrorSlotChange}
+        >${this._announcedError ?? ''}</slot
+      >
+    </span>`;
+  }
+
   // ─── Main render ─────────────────────────────────────────────────────────
 
   override render() {
     const previewColor = this._previewColor();
+    const hostDescText = this._hostDescriptionText();
+    const triggerDescribedBy = hostDescText ? this._hostDescId : undefined;
+
+    // Modern path: host owns the aria contract via `internals.*` — the
+    // trigger button just mirrors a stable visible label for non-AT consumers
+    // (testing, devtools).
+    // Fallback path: trigger carries the full contract via attributes.
+    const innerAriaLabel = this._supportsIdrefRefs
+      ? this.labelTrigger(this._inputValue)
+      : (this._fallbackTriggerAriaLabel ?? this.labelTrigger(this._inputValue));
+    const innerAriaLabelledBy = this._supportsIdrefRefs
+      ? undefined
+      : (this._fallbackTriggerAriaLabelledBy ?? undefined);
+    const innerAriaDescribedBy = this._supportsIdrefRefs
+      ? triggerDescribedBy
+      : [this._fallbackTriggerAriaDescribedBy, triggerDescribedBy]
+          .filter((t): t is string => !!t && t.length > 0)
+          .join(' ') || undefined;
+
+    const isInvalid = !this._internals.validity.valid || !!this._effectiveErrorText();
 
     if (this.inline) {
       return html`
-        <div style=${styleMap({ '--_preview-color': previewColor })}>${this._renderPanel()}</div>
+        <div style=${styleMap({ '--_preview-color': previewColor })}>
+          ${this._renderLabelSlot()} ${this._renderHostDescriptionSpan()} ${this._renderPanel()}
+          ${this._renderHelpSlot()} ${this._renderErrorSlot()}
+        </div>
       `;
     }
 
-    // P1-3: aria-label includes the current color value so AT users know the selected color
+    // P1-3: trigger aria-label includes current color value (preserved for
+    // AT on legacy engines and as a backup name for testing).
     return html`
+      ${this._renderLabelSlot()} ${this._renderHostDescriptionSpan()}
       <button
         part="trigger"
         type="button"
         class="trigger"
-        aria-label=${this.labelTrigger(this._inputValue)}
+        aria-label=${innerAriaLabel}
+        aria-labelledby=${ifDefined(innerAriaLabelledBy)}
+        aria-describedby=${ifDefined(innerAriaDescribedBy)}
         aria-expanded=${this._open ? 'true' : 'false'}
+        aria-invalid=${isInvalid ? 'true' : 'false'}
         ?disabled=${this.disabled}
         style=${styleMap({ '--_preview-color': previewColor })}
         @click=${this._handleTriggerClick}
@@ -911,6 +1531,7 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
           <span class="trigger-label">${this._inputValue}</span>
         </slot>
       </button>
+      ${this._renderHelpSlot()} ${this._renderErrorSlot()}
       ${this._open ? this._renderPanel() : nothing}
     `;
   }
