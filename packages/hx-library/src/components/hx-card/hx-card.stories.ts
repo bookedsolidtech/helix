@@ -322,9 +322,12 @@ export const Interactive: Story = {
     const card = canvasElement.querySelector('hx-card');
     await expect(card).toBeTruthy();
 
+    // hx-card migrated to host-canonical: role + tabindex live on the host
+    // via ElementInternals, not on the inner `.card` shadow element.
     const cardEl = card?.shadowRoot?.querySelector('.card') as HTMLElement | null;
-    await expect(cardEl?.getAttribute('role')).toBe('link');
-    await expect(cardEl?.getAttribute('tabindex')).toBe('0');
+    const cardInternals = (card as unknown as { _internals?: ElementInternals })._internals;
+    await expect(cardInternals?.role).toBe('link');
+    await expect(card?.getAttribute('tabindex')).toBe('0');
 
     // Click the internal shadow DOM element where the click handler lives
     cardEl?.click();
@@ -841,10 +844,11 @@ export const InteractiveClickTest: Story = {
     const card = canvasElement.querySelector('hx-card');
     await expect(card).toBeTruthy();
 
-    // Verify interactive attributes
+    // Verify interactive attributes — host-canonical post-Group-10
     const cardEl = card?.shadowRoot?.querySelector('.card');
-    await expect(cardEl?.getAttribute('role')).toBe('link');
-    await expect(cardEl?.getAttribute('tabindex')).toBe('0');
+    const cardInternals2 = (card as unknown as { _internals?: ElementInternals })._internals;
+    await expect(cardInternals2?.role).toBe('link');
+    await expect(card?.getAttribute('tabindex')).toBe('0');
     await expect(cardEl?.classList.contains('card--interactive')).toBe(true);
 
     // Click the internal shadow DOM element where the click handler lives
@@ -955,9 +959,11 @@ export const InteractiveFocusManagement: Story = {
     const cardEl = card?.shadowRoot?.querySelector('.card') as HTMLElement;
     await expect(cardEl).toBeTruthy();
 
-    // Verify the card is focusable
-    await expect(cardEl.getAttribute('tabindex')).toBe('0');
-    await expect(cardEl.getAttribute('role')).toBe('link');
+    // Verify the card is focusable — host-canonical: tabindex on host,
+    // role on internals (Group 10 hx-card migration).
+    const cardInternals = (card as unknown as { _internals?: ElementInternals })._internals;
+    await expect(card!.getAttribute('tabindex')).toBe('0');
+    await expect(cardInternals?.role).toBe('link');
 
     // Focus via the host — delegatesFocus routes focus to the internal card div
     if (!card) throw new Error('hx-card not found');
