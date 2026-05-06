@@ -6,6 +6,13 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixCardStyles } from './hx-card.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 const _nextCardId = createIdCounter('hx-card');
 
@@ -15,6 +22,25 @@ const _nextCardId = createIdCounter('hx-card');
  * @summary Content container with image, heading, body, footer, and action slots.
  *
  * @tag hx-card
+ *
+ * Group 10 host-canonical: when a card carries an accessible name (consumer
+ * `aria-label` / `aria-labelledby`, the `hx-label` property, or slotted
+ * heading text on the interactive variant) the announced role is written
+ * to the host via `_internals.role`. The mapping is:
+ *   - `hx-href` set         -> host role="link" + tabindex="0"
+ *   - non-interactive named -> host role="region"
+ *   - non-interactive plain -> no host role (generic container)
+ *
+ * `delegatesFocus: true` is preserved so that focusable descendants
+ * slotted inside the card still receive Tab focus first; the host itself
+ * is only focusable when it carries `role="link"`.
+ *
+ * On the legacy fallback path (engines without IDL element-references on
+ * `ElementInternals`) the inner `[part="card"]` element keeps the role +
+ * tabindex + aria-label so a single announced surface remains, and the
+ * host writes are suppressed to avoid a duplicate-treeitem-style
+ * problem. The resolved accessible name is mirrored onto the inner
+ * element via `aria-label` for parity with the modern path.
  *
  * @slot image - Optional image or media content at the top of the card.
  * @slot heading - The card heading/title content. Use a semantic heading element (h2, h3, etc.) for proper accessibility.
@@ -76,6 +102,19 @@ export class HelixCard extends HelixElement {
   };
 
   static override styles = [helixCardStyles, forcedColorsSurface];
+
+  /**
+   * Test seam (codex push-gate round-1 lift): when set to `true` or
+   * `false`, overrides the platform `supportsIdrefElementReferences`
+   * probe before `connectedCallback` seeds `_supportsIdrefRefs`. Mirrors
+   * the hx-menu-item / hx-tree-item / hx-select seam — required so tests
+   * can deterministically exercise the legacy fallback render branch.
+   *
+   * Production code MUST NOT touch this field. It is `static` so the
+   * test stub cleanup is global and obvious.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
 
   /**
    * Visual style variant of the card.
@@ -153,6 +192,30 @@ export class HelixCard extends HelixElement {
    */
   private _headingId = `${this._cardId}-heading`;
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Resolved accessible name for the card — read by both
+   * `_syncHostAriaSemantics()` (modern path: host `internals.ariaLabel`)
+   * and the fallback `render()` branch (legacy path: inner
+   * `[part="card"]` `aria-label`). Empty string means "no override" —
+   * for the interactive variant slotted heading text provides the
+   * implicit name through the announced surface (host on modern; inner
+   * div on fallback).
+   *
+   * AccName 1.2 §4.3.1 precedence: consumer host `aria-labelledby`
+   * (flattened) > consumer host `aria-label` > component `hx-label`
+   * property > implicit slotted heading text.
+   * @internal
+   */
+  private _resolvedAccessibleName = '';
+
   /** @internal */
   private _onImageSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
@@ -168,6 +231,10 @@ export class HelixCard extends HelixElement {
       .map((n) => n.textContent?.trim() ?? '')
       .join(' ')
       .trim();
+    // Heading text contributes to the accessible name on the interactive
+    // path; resync host semantics so consumer-supplied overrides still
+    // win and the fallback render branch has a fresh `_resolvedAccessibleName`.
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -190,6 +257,45 @@ export class HelixCard extends HelixElement {
     }
   }
 
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Honour the static test override so synthetic environments choose
+    // the path BEFORE connect runs — the fallback render branch needs
+    // to be selected at first paint so the role + aria-label placement
+    // matches a legacy engine for the entire lifecycle.
+    const ctor = this.constructor as typeof HelixCard;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+
+    this._syncHostAriaSemantics();
+
+    // Click + keydown live on the HOST so a single dispatch fires per
+    // logical activation regardless of which surface is focused: on
+    // the modern path the host (role="link") receives focus directly;
+    // on the legacy fallback path the inner element receives focus and
+    // its events bubble through the composed path to the host. The
+    // inner template intentionally does NOT wire the same handlers to
+    // avoid a double dispatch.
+    this.addEventListener('click', this._handleClick);
+    this.addEventListener('keydown', this._handleKeyDown);
+
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener('click', this._handleClick);
+    this.removeEventListener('keydown', this._handleKeyDown);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     // WCAG 4.1.2: interactive cards (with hx-href) must have an accessible name
@@ -203,6 +309,145 @@ export class HelixCard extends HelixElement {
         'hx-card',
         "Interactive card (hx-href is set) is missing an accessible name. Set `hx-label` or provide heading slot content to describe the card's destination or purpose (WCAG 4.1.2).",
       );
+    }
+    if (changedProperties.has('href') || changedProperties.has('label')) {
+      this._syncHostAriaSemantics();
+    }
+  }
+
+  /**
+   * Mirror card semantics onto the host via ElementInternals so
+   * consumer-supplied `aria-label` / `aria-labelledby` reaches the
+   * announced surface and the role honours the link / region / generic
+   * mapping.
+   *
+   * Suppression rule: on the legacy fallback path the inner
+   * `[part="card"]` element already exposes role + aria-label via the
+   * template. Writing the same fields on the host's ElementInternals
+   * would surface TWO announced controls for one logical card, so all
+   * host writes are cleared on the fallback path; the inner element is
+   * the canonical announced surface and `_resolvedAccessibleName` is
+   * mirrored onto it via the render branch.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    const isInteractive = !!this.href;
+
+    // Resolve the consumer's effective accessible-name overrides first
+    // — these win over the hx-label property and slotted heading text
+    // per AccName 1.2 §4.3.1.
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    // AccName precedence ladder for the resolved string used by the
+    // fallback render branch:
+    //   aria-labelledby (flattened) > aria-label > hx-label > heading text
+    let resolved = '';
+    if (hasEffectiveLabelledBy) {
+      resolved =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        hostAriaLabel ||
+        this.label ||
+        this._headingText ||
+        '';
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+    } else if (this.label) {
+      resolved = this.label;
+    } else if (this._headingText) {
+      resolved = this._headingText;
+    }
+
+    // Whether the card has an EXPLICIT accessible-name override
+    // (aria-label / aria-labelledby / hx-label). Slotted heading text
+    // alone is not enough to trigger the default-mode role promotion
+    // to "region": the user prompt scopes Option B to "promote only
+    // when a name exists" with name-source = explicit consumer
+    // override or component property, not implicit slotted content
+    // (otherwise every card with a heading silently becomes a
+    // landmark, which clutters AT navigation).
+    const hasExplicitName = hasEffectiveLabelledBy || !!hostAriaLabel || !!this.label;
+
+    if (!this._supportsIdrefRefs) {
+      // Legacy fallback: keep the inner element as the canonical
+      // announced surface. Clear any host writes to avoid a duplicate
+      // role + label; the render branch mirrors `_resolvedAccessibleName`
+      // onto the inner div.
+      internals.role = null;
+      internals.ariaLabel = null;
+    } else {
+      // Modern host-canonical path: host carries the role and label.
+      if (isInteractive) {
+        internals.role = 'link';
+      } else if (hasExplicitName) {
+        // ARIA-in-HTML: a region without an accessible name fails
+        // 4.1.2, so the role is only promoted when an explicit name
+        // exists. Implicit heading text does not promote.
+        internals.role = 'region';
+      } else {
+        internals.role = null;
+      }
+
+      // Project consumer aria-labelledby IDREFs through the IDL
+      // element-references API so cross-shadow targets resolve. The
+      // implicit heading element lives inside this component's shadow
+      // root, so for the heading-fallback case we still rely on
+      // `internals.ariaLabel` (set below) — the heading is not in the
+      // host's light DOM and IDREFs cannot reach it from outside.
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+
+      // `internals.ariaLabel` cascade:
+      //   - aria-labelledby resolved -> null (element refs win, don't shadow them)
+      //   - host aria-label -> use it directly (consumer wins over property)
+      //   - hx-label property -> mirror onto host
+      //   - else if heading text exists and host carries a role ->
+      //     mirror heading text so AT announces something even when
+      //     ariaLabelledByElements isn't supported
+      if (hasEffectiveLabelledBy) {
+        internals.ariaLabel = null;
+      } else if (hostAriaLabel) {
+        internals.ariaLabel = hostAriaLabel;
+      } else if (this.label) {
+        internals.ariaLabel = this.label;
+      } else if (resolved && (isInteractive || hasExplicitName)) {
+        internals.ariaLabel = resolved;
+      } else {
+        internals.ariaLabel = null;
+      }
+    }
+
+    // Tabindex: link cards are focusable on the host. Region/generic
+    // cards stay non-focusable so the host doesn't add a stop in the
+    // sequential tab order — `delegatesFocus` will still route focus to
+    // a focusable descendant if one is slotted into the body. On the
+    // legacy fallback path the inner element carries tabindex via the
+    // template, so the host stays out of the tab order entirely.
+    if (this._supportsIdrefRefs && isInteractive) {
+      this.tabIndex = 0;
+    } else {
+      // Defer to the absence of an explicit attribute (matches the
+      // pre-migration default of "no host tabindex") rather than -1,
+      // which would block delegated focus into focusable descendants.
+      if (this.hasAttribute('tabindex')) {
+        this.removeAttribute('tabindex');
+      }
+    }
+
+    if (this._resolvedAccessibleName !== resolved) {
+      this._resolvedAccessibleName = resolved;
+      if (!this._supportsIdrefRefs) {
+        this.requestUpdate();
+      }
     }
   }
 
@@ -247,6 +492,19 @@ export class HelixCard extends HelixElement {
 
   override render() {
     const isInteractive = !!this.href;
+    // On the legacy fallback path the inner element is the canonical
+    // announced surface and must carry the role, tabindex, and resolved
+    // accessible name. On the modern path the host owns those via
+    // `_internals` and the inner element stays presentational.
+    const useFallbackAria = !this._supportsIdrefRefs;
+    const fallbackResolved = this._resolvedAccessibleName;
+    // Region promotion on the fallback path mirrors the modern path:
+    // only an explicit consumer override (aria-label / aria-labelledby
+    // / hx-label) triggers the role. Heading text alone stays as
+    // implicit body content under a generic container.
+    const hostAriaLabelAttr = this.getAttribute('aria-label')?.trim() || '';
+    const hostAriaLabelledByAttr = this.getAttribute('aria-labelledby')?.trim() || '';
+    const fallbackHasExplicitName = !!hostAriaLabelAttr || !!hostAriaLabelledByAttr || !!this.label;
 
     const classes = {
       card: true,
@@ -255,16 +513,31 @@ export class HelixCard extends HelixElement {
       'card--interactive': isInteractive,
     };
 
+    const innerRole = useFallbackAria
+      ? isInteractive
+        ? 'link'
+        : fallbackHasExplicitName
+          ? 'region'
+          : nothing
+      : nothing;
+    const innerTabindex = useFallbackAria && isInteractive ? '0' : nothing;
+    const innerAriaLabel = useFallbackAria && fallbackResolved ? fallbackResolved : nothing;
+    const innerAriaLabelledBy =
+      useFallbackAria && this._hasHeading && !fallbackResolved ? this._headingId : nothing;
+
+    // Click + keydown are wired on the HOST in connectedCallback so the
+    // event path is uniform across the modern and fallback paths and a
+    // single dispatch fires per logical activation regardless of where
+    // the focused surface lives. The inner template stays free of
+    // @click/@keydown to avoid a double-dispatch when bubbling.
     return html`
       <div
         part="card"
         class=${classMap(classes)}
-        role=${isInteractive ? 'link' : nothing}
-        tabindex=${isInteractive ? '0' : nothing}
-        aria-label=${isInteractive && this.label ? this.label : nothing}
-        aria-labelledby=${this._hasHeading && !this.label ? this._headingId : nothing}
-        @click=${this._handleClick}
-        @keydown=${this._handleKeyDown}
+        role=${innerRole}
+        tabindex=${innerTabindex}
+        aria-label=${innerAriaLabel}
+        aria-labelledby=${innerAriaLabelledBy}
       >
         <div class="card__image" part="image" ?hidden=${!this._hasImage}>
           <slot name="image" @slotchange=${this._onImageSlotChange}></slot>

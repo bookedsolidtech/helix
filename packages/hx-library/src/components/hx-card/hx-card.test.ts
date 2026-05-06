@@ -82,56 +82,74 @@ describe('hx-card', () => {
   // ─── Property: hx-href (4) ───
 
   describe('Property: hx-href', () => {
-    it('has no role when no hx-href', async () => {
+    it('has no role on inner element on modern path (host carries role via internals)', async () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       expect(card.hasAttribute('role')).toBe(false);
+      // Host also has no role for an unlabelled non-interactive card.
+      expect(el.hasAttribute('role')).toBe(false);
     });
 
-    it('has role="link" when hx-href set', async () => {
+    it('host carries internals.role="link" when hx-href set (modern path)', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      expect(card.getAttribute('role')).toBe('link');
+      // On the modern path the inner element stays presentational.
+      expect(card.hasAttribute('role')).toBe(false);
+      // Host owns the announced role via ElementInternals.
+      expect((el as unknown as { _internals: ElementInternals })._internals.role).toBe('link');
     });
 
-    it('has tabindex="0" when hx-href set', async () => {
+    it('host carries tabindex="0" when hx-href set (modern path)', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      expect(card.getAttribute('tabindex')).toBe('0');
+      // Inner element stays out of the sequential focus order on modern.
+      expect(card.hasAttribute('tabindex')).toBe(false);
+      expect(el.getAttribute('tabindex')).toBe('0');
     });
 
-    it('has no aria-label by default when hx-href set (accessible name from content)', async () => {
+    it('has no internals.ariaLabel by default when hx-href set (accessible name from content)', async () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       expect(card.hasAttribute('aria-label')).toBe(false);
+      // No heading slot, no hx-label — `internals.ariaLabel` stays
+      // null; AT walks the slotted body content for the name.
+      expect((el as unknown as { _internals: ElementInternals })._internals.ariaLabel).toBeFalsy();
     });
 
-    it('uses hx-label when provided on interactive card', async () => {
+    it('uses hx-label when provided on interactive card (mirrored to host internals)', async () => {
       const el = await fixture<HelixCard>(
         '<hx-card hx-href="/test" hx-label="View patient record">Content</hx-card>',
       );
       const card = shadowQuery(el, '.card')!;
-      expect(card.getAttribute('aria-label')).toBe('View patient record');
+      // Modern path: inner stays presentational, host owns the label.
+      expect(card.hasAttribute('aria-label')).toBe(false);
+      expect((el as unknown as { _internals: ElementInternals })._internals.ariaLabel).toBe(
+        'View patient record',
+      );
     });
 
     it('updates interactive attributes when href changes after initial render', async () => {
       const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
-      expect(card.hasAttribute('role')).toBe(false);
-      expect(card.hasAttribute('tabindex')).toBe(false);
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBeFalsy();
+      expect(el.hasAttribute('tabindex')).toBe(false);
 
       el.href = '/new-path';
       await el.updateComplete;
 
-      expect(card.getAttribute('role')).toBe('link');
-      expect(card.getAttribute('tabindex')).toBe('0');
+      expect(internals.role).toBe('link');
+      expect(el.getAttribute('tabindex')).toBe('0');
       expect(card.classList.contains('card--interactive')).toBe(true);
+      // Inner element stays presentational across the toggle.
+      expect(card.hasAttribute('role')).toBe(false);
+      expect(card.hasAttribute('tabindex')).toBe(false);
 
       el.href = undefined;
       await el.updateComplete;
 
-      expect(card.hasAttribute('role')).toBe(false);
-      expect(card.hasAttribute('tabindex')).toBe(false);
+      expect(internals.role).toBeFalsy();
+      expect(el.hasAttribute('tabindex')).toBe(false);
       expect(card.classList.contains('card--interactive')).toBe(false);
     });
   });
@@ -201,7 +219,12 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      // Real user keydown events are composed:true so they cross the
+      // shadow boundary and reach the host listener — synthesised
+      // events must opt in explicitly.
+      card.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
       const event = await eventPromise;
       expect(event.detail.href).toBe('/test');
     });
@@ -213,7 +236,9 @@ describe('hx-card', () => {
       el.addEventListener('hx-click', () => {
         fired = true;
       });
-      card.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      card.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }),
+      );
       await el.updateComplete;
       expect(fired).toBe(false);
     });
@@ -225,7 +250,9 @@ describe('hx-card', () => {
       el.addEventListener('hx-click', () => {
         fired = true;
       });
-      card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      card.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
       await el.updateComplete;
       expect(fired).toBe(false);
     });
@@ -385,9 +412,8 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>(
         '<hx-card hx-href="/test"><span slot="heading">Title</span><button slot="actions">Action</button></hx-card>',
       );
-      const card = shadowQuery(el, '.card')!;
-      // Card has role="link" when hx-href is set
-      expect(card.getAttribute('role')).toBe('link');
+      // Host carries role="link" when hx-href is set (modern path).
+      expect((el as unknown as { _internals: ElementInternals })._internals.role).toBe('link');
       // Actions slot is populated (consumer's responsibility to avoid this combination)
       const action = el.querySelector('[slot="actions"]');
       expect(action).toBeTruthy();
@@ -496,7 +522,9 @@ describe('hx-card', () => {
       const el = await fixture<HelixCard>('<hx-card hx-href="/test">Content</hx-card>');
       const card = shadowQuery(el, '.card')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
-      card.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      card.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
       const event = await eventPromise;
       expect(event.detail.originalEvent).toBeInstanceOf(KeyboardEvent);
     });
@@ -596,7 +624,7 @@ describe('hx-card', () => {
   // ─── Coverage Gap: aria-labelledby from heading text ───
 
   describe('aria-labelledby from heading slot', () => {
-    it('sets aria-labelledby on the card div when heading slot is populated and no hx-label', async () => {
+    it('mirrors heading text into the host accessible name when no hx-label is set (modern path)', async () => {
       const el = await fixture<HelixCard>(`
         <hx-card hx-href="https://example.com">
           <h2 slot="heading">Card Title</h2>
@@ -607,14 +635,14 @@ describe('hx-card', () => {
       // Allow slot change event to propagate
       await Promise.resolve();
       await el.updateComplete;
-      const card = shadowQuery(el, '[part="card"]');
-      expect(card).toBeTruthy();
-      // With heading slotted and no hx-label, aria-labelledby should point to the heading container
-      const ariaLabelledby = card!.getAttribute('aria-labelledby');
-      expect(ariaLabelledby).toBeTruthy();
+      // Modern path: the host owns the announced surface via
+      // `_internals.ariaLabel`, the inner div stays presentational.
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('link');
+      expect(internals.ariaLabel).toBe('Card Title');
     });
 
-    it('uses hx-label as aria-label when both label and heading are present', async () => {
+    it('uses hx-label as the announced name when both label and heading are present (modern path)', async () => {
       const el = await fixture<HelixCard>(`
         <hx-card hx-href="https://example.com" hx-label="Explicit label">
           <h2 slot="heading">Card Title</h2>
@@ -622,9 +650,12 @@ describe('hx-card', () => {
         </hx-card>
       `);
       await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      // hx-label wins over implicit heading text per the AccName ladder.
+      expect(internals.ariaLabel).toBe('Explicit label');
+      // Inner element stays presentational on the modern path.
       const card = shadowQuery(el, '[part="card"]');
-      expect(card!.getAttribute('aria-label')).toBe('Explicit label');
-      // When hx-label is set, aria-labelledby should not be applied
+      expect(card!.getAttribute('aria-label')).toBeNull();
       expect(card!.getAttribute('aria-labelledby')).toBeNull();
     });
   });
@@ -657,9 +688,209 @@ describe('hx-card', () => {
       const card = shadowQuery<HTMLDivElement>(el, '[part="card"]')!;
       let fired = false;
       el.addEventListener('hx-click', () => { fired = true; });
-      card.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      card.dispatchEvent(
+        new KeyboardEvent('keydown', { key: ' ', bubbles: true, composed: true }),
+      );
       // Space must NOT fire hx-click on role="link" per WCAG 2.1.1 / ARIA APG
       expect(fired).toBe(false);
+    });
+  });
+
+  // ─── Group 10 host-canonical migration regression tests ───
+
+  describe('Host-canonical role: default-mode region promotion', () => {
+    it('host has no role on a plain unlabelled non-interactive card', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBeFalsy();
+      expect(internals.ariaLabel).toBeFalsy();
+    });
+
+    it('host promotes to role="region" when a consumer aria-label is set', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card aria-label="Patient summary">Content</hx-card>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('region');
+      expect(internals.ariaLabel).toBe('Patient summary');
+    });
+
+    it('host promotes to role="region" when hx-label is set on a non-interactive card', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-label="Patient summary">Content</hx-card>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('region');
+      expect(internals.ariaLabel).toBe('Patient summary');
+    });
+
+    it('host stays generic when only slotted heading text exists (no consumer label)', async () => {
+      // Slotted heading text is rendered into a shadow-DOM element — it
+      // cannot anchor a host `internals.ariaLabelledByElements`. The
+      // host stays role-less so the AccName cascade walks the slotted
+      // body content.
+      const el = await fixture<HelixCard>(
+        '<hx-card><h3 slot="heading">Patient details</h3>Content</hx-card>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBeFalsy();
+    });
+  });
+
+  describe('Host-canonical role: cross-shadow aria-labelledby projection', () => {
+    it('resolves consumer aria-labelledby to the IDL element-references API on the host', async () => {
+      const el = await fixture<HelixCard>(`
+        <div>
+          <span id="card-name">External label</span>
+          <hx-card aria-labelledby="card-name">Body</hx-card>
+        </div>
+      `);
+      const card = el.querySelector('hx-card') as HelixCard;
+      await card.updateComplete;
+      const internals = (card as unknown as { _internals: ElementInternals })._internals;
+      // Modern path: refs win, ariaLabel is cleared so the resolved
+      // refs aren't shadowed by a stale string.
+      expect(internals.role).toBe('region');
+      expect(internals.ariaLabel).toBeFalsy();
+      const refs = (
+        internals as ElementInternals & {
+          ariaLabelledByElements: Element[] | null;
+        }
+      ).ariaLabelledByElements;
+      expect(refs?.length).toBe(1);
+      expect(refs?.[0]?.id).toBe('card-name');
+    });
+
+    it('AccName precedence: host aria-labelledby > aria-label > hx-label > heading text', async () => {
+      const el = await fixture<HelixCard>(`
+        <div>
+          <span id="external-name">External label</span>
+          <hx-card
+            aria-labelledby="external-name"
+            aria-label="ignored aria-label"
+            hx-label="ignored property"
+          ><span slot="heading">ignored heading</span>Body</hx-card>
+        </div>
+      `);
+      const card = el.querySelector('hx-card') as HelixCard;
+      await card.updateComplete;
+      // Force a resync after slotchange so the heading text is
+      // factored into the resolved name cache.
+      const internals = (card as unknown as { _internals: ElementInternals })._internals;
+      // Modern path: refs win — ariaLabel is null because the IDL
+      // element-references API supplies the resolved name.
+      expect(internals.ariaLabel).toBeFalsy();
+      // The internal cache reflects the flattened external label, not
+      // the aria-label / hx-label / heading text overrides.
+      const resolved = (
+        card as unknown as { _resolvedAccessibleName: string }
+      )._resolvedAccessibleName;
+      expect(resolved).toBe('External label');
+    });
+  });
+
+  describe('Legacy fallback path (__testSupportsIdrefRefsOverride = false)', () => {
+    type HelixCardCtor = CustomElementConstructor & {
+      __testSupportsIdrefRefsOverride: boolean | null;
+    };
+
+    afterEach(() => {
+      // Reset the static seam between specs to avoid leakage.
+      const ctor = customElements.get('hx-card') as unknown as HelixCardCtor;
+      ctor.__testSupportsIdrefRefsOverride = null;
+    });
+
+    it('suppresses host internals writes and mirrors role + label onto the inner element', async () => {
+      const ctor = customElements.get('hx-card') as unknown as HelixCardCtor;
+      ctor.__testSupportsIdrefRefsOverride = false;
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="/test" hx-label="View record">Content</hx-card>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      // Host writes are cleared so AT only sees ONE announced surface.
+      expect(internals.role).toBeFalsy();
+      expect(internals.ariaLabel).toBeFalsy();
+      // Inner element carries role, tabindex, and the resolved label.
+      const card = shadowQuery(el, '[part="card"]')!;
+      expect(card.getAttribute('role')).toBe('link');
+      expect(card.getAttribute('tabindex')).toBe('0');
+      expect(card.getAttribute('aria-label')).toBe('View record');
+    });
+
+    it('mirrors region role on the inner element when a name is present and no href is set', async () => {
+      const ctor = customElements.get('hx-card') as unknown as HelixCardCtor;
+      ctor.__testSupportsIdrefRefsOverride = false;
+      const el = await fixture<HelixCard>(
+        '<hx-card aria-label="Patient summary">Content</hx-card>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBeFalsy();
+      const card = shadowQuery(el, '[part="card"]')!;
+      expect(card.getAttribute('role')).toBe('region');
+      expect(card.getAttribute('aria-label')).toBe('Patient summary');
+      // Host stays out of the sequential focus order on fallback —
+      // the inner element is the focusable surface (or, for region,
+      // not focusable at all).
+      expect(card.hasAttribute('tabindex')).toBe(false);
+      expect(el.hasAttribute('tabindex')).toBe(false);
+    });
+
+    it('Enter still activates an interactive card on the fallback path', async () => {
+      const ctor = customElements.get('hx-card') as unknown as HelixCardCtor;
+      ctor.__testSupportsIdrefRefsOverride = false;
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="/test" hx-label="View record">Content</hx-card>',
+      );
+      const card = shadowQuery(el, '[part="card"]')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
+      card.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
+      const event = await eventPromise;
+      expect(event.detail.href).toBe('/test');
+    });
+  });
+
+  describe('delegatesFocus interaction with host-canonical migration', () => {
+    it('shadowRoot.delegatesFocus stays true after migration', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      // delegatesFocus is preserved so focusable descendants slotted
+      // into the body still receive focus from clicks on the host.
+      expect(el.shadowRoot?.delegatesFocus).toBe(true);
+    });
+
+    it('interactive card stays focusable via tabindex on the host', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card hx-href="/test" hx-label="View record">Plain text</hx-card>',
+      );
+      // The host carries tabindex="0" so the link is part of the
+      // sequential focus order. The host is the announced surface
+      // (role="link" via internals) and the natural Tab landing site
+      // for an interactive card.
+      expect(el.getAttribute('tabindex')).toBe('0');
+      // Sanity: the matching tabIndex IDL property is also 0 — Tab
+      // navigation walks the host directly.
+      expect(el.tabIndex).toBe(0);
+    });
+
+    it('non-interactive card does not put the host in the tab order', async () => {
+      const el = await fixture<HelixCard>('<hx-card>Content</hx-card>');
+      // No href, no explicit name — the host stays out of the
+      // sequential focus order so the card behaves as a generic
+      // container under delegatesFocus (which still routes click
+      // focus to focusable shadow-tree descendants if any exist).
+      expect(el.hasAttribute('tabindex')).toBe(false);
+    });
+
+    it('region card with an explicit name does not put the host in the tab order', async () => {
+      const el = await fixture<HelixCard>(
+        '<hx-card aria-label="Patient summary">Content</hx-card>',
+      );
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('region');
+      // Region landmarks must NOT be focusable themselves — the host
+      // stays out of the tab order even with an accessible name.
+      expect(el.hasAttribute('tabindex')).toBe(false);
     });
   });
 });
