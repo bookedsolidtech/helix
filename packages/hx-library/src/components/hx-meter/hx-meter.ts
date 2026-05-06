@@ -331,7 +331,28 @@ export class HelixMeter extends HelixElement {
         internals.ariaLabel = hostAriaLabel;
       }
     } else if (this._hasSlotContent || this.label !== undefined) {
-      resolved = this.label ?? '';
+      // CodeRabbit SHOULD-FIX (PR #1649 follow-up): when the consumer
+      // provides ONLY slotted label content (no `label` attribute, no
+      // `aria-label`, no `aria-labelledby`), the documented precedence
+      // ladder (lines 31-33) says the slot text becomes the accessible
+      // name. Previously the host AccName fell back to `''` and AT only
+      // saw the value-text fallback. Walk the slot's assignedNodes when
+      // the property is unset so the slotted text propagates.
+      let slotDerived = '';
+      if (this.label === undefined && this._hasSlotContent) {
+        const slotEl = this.shadowRoot?.querySelector(
+          'slot[name="label"]',
+        ) as HTMLSlotElement | null;
+        if (slotEl) {
+          const nodes = slotEl.assignedNodes({ flatten: true });
+          let text = '';
+          for (const node of nodes) {
+            text += node.textContent ?? '';
+          }
+          slotDerived = text.replace(/\s+/g, ' ').trim();
+        }
+      }
+      resolved = this.label ?? slotDerived;
       if (this._supportsIdrefRefs) {
         internals.ariaLabel = resolved || null;
       }

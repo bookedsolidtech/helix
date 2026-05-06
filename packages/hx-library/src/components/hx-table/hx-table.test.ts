@@ -700,6 +700,35 @@ describe('hx-th', () => {
       expect(th?.hasAttribute('rowspan')).toBe(false);
     });
   });
+
+  // CodeRabbit SHOULD-FIX (PR #1649 follow-up): sort button name uses the
+  // resolved AccName precedence ladder, not just slotted text.
+  describe('sort button name resolution (CodeRabbit follow-up)', () => {
+    it('sort button aria-label uses host aria-label when consumer overrides slotted text', async () => {
+      const el = await fixture<HelixTableHeader>(
+        '<hx-th sortable aria-label="Patient Name">Name</hx-th>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, '.sort-btn');
+      // Sort button announces the resolved AccName, not the raw slot text.
+      expect(btn?.getAttribute('aria-label')).toBe('Sort by Patient Name');
+    });
+
+    it('sort button aria-label flattens aria-labelledby idref', async () => {
+      const el = await fixture<HTMLDivElement>(`
+        <div>
+          <span id="hdr-th-resolved">Patient Name</span>
+          <hx-th sortable aria-labelledby="hdr-th-resolved">Name</hx-th>
+        </div>
+      `);
+      const th = el.querySelector('hx-th') as HelixTableHeader;
+      await th.updateComplete;
+      await th.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(th, '.sort-btn');
+      expect(btn?.getAttribute('aria-label')).toBe('Sort by Patient Name');
+    });
+  });
 });
 
 // ─── hx-td ───
@@ -813,6 +842,21 @@ describe('hx-td', () => {
       el.label = 'Full Name';
       await el.updateComplete;
       expect(td?.getAttribute('data-label')).toBe('Full Name');
+    });
+
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up) — inner aria-label tracks
+    // the resolved precedence ladder, not raw `label`.
+    it('inner <td> aria-label uses host aria-label when consumer overrides label property', async () => {
+      const el = await fixture<HelixTableCell>(
+        '<hx-td label="Name" aria-label="Patient name">Jane</hx-td>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const td = shadowQuery(el, 'td');
+      // Host aria-label wins over the `label` property in the resolved ladder.
+      expect(td?.getAttribute('aria-label')).toBe('Patient name');
+      // data-label still honors the explicit label (mobile card layout contract).
+      expect(td?.getAttribute('data-label')).toBe('Name');
     });
   });
 });

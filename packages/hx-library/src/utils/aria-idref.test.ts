@@ -212,6 +212,72 @@ describe('installAriaIdrefMirror — reattach on slot change (codex push-gate fi
       void ownerA;
     }
   });
+
+  // CodeRabbit SHOULD-FIX (PR #1649 follow-up): when the host is reparented
+  // into a NEW shadow tree whose slot has the SAME name, the host's `slot`
+  // attribute does not change — so the slotAttrObserver never fires. We now
+  // poll `assignedSlot` identity in the host MutationObserver / root sync
+  // path so the reattach still happens.
+  it('reattaches when the host moves to a different shadow tree with a same-named slot', async () => {
+    const ownerA = document.createElement('div');
+    const ownerB = document.createElement('div');
+    document.body.appendChild(ownerA);
+    document.body.appendChild(ownerB);
+    cleanupNodes.push(ownerA, ownerB);
+
+    // Both owners expose a slot with the same name "x" — so reparenting
+    // the host does NOT mutate its `slot` attribute.
+    const rootA = ownerA.attachShadow({ mode: 'open' });
+    rootA.innerHTML = '<slot name="x"></slot>';
+    const rootB = ownerB.attachShadow({ mode: 'open' });
+    rootB.innerHTML = '<slot name="x"></slot>';
+
+    const inner = document.createElement('div');
+    inner.setAttribute('slot', 'x');
+    inner.setAttribute('aria-labelledby', 'live');
+    ownerA.appendChild(inner);
+
+    // Seed rootA with a target so initial resolution succeeds.
+    const targetA = document.createElement('span');
+    targetA.id = 'live';
+    targetA.textContent = 'A';
+    rootA.appendChild(targetA);
+
+    let resolved: Element[] = [];
+    let handle: AriaIdrefMirrorHandle | null = null;
+    try {
+      handle = installAriaIdrefMirror(inner, () => {
+        resolved = resolveIdrefTokens(inner, inner.getAttribute('aria-labelledby'));
+      });
+
+      expect(resolved.length).toBe(1);
+      expect(resolved[0]).toBe(targetA);
+
+      // Reparent without touching the slot attribute. This triggers no
+      // attribute mutation on the host — only `assignedSlot` flips.
+      ownerB.appendChild(inner);
+
+      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+
+      // Insert a new target only in rootB. With the assignedSlot poll fix,
+      // the next root-sync coalesces the reattach so resolved binds to targetB.
+      const targetB = document.createElement('span');
+      targetB.id = 'live';
+      targetB.textContent = 'B';
+      rootB.appendChild(targetB);
+
+      await new Promise((r) => setTimeout(r, 0));
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+
+      // The new target in rootB must be reachable now. Without the fix,
+      // resolved would still be bound to targetA.
+      expect(resolved.length).toBeGreaterThanOrEqual(1);
+      expect(resolved[0]).toBe(targetB);
+    } finally {
+      handle?.disconnect();
+    }
+  });
 });
 
 // ─────────────────────────────────────────────────────────────

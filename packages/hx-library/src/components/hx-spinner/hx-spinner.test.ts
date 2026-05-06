@@ -401,4 +401,25 @@ describe('hx-spinner', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── CodeRabbit SHOULD-FIX (PR #1649 follow-up): whitespace label normalize ───
+
+  describe('Whitespace label normalization', () => {
+    it('treats whitespace-only label as empty on the inner aria-label surface', async () => {
+      const original = console.warn;
+      console.warn = () => {};
+      try {
+        const el = await fixture<HelixSpinner>('<hx-spinner label="   "></hx-spinner>');
+        await el.updateComplete;
+        const inner = shadowQuery(el, '[part="base"]') as HTMLElement;
+        // Whitespace must NOT pass through as a visually-empty aria-label.
+        expect(inner.getAttribute('aria-label')).toBeNull();
+        // Host internals should also reject whitespace-only labels.
+        const internals = (el as unknown as { _internals: ElementInternals })._internals;
+        expect(internals.ariaLabel).toBeNull();
+      } finally {
+        console.warn = original;
+      }
+    });
+  });
 });
