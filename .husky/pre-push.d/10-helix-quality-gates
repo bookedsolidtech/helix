@@ -79,12 +79,7 @@ if command -v shellcheck > /dev/null 2>&1; then
     -type f 2>/dev/null | tr '\n' ' ' || true)
   if [ -n "$SHELL_SCRIPTS" ]; then
     # shellcheck disable=SC2086
-    # SC1078 added 2026-05-05 (helix-031): rea-managed
-    # .claude/hooks/_lib/cmd-segments.sh shipped in 0.26.1 contains awk
-    # scripts with `'\''` escape patterns that shellcheck's bash parser
-    # misreads as unclosed single-quoted strings. The patterns are valid
-    # POSIX awk inside bash heredocs. False-positive — exclude.
-    if ! shellcheck --shell=bash --severity=warning --exclude=SC1091,SC2034,SC1078 $SHELL_SCRIPTS > "$OUT" 2>&1; then
+    if ! shellcheck --shell=bash --severity=warning --exclude=SC1091,SC2034 $SHELL_SCRIPTS > "$OUT" 2>&1; then
       echo ""
       echo "GATE FAILED: Shellcheck"
       cat "$OUT"
