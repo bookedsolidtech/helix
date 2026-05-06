@@ -1064,4 +1064,146 @@ describe('hx-popover', () => {
       expect(tabEvent.defaultPrevented).toBe(false);
     });
   });
+
+  // ─── Host-attribute label mirror (group-4 round-1) ───
+
+  describe('Host-attribute label mirror', () => {
+    it('mirrors host aria-label to the inner body', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover aria-label="Patient details"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Patient details');
+    });
+
+    it('mirrors host aria-labelledby (single token) flattened to text', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="popover-label-1">Clinical notes</h2>
+        <hx-popover aria-labelledby="popover-label-1"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixPopover>('hx-popover')!;
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Clinical notes');
+      wrapper.remove();
+    });
+
+    it('mirrors host aria-labelledby with multiple tokens joined by space', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="popover-label-2a">Patient</h2>
+        <span id="popover-label-2b">Details</span>
+        <hx-popover aria-labelledby="popover-label-2a popover-label-2b"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixPopover>('hx-popover')!;
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Patient Details');
+      wrapper.remove();
+    });
+
+    it('falls back to label property when aria-labelledby tokens do not resolve', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover aria-labelledby="popover-typo-nonexistent" label="Fallback name"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Fallback name');
+    });
+
+    it('aria-labelledby outranks aria-label per AccName 1.2 §4.3.1', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="popover-label-3">From IDREF</h2>
+        <hx-popover aria-labelledby="popover-label-3" aria-label="From aria-label"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixPopover>('hx-popover')!;
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('From IDREF');
+      wrapper.remove();
+    });
+
+    it('aria-label outranks the label property', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover aria-label="Host wins" label="Property loses"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Host wins');
+    });
+
+    it('removing host aria-label restores the label property', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover aria-label="Initial" label="Restored"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      el.removeAttribute('aria-label');
+      // MutationObserver fires synchronously; allow a microtask for state propagation.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Restored');
+    });
+
+    it('label property changes flow into the inner body when no host attributes set', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover label="Initial"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      el.label = 'Updated';
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Updated');
+    });
+
+    it('falls back to literal "Popover" when nothing is set', async () => {
+      const el = await fixture<HelixPopover>(
+        '<hx-popover label=""><button slot="anchor">Trigger</button><p>Content</p></hx-popover>',
+      );
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Popover');
+    });
+
+    it('in-place text mutation on the IDREF target re-flows the inner body name', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="popover-label-4">Initial Name</h2>
+        <hx-popover aria-labelledby="popover-label-4"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixPopover>('hx-popover')!;
+      const heading = wrapper.querySelector<HTMLElement>('#popover-label-4')!;
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Initial Name');
+      heading.textContent = 'Updated Name';
+      // External-refs MutationObserver fires synchronously in microtask.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await el.updateComplete;
+      expect(body?.getAttribute('aria-label')).toBe('Updated Name');
+      wrapper.remove();
+    });
+
+    it('hidden IDREF targets are filtered out per AccName 1.2 §4.3.10', async () => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <h2 id="popover-label-5a" aria-hidden="true">Hidden</h2>
+        <span id="popover-label-5b">Visible</span>
+        <hx-popover aria-labelledby="popover-label-5a popover-label-5b"><button slot="anchor">Trigger</button><p>Content</p></hx-popover>
+      `;
+      document.body.appendChild(wrapper);
+      const el = wrapper.querySelector<HelixPopover>('hx-popover')!;
+      await el.updateComplete;
+      const body = shadowQuery(el, '[part="body"]');
+      expect(body?.getAttribute('aria-label')).toBe('Visible');
+      wrapper.remove();
+    });
+  });
 });

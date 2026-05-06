@@ -856,4 +856,348 @@ describe('hx-field', () => {
       }
     });
   });
+
+  // ─── ARIA: slotted control re-resolution ───
+
+  describe('ARIA: slotted control re-resolution', () => {
+    /**
+     * Wait one microtask + one render tick after a slot mutation so the
+     * default-slot `slotchange` handler runs, `_resolveSlottedControl()`
+     * adopts the new control, and the next `updated()` sync completes.
+     */
+    async function flushSlotChange(el: HelixField): Promise<void> {
+      await el.updateComplete;
+      await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
+      await el.updateComplete;
+    }
+
+    it('re-syncs ARIA wiring when the slotted control is replaced post-mount', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Name" required error="Required"><input id="first" type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+
+      const first = el.querySelector('input#first') as HTMLInputElement;
+      expect(first.getAttribute('aria-label')).toBe('Name');
+      expect(first.getAttribute('aria-required')).toBe('true');
+      expect(first.getAttribute('aria-invalid')).toBe('true');
+
+      // Swap the slotted control: remove the original, append a fresh one.
+      first.remove();
+      const replacement = document.createElement('input');
+      replacement.type = 'text';
+      replacement.id = 'second';
+      el.appendChild(replacement);
+
+      await flushSlotChange(el);
+
+      expect(replacement.getAttribute('aria-label')).toBe('Name');
+      expect(replacement.getAttribute('aria-required')).toBe('true');
+      expect(replacement.getAttribute('aria-invalid')).toBe('true');
+      expect(replacement.hasAttribute('aria-describedby')).toBe(true);
+
+      // The original control should have been stripped of host-owned ARIA.
+      expect(first.hasAttribute('aria-label')).toBe(false);
+      expect(first.hasAttribute('aria-required')).toBe(false);
+      expect(first.hasAttribute('aria-invalid')).toBe(false);
+      expect(first.hasAttribute('aria-describedby')).toBe(false);
+    });
+  });
+
+  // ─── ARIA: consumer aria-label precedence (round-13 F2) ───
+  //
+  // These tests exercise the marker-based ownership model. The host stamps
+  // `data-hx-owns-label` on any control whose `aria-label` it writes; the
+  // attribute's presence/absence is the single source of truth on every
+  // sync, so post-mount mutations by the consumer (add, remove, toggle
+  // `data-aria-managed`) are always honored.
+
+  describe('ARIA: consumer aria-label precedence (F2)', () => {
+    it('does not overwrite a consumer-set aria-label when the label prop is also set', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Visible Label"><input type="text" aria-label="Consumer Override" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('Consumer Override');
+      expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+    });
+
+    it('does not overwrite a consumer-set aria-label when label prop changes after mount', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="First"><input type="text" aria-label="Consumer" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+
+      el.label = 'Second';
+      await el.updateComplete;
+
+      expect(input.getAttribute('aria-label')).toBe('Consumer');
+    });
+
+    it('does not overwrite when consumer rewrites aria-label AFTER mount and label prop changes', async () => {
+      // Failure mode for the old one-shot snapshot flag: consumer rewrites
+      // aria-label post-mount, then the host runs another sync. The old
+      // implementation would have overwritten the consumer value because
+      // its captured-at-slotchange flag stayed false. The marker-based
+      // model detects the value mismatch and releases ownership without
+      // requiring the consumer to know about the marker.
+      const el = await fixture<HelixField>(
+        '<hx-field label="First"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('First');
+      expect(input.hasAttribute('data-hx-owns-label')).toBe(true);
+
+      // Consumer overwrites the value directly. They do NOT know about the
+      // marker — they just call setAttribute. The marker stays put on the
+      // DOM, but the value-mismatch check on the next sync detects the
+      // overwrite and releases ownership.
+      input.setAttribute('aria-label', 'Consumer Late Override');
+
+      // Trigger another sync. Host must NOT clobber the consumer value.
+      el.label = 'Second';
+      await el.updateComplete;
+
+      expect(input.getAttribute('aria-label')).toBe('Consumer Late Override');
+      expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+    });
+
+    it('restores the visible label when the consumer removes aria-label after mount', async () => {
+      // Failure mode for the old flag: once captured as "consumer-set", the
+      // host would never restore the label even if the consumer removed
+      // their attribute. The marker model recomputes per sync.
+      const el = await fixture<HelixField>(
+        '<hx-field label="Visible"><input type="text" aria-label="Consumer" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('Consumer');
+      expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+
+      // Consumer removes their override. The host should now mirror the
+      // visible `label` prop on the next sync.
+      input.removeAttribute('aria-label');
+
+      // Trigger updated() — any property write will do.
+      el.label = 'Visible Restored';
+      await el.updateComplete;
+
+      expect(input.getAttribute('aria-label')).toBe('Visible Restored');
+      expect(input.getAttribute('data-hx-owns-label')).toBe('true');
+    });
+
+    it('honors a runtime data-aria-managed toggle by leaving the slotted control alone', async () => {
+      // Failure mode for the old flag: it captured `data-aria-managed`
+      // status only at slotchange. The marker model checks the attribute
+      // on every sync, so toggling it post-mount works as expected.
+      const el = await fixture<HelixField>(
+        '<hx-field label="First"><input type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const input = el.querySelector('input') as HTMLInputElement;
+      expect(input.getAttribute('aria-label')).toBe('First');
+
+      // Consumer opts out of ARIA mutation post-mount.
+      input.setAttribute('data-aria-managed', '');
+
+      // Host must skip bridging entirely — it must not touch aria-label,
+      // aria-required, aria-invalid, or aria-describedby.
+      el.label = 'Second';
+      el.required = true;
+      el.error = 'oops';
+      await el.updateComplete;
+
+      // aria-label still has the value from before the opt-out (host did
+      // not overwrite, and did not remove host-owned label either).
+      expect(input.getAttribute('aria-label')).toBe('First');
+      expect(input.hasAttribute('aria-required')).toBe(false);
+      expect(input.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it('emits a dev-time warning when consumer aria-label competes with visible label prop', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Patient Name"><input type="text" aria-label="Patient Name Override" /></hx-field>',
+        );
+        await el.updateComplete;
+        const labelWarnings = warnSpy.mock.calls.filter((args) =>
+          String(args[0]).includes('Slotted control already has `aria-label`'),
+        );
+        expect(labelWarnings).toHaveLength(1);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('emits the competing-label warning at most once per adopted control', async () => {
+      // Failure mode if the warn-latch lived in `_resolveSlottedControl()`
+      // alone: subsequent syncs would re-emit the warning. The
+      // `_competingLabelWarned` latch in `_syncSlottedControl()` ensures
+      // exactly one warning per adoption no matter how many times the
+      // host syncs.
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Patient Name"><input type="text" aria-label="Override" /></hx-field>',
+        );
+        await el.updateComplete;
+
+        // Several updates — each triggers _syncSlottedControl().
+        el.label = 'Patient Name 2';
+        await el.updateComplete;
+        el.label = 'Patient Name 3';
+        await el.updateComplete;
+        el.required = true;
+        await el.updateComplete;
+        el.error = 'oops';
+        await el.updateComplete;
+
+        const labelWarnings = warnSpy.mock.calls.filter((args) =>
+          String(args[0]).includes('Slotted control already has `aria-label`'),
+        );
+        expect(labelWarnings).toHaveLength(1);
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('does not warn when consumer aria-label is present but label prop is empty', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field><input type="text" aria-label="Self-Labeled" /></hx-field>',
+        );
+        await el.updateComplete;
+        const labelWarnings = warnSpy.mock.calls.filter((args) =>
+          String(args[0]).includes('Slotted control already has `aria-label`'),
+        );
+        expect(labelWarnings).toHaveLength(0);
+        const input = el.querySelector('input') as HTMLInputElement;
+        expect(input.getAttribute('aria-label')).toBe('Self-Labeled');
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('respects consumer aria-label across slot replacement', async () => {
+      const el = await fixture<HelixField>(
+        '<hx-field label="Visible"><input id="a" type="text" /></hx-field>',
+      );
+      await el.updateComplete;
+      const first = el.querySelector('input') as HTMLInputElement;
+      // First control had no aria-label preset; hx-field wrote it and
+      // stamped the ownership marker.
+      expect(first.getAttribute('aria-label')).toBe('Visible');
+      expect(first.getAttribute('data-hx-owns-label')).toBe('true');
+
+      // Replace with a control that DOES have aria-label set by the consumer.
+      first.remove();
+      const replacement = document.createElement('input');
+      replacement.type = 'text';
+      replacement.id = 'b';
+      replacement.setAttribute('aria-label', 'Replacement Override');
+      el.appendChild(replacement);
+
+      // Wait for slotchange + sync.
+      await el.updateComplete;
+      await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
+      await el.updateComplete;
+
+      expect(replacement.getAttribute('aria-label')).toBe('Replacement Override');
+      expect(replacement.hasAttribute('data-hx-owns-label')).toBe(false);
+    });
+
+    it('does not remove a consumer-set aria-label on disconnect', async () => {
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Visible"><input type="text" aria-label="Owned by consumer" /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+        expect(input.getAttribute('aria-label')).toBe('Owned by consumer');
+
+        el.remove();
+
+        // The consumer's aria-label must survive teardown — hx-field never
+        // wrote it, so it must not delete it.
+        expect(input.getAttribute('aria-label')).toBe('Owned by consumer');
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+      } finally {
+        document.body.removeChild(container);
+      }
+    });
+
+    it('still strips host-owned aria-label on disconnect when the consumer did not preset it', async () => {
+      // Regression guard for the F2 fix: when the consumer did NOT preset
+      // aria-label, hx-field owns the attribute and must clean it up,
+      // including the ownership marker.
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        const el = await fixture<HelixField>(
+          '<hx-field label="Visible"><input type="text" /></hx-field>',
+        );
+        await el.updateComplete;
+        const input = el.querySelector('input') as HTMLInputElement;
+        expect(input.getAttribute('aria-label')).toBe('Visible');
+        expect(input.getAttribute('data-hx-owns-label')).toBe('true');
+
+        el.remove();
+        expect(input.hasAttribute('aria-label')).toBe(false);
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+      } finally {
+        document.body.removeChild(container);
+      }
+    });
+
+    it('releases an orphan ownership marker pre-mounted on a fresh control', async () => {
+      // Regression guard for round-13 follow-up F1: if a slotted control
+      // arrives with `data-hx-owns-label="true"` already stamped (e.g. it
+      // was migrated from a prior hx-field, or a consumer pre-mounted the
+      // marker themselves) and the new hx-field has never written to it,
+      // the new host's `_lastWrittenAriaLabel` is `null`. Without the F1
+      // guard, the value mismatch check `liveValue !== _lastWrittenAriaLabel`
+      // short-circuits with `null !== "A"` returning true, so the host
+      // would claim ownership and clobber the value on the next sync.
+      // The fix: when the marker is present but the snapshot is null, the
+      // host has no claim — strip the orphan marker and treat the value as
+      // consumer-owned (defense-in-depth).
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      try {
+        // Build an input with the ownership marker AND aria-label already
+        // stamped — simulating either cross-host migration or a consumer
+        // who pre-mounted the marker themselves.
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.setAttribute('aria-label', 'A');
+        input.setAttribute('data-hx-owns-label', 'true');
+
+        const field = document.createElement('hx-field') as HelixField;
+        // Note: NO label prop — field has never written to this control,
+        // so its `_lastWrittenAriaLabel` is null when the marker is seen.
+        field.appendChild(input);
+        container.appendChild(field);
+
+        // Wait for slotchange + initial sync to settle.
+        await field.updateComplete;
+        await new Promise((resolve) => queueMicrotask(() => resolve(undefined)));
+        await field.updateComplete;
+
+        // The orphan marker must be stripped, the consumer's aria-label
+        // must be preserved untouched, and the field must NOT have claimed
+        // ownership on its first encounter with this control.
+        expect(input.getAttribute('aria-label')).toBe('A');
+        expect(input.hasAttribute('data-hx-owns-label')).toBe(false);
+      } finally {
+        container.remove();
+      }
+    });
+  });
 });

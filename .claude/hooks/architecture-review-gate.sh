@@ -18,13 +18,11 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # ── 3. HALT check ────────────────────────────────────────────────────────────
-REA_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-HALT_FILE="${REA_ROOT}/.rea/HALT"
-if [ -f "$HALT_FILE" ]; then
-  printf 'REA HALT: %s\nAll agent operations suspended. Run: rea unfreeze\n' \
-    "$(head -c 1024 "$HALT_FILE" 2>/dev/null || echo 'Reason unknown')" >&2
-  exit 2
-fi
+# 0.16.0: HALT check sourced from shared _lib/halt-check.sh.
+# shellcheck source=_lib/halt-check.sh
+source "$(dirname "$0")/_lib/halt-check.sh"
+check_halt
+REA_ROOT=$(rea_root)
 
 # ── 4. Check if enabled ──────────────────────────────────────────────────────
 POLICY_FILE="${REA_ROOT}/.rea/policy.yaml"
@@ -41,21 +39,40 @@ if [[ -z "$FILE_PATH" ]]; then
   exit 0
 fi
 
-# Normalize to relative path
-if [[ "$FILE_PATH" == "$REA_ROOT"/* ]]; then
-  FILE_PATH="${FILE_PATH#$REA_ROOT/}"
-fi
+# 0.16.0 fix D.1: normalize via shared `_lib/path-normalize.sh` so
+# Windows / Git Bash backslash paths and URL-encoded forms are handled
+# uniformly with the rest of the hook layer. Pre-fix, this hook only
+# stripped $REA_ROOT prefix — `src\gateway\foo.ts` (Windows) or
+# `src%2Fgateway%2Ffoo.ts` (URL-encoded) silently bypassed the
+# architectural review.
+# shellcheck source=_lib/path-normalize.sh
+source "$(dirname "$0")/_lib/path-normalize.sh"
+FILE_PATH=$(normalize_path "$FILE_PATH")
 
 # ── 6. Check architecture-sensitive paths ─────────────────────────────────────
-ARCH_PATTERNS=(
-  'src/types/'
-  'src/gateway/'
-  'src/config/'
-  'src/cli/commands/init/'
-  'hooks/_lib/'
-  'templates/'
-  'profiles/'
-)
+# 0.20.1 helix-round-N P2: read patterns from policy. Pre-fix the
+# rea-internal source-tree patterns (`src/gateway/`, `hooks/_lib/`,
+# `profiles/`, etc.) shipped as hardcoded defaults — irrelevant noise
+# in consumer projects whose architecture-sensitive paths are
+# different. Consumers with their own architecture surfaces declare
+# them in `.rea/policy.yaml::architecture_review.patterns`. The
+# bst-internal profile pins the rea-source patterns so the dogfood
+# install behaves the same as before; consumers without a pattern
+# set get a silent no-op.
+# shellcheck source=_lib/policy-read.sh
+source "$(dirname "$0")/_lib/policy-read.sh"
+
+ARCH_PATTERNS=()
+while IFS= read -r entry; do
+  [[ -z "$entry" ]] && continue
+  ARCH_PATTERNS+=("$entry")
+done < <(policy_list "architecture_review.patterns" 2>/dev/null || true)
+
+if [[ ${#ARCH_PATTERNS[@]} -eq 0 ]]; then
+  # Empty/unset policy → silent no-op. Consumers who haven't declared
+  # architecture-sensitive paths see zero advisory output.
+  exit 0
+fi
 
 MATCHED=""
 for pattern in "${ARCH_PATTERNS[@]}"; do

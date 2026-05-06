@@ -15,6 +15,46 @@ export type { HxPopoverProps };
 
 /**
  * A popover that displays rich floating content attached to a trigger element.
+
+## Architecture Note: Host-Attribute Label Mirror (group-4 round-1)
+
+Unlike modal dialogs (`hx-dialog` / `hx-drawer`) where the HOST is the
+announced surface and `ElementInternals` projects consumer IDREFs across
+the shadow boundary, `hx-popover`'s announced surface is the inner
+`[part="body"]` element which carries `role="dialog"`. The host does not
+claim a role — it is a structural wrapper around an anchor slot and a
+separate floating panel.
+
+IDL element references on `internals.ariaLabelledByElements` therefore
+cannot help: AT walks the inner body's accessibility node, and IDL refs
+declared on the host are not visible from a shadow-internal descendant
+looking up. The viable cross-shadow path is the host-attribute mirror:
+
+  1. The host observes `aria-label` / `aria-labelledby` mutations.
+  2. On every sync, `aria-labelledby` IDREFs are resolved via
+     `resolveIdrefTokens` (composed-tree walk: host root → ancestor
+     shadow hosts → owner document) and **text-flattened** via
+     `flattenAccName` (AccName 1.2 §4.3.10 hidden-aware).
+  3. The flattened name is written to the inner body's `aria-label`,
+     overriding the `label` property only when consumer naming is set.
+
+Naming precedence (W3C AccName 1.2 §4.3.1):
+
+  1. Host `aria-labelledby` (resolved IDREFs, text-flattened)
+  2. Host `aria-label`
+  3. `label` property
+  4. Hard-coded literal `"Popover"` (last-resort accessible name)
+
+The text-flatten approach forfeits live IDL-ref tracking (mutating a
+referenced element's text re-fires through the shared root observer; see
+`installAriaIdrefMirror`). `aria-controls` is intentionally omitted on
+the trigger — the body lives in shadow DOM and consumer IDREFs cannot
+resolve cross-root from light-DOM (axe-core flags this as a critical
+violation if attempted; see line documenting this exception below).
+
+Slotted label support (e.g. `<slot name="title">`) is deliberately NOT
+added in this round — it would expand the public API surface and is
+tracked as a follow-up enhancement.
  *
  * @example
  * ```tsx
