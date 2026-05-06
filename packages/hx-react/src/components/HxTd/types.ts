@@ -18,8 +18,12 @@ export interface HxTdProps {
   colspan?: number;
   /** Number of rows this cell spans. */
   rowspan?: number;
-  /** Column header label for this cell. Forwarded as `data-label` on the native `<td>` for
-the mobile card layout (`td::before { content: attr(data-label) }`) and as `aria-label`
-so screen readers identify the column when the header row is hidden. */
+  /** Column header label for this cell. Forwarded as `data-label` on the native
+`<td>` for the mobile card layout (`td::before { content: attr(data-label) }`)
+AND projected to `aria-label` so screen readers identify the column when
+the header row is hidden via the mobile breakpoint. Group 7 audit B-A1
+fix: prior to migration, the JSDoc claimed aria-label projection but the
+implementation only set `data-label` — `::before { content: attr(...) }`
+is not reliably announced by VoiceOver / NVDA across versions. */
   label?: string;
 }

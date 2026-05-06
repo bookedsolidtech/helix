@@ -721,13 +721,19 @@ export class HelixDataTable extends HelixElement {
   // ─── Render ───
 
   override render() {
+    // Group 7 audit fix: drop the meaningless `|| 'Table'` fallback.
+    // Falling back to a generic literal silently labelled every consumer
+    // who forgot to set the `label` property as just "Table" — a WCAG
+    // 4.1.2 by-default violation. The devWarn (line ~309) already nudges
+    // consumers to provide a real label; let `aria-label` omit when empty.
+    const trimmedLabel = this.label.trim();
     return html`
       <slot name="toolbar"></slot>
       <div class="table-wrapper">
         <table
           part="table"
           role="grid"
-          aria-label=${this.label.trim() || 'Table'}
+          aria-label=${trimmedLabel || nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           @keydown=${this._handleKeydown}
         >

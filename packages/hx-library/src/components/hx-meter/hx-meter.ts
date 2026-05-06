@@ -5,6 +5,13 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixMeterStyles } from './hx-meter.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 type MeterState = 'optimum' | 'warning' | 'danger' | 'default';
 
@@ -14,6 +21,16 @@ const _nextMeterId = createIdCounter('hx-meter');
  * A scalar measurement within a known range — e.g., disk usage, health score,
  * or any numeric value with defined min/max bounds. Supports low/high/optimum
  * threshold markers for semantic color feedback.
+ *
+ * Group 7 host-canonical: `role="meter"` is mirrored onto the **host** via
+ * `_internals.role` AND kept on the inner `[role="meter"]` element. The dual
+ * surface is the hx-progress-ring pattern (Group 7 gold-standard exemplar):
+ * the host carries the cross-shadow IDREF wiring (`ariaLabelledByElements`
+ * resolves through the shared mirror) while the inner element keeps its
+ * existing role/state surface so legacy AT and consumer queries continue to
+ * work. AccName 1.2 §4.3.1 precedence is implemented uniformly: consumer
+ * host `aria-labelledby` (flattened) > consumer host `aria-label` >
+ * `label` property / slotted label > derived value-text fallback.
  *
  * @summary Scalar measurement gauge within a defined range.
  *
@@ -65,6 +82,18 @@ const _nextMeterId = createIdCounter('hx-meter');
 @customElement('hx-meter')
 export class HelixMeter extends HelixElement {
   static override styles = [helixMeterStyles, forcedColorsSurface];
+
+  /**
+   * Test seam (Group 7 host-canonical migration): when set to `true` or
+   * `false`, overrides the platform `supportsIdrefElementReferences` probe
+   * before `connectedCallback` seeds `_supportsIdrefRefs`. Tests that need
+   * to verify the legacy fallback path may opt in by setting this static
+   * to `false` before fixture creation.
+   *
+   * Production code MUST NOT touch this field.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
 
   /** @internal */
   private _uid = _nextMeterId();
@@ -124,6 +153,17 @@ export class HelixMeter extends HelixElement {
   @state()
   private _hasSlotContent = false;
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /** @internal */
+  private _resolvedAccessibleName = '';
+
   /** @internal */
   private _clampedValue(): number {
     return Math.min(Math.max(this.value, this.min), this.max);
@@ -145,8 +185,6 @@ export class HelixMeter extends HelixElement {
 
     if (!hasLow && !hasHigh && !hasOptimum) return 'default';
 
-    // When hasLow/hasHigh/hasOptimum are true, the corresponding property is defined.
-    // Use nullish coalescing to satisfy the type checker while preserving the runtime logic.
     const lowVal = this.low ?? 0;
     const highVal = this.high ?? this.max;
     const inLowZone = hasLow && v < lowVal;
@@ -182,22 +220,132 @@ export class HelixMeter extends HelixElement {
   private _onLabelSlotChange(e: Event) {
     const slot = e.target as HTMLSlotElement;
     this._hasSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
+    this._syncHostAriaSemantics();
+  }
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    const ctor = this.constructor as typeof HelixMeter;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-    // Set data-state on host so :host([data-state]) CSS selectors work
     this.dataset['state'] = this._resolveState();
-    // Set --_value-ratio for GPU-compositable scaleX() transform on indicator
     const ratio = this._percentage() / 100;
     this.style.setProperty('--_value-ratio', String(Math.max(0, Math.min(1, ratio))));
+    if (
+      changedProperties.has('value') ||
+      changedProperties.has('min') ||
+      changedProperties.has('max') ||
+      changedProperties.has('low') ||
+      changedProperties.has('high') ||
+      changedProperties.has('optimum') ||
+      changedProperties.has('label')
+    ) {
+      this._syncHostAriaSemantics();
+    }
+  }
+
+  /**
+   * Mirror meter semantics onto the host via ElementInternals. The inner
+   * `[role="meter"]` keeps its existing surface — this method ADDS a host-
+   * level surface via internals.* so consumer-supplied `aria-labelledby` /
+   * `aria-describedby` on the host project through `ariaLabelledByElements`
+   * (cross-shadow IDREF) on engines that support it. Mirrors hx-progress-ring's
+   * dual-surface pattern (Group 7 gold-standard exemplar).
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    const clampedValue = this._clampedValue();
+    const state = this._resolveState();
+    const stateLabel = state !== 'default' ? ` — ${state}` : '';
+    const ariaValuetext = `${clampedValue} of ${this.max}${stateLabel}`;
+
+    if (this._supportsIdrefRefs) {
+      internals.role = 'meter';
+      internals.ariaValueNow = String(clampedValue);
+      internals.ariaValueMin = String(this.min);
+      internals.ariaValueMax = String(this.max);
+      internals.ariaValueText = ariaValuetext;
+    } else {
+      // Legacy engines: clear host-internals so the inner [role="meter"] is
+      // the only announced surface (avoids the duplicate-surface problem).
+      internals.role = null;
+      internals.ariaLabel = null;
+      internals.ariaValueNow = null;
+      internals.ariaValueMin = null;
+      internals.ariaValueMax = null;
+      internals.ariaValueText = null;
+    }
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    let resolved = '';
+    if (hasEffectiveLabelledBy) {
+      const flattened =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        hostAriaLabel ||
+        this.label ||
+        '';
+      resolved = flattened || ariaValuetext;
+      if (this._supportsIdrefRefs) {
+        // Modern path: element refs win; clear ariaLabel so they aren't
+        // shadowed by a stale string on the host.
+        internals.ariaLabel = null;
+      }
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = hostAriaLabel;
+      }
+    } else if (this._hasSlotContent || this.label !== undefined) {
+      resolved = this.label ?? '';
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = resolved || null;
+      }
+    } else {
+      resolved = ariaValuetext;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = resolved;
+      }
+    }
+
+    this._resolvedAccessibleName = resolved;
   }
 
   // ─── WCAG 1.4.1: State label map ───
-  // The indicator bar color alone is insufficient for color-blind users.
-  // A visible state label is rendered below the track when a semantic state
-  // (optimum/warning/danger) is active, providing a non-color visual cue.
-  // aria-valuetext already embeds the state for AT users.
 
   /** @internal */
   private static readonly _STATE_LABELS: Partial<Record<MeterState, string>> = {
@@ -214,6 +362,9 @@ export class HelixMeter extends HelixElement {
     const hasVisibleLabel = this.label !== undefined || this._hasSlotContent;
     const visibleStateLabel = HelixMeter._STATE_LABELS[state];
 
+    // Inner element keeps role + value-state surface for legacy AT and
+    // existing consumer queries. The host carries the cross-shadow IDREF
+    // wiring via internals.* (see _syncHostAriaSemantics).
     return html`
       <div
         part="base"

@@ -6,9 +6,24 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { helixListItemStyles } from './hx-list-item.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 /**
  * A rich list item for use inside `hx-list`.
+ *
+ * Group 7 host-canonical: `role="option"` (interactive listbox mode) is
+ * mirrored onto the **host** via `_internals.role` AND the legacy
+ * setAttribute('role',...) path. The dual-surface pattern preserves the
+ * existing imperative host-attribute behaviour (so consumers querying
+ * `host.getAttribute('role')` still work) while adding cross-shadow IDREF
+ * wiring through `internals.ariaLabelledByElements` for engines that
+ * support it.
  *
  * @summary Individual list item with optional prefix, suffix, description, link, and disabled/selected states.
  *
@@ -38,6 +53,13 @@ import { forcedColorsSurface } from '../../styles/forced-colors.js';
 @customElement('hx-list-item')
 export class HelixListItem extends HelixElement {
   static override styles = [helixListItemStyles, forcedColorsSurface];
+
+  /**
+   * Test seam (Group 7 host-canonical migration): see other Group 7 components.
+   * Production code MUST NOT touch this field.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
 
   /**
    * Whether the item is disabled. Prevents interaction.
@@ -82,6 +104,36 @@ export class HelixListItem extends HelixElement {
   @property({ type: String, reflect: true })
   type: 'default' | 'term' | 'definition' = 'default';
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /** @internal */
+  private _resolvedAccessibleName = '';
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    const ctor = this.constructor as typeof HelixListItem;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    this._syncHostAria();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAria();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
   override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
     if (
@@ -95,11 +147,18 @@ export class HelixListItem extends HelixElement {
 
   /**
    * Syncs ARIA attributes to the host element when in interactive (listbox option) mode.
-   * This ensures correct ARIA ownership: ul[role=listbox] > hx-list-item[role=option].
+   * Preserves the prior imperative `setAttribute('role', 'option')` path so existing
+   * consumer queries and tests continue to pass. ALSO mirrors the same surface onto
+   * `internals.role` / `internals.ariaSelected` (modern path) so cross-shadow IDREF
+   * resolution through `internals.ariaLabelledByElements` works on engines that
+   * support it.
    */
   /** @internal */
   private _syncHostAria(): void {
-    if (this.interactive) {
+    const internals = this._internals;
+    const isInteractiveOption = this.interactive;
+
+    if (isInteractiveOption) {
       this.setAttribute('role', 'option');
       this.setAttribute('aria-selected', String(this.selected));
       if (this.disabled) {
@@ -112,12 +171,67 @@ export class HelixListItem extends HelixElement {
       } else {
         this.removeAttribute('tabindex');
       }
+
+      if (this._supportsIdrefRefs) {
+        internals.role = 'option';
+        internals.ariaSelected = this.selected ? 'true' : 'false';
+        internals.ariaDisabled = this.disabled ? 'true' : null;
+      } else {
+        internals.role = null;
+        internals.ariaSelected = null;
+        internals.ariaDisabled = null;
+      }
     } else {
       this.removeAttribute('role');
       this.removeAttribute('aria-selected');
       this.removeAttribute('aria-disabled');
       this.removeAttribute('tabindex');
+
+      internals.role = null;
+      internals.ariaSelected = null;
+      internals.ariaDisabled = null;
     }
+
+    // Cross-shadow IDREF wiring (independent of role placement). Consumer-
+    // supplied `aria-labelledby` on the host resolves through the shared
+    // mirror, projecting onto `ariaLabelledByElements` on engines that
+    // support it.
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs && isInteractiveOption) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+      if (hasEffectiveLabelledBy) {
+        // Element refs win on the modern path; clear ariaLabel so it isn't
+        // shadowed by a stale string.
+        internals.ariaLabel = null;
+      } else if (hostAriaLabel) {
+        internals.ariaLabel = hostAriaLabel;
+      } else {
+        internals.ariaLabel = null;
+      }
+    }
+
+    let resolved = '';
+    if (hasEffectiveLabelledBy) {
+      resolved =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        hostAriaLabel ||
+        '';
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+    }
+    this._resolvedAccessibleName = resolved;
   }
 
   /** @internal */

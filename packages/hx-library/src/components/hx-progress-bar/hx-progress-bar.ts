@@ -7,11 +7,30 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixProgressBarStyles } from './hx-progress-bar.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 const _nextProgressBarId = createIdCounter('hx-progress-bar');
 
 /**
  * A linear progress indicator for determinate and indeterminate states.
+ *
+ * Group 7 host-canonical: `role="progressbar"` is mirrored onto the **host**
+ * via `_internals.role` (cross-shadow IDREF wiring) AND kept on the inner
+ * `[role="progressbar"]` track for legacy AT and consumer queries. This is
+ * the hx-progress-ring dual-surface pattern (Group 7 gold-standard).
+ * Consumer-supplied `aria-labelledby` / `aria-describedby` on the host
+ * resolves through the shared IDREF mirror so cross-shadow naming reaches
+ * the announced surface even when the labels live in another shadow tree.
+ *
+ * The internal `aria-live="polite"` announcer for the "Complete" milestone
+ * is preserved (`role="progressbar"` does NOT imply a live region — an
+ * explicit live announcer is required for value-update announcements).
  *
  * @summary Displays task completion progress or an indeterminate loading state.
  *
@@ -56,6 +75,13 @@ const _nextProgressBarId = createIdCounter('hx-progress-bar');
 @customElement('hx-progress-bar')
 export class HelixProgressBar extends HelixElement {
   static override styles = [helixProgressBarStyles, forcedColorsSurface];
+
+  /**
+   * Test seam (Group 7 host-canonical migration): see other Group 7 components.
+   * Production code MUST NOT touch this field.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
 
   /**
    * Current progress value (min–max). Set to null for indeterminate state.
@@ -123,6 +149,17 @@ export class HelixProgressBar extends HelixElement {
   /** @internal */
   private _uid = _nextProgressBarId();
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /** @internal */
+  private _resolvedAccessibleName = '';
+
   /** @internal */
   private get _isIndeterminate(): boolean {
     return this.indeterminate || this.value === null;
@@ -146,6 +183,25 @@ export class HelixProgressBar extends HelixElement {
     return !this._isIndeterminate && this.value !== null && this.value >= this.max;
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    const ctor = this.constructor as typeof HelixProgressBar;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
   override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
     if ((changedProps.has('value') || changedProps.has('max')) && this._isComplete) {
@@ -165,6 +221,18 @@ export class HelixProgressBar extends HelixElement {
       this.style.setProperty('--_value-ratio', String(Math.max(0, Math.min(1, ratio))));
     }
 
+    if (
+      changedProps.has('value') ||
+      changedProps.has('min') ||
+      changedProps.has('max') ||
+      changedProps.has('indeterminate') ||
+      changedProps.has('label') ||
+      changedProps.has('description') ||
+      changedProps.has('variant')
+    ) {
+      this._syncHostAriaSemantics();
+    }
+
     if (!this.label && !this._warnedAboutLabel) {
       this._warnedAboutLabel = true;
       devWarn(
@@ -178,12 +246,87 @@ export class HelixProgressBar extends HelixElement {
   private _onLabelSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasLabelSlotContent = slot.assignedNodes({ flatten: true }).length > 0;
+    this._syncHostAriaSemantics();
   }
 
-  // ─── WCAG 1.4.1: Variant label map ───
-  // Semantic variants (success/warning/danger) must not rely on color alone.
-  // The variant label is included in aria-valuetext for AT users and rendered
-  // as visually-hidden text for users in high contrast or color-blind contexts.
+  /**
+   * Mirror progressbar semantics onto the host. Dual-surface: inner track
+   * keeps role + value-state, host adds the cross-shadow IDREF wiring via
+   * internals.* (the hx-progress-ring exemplar pattern).
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    const isIndeterminate = this._isIndeterminate;
+    const variantLabel = this._variantLabel;
+    const percentageText = isIndeterminate ? 'In progress' : `${Math.round(this._percentage)}%`;
+    const ariaValuetext = variantLabel ? `${percentageText} — ${variantLabel}` : percentageText;
+    const ariaValueNow = isIndeterminate ? null : String(this.value ?? this.min);
+
+    if (this._supportsIdrefRefs) {
+      internals.role = 'progressbar';
+      internals.ariaValueNow = ariaValueNow;
+      internals.ariaValueMin = String(this.min);
+      internals.ariaValueMax = String(this.max);
+      internals.ariaValueText = ariaValuetext;
+      internals.ariaBusy = isIndeterminate ? 'true' : null;
+    } else {
+      internals.role = null;
+      internals.ariaLabel = null;
+      internals.ariaValueNow = null;
+      internals.ariaValueMin = null;
+      internals.ariaValueMax = null;
+      internals.ariaValueText = null;
+      internals.ariaBusy = null;
+    }
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    let resolved = '';
+    if (hasEffectiveLabelledBy) {
+      const flattened =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        hostAriaLabel ||
+        this.label ||
+        '';
+      resolved = flattened || ariaValuetext;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = hostAriaLabel;
+      }
+    } else if (this._hasLabelSlotContent || this.label) {
+      resolved = this.label || '';
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = resolved || null;
+      }
+    } else {
+      resolved = '';
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    }
+
+    this._resolvedAccessibleName = resolved;
+  }
 
   /** @internal */
   private static readonly _VARIANT_LABELS: Partial<Record<HelixProgressBar['variant'], string>> = {
@@ -212,8 +355,6 @@ export class HelixProgressBar extends HelixElement {
     const ariaValueNow = this._isIndeterminate ? undefined : (this.value ?? this.min);
     const variantLabel = this._variantLabel;
 
-    // WCAG 1.4.1: Include variant label in aria-valuetext so AT users receive
-    // the semantic state (success/warning/danger) without relying on fill color.
     const percentageText = this._isIndeterminate
       ? 'In progress'
       : `${Math.round(this._percentage)}%`;

@@ -15,6 +15,14 @@ export type { HxListItemProps };
 
 /**
  * A rich list item for use inside `hx-list`.
+
+Group 7 host-canonical: `role="option"` (interactive listbox mode) is
+mirrored onto the **host** via `_internals.role` AND the legacy
+setAttribute('role',...) path. The dual-surface pattern preserves the
+existing imperative host-attribute behaviour (so consumers querying
+`host.getAttribute('role')` still work) while adding cross-shadow IDREF
+wiring through `internals.ariaLabelledByElements` for engines that
+support it.
  *
  * @example
  * ```tsx

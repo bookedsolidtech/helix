@@ -1,8 +1,15 @@
-import { html, nothing, css } from 'lit';
+import { html, nothing, css, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 /**
  * Detail type for `hx-sort` events dispatched from `hx-th`.
@@ -14,6 +21,12 @@ export interface HxTableSortDetail {
 /**
  * Semantic table header cell. Must be a child of `hx-tr`.
  * Supports sortable columns with accessible sort state.
+ *
+ * Group 7 host-canonical: `role="columnheader"` lives on the **host** via
+ * `_internals.role`. The host carries `aria-sort` reflecting the current
+ * sort direction (when `sortable` is true). The sort `<button>` aria-label
+ * incorporates the slotted column text so AT users hear "Sort by Patient
+ * name, currently sorted ascending" rather than just "Sort ascending".
  *
  * @summary Table header cell (`<th>`) with optional sort support.
  *
@@ -109,6 +122,24 @@ export class HelixTableHeader extends HelixElement {
         }
       }
 
+      /* ─── Forced Colors (Windows High Contrast) ─── */
+
+      @media (forced-colors: active) {
+        th {
+          border-bottom-color: CanvasText;
+        }
+
+        .sort-btn:focus-visible {
+          outline: 2px solid Highlight;
+          outline-offset: var(--hx-focus-ring-offset, 2px);
+        }
+
+        .sort-icon--active {
+          forced-color-adjust: none;
+          color: Highlight;
+        }
+      }
+
       /* ─── Mobile card layout ─── */
 
       @media (max-width: 768px) {
@@ -133,6 +164,13 @@ export class HelixTableHeader extends HelixElement {
       }
     `,
   ];
+
+  /**
+   * Test seam (Group 7 host-canonical migration): see other Group 7 components.
+   * Production code MUST NOT touch this field.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
 
   /**
    * When true, the header renders a sort button and emits `hx-sort` on activation.
@@ -169,6 +207,106 @@ export class HelixTableHeader extends HelixElement {
   @property({ type: Number })
   rowspan = 0;
 
+  /** @internal */
+  @state() private _slotText = '';
+
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    const ctor = this.constructor as typeof HelixTableHeader;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  override updated(changed: PropertyValues<this>): void {
+    super.updated(changed);
+    if (changed.has('sortable') || changed.has('sortDirection')) {
+      this._syncHostAriaSemantics();
+    }
+  }
+
+  /** @internal */
+  private _onSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const nodes = slot.assignedNodes({ flatten: true });
+    let text = '';
+    for (const node of nodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent ?? '';
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        text += flattenAccName(node as Element);
+      }
+    }
+    this._slotText = text.replace(/\s+/g, ' ').trim();
+  }
+
+  /** @internal */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    const ariaSort = this._ariaSortValue();
+
+    if (!this._supportsIdrefRefs) {
+      internals.role = null;
+      internals.ariaSort = null;
+      internals.ariaLabel = null;
+    } else {
+      internals.role = 'columnheader';
+      // ariaSort is only meaningful on sortable headers (per ARIA 1.2). For
+      // non-sortable headers the host clears it so axe-core does not flag a
+      // spurious "none" value as a state.
+      internals.ariaSort = ariaSort;
+    }
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    if (hasEffectiveLabelledBy) {
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    } else if (hostAriaLabel) {
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = hostAriaLabel;
+      }
+    } else {
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    }
+  }
+
   // ─── Event Handlers ───
 
   /** @internal */
@@ -187,7 +325,7 @@ export class HelixTableHeader extends HelixElement {
   // ─── Render Helpers ───
 
   /** @internal */
-  private _renderSortIcon() {
+  protected _renderSortIcon() {
     const isActive = this.sortDirection !== 'none';
     const iconClass = [
       'sort-icon',
@@ -213,21 +351,49 @@ export class HelixTableHeader extends HelixElement {
   }
 
   /** @internal */
-  private _ariaSort(): 'ascending' | 'descending' | 'none' | typeof nothing {
-    if (!this.sortable) return nothing;
+  private _ariaSortValue(): 'ascending' | 'descending' | 'none' | null {
+    if (!this.sortable) return null;
     if (this.sortDirection === 'asc') return 'ascending';
     if (this.sortDirection === 'desc') return 'descending';
     return 'none';
   }
 
   /** @internal */
-  private _sortLabel(): string {
-    if (this.sortDirection === 'asc') return 'Sort descending';
-    if (this.sortDirection === 'desc') return 'Sort ascending';
-    return 'Sort';
+  private _ariaSortAttr(): 'ascending' | 'descending' | 'none' | typeof nothing {
+    const value = this._ariaSortValue();
+    return value === null ? nothing : value;
+  }
+
+  /**
+   * Build the sort button's aria-label. Includes the slotted column text
+   * when available so a blind user pressing Tab through 5 sortable columns
+   * hears "Sort by Patient name, currently sorted ascending" instead of
+   * just "Sort. Sort. Sort." (audit B-A2-style label disambiguation).
+   * Promoted to `protected` so subclasses can override the i18n surface
+   * without re-implementing the full sort cycle.
+   * @internal
+   */
+  protected _sortLabel(): string {
+    const column = this._slotText;
+    let directionLabel: string;
+    if (this.sortDirection === 'asc') {
+      directionLabel = 'Sort descending';
+    } else if (this.sortDirection === 'desc') {
+      directionLabel = 'Sort ascending';
+    } else {
+      directionLabel = 'Sort';
+    }
+    if (!column) return directionLabel;
+    if (this.sortDirection === 'asc') return `Sort ${column} descending`;
+    if (this.sortDirection === 'desc') return `Sort ${column} ascending`;
+    return `Sort by ${column}`;
   }
 
   override render() {
+    // Dual-surface (Group 7 hx-progress-ring exemplar): inner <th> keeps
+    // role="columnheader" + aria-sort for legacy AT and consumer queries.
+    // Host adds cross-shadow IDREF wiring via internals.* in
+    // _syncHostAriaSemantics().
     return html`
       <th
         part="header"
@@ -235,16 +401,16 @@ export class HelixTableHeader extends HelixElement {
         scope=${this.scope}
         colspan=${ifDefined(this.colspan > 0 ? this.colspan : undefined)}
         rowspan=${ifDefined(this.rowspan > 0 ? this.rowspan : undefined)}
-        aria-sort=${this._ariaSort()}
+        aria-sort=${this._ariaSortAttr()}
       >
         ${this.sortable
           ? html`
               <button class="sort-btn" @click=${this._handleSort} aria-label=${this._sortLabel()}>
-                <slot></slot>
+                <slot @slotchange=${this._onSlotChange}></slot>
                 ${this._renderSortIcon()}
               </button>
             `
-          : html`<slot></slot>`}
+          : html`<slot @slotchange=${this._onSlotChange}></slot>`}
       </th>
     `;
   }
