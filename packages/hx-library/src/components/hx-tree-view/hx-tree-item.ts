@@ -505,6 +505,17 @@ export class HelixTreeItem extends HelixElement {
     // clicks on a nested CHILD tree-item bubble through this host. Without
     // an origin guard, both Child and Parent activate.
     if (!this._isOwnEvent(e)) return;
+    // CodeRabbit MUST-FIX: a click landing inside our own children
+    // container (the `[role="group"]` wrapper around `<slot name="children">`)
+    // — i.e. on padding, between child items, on the group itself — also
+    // walks back up to THIS host through `_isOwnEvent`. Treat any click
+    // sourced from the children group as NOT a row activation.
+    const path = e.composedPath();
+    for (const node of path) {
+      if (!(node instanceof Element)) continue;
+      if (node === this) break;
+      if (node.getAttribute && node.getAttribute('part') === 'children') return;
+    }
     if (this.disabled) {
       e.preventDefault();
       e.stopPropagation();

@@ -278,11 +278,12 @@ export class HelixSplitButton extends HelixElement {
     const liveLabelledBy = this.getAttribute('aria-labelledby');
     const consumerLabelEls = resolveIdrefTokens(this, liveLabelledBy);
 
-    const isVisibleForAccName = (el: Element): boolean =>
-      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
-
+    // CodeRabbit MUST-FIX: AccName 1.2 §4.3.2 — `aria-labelledby` references
+    // their target text content REGARDLESS of visibility. The previous
+    // outer visibility filter dropped legitimate accessible names from
+    // visually-hidden labels. `flattenAccName` already handles aria-hidden
+    // subtree pruning per §4.3.10.
     const flattenedFromIdrefs = consumerLabelEls
-      .filter(isVisibleForAccName)
       .map((el) => flattenAccName(el))
       .filter((t) => t.length > 0)
       .join(' ')

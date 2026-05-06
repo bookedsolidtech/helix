@@ -313,10 +313,23 @@ export class HelixProgressBar extends HelixElement {
       if (this._supportsIdrefRefs) {
         internals.ariaLabel = hostAriaLabel;
       }
-    } else if (this._hasLabelSlotContent || this.label) {
-      resolved = this.label || '';
+    } else if (this.label) {
+      // CodeRabbit MUST-FIX: precedence ladder is host aria-labelledby >
+      // host aria-label > `label` property > slotted text > default.
+      // The `label` property explicitly wins over slotted text so the
+      // host-canonical name does not get clobbered when both are present.
+      resolved = this.label;
       if (this._supportsIdrefRefs) {
-        internals.ariaLabel = resolved || null;
+        internals.ariaLabel = resolved;
+      }
+    } else if (this._hasLabelSlotContent) {
+      // Slotted text fallback: leave `internals.ariaLabel` null so AT
+      // walks the host subtree (slotted span) for the accessible name.
+      // The inner `<div role="progressbar">` already wires
+      // `aria-labelledby` to the slotted label span on the fallback path.
+      resolved = '';
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
       }
     } else {
       resolved = '';

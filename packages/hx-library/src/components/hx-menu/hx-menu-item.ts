@@ -349,7 +349,16 @@ export class HelixMenuItem extends HelixElement {
       }
     } else if (hostAriaLabel) {
       resolved = hostAriaLabel;
-      internals.ariaLabel = hostAriaLabel;
+      if (this._supportsIdrefRefs) {
+        // Modern path: host carries the accessible name directly.
+        internals.ariaLabel = hostAriaLabel;
+      } else {
+        // Fallback path: the inner [role="menuitem*"] div is the named
+        // surface (it mirrors `_resolvedAccessibleName` via aria-label).
+        // Suppress the host aria-label so AT does not announce a second
+        // duplicate name (CodeRabbit MUST-FIX: leaked duplicate name).
+        internals.ariaLabel = null;
+      }
     } else {
       // No override — leave the announced surface to walk slotted text.
       internals.ariaLabel = null;

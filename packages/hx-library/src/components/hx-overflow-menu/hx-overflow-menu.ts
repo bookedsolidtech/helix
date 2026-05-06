@@ -572,6 +572,11 @@ export class HelixOverflowMenu extends HelixElement {
     if (findClosestMenuAncestor(item) !== null) return;
     if (e.defaultPrevented) return;
     this._hide();
+    // CodeRabbit MUST-FIX (WCAG 2.1.1 / 2.4.3): ArrowLeft close from a
+    // top-level slotted item dropped focus to <body>. Mirror the Escape
+    // branch and restore focus to the trigger so keyboard continuity is
+    // preserved.
+    this._buttonEl?.focus();
   };
 
   /** @internal */
@@ -595,11 +600,12 @@ export class HelixOverflowMenu extends HelixElement {
     const liveLabelledBy = this.getAttribute('aria-labelledby');
     const consumerLabelEls = resolveIdrefTokens(this, liveLabelledBy);
 
-    const isVisibleForAccName = (el: Element): boolean =>
-      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
-
+    // CodeRabbit MUST-FIX: AccName 1.2 §4.3.2 — `aria-labelledby` references
+    // their target text content REGARDLESS of visibility. The previous
+    // outer visibility filter dropped legitimate accessible names from
+    // visually-hidden labels. `flattenAccName` already handles aria-hidden
+    // subtree pruning per §4.3.10.
     const flattenedFromIdrefs = consumerLabelEls
-      .filter(isVisibleForAccName)
       .map((el) => flattenAccName(el))
       .filter((t) => t.length > 0)
       .join(' ')

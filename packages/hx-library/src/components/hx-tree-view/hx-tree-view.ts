@@ -481,7 +481,11 @@ export class HelixTreeView extends HelixElement {
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
-    if (changedProperties.has('label')) {
+    // CodeRabbit MUST-FIX: `selection` change must re-sync host
+    // semantics so `aria-multiselectable` reflects the new mode
+    // (single → false, multiple → true, none → unset). Previously only
+    // `label` triggered the resync, leaving stale aria-multiselectable.
+    if (changedProperties.has('label') || changedProperties.has('selection')) {
       this._syncHostAriaSemantics();
     }
   }
