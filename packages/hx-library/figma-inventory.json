@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-06T04:42:13.389Z",
+  "generatedAt": "2026-05-06T11:01:35.731Z",
   "sourceCem": "custom-elements.json",
-  "helixVersion": "3.3.1",
+  "helixVersion": "3.4.0",
   "tokensVersion": "3.3.1",
   "components": [
     {
