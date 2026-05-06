@@ -446,19 +446,26 @@ export class HelixAlert extends HelixElement {
     // is never conveyed by color alone, regardless of whether showIcon is set.
     const severityLabel = this._effectiveSeverityLabel;
 
-    // (group-6 §5.1) The announcement-bearing children — severity label,
-    // icon, title text, and the default slot — are each marked
-    // aria-hidden=true so the sr-only announcer above is the SOLE
-    // announcement surface. Without this guard, JAWS+Chrome was observed
-    // reading the message twice (once from host text, once from the
-    // announcer).
+    // (group-6 §5.1) Decorative duplicates of announcer copy — severity
+    // label, icon, title — are each marked aria-hidden=true so the
+    // sr-only announcer is the SOLE announcement surface for THAT copy.
+    // Without this guard, JAWS+Chrome was observed reading those bits
+    // twice (once from host text, once from the announcer).
     //
-    // aria-hidden is NOT placed on the alert container, the actions slot
-    // wrapper, or the close button — those host focusable descendants,
-    // and aria-hidden on a parent of focusable elements is an axe-core
-    // 'aria-hidden-focus' violation. Consumers SHOULD NOT place focusable
-    // elements in the default slot for the same reason; use the actions
-    // slot instead.
+    // (group-6 codex round-1 fix) The default slot wrapper is NO LONGER
+    // aria-hidden. The default slot can hold consumer-supplied interactive
+    // content (inline links, inline buttons inside an alert message), and
+    // aria-hidden on a parent of focusable elements is an axe-core
+    // `aria-hidden-focus` violation: AT users would tab into invisible
+    // controls. To suppress the (now exclusively-announcer-driven)
+    // double-announce risk on the slot text itself, the announcer copy is
+    // built from `this.textContent` and the host has its `role` toggled
+    // off-then-on across the open transition, so AT only registers the
+    // announcer as the live region for that text — not the host.
+    //
+    // aria-hidden is also NOT placed on the alert container, the actions
+    // slot wrapper, or the close button — those host focusable descendants
+    // for the same axe-core reason.
     return html`
       <div
         class="sr-only"
@@ -483,7 +490,7 @@ export class HelixAlert extends HelixElement {
           >
             <slot name="title"></slot>
           </div>
-          <span class="alert__default-slot" aria-hidden="true"><slot></slot></span>
+          <span class="alert__default-slot"><slot></slot></span>
           <div
             part="actions"
             class="alert__actions ${this._hasActions ? 'alert__actions--visible' : ''}"

@@ -152,6 +152,26 @@ describe('hx-toast', () => {
       expect(base.hasAttribute('role')).toBe(false);
     });
 
+    it('mirrors role on the host as a legacy attribute fallback (group-6 codex round-1)', async () => {
+      // (group-6 codex round-1) Some AT+browser combos still ignore
+      // ElementInternals-backed ARIA on custom elements; without an attribute
+      // fallback they would stop announcing toasts entirely. role is mirrored
+      // to the host attribute in addition to internals (harmonized with
+      // hx-alert/hx-banner). aria-live is NOT mirrored — role implies it.
+      const status = await fixture<HelixToast>('<hx-toast variant="success">Test</hx-toast>');
+      expect(status.getAttribute('role')).toBe('status');
+      const danger = await fixture<HelixToast>('<hx-toast variant="danger">Test</hx-toast>');
+      expect(danger.getAttribute('role')).toBe('alert');
+    });
+
+    it('keeps host role attribute in sync with variant changes', async () => {
+      const el = await fixture<HelixToast>('<hx-toast variant="info">Test</hx-toast>');
+      expect(el.getAttribute('role')).toBe('status');
+      el.variant = 'danger';
+      await el.updateComplete;
+      expect(el.getAttribute('role')).toBe('alert');
+    });
+
     it('close button has aria-label', async () => {
       const el = await fixture<HelixToast>('<hx-toast open closable>Test</hx-toast>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part~="close-button"]')!;
@@ -740,6 +760,55 @@ describe('toast() utility', () => {
 
     expect(t1.open).toBe(false);
     expect(t4.open).toBe(true);
+  });
+
+  it('enforces stack limit under a rapid burst within MIN_DISPLAY_MS (group-6 codex round-1)', async () => {
+    // (group-6 codex round-1 burst-fix) When more than one toast() call
+    // arrives inside the 1500ms minimum-display window after the stack is
+    // at capacity, every call must hide a DIFFERENT successive oldest —
+    // not pile multiple deferred hides on the same target. Previously the
+    // factory only inspected the single oldest toast, so a 5-call burst
+    // against a limit-3 stack settled at 4 visible toasts after the
+    // deferred hide fired.
+    const placement = 'top-end';
+    document
+      .querySelectorAll(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    // Fill to capacity (default stackLimit = 3).
+    const t1 = toast({ message: 'Burst 1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Burst 2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Burst 3', placement });
+    await t3.updateComplete;
+
+    // Burst two more in quick succession, well inside MIN_DISPLAY_MS.
+    const t4 = toast({ message: 'Burst 4', placement });
+    await t4.updateComplete;
+    const t5 = toast({ message: 'Burst 5', placement });
+    await t5.updateComplete;
+
+    // Wait for the deferred displacement window to elapse.
+    // (need MIN_DISPLAY_MS + buffer for both deferred hides scheduled at
+    // call 4 and call 5, where call 5's elapsed is slightly higher)
+    await new Promise((r) => setTimeout(r, 1900));
+    await t1.updateComplete;
+    await t2.updateComplete;
+
+    // The two oldest must be displaced (one per overflow slot), leaving
+    // exactly stackLimit (3) toasts visible.
+    expect(t1.open).toBe(false);
+    expect(t2.open).toBe(false);
+    expect(t3.open).toBe(true);
+    expect(t4.open).toBe(true);
+    expect(t5.open).toBe(true);
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const stillOpen = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
+    expect(stillOpen.length).toBeLessThanOrEqual(3);
   });
 
   it('removes the toast element from DOM after hx-after-hide fires', async () => {

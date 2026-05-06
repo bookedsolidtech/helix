@@ -772,10 +772,33 @@ describe('hx-alert', () => {
       expect(sev?.getAttribute('aria-hidden')).toBe('true');
     });
 
-    it('marks the visible default slot aria-hidden so AT only sees announcer copy', async () => {
+    it('does NOT mark the default slot wrapper aria-hidden (consumer interactive content)', async () => {
+      // (group-6 codex round-1) Consumer content slotted into the default
+      // slot may include interactive descendants (inline links/buttons inside
+      // a message); aria-hidden on a focusable parent is an axe-core
+      // `aria-hidden-focus` violation. The wrapper must remain visible to AT.
       const el = await fixture<HxAlert>('<hx-alert variant="error">Server error</hx-alert>');
       const slotWrap = el.shadowRoot!.querySelector('.alert__default-slot');
-      expect(slotWrap?.getAttribute('aria-hidden')).toBe('true');
+      expect(slotWrap).toBeTruthy();
+      expect(slotWrap?.getAttribute('aria-hidden')).not.toBe('true');
+    });
+
+    it('keeps slotted interactive content reachable to AT (no aria-hidden ancestor in shadow)', async () => {
+      // (group-6 codex round-1 regression) Verify that an interactive
+      // descendant in the default slot is NOT inside an aria-hidden=true
+      // shadow ancestor.
+      const el = await fixture<HxAlert>(
+        '<hx-alert variant="error">Click <a href="#help">help</a> to recover.</hx-alert>',
+      );
+      const slotWrap = el.shadowRoot!.querySelector<HTMLElement>('.alert__default-slot');
+      expect(slotWrap).toBeTruthy();
+      // Walk up from the slot wrapper to the shadow root checking no ancestor
+      // carries aria-hidden=true.
+      let node: HTMLElement | null = slotWrap;
+      while (node) {
+        expect(node.getAttribute('aria-hidden')).not.toBe('true');
+        node = node.parentElement;
+      }
     });
 
     it('marks the visible title aria-hidden so AT only sees announcer copy', async () => {

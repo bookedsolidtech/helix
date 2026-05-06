@@ -159,15 +159,29 @@ export class HelixToast extends HelixElement {
     // role implies aria-live per ARIA spec (alert→assertive, status→polite),
     // so we do NOT also set explicit aria-live (avoids §5.1 double-announce
     // on older NVDA/JAWS).
+    //
+    // (group-6 codex round-1) Dual-write: keep an attribute fallback for
+    // `role` on the host, harmonized with hx-alert/hx-banner. Some AT +
+    // browser combos still ignore internals-backed ARIA reflection on
+    // custom elements (notably older JAWS + Chrome and certain
+    // VoiceOver+Safari builds); without an attribute they would stop
+    // announcing toasts entirely. role implies aria-live, so we do NOT
+    // also write an explicit aria-live attribute (the implicit live region
+    // is what `role` already provides — adding aria-live duplicates the
+    // signal and re-introduces the §5.1 double-announce on those same
+    // older AT+browser combos).
     this._internals.role = this._role;
     this._internals.ariaAtomic = 'true';
+    this.setAttribute('role', this._role);
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
     if (changedProperties.has('variant')) {
       // Keep host role in sync with variant (alert vs status).
+      // Dual-write: internals (modern) + attribute (legacy fallback).
       this._internals.role = this._role;
+      this.setAttribute('role', this._role);
     }
     if (changedProperties.has('open') || changedProperties.has('duration')) {
       this._auditWcag223();
