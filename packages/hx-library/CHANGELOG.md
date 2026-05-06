@@ -1,5 +1,364 @@
 # @helixui/library
 
+## 3.4.0
+
+### Minor Changes
+
+- 8e026a3: ARIA Group 2 (selection controls): host-canonical accessibility for `hx-checkbox`, `hx-checkbox-group`, `hx-radio`, `hx-radio-group`, `hx-switch`, `hx-toggle-button`.
+  - Role, checked/disabled state, accessible name, and accessible description are now announced from the host element via `ElementInternals` (`internals.role`, `ariaChecked`, `ariaDisabled`, `ariaLabelledByElements`, `ariaDescribedByElements`) rather than from inner shadow elements. Assistive tech sees one element per control instead of host-plus-inner duplicates.
+  - Engines without IDREF-ref support fall through to a parity path that keeps the inner control's `aria-label` and `aria-describedby` reachable, so legacy targets still announce correctly.
+  - `hx-checkbox-group` form participation is stable: the group owns the form value end-to-end, so child `name` mutations after attach no longer hijack submission, and child checkboxes resume stand-alone form participation cleanly when the group is removed from the DOM.
+  - `hx-radio-group` reconciles `value`, form value, and validity when radios are added or removed via slot mutation. `hx-radio` gains an internal `_groupedSuppress` shim for symmetry with `hx-checkbox` so any future form-association change on the child element is automatically suppressed inside a group.
+  - `hx-checkbox` keeps `change` and `hx-change` firing exactly once per user activation, including on label clicks and on engines that take the legacy fallback path.
+
+- 1a82b8d: ARIA group-4b overlays + disclosure: host-attribute label mirror + tooltip slot-text observer + accordion audit (group-4 round-1)
+
+  Four components in this round, all anchored-overlay or disclosure family. Pattern is **host-attribute mirror to inner panel** — distinct from the host-canonical role transplant used by group-2 selection controls and group-4a modal dialogs (`hx-dialog`, `hx-drawer`). The inner panel/body is the announced surface, not the host, so `ElementInternals.ariaLabelledByElements` on the host cannot project across the shadow boundary. We instead resolve consumer IDREFs at sync time, text-flatten via `flattenAccName` (AccName 1.2 §4.3.10 hidden-aware), and write the result to the inner panel's `aria-label`.
+
+  **`hx-popover`**: inner `[part="body"]` `role="dialog"` now consumes consumer host `aria-label` / `aria-labelledby` per AccName 1.2 §4.3.1 precedence (host `aria-labelledby` > host `aria-label` > `label` property > literal `"Popover"`). Shared root mirror via `installAriaIdrefMirror`. `_externalRefsObserver` watches in-place text/visibility mutations on resolved IDREF targets so a consumer mutating `<h2 id="x">Patient</h2>` → `Member` re-flows into the body's `aria-label`. `aria-controls` on the trigger remains intentionally omitted (cross-shadow IDREF; documented exception). Slotted-label support deferred to a follow-up.
+
+  **`hx-dropdown`**: same shape — panel `[part="panel"]` `role="menu"` adopts the host-attribute mirror (precedence: host `aria-labelledby` > host `aria-label` > `label` property > literal `"Menu"`). **Group 5 boundary** documented in code: this round is additive only; the `role="menu"` panel and menuitem-roving keyboard pattern are NOT touched here. Group 5 will own the broader menu/menubar/menuitem refactor.
+
+  **`hx-tooltip`**: added `_contentSlotTextObserver` (round-23 P2 pattern) that watches `characterData` / `subtree` / `childList` on the elements assigned to `<slot name="content">`. Without this, framework-driven in-place `textContent` rewrites of the slotted content element would leave the document-scope `aria-describedby` shim stale. Cleanup added to `disconnectedCallback`. New tests cover in-place mutation, subtree mutation, shim removal on disconnect, multiple-tooltip id uniqueness, cross-shadow hosting (tooltip nested inside another component's shadow root still creates the document-scope shim), and slot replacement (observer is reinstalled on `slotchange`). Tooltip is NEVER promoted to `role="dialog"` — APG forbids tooltips from holding focus. No host-canonical `_internals` work is owed: the trigger is the announced surface and already correctly references the tooltip via `aria-describedby`.
+
+  **`hx-accordion` + `hx-accordion-item`**: audit-only commit. The existing implementation already follows APG: `<details><summary role="heading" aria-level=N>` with `aria-controls` to a same-shadow-root `<div role="region" aria-labelledby=${trigger-id}>`. Added an explicit architectural deviation note in `hx-accordion-item.ts` documenting why the host-canonical / `internals.ariaLabelledByElements` pattern is intentionally NOT applied here (the trigger label comes from `<slot name="trigger">` projected directly into the `<summary>`, AT reads slot-projected text natively, and `<summary>` MUST be a direct child of `<details>` so wrapping it in an `<h3>` would forfeit native disclosure). Tests added: `role="heading"` + `aria-level` (with clamp), same-shadow-root `aria-controls` / `aria-labelledby` round-trip, `aria-disabled` + `tabindex="-1"` for disabled items, `aria-expanded` synced to `expanded`, and a regression guard that the host element does NOT carry host-canonical role / aria-label (the deviation).
+
+  All four components: `aria-controls` cross-shadow remains intentionally omitted on triggers (popover, dropdown) or scoped same-shadow-root (accordion). Forced-colors mixins (`forcedColorsSurface`, `forcedColorsInteractive`) already in place — host-focus-visible parity is N/A because the host is never focused; the inner panel/summary owns focus.
+
+  Implementation notes:
+  - Reuses `aria-idref.ts` (`installAriaIdrefMirror`, `resolveIdrefTokens`) and `aria-flatten.ts` (`flattenAccName`) — same shared utilities used by `hx-drawer` (group-4a) and every group-2 selection control.
+  - Shared root observer (`installAriaIdrefMirror` round-7 #11 perf optimization) collapses N per-instance subtree observers into one per `Document`/`ShadowRoot`, so a page with many host-attribute-mirror components pays a single attach cost.
+  - `label` property changes flow through `updated()` so a consumer mutating `el.label` repaints the inner panel's accessible name without a full re-fixture.
+
+  This PR is additive to the public API; no breaking changes.
+
+- 0de77f8: Group 5a — tabs family ARIA hardening (host-canonical Path A)
+
+  3 components hardened per `.reports/aria-group-5-scope.md`. Lowest-risk PR of Group 5; validates `role="tab"` on host with inner activation pattern.
+
+  **hx-tab** — host-canonical:
+  - `internals.role = 'tab'` on host
+  - Inner element changed from `<button>` to `<div part="tab">` on modern path (ARIA 1.2 forbids `role="presentation"` on focusable elements; cleanest strip is to use a roleless element)
+  - Click + pointer activation still works on `<div>`; keyboard activation owned by parent `hx-tabs` keydown handler operating on host
+  - Inner `aria-disabled` retained as non-AT signal so axe-core's color-contrast rule excludes the disabled surface
+  - `internals.ariaSelected` / `internals.ariaDisabled` mirror reactive state
+  - `internals.ariaControlsElements` references corresponding `hx-tab-panel` host (cross-shadow IDL refs); legacy fallback writes string `aria-controls`
+
+  **hx-tabs** — host-canonical:
+  - `internals.role = 'tablist'` on host
+  - `internals.ariaOrientation` reactive to `orientation` property
+  - Cross-shadow naming belt-and-suspenders — host `aria-label` / `aria-labelledby` resolve via `installAriaIdrefMirror` + `resolveIdrefTokens`; `internals.ariaLabelledByElements` set on modern path; `flattenAccName`-flattened string on legacy path
+  - **Manual activation default** — flipped from `automatic` per scope §5.4 + healthcare patterns (safer for accidental keypress). Public API still supports both modes via `activation="automatic|manual"` attribute.
+
+  **hx-tab-panel** — host-canonical:
+  - `internals.role = 'tabpanel'` on host
+  - `internals.ariaLabelledByElements` projects controlling tab host as element reference (cross-shadow naming via IDL refs, no text serialization)
+  - Legacy fallback retains `setAttribute('role')` for back-compat
+
+  **Roving tabindex** — single-host. Active tab `tabindex=0`, inactive `tabindex=-1`. Focus moves to host (no longer dual button/host focus).
+
+  **CSS state hooks moved** from inner ARIA attributes (`[aria-selected]`/`[aria-disabled]`) to `:host([selected])` / `:host([disabled])` since aria-\* is stripped from inner div on modern path. Functionally identical (same reactive state via `reflect: true`); more idiomatic for host-canonical.
+
+  **Cross-AT smoke test added** — asserts `document.activeElement === tab` (host), `internals.role === 'tab'`, and `internals.ariaSelected === 'true'` after `tab.focus()`. Validates the role-on-host with inner-activation pattern.
+
+  87 hx-tabs tests passing (was 83; +4 net new — ariaControlsElements, ariaLabelledByElements, host owns focus smoke, automatic activation attr; reframed several to host-canonical surface). 2 keyboard-navigation tabs section tests passing (re-pinned to `activation="automatic"` HTML for arrow-activation assertions).
+
+  `pnpm run verify` clean. helix-028 standing risk-accept.
+
+- 8876409: Group 6 — live regions / status feedback ARIA hardening (single PR)
+
+  4 components hardened per `.reports/aria-group-6-scope.md`. Closes Group 6.
+
+  **hx-banner** (smallest delta — establishes harmonization):
+  - Variant→role harmonized (Option A): `error` → `alert` (assertive); `warning`/`success`/`info` → `status` (polite). Matches hx-alert/hx-toast contract.
+  - Dual-write `internals.role` + `setAttribute('role')` in connectedCallback + updated()
+  - ARIA-naming-disambiguation block: hx-banner is a UX descriptor, NOT the LANDMARK `role="banner"`. LANDMARK regression guards (host attr + shadow descendants).
+
+  **hx-alert** (highest-risk delta):
+  - Dual-write `internals.role` + `setAttribute('role')`
+  - §5.1 double-announce mitigation: severity-label, icon, title, default-slot wrapper each individually `aria-hidden="true"` so sr-only announcer is the SOLE announcement surface. Container/actions/close button NOT aria-hidden (focusable descendants — `aria-hidden-focus` axe rule).
+  - §5.4 announcer race-guard counter `_announcerCycle`: rapid open/close cycles collapse to one announcement on the final settled state
+  - New `.alert__default-slot { display: contents; }` preserves layout while allowing aria-hidden wrapping
+
+  **hx-toast** (largest behavioral delta):
+  - Host-canonical migration: `internals.role = this._role`, `internals.ariaAtomic = 'true'` set in connectedCallback. Inner `[part="base"]` div drops role/aria-live/aria-atomic (presentation-only).
+  - §5.1 double-announce mitigation: NO explicit `aria-live` anywhere — role implies live per ARIA spec
+  - §5.3 WCAG 2.2.3 devWarn: `MIN_DISPLAY_MS_BY_VARIANT` (default/info/success=3s, warning=4s, danger=6s); `_auditWcag223()` fires devWarn when consumer sets duration shorter than role-implied minimum
+  - Variant change syncs role in updated()
+
+  **hx-toast-stack** (audit + factory min-display-time):
+  - §3.2/§5.9 no-container-role decision documented (would create nested live regions and double-announce)
+  - `toast-factory.ts`: §5.5 `MIN_DISPLAY_MS=1500` guard. `_shownAt` WeakMap tracks `show()` timestamps; stack-limit-driven hide of oldest toast is deferred via setTimeout if below minimum window. Prevents AT clipping on rapid-fire bursts.
+
+  **Patterns NOT applied (intentional):**
+  - No `aria-relevant` anywhere (per scope §5.9)
+  - No role on hx-toast-stack (per scope §3.2)
+  - Forced-colors styles untouched (hx-toast bespoke `@media`; hx-alert/banner already compose `forcedColorsSurface`)
+
+  231/231 tests passing across the 4 components (+27 new cases): hx-toast 72 (+12), hx-alert 87 (+9), hx-banner 72 (+6), hx-toast-stack 3 (+3). 4 pre-existing tests updated (warning→status assertion swap; stack-limit waits; host-canonical aria-atomic).
+
+  `pnpm run verify` clean (14/14 turborepo tasks).
+
+- 1eedfee: hx-color-picker: composite color-picker ARIA hardening (group-3 round-4 — closes Group 3)
+
+  Applies the canonical hardening pattern stack from hx-combobox / hx-time-picker / hx-date-picker to `hx-color-picker`. Component is the **composite color-picking widget** (NOT a combobox or dialog): HSL/RGB sliders + swatch grid + hex input + inline panel with `role="group"`. Pattern stack adapted accordingly.
+
+  12 patterns applied (subset that fits a composite color-picking widget):
+  1. Cross-shadow naming for the host — `internals.ariaLabelledByElements`/`ariaDescribedByElements` projecting consumer aria-labelledby/describedby; `internals.ariaLabel = null` (not `''`) when no override
+  2. `_supportsIdrefRefs` probe + `__testSupportsIdrefRefsOverride` static seam — modern (host canonical) vs legacy (trigger-button mirror)
+  3. Hidden content per AccName 1.2 §4.3.10 — `flattenAccName` skips aria-hidden + [hidden] subtrees including roots
+  4. Slot label aggregation — new `<slot name="label">` with multi-node `_slottedLabelEls` + AccName whitespace collapse
+  5. Description channel unified — synthesized hidden `<span>` joins consumer description + helpText + error; trigger button aria-describedby chains to single ID; never writes aria-description
+  6. Validity surface unioned — `_updateValidity()` unions `internals.validity` ∪ `error` prop ∪ slotted error via `customError`
+  7. First-paint slot state seeding — `_seedSlotStateSync()` in firstUpdated
+  8. 5 mutation observers — external IDREFs + label/help/error slots + host attrs (via `installAriaIdrefMirror`); characterData + childList + subtree + aria-hidden/[hidden] attribute filter
+  9. Help/error effective text via flattenAccName
+  10. Error population via willUpdate — first paint + every error change; rAF clear-and-reset for transition re-announcement
+  11. Forced-colors mixin — `forcedColorsField` preserved in static styles
+  12. Name-resolution precedence — consumer aria-labelledby → consumer aria-label → accessible-label → label → slotted label → labelTrigger(value) default
+
+  Patterns NOT applied (per architecture directive):
+  - No `role="combobox"` on hex input (it's not a combobox)
+  - No `aria-haspopup` (panel inline, no popup contract)
+  - Panel `role="group"` preserved (DO NOT change to dialog/aria-modal — see line ~865 comment: "A11y fix WCAG 4.1.2: Tab can exit, Escape closes")
+  - Sliders' `role="slider"` + `aria-valuemin/max/now/text` preserved (untouched)
+  - Swatches `role="group"` + `aria-label` preserved (untouched)
+
+  New public API surface:
+  - `label`, `accessible-label`, `help-text`, `error` properties
+  - `<slot name="label">`, `<slot name="help-text">`, `<slot name="error">`
+  - CSS parts: `label`, `help-text`, `error`
+
+  100/100 hx-color-picker tests passing. 218 neighbor tests (hx-toggle-button + hx-checkbox) green — no regression from shared aria-idref util usage. `pnpm run verify` clean. CEM regenerated; 102 components passed CEM validation.
+
+  Closes ARIA Group 3 (selects/combos/pickers).
+
+- b64b6cc: hx-combobox: W3C APG editable-combobox ARIA hardening (group-3, 12 push-gate rounds)
+
+  `hx-combobox` is an editable combobox (users type to filter options), so per W3C APG it follows the inner-input-canonical pattern (option I): `role="combobox"` lives on the inner `<input>` element where it replaces the implicit textbox role. This is structurally distinct from `hx-select` (a non-editable select-replacement) which is host-canonical option II.
+
+  Cross-shadow consumer IDREFs use belt-and-suspenders naming:
+  - **Modern engines** (with `ElementInternals.ariaLabelledByElements` / `ariaDescribedByElements`): the host carries `internals.ariaLabelledByElements` / `internals.ariaDescribedByElements` set to the resolved consumer + visible slotted label elements; consumer host `aria-labelledby` / `aria-describedby` attributes are PRESERVED on both paths so AT walking up from focused descendants finds them. `internals.ariaLabel` is cleared with `null` (not `''`) so element references win.
+  - **Legacy fallback** (no IDL element-references support): host attributes also stay intact (the component never strips host ARIA). Consumer-resolved label elements are text-flattened (per AccName 1.2 §4.3.1 precedence) into the inner input's `aria-label`. The inner input NEVER receives `aria-description` — consumer description text is mirrored into a synthesized in-shadow span and joined into `aria-describedby` instead, since `aria-description` is silently dropped by AT when `aria-describedby` is also present.
+
+  Inner `<input>` carries the full combobox ARIA surface: `role="combobox"`, `aria-haspopup="listbox"`, `aria-autocomplete="list"`, `aria-controls`, `aria-expanded`, `aria-activedescendant`, `aria-required`, `aria-invalid`, `aria-busy`, `aria-disabled`. All cross-shadow IDREFs (controls, activedescendant) resolve same-root because the listbox and options are rendered in the same shadow root as the input.
+
+  Hardening rounds applied (12 codex push-gate rounds, 29 findings closed):
+  - Slotted label resolution — `_readLabelSlotState` aggregates `textContent` across ALL assigned nodes (elements + text) with whitespace collapse per AccName
+  - `_labelSource` discriminated union (`'slot' | 'aria-label' | 'aria-labelledby' | 'label-prop' | 'none'`)
+  - AccName 1.2 §4.3.10 hidden-content filtering — `flattenAccName` TreeWalker rejects `aria-hidden="true"` AND `[hidden]` subtrees, including roots, across every flatten path (external IDREF, slotted label aggregation, slot text MOs)
+  - Six MutationObservers wired up: `_externalRefsObserver` (characterData/childList/attributes on resolved external label/desc elements), `_labelSlotTextObserver`, `_helpSlotTextObserver`, `_errorSlotTextObserver`, `_hostDescribedByObserver` (defense-in-depth on host attribute changes — the round-10 disconnect-during-strip pattern was retired in round-12 F4 once the don't-strip approach landed)
+  - First-paint correctness via `firstUpdated` → `_seedSlotStateSync` reading each named slot's `assignedNodes()` before the first `_syncHostAriaSemantics()` call
+  - Validity surface unioned across `ElementInternals.setValidity()`, consumer `error` property/attribute, and slotted error content; `_announcedError` seeded in `willUpdate` for first paint
+  - Name-resolution precedence per AccName 1.2 §4.3.1 with helix-specific `accessibleLabel` override at the top, then consumer `aria-labelledby` (above `aria-label` — round-12 fix)
+  - `__testSupportsIdrefRefsOverride` static seam with `afterEach` teardown for fallback-path testing
+
+  180/180 hx-combobox tests passing (50 new regression tests across modern + legacy paths × labelledby + describedby; first-paint, runtime error population, multi-node slot aggregation, hidden-aware visibility tree walking, retraction sequences). `pnpm run verify` clean.
+
+- 4235d63: hx-date-picker: APG date picker dialog ARIA hardening (group-3 round-3)
+
+  Applies the canonical hardening pattern stack from hx-combobox / hx-time-picker (PR #1631 / #1632) to `hx-date-picker`. Component is the **W3C APG date picker dialog pattern** (NOT a combobox): readonly inner `<input>` + trigger button + calendar `role="grid"` dialog. Pattern stack adapted accordingly — keeps `aria-haspopup="dialog"` on input + button (not "listbox"), no `role="combobox"`, retains documented cross-shadow `aria-controls` from trigger button → calendar id (matches hx-popover/dropdown precedent).
+
+  12 hardening patterns applied:
+  1. Cross-shadow naming (belt-and-suspenders) — `_supportsIdrefRefs` probe + IDL `internals.ariaLabelledByElements`/`ariaDescribedByElements` + text-flatten fallback
+  2. Hidden content per AccName 1.2 §4.3.10 — `flattenAccName` TreeWalker rejects aria-hidden + [hidden] subtrees including roots
+  3. Slot label aggregation — multi-node `_slottedLabelEls` + AccName whitespace collapse
+  4. Description channel unified — synthesized hidden `<span>` mirrors consumer-resolved description text; never write `aria-description` on inner input
+  5. Validity surface unioned — `internals.validity.valid` ∪ consumer `error` prop ∪ slotted error
+  6. First-paint slot state seeding — `_seedSlotStateSync()` in firstUpdated
+  7. Mutation observers — external IDREFs + label slot + help slot + error slot + host attrs (5 observers)
+  8. Help/error effective text via flattenAccName
+  9. Error population via willUpdate — first paint + every error change + rAF clear-and-reset for re-announcement
+  10. Forced-colors mixin — `forcedColorsField` preserved
+  11. Name-resolution precedence per W3C AccName 1.2 §4.3.1 — accessibleLabel → consumer aria-labelledby → host aria-label → slotted label → label property
+  12. Inner input ARIA — `aria-haspopup="dialog"`, `aria-required`, `aria-invalid`, `aria-disabled`. NO `role="combobox"`. Trigger button retains `aria-controls=${calendarId}` (documented cross-shadow limitation per hx-popover/dropdown).
+
+  Shared utility additions (will dedupe on merge with PR #1632):
+  - `packages/hx-library/src/utils/aria-flatten.ts` (new) — `flattenAccName` TreeWalker
+  - `packages/hx-library/src/utils/aria-idref.ts` — `collectIdrefSearchRoots` walks `Element.assignedSlot` hops into slot-owner shadow roots (closes round-6 P1 cross-shadow IDREF resolution for slotted hosts)
+
+  123/123 hx-date-picker tests passing. 501 other aria-idref consumer tests (hx-checkbox, hx-checkbox-group, hx-radio-group, hx-switch, hx-toggle-button) green — no regression. `pnpm run verify` clean.
+
+- 2143bb9: hx-dialog: Path A native-dialog ARIA hardening (group-4a round-2 — closes Group 4a)
+
+  Path A migration per `.reports/aria-group-4-scope.md` Section 3.1: hx-dialog uses native `<dialog>` HTMLDialogElement which has implicit `role="dialog"` baked in by the browser. The host does NOT carry `internals.role`/`internals.ariaModal` to avoid nested-dialog announcements. Cross-shadow consumer IDREFs project via `internals.aria*Elements` on the host (modern path), with always-on hybrid fallback writing reconciled attrs directly to the inner native `<dialog>` for AT that doesn't honor host IDL refs when focus is inside a native modal.
+
+  12-pattern hardening stack adapted for native-dialog:
+  1. **NO `internals.role`, NO `internals.ariaModal` on host** — native `<dialog>` keeps implicit role; `showModal()` keeps platform-level modality
+  2. **Cross-shadow naming via `internals.aria*Elements`** — `ariaLabelledByElements` / `ariaDescribedByElements` / `ariaLabel` for IDL-ref engines; `_supportsIdrefRefs` probe + `__testSupportsIdrefRefsOverride` test seam
+  3. **Hybrid fallback (always-on)** — inner native `<dialog>` ALSO receives reconciled `aria-labelledby` / `aria-label` / `aria-describedby` / `aria-modal` writes via `_syncHostAriaSemantics()`. Belt-and-suspenders for cross-AT compatibility.
+  4. **`flattenAccName`** wired through slot-aggregation + cross-shadow IDREF text-flatten
+  5. **Slot-aware header reading** — `<slot name="header">` aggregates ALL assigned elements (composed icon + text headers project per AccName 1.2 §4.3.10); `hasUsefulName` vs `hasAnyAssigned` discriminated for empty-slot devWarn
+  6. **Description channel unified** via two synthesized in-shadow spans (`_consumerLabelId` for name target, `_consumerDescId` for description target). `aria-description` never written.
+  7. **First-paint slot state seeding INTENTIONALLY OMITTED** — same rationale as hx-drawer round-1 (proactive seed reorders open-dialog promise chain, breaks focus trap on Chromium). Documented inline.
+  8. **Three mutation observers** — `_externalRefsObserver`, `_headerSlotTextObserver`, `_hostDescribedByObserver` (`attributeOldValue: true` for authentic consumer aria-describedby retraction). Plus shared `installAriaIdrefMirror` registry observer.
+  9. **Validity surface** — N/A (dialog not form-associated)
+  10. **Forced colors** — `forcedColorsSurface` already composed
+  11. **Name-resolution precedence per AccName 1.2 §4.3.1** — consumer aria-labelledby → consumer aria-label → header slot text → heading property → "Dialog" literal
+  12. **Existing patterns preserved** — focus trap, ESC dismiss with `hx-cancel` BEFORE `hx-close`, focus-restore via `_triggerElement`, native `showModal()` semantics, `_isTransitioning` re-entrancy guard with 200ms fallback timer, `_pendingReturnValue` for D11
+
+  **Cross-AT risk note:** Path A IDL-ref projection on a host whose shadow root contains a native `<dialog>` is not validated against NVDA/VoiceOver/JAWS in this round. The hybrid fallback is **always-on** (every name path also writes attributes directly to inner `<dialog>`), so worst case is loss of live IDL-ref tracking when consumer light-DOM text mutates without firing the external-refs observer — covered by the observer's documented mutation surfaces. Push-gate codex catches any deeper AT-projection issue.
+
+  70/70 hx-dialog tests passing (existing). New test cases (~30) for AccName 1.2 §4.3.10 hidden-aware aggregation, IDREF retraction, hybrid-fallback parity, etc. are scoped for round-2 follow-up. `pnpm run verify` clean (14/14 turborepo tasks).
+
+  Closes Group 4a (modal dialogs). hx-popover/tooltip/dropdown/accordion follow as Group 4b.
+
+- 93342cd: hx-drawer: host-canonical modal dialog ARIA hardening (group-4a round-1)
+
+  Path A migration per `.reports/aria-group-4-scope.md` Section 3.2: drawer's inner `<div role="dialog" aria-modal="true">` migrates to host-canonical via `internals.role = 'dialog'` + `internals.ariaModal = 'true'`. Inner div drops role + aria-modal + aria-\* naming. Host carries the announced dialog surface.
+
+  12-pattern hardening stack (modal-dialog adaptation of the hx-combobox canonical):
+  1. **Host-canonical role + modal flag** — `internals.role = 'dialog'`, `internals.ariaModal = 'true'` seeded in `connectedCallback`
+  2. **Cross-shadow naming (belt-and-suspenders)** — `internals.ariaLabelledByElements` / `ariaDescribedByElements` for IDL-ref engines; `internals.ariaLabel` always carries flattened-text fallback; legacy fallback writes `aria-label`/`aria-labelledby` to inner overlay
+  3. **`flattenAccName` shared util** — slot-label aggregation + external IDREF flatten per AccName 1.2 §4.3.10
+  4. **Multi-node slot-label aggregation** — `_slottedLabelEls: Element[]`; aria-hidden/[hidden] filtered from IDL refs
+  5. **Description channel unified** — synthesized hidden `<span id="${_id}-consumer-desc">` mirrors consumer-resolved description text; chained via inner overlay's `aria-describedby`. Never write `aria-description`
+  6. **Validity surface** — N/A (drawer not form-associated)
+  7. **First-paint slot state seeding** — intentionally NOT seeded from firstUpdated due to focus-trap timing interaction (see below). Slotchange microtask handles state one tick later
+  8. **3 mutation observers** — external IDREF targets + label-slot text + dedicated `aria-describedby` retraction observer with `attributeOldValue: true`
+  9. **Help/error effective text** — N/A (drawer has no help/error slots)
+  10. **Forced colors** — `forcedColorsSurface` already composed; host `display: contents` so `:host(:focus-visible)` is moot (focus is on inner panel)
+  11. **Name-resolution precedence per W3C AccName 1.2 §4.3.1** — consumer aria-labelledby → host aria-label → slotted label → label property → literal "Drawer"
+  12. **Focus trap, ESC dismiss, focus-restore, inert-outside-content** — preserved from prior implementation
+
+  **Pre-flight cross-AT validation:** Path A is sound for hx-drawer because inner is `<div>` (no native `<dialog>` implicit-role conflict). Single announced dialog surface via `internals.role`. Validates the baseline before hx-dialog (round-2) faces the native-`<dialog>` coexistence question.
+
+  **Focus-trap timing discovery for hx-dialog round-2:** Initial seed-from-firstUpdated implementation interleaved Lit re-render with the open-drawer focus chain (`updateComplete.then(...) → _isOpen = true → updateComplete.then(...) → _setInitialFocus()`), breaking slotted-children focus on consumer code that calls `.focus()` immediately after the first updateComplete. Resolution: seed omitted; slotchange microtask handles state one tick later. Sub-frame lost-name window. Documented in source so a future round can reintroduce the seed only after the open-drawer chain is restructured. **Forward-relevance:** hx-dialog uses native `<dialog>.showModal()` rather than the `_isOpen` CSS-visibility pattern; if the seed is reintroduced there, validate against the same .focus()-immediately-after-fixture test scaffolding.
+
+  99/99 hx-drawer tests passing (75 existing + 24 new — 3 retargeted to host-canonical surface). 323 adjacent component tests (drawer + dialog + popover + popup) green — no regression. `pnpm run verify` clean.
+
+- 32cef7d: hx-select: host-canonical combobox (ARIA Group 3 round 1) — option II architecture. The `<hx-select>` host element now carries `role="combobox"` (via ElementInternals + attribute mirror); the inner trigger is fully roleless. Modern engines use `internals.ariaLabelledByElements` / `ariaDescribedByElements` IDL element-array references; legacy fallback uses single-channel `internals.ariaDescription` text concatenation per W3C AccName 1.2 precedence. Consumer `aria-describedby` is preserved on the modern path and strictly shadows internal descriptions on fallback. Closes 11 codex review rounds (rounds 3 + 5 + 6 + 8 + 10 + r11 nit) including a principal-engineer architectural sign-off on the disconnect-during-strip MutationObserver pattern that resolves the round-9 counter-race vs bare-removeAttribute defect class. 149/149 tests green.
+- 5ae29a2: hx-time-picker: APG editable-combobox ARIA hardening (group-3 round-2)
+
+  Applies the full hardening pattern stack from `hx-combobox` (PR #1631) to `hx-time-picker`. Component was already on the correct architectural pattern (W3C APG editable-combobox option I — `role="combobox"` on inner `<input>`); this PR brings the cross-shadow naming, slot machinery, mutation observers, and validity union up to the post-12-codex-rounds canonical state.
+
+  12 hardening patterns applied:
+  1. **Cross-shadow naming (belt-and-suspenders)** — `_supportsIdrefRefs` probe, `__testSupportsIdrefRefsOverride` static seam, `internals.ariaLabelledByElements` / `ariaDescribedByElements` on modern path, text-flatten to inner input `aria-label` on legacy fallback
+  2. **Hidden content per AccName 1.2 §4.3.10** — `flattenAccName` TreeWalker rejects aria-hidden + [hidden] subtrees including roots
+  3. **Slot label aggregation** — multi-node `_slottedLabelEls`, AccName whitespace collapse
+  4. **Description channel unified** — synthesized hidden span with consumer-resolved description text; never write `aria-description` on inner input
+  5. **Validity surface unioned** — `setValidity` ∪ consumer error prop ∪ slotted error
+  6. **First-paint slot state seeding** — `_seedSlotStateSync()` in firstUpdated
+  7. **Six mutation observers** — external IDREFs, slotted label, help slot, error slot, host attributes, IDREF aria mirror; all watch characterData + childList + aria-hidden/hidden attrs
+  8. **Help/error effective text via flattenAccName** — `_readHelpSlotStateSync`, `_readErrorSlotStateSync`
+  9. **Error population via willUpdate** — first paint + every error change; rAF clear-and-re-set retained for re-announcement
+  10. **Forced-colors mixin** — `forcedColorsField` preserved in static styles
+  11. **Name-resolution precedence per W3C AccName 1.2 §4.3.1** — accessibleLabel → consumer aria-labelledby → host aria-label → slot → label property
+  12. **Inner input ARIA surface** — full combobox state attributes on inner `<input>`; `aria-required` always reflected (`true|false`), `aria-invalid` reflects validity union
+
+  Existing test contracts updated (canonical behavior changes):
+  - `aria-required` always reflected (was conditionally absent)
+  - Error div is persistent `role="alert"` container with `[hidden]` toggle (was conditionally rendered)
+  - Slotted `<label>` text-flattens to inner input `aria-label` (was unsafely writing light-DOM id as `aria-labelledby`)
+  - `label` property points inner input `aria-labelledby` at internal `<label id>` (same shadow root)
+
+  168/168 tests passing (134 baseline + 34 new regression tests across 9 hardening categories). `pnpm run verify` clean.
+
+### Patch Changes
+
+- c66503f: fix(aria-group-5b): codex push-gate round-9 — submenu open/close routing in dropdown + overflow-menu + split-button
+
+  Round-4 added `hx-item-submenu-open` / `hx-item-submenu-close` handling to
+  `hx-menu` (parent walk + `setSubmenuOpen` on owning ancestor). The 3
+  composite hosts that wrap their own `[role="menu"]` panel of slotted
+  `hx-menu-item`s — `hx-dropdown`, `hx-overflow-menu`, `hx-split-button` —
+  never got that handling. When a slotted `hx-menu-item` opens or closes a
+  nested submenu, the events bubbled past the composite with no listener.
+
+  **Fixes:**
+  - **P1 — `hx-dropdown.ts`**: panel now binds `@hx-item-submenu-open` and
+    `@hx-item-submenu-close`. Defers to an inner `hx-menu` when one
+    encloses the dispatching item (it owns the toggle); otherwise opens or
+    closes the panel-level surface.
+  - **P1 — `hx-overflow-menu.ts`**: same delegation, applied to the
+    conditionally rendered overflow panel.
+  - **P1 — `hx-split-button.ts`**: same delegation, applied to the
+    split-button menu panel.
+
+  **Helper extraction:** `findClosestMenuAncestor` and `findOwningMenuItem`
+  moved from `hx-menu.ts` (4 callsites) to a new shared util
+  `packages/hx-library/src/utils/menu-tree.ts` (now 7+ callsites across the
+  4 menu-family components). `hx-menu.ts` keeps thin typed wrappers that
+  narrow the shared `Element` return to `HelixMenu` / `HelixMenuItem` to
+  preserve in-file callsite types.
+
+  **Regression tests** added in each composite: nested
+  `<hx-menu-item submenu-open><hx-menu slot="submenu"><hx-menu-item>...`
+  inside the composite. ArrowLeft on Child asserts the parent's
+  `aria-expanded === 'false'`, the composite panel stays open, and focus
+  returns to the parent host.
+
+- bd52f5f: CEM accuracy: doc-sweep for 3 of 4 cem-accuracy campaign blocking findings
+
+  Documentation-only fixes for the cem-accuracy codex campaign blocking findings:
+  - **hx-phi-field**: Removed stale `@cssprop --hx-phi-field-auto-hide-warning-color` JSDoc (token documented as "future use" but never consumed in styles).
+  - **hx-select**: Added `@fires {Event} invalid` JSDoc — the form-associated component participates in constraint validation via `ElementInternals.setValidity()` and the platform `invalid` event was undocumented in the CEM events[] array.
+  - **hx-theme**: Replaced wildcard `@cssprop [--hx-*]` with explicit token entries (the wildcard is not a valid CEM cssProperties[] entry; it was being indexed as a literal `--hx-*` name).
+
+  The 4th blocking finding (hx-slider missing `formAssociated: true` in CEM) is a systemic CEM analyzer gap — ALL form-associated components have it. Tracked separately as a follow-up to add a custom-elements-manifest analyzer plugin that detects `static formAssociated = true`.
+
+- 69de082: CI tooling: scripts/check-coverage.mjs falls through to threshold check when test-results.json missing but coverage data exists (no public API change; unblocks Coverage gate on PRs where vitest --reporter=json CLI flag doesn't honor config outputFile)
+- 174c2b9: Re-baseline CDN bundle ceilings for ARIA Group 3 (selects/combos/pickers)
+
+  Config-only change to `.cdn-budget.json` per the documented per-Group bump pattern. No public API change. Bundle ceilings raised to accommodate Group 3 ARIA hardening pattern stack (~6.4 KB JS so far across hx-select + hx-combobox; pickers project to add ~6-10 KB more).
+  - `fullBundleJs` ceiling: 215.0 KB → 230.0 KB
+  - `strategyATotal` ceiling: 270.0 KB → 290.0 KB
+
+  Unblocks PR #1631 (hx-combobox) and PR #1632 (hx-time-picker) bundle size CI checks.
+
+- 158c706: fix(hx-checkbox): close Figgy HX-015 — read attribute storage instead of `this.ariaLabel` IDL property
+
+  `hx-checkbox._effectiveLabel` and the visible-label-conflict devWarn block both read `this.ariaLabel` (the native `HTMLElement` IDL property, populated by `mixinDelegatesAria`'s `Object.defineProperty` shadow). Under fallback browsers and the v3 `accessibleLabel` migration guide, consumers who stop setting `ariaLabel` get a silent label disappearance.
+
+  Migration parity with `hx-action-bar.ts:102-125`, `hx-button.ts:204` (Group 8), and the rest of the v3 component surface — read `accessibleLabel` first, then `data-aria-label` (mixin storage), then `aria-label` attribute, then empty string. Closes Figgy HX-015 for `hx-checkbox`.
+
+- e1ad574: `hx-field`: harden `aria-label` ownership across the shadow-DOM bridge.
+
+  When `hx-field` writes `aria-label` to a slotted form control, it now stamps a `data-hx-owns-label="true"` marker and snapshots the written value. Consumers can:
+  - **Suspend** all ARIA bridging by setting `data-aria-managed` on the control. While present, `hx-field` skips every `aria-*` mutation; removing `data-aria-managed` may resume host ownership if the live value still matches the snapshot.
+  - **Release** ownership permanently by overwriting `aria-label` to any different value. The mismatch strips the marker and clears the snapshot.
+
+  Removed the unused IDREF MutationObserver (no IDREF surface exists on `hx-field`). Class-level JSDoc rewritten to clearly distinguish suspend vs release semantics, including the snapshot limitation (an exact-same-value rewrite is invisible to release detection — write a different value or remove the marker manually to take ownership in that case).
+
+- 2a790dd: `hx-nav-item`: scope forced-colors disabled opacity reset to `.nav-item__link`.
+
+  Previously the `:host([disabled]) { opacity: 1 }` rule inside `@media (forced-colors: active)` reset opacity on the host itself, which propagated to children and obscured the GrayText hint on the nav link in Windows High Contrast mode. The reset now lives on `.nav-item__link` directly so the GrayText override stays visible while the host remains opaque to layout. Adds a runtime regression test pinning forced-colors override source-order so a silent cascade regression cannot land.
+
+- 5a15e9e: Upgrade @bookedsolid/rea 0.23.0 → 0.26.1 — closes helix-024 + helix-028
+
+  **helix-024 P1 × 3 closed** (round-24 fix landed in rea 0.26.0):
+  - cwd-relative kill-switch defeat (`cd .rea && echo > HALT`)
+  - Doubly-nested eval bypass (`eval "eval \"...\""`)
+  - Symlink-alias-write bypass (`ln -sf .rea/HALT /tmp/x && echo > /tmp/x`)
+
+  **helix-028 P1 closed** (rea 0.26.1):
+  - Multiline payload awk bypass in `_lib/cmd-segments.sh:193`
+  - Fix uses `\x1c\x1d` (FS+GS control bytes) as RS instead of default newline-RS, so multiline `bash -lc $'cmd1\\ncmd2'` payloads process as single record
+  - Bonus: ANSI-C `$'...'` quoted span recognition (mode 3) closes additional bypass classes
+
+  SHA verification:
+  - `_lib/cmd-segments.sh`: `32879325...` (0.23.0/0.24.0/0.25.0) → `7ca44ef02937...` (0.26.1)
+  - `blocked-paths-bash-gate.sh`, `protected-paths-bash-gate.sh`, `settings-protection.sh`: unchanged (didn't need fixing)
+
+  **New rea-managed agents added:**
+  - `platform-architect`, `principal-engineer`, `principal-product-engineer`, `release-captain`, `security-architect`, `data-architect`, `devex-architect`
+
+  **New hook:** `local-review-gate.sh` (PreToolUse:Bash chain).
+
+  `REA_SKIP_PUSH_GATE=1` standing risk-accept can be retired for routine pushes once this lands. The helix-side filter at `scripts/helix-push-gate-filter.mjs` (helix-029) remains as the durable workaround for any future rea-managed-finding cases.
+
+- 396ad82: Upgrade @bookedsolid/rea 0.26.1 → 0.28.0 — closes helix-031 + ships verify-claim CLI
+
+  **helix-031 closed** (0.27.0): `# shellcheck disable=SC1078` directives at L165 + L535 of `cmd-segments.sh`. Helix-side `--exclude=SC1078` workaround retired from `.husky/pre-push.d/10-helix-quality-gates`.
+
+  **0.28.0 highlights:**
+  - New `rea verify-claim <claim-id>` CLI replays canonical PoC battery against `dist/cli/index.js` — kills the SHA-of-shims methodology error class permanently
+  - 6 new specialist agents: `adversarial-test-specialist`, `ast-parser-specialist`, `figma-dx-specialist`, `mcp-protocol-specialist`, `observability-specialist`, `shell-scripting-specialist`
+  - Hook updates: `cmd-segments.sh`, `blocked-paths-bash-gate.sh`, `protected-paths-bash-gate.sh` auto-updated
+  - Manifest updates: codex-adversarial.md, rea-orchestrator.md, codex-review.md command
+
+  `REA_SKIP_PUSH_GATE=1` standing risk-accept can be retired for routine pushes once this lands. The local-first `rea review` flow remains the canonical path.
+
 ## 3.3.1
 
 ### Patch Changes
