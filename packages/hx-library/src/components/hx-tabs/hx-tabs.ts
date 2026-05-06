@@ -7,6 +7,13 @@ import { helixTabsStyles } from './hx-tabs.styles.js';
 import type { HelixTab } from './hx-tab.js';
 import type { HelixTabPanel } from './hx-tab-panel.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 const _nextTabsId = createIdCounter('hx-tabs');
 
@@ -20,6 +27,16 @@ export interface HxTabChangeDetail {
  * A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children.
  * Supports horizontal and vertical orientations, automatic and manual activation modes,
  * and full keyboard navigation per the ARIA Authoring Practices Guide.
+ *
+ * Group 5a host-canonical: `role="tablist"` lives on the host via
+ * `_internals.role`. `aria-orientation`, `aria-label`, and consumer
+ * `aria-labelledby` resolve through the host. Per-tab `role="tab"` and
+ * per-panel `role="tabpanel"` likewise live on their respective hosts.
+ *
+ * Activation defaults to **manual** per healthcare patterns — keyboard arrow
+ * keys move focus only; Enter/Space activates. APG explicitly allows both
+ * automatic and manual activation; manual is safer when panels are heavy or
+ * announce changes via live regions.
  *
  * @summary Tab container that organizes content into selectable panels.
  *
@@ -78,14 +95,22 @@ export class HelixTabs extends HelixElement {
    * Controls how keyboard navigation activates tabs.
    * In `automatic` mode, focus also activates the tab.
    * In `manual` mode, focus moves independently; Space or Enter activates.
+   *
+   * Group 5a default: `manual` — safer for healthcare patterns where panel
+   * content may be heavy or announce updates via live regions. APG explicitly
+   * allows both modes; manual avoids disorienting auto-activation when users
+   * scan tabs with arrow keys.
+   *
    * @attr activation
    */
   @property({ type: String, attribute: 'activation', reflect: true })
-  activation: 'manual' | 'automatic' = 'automatic';
+  activation: 'manual' | 'automatic' = 'manual';
 
   /**
-   * Accessible label for the tablist. Rendered as `aria-label` on the tablist container.
-   * Provide a brief description of what the tabs represent (e.g., "Patient record sections").
+   * Accessible label for the tablist. Drives the host `internals.ariaLabel`.
+   * Provide a brief description of what the tabs represent (e.g., "Patient
+   * record sections"). Consumer `aria-label` / `aria-labelledby` on the host
+   * override this property when present.
    * @attr label
    */
   @property({ type: String, reflect: true })
@@ -95,6 +120,14 @@ export class HelixTabs extends HelixElement {
 
   /** @internal */
   @state() private _activePanel = '';
+
+  /** @internal */
+  @state() private _supportsIdrefRefs = true;
+
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
 
   // ─── Child Accessors ───
 
@@ -184,6 +217,7 @@ export class HelixTabs extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
     this.addEventListener('hx-tab-select', this._handleTabSelect);
     this.addEventListener('keydown', this._handleKeydown);
     // Watch for panel/name attribute changes on child tabs and panels
@@ -198,6 +232,11 @@ export class HelixTabs extends HelixElement {
         attributeFilter: ['panel', 'name'],
       });
     }
+    // Seed host-canonical semantics so the role/label appear before first paint.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
   }
 
   override disconnectedCallback(): void {
@@ -206,6 +245,8 @@ export class HelixTabs extends HelixElement {
     this.removeEventListener('keydown', this._handleKeydown);
     this._observer?.disconnect();
     this._observer = null;
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
   }
 
   override firstUpdated(): void {
@@ -242,6 +283,63 @@ export class HelixTabs extends HelixElement {
     if ((changedProperties as Map<PropertyKey, unknown>).has('_activePanel')) {
       this._updateTabsAndPanels();
     }
+    if (
+      (changedProperties as Map<PropertyKey, unknown>).has('orientation') ||
+      (changedProperties as Map<PropertyKey, unknown>).has('label')
+    ) {
+      this._syncHostAriaSemantics();
+    }
+  }
+
+  // ─── Host ARIA Sync ───
+
+  /**
+   * Mirror tablist semantics onto the host via ElementInternals so consumer-
+   * supplied `aria-label`, `aria-labelledby`, and the `label` property all
+   * reach the announced control. The host carries `role="tablist"` and the
+   * orientation reflects the `orientation` property reactively.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    internals.role = 'tablist';
+    internals.ariaOrientation = this.orientation;
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    // Precedence: consumer aria-label > consumer aria-labelledby (resolved) >
+    // `label` property. When labelledby resolves on the modern path, the IDL
+    // refs above carry the live target; clear ariaLabel so the element refs
+    // win. On the fallback path, flatten the labelledby targets to a string.
+    if (hostAriaLabel) {
+      internals.ariaLabel = hostAriaLabel;
+    } else if (hasEffectiveLabelledBy) {
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      } else {
+        internals.ariaLabel =
+          labelEls
+            .map((el) => flattenAccName(el))
+            .filter(Boolean)
+            .join(' ') ||
+          this.label ||
+          null;
+      }
+    } else {
+      internals.ariaLabel = this.label || null;
+    }
   }
 
   // ─── Tab / Panel Sync ───
@@ -261,30 +359,46 @@ export class HelixTabs extends HelixElement {
       if (panel) {
         const panelId = panel.id || `hx-panel-${this._id}-${i}`;
         panel.id = panelId;
-        // Set controls on the tab so aria-controls lands on the inner button (role="tab")
+        // String IDREF (legacy fallback path) — the inner button mirrors this
+        // when the platform lacks IDL element references.
         tab.controls = panelId;
-        // Use aria-label instead of aria-labelledby to avoid shadow boundary failures.
-        // aria-labelledby pointing to hx-tab host IDs fails because the host element's
-        // accessible text is inside its shadow DOM (the inner <button>), which AT cannot
-        // traverse via aria-labelledby references across shadow roots.
-        // Extract only default-slot children (no `slot` attribute) to exclude prefix/suffix
-        // slot content (e.g. badge counts) from the panel accessible name (WCAG 1.3.1).
-        const tabLabel = Array.from(tab.childNodes)
-          .filter(
-            (node) =>
-              node.nodeType === Node.TEXT_NODE ||
-              (node.nodeType === Node.ELEMENT_NODE && !(node as Element).hasAttribute('slot')),
-          )
-          .map((node) => node.textContent ?? '')
-          .join('')
-          .trim();
-        if (tabLabel) {
-          panel.setAttribute('aria-label', tabLabel);
-          panel.removeAttribute('aria-labelledby');
+        // Modern path: project the panel host as an element reference so AT
+        // walks across the shadow boundary by reference rather than IDREF.
+        tab.setControlsPanel(panel);
+        // Project the tab host as the panel's labelledby reference. Cross-
+        // shadow naming via IDL element references resolves the tab's
+        // accessible name (its slotted label content) without serialization.
+        // Legacy fallback: the parent additionally writes a flattened
+        // `aria-label` string on the panel host so AT without IDL refs still
+        // names the panel.
+        panel.setLabelledByTabs([tab]);
+
+        if (!this._supportsIdrefRefs) {
+          // Extract only default-slot children (no `slot` attribute) to exclude
+          // prefix/suffix slot content (e.g. badge counts) from the panel
+          // accessible name (WCAG 1.3.1).
+          const tabLabel = Array.from(tab.childNodes)
+            .filter(
+              (node) =>
+                node.nodeType === Node.TEXT_NODE ||
+                (node.nodeType === Node.ELEMENT_NODE && !(node as Element).hasAttribute('slot')),
+            )
+            .map((node) => node.textContent ?? '')
+            .join('')
+            .trim();
+          if (tabLabel) {
+            panel.setAttribute('aria-label', tabLabel);
+            panel.removeAttribute('aria-labelledby');
+          } else {
+            // Fall back to aria-labelledby string ID if no text content yet;
+            // this gets corrected on the next slotchange.
+            panel.setAttribute('aria-labelledby', tabId);
+          }
         } else {
-          // Fall back to aria-labelledby if no text content is yet available;
-          // this will be corrected on slotchange once content is assigned.
-          panel.setAttribute('aria-labelledby', tabId);
+          // Modern path: scrub legacy fallback attributes so a previously-
+          // mounted-on-legacy panel doesn't leak stale strings.
+          panel.removeAttribute('aria-label');
+          panel.removeAttribute('aria-labelledby');
         }
       }
     });
@@ -300,11 +414,10 @@ export class HelixTabs extends HelixElement {
     tabs.forEach((tab) => {
       const isSelected = tab.panel === this._activePanel;
       tab.selected = isSelected;
-      // Dual tabindex is intentional: the inner button in hx-tab manages its own tabindex
-      // via the `selected` property. We also set it on the host element for the roving
-      // tabindex pattern so document.activeElement comparisons work correctly when the
-      // inner button is focused. This is safe because the inner button is the only
-      // focusable element in hx-tab's shadow DOM (WCAG 2.4.3).
+      // Single-host roving tabindex (Group 5a): the host is the only focusable
+      // surface for the tab. The inner button is `tabindex=-1` and
+      // presentational on the modern path. document.activeElement compares
+      // directly against the host.
       tab.tabIndex = isSelected ? 0 : -1;
     });
 
@@ -427,8 +540,13 @@ export class HelixTabs extends HelixElement {
       return;
     }
 
-    // Determine focused tab — when a button inside shadow DOM is focused,
-    // document.activeElement returns the shadow host (hx-tab), not the inner button.
+    // Determine focused tab — host-canonical: the host IS the focusable
+    // surface, so document.activeElement matches the hx-tab host directly
+    // (no shadow-DOM activeElement traversal needed on the modern path).
+    // On the legacy fallback path, focus may land on the inner button; the
+    // tab host is still the focused element in document.activeElement
+    // because the shadow root is closed at the host boundary for outer-tree
+    // queries.
     const focusedTab = allTabs.find((tab) => tab === document.activeElement);
 
     if (e.key === ' ' || e.key === 'Enter') {
@@ -436,7 +554,7 @@ export class HelixTabs extends HelixElement {
       if (focusedTab && !focusedTab.disabled) {
         e.preventDefault();
         this._activateTab(focusedTab);
-        focusedTab.shadowRoot?.querySelector('button')?.focus();
+        focusedTab.focus();
       }
       return;
     }
@@ -468,8 +586,9 @@ export class HelixTabs extends HelixElement {
       return;
     }
 
-    // Focus the tab button inside the shadow root
-    targetTab.shadowRoot?.querySelector('button')?.focus();
+    // Focus the host directly — single-host roving tabindex (Group 5a).
+    // The host owns the tab stop; the inner button is presentational.
+    targetTab.focus();
 
     // Only activate in automatic mode if the target tab is not disabled
     if (this.activation === 'automatic' && !targetTab.disabled) {
@@ -482,13 +601,7 @@ export class HelixTabs extends HelixElement {
   override render() {
     return html`
       <div class="tabs">
-        <div
-          part="tablist"
-          class="tablist"
-          role="tablist"
-          aria-orientation=${this.orientation}
-          aria-label=${this.label || 'Tabs'}
-        >
+        <div part="tablist" class="tablist">
           <slot name="tab" @slotchange=${this._handleSlotChange}></slot>
         </div>
         <div part="panels" class="panels">

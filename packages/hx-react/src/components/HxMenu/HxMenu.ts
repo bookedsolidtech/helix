@@ -16,6 +16,21 @@ export type { HxMenuProps };
 /**
  * A menu container that manages keyboard navigation over a list of menu items.
 Use with `hx-menu-item` and `hx-menu-divider`.
+
+Group 5b host-canonical: `role="menu"` lives on the **host** via
+`_internals.role`. The host carries the announced surface so AT walks
+`<hx-menu>` (role=menu) → slotted `<hx-menu-item>` (role=menuitem on host)
+directly without two layers of indirection. Consumer-supplied
+`aria-label` / `aria-labelledby` on the host are resolved via the shared
+IDREF mirror; cross-shadow naming uses `ariaLabelledByElements` (modern)
+with a flattened-string fallback (legacy).
+
+Submenu coordination: when an `hx-menu-item` emits `hx-item-submenu-open`
+or `hx-item-submenu-close`, the parent menu auto-handles the toggle by
+calling `setSubmenuOpen()` on the item — UNLESS the consumer has called
+`event.preventDefault()` on the bubbled event, signaling that they own the
+submenu lifecycle. This matches APG-mandated behaviour while leaving an
+opt-out for advanced consumers.
  *
  * @example
  * ```tsx

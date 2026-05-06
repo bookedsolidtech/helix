@@ -17,6 +17,16 @@ export type { HxMeterProps };
  * A scalar measurement within a known range — e.g., disk usage, health score,
 or any numeric value with defined min/max bounds. Supports low/high/optimum
 threshold markers for semantic color feedback.
+
+Group 7 host-canonical: `role="meter"` is mirrored onto the **host** via
+`_internals.role` AND kept on the inner `[role="meter"]` element. The dual
+surface is the hx-progress-ring pattern (Group 7 gold-standard exemplar):
+the host carries the cross-shadow IDREF wiring (`ariaLabelledByElements`
+resolves through the shared mirror) while the inner element keeps its
+existing role/state surface so legacy AT and consumer queries continue to
+work. AccName 1.2 §4.3.1 precedence is implemented uniformly: consumer
+host `aria-labelledby` (flattened) > consumer host `aria-label` >
+`label` property / slotted label > derived value-text fallback.
  *
  * @example
  * ```tsx

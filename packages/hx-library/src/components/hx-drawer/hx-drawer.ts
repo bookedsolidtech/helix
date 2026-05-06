@@ -2,12 +2,18 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { lockBodyScroll, unlockBodyScroll } from '../../utils/body-scroll-lock.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixDrawerStyles } from './hx-drawer.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextDrawerId = createIdCounter('hx-drawer');
 
@@ -36,6 +42,59 @@ const FOCUSABLE_SELECTORS = [
  * A slide-in drawer panel that can appear from any edge of the viewport.
  * Supports focus trapping, overlay backdrop, keyboard navigation, and full
  * ARIA labelling for enterprise healthcare accessibility requirements.
+ *
+ * ## Architecture Note: Host-Canonical ARIA (group-4 round-1, Path A)
+ *
+ * The host carries the announced dialog semantics via `ElementInternals`:
+ *
+ *   - `internals.role = 'dialog'` (the host IS the dialog surface)
+ *   - `internals.ariaModal = 'true'` (modality declared on host)
+ *   - `internals.ariaLabelledByElements` / `internals.ariaDescribedByElements`
+ *     project consumer light-DOM IDREFs across the shadow boundary.
+ *   - `internals.ariaLabel` carries the resolved fallback name when no
+ *     IDREF chain or slotted title exists.
+ *
+ * The inner `<div part="overlay">` no longer carries `role`, `aria-modal`,
+ * `aria-labelledby`, or `aria-label` — those would create a nested-dialog
+ * announcement above the host's canonical surface. Belt-and-suspenders
+ * fallback: when the runtime does NOT expose IDL element references on
+ * `ElementInternals` (older Firefox / Safari builds), the resolved label
+ * text is text-flattened and written to the inner overlay's `aria-label`
+ * so AT walking down from the host still finds an announceable name.
+ *
+ * Naming precedence (W3C AccName 1.2 §4.3.1):
+ *
+ *   1. Consumer `aria-labelledby` on the host — IDREFs resolved across the
+ *      shadow boundary via `resolveIdrefTokens` (same scope walk used by
+ *      every host-canonical hx-* control: own root → ancestor shadow hosts
+ *      → owner document → slot owners).
+ *   2. Consumer `aria-label` on the host.
+ *   3. `<slot name="label">` text content (multi-node aggregation per
+ *      AccName 1.2 §4.3.10 — decorative `aria-hidden` / `[hidden]` subtrees
+ *      contribute zero to the name).
+ *   4. `label` property — explicit author fallback string.
+ *   5. Hard-coded literal `"Drawer"` (last-resort accessible name).
+ *
+ * Description channel: a synthesized `<span id="${id}-consumer-desc">` is
+ * rendered inside the shadow root and updated to mirror consumer-resolved
+ * description text. The host's `internals.ariaDescribedByElements` carries
+ * the live element references on the modern path; the in-shadow span is the
+ * fallback target for AT that does not walk IDL refs. `aria-description` is
+ * intentionally NEVER written — the W3C AccName algorithm ignores it
+ * whenever `aria-describedby` is also present.
+ *
+ * Slot mutation observers track:
+ *   1. The label slot's text content (in-place i18n re-renders).
+ *   2. Consumer-resolved external IDREF targets (so a consumer mutating
+ *      `<label id="x">Patient</label>` in place re-flows the name).
+ *   3. Host attribute mutations (delegated to `installAriaIdrefMirror`,
+ *      which also catches late-inserted IDREF targets and id renames in
+ *      every relevant root).
+ *
+ * Focus trap, ESC dismiss, focus-restore, and the inert-outside-content
+ * sibling-walk are unchanged from the pre-host-canonical implementation —
+ * they operate against the shadow-internal panel which is still the focus
+ * target for keyboard users.
  *
  * ## Architecture Note: Native `<dialog>` Migration
  *
@@ -212,7 +271,102 @@ export class HelixDrawer extends HelixElement {
    * Unique ID for the title element, used by aria-labelledby to link the dialog to its label.
    * @internal
    */
-  private readonly _titleId = `${_nextDrawerId()}-title`;
+  private readonly _id = _nextDrawerId();
+  /** @internal */
+  private readonly _titleId = `${this._id}-title`;
+  /**
+   * Id of the synthesized in-shadow span that mirrors consumer-resolved
+   * description text. Belt-and-suspenders: the host's
+   * `internals.ariaDescribedByElements` carries the live element references
+   * on the modern path; this in-shadow span is the fallback referenced via
+   * `aria-describedby` on the inner overlay so AT that does not walk IDL refs
+   * still finds an announceable description.
+   * @internal
+   */
+  private readonly _consumerDescId = `${this._id}-consumer-desc`;
+
+  // ─── Host-canonical ARIA state ───
+
+  /**
+   * Test seam: when set to `true` or `false`, overrides the platform
+   * `supportsIdrefElementReferences` probe before `connectedCallback`
+   * seeds `_supportsIdrefRefs`. Mirrors hx-combobox round-3 finding 4 —
+   * tests must select the path BEFORE the host connects so the synthetic
+   * environment matches a legacy engine. Production code MUST NOT touch
+   * this field. It is `static` so the cleanup is global and obvious.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
+  /**
+   * Whether the runtime exposes IDL element references on ElementInternals.
+   * Drives the modern-vs-fallback ARIA projection in `_syncHostAriaSemantics`.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+
+  /**
+   * Direct references to ALL labellable elements projected into
+   * `<slot name="label">`. Aggregates every assigned element so composed
+   * labels (e.g. `<svg slot="label" aria-hidden="true">…</svg><span slot="label">Patient</span>`)
+   * project the FULL visible label via `internals.ariaLabelledByElements`
+   * while `flattenAccName` strips the decorative subtree per AccName 1.2.
+   * @internal
+   */
+  private _slottedLabelEls: Element[] = [];
+
+  /**
+   * Flattened text content of the slotted label nodes, used for the no-IDL-ref
+   * fallback `internals.ariaLabel` and the legacy inner-overlay `aria-label`.
+   * @internal
+   */
+  @state() private _labelSlotText = '';
+
+  /**
+   * Most recently observed consumer-supplied `aria-labelledby` token list on
+   * the host. Refreshed every sync via `getAttribute()` — the host attribute
+   * IS the live source of truth, so `removeAttribute` is observable on the
+   * next sync (it returns `null`).
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+  /** @internal — see `_consumerLabelledBy`. */
+  private _consumerDescribedBy: string | null = null;
+
+  /**
+   * Handle for the shared IDREF mirror. See `installAriaIdrefMirror()`.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
+   * Watches in-place text mutations on the assigned slotted label nodes
+   * (e.g. consumer i18n re-renders that mutate `textContent` instead of
+   * replacing the node). `slotchange` does NOT fire on descendant text
+   * mutations, so this observer is the only signal that keeps the host's
+   * accessible name synchronized with the visible label.
+   * @internal
+   */
+  private _labelSlotTextObserver: MutationObserver | null = null;
+
+  /**
+   * Watches in-place text / visibility mutations on consumer light-DOM
+   * elements resolved from host `aria-labelledby` / `aria-describedby`.
+   * Reinstalled on every sync against the deduped union of resolved
+   * elements; disconnects automatically when the consumer retracts both
+   * IDREF chains.
+   * @internal
+   */
+  private _externalRefsObserver: MutationObserver | null = null;
+
+  /**
+   * Dedicated host observer scoped to `aria-describedby` with
+   * `attributeOldValue: true`. Catches authentic consumer retraction
+   * (oldValue !== null && newValue === null) so the cached baseline
+   * follows the live attribute.
+   * @internal
+   */
+  private _hostDescribedByObserver: MutationObserver | null = null;
 
   // ─── Public Properties ───
 
@@ -282,6 +436,53 @@ export class HelixDrawer extends HelixElement {
       devWarn('hx-drawer', 'The "size" attribute is deprecated. Use "hx-size" instead.');
       this.size = legacySize as DrawerSize;
     }
+
+    // Honour the static test override so synthetic environments choose the
+    // path BEFORE connect runs.
+    const ctor = this.constructor as typeof HelixDrawer;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+
+    // Establish host-canonical ARIA semantics BEFORE first paint. The host
+    // carries `role="dialog"` and (when modal) `aria-modal="true"` via
+    // ElementInternals so consumers and AT see the dialog surface even before
+    // any IDREF resolution lands.
+    this._internals.role = 'dialog';
+    this._internals.ariaModal = 'true';
+
+    // Install the dedicated `aria-describedby` retraction observer BEFORE the
+    // seeded `_syncHostAriaSemantics()` call below — mirrors hx-combobox
+    // round-10 finding 1 — so authentic consumer clears propagate immediately.
+    this._hostDescribedByObserver = new MutationObserver((records) => {
+      let consumerCleared = false;
+      for (const record of records) {
+        if (record.attributeName !== 'aria-describedby') continue;
+        const oldValue = record.oldValue;
+        const newValue = this.getAttribute('aria-describedby');
+        if (oldValue !== null && newValue === null) {
+          this._consumerDescribedBy = null;
+          consumerCleared = true;
+        }
+      }
+      if (consumerCleared) {
+        this._syncHostAriaSemantics();
+      }
+    });
+    this._hostDescribedByObserver.observe(this, {
+      attributes: true,
+      attributeFilter: ['aria-describedby'],
+      attributeOldValue: true,
+    });
+
+    // Seed root-independent semantics from connect so the host announces its
+    // dialog role + accessible name before first paint. The mirror's initial
+    // sync also fires synchronously inside `installAriaIdrefMirror`.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
   }
 
   override disconnectedCallback(): void {
@@ -291,6 +492,14 @@ export class HelixDrawer extends HelixElement {
       clearTimeout(this._animationTimeout);
     }
     this._restoreBodyScroll();
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    this._labelSlotTextObserver?.disconnect();
+    this._labelSlotTextObserver = null;
+    this._externalRefsObserver?.disconnect();
+    this._externalRefsObserver = null;
+    this._hostDescribedByObserver?.disconnect();
+    this._hostDescribedByObserver = null;
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -307,6 +516,32 @@ export class HelixDrawer extends HelixElement {
     if (changedProperties.has('size')) {
       this._applySizeVar();
     }
+
+    // Re-sync host ARIA on every update — `label` / `_hasLabelSlot` /
+    // `_slottedLabelEls` / `_labelSlotText` / consumer attributes can all
+    // change between renders and the projection is the SSOT for AT.
+    this._syncHostAriaSemantics();
+  }
+
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+    // The native `slotchange` event fires as a microtask after the initial
+    // synchronous render. We deliberately do NOT proactively seed
+    // `_hasLabelSlot` / `_labelSlotText` from `firstUpdated` because doing so
+    // schedules an additional Lit re-render that subtly reorders the
+    // promise-chain inside `_openDrawer` (`updateComplete.then(...) →
+    // _isOpen = true → updateComplete.then(...) → _setInitialFocus()`). On
+    // Chromium that reordering interleaves the inner `is-open` visibility
+    // flip with `_setInitialFocus()` and breaks slotted-children focus for
+    // consumer test code that calls `.focus()` immediately after the first
+    // `updateComplete` (regression: `Focus Trap > traps forward Tab at the
+    // last focusable element`). The slotchange handler runs one microtask
+    // later and the `_syncHostAriaSemantics()` call from `updated()` picks
+    // up the resolved state on the very next paint — close enough that AT
+    // never observes the unnamed window. If a future round needs the seed
+    // for a stricter timing requirement, re-introduce it here AND update the
+    // open-drawer chain to await `_isOpen` activation before the focus
+    // restoration test runs (likely needs an extra `updateComplete`).
   }
 
   // ─── Public Methods ───
@@ -640,8 +875,327 @@ export class HelixDrawer extends HelixElement {
 
   /** @internal */
   private _handleLabelSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    this._hasLabelSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    const state = this._readLabelSlotState(e.target);
+    this._hasLabelSlot = state.hasUsefulName;
+    this._slottedLabelEls = state.elements;
+    this._labelSlotText = state.text;
+    this._installLabelSlotTextObserver(state.elements);
+    this._syncHostAriaSemantics();
+  }
+
+  // ─── Host-canonical ARIA helpers ───
+
+  /**
+   * Reads the label slot's assigned nodes and computes the discriminated
+   * naming state. Aggregates ALL assigned elements (not just the first) so
+   * composed labels project the FULL visible label via
+   * `internals.ariaLabelledByElements`. Per AccName 1.2 §4.3.10,
+   * `aria-hidden="true"` / `[hidden]` elements contribute zero to the
+   * accessible name but stay in `elements` so AT walking IDL refs sees the
+   * full visible group. `hasUsefulName` is gated on the flattened text
+   * length: a slot containing only decorative wrappers does NOT name the
+   * dialog, and the host falls through to the next naming source.
+   * @internal
+   */
+  private _readLabelSlotState(slot: HTMLSlotElement): {
+    hasUsefulName: boolean;
+    elements: Element[];
+    text: string;
+  } {
+    const nodes = slot.assignedNodes({ flatten: true });
+    const elements: Element[] = [];
+    const fragments: string[] = [];
+    for (const node of nodes) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        elements.push(el);
+        if (el.getAttribute('aria-hidden') === 'true') continue;
+        const elText = flattenAccName(el);
+        if (elText) fragments.push(elText);
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        const txt = (node.textContent ?? '').trim();
+        if (txt) fragments.push(txt);
+      }
+    }
+    const trimmedText = fragments.join(' ').replace(/\s+/g, ' ').trim();
+    return {
+      hasUsefulName: trimmedText.length > 0,
+      elements,
+      text: trimmedText,
+    };
+  }
+
+  /**
+   * (Re-)installs the mutation observer over the current set of slotted label
+   * elements. On any descendant text/visibility mutation we re-flatten and
+   * re-sync so the host's accessible name tracks the visible label.
+   * @internal
+   */
+  private _installLabelSlotTextObserver(elements: Element[]): void {
+    this._labelSlotTextObserver?.disconnect();
+    if (elements.length === 0) {
+      this._labelSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      const fragments: string[] = [];
+      for (const el of elements) {
+        if (el.getAttribute('aria-hidden') === 'true') continue;
+        const t = flattenAccName(el);
+        if (t) fragments.push(t);
+      }
+      const trimmed = fragments.join(' ').replace(/\s+/g, ' ').trim();
+      this._labelSlotText = trimmed;
+      this._hasLabelSlot = trimmed.length > 0;
+      this._syncHostAriaSemantics();
+    });
+    for (const el of elements) {
+      observer.observe(el, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._labelSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs a `MutationObserver` against the deduped union of
+   * consumer-resolved label/description elements. Watches `characterData`,
+   * `childList`, `subtree`, and `aria-hidden` / `hidden` attributes so any
+   * in-place mutation on the referenced light-DOM nodes triggers a fresh
+   * sync — keeping the modern-path IDL refs and the fallback-path text
+   * flatten aligned with the live consumer text.
+   * @internal
+   */
+  private _installExternalRefsObserver(elements: Element[]): void {
+    if (this._externalRefsObserver) {
+      this._externalRefsObserver.disconnect();
+      this._externalRefsObserver = null;
+    }
+    if (elements.length === 0) return;
+    const unique = new Set<Element>(elements);
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    for (const el of unique) {
+      observer.observe(el, {
+        characterData: true,
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._externalRefsObserver = observer;
+  }
+
+  /**
+   * Resolves consumer-supplied label/description IDREFs on the host and
+   * projects the canonical dialog ARIA onto the **host** via
+   * `ElementInternals` (modern path) and onto the inner overlay via attribute
+   * writes (fallback path).
+   *
+   * Cross-shadow naming is belt-and-suspenders:
+   *
+   *   1. **Modern path** (`_supportsIdrefRefs === true`): consumer-resolved
+   *      label/description elements are written onto
+   *      `internals.ariaLabelledByElements` / `internals.ariaDescribedByElements`
+   *      on the host. AT walking the host's accessibility tree finds them
+   *      across the shadow boundary. `internals.ariaLabel` carries the
+   *      flattened text fallback (only when no labelledby resolves) so AT
+   *      that does not walk IDL refs still announces a name.
+   *   2. **Fallback path** (`_supportsIdrefRefs === false`): the resolved
+   *      element text is flattened and written to `internals.ariaLabel` AND
+   *      mirrored to the inner overlay's `aria-label`.
+   *
+   * The synthesized `<span id="${_consumerDescId}">` mirrors the resolved
+   * description text on every sync. The inner overlay's `aria-describedby`
+   * chains the in-shadow span. `aria-description` is intentionally NEVER
+   * written — W3C AccName ignores it whenever `aria-describedby` is set.
+   *
+   * Naming precedence (W3C AccName 1.2 §4.3.1):
+   *   1. Consumer `aria-labelledby` (resolved IDREFs, text-flattened)
+   *   2. Consumer `aria-label`
+   *   3. Slotted `<slot name="label">` text
+   *   4. `label` property
+   *   5. Hard-coded `"Drawer"`
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    // The host's canonical role + modal flag are seeded in `connectedCallback`.
+    // We do NOT rewrite them on every sync — they are stable for the
+    // component's lifetime and rewriting them on every render shifts focus
+    // tracking on some Chromium / WebKit builds (idempotent writes can still
+    // re-enter the AT layer's accessibility tree builder).
+
+    // Refresh the consumer baseline. The host attribute IS the live source
+    // of truth — `null` authentically represents consumer retraction.
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    this._consumerLabelledBy = liveLabelledBy;
+    const liveDescribedBy = this.getAttribute('aria-describedby');
+    this._consumerDescribedBy = liveDescribedBy;
+
+    const consumerLabelEls = resolveIdrefTokens(this, this._consumerLabelledBy);
+    const hasEffectiveLabelledBy = consumerLabelEls.length > 0;
+    const consumerDescEls = resolveIdrefTokens(this, this._consumerDescribedBy);
+
+    // Observe in-place mutations on the resolved external IDREF targets.
+    // Without this a consumer mutating `<h2 id="x">Patient</h2>` → "Member"
+    // in place leaves the host's flattened `aria-label` stuck on "Patient".
+    this._installExternalRefsObserver([...consumerLabelEls, ...consumerDescEls]);
+
+    // Per AccName 1.2 §4.3.10, top-level aria-hidden / hidden elements
+    // contribute zero to the name. Filter them from the IDL-refs path so the
+    // modern path matches the fallback path's text-flatten behavior.
+    const isVisibleForAccName = (el: Element): boolean =>
+      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
+
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() : '';
+
+    // Build the augmented label-elements list used by the modern path.
+    // Slotted-title elements feed in only when no consumer aria-labelledby
+    // resolved (AccName 1.2 precedence: external > slot > property).
+    const labelElsForInternals: Element[] = [];
+    labelElsForInternals.push(...consumerLabelEls.filter(isVisibleForAccName));
+    if (!hasEffectiveLabelledBy && !hostAriaLabel && this._hasLabelSlot) {
+      // Aggregate every slotted label element so AT composes icon + text.
+      labelElsForInternals.push(...this._slottedLabelEls.filter(isVisibleForAccName));
+    }
+
+    const descElsForInternals: Element[] = [...consumerDescEls.filter(isVisibleForAccName)];
+
+    // ─── Compute the resolved accessible name (text-flatten path) ───
+    const flattenText = (els: Element[]): string =>
+      els
+        .filter(isVisibleForAccName)
+        .map((el) => flattenAccName(el))
+        .filter((t) => t.length > 0)
+        .join(' ');
+
+    let resolvedName = '';
+    if (hasEffectiveLabelledBy) {
+      resolvedName = flattenText(consumerLabelEls);
+    }
+    if (!resolvedName && hostAriaLabel) {
+      resolvedName = hostAriaLabel;
+    }
+    if (!resolvedName && this._hasLabelSlot && this._labelSlotText) {
+      resolvedName = this._labelSlotText;
+    }
+    if (!resolvedName && this.label) {
+      resolvedName = this.label;
+    }
+    if (!resolvedName) {
+      // Last-resort literal — preserves the pre-host-canonical default so an
+      // unlabeled drawer still has SOME announced name. Consumer responsibility
+      // to provide a meaningful one in real usage.
+      resolvedName = 'Drawer';
+    }
+
+    // ─── Modern-path: ElementInternals IDL element references ───
+    type InternalsWithIdrefRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+      ariaDescribedByElements: Element[] | null;
+    };
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithIdrefRefs;
+      refsInternals.ariaLabelledByElements =
+        labelElsForInternals.length > 0 ? labelElsForInternals : null;
+      refsInternals.ariaDescribedByElements =
+        descElsForInternals.length > 0 ? descElsForInternals : null;
+      // Forward `aria-label` to `internals.ariaLabel` ONLY when no labelledby
+      // resolved — per AccName 1.2 a non-empty aria-label outranks
+      // aria-labelledby, and we never want to silently erase the IDL-ref
+      // resolution. When labelledby is present, `null` removes the override
+      // so element references win.
+      if (hasEffectiveLabelledBy) {
+        internals.ariaLabel = null;
+      } else {
+        internals.ariaLabel = resolvedName;
+      }
+    } else {
+      // Fallback path: write the flattened name directly to internals.
+      // Older engines without IDL refs use this as the canonical name.
+      internals.ariaLabel = resolvedName;
+    }
+
+    // ─── Synthesized in-shadow consumer-description span ───
+    // Mirror consumer-resolved description text into a same-root span so the
+    // inner overlay's `aria-describedby` resolves cross-shadow without
+    // pointing at light-DOM ids (which do not resolve from inside a shadow
+    // root). `aria-description` is intentionally NEVER written.
+    const consumerDescSpan = this.shadowRoot?.getElementById(this._consumerDescId) ?? null;
+    const consumerDescText = flattenText(consumerDescEls);
+    if (consumerDescSpan && consumerDescSpan.textContent !== consumerDescText) {
+      consumerDescSpan.textContent = consumerDescText;
+    }
+
+    // ─── Inner overlay attribute reconciliation ───
+    // The overlay no longer carries `role` / `aria-modal` / `aria-labelledby`
+    // / `aria-label` on the modern path — the host owns those via internals.
+    // Strip stale attributes defensively in case an earlier sync wrote them
+    // and reconcile the fallback `aria-label` only when IDL refs are not
+    // supported (so screen readers walking the inner overlay still find a
+    // name on legacy engines).
+    const overlay = this._overlayEl ?? null;
+    if (overlay) {
+      // Belt-and-suspenders: never write `role` / `aria-modal` to the inner
+      // overlay on either path — that would create nested-dialog semantics
+      // above the host's canonical surface.
+      if (overlay.hasAttribute('role')) overlay.removeAttribute('role');
+      if (overlay.hasAttribute('aria-modal')) overlay.removeAttribute('aria-modal');
+      // Internal slotted-title id on the SAME shadow root resolves cleanly,
+      // so we project it onto the overlay's `aria-labelledby` only on the
+      // fallback path. The modern path uses `internals.ariaLabelledByElements`.
+      const wantOverlayLabelledBy =
+        !this._supportsIdrefRefs && this._hasLabelSlot ? this._titleId : null;
+      const wantOverlayLabel =
+        !this._supportsIdrefRefs && !wantOverlayLabelledBy ? resolvedName : null;
+      if (wantOverlayLabelledBy) {
+        if (overlay.getAttribute('aria-labelledby') !== wantOverlayLabelledBy) {
+          overlay.setAttribute('aria-labelledby', wantOverlayLabelledBy);
+        }
+      } else if (overlay.hasAttribute('aria-labelledby')) {
+        overlay.removeAttribute('aria-labelledby');
+      }
+      if (wantOverlayLabel) {
+        if (overlay.getAttribute('aria-label') !== wantOverlayLabel) {
+          overlay.setAttribute('aria-label', wantOverlayLabel);
+        }
+      } else if (overlay.hasAttribute('aria-label')) {
+        overlay.removeAttribute('aria-label');
+      }
+
+      // Inner overlay's `aria-describedby` chains the in-shadow consumer-desc
+      // span. Same-root id resolves cleanly; cross-shadow consumer ids are
+      // ignored at the AT level (light-DOM ids do not resolve from inside a
+      // shadow root) so we never write them directly.
+      if (consumerDescText && consumerDescSpan) {
+        const value = this._consumerDescId;
+        if (overlay.getAttribute('aria-describedby') !== value) {
+          overlay.setAttribute('aria-describedby', value);
+        }
+      } else if (overlay.hasAttribute('aria-describedby')) {
+        overlay.removeAttribute('aria-describedby');
+      }
+
+      // Forced-colors: the host has display: contents so :host(:focus-visible)
+      // has no painting surface — focus is on the inner panel. The existing
+      // `forcedColorsSurface` mixin paints the host CanvasText border which
+      // the panel inherits via the parent box. No change owed here, but if a
+      // future change makes the host focusable directly we'd add the rule.
+    }
+
+    // Strip `aria-description` defensively — never written on either path.
+    if (overlay && overlay.hasAttribute('aria-description')) {
+      overlay.removeAttribute('aria-description');
+    }
   }
 
   // ─── Render Helpers ───
@@ -728,19 +1282,16 @@ export class HelixDrawer extends HelixElement {
       'is-open': this._isOpen,
     };
 
-    // P1-06: ensure the dialog always has an accessible name.
-    // Priority: aria-labelledby (slot) > aria-label (prop) > aria-label (fallback "Drawer")
-    const ariaLabelledby = this._hasLabelSlot ? this._titleId : undefined;
-    const ariaLabel = !this._hasLabelSlot ? this.label || 'Drawer' : undefined;
-
+    // Host-canonical: the inner overlay carries NO `role` / `aria-modal` /
+    // `aria-labelledby` / `aria-label` here. Those are projected onto the
+    // host via `ElementInternals` in `_syncHostAriaSemantics()`. On the
+    // legacy (no-IDL-ref) fallback path the sync method imperatively writes
+    // `aria-label` / `aria-labelledby` onto the overlay so AT walking down
+    // from the host still finds an announceable name.
     return html`
       <div
         part="overlay"
         class=${classMap(overlayClasses)}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby=${ifDefined(ariaLabelledby)}
-        aria-label=${ifDefined(ariaLabel)}
         tabindex="-1"
         @click=${this._handleOverlayClick}
       >
@@ -752,6 +1303,16 @@ export class HelixDrawer extends HelixElement {
           </div>
           ${this._renderFooter()}
         </div>
+        <!--
+          Synthesized in-shadow span carrying consumer-resolved description
+          text. Updated imperatively on every sync. The inner overlay's
+          \`aria-describedby\` references this span so cross-shadow consumer
+          descriptions resolve through the standard described-by channel
+          without writing light-DOM ids that cannot resolve from inside a
+          shadow root. \`aria-description\` is intentionally NEVER written —
+          AccName ignores it whenever \`aria-describedby\` is present.
+        -->
+        <span id=${this._consumerDescId} class="drawer-sr-only" aria-hidden="false"></span>
       </div>
     `;
   }

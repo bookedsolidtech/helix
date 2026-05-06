@@ -16,7 +16,21 @@ export type { HxMenuItemProps };
 /**
  * A single interactive item for use inside `hx-menu`. Supports normal, checkbox,
 and radio types, loading state, prefix/suffix slots, and submenu nesting.
-Use `aria-label` on the parent `hx-menu` to provide an accessible name.
+
+Group 5b host-canonical: `role="menuitem"` (or `menuitemcheckbox` /
+`menuitemradio` based on `type`) lives on the **host** via
+`_internals.role`. The roving tabindex is written to the host, so the host
+is the focusable surface and lands directly under the parent `<hx-menu>`
+(which carries `role="menu"`) in the AT walked tree. The inner element is
+presentational on the modern path — no role, no aria-* attributes — and
+carries only click/keyboard event handlers. Keyboard activation
+(Enter/Space) is owned by the host's `keydown` handler.
+
+Cross-shadow naming: consumer-supplied `aria-label` / `aria-labelledby` on
+the host project to `internals.ariaLabel` / `internals.ariaLabelledByElements`
+via the shared IDREF mirror. The slotted text content is used as the default
+accessible name when no override is set (AT walks slotted children
+automatically through the host's role).
  *
  * @example
  * ```tsx

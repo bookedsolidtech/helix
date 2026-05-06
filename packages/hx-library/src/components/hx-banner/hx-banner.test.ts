@@ -327,9 +327,11 @@ describe('hx-banner', () => {
       expect(el.getAttribute('role')).toBe('status');
     });
 
-    it('uses role="alert" for warning variant on host element', async () => {
+    it('uses role="status" for warning variant on host element', async () => {
+      // (group-6) Harmonized with hx-alert/hx-toast: warning is non-urgent and
+      // uses a polite live region. Only error/danger remains assertive.
       const el = await fixture<HxBanner>('<hx-banner variant="warning">Warning</hx-banner>');
-      expect(el.getAttribute('role')).toBe('alert');
+      expect(el.getAttribute('role')).toBe('status');
     });
 
     it('uses role="alert" for error variant on host element', async () => {
@@ -541,6 +543,64 @@ describe('hx-banner', () => {
       el.dismiss();
       await el.updateComplete;
       expect(el.open).toBe(false);
+    });
+  });
+
+  // ─── (group-6) Host-canonical internals.role mirror ───
+
+  describe('Host-canonical role via ElementInternals (group-6)', () => {
+    it('mirrors role on internals for status variants', async () => {
+      const el = await fixture<HxBanner>('<hx-banner variant="info">Info</hx-banner>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('status');
+    });
+
+    it('mirrors role on internals for error variant', async () => {
+      const el = await fixture<HxBanner>('<hx-banner variant="error">Error</hx-banner>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('alert');
+    });
+
+    it('keeps internals.role in sync with variant changes', async () => {
+      const el = await fixture<HxBanner>('<hx-banner variant="info">Info</hx-banner>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('status');
+      el.variant = 'error';
+      await el.updateComplete;
+      expect(internals.role).toBe('alert');
+    });
+
+    it('does NOT set explicit aria-live on host (role implies live)', async () => {
+      const el = await fixture<HxBanner>('<hx-banner variant="error">Error</hx-banner>');
+      // §5.1: role implies aria-live; setting both produces double-announce
+      // on older NVDA/JAWS. Host carries role (via internals + attribute) only.
+      expect(el.hasAttribute('aria-live')).toBe(false);
+    });
+  });
+
+  // ─── (group-6) LANDMARK role disambiguation regression guard ───
+
+  describe('LANDMARK role disambiguation (group-6)', () => {
+    it('never applies role="banner" (the LANDMARK role) to host', async () => {
+      const variants = ['info', 'success', 'warning', 'error'] as const;
+      for (const variant of variants) {
+        const el = await fixture<HxBanner>(
+          `<hx-banner variant="${variant}">Banner</hx-banner>`,
+        );
+        // Host carries role=alert|status (live region), NEVER role="banner"
+        // (the page-level LANDMARK). The component name is a UX descriptor,
+        // not an ARIA semantic. See ARIA naming disambiguation block at top
+        // of hx-banner.ts.
+        expect(el.getAttribute('role')).not.toBe('banner');
+        const internals = (el as unknown as { _internals: ElementInternals })._internals;
+        expect(internals.role).not.toBe('banner');
+      }
+    });
+
+    it('never renders a shadow descendant with role="banner"', async () => {
+      const el = await fixture<HxBanner>('<hx-banner variant="info">Banner</hx-banner>');
+      const banners = el.shadowRoot!.querySelectorAll('[role="banner"]');
+      expect(banners.length).toBe(0);
     });
   });
 });

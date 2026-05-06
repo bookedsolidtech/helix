@@ -72,6 +72,21 @@ export class HelixButtonGroup extends HelixElement {
 
   // ─── Lifecycle ───
 
+  /**
+   * Tracks whether the consumer set `aria-label` directly as an HTML attribute
+   * BEFORE the `label` property fired. Used to avoid clobbering consumer-set
+   * aria-label when `label` is empty.
+   * @internal
+   */
+  private _consumerAriaLabel: string | null = null;
+
+  /**
+   * Tracks whether the no-label devWarn has already fired for this instance,
+   * so disconnect/reconnect cycles do not spam the console.
+   * @internal
+   */
+  private _emptyLabelWarnEmitted = false;
+
   override updated(changedProperties: PropertyValues<this>): void {
     super.updated(changedProperties);
 
@@ -82,6 +97,12 @@ export class HelixButtonGroup extends HelixElement {
     if (changedProperties.has('label')) {
       if (this.label) {
         this.setAttribute('aria-label', this.label);
+      } else if (this._consumerAriaLabel !== null) {
+        // Restore consumer-set aria-label rather than removing it. The
+        // consumer's HTML attribute is the documented Drupal/Twig path
+        // (lines 67-68 narrative) and must not be clobbered by an empty
+        // `label` property.
+        this.setAttribute('aria-label', this._consumerAriaLabel);
       } else {
         this.removeAttribute('aria-label');
       }
@@ -90,11 +111,26 @@ export class HelixButtonGroup extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute('role', 'group');
+    // Capture any consumer-set aria-label BEFORE the `label` property writes
+    // overwrite it. This snapshot wins back the host attribute when `label`
+    // is later cleared.
+    if (this._consumerAriaLabel === null && this.hasAttribute('aria-label')) {
+      this._consumerAriaLabel = this.getAttribute('aria-label');
+    }
+    // Host-canonical role: use ElementInternals so the role survives in the
+    // a11y tree even if a consumer attribute-strips the host. Mirror to the
+    // host attribute as well for older AT/devtools that walk attributes.
+    this._internals.role = 'group';
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'group');
+    }
     this.style.setProperty('--hx-button-group-size', this.size);
     if (this.label) {
       this.setAttribute('aria-label', this.label);
-    } else {
+    } else if (this._consumerAriaLabel !== null) {
+      // Consumer-set aria-label is fine — no warning needed.
+    } else if (!this._emptyLabelWarnEmitted) {
+      this._emptyLabelWarnEmitted = true;
       devWarn(
         'hx-button-group',
         'Missing accessible label. Provide a `label` attribute so screen readers can announce the group purpose (WCAG 4.1.2).',

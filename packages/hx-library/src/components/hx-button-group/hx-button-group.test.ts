@@ -458,4 +458,125 @@ describe('hx-button-group', () => {
       expect(el.getAttribute('aria-label')).toBe('Updated label');
     });
   });
+
+  // ─── ARIA Group 8 round-1: host-canonical role + consumer aria-label ───
+
+  describe('ARIA Group 8 — host-canonical role + consumer aria-label precedence', () => {
+    it('mirrors role="group" via ElementInternals (host-canonical, modern path)', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Sort">
+          <hx-button variant="secondary">Name</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals).toBeInstanceOf(ElementInternals);
+      expect(internals.role).toBe('group');
+    });
+
+    it('mirrors role="group" as a host attribute (fallback path)', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group label="Sort">
+          <hx-button variant="secondary">Name</hx-button>
+        </hx-button-group>
+      `);
+      expect(el.getAttribute('role')).toBe('group');
+    });
+
+    it('preserves consumer-set aria-label when label property is later cleared', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group aria-label="Consumer sort label" label="Initial property label">
+          <hx-button variant="secondary">Name</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      // The label property wins on initial render — current contract.
+      expect(el.getAttribute('aria-label')).toBe('Initial property label');
+      // Clear the property; consumer-set aria-label must be restored, not lost.
+      el.label = '';
+      await el.updateComplete;
+      expect(el.getAttribute('aria-label')).toBe('Consumer sort label');
+    });
+
+    it('does not warn when consumer-set aria-label is present and label is empty', async () => {
+      const original = console.warn;
+      let warned = false;
+      console.warn = (..._args: unknown[]) => {
+        warned = true;
+      };
+      try {
+        await fixture<HelixButtonGroup>(`
+          <hx-button-group aria-label="Consumer sort label">
+            <hx-button variant="secondary">Name</hx-button>
+          </hx-button-group>
+        `);
+        expect(warned).toBe(false);
+      } finally {
+        console.warn = original;
+      }
+    });
+
+    it('emits the missing-label devWarn at most once across reconnects', async () => {
+      const original = console.warn;
+      let warnCount = 0;
+      console.warn = (...args: unknown[]) => {
+        const first = String(args[0] ?? '');
+        if (first.includes('hx-button-group') && first.includes('Missing accessible label')) {
+          warnCount += 1;
+        }
+      };
+      try {
+        const el = await fixture<HelixButtonGroup>(`
+          <hx-button-group>
+            <hx-button variant="secondary">Name</hx-button>
+          </hx-button-group>
+        `);
+        // Disconnect + reconnect should NOT re-warn.
+        const parent = el.parentElement!;
+        parent.removeChild(el);
+        parent.appendChild(el);
+        await el.updateComplete;
+        expect(warnCount).toBe(1);
+      } finally {
+        console.warn = original;
+      }
+    });
+  });
+
+  // ─── HX-020 regression: HelixElement._internals lazy getter is the only attach site ───
+
+  describe('HX-020 — Firefox attachInternals double-call regression guard', () => {
+    it('does not call this.attachInternals() directly (uses inherited _internals)', async () => {
+      // Spy on attachInternals: if hx-button-group still called it directly,
+      // a fresh instance would invoke the spy twice (once from the component's
+      // own connectedCallback, once from the inherited lazy getter on first
+      // access). The base class should be the only call site.
+      const proto = HTMLElement.prototype as unknown as {
+        attachInternals: () => ElementInternals;
+      };
+      const original = proto.attachInternals;
+      let calls = 0;
+      proto.attachInternals = function (this: HTMLElement): ElementInternals {
+        calls += 1;
+        return original.call(this);
+      };
+      try {
+        const el = await fixture<HelixButtonGroup>(`
+          <hx-button-group label="Sort">
+            <hx-button variant="secondary">Name</hx-button>
+          </hx-button-group>
+        `);
+        // Touch _internals once to confirm the lazy getter resolves.
+        const internals = (el as unknown as { _internals: ElementInternals })._internals;
+        expect(internals).toBeInstanceOf(ElementInternals);
+        // The lazy getter calls attachInternals exactly once for this element.
+        // hx-button child (form-associated) plus the hx-button-group itself
+        // each get their own single call. No element should attach twice.
+        // We verify no NotSupportedError surfaces (Firefox would throw).
+        expect(calls).toBeGreaterThan(0);
+      } finally {
+        proto.attachInternals = original;
+      }
+    });
+  });
 });

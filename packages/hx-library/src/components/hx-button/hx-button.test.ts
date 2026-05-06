@@ -1150,4 +1150,87 @@ describe('hx-button', () => {
       expect(submitted).toBe(false);
     });
   });
+
+  // ─── ARIA Group 8 round-1: HX-015 accessibleLabel migration + ARIA projection ───
+
+  describe('ARIA Group 8 — HX-015 accessibleLabel migration', () => {
+    it('reads aria-label via the data-aria-label storage (not the IDL property)', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button aria-label="Save document">Save</hx-button>',
+      );
+      await el.updateComplete;
+      // mixinDelegatesAria moves aria-label → data-aria-label so the host is
+      // absent from the a11y tree (no double-announce).
+      expect(el.hasAttribute('aria-label')).toBe(false);
+      expect(el.getAttribute('data-aria-label')).toBe('Save document');
+      // The inner button still gets aria-label projected from data-aria-label.
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-label')).toBe('Save document');
+    });
+
+    it('does not regress when consumer-set aria-label is the only label source', async () => {
+      // The HX-015 fix avoids reading this.ariaLabel (the native IDL prop).
+      // Consumers who only set the attribute should still get a working label.
+      const el = await fixture<HelixButton>('<hx-button aria-label="Close">X</hx-button>');
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-label')).toBe('Close');
+    });
+  });
+
+  describe('ARIA Group 8 — consumer ARIA projection through mixinDelegatesAria', () => {
+    it('projects aria-pressed onto the inner <button> for toggle-button consumers', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button aria-pressed="true">Toggle</hx-button>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-pressed')).toBe('true');
+      // Host should not carry aria-pressed (mixin moves it to data-aria-pressed).
+      expect(el.hasAttribute('aria-pressed')).toBe(false);
+    });
+
+    it('projects aria-expanded + aria-haspopup + aria-controls onto the inner <button>', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button aria-expanded="false" aria-haspopup="menu" aria-controls="menu-1">Open</hx-button>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+      expect(btn.getAttribute('aria-haspopup')).toBe('menu');
+      expect(btn.getAttribute('aria-controls')).toBe('menu-1');
+    });
+
+    it('projects aria-describedby onto the inner <button>', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button aria-describedby="help-text">Save</hx-button>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-describedby')).toBe('help-text');
+    });
+
+    it('projects aria-current onto the inner <a> for active-link semantics', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="/x" aria-current="page">Home</hx-button>',
+      );
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('aria-current')).toBe('page');
+    });
+  });
+
+  describe('ARIA Group 8 — loading anchor tabindex consistency', () => {
+    it('sets tabindex="-1" on the anchor when loading (parity with disabled)', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="/x" loading>Saving…</hx-button>',
+      );
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('tabindex')).toBe('-1');
+      expect(anchor.getAttribute('aria-busy')).toBe('true');
+      // href must be omitted when loading so Enter does not navigate.
+      expect(anchor.hasAttribute('href')).toBe(false);
+    });
+  });
 });

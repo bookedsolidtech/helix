@@ -361,7 +361,10 @@ export const HealthcareUseCases: Story = {
           >
             Actions ▾
           </button>
-          <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 200px;">
+          <ul
+            role="menu"
+            style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 200px;"
+          >
             <li
               data-value="schedule"
               role="menuitem"
@@ -411,7 +414,10 @@ export const HealthcareUseCases: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
 };
 
 // ─────────────────────────────────────────────────
@@ -423,12 +429,13 @@ export const KeyboardNavigation: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
-        Tab focuses the trigger button. Enter or Space opens the menu. Arrow Down/Up navigates menu items. Enter selects. Escape closes.
+        Tab focuses the trigger button. Enter or Space opens the menu. Arrow Down/Up navigates menu
+        items. Enter selects. Escape closes.
       </p>
       <hx-dropdown></hx-dropdown>
     </div>
   `,
-    play: async ({ canvasElement }) => {
+  play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-dropdown');
     await expect(el).toBeTruthy();
     await userEvent.tab();

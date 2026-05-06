@@ -12,8 +12,11 @@ export interface HxTreeViewProps {
   className?: string;
   /** Inline styles */
   style?: React.CSSProperties;
-  /** Accessible label for the tree. Applied as `aria-label` on the tree container.
-Provides context to screen readers about the tree's purpose. */
+  /** Accessible label for the tree. Used as a fallback when no
+consumer-supplied `aria-label` / `aria-labelledby` is present on the
+host. On the modern host-canonical path this projects onto
+`internals.ariaLabel`; on the legacy fallback path it appears as
+`aria-label` on the inner `[role="tree"]` element. */
   label?: string;
   /** Selection mode for the tree.
 - `none` — items cannot be selected

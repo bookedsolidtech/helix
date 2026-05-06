@@ -16,6 +16,27 @@ export type { HxTreeItemProps };
 /**
  * A tree item used within an hx-tree-view component.
 Supports expand/collapse, selection, keyboard navigation, and icon/children slots.
+
+Group 5c host-canonical: `role="treeitem"` lives on the **host** via
+`_internals.role`. The roving tabindex is written to the host on the
+modern path so the host is the focusable surface and lands directly
+under the parent `<hx-tree-view>` (which carries `role="tree"`) in the
+AT-walked tree. The inner `.item-row` is presentational on the modern
+path — no role, no aria-* attributes — and carries only click/keyboard
+event handlers. Keyboard activation (Enter/Space) and expand/collapse
+(ArrowLeft/Right at the leaf level) are owned by the host's `keydown`
+handler; ArrowUp/Down/Home/End and typeahead bubble to the parent
+`<hx-tree-view>` for navigation.
+
+The nested `[role="group"]` element that wraps the `slot="children"`
+stays in the inner shadow DOM regardless of path — that group is a
+separate sub-surface for the children, not a duplicate of the
+treeitem role.
+
+On the legacy fallback path the inner `.item-row` carries
+`role="treeitem"` + aria-* state, the host role is suppressed, and the
+roving tabindex is written to the inner element so there is only ONE
+focusable surface per item (mirrors hx-menu-item round-8).
  *
  * @example
  * ```tsx

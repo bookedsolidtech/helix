@@ -16,6 +16,16 @@ export type { HxTabProps };
 /**
  * An individual tab button, designed to be used inside an `<hx-tabs>` container.
 Must be placed in the `tab` named slot of `<hx-tabs>`.
+
+Group 5a host-canonical: `role="tab"` lives on the **host** via
+`_internals.role`. The host is the focusable surface (carries the roving
+tabindex); the inner `<button>` retains click activation semantics
+(Enter/Space and pointer events) but is no longer the AT-announced surface
+— its role and ARIA state are stripped on the modern path so the host's
+canonical surface wins. `internals.ariaSelected`, `ariaDisabled`, and
+`ariaControlsElements` mirror reactive state. The host `aria-label` /
+`aria-labelledby` resolved via the shared IDREF mirror name the tab
+cross-shadow.
  *
  * @example
  * ```tsx

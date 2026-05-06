@@ -18,6 +18,59 @@ export type { HxDrawerProps };
 Supports focus trapping, overlay backdrop, keyboard navigation, and full
 ARIA labelling for enterprise healthcare accessibility requirements.
 
+## Architecture Note: Host-Canonical ARIA (group-4 round-1, Path A)
+
+The host carries the announced dialog semantics via `ElementInternals`:
+
+  - `internals.role = 'dialog'` (the host IS the dialog surface)
+  - `internals.ariaModal = 'true'` (modality declared on host)
+  - `internals.ariaLabelledByElements` / `internals.ariaDescribedByElements`
+    project consumer light-DOM IDREFs across the shadow boundary.
+  - `internals.ariaLabel` carries the resolved fallback name when no
+    IDREF chain or slotted title exists.
+
+The inner `<div part="overlay">` no longer carries `role`, `aria-modal`,
+`aria-labelledby`, or `aria-label` — those would create a nested-dialog
+announcement above the host's canonical surface. Belt-and-suspenders
+fallback: when the runtime does NOT expose IDL element references on
+`ElementInternals` (older Firefox / Safari builds), the resolved label
+text is text-flattened and written to the inner overlay's `aria-label`
+so AT walking down from the host still finds an announceable name.
+
+Naming precedence (W3C AccName 1.2 §4.3.1):
+
+  1. Consumer `aria-labelledby` on the host — IDREFs resolved across the
+     shadow boundary via `resolveIdrefTokens` (same scope walk used by
+     every host-canonical hx-* control: own root → ancestor shadow hosts
+     → owner document → slot owners).
+  2. Consumer `aria-label` on the host.
+  3. `<slot name="label">` text content (multi-node aggregation per
+     AccName 1.2 §4.3.10 — decorative `aria-hidden` / `[hidden]` subtrees
+     contribute zero to the name).
+  4. `label` property — explicit author fallback string.
+  5. Hard-coded literal `"Drawer"` (last-resort accessible name).
+
+Description channel: a synthesized `<span id="${id}-consumer-desc">` is
+rendered inside the shadow root and updated to mirror consumer-resolved
+description text. The host's `internals.ariaDescribedByElements` carries
+the live element references on the modern path; the in-shadow span is the
+fallback target for AT that does not walk IDL refs. `aria-description` is
+intentionally NEVER written — the W3C AccName algorithm ignores it
+whenever `aria-describedby` is also present.
+
+Slot mutation observers track:
+  1. The label slot's text content (in-place i18n re-renders).
+  2. Consumer-resolved external IDREF targets (so a consumer mutating
+     `<label id="x">Patient</label>` in place re-flows the name).
+  3. Host attribute mutations (delegated to `installAriaIdrefMirror`,
+     which also catches late-inserted IDREF targets and id renames in
+     every relevant root).
+
+Focus trap, ESC dismiss, focus-restore, and the inert-outside-content
+sibling-walk are unchanged from the pre-host-canonical implementation —
+they operate against the shadow-internal panel which is still the focus
+target for keyboard users.
+
 ## Architecture Note: Native `<dialog>` Migration
 
 This component currently uses `role="dialog"` + `aria-modal="true"` on a

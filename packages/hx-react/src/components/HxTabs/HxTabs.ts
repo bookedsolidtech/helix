@@ -17,6 +17,16 @@ export type { HxTabsProps };
  * A tabbed content organizer that manages a set of `<hx-tab>` and `<hx-tab-panel>` children.
 Supports horizontal and vertical orientations, automatic and manual activation modes,
 and full keyboard navigation per the ARIA Authoring Practices Guide.
+
+Group 5a host-canonical: `role="tablist"` lives on the host via
+`_internals.role`. `aria-orientation`, `aria-label`, and consumer
+`aria-labelledby` resolve through the host. Per-tab `role="tab"` and
+per-panel `role="tabpanel"` likewise live on their respective hosts.
+
+Activation defaults to **manual** per healthcare patterns — keyboard arrow
+keys move focus only; Enter/Space activates. APG explicitly allows both
+automatic and manual activation; manual is safer when panels are heavy or
+announce changes via live regions.
  *
  * @example
  * ```tsx

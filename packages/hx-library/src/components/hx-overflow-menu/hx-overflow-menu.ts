@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -6,12 +6,40 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixOverflowMenuStyles } from './hx-overflow-menu.styles.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
+import { getMenuItemTypeaheadLabel } from '../../utils/menu-label.js';
+import { writeMenuItemRovingTabIndex } from '../../utils/menu-roving.js';
+import { findClosestMenuAncestor } from '../../utils/menu-tree.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
 
 /**
  * An overflow menu (kebab/meatball menu) that reveals hidden actions via a
  * floating panel. Composed from a trigger button and a slotted menu panel.
+ *
+ * ## Architecture Note: Host-Attribute Trigger Label Mirror (group-5b)
+ *
+ * The composite has TWO ARIA-bearing surfaces inside its shadow DOM: the
+ * trigger button (`role` defaulted from `<button>`, with `aria-haspopup`,
+ * `aria-expanded`, `aria-controls`) and the panel (`role="menu"` on the
+ * inner div). The host wraps both — it cannot carry either canonical role
+ * itself, so role placement remains on the inner elements.
+ *
+ * What Group 5b adds:
+ * - **Roving tabindex** on slotted menu items (only the focused item has
+ *   tabindex=0; arrow keys move focus and rewrite tabindex). Closing-Tab
+ *   path is preserved (Tab moves focus past the menu and closes it).
+ * - **First-character typeahead** with 500ms timeout matching `hx-menu`.
+ * - **Host-attribute label mirror**: consumer-supplied `aria-label` /
+ *   `aria-labelledby` on the host flow to the trigger button's
+ *   `aria-label` (the trigger is the announced surface of the disclosure
+ *   pattern; consumer override wins over the `label` property). The panel
+ *   continues to use `labelMenu` for its own slot label.
  *
  * @summary "..." or kebab icon button that reveals hidden actions.
  *
@@ -115,7 +143,9 @@ export class HelixOverflowMenu extends HelixElement {
   icon: 'vertical' | 'horizontal' = 'vertical';
 
   /**
-   * Accessible label for the trigger button.
+   * Accessible label for the trigger button. Used as a fallback when no
+   * consumer-supplied `aria-label` / `aria-labelledby` is present on the
+   * host. Consumer host attributes win in the AccName 1.2 §4.3.1 cascade.
    * @attr label
    */
   @property({ type: String, reflect: true })
@@ -135,6 +165,41 @@ export class HelixOverflowMenu extends HelixElement {
   @state() private _open = false;
 
   /**
+   * Resolved accessible name for the trigger button — written to the inner
+   * button's `aria-label`. Recomputed via the host-attribute mirror on
+   * every aria-* mutation. AccName 1.2 §4.3.1 precedence: host
+   * `aria-labelledby` (flattened) > host `aria-label` > `label` property.
+   * @internal
+   */
+  @state() private _resolvedTriggerLabel = '';
+
+  /**
+   * Index within `_getMenuItems()` of the item currently holding the
+   * roving tabindex (and thus visual focus). −1 means the panel has not
+   * been keyboard-focused yet (first key press lands on item 0).
+   * @internal
+   */
+  private _rovingIndex = -1;
+
+  /**
+   * Accumulated character buffer for typeahead search within menu items.
+   * @internal
+   */
+  private _typeaheadBuffer = '';
+
+  /**
+   * Timer handle that clears the typeahead buffer after a period of inactivity.
+   * @internal
+   */
+  private _typeaheadTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Handle for the shared host attribute / root id observer.
+   * @internal
+   */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /**
    * Unique ID for the floating panel element, used to wire aria-controls on the trigger button.
    * @internal
    */
@@ -152,12 +217,29 @@ export class HelixOverflowMenu extends HelixElement {
     super.connectedCallback();
     document.addEventListener('click', this._handleDocumentClick, true);
     this.addEventListener('keydown', this._handleKeydown);
+    this._syncResolvedTriggerLabel();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncResolvedTriggerLabel();
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this._handleDocumentClick, true);
     this.removeEventListener('keydown', this._handleKeydown);
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+      this._typeaheadTimer = null;
+    }
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  override willUpdate(changedProperties: PropertyValues<this>): void {
+    super.willUpdate(changedProperties);
+    if (changedProperties.has('label')) {
+      this._syncResolvedTriggerLabel();
+    }
   }
 
   // ─── Open / Close ───
@@ -168,6 +250,7 @@ export class HelixOverflowMenu extends HelixElement {
     this._open = true;
     await this.updateComplete;
     await this._updatePosition();
+    this._initRovingTabIndex();
     this._focusFirstItem();
     this.dispatchEvent(new CustomEvent<void>('hx-show', { bubbles: true, composed: true }));
   }
@@ -176,6 +259,7 @@ export class HelixOverflowMenu extends HelixElement {
   private _hide(): void {
     if (!this._open) return;
     this._open = false;
+    this._rovingIndex = -1;
     this.dispatchEvent(new CustomEvent<void>('hx-hide', { bubbles: true, composed: true }));
   }
 
@@ -214,12 +298,70 @@ export class HelixOverflowMenu extends HelixElement {
   /** @internal */
   private _focusFirstItem(): void {
     const items = this._getMenuItems();
+    if (items.length === 0) return;
+    this._rovingIndex = 0;
+    this._applyRovingTabIndex();
     items[0]?.focus();
+  }
+
+  /**
+   * Codex push-gate round-2 finding 3: write the roving tabindex through
+   * the right surface for each item shape. Implementation moved to the
+   * shared `writeMenuItemRovingTabIndex` util (round-8 finding 2) so
+   * `hx-dropdown` and any future host-canonical menu shape route through
+   * one source of truth instead of duplicating the host-vs-inner-element
+   * branch per component.
+   *
+   * - `hx-menu-item` is host-canonical: on the modern path the roving
+   *   tabindex must land on the host (it carries the announced role +
+   *   IDL ARIA), and on the fallback path it must land on the inner
+   *   `.menu-item` (the host is forced to `tabindex=-1` so there is
+   *   exactly one focusable surface per item). The util's
+   *   `setRovingTabIndex(value)` route handles both paths internally.
+   * - Plain slotted `[role="menuitem"]` elements (legacy `<button>`-style
+   *   children) keep the direct `item.tabIndex = value` write.
+   *
+   * Without this routing, host-canonical items on the fallback path stay
+   * at `tabindex=-1` because the host write never reaches the inner
+   * focusable surface — Tab would land on a non-focusable host and arrow
+   * navigation would fail to advance the announced item.
+   * @internal
+   */
+
+  /**
+   * Initialize roving tabindex on all enabled menu items: only the first
+   * receives tabindex=0; the rest are tabindex=-1. Maintains the closing-
+   * Tab semantics required by APG (tabbing past the menu closes it via
+   * the keydown handler below).
+   * @internal
+   */
+  private _initRovingTabIndex(): void {
+    const items = this._getMenuItems();
+    items.forEach((item, i) => {
+      writeMenuItemRovingTabIndex(item, i === 0 ? 0 : -1);
+    });
+    this._rovingIndex = items.length > 0 ? 0 : -1;
+  }
+
+  /** @internal */
+  private _applyRovingTabIndex(): void {
+    const items = this._getMenuItems();
+    items.forEach((item, i) => {
+      writeMenuItemRovingTabIndex(item, i === this._rovingIndex ? 0 : -1);
+    });
   }
 
   /** @internal */
   private _getMenuItems(): HTMLElement[] {
     const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
+    // Allow-list of host-canonical menu-item shapes — `hx-menu-item` carries
+    // its `role` via `_internals.role` (AT-only, no DOM attribute), so the
+    // role-attribute checks below would miss it. Restrict the wc allow-list
+    // to known menu-item hosts so siblings like `hx-menu-divider`
+    // (`role="separator"`) and decorative `hx-text` / `hx-icon` slotted into
+    // the panel are NOT treated as focus / typeahead targets — APG mandates
+    // separators stay non-focusable.
+    const isHostCanonicalMenuItem = (el: Element): boolean => el.localName === 'hx-menu-item';
     return (
       (slot
         ?.assignedElements({ flatten: true })
@@ -231,7 +373,7 @@ export class HelixOverflowMenu extends HelixElement {
             (el.getAttribute('role') === 'menuitem' ||
               el.getAttribute('role') === 'menuitemcheckbox' ||
               el.getAttribute('role') === 'menuitemradio' ||
-              el.tagName.toLowerCase().startsWith('hx-')),
+              isHostCanonicalMenuItem(el)),
         ) as HTMLElement[]) ?? []
     );
   }
@@ -263,6 +405,8 @@ export class HelixOverflowMenu extends HelixElement {
       return;
     }
     if (e.key === 'Tab') {
+      // APG: Tab moves focus past the menu and closes it. Do not
+      // preventDefault; let focus advance naturally.
       this._hide();
       return;
     }
@@ -282,13 +426,54 @@ export class HelixOverflowMenu extends HelixElement {
       } else {
         next = items.length - 1;
       }
+      this._rovingIndex = next;
+      this._applyRovingTabIndex();
       items[next]?.focus();
+      return;
+    }
+    // First-character typeahead — letters only, no modifier keys, ignore Space.
+    if (e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      this._handleTypeahead(e.key);
     }
   };
 
   /** @internal */
+  private _handleTypeahead(char: string): void {
+    if (this._typeaheadTimer !== null) {
+      clearTimeout(this._typeaheadTimer);
+    }
+    this._typeaheadBuffer += char.toLowerCase();
+    this._typeaheadTimer = setTimeout(() => {
+      this._typeaheadBuffer = '';
+      this._typeaheadTimer = null;
+    }, 500);
+
+    const items = this._getMenuItems();
+    // Codex push-gate round-7 finding 3: shared submenu-aware label
+    // extractor — see hx-menu / hx-dropdown for rationale.
+    const match = items.findIndex((item) => {
+      const text = getMenuItemTypeaheadLabel(item).toLowerCase();
+      return text.startsWith(this._typeaheadBuffer);
+    });
+
+    if (match !== -1) {
+      this._rovingIndex = match;
+      this._applyRovingTabIndex();
+      items[match]?.focus();
+    }
+  }
+
+  /** @internal */
   private readonly _handleSlotClick = (e: Event): void => {
     const target = e.target as HTMLElement;
+    // Group 5b round-3 (codex): bail FIRST on host-canonical `hx-menu-item`,
+    // independently of what `closest()` resolves with the legacy selectors.
+    // If a consumer slots a `[role="menuitem*"]` descendant inside an
+    // `hx-menu-item`, `closest()` would resolve to the descendant first
+    // (nearest match) and the legacy localName guard would miss, double-firing
+    // `hx-select` (once here, once from `_handleSlotItemSelect`). The host
+    // owns its own dispatch path; descendants of the host must defer.
+    if (target.closest('hx-menu-item')) return;
     const menuItem = target.closest(
       '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]',
     ) as HTMLElement | null;
@@ -304,6 +489,143 @@ export class HelixOverflowMenu extends HelixElement {
     );
     this._hide();
   };
+
+  /**
+   * Handle `hx-item-select` bubbling from slotted `hx-menu-item` children.
+   * The host-canonical shape owns its own activation (click + Enter/Space),
+   * so route its event through to the composite's `hx-select` contract and
+   * close the panel. Disabled items never emit `hx-item-select`, so no
+   * disabled-guard is needed here.
+   * @internal
+   */
+  private readonly _handleSlotItemSelect = (e: Event): void => {
+    const detail = (e as CustomEvent<{ item: HTMLElement; value: string }>).detail;
+    const value = detail?.value ?? '';
+    this.dispatchEvent(
+      new CustomEvent<{ value: string }>('hx-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value },
+      }),
+    );
+    this._hide();
+  };
+
+  /**
+   * Bubbled `hx-item-submenu-open` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: when slotted `hx-menu-item`s open / close
+   * a nested submenu inside this panel (no enclosing `hx-menu`), the
+   * events fly past with no handler. Match the round-4
+   * `hx-menu._handleSubmenuOpen` shape so APG behaviour holds. Defer to
+   * an inner `hx-menu` when present (it owns the toggle). Otherwise this
+   * panel is the enclosing menu surface — call `setSubmenuOpen(true)` on
+   * the dispatching item and focus its first nested child.
+   * @internal
+   */
+  private readonly _handleSlotSubmenuOpen = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HTMLElement }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    if (findClosestMenuAncestor(item) !== null) return;
+    queueMicrotask(() => {
+      if (e.defaultPrevented) return;
+      const setter = (item as HTMLElement & { setSubmenuOpen?: (v: boolean) => void })
+        .setSubmenuOpen;
+      if (typeof setter !== 'function') return;
+      setter.call(item, true);
+      const updateComplete = (item as HTMLElement & { updateComplete?: Promise<unknown> })
+        .updateComplete;
+      if (updateComplete) {
+        void updateComplete
+          .then(() => {
+            const submenuSlot = (
+              item as HTMLElement & { shadowRoot?: ShadowRoot | null }
+            ).shadowRoot?.querySelector<HTMLSlotElement>('slot[name="submenu"]');
+            const nested = submenuSlot
+              ?.assignedElements({ flatten: true })
+              .find((el) => el.tagName.toLowerCase() === 'hx-menu') as
+              | (HTMLElement & { focusFirst?: () => void })
+              | undefined;
+            nested?.focusFirst?.();
+          })
+          .catch(() => undefined);
+      }
+    });
+  };
+
+  /**
+   * Bubbled `hx-item-submenu-close` from a slotted `hx-menu-item` host.
+   * Codex push-gate round-9 P1: when an inner `hx-menu` (a nested
+   * submenu) handles its own close, the event still bubbles through this
+   * panel — defer in that case so the panel stays open. When the
+   * dispatching item is top-level inside this panel (no enclosing
+   * `hx-menu`), there is no parent submenu to collapse, so close the
+   * composite's panel and return focus to the trigger.
+   * @internal
+   */
+  private readonly _handleSlotSubmenuClose = (e: Event): void => {
+    if (!(e instanceof CustomEvent)) return;
+    const detail = (e as CustomEvent<{ item: HTMLElement }>).detail;
+    const item = detail?.item;
+    if (!item) return;
+    if (findClosestMenuAncestor(item) !== null) return;
+    if (e.defaultPrevented) return;
+    this._hide();
+    // CodeRabbit MUST-FIX (WCAG 2.1.1 / 2.4.3): ArrowLeft close from a
+    // top-level slotted item dropped focus to <body>. Mirror the Escape
+    // branch and restore focus to the trigger so keyboard continuity is
+    // preserved.
+    this._buttonEl?.focus();
+  };
+
+  /** @internal */
+  private readonly _handleSlotChange = (): void => {
+    if (this._open) {
+      this._initRovingTabIndex();
+    }
+  };
+
+  // ─── Host-attribute trigger label mirror ───
+
+  /**
+   * Resolves the trigger button's accessible name from host attributes and
+   * the `label` property. AccName 1.2 §4.3.1 precedence:
+   *   1. Host `aria-labelledby` (resolved IDREFs, flattened)
+   *   2. Host `aria-label`
+   *   3. `label` property
+   * @internal
+   */
+  private _syncResolvedTriggerLabel(): void {
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    const consumerLabelEls = resolveIdrefTokens(this, liveLabelledBy);
+
+    // CodeRabbit MUST-FIX: AccName 1.2 §4.3.2 — `aria-labelledby` references
+    // their target text content REGARDLESS of visibility. The previous
+    // outer visibility filter dropped legitimate accessible names from
+    // visually-hidden labels. `flattenAccName` already handles aria-hidden
+    // subtree pruning per §4.3.10.
+    const flattenedFromIdrefs = consumerLabelEls
+      .map((el) => flattenAccName(el))
+      .filter((t) => t.length > 0)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() : '';
+
+    let resolved = '';
+    if (flattenedFromIdrefs) {
+      resolved = flattenedFromIdrefs;
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+    } else {
+      resolved = this.label;
+    }
+
+    this._resolvedTriggerLabel = resolved;
+  }
 
   // ─── SVG Icons ───
 
@@ -355,7 +677,7 @@ export class HelixOverflowMenu extends HelixElement {
         part="button trigger"
         class=${classMap(btnClasses)}
         type="button"
-        aria-label=${this.label}
+        aria-label=${this._resolvedTriggerLabel}
         aria-haspopup="menu"
         aria-expanded=${String(this._open)}
         aria-controls=${this._open ? this._panelId : nothing}
@@ -373,8 +695,11 @@ export class HelixOverflowMenu extends HelixElement {
               aria-label=${this.labelMenu}
               class="panel"
               @click=${this._handleSlotClick}
+              @hx-item-select=${this._handleSlotItemSelect}
+              @hx-item-submenu-open=${this._handleSlotSubmenuOpen}
+              @hx-item-submenu-close=${this._handleSlotSubmenuClose}
             >
-              <slot></slot>
+              <slot @slotchange=${this._handleSlotChange}></slot>
             </div>
           `
         : nothing}

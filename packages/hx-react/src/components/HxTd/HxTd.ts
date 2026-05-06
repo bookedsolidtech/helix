@@ -15,6 +15,11 @@ export type { HxTdProps };
 
 /**
  * Semantic table data cell. Must be a child of `hx-tr`.
+
+Group 7 host-canonical: `role="cell"` lives on the **host** via
+`_internals.role`. The host carries the cell's accessible name (resolved
+from the `label` property — fixing audit B-A1, where mobile screen reader
+users lost column context because `data-label` was visual-only).
  *
  * @example
  * ```tsx

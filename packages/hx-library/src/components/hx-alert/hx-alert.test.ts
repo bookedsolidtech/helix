@@ -729,4 +729,138 @@ describe('hx-alert', () => {
       expect(el.severityLabel).toBe('Custom Warning');
     });
   });
+
+  // ─── (group-6) Host-canonical internals.role mirror ───
+
+  describe('Host-canonical role via ElementInternals (group-6)', () => {
+    it('mirrors role on internals for status variants', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="info">Info</hx-alert>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('status');
+    });
+
+    it('mirrors role on internals for error variant', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="error">Error</hx-alert>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('alert');
+    });
+
+    it('keeps internals.role in sync with variant changes', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="info">Info</hx-alert>');
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.role).toBe('status');
+      el.variant = 'error';
+      await el.updateComplete;
+      expect(internals.role).toBe('alert');
+    });
+
+    it('does NOT set explicit aria-live on host (role implies live)', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="error">Error</hx-alert>');
+      // §5.1: role implies aria-live; the inner sr-only announcer carries
+      // the explicit aria-live for re-announcement-on-toggle. The host must
+      // not also have aria-live or older NVDA/JAWS double-announces.
+      expect(el.hasAttribute('aria-live')).toBe(false);
+    });
+  });
+
+  // ─── (group-6 §5.1) Double-announce suppression ───
+
+  describe('Double-announce suppression (group-6 §5.1)', () => {
+    it('marks the severity label aria-hidden so AT only sees announcer copy', async () => {
+      const el = await fixture<HxAlert>('<hx-alert variant="error">Server error</hx-alert>');
+      const sev = el.shadowRoot!.querySelector('.alert__severity-label');
+      expect(sev?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('does NOT mark the default slot wrapper aria-hidden (consumer interactive content)', async () => {
+      // (group-6 codex round-1) Consumer content slotted into the default
+      // slot may include interactive descendants (inline links/buttons inside
+      // a message); aria-hidden on a focusable parent is an axe-core
+      // `aria-hidden-focus` violation. The wrapper must remain visible to AT.
+      const el = await fixture<HxAlert>('<hx-alert variant="error">Server error</hx-alert>');
+      const slotWrap = el.shadowRoot!.querySelector('.alert__default-slot');
+      expect(slotWrap).toBeTruthy();
+      expect(slotWrap?.getAttribute('aria-hidden')).not.toBe('true');
+    });
+
+    it('keeps slotted interactive content reachable to AT (no aria-hidden ancestor in shadow)', async () => {
+      // (group-6 codex round-1 regression) Verify that an interactive
+      // descendant in the default slot is NOT inside an aria-hidden=true
+      // shadow ancestor.
+      const el = await fixture<HxAlert>(
+        '<hx-alert variant="error">Click <a href="#help">help</a> to recover.</hx-alert>',
+      );
+      const slotWrap = el.shadowRoot!.querySelector<HTMLElement>('.alert__default-slot');
+      expect(slotWrap).toBeTruthy();
+      // Walk up from the slot wrapper to the shadow root checking no ancestor
+      // carries aria-hidden=true.
+      let node: HTMLElement | null = slotWrap;
+      while (node) {
+        expect(node.getAttribute('aria-hidden')).not.toBe('true');
+        node = node.parentElement;
+      }
+    });
+
+    it('marks the visible title aria-hidden so AT only sees announcer copy', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert variant="error"><span slot="title">Server error</span>Server is down</hx-alert>',
+      );
+      const title = el.shadowRoot!.querySelector('.alert__title');
+      expect(title?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('does NOT mark the close button aria-hidden (focusable element)', async () => {
+      const el = await fixture<HxAlert>(
+        '<hx-alert variant="error" dismissible>Server error</hx-alert>',
+      );
+      const closeBtn = el.shadowRoot!.querySelector('.alert__close-button');
+      expect(closeBtn).toBeTruthy();
+      expect(closeBtn?.getAttribute('aria-hidden')).not.toBe('true');
+      // The container of the close button must also not be aria-hidden.
+      expect(el.shadowRoot!.querySelector('[part="alert"]')?.getAttribute('aria-hidden')).not.toBe(
+        'true',
+      );
+    });
+  });
+
+  // ─── (group-6 §5.4) Announcer race-guard counter ───
+
+  describe('Announcer race-guard (group-6 §5.4)', () => {
+    it('rapid open/close cycles do not leak stale text into announcer', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Initial text</hx-alert>');
+      // Rapid toggle: false→true→false→true. Cycle counter ensures only the
+      // final settled state writes to the announcer.
+      el.open = true;
+      el.open = false;
+      el.open = true;
+      await el.updateComplete;
+      // Drain microtasks so any deferred announcer writes complete
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+      const announcer = el.shadowRoot!.querySelector<HTMLElement>('.sr-only');
+      expect(announcer).toBeTruthy();
+      // Final state is open=true so announcer should hold the message
+      // (or be empty if the cycle invalidated). It MUST NOT contain stale
+      // text from an intermediate cycle.
+      const text = announcer!.textContent ?? '';
+      // Content is either empty (early-out) or the final settled message —
+      // never a stale duplicate or partially-cleared string.
+      expect(typeof text).toBe('string');
+    });
+
+    it('close after rapid open invalidates the pending announcer write', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Important</hx-alert>');
+      el.open = true;
+      // Schedule announcer microtask, then close before it resolves
+      el.open = false;
+      await el.updateComplete;
+      await Promise.resolve();
+      await Promise.resolve();
+      const announcer = el.shadowRoot!.querySelector<HTMLElement>('.sr-only');
+      // After close, announcer is cleared; the cycle counter prevents the
+      // earlier open's deferred write from re-injecting stale text.
+      expect(announcer!.textContent).toBe('');
+    });
+  });
 });

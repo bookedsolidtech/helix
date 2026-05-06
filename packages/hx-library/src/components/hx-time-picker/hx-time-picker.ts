@@ -9,6 +9,13 @@ import { live } from 'lit/directives/live.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { helixTimePickerStyles } from './hx-time-picker.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
+import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
 
 // ─── Time Slot ───────────────────────────────────────────────────────────────
 
@@ -128,6 +135,50 @@ function parseUserInput(raw: string): string | null {
   return null;
 }
 
+/**
+ * AccName-aware text flattener. Walks the subtree of `root` and concatenates
+ * text-node content, REJECTING any element subtree carrying `aria-hidden="true"`
+ * or the `hidden` attribute per W3C AccName 1.2 §4.3.10. Used by hx-time-picker
+ * for both external IDREF flatten (host aria-labelledby/aria-describedby
+ * targets) and slotted-label aggregation, so nested decorative content like
+ * `<svg aria-hidden="true"><title>icon</title></svg>` does not leak into the
+ * inner input's announced name/description.
+ *
+ * The TreeWalker filter only inspects elements VISITED during the walk — it
+ * never tests the root itself, so a hidden ROOT (e.g. `<span slot="label" hidden>`)
+ * would still contribute its descendants' text. Per AccName 1.2 §4.3.10, a
+ * hidden root contributes the empty string. Gate the walk here so every caller
+ * (slotted label/help/error and external IDREF flatten) honors the rule
+ * symmetrically.
+ */
+function flattenAccName(root: Element): string {
+  if (root.getAttribute('aria-hidden') === 'true' || root.hasAttribute('hidden')) {
+    return '';
+  }
+  let result = '';
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        if (el.getAttribute('aria-hidden') === 'true') {
+          return NodeFilter.FILTER_REJECT;
+        }
+        if (el.hasAttribute('hidden')) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_SKIP;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+  let textNode: Node | null = walker.nextNode();
+  while (textNode) {
+    result += textNode.textContent ?? '';
+    textNode = walker.nextNode();
+  }
+  return result.replace(/\s+/g, ' ').trim();
+}
+
 const _nextTimePickerId = createIdCounter('hx-time-picker');
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -222,6 +273,15 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
    */
   static override formAssociated = true;
 
+  /**
+   * Test seam: when set to `true` or `false`, overrides the platform
+   * `supportsIdrefElementReferences` probe before `connectedCallback` seeds
+   * `_supportsIdrefRefs`. Production code MUST NOT touch this field. It is a
+   * `static` so the test stub cleanup is global and obvious.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
   // ─── Properties ───
 
   /**
@@ -294,6 +354,15 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
   @property({ type: String, reflect: true })
   format: '12h' | '24h' = '12h';
 
+  /**
+   * Accessible name for screen readers, if different from the visible label.
+   * Uses `accessible-label` attribute instead of `aria-label` to avoid
+   * ARIAMixin shadowing on the host element. Highest-precedence naming source.
+   * @attr accessible-label
+   */
+  @property({ type: String, attribute: 'accessible-label' })
+  accessibleLabel: string | null = null;
+
   // ─── Internal State ───
 
   /**
@@ -327,10 +396,36 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
    */
   @state() private _hasHelpSlot = false;
   /**
-   * The ID of the slotted label element, used for aria-labelledby cross-root linking.
+   * Source of the accessible name. Discriminated union avoids string sentinels.
    * @internal
    */
-  @state() private _slottedLabelId = '';
+  @state() private _labelSource: 'string' | 'slot' | 'none' = 'none';
+  /**
+   * Flattened, trimmed text content from all label-slot nodes — used to drive
+   * the inner input's `aria-label` on the no-IDL-ref fallback path and to
+   * gate `_hasLabelSlot` per AccName 1.2.
+   * @internal
+   */
+  @state() private _labelSlotText = '';
+  /**
+   * Whether the platform supports IDL element references on `ElementInternals`.
+   * Drives the cross-shadow naming strategy for the inner `<input>`.
+   * @internal
+   */
+  @state() private _supportsIdrefRefs = true;
+  /**
+   * Cached invalidity flag derived from `internals.validity.valid`, the
+   * `error` property, and the slotted error content. Drives `aria-invalid`
+   * on the inner input.
+   * @internal
+   */
+  @state() private _invalid = false;
+  /**
+   * Deferred copy of `error` driven through reactive state so the persistent
+   * live region can re-announce on transitions without direct DOM mutation.
+   * @internal
+   */
+  @state() private _announcedError = '';
 
   // ─── Stable IDs (monotonically incrementing counter for SSR safety) ───
 
@@ -350,6 +445,22 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
    * @internal
    */
   private readonly _helpId = `${this._id}-help`;
+  /**
+   * Unique ID for the internal `<label>` element, referenced by inner input
+   * `aria-labelledby` when the `label` property names the field.
+   * @internal
+   */
+  private readonly _labelId = `${this._id}-label`;
+  /**
+   * Id of the synthesized in-shadow span that mirrors the consumer-resolved
+   * description text. Appended to the inner input's `aria-describedby` so AT
+   * picks the consumer description up through the standard described-by
+   * channel — `aria-description` is intentionally NOT written, because the
+   * W3C AccName algorithm ignores `aria-description` whenever
+   * `aria-describedby` is also present.
+   * @internal
+   */
+  private readonly _consumerDescId = `${this._id}-consumer-desc`;
 
   // ─── Query References ───
 
@@ -393,6 +504,67 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     return this._cachedSlots;
   }
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** Handle for the shared IDREF observer. @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+  /**
+   * Watches assigned `<slot name="help-text">` nodes for in-place text
+   * mutations so help-text effective state stays in sync with consumer
+   * `textContent` writes that don't trigger a `slotchange` event.
+   * @internal
+   */
+  private _helpSlotTextObserver: MutationObserver | null = null;
+  /**
+   * Watches assigned `<slot name="error">` nodes for in-place text mutations.
+   * @internal
+   */
+  private _errorSlotTextObserver: MutationObserver | null = null;
+  /**
+   * Dedicated host observer scoped to `aria-describedby` with
+   * `attributeOldValue: true`. Governed by the disconnect-during-strip
+   * discipline.
+   * @internal
+   */
+  private _hostDescribedByObserver: MutationObserver | null = null;
+  /**
+   * Most recently observed *consumer-supplied* `aria-labelledby` baseline.
+   * Refreshed on every sync. Modern + legacy paths leave the host attribute
+   * in place, so the live attribute IS the cache.
+   * @internal
+   */
+  private _consumerLabelledBy: string | null = null;
+  /** @internal — see `_consumerLabelledBy`. */
+  private _consumerDescribedBy: string | null = null;
+  /**
+   * Direct references to ALL labellable elements projected into
+   * `<slot name="label">`. Aggregating every assigned element preserves
+   * composed labels such as
+   * `<svg slot="label" aria-hidden="true">…</svg><span slot="label">Time</span>`.
+   * The modern path passes the visible subset to
+   * `internals.ariaLabelledByElements`; the fallback path text-flattens every
+   * non-hidden node into `_labelSlotText` per AccName 1.2.
+   * @internal
+   */
+  private _slottedLabelEls: Element[] = [];
+  /**
+   * Watches in-place text mutations on the assigned slotted label nodes. The
+   * `slotchange` event covers add/remove/replace; this MO covers
+   * `node.textContent = '…'` updates on an unchanged node (consumer i18n
+   * re-renders) and `aria-hidden` / `hidden` toggles per AccName 1.2 §4.3.10.
+   * @internal
+   */
+  private _labelSlotTextObserver: MutationObserver | null = null;
+  /**
+   * Watches in-place text mutations on consumer light-DOM elements resolved
+   * from host `aria-labelledby` / `aria-describedby`. Without this, a consumer
+   * keeping the same `<label id="…">` but mutating its `textContent` (e.g.
+   * i18n re-render) would leave the inner input's `aria-label` and
+   * synthesized description span stale indefinitely.
+   * @internal
+   */
+  private _externalRefsObserver: MutationObserver | null = null;
+
   // ─── Outside-click handler (bound reference for add/removeEventListener) ───
 
   /**
@@ -411,14 +583,66 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback();
     document.addEventListener('click', this._handleOutsideClick);
+
+    // Honour the static test override so synthetic environments choose the
+    // path BEFORE connect runs.
+    const ctor = this.constructor as typeof HelixTimePicker;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+
+    // Install the dedicated `aria-describedby` retraction observer BEFORE
+    // the seeded `_syncHostAriaSemantics()` call below, then govern its
+    // lifetime with the disconnect-during-strip discipline.
+    this._hostDescribedByObserver = new MutationObserver((records) => {
+      let consumerCleared = false;
+      for (const record of records) {
+        if (record.attributeName !== 'aria-describedby') continue;
+        const oldValue = record.oldValue;
+        const newValue = this.getAttribute('aria-describedby');
+        if (oldValue !== null && newValue === null) {
+          this._consumerDescribedBy = null;
+          consumerCleared = true;
+        }
+      }
+      if (consumerCleared) {
+        this._syncHostAriaSemantics();
+      }
+    });
+    this._hostDescribedByObserver.observe(this, {
+      attributes: true,
+      attributeFilter: ['aria-describedby'],
+      attributeOldValue: true,
+    });
+
+    // Seed root-independent semantics from connect so the inner input
+    // resolves naming before first paint.
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('click', this._handleOutsideClick);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+    this._helpSlotTextObserver?.disconnect();
+    this._helpSlotTextObserver = null;
+    this._errorSlotTextObserver?.disconnect();
+    this._errorSlotTextObserver = null;
+    this._labelSlotTextObserver?.disconnect();
+    this._labelSlotTextObserver = null;
+    this._hostDescribedByObserver?.disconnect();
+    this._hostDescribedByObserver = null;
+    this._externalRefsObserver?.disconnect();
+    this._externalRefsObserver = null;
   }
 
   override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed);
     // Keep display value in sync whenever the canonical value or format changes
     if (changed.has('value') || changed.has('format')) {
       this._inputDisplayValue = this.value
@@ -426,6 +650,16 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
           ? to12h(this.value)
           : this.value
         : '';
+    }
+    // Seed `_announcedError` BEFORE render so the persistent live region
+    // renders with the error text in the SAME frame that removes `hidden`
+    // from the alert container. Covers first paint AND runtime transitions
+    // from "" to "Server rejected" via async/server-side validation.
+    if (changed.has('error') || !this.hasUpdated) {
+      this._announcedError = this.error ?? '';
+    }
+    if (changed.has('label')) {
+      this._refreshLabelSource();
     }
   }
 
@@ -438,18 +672,524 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     if ((changed as Map<PropertyKey, unknown>).has('_open') && this._open) {
       this._scrollActiveOptionIntoView();
     }
-    // Force screen reader re-announcement when error text changes (a11y-v3-005)
-    if (changed.has('error') && this.error) {
-      const errorEl = this.shadowRoot?.querySelector('[role="alert"]');
-      if (errorEl) {
-        const msg = this.error;
+    // Host-elevated ARIA semantics — see _syncHostAriaSemantics.
+    this._syncHostAriaSemantics();
+    // Drive re-announcement from reactive state on error→error transitions
+    // (rAF clear-and-re-set forces AT to re-read role="alert" content).
+    if (changed.has('error')) {
+      const previousError = changed.get('error') as string | undefined;
+      if (previousError && this.error) {
+        this._announcedError = '';
         requestAnimationFrame(() => {
-          errorEl.textContent = '';
-          requestAnimationFrame(() => {
-            errorEl.textContent = msg;
-          });
+          this._announcedError = this.error;
         });
+      } else {
+        this._announcedError = this.error;
       }
+    }
+  }
+
+  override firstUpdated(changed: PropertyValues<this>): void {
+    super.firstUpdated(changed);
+    // `slotchange` fires as a microtask after the initial synchronous render.
+    // Without proactive seeding, the first `_syncHostAriaSemantics()` call
+    // (driven from `updated()` in this same cycle, AFTER firstUpdated returns)
+    // would observe stale `false` / empty state for `_hasLabelSlot`,
+    // `_slottedLabelEls`, `_labelSlotText`, `_hasHelpSlot`, and
+    // `_hasErrorSlot`. Seed synchronously here.
+    this._seedSlotStateSync();
+    // Re-sync now that the slot state is populated so AT sees the right
+    // accessible name on first paint.
+    this._syncHostAriaSemantics();
+    // WCAG 4.1.2: warn when no accessible name is available.
+    if (
+      !this.label &&
+      !this.accessibleLabel &&
+      !this._hasLabelSlot &&
+      !this.getAttribute('aria-label') &&
+      !this.getAttribute('aria-labelledby')
+    ) {
+      devWarn(
+        'hx-time-picker',
+        'No accessible label provided. Set the `label` attribute, `accessible-label`, `aria-label`, `aria-labelledby`, or project a `<slot name="label">` child. An unlabeled time picker violates WCAG 2.1 AA (4.1.2 Name, Role, Value).',
+      );
+    }
+  }
+
+  /**
+   * Synchronous slot-state seed. Mirrors the side effects of the three
+   * `_handle*SlotChange` handlers (label / help-text / error) but is driven by
+   * direct `slot.assignedNodes()` reads so we can populate state BEFORE the
+   * microtask `slotchange` events fire after the first render.
+   * @internal
+   */
+  private _seedSlotStateSync(): void {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const labelSlot = root.querySelector<HTMLSlotElement>('slot[name="label"]');
+    if (labelSlot) {
+      const state = this._readLabelSlotState(labelSlot);
+      this._hasLabelSlot = state.hasUsefulName;
+      this._slottedLabelEls = state.elements;
+      this._labelSlotText = state.text;
+      this._installLabelSlotTextObserver(state.elements);
+      this._refreshLabelSource();
+    }
+    const helpSlot = root.querySelector<HTMLSlotElement>('slot[name="help-text"]');
+    if (helpSlot) {
+      this._hasHelpSlot = this._readHelpSlotStateSync(helpSlot);
+      this._installHelpSlotTextObserver(helpSlot);
+    }
+    const errorSlot = root.querySelector<HTMLSlotElement>('slot[name="error"]');
+    if (errorSlot) {
+      this._hasErrorSlot = this._readErrorSlotStateSync(errorSlot);
+      this._installErrorSlotTextObserver(errorSlot);
+    }
+  }
+
+  /**
+   * Reads the label slot's assigned nodes and computes the discriminated
+   * naming state. An empty whitespace-only slot does NOT count as a useful
+   * name. Aggregates ALL assigned elements (not just the first); per AccName
+   * 1.2 §4.3.10, `aria-hidden="true"` and `[hidden]` elements contribute zero
+   * to the accessible name (their text is skipped during flattening).
+   * @internal
+   */
+  private _readLabelSlotState(slot: HTMLSlotElement): {
+    hasUsefulName: boolean;
+    elements: Element[];
+    text: string;
+  } {
+    const nodes = slot.assignedNodes({ flatten: true });
+    const elements: Element[] = [];
+    const fragments: string[] = [];
+    for (const node of nodes) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as Element;
+        elements.push(el);
+        if (el.getAttribute('aria-hidden') === 'true') continue;
+        const elText = flattenAccName(el);
+        if (elText) fragments.push(elText);
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        const txt = (node.textContent ?? '').trim();
+        if (txt) fragments.push(txt);
+      }
+    }
+    const trimmedText = fragments.join(' ').replace(/\s+/g, ' ').trim();
+    return {
+      hasUsefulName: trimmedText.length > 0,
+      elements,
+      text: trimmedText,
+    };
+  }
+
+  /**
+   * Re-evaluate the help-text slot's "has meaningful content" state from its
+   * current effective text. Mirrors the slotchange-handler logic but is
+   * invocable from the in-place mutation observer so that clearing
+   * `textContent` on the same slotted node flips `_hasHelpSlot` back to
+   * `false`. Uses AccName-aware flatten so descendants carrying
+   * `aria-hidden="true"` or `hidden` do NOT count toward "has meaningful
+   * content".
+   * @internal
+   */
+  private _readHelpSlotStateSync(slot: HTMLSlotElement): boolean {
+    const nodes = slot.assignedNodes({ flatten: true });
+    for (const node of nodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if ((node.textContent ?? '').trim().length > 0) return true;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (flattenAccName(node as Element).length > 0) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Re-evaluate the error slot's "has meaningful content" state from its
+   * current effective text. AccName-aware so visibility-suppressed roots /
+   * descendants don't keep the field stuck in error state.
+   * @internal
+   */
+  private _readErrorSlotStateSync(slot: HTMLSlotElement): boolean {
+    const nodes = slot.assignedNodes({ flatten: true });
+    for (const node of nodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        if ((node.textContent ?? '').trim().length > 0) return true;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (flattenAccName(node as Element).length > 0) return true;
+      }
+    }
+    return false;
+  }
+
+  // ─── Inner-input ARIA sync (W3C APG editable combobox) ───
+
+  /**
+   * (Re-)installs a `MutationObserver` against the deduped union of
+   * consumer-resolved label/description elements. Watches `characterData`,
+   * `childList`, `subtree`, and aria-hidden/hidden attribute toggles so any
+   * in-place text or visibility mutation triggers a fresh sync.
+   * @internal
+   */
+  private _installExternalRefsObserver(elements: Element[]): void {
+    if (this._externalRefsObserver) {
+      this._externalRefsObserver.disconnect();
+      this._externalRefsObserver = null;
+    }
+    if (elements.length === 0) return;
+    const unique = new Set<Element>(elements);
+    const observer = new MutationObserver(() => {
+      this._syncHostAriaSemantics();
+    });
+    for (const el of unique) {
+      observer.observe(el, {
+        characterData: true,
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._externalRefsObserver = observer;
+  }
+
+  /**
+   * Resolves consumer-supplied label/description IDREFs on the host and writes
+   * the canonical combobox ARIA onto the **inner `<input>`** per W3C APG
+   * editable combobox pattern. The inner input owns `role="combobox"`
+   * (replacing its implicit textbox role) and all combobox state ARIA so AT
+   * sees a single announced + focused surface.
+   *
+   * Cross-shadow naming uses a belt-and-suspenders strategy:
+   *
+   *   1. **Modern path** (`_supportsIdrefRefs === true`): consumer-resolved
+   *      label/description elements are written onto
+   *      `internals.ariaLabelledByElements` / `internals.ariaDescribedByElements`
+   *      on the host. Host-level `aria-labelledby` / `aria-describedby`
+   *      attributes are LEFT IN PLACE so AT walking up the DOM also sees them.
+   *      The text content of the resolved elements is also flattened onto the
+   *      inner input as `aria-label` so AT that does not walk up still
+   *      announces the right name.
+   *
+   *   2. **Legacy fallback** (`_supportsIdrefRefs === false`): the resolved-
+   *      element text is flattened onto the inner input as `aria-label` and
+   *      mirrored into a synthesized in-shadow span pointed at by the inner
+   *      input's `aria-describedby`.
+   *
+   * Writing `aria-labelledby="<light-DOM id>"` directly on the shadow-DOM
+   * inner input is INTENTIONALLY avoided: light-DOM ids do not resolve from
+   * inside a shadow root.
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+
+    const input = this._inputEl;
+    if (!input) {
+      // Inner input not yet rendered; defer. Still derive `_invalid` so
+      // `aria-invalid` first-paint is correct once the input renders.
+      const isInvalidEarly = !internals.validity.valid || !!(this.error || this._hasErrorSlot);
+      if (this._invalid !== isInvalidEarly) this._invalid = isInvalidEarly;
+      return;
+    }
+
+    const liveAriaLabel = this.getAttribute('aria-label');
+    const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() || '' : '';
+
+    const internalLabel = this.shadowRoot?.getElementById(this._labelId) ?? null;
+    const slottedLabelEls = this._slottedLabelEls;
+    const helpEl = this.shadowRoot?.getElementById(this._helpId) ?? null;
+    const errorEl = this.shadowRoot?.getElementById(this._errorId) ?? null;
+
+    const liveLabelledBy = this.getAttribute('aria-labelledby');
+    this._consumerLabelledBy = liveLabelledBy;
+    const liveDescribedBy = this.getAttribute('aria-describedby');
+    this._consumerDescribedBy = liveDescribedBy;
+
+    const consumerLabelEls = resolveIdrefTokens(this, this._consumerLabelledBy);
+    const hasEffectiveLabelledBy = consumerLabelEls.length > 0;
+
+    const consumerDescEls = resolveIdrefTokens(this, this._consumerDescribedBy);
+
+    // Observe in-place text mutations on the resolved external IDREF targets.
+    this._installExternalRefsObserver([...consumerLabelEls, ...consumerDescEls]);
+
+    const hasError = !!(this.error || this._hasErrorSlot);
+
+    // `aria-invalid` reflects EVERY signal the consumer can use to express
+    // invalidity: `setValidity()` (required-empty), explicit `error` property,
+    // and slotted error content.
+    const isInvalid = !internals.validity.valid || hasError;
+    if (this._invalid !== isInvalid) this._invalid = isInvalid;
+
+    // `accessibleLabel` is the canonical AT name when explicitly set; it
+    // outranks visible label / aria-labelledby per the helix override.
+    const explicitAccessibleLabel =
+      typeof this.accessibleLabel === 'string' && this.accessibleLabel.trim().length > 0
+        ? this.accessibleLabel
+        : null;
+
+    // Top-level `aria-hidden="true"` / `hidden` elements MUST NOT be forwarded
+    // to `internals.ariaLabelledByElements` / `ariaDescribedByElements`.
+    const isVisibleForAccName = (el: Element): boolean =>
+      el.getAttribute('aria-hidden') !== 'true' && !el.hasAttribute('hidden');
+
+    // Build the augmented element lists used by the modern (IDL-refs) path.
+    const labelElsForInternals: Element[] = [];
+    if (!explicitAccessibleLabel) {
+      labelElsForInternals.push(...consumerLabelEls.filter(isVisibleForAccName));
+      if (!hasEffectiveLabelledBy && !hostAriaLabel) {
+        if (this._labelSource === 'slot' && slottedLabelEls.length > 0) {
+          labelElsForInternals.push(...slottedLabelEls.filter(isVisibleForAccName));
+        } else if (this._labelSource === 'string' && internalLabel) {
+          labelElsForInternals.push(internalLabel);
+        }
+      }
+    }
+
+    const descElsForInternals: Element[] = [...consumerDescEls.filter(isVisibleForAccName)];
+    if (helpEl && !hasError && this._hasHelpSlot) {
+      descElsForInternals.push(helpEl);
+    }
+    if (errorEl && hasError) {
+      descElsForInternals.push(errorEl);
+    }
+
+    // ─── Modern-path: ElementInternals IDL element references ───
+    type InternalsWithIdrefRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+      ariaDescribedByElements: Element[] | null;
+    };
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithIdrefRefs;
+      refsInternals.ariaLabelledByElements =
+        labelElsForInternals.length > 0 ? labelElsForInternals : null;
+      refsInternals.ariaDescribedByElements =
+        descElsForInternals.length > 0 ? descElsForInternals : null;
+      // Forward `accessibleLabel` to `internals.ariaLabel` when set; CLEAR
+      // with `null` (NOT `''`) when absent, because per W3C AccName an empty
+      // `aria-label` STILL outranks `aria-labelledby` and would erase the
+      // name resolved from element references / fallbacks.
+      if (explicitAccessibleLabel) {
+        internals.ariaLabel = explicitAccessibleLabel;
+      } else {
+        internals.ariaLabel = null;
+      }
+    }
+
+    // ─── Compute the inner input's accessible name (text-flatten path) ───
+    const flattenText = (els: Element[]): string =>
+      els
+        .filter(isVisibleForAccName)
+        .map((el) => flattenAccName(el))
+        .filter((t) => t.length > 0)
+        .join(' ');
+
+    let inputAriaLabel: string | null = null;
+    let inputAriaLabelledBy: string | null = null;
+
+    // Precedence (per AccName 1.2 §4.3.1 with helix override):
+    //   1. accessibleLabel (helix-specific override)
+    //   2. consumer aria-labelledby resolves → text-flatten
+    //   3. consumer aria-label on the host
+    //   4. slotted label → text content (NEVER cross-shadow id reference)
+    //   5. label property → internal `<label>` id (same shadow root)
+    //   6. else: unnamed
+    let labelledByFlat = '';
+    if (!explicitAccessibleLabel && hasEffectiveLabelledBy) {
+      labelledByFlat = flattenText(consumerLabelEls);
+    }
+    if (explicitAccessibleLabel) {
+      inputAriaLabel = explicitAccessibleLabel;
+    } else if (labelledByFlat) {
+      inputAriaLabel = labelledByFlat;
+    } else if (hostAriaLabel) {
+      inputAriaLabel = hostAriaLabel;
+    } else if (this._labelSource === 'slot') {
+      // Light-DOM ids do not resolve from inside a shadow root, so we MUST
+      // text-flatten on the legacy/fallback path.
+      if (this._labelSlotText) {
+        inputAriaLabel = this._labelSlotText;
+      } else if (slottedLabelEls.length > 0) {
+        const flat = flattenText(slottedLabelEls);
+        if (flat) inputAriaLabel = flat;
+      }
+    } else if (this._labelSource === 'string') {
+      if (internalLabel?.id) {
+        inputAriaLabelledBy = internalLabel.id;
+      } else if (this.label) {
+        inputAriaLabel = this.label;
+      }
+    }
+
+    if (inputAriaLabelledBy) {
+      if (input.getAttribute('aria-labelledby') !== inputAriaLabelledBy) {
+        input.setAttribute('aria-labelledby', inputAriaLabelledBy);
+      }
+      if (input.hasAttribute('aria-label')) input.removeAttribute('aria-label');
+    } else if (inputAriaLabel) {
+      if (input.getAttribute('aria-label') !== inputAriaLabel) {
+        input.setAttribute('aria-label', inputAriaLabel);
+      }
+      if (input.hasAttribute('aria-labelledby')) input.removeAttribute('aria-labelledby');
+    } else {
+      if (input.hasAttribute('aria-label')) input.removeAttribute('aria-label');
+      if (input.hasAttribute('aria-labelledby')) input.removeAttribute('aria-labelledby');
+    }
+
+    // ─── Write the inner input's aria-describedby chain ───
+    // Unify ALL descriptions through a single `aria-describedby` channel.
+    // The W3C AccName algorithm ignores `aria-description` whenever
+    // `aria-describedby` is also present, so consumer descriptions are
+    // mirrored into a synthesized in-shadow span and that same-root id is
+    // added to the chain.
+    const consumerDescSpan = this.shadowRoot?.getElementById(this._consumerDescId) ?? null;
+    const consumerDescText = flattenText(consumerDescEls);
+    if (consumerDescSpan && consumerDescSpan.textContent !== consumerDescText) {
+      consumerDescSpan.textContent = consumerDescText;
+    }
+
+    const describedByIds: string[] = [];
+    if (consumerDescText && consumerDescSpan) {
+      describedByIds.push(this._consumerDescId);
+    }
+    if (helpEl && !hasError && this._hasHelpSlot) {
+      describedByIds.push(this._helpId);
+    }
+    if (errorEl && hasError) {
+      describedByIds.push(this._errorId);
+    }
+    if (describedByIds.length > 0) {
+      const value = describedByIds.join(' ');
+      if (input.getAttribute('aria-describedby') !== value) {
+        input.setAttribute('aria-describedby', value);
+      }
+    } else if (input.hasAttribute('aria-describedby')) {
+      input.removeAttribute('aria-describedby');
+    }
+
+    // Never write `aria-description` on the inner input — silently dropped by
+    // AccName whenever `aria-describedby` is also present. Strip defensively.
+    if (input.hasAttribute('aria-description')) {
+      input.removeAttribute('aria-description');
+    }
+  }
+
+  /**
+   * (Re-)installs the help-text slot text/visibility observer.
+   * @internal
+   */
+  private _installHelpSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._helpSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._helpSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._hasHelpSlot = this._readHelpSlotStateSync(slot);
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        observer.observe(node, {
+          characterData: true,
+          childList: true,
+          subtree: true,
+        });
+        return;
+      }
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._helpSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the error slot text/visibility observer.
+   * @internal
+   */
+  private _installErrorSlotTextObserver(slot: HTMLSlotElement | null): void {
+    this._errorSlotTextObserver?.disconnect();
+    if (!slot) {
+      this._errorSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      this._hasErrorSlot = this._readErrorSlotStateSync(slot);
+      this._syncHostAriaSemantics();
+    });
+    slot.assignedNodes().forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        observer.observe(node, {
+          characterData: true,
+          childList: true,
+          subtree: true,
+        });
+        return;
+      }
+      observer.observe(node, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    });
+    this._errorSlotTextObserver = observer;
+  }
+
+  /**
+   * (Re-)installs the label slot text/visibility observer over the current
+   * set of slotted label elements.
+   * @internal
+   */
+  private _installLabelSlotTextObserver(elements: Element[]): void {
+    this._labelSlotTextObserver?.disconnect();
+    if (elements.length === 0) {
+      this._labelSlotTextObserver = null;
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      const fragments: string[] = [];
+      for (const el of elements) {
+        if (el.getAttribute('aria-hidden') === 'true') continue;
+        const t = flattenAccName(el);
+        if (t) fragments.push(t);
+      }
+      const trimmed = fragments.join(' ').replace(/\s+/g, ' ').trim();
+      this._labelSlotText = trimmed;
+      this._hasLabelSlot = trimmed.length > 0;
+      this._refreshLabelSource();
+      this._syncHostAriaSemantics();
+    });
+    for (const el of elements) {
+      observer.observe(el, {
+        characterData: true,
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden', 'hidden'],
+      });
+    }
+    this._labelSlotTextObserver = observer;
+  }
+
+  /**
+   * Recomputes the discriminated label source. @internal
+   */
+  private _refreshLabelSource(): void {
+    if (this.label) {
+      this._labelSource = 'string';
+    } else if (this._hasLabelSlot) {
+      this._labelSource = 'slot';
+    } else {
+      this._labelSource = 'none';
     }
   }
 
@@ -466,6 +1206,9 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     } else {
       this._internals.setValidity({});
     }
+    // Re-sync ARIA after every setValidity() so `aria-invalid` reflects
+    // freshly computed validity.
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
@@ -482,9 +1225,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     state: File | string | FormData | null,
     _mode: 'restore' | 'autocomplete',
   ): void {
-    // Only string states are valid for this component; ignore File/FormData
     if (typeof state !== 'string') return;
-    // Validate and clamp before assigning; ignore out-of-spec values
     const clamped = clampValue(state, this.min, this.max);
     this.value = clamped;
   }
@@ -499,7 +1240,6 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
   /** @internal */
   private _openListbox(): void {
     if (this._open) return;
-    // Pre-set active index to currently selected slot (or 0)
     const selectedIndex = this._slots.findIndex((s) => s.value === this.value);
     this._activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
     this._open = true;
@@ -533,36 +1273,30 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
 
   /** @internal */
   private _handleLabelSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    const nodes = slot.assignedNodes({ flatten: true });
-    this._hasLabelSlot = nodes.length > 0;
-    if (this._hasLabelSlot) {
-      // Forward aria-labelledby: ensure the slotted label element has an ID so
-      // the shadow-DOM input can reference it via aria-labelledby (A-03).
-      const labelEl = nodes.find((n) => n.nodeType === Node.ELEMENT_NODE) as
-        | HTMLElement
-        | undefined;
-      if (labelEl) {
-        if (!labelEl.id) {
-          labelEl.id = `${this._id}-slotted-label`;
-        }
-        this._slottedLabelId = labelEl.id;
-      }
-    } else {
-      this._slottedLabelId = '';
-    }
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    const state = this._readLabelSlotState(e.target);
+    this._hasLabelSlot = state.hasUsefulName;
+    this._slottedLabelEls = state.elements;
+    this._labelSlotText = state.text;
+    this._installLabelSlotTextObserver(state.elements);
+    this._refreshLabelSource();
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
   private _handleErrorSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    this._hasErrorSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasErrorSlot = this._readErrorSlotStateSync(e.target);
+    this._installErrorSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
   }
 
   /** @internal */
   private _handleHelpSlotChange(e: Event): void {
-    const slot = e.target as HTMLSlotElement;
-    this._hasHelpSlot = slot.assignedNodes({ flatten: true }).length > 0;
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._hasHelpSlot = this._readHelpSlotStateSync(e.target);
+    this._installHelpSlotTextObserver(e.target);
+    this._syncHostAriaSemantics();
   }
 
   // ─── Event Dispatch ───
@@ -601,7 +1335,6 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
   private _handleInputInput(e: Event): void {
     const target = e.target as HTMLInputElement;
     this._inputDisplayValue = target.value;
-    // Open the listbox as the user types
     if (!this._open) this._openListbox();
   }
 
@@ -611,7 +1344,6 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
     const raw = target.value.trim();
 
     if (!raw) {
-      // User cleared the field
       this.value = '';
       this._handleInteractionInput();
       this._handleInteractionBlur();
@@ -628,7 +1360,6 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
       this._handleInteractionBlur();
       this._dispatchChange(clamped);
     } else {
-      // Revert display to last known good value
       this._inputDisplayValue = this.value
         ? this.format === '12h'
           ? to12h(this.value)
@@ -695,7 +1426,6 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
 
   /** @internal */
   private _handleOptionPointerDown(e: MouseEvent): void {
-    // Prevent the input from losing focus when clicking an option
     e.preventDefault();
   }
 
@@ -737,19 +1467,20 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
 
     const placeholder = this.format === '12h' ? 'hh:mm AM' : 'hh:mm';
 
-    // WCAG 1.3.1: the help-text div with _helpId always renders in the DOM unconditionally.
-    // Always include _helpId in describedBy — an empty target is harmless for AT and ensures
-    // the link is established immediately without waiting for the slotchange event to fire.
-    const describedBy =
-      [hasError ? this._errorId : null, this._helpId].filter(Boolean).join(' ') || undefined;
-
+    // W3C APG editable combobox (option I): role="combobox" lives on the
+    // inner <input>, replacing the implicit textbox role. All combobox state
+    // ARIA — aria-expanded, aria-controls, aria-activedescendant,
+    // aria-autocomplete, aria-haspopup, aria-required, aria-invalid,
+    // aria-disabled — is bound on the input via Lit. aria-label /
+    // aria-labelledby / aria-describedby are written imperatively by
+    // _syncHostAriaSemantics after consumer-IDREF resolution.
     return html`
       <div part="field" class=${classMap(fieldClasses)}>
         <!-- Label -->
         <slot name="label" @slotchange=${this._handleLabelSlotChange}>
           ${this.label
             ? html`
-                <label part="label" class="field__label" for=${this._id}>
+                <label part="label" id=${this._labelId} class="field__label" for=${this._id}>
                   ${this.label}
                   ${this.required
                     ? html`<span class="field__required-marker" aria-hidden="true">*</span>`
@@ -780,12 +1511,9 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
             aria-autocomplete="list"
             aria-controls=${this._listboxId}
             aria-activedescendant=${ifDefined(activeDescendant)}
-            aria-invalid=${hasError ? 'true' : nothing}
-            aria-describedby=${ifDefined(describedBy)}
-            aria-required=${this.required ? 'true' : nothing}
-            aria-labelledby=${ifDefined(
-              this._hasLabelSlot && this._slottedLabelId ? this._slottedLabelId : undefined,
-            )}
+            aria-invalid=${this._invalid ? 'true' : 'false'}
+            aria-required=${this.required ? 'true' : 'false'}
+            aria-disabled=${this.disabled ? 'true' : nothing}
             @click=${this._handleInputClick}
             @input=${this._handleInputInput}
             @change=${this._handleInputChange}
@@ -828,7 +1556,7 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
             class="field__listbox"
             id=${this._listboxId}
             role="listbox"
-            aria-label=${this.label || 'Time options'}
+            aria-label=${this.label || this.accessibleLabel || 'Time options'}
             ?hidden=${!this._open}
           >
             ${this._open
@@ -862,21 +1590,40 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
           </ul>
         </div>
 
-        <!-- Error slot / property -->
-        <slot name="error" @slotchange=${this._handleErrorSlotChange}>
-          ${this.error
-            ? html`
-                <div part="error" class="field__error" id=${this._errorId} role="alert">
-                  ${this.error}
-                </div>
-              `
-            : nothing}
-        </slot>
+        <!--
+          Persistent error live region. role="alert" is set from first paint
+          so the WAI-ARIA contract for live updates is honoured.
+        -->
+        <div
+          part="error"
+          class="field__error"
+          id=${this._errorId}
+          role="alert"
+          ?hidden=${!hasError}
+        >
+          <slot name="error" @slotchange=${this._handleErrorSlotChange}
+            >${this._announcedError}</slot
+          >
+        </div>
 
         <!-- Help slot -->
-        <div part="help-text" class="field__help-text" id=${this._helpId}>
+        <div
+          part="help-text"
+          class="field__help-text"
+          id=${this._helpId}
+          ?hidden=${!this._hasHelpSlot || hasError}
+        >
           <slot name="help-text" @slotchange=${this._handleHelpSlotChange}></slot>
         </div>
+
+        <!--
+          Synthesized in-shadow mirror of the consumer-resolved description
+          text. Its id is appended to the inner input's aria-describedby chain
+          so AT picks the consumer description up through the standard
+          described-by channel without needing aria-description (which W3C
+          AccName drops whenever aria-describedby is also present).
+        -->
+        <span id=${this._consumerDescId} class="field__sr-only" aria-hidden="false"></span>
       </div>
     `;
   }

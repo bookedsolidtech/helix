@@ -344,16 +344,15 @@ describe('hx-icon-button', () => {
   });
 
   // ─── Loading state (1) ───
-  // P1-06: The loading state feature is not yet implemented on hx-icon-button.
-  // This test documents the current behavior (no loading property exists) so
-  // a regression is caught if a partial/broken implementation is added without
-  // completing the feature end-to-end.
+  // Group 8 round-1 implemented the loading property on hx-icon-button.
+  // The exhaustive loading-state coverage lives further down in the
+  // "Group 8 — loading state" describe; this guard confirms the property
+  // is declared and defaults to false.
 
   describe('Loading state', () => {
-    it('does not have a loading property (feature not yet implemented)', async () => {
+    it('declares loading property defaulting to false', async () => {
       const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
-      // 'loading' is not a declared property — accessing it returns undefined
-      expect((el as unknown as Record<string, unknown>)['loading']).toBeUndefined();
+      expect(el.loading).toBe(false);
     });
   });
 
@@ -641,6 +640,101 @@ describe('hx-icon-button', () => {
       await el.updateComplete;
       const btn = shadowQuery(el, 'button')!;
       expect(btn.getAttribute('aria-label')).toBe('Close');
+    });
+  });
+
+  // ─── ARIA Group 8 round-1: mixinDelegatesAria + loading state ───
+
+  describe('ARIA Group 8 — mixinDelegatesAria adoption', () => {
+    it('moves consumer-set aria-pressed to data-aria-pressed and projects onto inner <button>', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Toggle bold" aria-pressed="true"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      // mixin moves aria-pressed → data-aria-pressed on the host.
+      expect(el.hasAttribute('aria-pressed')).toBe(false);
+      expect(el.getAttribute('data-aria-pressed')).toBe('true');
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('projects aria-expanded + aria-haspopup + aria-controls onto inner <button>', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Open menu" aria-expanded="false" aria-haspopup="menu" aria-controls="menu-1"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+      expect(btn.getAttribute('aria-haspopup')).toBe('menu');
+      expect(btn.getAttribute('aria-controls')).toBe('menu-1');
+    });
+
+    it('projects aria-describedby onto inner <button>', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Save" aria-describedby="save-help"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-describedby')).toBe('save-help');
+    });
+
+    it('projects aria-current onto inner <a> in href mode', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Home" href="/" aria-current="page"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('aria-current')).toBe('page');
+    });
+  });
+
+  describe('ARIA Group 8 — loading state', () => {
+    it('renders the spinner part and hides the icon slot when loading', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Saving" loading></hx-icon-button>',
+      );
+      await el.updateComplete;
+      const spinner = shadowQuery(el, '[part="spinner"]');
+      expect(spinner).toBeTruthy();
+      // The icon slot wrapper is suppressed in favour of the spinner.
+      const icon = shadowQuery(el, '[part="icon"]');
+      expect(icon).toBeNull();
+    });
+
+    it('sets aria-busy="true" on the inner <button> when loading', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Saving" loading></hx-icon-button>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(btn.getAttribute('aria-busy')).toBe('true');
+      // Native disabled is NOT set — loading is transient, not persistent.
+      expect(btn.hasAttribute('disabled')).toBe(false);
+    });
+
+    it('blocks click activation while loading', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Saving" loading></hx-icon-button>',
+      );
+      await el.updateComplete;
+      let fired = false;
+      el.addEventListener('hx-click', () => {
+        fired = true;
+      });
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      btn.click();
+      expect(fired).toBe(false);
+    });
+
+    it('removes href and sets tabindex="-1" + aria-busy on a loading anchor', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="/x" loading></hx-icon-button>',
+      );
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.hasAttribute('href')).toBe(false);
+      expect(anchor.getAttribute('tabindex')).toBe('-1');
+      expect(anchor.getAttribute('aria-busy')).toBe('true');
     });
   });
 });

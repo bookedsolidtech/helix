@@ -154,7 +154,12 @@ export const HorizontalIcon: Story = {
   },
   render: (args) => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu role="menu" icon=${args.icon} placement=${args.placement} hx-size=${args.size}>
+      <hx-overflow-menu
+        role="menu"
+        icon=${args.icon}
+        placement=${args.placement}
+        hx-size=${args.size}
+      >
         <button role="menuitem">View details</button>
         <button role="menuitem">Assign</button>
         <button role="menuitem">Export</button>
@@ -173,7 +178,12 @@ export const VerticalIcon: Story = {
   },
   render: (args) => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
-      <hx-overflow-menu role="menu" icon=${args.icon} placement=${args.placement} hx-size=${args.size}>
+      <hx-overflow-menu
+        role="menu"
+        icon=${args.icon}
+        placement=${args.placement}
+        hx-size=${args.size}
+      >
         <button role="menuitem">View details</button>
         <button role="menuitem">Assign</button>
         <button role="menuitem">Export</button>
@@ -484,7 +494,10 @@ export const KeyboardEscape: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     icon: 'vertical',
     placement: 'bottom-end',

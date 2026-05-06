@@ -16,6 +16,25 @@ export type { HxOverflowMenuProps };
 /**
  * An overflow menu (kebab/meatball menu) that reveals hidden actions via a
 floating panel. Composed from a trigger button and a slotted menu panel.
+
+## Architecture Note: Host-Attribute Trigger Label Mirror (group-5b)
+
+The composite has TWO ARIA-bearing surfaces inside its shadow DOM: the
+trigger button (`role` defaulted from `<button>`, with `aria-haspopup`,
+`aria-expanded`, `aria-controls`) and the panel (`role="menu"` on the
+inner div). The host wraps both — it cannot carry either canonical role
+itself, so role placement remains on the inner elements.
+
+What Group 5b adds:
+- **Roving tabindex** on slotted menu items (only the focused item has
+  tabindex=0; arrow keys move focus and rewrite tabindex). Closing-Tab
+  path is preserved (Tab moves focus past the menu and closes it).
+- **First-character typeahead** with 500ms timeout matching `hx-menu`.
+- **Host-attribute label mirror**: consumer-supplied `aria-label` /
+  `aria-labelledby` on the host flow to the trigger button's
+  `aria-label` (the trigger is the announced surface of the disclosure
+  pattern; consumer override wins over the `label` property). The panel
+  continues to use `labelMenu` for its own slot label.
  *
  * @example
  * ```tsx

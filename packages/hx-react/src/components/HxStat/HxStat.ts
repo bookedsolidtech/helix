@@ -15,6 +15,13 @@ export type { HxStatProps };
 
 /**
  * A static stat display component for presenting key metrics in a healthcare dashboard.
+
+Group 7 host-canonical: `role="group"` lives on the **host** via
+`_internals.role`. The host carries the resolved accessible name so AT
+walks `<hx-stat>` (role=group, label="value: label") directly. The
+internal `aria-live="polite"` announcer remains in the shadow tree —
+`role="group"` does NOT imply a live region, so the announcer is required
+for value/label/trend update announcements.
  *
  * @example
  * ```tsx

@@ -179,6 +179,18 @@ export class HelixAlert extends HelixElement {
   /** @internal */
   private _titleSlotChangeHandler: (() => void) | null = null;
 
+  /**
+   * (group-6 §5.4) Race-guard counter for the sr-only announcer microtask
+   * dance. Each open=false→true transition increments this; the deferred
+   * text-clear + re-inject only writes to the announcer when the counter
+   * matches the value captured at scheduling time. Rapid open/close cycles
+   * therefore collapse to a single announcement on the final settled state
+   * rather than leaking stale text from earlier cycles.
+   *
+   * @internal
+   */
+  private _announcerCycle = 0;
+
   // ─── Private Helpers ───
 
   /** @internal */
@@ -220,6 +232,14 @@ export class HelixAlert extends HelixElement {
     // Apply ARIA role to the host element for reliable screen reader support across
     // Shadow DOM boundaries. Placing role on a shadow-internal element has inconsistent
     // AT support in JAWS+Chrome and VoiceOver+Safari combinations (particularly pre-2024).
+    //
+    // (group-6) Dual-write: `internals.role` is the modern IDL-based source of
+    // truth; the `role` attribute is retained as a legacy fallback for older AT
+    // that don't yet honour ElementInternals ARIA reflection. role implies
+    // aria-live per ARIA spec — we do NOT set explicit aria-live on the host
+    // (the inner sr-only announcer carries the explicit aria-live so the
+    // open=false→true text-mutation is observed by AT).
+    this._internals.role = this._role;
     this.setAttribute('role', this._role);
     if (!this.open) {
       this.setAttribute('aria-hidden', 'true');
@@ -262,6 +282,8 @@ export class HelixAlert extends HelixElement {
     super.updated(changedProperties);
     if (changedProperties.has('variant')) {
       // Keep host ARIA role in sync with variant (assertive vs. polite).
+      // Dual-write: internals (modern) + attribute (legacy fallback).
+      this._internals.role = this._role;
       this.setAttribute('role', this._role);
     }
     if (changedProperties.has('open')) {
@@ -276,13 +298,20 @@ export class HelixAlert extends HelixElement {
         // is registered by the AT before content arrives.
         const previousOpen = changedProperties.get('open');
         if (previousOpen === false) {
+          // (group-6 §5.4) Race-guard: bump the cycle counter and capture it.
+          // The deferred microtask only writes if the counter still matches —
+          // rapid open/close cycles therefore collapse to a single announcement
+          // on the final settled state rather than leaking stale text.
+          const myCycle = ++this._announcerCycle;
           Promise.resolve().then(() => {
+            if (myCycle !== this._announcerCycle || !this.open) return;
             const announcer = this.renderRoot.querySelector<HTMLElement>('.sr-only');
             if (announcer) {
               announcer.textContent = '';
               // Second microtask ensures the clear is processed before re-injection,
               // guaranteeing the AT sees a content change rather than no-op.
               Promise.resolve().then(() => {
+                if (myCycle !== this._announcerCycle || !this.open) return;
                 const prefix = this._effectiveSeverityLabel;
                 const message = this.textContent?.trim() ?? '';
                 announcer.textContent = prefix ? `${prefix} ${message}` : message;
@@ -292,6 +321,9 @@ export class HelixAlert extends HelixElement {
         }
       } else {
         this.setAttribute('aria-hidden', 'true');
+        // (group-6 §5.4) Bump the cycle counter on close so any pending
+        // announcer microtask from the previous open is invalidated.
+        this._announcerCycle++;
         // Clear the announcer when hidden so stale text is not re-read on next open.
         const announcer = this.renderRoot.querySelector<HTMLElement>('.sr-only');
         if (announcer) {
@@ -414,6 +446,26 @@ export class HelixAlert extends HelixElement {
     // is never conveyed by color alone, regardless of whether showIcon is set.
     const severityLabel = this._effectiveSeverityLabel;
 
+    // (group-6 §5.1) Decorative duplicates of announcer copy — severity
+    // label, icon, title — are each marked aria-hidden=true so the
+    // sr-only announcer is the SOLE announcement surface for THAT copy.
+    // Without this guard, JAWS+Chrome was observed reading those bits
+    // twice (once from host text, once from the announcer).
+    //
+    // (group-6 codex round-1 fix) The default slot wrapper is NO LONGER
+    // aria-hidden. The default slot can hold consumer-supplied interactive
+    // content (inline links, inline buttons inside an alert message), and
+    // aria-hidden on a parent of focusable elements is an axe-core
+    // `aria-hidden-focus` violation: AT users would tab into invisible
+    // controls. To suppress the (now exclusively-announcer-driven)
+    // double-announce risk on the slot text itself, the announcer copy is
+    // built from `this.textContent` and the host has its `role` toggled
+    // off-then-on across the open transition, so AT only registers the
+    // announcer as the live region for that text — not the host.
+    //
+    // aria-hidden is also NOT placed on the alert container, the actions
+    // slot wrapper, or the close button — those host focusable descendants
+    // for the same axe-core reason.
     return html`
       <div
         class="sr-only"
@@ -421,20 +473,24 @@ export class HelixAlert extends HelixElement {
         aria-atomic="true"
       ></div>
       <div part="alert" class=${classMap(classes)}>
-        <span class="alert__severity-label">${severityLabel}</span>
+        <span class="alert__severity-label" aria-hidden="true">${severityLabel}</span>
         ${this.showIcon
           ? html`
-              <div part="icon" class="alert__icon">
+              <div part="icon" class="alert__icon" aria-hidden="true">
                 <slot name="icon">${this._renderDefaultIcon()}</slot>
               </div>
             `
           : nothing}
 
         <div part="message" class="alert__message">
-          <div part="title" class="alert__title ${this._hasTitle ? 'alert__title--visible' : ''}">
+          <div
+            part="title"
+            class="alert__title ${this._hasTitle ? 'alert__title--visible' : ''}"
+            aria-hidden="true"
+          >
             <slot name="title"></slot>
           </div>
-          <slot></slot>
+          <span class="alert__default-slot"><slot></slot></span>
           <div
             part="actions"
             class="alert__actions ${this._hasActions ? 'alert__actions--visible' : ''}"
