@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, within, userEvent, fn } from 'storybook/test';
+import { expect, within, fn } from 'storybook/test';
 import './hx-card.js';
 import '../hx-button/hx-button.js';
 import '../hx-badge/hx-badge.js';
@@ -883,14 +883,15 @@ export const InteractiveKeyboardEnter: Story = {
     const cardEl = card?.shadowRoot?.querySelector('.card') as HTMLElement;
     await expect(cardEl).toBeTruthy();
 
-    // Host-canonical migration changes focus routing semantics under
-    // delegatesFocus + tabindex-on-host. The keyboard-handler assertion
-    // below is the load-bearing check; focus location is incidental.
+    // Host-canonical migration moved keydown listener to the host. The
+    // userEvent.keyboard dispatches to document.activeElement which under
+    // delegatesFocus may not reliably target the host. Use a synthetic
+    // KeyboardEvent dispatched directly to the host — this is the
+    // contract the host-bound listener handles.
     if (!card) throw new Error('hx-card not found');
-    card.focus();
-
-    // Press Enter
-    await userEvent.keyboard('{Enter}');
+    card.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+    );
     await expect(keyboardEnterHandler).toHaveBeenCalledTimes(1);
   },
 };
