@@ -1,9 +1,10 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
+import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -60,7 +61,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-color-error-600] - Color.
  */
 @customElement('hx-icon-button')
-export class HelixIconButton extends HelixElement {
+export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
   static override styles = [helixIconButtonStyles, forcedColorsInteractive];
 
   /**
@@ -102,6 +103,16 @@ export class HelixIconButton extends HelixElement {
   disabled = false;
 
   /**
+   * Whether the button is in a loading state. Shows the spinner, prevents
+   * activation, and sets `aria-busy="true"` on the inner element. Does NOT
+   * set the native `disabled` attribute (loading is transient; disabled is
+   * persistent, and AT announces them differently).
+   * @attr loading
+   */
+  @property({ type: Boolean, reflect: true })
+  loading = false;
+
+  /**
    * When set, renders an `<a>` element instead of a `<button>`.
    * @attr href
    */
@@ -135,7 +146,7 @@ export class HelixIconButton extends HelixElement {
 
   /** @internal */
   private _handleClick(e: MouseEvent): void {
-    if (this.disabled) {
+    if (this.disabled || this.loading) {
       e.preventDefault();
       e.stopPropagation();
       return;
@@ -176,12 +187,43 @@ export class HelixIconButton extends HelixElement {
       button: true,
       [`button--${this.variant}`]: true,
       [`button--${this.size}`]: true,
+      'button--loading': this.loading,
     };
   }
 
   /** @internal */
   private _iconSlot() {
     return html`<span part="icon" class="icon"><slot></slot></span>`;
+  }
+
+  /** @internal */
+  private _renderSpinner(): TemplateResult {
+    return html`
+      <svg
+        class="button__spinner"
+        part="spinner"
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+      >
+        <circle
+          class="button__spinner-track"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="3"
+          opacity="0.3"
+        />
+        <path
+          class="button__spinner-arc"
+          d="M12 2a10 10 0 0 1 10 10"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+        />
+      </svg>
+    `;
   }
 
   // ─── Render ───
@@ -196,11 +238,23 @@ export class HelixIconButton extends HelixElement {
       return nothing;
     }
 
+    // mixinDelegatesAria forwarding: consumer-set aria-* (aria-pressed,
+    // aria-expanded, aria-haspopup, aria-controls, aria-describedby) lands
+    // in data-aria-* on the host. Project them onto the inner element so the
+    // a11y tree sees them on the role-bearing native element.
+    const projectedDescribedBy = this.getAttribute('data-aria-describedby');
+    const projectedPressed = this.getAttribute('data-aria-pressed');
+    const projectedExpanded = this.getAttribute('data-aria-expanded');
+    const projectedHasPopup = this.getAttribute('data-aria-haspopup');
+    const projectedControls = this.getAttribute('data-aria-controls');
+    const projectedCurrent = this.getAttribute('data-aria-current');
+
     if (this.href !== undefined) {
       // P1-03 fix: disabled anchor must set tabindex="-1" explicitly — an <a>
       // without href is non-focusable by default in most browsers, but this is
       // browser-dependent. Explicit tabindex="-1" guarantees keyboard exclusion
-      // across all conforming browsers.
+      // across all conforming browsers. Loading anchors are also tab-skipped
+      // for consistency with disabled.
       // P1-07 note: aria-disabled IS required on the anchor branch because
       // <a> elements have no native disabled attribute; aria-disabled is the
       // only AT signal available.
@@ -208,14 +262,21 @@ export class HelixIconButton extends HelixElement {
         <a
           part="button"
           class=${classMap(this._classes())}
-          href=${ifDefined(this.disabled ? undefined : this.href)}
+          href=${ifDefined(this.disabled || this.loading ? undefined : this.href)}
           aria-label=${normalizedLabel}
           title=${normalizedLabel}
           aria-disabled=${this.disabled ? 'true' : nothing}
-          tabindex=${this.disabled ? '-1' : nothing}
+          aria-busy=${this.loading ? 'true' : nothing}
+          aria-pressed=${ifDefined(projectedPressed ?? undefined)}
+          aria-expanded=${ifDefined(projectedExpanded ?? undefined)}
+          aria-haspopup=${ifDefined(projectedHasPopup ?? undefined)}
+          aria-controls=${ifDefined(projectedControls ?? undefined)}
+          aria-describedby=${ifDefined(projectedDescribedBy ?? undefined)}
+          aria-current=${ifDefined(projectedCurrent ?? undefined)}
+          tabindex=${this.disabled || this.loading ? '-1' : nothing}
           @click=${this._handleClick}
         >
-          ${this._iconSlot()}
+          ${this.loading ? this._renderSpinner() : this._iconSlot()}
         </a>
       `;
     }
@@ -232,11 +293,18 @@ export class HelixIconButton extends HelixElement {
         type=${this.type}
         aria-label=${normalizedLabel}
         title=${normalizedLabel}
+        aria-busy=${this.loading ? 'true' : nothing}
+        aria-pressed=${ifDefined(projectedPressed ?? undefined)}
+        aria-expanded=${ifDefined(projectedExpanded ?? undefined)}
+        aria-haspopup=${ifDefined(projectedHasPopup ?? undefined)}
+        aria-controls=${ifDefined(projectedControls ?? undefined)}
+        aria-describedby=${ifDefined(projectedDescribedBy ?? undefined)}
+        aria-current=${ifDefined(projectedCurrent ?? undefined)}
         name=${ifDefined(this.name)}
         value=${ifDefined(this.value)}
         @click=${this._handleClick}
       >
-        ${this._iconSlot()}
+        ${this.loading ? this._renderSpinner() : this._iconSlot()}
       </button>
     `;
   }
