@@ -236,9 +236,13 @@ export class HelixTableCell extends HelixElement {
 
     if (this._resolvedAccessibleName !== resolved) {
       this._resolvedAccessibleName = resolved;
-      if (!this._supportsIdrefRefs) {
-        this.requestUpdate();
-      }
+      // CodeRabbit SHOULD-FIX (PR #1649 follow-up): the inner <td>'s
+      // aria-label now mirrors `_resolvedAccessibleName`, so request a
+      // render whenever the resolved name changes — not just on the
+      // legacy fallback path. Without this, consumer mutations to host
+      // `aria-label` / `aria-labelledby` would update host-internals but
+      // not the inner cell's announced name.
+      this.requestUpdate();
     }
   }
 
@@ -248,11 +252,21 @@ export class HelixTableCell extends HelixElement {
     // for legacy AT and consumer queries. Host adds cross-shadow IDREF
     // wiring via internals.* in _syncHostAriaSemantics(). data-label still
     // feeds the mobile card layout's CSS pseudo-element.
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up): the inner <td> previously
+    // mirrored only the raw `label` property, so when a consumer set
+    // `aria-label` or `aria-labelledby` on the host, the inner cell's
+    // accessible name diverged from the host on legacy fallback engines.
+    // Use the resolved name from the precedence ladder
+    // (aria-labelledby > aria-label > label) so the inner surface tracks
+    // the host. `data-label` keeps using `this.label` because it feeds the
+    // mobile card layout's CSS pseudo-element, which only knows about the
+    // explicit column label string.
+    const innerAriaLabel = this._resolvedAccessibleName || this.label || undefined;
     return html`
       <td
         part="cell"
         role="cell"
-        aria-label=${ifDefined(this.label || undefined)}
+        aria-label=${ifDefined(innerAriaLabel)}
         data-label=${ifDefined(this.label || undefined)}
         colspan=${ifDefined(this.colspan > 0 ? this.colspan : undefined)}
         rowspan=${ifDefined(this.rowspan > 0 ? this.rowspan : undefined)}

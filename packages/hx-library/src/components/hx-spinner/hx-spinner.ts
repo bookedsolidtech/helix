@@ -160,8 +160,14 @@ export class HelixSpinner extends HelixElement {
     // Decorative spinners use role="presentation" to suppress AT announcements.
     // Non-decorative spinners use role="status" with aria-label for accessible naming.
     // Guard against empty label (aria-label="" is a WCAG failure).
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up): trim whitespace before the
+    // truthiness check so a label like `"   "` doesn't pass through as a
+    // visually-empty aria-label on the inner element. The host-internals path
+    // in `_syncHostAriaSemantics` already trims; this aligns the inner
+    // dual-surface mirror with that policy.
     const role = this.decorative ? 'presentation' : 'status';
-    const ariaLabel = this.decorative ? undefined : this.label || undefined;
+    const trimmedLabel = (this.label ?? '').trim();
+    const ariaLabel = this.decorative ? undefined : trimmedLabel || undefined;
 
     return html`
       <div

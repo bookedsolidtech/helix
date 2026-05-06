@@ -713,5 +713,17 @@ describe('hx-meter', () => {
       // ariaLabel is cleared so the IDREF wins.
       expect(internals.ariaLabel).toBeNull();
     });
+
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up) — slot-only label fallback.
+    it('derives host AccName from slot text when label/aria-* are all absent', async () => {
+      const el = await fixture<HelixMeter>(
+        '<hx-meter value="60"><span slot="label">Disk Usage</span></hx-meter>',
+      );
+      await el.updateComplete;
+      // Allow slotchange + a follow-up sync to settle.
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(internals.ariaLabel).toBe('Disk Usage');
+    });
   });
 });

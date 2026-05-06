@@ -385,12 +385,30 @@ export function installAriaIdrefMirror(
   const observedAttributes = options.observedAttributes ?? DEFAULT_HOST_OBSERVED_ATTRS;
   const observeRoot = options.observeRoot ?? true;
 
+  // CodeRabbit SHOULD-FIX (PR #1649 follow-up): the `slot` attribute
+  // observer below only fires when the host's `slot` attribute mutates.
+  // When the host is REPARENTED (e.g. moved into a different shadow tree
+  // whose slot has the same name), `assignedSlot` changes but the host's
+  // own attributes don't, so the observer never fires and the resolver
+  // keeps watching the OLD slot-owner shadow root. Poll `assignedSlot`
+  // identity on every sync; when it shifts, reattach root observers so
+  // the new slot-owner shadow root is in scope before we resolve idrefs.
+  let lastAssignedSlot: HTMLSlotElement | null = host.assignedSlot;
+  const reparentAwareSync = (): void => {
+    const currentSlot = host.assignedSlot;
+    if (currentSlot !== lastAssignedSlot) {
+      lastAssignedSlot = currentSlot;
+      attachRootObservers();
+    }
+    sync();
+  };
+
   // Observe consumer mutations to the host's ARIA / data-aria attributes.
   // We do NOT use `observedAttributes`/`attributeChangedCallback` here because
   // that requires class-level wiring that conflicts with downstream mixins
   // (e.g. `mixinDelegatesAria` already commandeers `attributeChangedCallback`
   // for the same attributes). A scoped `MutationObserver` is reentry-safe.
-  const hostObserver = new MutationObserver(() => sync());
+  const hostObserver = new MutationObserver(() => reparentAwareSync());
   hostObserver.observe(host, {
     attributes: true,
     attributeFilter: [...observedAttributes],
@@ -407,6 +425,9 @@ export function installAriaIdrefMirror(
   const slotAttrObserver = new MutationObserver(() => {
     // Reattach observers to the new reachable-roots set, then sync.
     attachRootObservers();
+    // Refresh the assignedSlot snapshot too — slot attr changes can also
+    // cause assignedSlot to flip in the same task tick.
+    lastAssignedSlot = host.assignedSlot;
     sync();
   });
   slotAttrObserver.observe(host, {
@@ -460,7 +481,7 @@ export function installAriaIdrefMirror(
     // + owner document) that the resolver can now match against.
     for (const root of wanted) {
       if (!rootSubscriptions.has(root)) {
-        rootSubscriptions.set(root, subscribeToRoot(root, sync));
+        rootSubscriptions.set(root, subscribeToRoot(root, reparentAwareSync));
       }
     }
   };
@@ -471,6 +492,7 @@ export function installAriaIdrefMirror(
 
   return {
     resync(): void {
+      lastAssignedSlot = host.assignedSlot;
       attachRootObservers();
       sync();
     },

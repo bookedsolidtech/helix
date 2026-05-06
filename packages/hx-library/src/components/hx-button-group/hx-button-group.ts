@@ -81,6 +81,16 @@ export class HelixButtonGroup extends HelixElement {
   private _consumerAriaLabel: string | null = null;
 
   /**
+   * Snapshot of the consumer-set `role` attribute taken at connect time.
+   * When non-null, the consumer has explicitly set a role (e.g. `toolbar`,
+   * `radiogroup`) and the host-canonical mirror MUST defer to that role
+   * rather than overwriting `internals.role` with the default `"group"`.
+   * Mirrors the `_consumerAriaLabel` snapshot pattern above.
+   * @internal
+   */
+  private _consumerRole: string | null = null;
+
+  /**
    * Tracks whether the no-label devWarn has already fired for this instance,
    * so disconnect/reconnect cycles do not spam the console.
    * @internal
@@ -117,11 +127,22 @@ export class HelixButtonGroup extends HelixElement {
     if (this._consumerAriaLabel === null && this.hasAttribute('aria-label')) {
       this._consumerAriaLabel = this.getAttribute('aria-label');
     }
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up): snapshot the consumer's
+    // explicit `role` BEFORE the host-canonical mirror overwrites it. When
+    // a consumer sets `role="toolbar"` (or `radiogroup`, etc.), the mirror
+    // must defer to that role; otherwise two surfaces disagree (host attr
+    // says toolbar, internals says group) and AT picks one inconsistently.
+    if (this._consumerRole === null && this.hasAttribute('role')) {
+      this._consumerRole = this.getAttribute('role');
+    }
     // Host-canonical role: use ElementInternals so the role survives in the
     // a11y tree even if a consumer attribute-strips the host. Mirror to the
     // host attribute as well for older AT/devtools that walk attributes.
-    this._internals.role = 'group';
-    if (!this.hasAttribute('role')) {
+    if (this._consumerRole) {
+      // Defer to the consumer's role on both surfaces.
+      this._internals.role = this._consumerRole;
+    } else {
+      this._internals.role = 'group';
       this.setAttribute('role', 'group');
     }
     this.style.setProperty('--hx-button-group-size', this.size);

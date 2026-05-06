@@ -94,6 +94,35 @@ function readJsonOrFail(path, label) {
   return undefined;
 }
 
+// Codex push-gate finding (#1648 / task #102): review-engine error propagation.
+// rea writes `.rea/last-review.json` even when the upstream review engine fails
+// (e.g. codex API outage, malformed response, runner crash). When the verdict
+// shape is unexpected the filter previously coerced findings to [] and reported
+// "pass", masking the engine failure as a clean review. Treat unknown / missing
+// verdicts as engine errors and exit 2 so the operator surfaces the real cause
+// instead of acting on a fabricated pass.
+function assertReviewShape(review) {
+  if (review === null || typeof review !== 'object' || Array.isArray(review)) {
+    fail('review-engine error: .rea/last-review.json is not a JSON object');
+  }
+  const verdict = review.verdict;
+  const validVerdicts = new Set(['pass', 'concerns', 'blocking']);
+  if (typeof verdict !== 'string' || !validVerdicts.has(verdict)) {
+    fail(
+      `review-engine error: .rea/last-review.json has missing or invalid verdict ` +
+        `(got ${JSON.stringify(verdict)}, expected one of ${[...validVerdicts].join('/')}). ` +
+        `The upstream rea/codex review likely failed to complete — rerun the review or ` +
+        `inspect codex logs before retrying push.`,
+    );
+  }
+  if (!Array.isArray(review.findings)) {
+    fail(
+      `review-engine error: .rea/last-review.json has missing or non-array findings ` +
+        `(got ${typeof review.findings}). Treating as engine failure rather than empty-pass.`,
+    );
+  }
+}
+
 function loadReaManagedPaths(manifest) {
   // The manifest shape is `{ files: [{ path: "..." }, ...] }` per
   // `.rea/install-manifest.json` schema. Treat each entry as repo-relative.
@@ -159,10 +188,12 @@ function appendAuditLog(entry) {
 
 function main() {
   const review = readJsonOrFail(REVIEW_PATH, '.rea/last-review.json');
+  assertReviewShape(review);
   const manifest = readJsonOrFail(MANIFEST_PATH, '.rea/install-manifest.json');
 
   const reaManagedPaths = loadReaManagedPaths(manifest);
-  const allFindings = Array.isArray(review.findings) ? review.findings : [];
+  // Shape was validated above; findings is guaranteed to be an array here.
+  const allFindings = review.findings;
 
   const filteredOut = [];
   const remaining = [];
