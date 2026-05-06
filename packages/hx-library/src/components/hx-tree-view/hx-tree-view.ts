@@ -488,6 +488,12 @@ export class HelixTreeView extends HelixElement {
     if (changedProperties.has('label') || changedProperties.has('selection')) {
       this._syncHostAriaSemantics();
     }
+    if (changedProperties.has('selection')) {
+      // Per-item _selectable flag also depends on the parent's selection
+      // mode — recompute the descendants so each hx-tree-item host's
+      // `aria-selected` matches the new container contract.
+      this._updateAriaMetadataForContainer(this, 1);
+    }
   }
 
   override firstUpdated(): void {
