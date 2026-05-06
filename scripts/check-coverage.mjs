@@ -338,6 +338,48 @@ function main() {
 
   const shardComponents = HX_COVERAGE_COMPONENTS ? loadShardComponents() : null;
 
+  // Codex push-gate finding (#1649 / task #101): scoped-target absence check.
+  // The earlier sentinel branch handles "missing-everything" (no coverage data
+  // at all). This handles the orthogonal "scoped-but-incomplete" case: coverage
+  // data IS present, but one or more components named in HX_COVERAGE_COMPONENTS
+  // are absent from it. Without this check the gate silently passes — the loop
+  // below never iterates over the missing names so they cannot fail.
+  //
+  // Causes: scoped vitest crashed mid-run after writing partial coverage; shard
+  // distribution skipped the named component AND the runner failed to write
+  // empty-shard.flag; barrel-import side effect produced data for siblings but
+  // not for the target.
+  //
+  // If the empty-shard sentinel is present we already exited above; reaching
+  // here means scoped enforcement was requested with real coverage data, and
+  // every named component must be accounted for as either present-in-data or
+  // ran-on-another-shard.
+  if (HX_COVERAGE_COMPONENTS) {
+    const presentInData = new Set(components.keys());
+    const missing = [...HX_COVERAGE_COMPONENTS].filter((name) => {
+      if (presentInData.has(name)) return false;
+      // If we know which components actually had test files on this shard,
+      // a named component that is NOT on this shard is legitimately absent
+      // from coverage data — its enforcement happens on another shard.
+      if (shardComponents && !shardComponents.has(name)) return false;
+      return true;
+    });
+    if (missing.length > 0) {
+      const msg =
+        `Coverage gate FAILED: scoped coverage targets [${missing.join(', ')}] ` +
+        `missing from coverage data — scoped vitest run may have crashed before ` +
+        `writing coverage for these components. ` +
+        `Coverage data contains: [${[...presentInData].sort().join(', ') || '(none)'}]. ` +
+        `If this run was intentionally empty for these targets, the test runner ` +
+        `must write the empty-shard sentinel (${EMPTY_SHARD_FLAG}).`;
+      if (process.env.GITHUB_ACTIONS === 'true') {
+        console.log(`::error title=Coverage gate failed::${msg}`);
+      }
+      console.error(msg);
+      process.exit(1);
+    }
+  }
+
   if (HX_COVERAGE_COMPONENTS) {
     console.log(
       `Scoped enforcement: checking only [${[...HX_COVERAGE_COMPONENTS].join(', ')}] — other components in coverage data are transitive imports and will be skipped.`,

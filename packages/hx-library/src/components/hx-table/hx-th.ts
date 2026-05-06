@@ -218,6 +218,16 @@ export class HelixTableHeader extends HelixElement {
   /** @internal */
   private _ariaMirror: AriaIdrefMirrorHandle | null = null;
 
+  /**
+   * Resolved accessible name from the host precedence ladder
+   * (aria-labelledby > aria-label > slotted column text). Surfaced to the
+   * inner sort button's aria-label so AT users hear the same name on the
+   * host columnheader and on the sort control. CodeRabbit SHOULD-FIX
+   * (PR #1649 follow-up).
+   * @internal
+   */
+  private _resolvedAccessibleName = '';
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -258,7 +268,14 @@ export class HelixTableHeader extends HelixElement {
         text += flattenAccName(node as Element);
       }
     }
-    this._slotText = text.replace(/\s+/g, ' ').trim();
+    const next = text.replace(/\s+/g, ' ').trim();
+    if (next !== this._slotText) {
+      this._slotText = next;
+      // CodeRabbit SHOULD-FIX (PR #1649 follow-up): re-run host AccName
+      // resolution so the precedence ladder picks up the new slotted text
+      // when no consumer aria-* override is present.
+      this._syncHostAriaSemantics();
+    }
   }
 
   /** @internal */
@@ -292,18 +309,38 @@ export class HelixTableHeader extends HelixElement {
       refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
     }
 
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up): compute the resolved
+    // accessible name via the AccName 1.2 precedence ladder
+    // (aria-labelledby flatten > aria-label > slotted column text) so the
+    // inner sort button's aria-label tracks the columnheader's accessible
+    // name. Without this, "Sort by <column>" diverges from the column's
+    // actual announced name on engines that support aria-labelledby.
+    let resolved = '';
     if (hasEffectiveLabelledBy) {
+      const flattened = labelEls
+        .map((el) => flattenAccName(el))
+        .filter(Boolean)
+        .join(' ');
+      resolved = flattened || hostAriaLabel || this._slotText;
       if (this._supportsIdrefRefs) {
         internals.ariaLabel = null;
       }
     } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
       if (this._supportsIdrefRefs) {
         internals.ariaLabel = hostAriaLabel;
       }
     } else {
+      resolved = this._slotText;
       if (this._supportsIdrefRefs) {
         internals.ariaLabel = null;
       }
+    }
+
+    if (this._resolvedAccessibleName !== resolved) {
+      this._resolvedAccessibleName = resolved;
+      // Re-render so the sort button's aria-label picks up the new name.
+      this.requestUpdate();
     }
   }
 
@@ -374,7 +411,11 @@ export class HelixTableHeader extends HelixElement {
    * @internal
    */
   protected _sortLabel(): string {
-    const column = this._slotText;
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up): prefer the resolved
+    // accessible name (aria-labelledby > aria-label > slotted text) so
+    // the sort button announces the same column name as the host
+    // columnheader. Falls back to slotted text for backwards compat.
+    const column = this._resolvedAccessibleName || this._slotText;
     let directionLabel: string;
     if (this.sortDirection === 'asc') {
       directionLabel = 'Sort descending';

@@ -93,7 +93,8 @@ export const helixCardStyles = css`
     transform: translateY(var(--hx-transform-lift-md, -2px));
   }
 
-  .card--interactive:focus-visible {
+  .card--interactive:focus-visible,
+  :host(:focus-visible) .card--interactive {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-card-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
@@ -191,6 +192,18 @@ export const helixCardStyles = css`
 
     .card__actions {
       border-top-color: CanvasText;
+    }
+
+    /*
+     * Force a system-color focus ring on the interactive card under
+     * Windows High Contrast Mode — the token-driven outline above
+     * collapses to system colors but the explicit Highlight color is
+     * stricter for AT contrast and reaches the host on the modern
+     * host-canonical path (the host is the focused surface).
+     */
+    .card--interactive:focus-visible,
+    :host(:focus-visible) .card--interactive {
+      outline-color: Highlight;
     }
   }
 `;
