@@ -89,6 +89,7 @@ export interface HxSelectChangeDetail {
  * @slot help-text - Custom help text content (overrides the helpText property).
  *
  * @fires {CustomEvent<{value: string}>} hx-change - Dispatched when the selected option changes.
+ * @fires {Event} invalid - Platform constraint-validation event fired when checkValidity() / reportValidity() determine the value is invalid (form-associated component contract via ElementInternals.setValidity).
  *
  * @csspart field - The outer field container.
  * @csspart label - The label element.

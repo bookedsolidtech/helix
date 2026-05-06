@@ -162,6 +162,11 @@ _rea_unwrap_at_depth() {
   local _unwrap_sep
   _unwrap_sep=$'\x1c\x1d'
   local masked
+  # shellcheck disable=SC1078
+  # SC1078 fires inside the awk program because shellcheck's bash parser
+  # cannot model awk's nested-quote semantics (`'\''` here is the
+  # bash-to-awk single-apostrophe escape pattern, not an unclosed shell
+  # string). Verified false-positive — the awk program parses cleanly.
   masked=$(printf '%s%s' "$cmd" "$_unwrap_sep" | awk '
     BEGIN { RS = "\034\035" }
     {
@@ -527,6 +532,11 @@ _rea_split_segments() {
   # records; the existing pipeline then quote-masks and splits each
   # record independently. Inner payload anchors trigger words for the
   # `any_segment_*` checks downstream.
+  # shellcheck disable=SC1078
+  # SC1078 fires inside the awk program because shellcheck's bash parser
+  # cannot model awk's nested-quote semantics (`'\''` here is the
+  # bash-to-awk single-apostrophe escape pattern, not an unclosed shell
+  # string). Verified false-positive — the awk program parses cleanly.
   _rea_unwrap_nested_shells "$cmd" \
     | awk '
         BEGIN {
