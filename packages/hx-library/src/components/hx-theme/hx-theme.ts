@@ -190,8 +190,9 @@ function _buildThemeCss(theme: ThemeName): string {
  *
  * @csspart base - The inner slot wrapper element. `display: contents` — no layout effect.
  *
- * @cssprop [--hx-*] - All design tokens for the selected theme are injected
- *   as CSS custom properties on the host element.
+ * Theme-injected CSS custom properties (semantic surface — full token catalog
+ * lives in `@helixui/tokens`; the wildcard `--hx-*` was previously documented
+ * here but the CEM cssProperties[] surface requires explicit names).
  *
  * @example Drupal Twig — wrap a region with a dark theme:
  * ```twig
@@ -216,9 +217,13 @@ function _buildThemeCss(theme: ThemeName): string {
  *   <!-- Clinical dashboard content -->
  * </hx-theme>
  * ```
- * @cssprop [--hx-color-text-primary] - Color.
- * @cssprop [--hx-space-4] - Spacing token.
- * @cssprop [--hx-duration-fast] - Animation duration.
+ * @cssprop [--hx-color-text-primary] - Primary text color (theme-injected).
+ * @cssprop [--hx-color-surface-base] - Base surface background (theme-injected).
+ * @cssprop [--hx-color-border-default] - Default border color (theme-injected).
+ * @cssprop [--hx-space-4] - Spacing token (theme-injected).
+ * @cssprop [--hx-duration-fast] - Animation duration (theme-injected).
+ * @cssprop [--hx-radius-md] - Medium border-radius (theme-injected).
+ * @cssprop [--hx-font-family-body] - Body font family (theme-injected).
  */
 @customElement('hx-theme')
 export class HelixTheme extends HelixElement {
