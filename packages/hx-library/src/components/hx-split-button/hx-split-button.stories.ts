@@ -669,12 +669,26 @@ export const KeyboardEscapeClosesMenu: Story = {
     ) as HTMLButtonElement;
     await userEvent.click(triggerButton);
     await splitButton!.updateComplete;
+    // Wait for the async focus-transfer to the first menu item
+    // (`_openMenu` queues focus in a microtask after `updateComplete`).
+    await new Promise((r) => setTimeout(r, 50));
     await expect(triggerButton.getAttribute('aria-expanded')).toBe('true');
 
-    // Press Escape to close
-    await userEvent.keyboard('{Escape}');
+    // Dispatch Escape directly to the menu panel — post-host-canonical
+    // migration (group-5b) the hx-menu-item host is the focusable surface,
+    // but `userEvent.keyboard` against that target races the async
+    // focus-transfer queued by `_openMenu`. Dispatching a composed keydown
+    // at the menu panel exercises the same handler deterministically.
+    const menuPanel = splitButton!.shadowRoot!.querySelector(
+      '.split-button__menu',
+    ) as HTMLElement;
+    await expect(menuPanel).toBeTruthy();
+    menuPanel.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }),
+    );
     await splitButton!.updateComplete;
     await expect(triggerButton.getAttribute('aria-expanded')).toBe('false');
+    await expect(menuPanel.classList.contains('split-button__menu--open')).toBe(false);
   },
 };
 
