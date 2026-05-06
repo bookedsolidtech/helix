@@ -7,9 +7,22 @@ import { helixListStyles } from './hx-list.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { HelixListItem } from './hx-list-item.js'; // real import for instanceof check and property access
 import { devWarn } from '../../utils/dev-warn.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 /**
  * A styled list container supporting plain, bulleted, numbered, description, and interactive variants.
+ *
+ * Group 7 host-canonical: `role="list"` (or `role="listbox"` in interactive
+ * mode) lives on the **host** via `_internals.role`, harmonizing with
+ * `hx-structured-list` (the gold-standard exemplar for Group 7). The `<dl>`
+ * description variant keeps native semantics — no host role assigned, since
+ * `<dl>` IS the semantic surface and AT walks it directly.
  *
  * @summary Container for list items with optional dividers and interactive selection.
  *
@@ -33,6 +46,13 @@ export class HelixList extends HelixElement {
   static override styles = [helixListStyles, forcedColorsSurface];
 
   /**
+   * Test seam (Group 7 host-canonical migration): see other Group 7 components.
+   * Production code MUST NOT touch this field.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
+  /**
    * Visual variant of the list.
    * @attr variant
    */
@@ -53,20 +73,46 @@ export class HelixList extends HelixElement {
   @property({ type: String })
   label: string | undefined = undefined;
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /** @internal */
+  private _resolvedAccessibleName = '';
+
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('keydown', this._handleKeydown);
+    const ctor = this.constructor as typeof HelixList;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this._handleKeydown);
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
   }
 
   override updated(changedProps: PropertyValues<this>): void {
     super.updated(changedProps);
     if (changedProps.has('variant')) {
       this._updateItemStates();
+      this._syncHostAriaSemantics();
+    }
+    if (changedProps.has('label')) {
+      this._syncHostAriaSemantics();
     }
     if (this.variant === 'interactive' && !this.label) {
       devWarn(
@@ -87,6 +133,92 @@ export class HelixList extends HelixElement {
     const items = this.querySelectorAll('hx-list-item');
     for (const item of items) {
       (item as HelixListItem).interactive = isInteractive;
+    }
+  }
+
+  /**
+   * Resolve the host's role for the current variant. Description variant
+   * uses native `<dl>` semantics (returns `null` so the host carries no
+   * explicit role). Interactive variant becomes `listbox`. All other
+   * variants are `list`.
+   * @internal
+   */
+  private _hostRole(): 'list' | 'listbox' | null {
+    if (this.variant === 'description') return null;
+    if (this.variant === 'interactive') return 'listbox';
+    return 'list';
+  }
+
+  /** @internal */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    const role = this._hostRole();
+
+    if (!this._supportsIdrefRefs || role === null) {
+      // Either the engine lacks IDL element references, or the variant uses
+      // native <dl> semantics — clear host role/state writes so we don't
+      // duplicate AT surfaces.
+      internals.role = null;
+      internals.ariaLabel = null;
+      internals.ariaMultiSelectable = null;
+    } else {
+      internals.role = role;
+      // Listbox is single-select today (matches the prior hardcoded
+      // aria-multiselectable="false" on the inner div). When multi-select
+      // becomes a use case, parameterise via a property.
+      internals.ariaMultiSelectable = role === 'listbox' ? 'false' : null;
+    }
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs && role !== null) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    let resolved = '';
+    if (hasEffectiveLabelledBy) {
+      const flattened =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        hostAriaLabel ||
+        this.label ||
+        '';
+      resolved = flattened;
+      if (this._supportsIdrefRefs && role !== null) {
+        internals.ariaLabel = null;
+      }
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+      if (this._supportsIdrefRefs && role !== null) {
+        internals.ariaLabel = hostAriaLabel;
+      }
+    } else if (this.label) {
+      resolved = this.label;
+      if (this._supportsIdrefRefs && role !== null) {
+        internals.ariaLabel = this.label;
+      }
+    } else {
+      resolved = '';
+      if (this._supportsIdrefRefs && role !== null) {
+        internals.ariaLabel = null;
+      }
+    }
+
+    if (this._resolvedAccessibleName !== resolved) {
+      this._resolvedAccessibleName = resolved;
+      if (!this._supportsIdrefRefs) {
+        this.requestUpdate();
+      }
     }
   }
 
@@ -155,6 +287,10 @@ export class HelixList extends HelixElement {
 
     const slot = html`<slot @slotchange=${this._handleSlotChange}></slot>`;
 
+    // Dual-surface (Group 7 hx-progress-ring exemplar / hx-structured-list
+    // gold standard): inner element keeps role + label for legacy AT and
+    // consumer queries. Host adds cross-shadow IDREF wiring via internals.*
+    // in _syncHostAriaSemantics().
     if (isDescription) {
       return html`
         <dl

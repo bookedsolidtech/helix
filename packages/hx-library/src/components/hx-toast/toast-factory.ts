@@ -15,6 +15,33 @@ export interface ToastOptions {
 }
 
 /**
+ * (group-6 §5.5) Minimum on-screen lifetime for any toast created via the
+ * factory, regardless of `stackLimit`-driven displacement. Prevents
+ * AT-clipping when rapid-fire `toast()` calls (e.g. during a Drupal
+ * BigPipe re-attach burst) would otherwise hide a toast before NVDA/JAWS
+ * finished reading it.
+ */
+const MIN_DISPLAY_MS = 1500;
+
+/** @internal Tracks `show()` timestamps so the factory can defer displacement. */
+const _shownAt = new WeakMap<HelixToast, number>();
+
+/**
+ * @internal
+ * Tracks toasts that already have a deferred-hide scheduled so successive
+ * `toast()` calls within the same MIN_DISPLAY_MS window do NOT pile multiple
+ * timers on the same target while leaving newer overflow toasts untouched.
+ *
+ * (group-6 §5.5 burst-fix) Without this guard, a 5-call burst against a
+ * limit-3 stack would schedule three hides on the SAME oldest toast (calls
+ * 4, 5, and any subsequent within the window), and the stack would settle
+ * at 4 visible toasts after the deferred hide fired — violating
+ * `stackLimit`. The set + per-toast guard ensures each successive oldest
+ * is hidden exactly once.
+ */
+const _pendingDisplacements = new WeakSet<HelixToast>();
+
+/**
  * Imperatively create and display a toast notification.
  *
  * Creates a shared `hx-toast-stack` on `document.body` if one does not exist,
@@ -46,11 +73,39 @@ export function toast(options: ToastOptions): HelixToast {
     document.body.appendChild(stack);
   }
 
-  // Enforce stack limit: hide oldest open toast if at capacity
+  // Enforce stack limit: hide oldest open toasts if at capacity.
+  // (group-6 §5.5) Minimum display time prevents AT-clipping under rapid-fire
+  // bursts. If a toast has not yet been on screen for MIN_DISPLAY_MS, defer
+  // its hide until the remainder elapses; otherwise hide immediately.
+  //
+  // Burst-fix: previously this branch only inspected the single oldest toast,
+  // so calls 4..N within the same MIN_DISPLAY_MS window all scheduled hides
+  // on the same target while the stack settled at limit+(N-1) visible. Now we
+  // walk every overflow slot and use `_pendingDisplacements` to guarantee each
+  // successive oldest is hidden exactly once.
   if (stack.stackLimit > 0) {
     const openToasts = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
-    if (openToasts.length >= stack.stackLimit) {
-      openToasts[0]?.hide();
+    // Treat anything already queued for displacement as already-hiding so we
+    // pick the next surviving oldest. Since the new toast is appended after
+    // this block, we must overshoot by 1 to cover it.
+    const survivors = openToasts.filter((t) => !_pendingDisplacements.has(t));
+    const overflow = survivors.length + 1 - stack.stackLimit;
+    for (let i = 0; i < overflow; i++) {
+      const target = survivors[i];
+      if (!target) break;
+      const shownAt = _shownAt.get(target);
+      const elapsed = shownAt === undefined ? Number.POSITIVE_INFINITY : Date.now() - shownAt;
+      if (elapsed >= MIN_DISPLAY_MS) {
+        target.hide();
+      } else {
+        const remaining = MIN_DISPLAY_MS - elapsed;
+        _pendingDisplacements.add(target);
+        setTimeout(() => {
+          _pendingDisplacements.delete(target);
+          // Guard: only hide if still open (consumer may have hidden it manually)
+          if (target.open) target.hide();
+        }, remaining);
+      }
     }
   }
 
@@ -63,11 +118,14 @@ export function toast(options: ToastOptions): HelixToast {
 
   // Remove from DOM after hiding
   toastEl.addEventListener('hx-after-hide', () => {
+    _shownAt.delete(toastEl);
+    _pendingDisplacements.delete(toastEl);
     toastEl.remove();
   });
 
   stack.appendChild(toastEl);
   toastEl.show();
+  _shownAt.set(toastEl, Date.now());
 
   return toastEl;
 }

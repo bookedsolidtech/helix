@@ -1,11 +1,23 @@
-import { html, css } from 'lit';
+import { html, css, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
+import {
+  installAriaIdrefMirror,
+  resolveIdrefTokens,
+  supportsIdrefElementReferences,
+  type AriaIdrefMirrorHandle,
+} from '../../utils/aria-idref.js';
+import { flattenAccName } from '../../utils/aria-flatten.js';
 
 /**
  * Semantic table data cell. Must be a child of `hx-tr`.
+ *
+ * Group 7 host-canonical: `role="cell"` lives on the **host** via
+ * `_internals.role`. The host carries the cell's accessible name (resolved
+ * from the `label` property — fixing audit B-A1, where mobile screen reader
+ * users lost column context because `data-label` was visual-only).
  *
  * @summary Table data cell (`<td>`) for use inside `hx-tr`.
  *
@@ -49,6 +61,19 @@ export class HelixTableCell extends HelixElement {
         border-radius: var(--hx-border-radius-sm, 2px);
       }
 
+      /* ─── Forced Colors (Windows High Contrast) ─── */
+
+      @media (forced-colors: active) {
+        td {
+          border-bottom-color: CanvasText;
+        }
+
+        td:focus-visible {
+          outline: 2px solid Highlight;
+          outline-offset: var(--hx-focus-ring-offset, -2px);
+        }
+      }
+
       /* ─── Mobile card layout ─── */
 
       @media (max-width: 768px) {
@@ -75,6 +100,13 @@ export class HelixTableCell extends HelixElement {
   ];
 
   /**
+   * Test seam (Group 7 host-canonical migration): see other Group 7 components.
+   * Production code MUST NOT touch this field.
+   * @internal
+   */
+  static __testSupportsIdrefRefsOverride: boolean | null = null;
+
+  /**
    * Horizontal alignment for cell content.
    * @attr align
    */
@@ -96,19 +128,131 @@ export class HelixTableCell extends HelixElement {
   rowspan = 0;
 
   /**
-   * Column header label for this cell. Forwarded as `data-label` on the native `<td>` for
-   * the mobile card layout (`td::before { content: attr(data-label) }`) and as `aria-label`
-   * so screen readers identify the column when the header row is hidden.
+   * Column header label for this cell. Forwarded as `data-label` on the native
+   * `<td>` for the mobile card layout (`td::before { content: attr(data-label) }`)
+   * AND projected to `aria-label` so screen readers identify the column when
+   * the header row is hidden via the mobile breakpoint. Group 7 audit B-A1
+   * fix: prior to migration, the JSDoc claimed aria-label projection but the
+   * implementation only set `data-label` — `::before { content: attr(...) }`
+   * is not reliably announced by VoiceOver / NVDA across versions.
    * @attr label
    */
   @property({ type: String, attribute: 'label' })
   label = '';
 
+  // ─── Host-canonical ARIA bookkeeping ───
+
+  /** @internal */
+  private _supportsIdrefRefs = true;
+
+  /** @internal */
+  private _ariaMirror: AriaIdrefMirrorHandle | null = null;
+
+  /** @internal */
+  private _resolvedAccessibleName = '';
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    const ctor = this.constructor as typeof HelixTableCell;
+    this._supportsIdrefRefs =
+      ctor.__testSupportsIdrefRefsOverride !== null
+        ? ctor.__testSupportsIdrefRefsOverride
+        : supportsIdrefElementReferences(this._internals);
+    this._syncHostAriaSemantics();
+    this._ariaMirror = installAriaIdrefMirror(this, () => {
+      this._syncHostAriaSemantics();
+    });
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._ariaMirror?.disconnect();
+    this._ariaMirror = null;
+  }
+
+  override updated(changed: PropertyValues<this>): void {
+    super.updated(changed);
+    if (changed.has('label')) {
+      this._syncHostAriaSemantics();
+    }
+  }
+
+  /** @internal */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    if (!this._supportsIdrefRefs) {
+      internals.role = null;
+      internals.ariaLabel = null;
+    } else {
+      internals.role = 'cell';
+    }
+
+    const hostAriaLabel = this.getAttribute('aria-label')?.trim() || '';
+    const consumerLabelledBy = this.getAttribute('aria-labelledby');
+    const labelEls = resolveIdrefTokens(this, consumerLabelledBy);
+    const hasEffectiveLabelledBy = labelEls.length > 0;
+
+    type InternalsWithRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+
+    if (this._supportsIdrefRefs) {
+      const refsInternals = internals as InternalsWithRefs;
+      refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
+    }
+
+    let resolved = '';
+    if (hasEffectiveLabelledBy) {
+      const flattened =
+        labelEls
+          .map((el) => flattenAccName(el))
+          .filter(Boolean)
+          .join(' ') ||
+        hostAriaLabel ||
+        this.label ||
+        '';
+      resolved = flattened;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    } else if (hostAriaLabel) {
+      resolved = hostAriaLabel;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = hostAriaLabel;
+      }
+    } else if (this.label) {
+      // Group 7 B-A1 fix: derive aria-label from the `label` property when
+      // no consumer override is supplied.
+      resolved = this.label;
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = this.label;
+      }
+    } else {
+      resolved = '';
+      if (this._supportsIdrefRefs) {
+        internals.ariaLabel = null;
+      }
+    }
+
+    if (this._resolvedAccessibleName !== resolved) {
+      this._resolvedAccessibleName = resolved;
+      if (!this._supportsIdrefRefs) {
+        this.requestUpdate();
+      }
+    }
+  }
+
   override render() {
+    // Dual-surface (Group 7 hx-progress-ring exemplar): inner <td> keeps
+    // role="cell" + the audit B-A1 aria-label projection from `this.label`
+    // for legacy AT and consumer queries. Host adds cross-shadow IDREF
+    // wiring via internals.* in _syncHostAriaSemantics(). data-label still
+    // feeds the mobile card layout's CSS pseudo-element.
     return html`
       <td
         part="cell"
         role="cell"
+        aria-label=${ifDefined(this.label || undefined)}
         data-label=${ifDefined(this.label || undefined)}
         colspan=${ifDefined(this.colspan > 0 ? this.colspan : undefined)}
         rowspan=${ifDefined(this.rowspan > 0 ? this.rowspan : undefined)}

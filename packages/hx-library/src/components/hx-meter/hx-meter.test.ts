@@ -661,4 +661,57 @@ describe('hx-meter', () => {
       expect(base.getAttribute('aria-labelledby')).toMatch(/^hx-meter-\d+-label$/);
     });
   });
+
+  // ─── Group 7 host-canonical migration ───
+
+  describe('Host-canonical (Group 7)', () => {
+    it('mirrors role="meter" onto host internals on the modern path', async () => {
+      const el = await fixture<HelixMeter>('<hx-meter value="42" max="100"></hx-meter>');
+      await el.updateComplete;
+      const internals = (
+        el as unknown as { _internals: ElementInternals }
+      )._internals;
+      expect(internals.role).toBe('meter');
+      expect(internals.ariaValueNow).toBe('42');
+      expect(internals.ariaValueMax).toBe('100');
+    });
+
+    it('suppresses host internals.role on the fallback path', async () => {
+      // Toggle the test seam to force fallback path BEFORE element connects.
+      const ctor = customElements.get('hx-meter') as typeof HelixMeter;
+      ctor.__testSupportsIdrefRefsOverride = false;
+      try {
+        const el = await fixture<HelixMeter>('<hx-meter value="42"></hx-meter>');
+        await el.updateComplete;
+        const internals = (
+          el as unknown as { _internals: ElementInternals }
+        )._internals;
+        expect(internals.role).toBeNull();
+        // Inner [role="meter"] remains the announced surface.
+        const inner = shadowQuery(el, '[part="base"]');
+        expect(inner?.getAttribute('role')).toBe('meter');
+      } finally {
+        ctor.__testSupportsIdrefRefsOverride = null;
+      }
+    });
+
+    it('AccName 1.2 §4.3.1 precedence: host aria-labelledby > aria-label', async () => {
+      const el = await fixture<HelixMeter>(
+        '<div><label id="lbl-meter-1">Battery</label><hx-meter aria-label="overridden" aria-labelledby="lbl-meter-1" value="60"></hx-meter></div>',
+      );
+      const meter = el.querySelector('hx-meter') as HelixMeter;
+      await meter.updateComplete;
+      const internals = (
+        meter as unknown as { _internals: ElementInternals }
+      )._internals;
+      type InternalsWithRefs = ElementInternals & {
+        ariaLabelledByElements: Element[] | null;
+      };
+      const refs = (internals as InternalsWithRefs).ariaLabelledByElements ?? [];
+      expect(refs.length).toBe(1);
+      expect(refs[0]?.id).toBe('lbl-meter-1');
+      // ariaLabel is cleared so the IDREF wins.
+      expect(internals.ariaLabel).toBeNull();
+    });
+  });
 });

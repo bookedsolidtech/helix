@@ -203,7 +203,7 @@ export const Success: Story = {
   },
 };
 
-/** Warning banner for situations requiring immediate clinician or administrator attention. Uses `role="alert"` (assertive). */
+/** Warning banner for situations requiring clinician or administrator attention. Uses `role="status"` (polite); only `error` is assertive (group-6 harmonization with hx-alert / hx-toast). */
 export const Warning: Story = {
   args: {
     variant: 'warning',
@@ -215,8 +215,8 @@ export const Warning: Story = {
     await expect(banner).toBeTruthy();
     await expect(banner?.variant).toBe('warning');
 
-    // Role is on the host element; assertive for warning
-    await expect(banner?.getAttribute('role')).toBe('alert');
+    // Role is on the host element; warning is polite (group-6: only error → alert)
+    await expect(banner?.getAttribute('role')).toBe('status');
   },
 };
 

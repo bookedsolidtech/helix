@@ -42,16 +42,19 @@ export const helixTabStyles = css`
     position: relative;
   }
 
-  /* ─── Hover State ─── */
+  /* ─── Hover State ───
+     Group 5a host-canonical: drive visual state from host attributes
+     (selected / disabled are reflect: true), not from inner-element ARIA
+     attributes which now live on the host's ElementInternals. */
 
-  .tab:not([aria-selected='true']):not([aria-disabled='true']):hover {
+  :host(:not([selected]):not([disabled])) .tab:hover {
     color: var(--hx-tabs-tab-hover-color, var(--hx-color-neutral-800, #202b39));
     background-color: var(--hx-tabs-tab-hover-bg, var(--hx-color-neutral-50, #f5f8f3));
   }
 
   /* ─── Selected State ─── */
 
-  .tab[aria-selected='true'] {
+  :host([selected]) .tab {
     color: var(--hx-tabs-tab-active-color, var(--hx-color-primary-600, #0f7078));
     border-bottom-color: var(
       --_tab-indicator-bottom-color,
@@ -61,13 +64,21 @@ export const helixTabStyles = css`
     font-weight: var(--hx-tabs-tab-active-font-weight, var(--hx-font-weight-semibold, 600));
   }
 
-  /* ─── Focus State ─── */
+  /* ─── Focus State ───
+     Focus lands on the HOST in Group 5a host-canonical mode. The inner
+     [part="tab"] is presentational (tabindex=-1). Use :host(:focus-visible). */
 
-  .tab:focus-visible {
+  :host(:focus-visible) .tab {
     outline: var(--hx-focus-ring-width, 2px) solid
       var(--hx-tabs-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
     outline-offset: var(--hx-focus-ring-offset, 2px);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
+  }
+
+  /* Strip the default host focus ring — outline lands on the inner [part="tab"]
+     surface above for visual continuity with the existing component appearance. */
+  :host(:focus) {
+    outline: none;
   }
 
   /* ─── Disabled State ─── */
@@ -76,7 +87,7 @@ export const helixTabStyles = css`
     cursor: not-allowed;
   }
 
-  .tab[aria-disabled='true'] {
+  :host([disabled]) .tab {
     pointer-events: none;
     color: var(--hx-tabs-tab-disabled-color, var(--hx-color-neutral-400, #8e9c98));
   }
@@ -108,18 +119,18 @@ export const helixTabStyles = css`
       background-color: ButtonFace;
     }
 
-    .tab[aria-selected='true'] {
+    :host([selected]) .tab {
       color: HighlightText;
       background-color: Highlight;
       border-bottom-color: Highlight;
     }
 
-    .tab:focus-visible {
+    :host(:focus-visible) .tab {
       outline: 3px solid Highlight;
       outline-offset: 2px;
     }
 
-    .tab[aria-disabled='true'] {
+    :host([disabled]) .tab {
       color: GrayText;
     }
   }

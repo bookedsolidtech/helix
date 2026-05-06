@@ -15,6 +15,12 @@ export type { HxListProps };
 
 /**
  * A styled list container supporting plain, bulleted, numbered, description, and interactive variants.
+
+Group 7 host-canonical: `role="list"` (or `role="listbox"` in interactive
+mode) lives on the **host** via `_internals.role`, harmonizing with
+`hx-structured-list` (the gold-standard exemplar for Group 7). The `<dl>`
+description variant keeps native semantics — no host role assigned, since
+`<dl>` IS the semantic surface and AT walks it directly.
  *
  * @example
  * ```tsx

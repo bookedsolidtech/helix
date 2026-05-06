@@ -30,6 +30,10 @@ the value is used as the suggested filename. */
   /** Relationship between the current document and the linked URL.
 Automatically set to "noopener noreferrer" when target="_blank". */
   rel?: string | undefined;
+  /** Localised announcement text appended (visually hidden) to the link's
+accessible name when `target="_blank"`. Defaults to English. Override
+for i18n contexts so AT users hear the new-tab notice in their locale. */
+  externalLabel?: string;
 
   // Event callbacks
   /** Dispatched when the link is clicked and is not disabled. */

@@ -517,4 +517,43 @@ describe('hx-tag', () => {
       expect(btn?.getAttribute('aria-label')).toBe('Remove Hello World');
     });
   });
+
+  // ─── Group 9: per-variant forced-colors fallbacks ───
+
+  describe('Group 9 forced-colors per-variant fallbacks', () => {
+    function collectForcedColorsRules(el: HTMLElement): string {
+      const sheets = el.shadowRoot!.adoptedStyleSheets;
+      let text = '';
+      for (const sheet of sheets) {
+        for (const rule of sheet.cssRules) {
+          if (rule.cssText.includes('forced-colors')) {
+            text += rule.cssText;
+          }
+        }
+      }
+      return text;
+    }
+
+    it('includes per-variant border-style for success/warning/danger under forced-colors', async () => {
+      const el = await fixture<HxTag>('<hx-tag variant="success">x</hx-tag>');
+      const rules = collectForcedColorsRules(el);
+      expect(rules).toContain('.tag--success');
+      expect(rules).toContain('.tag--warning');
+      expect(rules).toContain('.tag--danger');
+    });
+
+    it('uses distinct border-style values per semantic variant', async () => {
+      const el = await fixture<HxTag>('<hx-tag>x</hx-tag>');
+      const rules = collectForcedColorsRules(el);
+      expect(rules).toMatch(/\.tag--success[^}]*solid/);
+      expect(rules).toMatch(/\.tag--warning[^}]*dashed/);
+      expect(rules).toMatch(/\.tag--danger[^}]*double/);
+    });
+
+    it('forces forced-color-adjust:none on .tag so the variant fallback survives HCM', async () => {
+      const el = await fixture<HxTag>('<hx-tag>x</hx-tag>');
+      const rules = collectForcedColorsRules(el);
+      expect(rules).toContain('forced-color-adjust');
+    });
+  });
 });

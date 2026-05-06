@@ -7,7 +7,7 @@ import {
   cleanup,
   checkA11y,
 } from '../../test-utils.js';
-import type { HelixTimePicker } from './hx-time-picker.js';
+import { HelixTimePicker } from './hx-time-picker.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -599,10 +599,10 @@ describe('hx-time-picker', () => {
       expect(input.getAttribute('aria-required')).toBe('true');
     });
 
-    it('input does not have aria-required when not required', async () => {
+    it('input has aria-required="false" when not required (APG editable combobox always reflects)', async () => {
       const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-required')).toBeNull();
+      expect(input.getAttribute('aria-required')).toBe('false');
     });
 
     it('input has aria-autocomplete="list"', async () => {
@@ -665,10 +665,13 @@ describe('hx-time-picker', () => {
       expect(errorDiv?.getAttribute('aria-live')).toBeNull();
     });
 
-    it('does not render error div when no error', async () => {
+    it('error div is persistent and hidden when no error (live-region pattern)', async () => {
       const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
       const errorDiv = shadowQuery(el, '.field__error');
-      expect(errorDiv).toBeNull();
+      // Persistent role="alert" container — present in DOM from first paint,
+      // hidden via the [hidden] attribute when no error so AT contract is honoured.
+      expect(errorDiv).toBeTruthy();
+      expect(errorDiv?.hasAttribute('hidden')).toBe(true);
     });
   });
 
@@ -917,33 +920,43 @@ describe('hx-time-picker', () => {
   // ─── Slotted label aria-labelledby (A-03) ───
 
   describe('Slotted label accessibility', () => {
-    it('input gets aria-labelledby when label slot is used (A-03)', async () => {
+    it('slotted <label> text-flattens onto input aria-label (cross-shadow safe; A-03)', async () => {
+      // Light-DOM ids do NOT resolve from inside a shadow root, so the
+      // canonical pattern is to text-flatten slotted-label content onto the
+      // inner input as aria-label rather than write a cross-shadow IDREF.
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker><label slot="label" id="my-label">My Time</label></hx-time-picker>',
       );
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-labelledby')).toBe('my-label');
+      expect(input.getAttribute('aria-label')).toBe('My Time');
+      // Inner input must NOT carry a light-DOM id as aria-labelledby — that
+      // pattern is silently broken across the shadow boundary.
+      expect(input.getAttribute('aria-labelledby')).toBeNull();
     });
 
-    it('assigns an id to the slotted label if it lacks one (A-03)', async () => {
+    it('slotted <label> without id still names the input via aria-label (A-03)', async () => {
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker><label slot="label">No ID Label</label></hx-time-picker>',
       );
       await el.updateComplete;
-      const slottedLabel = el.querySelector<HTMLLabelElement>('[slot="label"]')!;
-      expect(slottedLabel.id).toBeTruthy();
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-labelledby')).toBe(slottedLabel.id);
+      expect(input.getAttribute('aria-label')).toBe('No ID Label');
+      expect(input.getAttribute('aria-labelledby')).toBeNull();
     });
 
-    it('input has no aria-labelledby when prop label is used (A-03)', async () => {
+    it('label property points inner input aria-labelledby at the rendered <label> (same shadow root) (A-03)', async () => {
+      // When the label property names the field, we render an internal
+      // <label id> in the same shadow root and reference it with
+      // aria-labelledby — that IS resolvable inside the shadow.
       const el = await fixture<HelixTimePicker>(
         '<hx-time-picker label="Appointment Time"></hx-time-picker>',
       );
       await el.updateComplete;
       const input = shadowQuery<HTMLInputElement>(el, 'input')!;
-      expect(input.getAttribute('aria-labelledby')).toBeNull();
+      const labelEl = shadowQuery<HTMLLabelElement>(el, 'label')!;
+      expect(labelEl.id).toBeTruthy();
+      expect(input.getAttribute('aria-labelledby')).toBe(labelEl.id);
     });
   });
 
@@ -1476,6 +1489,555 @@ describe('hx-time-picker', () => {
 
       // The component value (and thus the form submission value) stays at "11:00".
       expect(el.value).toBe('11:00');
+    });
+  });
+
+  // ─── Property: accessibleLabel ─────────────────────────────────────────────
+
+  describe('Property: accessibleLabel', () => {
+    it('writes accessibleLabel onto the inner input as aria-label', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker accessible-label="Appointment time picker"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Appointment time picker');
+    });
+
+    it('accessibleLabel takes precedence over visible label property', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="Visible Label" accessible-label="AT-only Name"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('AT-only Name');
+      // accessibleLabel suppresses the internal label aria-labelledby chain.
+      expect(input.getAttribute('aria-labelledby')).toBeNull();
+    });
+
+    it('accessibleLabel takes precedence over consumer aria-labelledby (helix override)', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-label-1">External Label</span>
+        <hx-time-picker accessible-label="Override" aria-labelledby="ext-label-1"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Override');
+      root.remove();
+    });
+  });
+
+  // ─── Cross-shadow naming: aria-labelledby on host ──────────────────────────
+
+  describe('Consumer aria-labelledby resolves through shadow boundary', () => {
+    it('resolves consumer aria-labelledby and text-flattens onto inner input aria-label', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-tp-1">Patient appointment time</span>
+        <hx-time-picker aria-labelledby="ext-tp-1"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Patient appointment time');
+      root.remove();
+    });
+
+    it('mutating textContent of resolved aria-labelledby target updates inner input aria-label', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-tp-2">First Label</span>
+        <hx-time-picker aria-labelledby="ext-tp-2"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('First Label');
+      // In-place text mutation on the same element — no slotchange, no host
+      // attribute change. The external-refs observer must catch it.
+      const target = root.querySelector('#ext-tp-2')!;
+      target.textContent = 'Second Label';
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      expect(input.getAttribute('aria-label')).toBe('Second Label');
+      root.remove();
+    });
+
+    it('aria-labelledby with nested aria-hidden subtree flattens to visible text only (AccName 1.2 §4.3.10)', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <label id="ext-tp-3"><svg aria-hidden="true"><title>icon</title></svg>Visible Time</label>
+        <hx-time-picker aria-labelledby="ext-tp-3"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Visible Time');
+      root.remove();
+    });
+
+    it('toggling aria-hidden on resolved external label resyncs inner input aria-label', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-tp-4">Visible</span>
+        <hx-time-picker aria-labelledby="ext-tp-4"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Visible');
+      const target = root.querySelector('#ext-tp-4')!;
+      target.setAttribute('aria-hidden', 'true');
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      // With the only label hidden, no labelledby resolution; falls through
+      // to other naming sources (none here) so aria-label is unset.
+      expect(input.getAttribute('aria-label')).toBeNull();
+      root.remove();
+    });
+
+    it('aria-labelledby precedence over aria-label (W3C AccName 1.2 §4.3.1)', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-tp-5">From Labelledby</span>
+        <hx-time-picker aria-labelledby="ext-tp-5" aria-label="From Aria Label"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('From Labelledby');
+      root.remove();
+    });
+
+    it('unresolvable aria-labelledby falls through to host aria-label', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <hx-time-picker aria-labelledby="does-not-exist" aria-label="Fallback Label"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Fallback Label');
+      root.remove();
+    });
+  });
+
+  // ─── Cross-shadow description: aria-describedby ────────────────────────────
+
+  describe('Consumer aria-describedby through synthesized desc span', () => {
+    it('mirrors consumer aria-describedby text into in-shadow span and adds id to inner input aria-describedby chain', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-desc-tp-1">Pick a time after 9am</span>
+        <hx-time-picker label="When" aria-describedby="ext-desc-tp-1"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const describedBy = input.getAttribute('aria-describedby') ?? '';
+      const tokens = describedBy.split(/\s+/).filter(Boolean);
+      // Synthesized span id must be in the chain.
+      const synthesized = el.shadowRoot?.querySelector<HTMLSpanElement>(
+        `#${tokens.find((t) => t.includes('-consumer-desc'))}`,
+      );
+      expect(synthesized).toBeTruthy();
+      expect(synthesized?.textContent).toBe('Pick a time after 9am');
+      root.remove();
+    });
+
+    it('mutating textContent of resolved aria-describedby target updates synthesized desc span', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-desc-tp-2">Initial desc</span>
+        <hx-time-picker label="When" aria-describedby="ext-desc-tp-2"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const synthesizedId = (
+        shadowQuery<HTMLInputElement>(el, 'input')!.getAttribute('aria-describedby') ?? ''
+      )
+        .split(/\s+/)
+        .find((t) => t.includes('-consumer-desc'))!;
+      const synthesized = el.shadowRoot!.getElementById(synthesizedId)!;
+      expect(synthesized.textContent).toBe('Initial desc');
+      const target = root.querySelector('#ext-desc-tp-2')!;
+      target.textContent = 'Updated desc';
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      expect(synthesized.textContent).toBe('Updated desc');
+      root.remove();
+    });
+
+    it('clearing host aria-describedby removes synthesized text and drops id from chain', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-desc-tp-3">Some hint</span>
+        <hx-time-picker label="When" aria-describedby="ext-desc-tp-3"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      let tokens = (input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+      expect(tokens.some((t) => t.includes('-consumer-desc'))).toBe(true);
+      el.removeAttribute('aria-describedby');
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      tokens = (input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+      expect(tokens.some((t) => t.includes('-consumer-desc'))).toBe(false);
+      root.remove();
+    });
+
+    it('inner input never carries aria-description (AccName drops it when describedby is present)', async () => {
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="ext-desc-tp-4">A description</span>
+        <hx-time-picker label="When" aria-describedby="ext-desc-tp-4"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.hasAttribute('aria-description')).toBe(false);
+      root.remove();
+    });
+  });
+
+  // ─── Slotted label: hidden roots and decorative-only ───────────────────────
+
+  describe('Slotted label hidden-root semantics (AccName 1.2 §4.3.10)', () => {
+    it('hidden root in slot="label" contributes empty text — no useful name', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><span slot="label" hidden>Secret</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBeNull();
+    });
+
+    it('aria-hidden root in slot="label" contributes empty text — no useful name', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><span slot="label" aria-hidden="true">Secret</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBeNull();
+    });
+
+    it('decorative-only slot="label" content (only aria-hidden svg) does NOT name the input', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><svg slot="label" aria-hidden="true"><title>icon</title></svg></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBeNull();
+    });
+
+    it('decorative svg + visible span in slot="label" — fallback path text-flattens to the visible text only', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><svg slot="label" aria-hidden="true"><title>icon</title></svg><span slot="label">Time</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Time');
+    });
+
+    it('multiple slotted label nodes aggregate into a single accessible name', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><span slot="label">Patient</span><span slot="label">name</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Patient name');
+    });
+
+    it('in-place textContent mutation on the same slotted label node triggers aria-label resync', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><span slot="label">First</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('First');
+      const slotted = el.querySelector('[slot="label"]')!;
+      slotted.textContent = 'Second';
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      expect(input.getAttribute('aria-label')).toBe('Second');
+    });
+  });
+
+  // ─── Slotted help-text and error: hidden semantics ─────────────────────────
+
+  describe('Slot effective-text uses AccName flatten (help-text + error)', () => {
+    it('help-text slot containing only [hidden] descendants does NOT mark help present', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When"><span slot="help-text" hidden>foo</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const tokens = (input.getAttribute('aria-describedby') ?? '')
+        .split(/\s+/)
+        .filter(Boolean);
+      expect(tokens.some((t) => t.includes('-help'))).toBe(false);
+    });
+
+    it('error slot containing only aria-hidden descendants does NOT activate error state', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When"><span slot="error" aria-hidden="true">err</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      // aria-invalid stays false; error id NOT in describedby
+      expect(input.getAttribute('aria-invalid')).toBe('false');
+      const tokens = (input.getAttribute('aria-describedby') ?? '')
+        .split(/\s+/)
+        .filter(Boolean);
+      expect(tokens.some((t) => t.includes('-error'))).toBe(false);
+    });
+
+    it('clearing the same slotted error textContent clears error state and removes id from describedby', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When"><span slot="error">Bad time</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      const errorEl = el.shadowRoot!.querySelector<HTMLElement>('.field__error')!;
+      expect((input.getAttribute('aria-describedby') ?? '').split(/\s+/)).toContain(errorEl.id);
+      // In-place clear of textContent on the SAME slotted node — no slotchange.
+      const slotted = el.querySelector('[slot="error"]')!;
+      slotted.textContent = '';
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      expect(input.getAttribute('aria-invalid')).toBe('false');
+      const tokens = (input.getAttribute('aria-describedby') ?? '')
+        .split(/\s+/)
+        .filter(Boolean);
+      expect(tokens).not.toContain(errorEl.id);
+    });
+
+    it('clearing the same slotted help-text textContent flips _hasHelpSlot and removes id from describedby', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When"><span slot="help-text">Pick wisely</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const helpEl = el.shadowRoot!.querySelector<HTMLElement>('.field__help-text')!;
+      expect((input.getAttribute('aria-describedby') ?? '').split(/\s+/)).toContain(helpEl.id);
+      const slotted = el.querySelector('[slot="help-text"]')!;
+      slotted.textContent = '';
+      await new Promise((r) => setTimeout(r, 20));
+      await el.updateComplete;
+      const tokens = (input.getAttribute('aria-describedby') ?? '')
+        .split(/\s+/)
+        .filter(Boolean);
+      expect(tokens).not.toContain(helpEl.id);
+    });
+  });
+
+  // ─── Validity surface: error property ──────────────────────────────────────
+
+  describe('Validity surface union (consumer error + slot + setValidity)', () => {
+    it('consumer `error` property marks inner input aria-invalid="true"', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When" error="Server rejected"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('runtime error property change populates alert on the SAME frame the container becomes visible', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const errorDiv = shadowQuery(el, '.field__error')!;
+      expect(errorDiv.hasAttribute('hidden')).toBe(true);
+      el.error = 'Async validation failed';
+      await el.updateComplete;
+      expect(errorDiv.hasAttribute('hidden')).toBe(false);
+      expect(errorDiv.textContent?.trim()).toContain('Async validation failed');
+    });
+  });
+
+  // ─── First-paint slot state seeding ────────────────────────────────────────
+
+  describe('First-paint slot state seeding (no slotchange wait)', () => {
+    it('slot-only label produces correct inner-input aria-label on first paint', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker><span slot="label">Time of Day</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(input.getAttribute('aria-label')).toBe('Time of Day');
+    });
+
+    it('slot-only help-text contributes its wrapper id to aria-describedby on first paint', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When"><span slot="help-text">Choose wisely</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const helpEl = el.shadowRoot!.querySelector<HTMLElement>('.field__help-text')!;
+      const tokens = (input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+      expect(tokens).toContain(helpEl.id);
+    });
+
+    it('slot-only error contributes its wrapper id to aria-describedby on first paint', async () => {
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="When"><span slot="error">Bad</span></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      const errorEl = el.shadowRoot!.querySelector<HTMLElement>('.field__error')!;
+      const tokens = (input.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+      expect(tokens).toContain(errorEl.id);
+    });
+  });
+
+  // ─── Forced colors mixin ────────────────────────────────────────────────────
+
+  describe('Forced colors mixin composition', () => {
+    it('forcedColorsField participates in the host stylesheet', async () => {
+      const el = await fixture<HelixTimePicker>('<hx-time-picker></hx-time-picker>');
+      const ctor = el.constructor as typeof HelixTimePicker;
+      const styles = ctor.styles;
+      expect(Array.isArray(styles)).toBe(true);
+      // Two-element array: [helixTimePickerStyles, forcedColorsField]
+      expect((styles as readonly unknown[]).length).toBeGreaterThanOrEqual(2);
+    });
+  });
+
+  // ─── Modern path: ElementInternals IDL element references ─────────────────
+
+  describe('Modern path: internals.ariaLabelledByElements', () => {
+    it('host has internals.ariaLabelledByElements set when consumer aria-labelledby resolves', async () => {
+      // Skip if the engine doesn't expose IDL refs.
+      const probe = document.createElement('hx-time-picker') as HelixTimePicker;
+      document.body.appendChild(probe);
+      const internals = (probe as unknown as { _internals: ElementInternals })._internals;
+      const supports = 'ariaLabelledByElements' in internals;
+      probe.remove();
+      if (!supports) return;
+
+      const root = document.createElement('div');
+      root.innerHTML = `
+        <span id="modern-ext-1">Modern Label</span>
+        <hx-time-picker aria-labelledby="modern-ext-1"></hx-time-picker>
+      `;
+      document.body.appendChild(root);
+      const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+      await el.updateComplete;
+      const elInternals = (el as unknown as { _internals: ElementInternals })._internals;
+      const refs = (
+        elInternals as ElementInternals & {
+          ariaLabelledByElements: Element[] | null;
+        }
+      ).ariaLabelledByElements;
+      const target = root.querySelector('#modern-ext-1');
+      expect(refs).not.toBeNull();
+      expect(refs).toContain(target);
+      root.remove();
+    });
+
+    it('modern path: internals.ariaLabel is null (NOT empty string) when accessibleLabel is unset', async () => {
+      const probe = document.createElement('hx-time-picker') as HelixTimePicker;
+      document.body.appendChild(probe);
+      const internals = (probe as unknown as { _internals: ElementInternals })._internals;
+      const supports = 'ariaLabelledByElements' in internals;
+      probe.remove();
+      if (!supports) return;
+
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker label="Visible"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const elInternals = (el as unknown as { _internals: ElementInternals })._internals;
+      // Empty-string aria-label would erase higher-precedence sources; must be null.
+      expect(elInternals.ariaLabel).toBeNull();
+    });
+
+    it('modern path: explicit accessibleLabel is forwarded to internals.ariaLabel', async () => {
+      const probe = document.createElement('hx-time-picker') as HelixTimePicker;
+      document.body.appendChild(probe);
+      const internals = (probe as unknown as { _internals: ElementInternals })._internals;
+      const supports = 'ariaLabelledByElements' in internals;
+      probe.remove();
+      if (!supports) return;
+
+      const el = await fixture<HelixTimePicker>(
+        '<hx-time-picker accessible-label="Override Name"></hx-time-picker>',
+      );
+      await el.updateComplete;
+      const elInternals = (el as unknown as { _internals: ElementInternals })._internals;
+      expect(elInternals.ariaLabel).toBe('Override Name');
+    });
+  });
+
+  // ─── Legacy fallback path (test seam) ──────────────────────────────────────
+
+  describe('Legacy fallback path (no IDL refs)', () => {
+    it('text-flattens consumer aria-labelledby onto inner input aria-label', async () => {
+      // Force the legacy code path by overriding the support probe BEFORE
+      // the host connects.
+      const ctor = HelixTimePicker as unknown as { __testSupportsIdrefRefsOverride: boolean | null };
+      ctor.__testSupportsIdrefRefsOverride = false;
+      try {
+        const root = document.createElement('div');
+        root.innerHTML = `
+          <span id="legacy-ext-1">Legacy Label</span>
+          <hx-time-picker aria-labelledby="legacy-ext-1"></hx-time-picker>
+        `;
+        document.body.appendChild(root);
+        const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+        await el.updateComplete;
+        const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+        expect(input.getAttribute('aria-label')).toBe('Legacy Label');
+        root.remove();
+      } finally {
+        ctor.__testSupportsIdrefRefsOverride = null;
+      }
+    });
+
+    it('text-flattens consumer aria-describedby into the synthesized in-shadow span', async () => {
+      const ctor = HelixTimePicker as unknown as { __testSupportsIdrefRefsOverride: boolean | null };
+      ctor.__testSupportsIdrefRefsOverride = false;
+      try {
+        const root = document.createElement('div');
+        root.innerHTML = `
+          <span id="legacy-ext-2">Legacy Desc</span>
+          <hx-time-picker label="When" aria-describedby="legacy-ext-2"></hx-time-picker>
+        `;
+        document.body.appendChild(root);
+        const el = root.querySelector<HelixTimePicker>('hx-time-picker')!;
+        await el.updateComplete;
+        const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+        const tokens = (input.getAttribute('aria-describedby') ?? '')
+          .split(/\s+/)
+          .filter(Boolean);
+        const synthesizedId = tokens.find((t) => t.includes('-consumer-desc'))!;
+        const synthesized = el.shadowRoot!.getElementById(synthesizedId)!;
+        expect(synthesized.textContent).toBe('Legacy Desc');
+        root.remove();
+      } finally {
+        ctor.__testSupportsIdrefRefsOverride = null;
+      }
     });
   });
 });

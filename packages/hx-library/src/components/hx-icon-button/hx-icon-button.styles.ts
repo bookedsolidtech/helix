@@ -153,11 +153,36 @@ export const helixIconButtonStyles = css`
        multiplicative stacking (0.5 * 0.5 = 0.25). Do not add opacity here. */
   }
 
+  /* ─── Loading State ─── */
+
+  .button--loading {
+    position: relative;
+    cursor: wait;
+  }
+
+  .button__spinner {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    animation: hx-icon-button-spin var(--hx-duration-spinner, 750ms) linear infinite;
+  }
+
+  @keyframes hx-icon-button-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   /* ─── Reduced Motion ─── */
 
   @media (prefers-reduced-motion: reduce) {
     .button {
       transition: none;
+    }
+
+    .button__spinner {
+      animation: none;
+      opacity: var(--hx-opacity-muted, 0.6);
     }
   }
 
@@ -185,6 +210,11 @@ export const helixIconButtonStyles = css`
 
     :host([disabled]) {
       opacity: 1;
+    }
+
+    .button--loading .button__spinner {
+      stroke: ButtonText;
+      forced-color-adjust: none;
     }
   }
 `;

@@ -4,6 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
+import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixLinkStyles } from './hx-link.styles.js';
 import { forcedColorsLink } from '../../styles/forced-colors.js';
 
@@ -62,7 +63,7 @@ export type LinkVariant = 'default' | 'subtle' | 'danger';
  * @cssprop [--hx-color-neutral-400] - Color.
  */
 @customElement('hx-link')
-export class HelixLink extends HelixElement {
+export class HelixLink extends mixinDelegatesAria(HelixElement) {
   static override styles = [helixLinkStyles, forcedColorsLink];
 
   /**
@@ -112,6 +113,15 @@ export class HelixLink extends HelixElement {
    */
   @property({ type: String })
   rel: string | undefined = undefined;
+
+  /**
+   * Localised announcement text appended (visually hidden) to the link's
+   * accessible name when `target="_blank"`. Defaults to English. Override
+   * for i18n contexts so AT users hear the new-tab notice in their locale.
+   * @attr external-label
+   */
+  @property({ type: String, attribute: 'external-label' })
+  externalLabel: string = '(opens in new tab)';
 
   // --- Event Handling ---
 
@@ -166,7 +176,7 @@ export class HelixLink extends HelixElement {
       >
         ${svg`<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />`}
       </svg>
-      <span class="sr-only">(opens in new tab)</span>
+      <span class="sr-only">${this.externalLabel}</span>
     `;
   }
 
@@ -179,6 +189,15 @@ export class HelixLink extends HelixElement {
       'link--disabled': this.disabled,
     };
 
+    // mixinDelegatesAria forwarding: consumer-set aria-* land in
+    // data-aria-* on the host. Project them onto the inner role-bearing
+    // element (the <a> or the <span role="link">) so AT walks them
+    // correctly without double-announcement on the host.
+    const projectedLabel = this.getAttribute('data-aria-label');
+    const projectedLabelledBy = this.getAttribute('data-aria-labelledby');
+    const projectedDescribedBy = this.getAttribute('data-aria-describedby');
+    const projectedCurrent = this.getAttribute('data-aria-current');
+
     if (this.disabled) {
       return html`
         <span
@@ -186,6 +205,10 @@ export class HelixLink extends HelixElement {
           class=${classMap(classes)}
           role="link"
           aria-disabled="true"
+          aria-label=${ifDefined(projectedLabel ?? undefined)}
+          aria-labelledby=${ifDefined(projectedLabelledBy ?? undefined)}
+          aria-describedby=${ifDefined(projectedDescribedBy ?? undefined)}
+          aria-current=${ifDefined(projectedCurrent ?? undefined)}
           tabindex="0"
           @click=${this._handleClick}
           @keydown=${this._handleDisabledKeydown}
@@ -203,6 +226,10 @@ export class HelixLink extends HelixElement {
         target=${ifDefined(this.target)}
         rel=${ifDefined(this._computeRel())}
         download=${ifDefined(this.download)}
+        aria-label=${ifDefined(projectedLabel ?? undefined)}
+        aria-labelledby=${ifDefined(projectedLabelledBy ?? undefined)}
+        aria-describedby=${ifDefined(projectedDescribedBy ?? undefined)}
+        aria-current=${ifDefined(projectedCurrent ?? undefined)}
         @click=${this._handleClick}
       >
         <slot></slot>

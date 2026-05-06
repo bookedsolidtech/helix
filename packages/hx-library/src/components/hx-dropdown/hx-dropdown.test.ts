@@ -2,7 +2,9 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixDropdown } from './hx-dropdown.js';
+import { HelixMenuItem } from '../hx-menu/hx-menu-item.js';
 import './index.js';
+import '../hx-menu/index.js';
 
 afterEach(cleanup);
 
@@ -262,6 +264,88 @@ describe('hx-dropdown', () => {
       await el.updateComplete;
       expect(el.open).toBe(false);
       expect(document.activeElement).toBe(trigger);
+    });
+  });
+
+  // ─── Nested submenu routing (codex push-gate round-9) ───
+
+  describe('Nested submenu open/close routing (codex push-gate round-9 P1)', () => {
+    it('ArrowLeft on a child of a nested submenu closes the parent submenu and keeps the dropdown panel open', async () => {
+      // Regression: previously, hx-item-submenu-close events bubbled up to
+      // the dropdown panel with no handler — the inner hx-menu's own
+      // round-4 handler did the right thing, but the bug was that without
+      // the panel-level guard, follow-up rounds risked the panel either
+      // (a) ignoring the event and leaving stale state in newly added
+      // composite handling, or (b) treating the nested close as a
+      // top-level close and collapsing the entire dropdown. This test
+      // pins the contract: nested closes leave the panel open and focus
+      // the parent item (via the inner menu's handler).
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="parent" submenu-open>
+            Parent
+            <hx-menu slot="submenu">
+              <hx-menu-item value="child">Child</hx-menu-item>
+            </hx-menu>
+          </hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const parent = el.querySelector<HelixMenuItem>('hx-menu-item[value="parent"]')!;
+      const child = el.querySelector<HelixMenuItem>('hx-menu-item[value="child"]')!;
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      // ArrowLeft on the Child fires hx-item-submenu-close. Inner
+      // hx-menu handles it (closes parent, focuses parent). Dropdown
+      // panel must stay open.
+      child.focus();
+      child.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+      // Allow the queued microtask in hx-menu's submenu close handler to
+      // run.
+      await new Promise((r) => setTimeout(r, 0));
+      await parent.updateComplete;
+      await child.updateComplete;
+
+      const parentInternals = (parent as unknown as { _internals: ElementInternals })._internals;
+      expect(parentInternals.ariaExpanded).toBe('false');
+      expect(el.open).toBe(true);
+      // Focus returned to Parent (host-canonical or legacy inner-element
+      // focus targeting both count).
+      expect(document.activeElement === parent || parent.matches(':focus-within')).toBe(true);
+    });
+  });
+
+  // ─── Typeahead — submenu-aware label extractor (codex round-7) ───
+
+  describe('Typeahead with nested submenus (codex push-gate round-7 finding 3)', () => {
+    it('parent item with submenu-only-text does not match its grandchild prefix', async () => {
+      // Parent has NO own-text — only a nested submenu containing "Apple".
+      // Pre-fix: textContent walks into submenu and returns "Apple", so
+      // typing "a" matches the parent. Post-fix: parent's own label is "",
+      // so "a" matches the legitimate sibling "Apricot".
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="parent" role="menuitem" tabindex="-1"><hx-menu slot="submenu"><hx-menu-item value="apple">Apple</hx-menu-item></hx-menu></hx-menu-item>
+          <hx-menu-item value="apricot" role="menuitem" tabindex="-1">Apricot</hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const parentItem = el.querySelector<HTMLElement>('hx-menu-item[value="parent"]')!;
+      const apricotItem = el.querySelector<HTMLElement>('hx-menu-item[value="apricot"]')!;
+      parentItem.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+      expect(document.activeElement === apricotItem || apricotItem.matches(':focus-within')).toBe(
+        true,
+      );
     });
   });
 
@@ -590,7 +674,10 @@ describe('hx-dropdown', () => {
       trigger.click();
       await el.updateComplete;
 
-      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(el, 'hx-select');
+      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(
+        el,
+        'hx-select',
+      );
       const item = el.querySelector<HTMLElement>('[data-value="edit"]')!;
       item.click();
       const event = await eventPromise;
@@ -653,7 +740,10 @@ describe('hx-dropdown', () => {
       newItem.textContent = 'Archive';
       ul.appendChild(newItem);
 
-      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(el, 'hx-select');
+      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(
+        el,
+        'hx-select',
+      );
       newItem.click();
       const event = await eventPromise;
       expect(event.detail.value).toBe('archive');
@@ -831,6 +921,193 @@ describe('hx-dropdown', () => {
       const panel = shadowQuery(el, '[part="panel"]');
       // Confirm Group 4 work did NOT touch the menu role — Group 5 owns that refactor.
       expect(panel?.getAttribute('role')).toBe('menu');
+    });
+  });
+
+  // ─── Host-canonical hx-menu-item integration (codex round-2) ───
+
+  describe('Host-canonical hx-menu-item integration', () => {
+    const hxMenuItemHtml = `
+      <hx-dropdown>
+        <button slot="trigger" type="button">Open</button>
+        <hx-menu-item value="edit">Edit</hx-menu-item>
+        <hx-menu-item value="delete">Delete</hx-menu-item>
+      </hx-dropdown>
+    `;
+
+    it('finds slotted hx-menu-item children for first-focus on open', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const triggerWrapper = shadowQuery(el, '[part="trigger"]')!;
+      triggerWrapper.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await el.updateComplete;
+      await el.updateComplete;
+
+      const items = el.querySelectorAll<HTMLElement>('hx-menu-item');
+      expect(items.length).toBe(2);
+      expect(document.activeElement).toBe(items[0]);
+    });
+
+    it('walks hx-menu-item children for ArrowDown traversal', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const items = el.querySelectorAll<HTMLElement>('hx-menu-item');
+      items[0].focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      expect(document.activeElement).toBe(items[1]);
+    });
+
+    it('routes hx-item-select from hx-menu-item through hx-select', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const eventPromise = oneEvent<CustomEvent<{ value: string | null; label: string }>>(
+        el,
+        'hx-select',
+      );
+      const item = el.querySelector<HTMLElement>('hx-menu-item')!;
+      item.click();
+      const event = await eventPromise;
+      expect(event.detail.value).toBe('edit');
+      expect(event.detail.label).toBe('Edit');
+    });
+
+    it('closes the panel after hx-menu-item activation', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const item = el.querySelector<HTMLElement>('hx-menu-item')!;
+      item.click();
+      await el.updateComplete;
+      expect(el.open).toBe(false);
+    });
+
+    it('does not double-fire hx-select for a single hx-menu-item click', async () => {
+      const el = await fixture<HelixDropdown>(hxMenuItemHtml);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      let count = 0;
+      el.addEventListener('hx-select', () => {
+        count += 1;
+      });
+      const item = el.querySelector<HTMLElement>('hx-menu-item')!;
+      item.click();
+      await el.updateComplete;
+      expect(count).toBe(1);
+    });
+
+    // Codex round-3: descendant-target click bypass. If a consumer slots a
+    // `[data-value]` descendant inside an `hx-menu-item`, `closest()` on the
+    // legacy selector would resolve to the inner span (nearest match) and the
+    // localName guard misses — triggering BOTH the legacy panel-click dispatch
+    // AND the bubbled `hx-item-select` -> `_handlePanelItemSelect` dispatch.
+    // The host-canonical bail must run FIRST, independent of legacy selectors.
+    it('does not double-fire hx-select when clicking a [data-value] descendant inside hx-menu-item', async () => {
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="edit"><span data-value="inner">Edit</span></hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      let count = 0;
+      el.addEventListener('hx-select', () => {
+        count += 1;
+      });
+      const inner = el.querySelector<HTMLElement>('span[data-value="inner"]')!;
+      inner.click();
+      await el.updateComplete;
+      expect(count).toBe(1);
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Codex push-gate round-8 finding 2: roving tabindex on host-canonical
+  // `hx-menu-item` slotted into hx-dropdown's panel must be routed via
+  // `setRovingTabIndex` (shared `writeMenuItemRovingTabIndex` util) so the
+  // value lands on the inner `.menu-item` on the fallback path. A direct
+  // `item.tabIndex = value` write on the host fails because the host is
+  // forced to `tabindex=-1` to keep one focusable surface per item.
+  // ─────────────────────────────────────────────────────────────
+
+  describe('roving tabindex routing on host-canonical hx-menu-item (codex push-gate round-8 finding 2)', () => {
+    type HelixMenuItemCtor = typeof HelixMenuItem & {
+      __testSupportsIdrefRefsOverride: boolean | null;
+    };
+
+    afterEach(() => {
+      const ctor = customElements.get('hx-menu-item') as unknown as
+        | HelixMenuItemCtor
+        | undefined;
+      if (ctor) ctor.__testSupportsIdrefRefsOverride = null;
+    });
+
+    it('lands roving tabindex on inner .menu-item on the fallback path; host stays tabIndex=-1', async () => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+      ctor.__testSupportsIdrefRefsOverride = false;
+
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="edit">Edit</hx-menu-item>
+          <hx-menu-item value="delete">Delete</hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HelixMenuItem>('hx-menu-item'));
+      // Focus first to seed the roving index, then advance.
+      items[0]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+
+      // Host MUST stay out of the tab order on the fallback path.
+      expect(items[1].tabIndex).toBe(-1);
+
+      // Inner `.menu-item` of the focused item carries the roving 0;
+      // the previously focused item's inner element should be -1.
+      const focusedInner = items[1].shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      const blurredInner = items[0].shadowRoot!.querySelector<HTMLElement>('.menu-item')!;
+      expect(focusedInner.tabIndex).toBe(0);
+      expect(blurredInner.tabIndex).toBe(-1);
+    });
+
+    it('lands roving tabindex on the host on the modern path (regression guard)', async () => {
+      const ctor = customElements.get('hx-menu-item') as unknown as HelixMenuItemCtor;
+      ctor.__testSupportsIdrefRefsOverride = true;
+
+      const el = await fixture<HelixDropdown>(`
+        <hx-dropdown>
+          <button slot="trigger" type="button">Open</button>
+          <hx-menu-item value="edit">Edit</hx-menu-item>
+          <hx-menu-item value="delete">Delete</hx-menu-item>
+        </hx-dropdown>
+      `);
+      const trigger = el.querySelector<HTMLElement>('[slot="trigger"]')!;
+      trigger.click();
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HelixMenuItem>('hx-menu-item'));
+      items[0]?.focus();
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      await el.updateComplete;
+
+      // Modern path: host is the canonical Tab stop.
+      expect(items[1].tabIndex).toBe(0);
+      expect(items[0].tabIndex).toBe(-1);
     });
   });
 });

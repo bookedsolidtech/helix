@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T12:24:24.560Z",
+  "generatedAt": "2026-05-06T04:42:13.389Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -11459,6 +11459,17 @@
             "true"
           ],
           "default": "false"
+        },
+        {
+          "figmaAxisName": "loading",
+          "cemAttribute": "loading",
+          "cemFieldName": "loading",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ],
       "textProperties": [
@@ -11505,6 +11516,10 @@
         {
           "description": "The icon container span wrapping the default slot.",
           "name": "icon"
+        },
+        {
+          "description": "The loading spinner SVG element shown when `loading` is true.",
+          "name": "spinner"
         }
       ],
       "events": [
@@ -11981,6 +11996,12 @@
           "cemAttribute": "rel",
           "type": "text",
           "defaultValue": "undefined"
+        },
+        {
+          "figmaPropertyName": "externalLabel",
+          "cemAttribute": "external-label",
+          "type": "text",
+          "defaultValue": "(opens in new tab)"
         }
       ],
       "slots": [
@@ -12748,7 +12769,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-menu-item",
       "figmaPagePlacement": "4a",
-      "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting. Use `aria-label` on the parent `hx-menu` to…",
+      "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting.",
       "tier": "atom",
       "variantAxes": [
         {
@@ -12870,18 +12891,18 @@
           "description": "Dispatched when the item is activated via click, Enter, or Space."
         },
         {
-          "name": "hx-item-submenu-open",
           "type": {
             "text": "CustomEvent<{item: HelixMenuItem}>"
           },
-          "description": "Dispatched when ArrowRight is pressed on an item with a submenu."
+          "description": "Dispatched when ArrowRight is pressed on an item with a submenu.",
+          "name": "hx-item-submenu-open"
         },
         {
-          "name": "hx-item-submenu-close",
           "type": {
             "text": "CustomEvent<{item: HelixMenuItem}>"
           },
-          "description": "Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus."
+          "description": "Dispatched when ArrowLeft is pressed on an item, signaling the parent to close the submenu and return focus.",
+          "name": "hx-item-submenu-close"
         }
       ],
       "cssProperties": [
@@ -17134,6 +17155,13 @@
             "text": "CustomEvent<{value: string}>"
           },
           "description": "Dispatched when the selected option changes."
+        },
+        {
+          "type": {
+            "text": "Event"
+          },
+          "description": "Platform constraint-validation event fired when checkValidity() / reportValidity() determine the value is invalid (form-associated component contract via ElementInternals.setValidity).",
+          "name": "invalid"
         }
       ],
       "cssProperties": [
@@ -21704,7 +21732,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-tab-panel",
       "figmaPagePlacement": "4a",
-      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`.",
+      "description": "A content panel associated with an `<hx-tab>`, managed by a parent `<hx-tabs>`. Group 5a host-canonical: `role=\"tabpanel\"` lives on the host via `_internals.role`. The host carries the canonical AT…",
       "tier": "atom",
       "variantAxes": [],
       "textProperties": [
@@ -22043,7 +22071,7 @@
             "manual",
             "automatic"
           ],
-          "default": "automatic"
+          "default": "manual"
         }
       ],
       "textProperties": [
@@ -24201,30 +24229,45 @@
       ],
       "cssParts": [
         {
-          "description": "The inner slot wrapper element. `display: contents` — no layout effect.",
+          "description": "The inner slot wrapper element. `display: contents` — no layout effect. Theme-injected CSS custom properties (semantic surface — full token catalog lives in `@helixui/tokens`; the wildcard `--hx-*` was previously documented here but the CEM cssProperties[] surface requires explicit names).",
           "name": "base"
         }
       ],
       "events": [],
       "cssProperties": [
         {
-          "description": "All design tokens for the selected theme are injected as CSS custom properties on the host element.",
-          "name": "--hx-*",
-          "figmaBinding": null
-        },
-        {
-          "description": "Color.",
+          "description": "Primary text color (theme-injected).",
           "name": "--hx-color-text-primary",
           "figmaBinding": null
         },
         {
-          "description": "Spacing token.",
+          "description": "Base surface background (theme-injected).",
+          "name": "--hx-color-surface-base",
+          "figmaBinding": null
+        },
+        {
+          "description": "Default border color (theme-injected).",
+          "name": "--hx-color-border-default",
+          "figmaBinding": null
+        },
+        {
+          "description": "Spacing token (theme-injected).",
           "name": "--hx-space-4",
           "figmaBinding": null
         },
         {
-          "description": "Animation duration.",
+          "description": "Animation duration (theme-injected).",
           "name": "--hx-duration-fast",
+          "figmaBinding": null
+        },
+        {
+          "description": "Medium border-radius (theme-injected).",
+          "name": "--hx-radius-md",
+          "figmaBinding": null
+        },
+        {
+          "description": "Body font family (theme-injected).",
+          "name": "--hx-font-family-body",
           "figmaBinding": null
         }
       ],
@@ -24318,6 +24361,12 @@
           "cemAttribute": "error",
           "type": "text",
           "defaultValue": ""
+        },
+        {
+          "figmaPropertyName": "accessibleLabel",
+          "cemAttribute": "accessible-label",
+          "type": "text",
+          "defaultValue": "null"
         }
       ],
       "slots": [
@@ -25150,7 +25199,7 @@
       "events": [],
       "cssProperties": [
         {
-          "description": "Z-index for the fixed stack.",
+          "description": "Z-index for the fixed stack. ─── ARIA scope (group-6 §3.2 / §5.9) ───────────────────────────────────── `hx-toast-stack` deliberately has NO `role`, `aria-live`, `aria-atomic`, or `aria-relevant` on its host or inner container. Each child `hx-toast` is its own live region (role=alert/status via ElementInternals). Wrapping those toasts in a second live region (e.g. `role=\"log\"` on the stack) would create nested live regions, which causes older NVDA/JAWS to announce every toast TWICE — once for the toast's own role, once for the surrounding log region. The stack is purely a positional/z-index container; it is invisible to the AT tree. Do NOT add a container role unless this entire architecture is rewritten so individual toasts no longer carry their own roles.",
           "name": "--hx-z-index-toast",
           "default": "9000",
           "figmaBinding": {
@@ -26268,7 +26317,7 @@
           "name": "item"
         },
         {
-          "description": "The interactive item row (contains expand icon, icon slot, and label).",
+          "description": "The interactive item row (presentational on the modern path; carries role=\"treeitem\" + aria-* on the legacy fallback).",
           "name": "row"
         },
         {
@@ -26280,7 +26329,7 @@
           "name": "label"
         },
         {
-          "description": "The children container.",
+          "description": "The children container (always carries role=\"group\").",
           "name": "children"
         }
       ],
@@ -26424,7 +26473,7 @@
       ],
       "cssParts": [
         {
-          "description": "The tree container element with role=\"tree\".",
+          "description": "The tree container element with role=\"tree\" (legacy fallback path) or the inner shadow surface (modern path; role lives on the host).",
           "name": "tree"
         }
       ],

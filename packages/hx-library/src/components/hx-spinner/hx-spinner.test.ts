@@ -206,6 +206,49 @@ describe('hx-spinner', () => {
     });
   });
 
+  // ─── Group 9 host-canonical migration ───
+
+  describe('Group 9 host-canonical role mirror', () => {
+    type SpinnerInternals = HelixSpinner & { _internals: ElementInternals };
+
+    it('mirrors role="status" onto host via internals when not decorative', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner></hx-spinner>');
+      const internals = (el as SpinnerInternals)._internals;
+      expect(internals.role).toBe('status');
+    });
+
+    it('mirrors role="presentation" onto host via internals when decorative', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner decorative></hx-spinner>');
+      const internals = (el as SpinnerInternals)._internals;
+      expect(internals.role).toBe('presentation');
+      expect(internals.ariaLabel).toBeNull();
+    });
+
+    it('mirrors aria-label onto host via internals.ariaLabel', async () => {
+      const el = await fixture<HelixSpinner>(
+        '<hx-spinner label="Saving record"></hx-spinner>',
+      );
+      const internals = (el as SpinnerInternals)._internals;
+      expect(internals.ariaLabel).toBe('Saving record');
+    });
+
+    it('clears host ariaLabel when label is empty (silent unnamed status)', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner label=""></hx-spinner>');
+      const internals = (el as SpinnerInternals)._internals;
+      expect(internals.ariaLabel).toBeNull();
+    });
+
+    it('updates host role + ariaLabel reactively when decorative toggles', async () => {
+      const el = await fixture<HelixSpinner>('<hx-spinner label="Loading"></hx-spinner>');
+      const internals = (el as SpinnerInternals)._internals;
+      expect(internals.role).toBe('status');
+      el.decorative = true;
+      await el.updateComplete;
+      expect(internals.role).toBe('presentation');
+      expect(internals.ariaLabel).toBeNull();
+    });
+  });
+
   // ─── Reduced Motion ───
 
   describe('Reduced Motion', () => {

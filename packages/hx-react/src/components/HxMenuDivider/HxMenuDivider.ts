@@ -15,6 +15,13 @@ export type { HxMenuDividerProps };
 
 /**
  * A visual separator for grouping items within an `hx-menu`.
+
+Group 5b host-canonical: `role="separator"` lives on the **host** via
+`_internals.role` so the parent `<hx-menu>` (`role="menu"`) sees the
+separator as a direct child. `aria-orientation` is mirrored onto the host
+via `internals.ariaOrientation`. The inner div is presentational on the
+modern path and stripped of its role; the legacy fallback keeps the
+inner role for engines without ElementInternals IDL accessors.
  *
  * @example
  * ```tsx

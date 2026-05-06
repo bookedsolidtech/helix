@@ -16,6 +16,14 @@ export type { HxTrProps };
 /**
  * Semantic table row. Must be a child of `hx-thead`, `hx-tbody`, or `hx-tfoot`.
 Contains `hx-th` or `hx-td` cells.
+
+Group 7 host-canonical: `role="row"` lives on the **host** via
+`_internals.role`. The host carries `aria-selected` / `aria-disabled`
+mirroring `selected` / `disabled` reflected attributes. Consumer-supplied
+`aria-label` / `aria-labelledby` on the host project to the host's
+announced surface so AT walks `<hx-tr>` (role=row) directly. Fallback
+path keeps the inner `<tr role="row">` as the announced surface for
+engines without IDL element references.
  *
  * @example
  * ```tsx

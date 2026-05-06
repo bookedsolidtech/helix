@@ -197,11 +197,26 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
 
   /**
    * Returns the effective label for the button, checking accessible-label first,
-   * then the aria-label attribute, falling back to empty string.
+   * then the consumer-set aria-label attribute (read via data-aria-label which
+   * mixinDelegatesAria writes when consumers set the host's `aria-label`),
+   * then the still-pending `aria-label` attribute (in case the mixin has not
+   * yet processed it), falling back to empty string.
+   *
+   * HX-015 migration: never read `this.ariaLabel` (the native HTMLElement IDL
+   * property). The mixin overrides `ariaLabel` to read `data-aria-label` in
+   * modern browsers, but the IDL fallback path breaks in fallback browsers and
+   * confuses consumers who follow the v3 upgrade guide. Read the attribute
+   * storage directly so the source-of-truth is unambiguous.
+   *
    * @internal
    */
   private get _effectiveLabel(): string {
-    return this.accessibleLabel?.trim() || this.ariaLabel?.trim() || '';
+    return (
+      this.accessibleLabel?.trim() ||
+      this.getAttribute('data-aria-label')?.trim() ||
+      this.getAttribute('aria-label')?.trim() ||
+      ''
+    );
   }
 
   // ─── Form API ───
@@ -375,6 +390,20 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
       'button--loading': this.loading,
     };
 
+    // mixinDelegatesAria forwarding: consumer-set aria-* (aria-pressed for
+    // toggle buttons, aria-expanded/aria-haspopup/aria-controls for
+    // menu/dropdown triggers, aria-describedby for inline help, aria-current
+    // for active-link semantics in href mode) land in data-aria-* on the
+    // host. Project them onto the inner role-bearing native element so AT
+    // walks them on the <button>/<a>, not the generic host.
+    const projectedPressed = this.getAttribute('data-aria-pressed');
+    const projectedExpanded = this.getAttribute('data-aria-expanded');
+    const projectedHasPopup = this.getAttribute('data-aria-haspopup');
+    const projectedControls = this.getAttribute('data-aria-controls');
+    const projectedDescribedBy = this.getAttribute('data-aria-describedby');
+    const projectedCurrent = this.getAttribute('data-aria-current');
+    const projectedLabelledBy = this.getAttribute('data-aria-labelledby');
+
     if (this.href !== undefined) {
       return html`
         <a
@@ -384,9 +413,16 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
           target=${ifDefined(this.target)}
           rel=${this.target === '_blank' ? 'noopener noreferrer' : nothing}
           aria-label=${this._effectiveLabel || nothing}
+          aria-labelledby=${ifDefined(projectedLabelledBy ?? undefined)}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
-          tabindex=${this.disabled ? '-1' : nothing}
+          aria-pressed=${ifDefined(projectedPressed ?? undefined)}
+          aria-expanded=${ifDefined(projectedExpanded ?? undefined)}
+          aria-haspopup=${ifDefined(projectedHasPopup ?? undefined)}
+          aria-controls=${ifDefined(projectedControls ?? undefined)}
+          aria-describedby=${ifDefined(projectedDescribedBy ?? undefined)}
+          aria-current=${ifDefined(projectedCurrent ?? undefined)}
+          tabindex=${this.disabled || this.loading ? '-1' : nothing}
           @click=${this._handleClick}
         >
           ${this._renderInner()}
@@ -401,7 +437,13 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
         ?disabled=${this.disabled}
         type=${this.type}
         aria-label=${this._effectiveLabel || nothing}
+        aria-labelledby=${ifDefined(projectedLabelledBy ?? undefined)}
         aria-busy=${this.loading ? 'true' : nothing}
+        aria-pressed=${ifDefined(projectedPressed ?? undefined)}
+        aria-expanded=${ifDefined(projectedExpanded ?? undefined)}
+        aria-haspopup=${ifDefined(projectedHasPopup ?? undefined)}
+        aria-controls=${ifDefined(projectedControls ?? undefined)}
+        aria-describedby=${ifDefined(projectedDescribedBy ?? undefined)}
         @click=${this._handleClick}
       >
         ${this._renderInner()}

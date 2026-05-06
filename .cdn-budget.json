@@ -1,22 +1,22 @@
 {
   "comment": "CDN bundle size budgets for @helixui/library (gzipped bytes). Enforced in CI by scripts/check-cdn-size.mjs. Changes require code review and a justification in the PR description. The CDN build emits several artifacts with different size profiles — this file tracks per-artifact budgets rather than a single aggregate ceiling so drift in one strategy (A vs B) is surfaced precisely.",
-  "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2 (full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A=229.7 KB). Re-baselined 2026-04-25 after the 3.2.0 component-tier + palette expansion landed (full JS climbed to ~200.4 KB gz with the 3.2.1 token-cascade remediation). Re-baselined 2026-05-04 for ARIA Group 2 (selection controls): host-canonical ElementInternals refactor across 6 components took full JS to ~210.3 KB gz and full CSS to ~53.3 KB gz. Re-baselined 2026-05-05 for ARIA Group 3 (selects/combos/pickers): hx-select host-canonical option-II combobox + hx-combobox option-I editable combobox + hx-time-picker + hx-date-picker + hx-color-picker — each adds ~1.5-3 KB for the AccName 1.2 §4.3.10 hardening pattern stack (12 patterns across 6 mutation observers, synthesized hidden description span, slot label aggregation, validity surface union, first-paint slot state seeding, etc.). hx-select + hx-combobox alone took fullBundleJs to ~216.7 KB gz; pickers (3 components) project to add ~6-10 KB more to fullBundleJs + ~1-2 KB CSS. New ceiling 230 KB / strategyATotal 290 KB sized to absorb the rest of Group 3 plus a small margin, with another re-baseline expected for Group 4 (overlays / disclosure — modal dialogs, popovers, tooltips, dropdowns, accordions). Headroom is intentionally tight per artifact so drift is surfaced. Warn thresholds sit approximately halfway between current and ceiling.",
+  "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2 (full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A=229.7 KB). Re-baselined 2026-04-25 after the 3.2.0 component-tier + palette expansion landed. Re-baselined 2026-05-04 for ARIA Group 2 (selection controls). Re-baselined 2026-05-05 for ARIA Group 3 (selects/combos/pickers). Re-baselined 2026-05-05 (late) for the ARIA epic PR #1649 covering Groups 5b + 5c + 7 + 8 + 9 + 10 — host-canonical migration across 16+ components plus four shared utils (menu-label, menu-roving, menu-tree, tree-walk), per-variant forced-colors fallbacks (hx-badge / hx-tag), AccName 1.2 §4.3.1 precedence ladders in fallback paths, origin guards on host-bound click+keydown handlers, idref characterData + visibility observation, mixin adoption for hx-icon-button / hx-link, hx-button-group host-canonical role, hx-tree-view + hx-tree-item host-canonical migration, hx-spinner host-canonical role mirror. Full JS measured at 236.0 KB gz / strategyATotal 291.1 KB gz at the epic head. New ceiling 245 KB / strategyATotal 310 KB / fullBundleCss 65 KB sized with ~9 KB headroom for any post-merge cleanup. Warn thresholds sit approximately halfway between current and ceiling.",
   "budgets": {
     "fullBundleJs": {
       "file": "helix-{version}.min.js",
       "description": "Strategy A full self-contained JS bundle (all 81 components + Lit).",
-      "ceilingBytes": 235520,
-      "warnBytes": 225280,
-      "currentBytes": 221952,
-      "currentNote": "216.7 KB gz at ARIA Group 3 partial-head (hx-select + hx-combobox merged; was 210.3 KB at Group 2 head — Group 3a adds ~6.4 KB so far across host-canonical option-II + option-I + AccName flatten + 6 mutation observers + synthesized hidden desc span. hx-time-picker + hx-date-picker + hx-color-picker are pending and will add ~6-10 KB more, hence the 230 KB ceiling)"
+      "ceilingBytes": 250880,
+      "warnBytes": 241664,
+      "currentBytes": 241664,
+      "currentNote": "236.0 KB gz at ARIA epic head (PR #1649 — Groups 5b + 5c + 7 + 8 + 9 + 10; was 216.7 KB at Group 3 partial-head). Epic adds ~19.3 KB across 16+ host-canonical migrations + 4 shared utils + per-variant HCM fallbacks + AccName ladders + origin guards."
     },
     "fullBundleCss": {
       "file": "helix-{version}.min.css",
       "description": "Strategy A full CSS bundle (all component shadow-root-adoptable CSS).",
-      "ceilingBytes": 61440,
-      "warnBytes": 56320,
-      "currentBytes": 55296,
-      "currentNote": "54.0 KB gz at ARIA Group 3 partial-head (was 53.3 KB at Group 2 head; Group 3 adds ~0.7 KB so far for .field__sr-only visually-hidden style + minor CSS adjustments per component)"
+      "ceilingBytes": 66560,
+      "warnBytes": 60416,
+      "currentBytes": 56422,
+      "currentNote": "55.1 KB gz at ARIA epic head (was 54.0 KB at Group 3 partial-head; epic adds ~1.1 KB for per-variant HCM blocks + spinner/icon-button styles)."
     },
     "coreBundleJs": {
       "file": "helix-core-{version}.min.js",
@@ -28,10 +28,10 @@
     },
     "strategyATotal": {
       "description": "Aggregate Strategy A consumer payload (full JS + full CSS). This is what a page that loads the full bundle actually downloads.",
-      "ceilingBytes": 296960,
-      "warnBytes": 286720,
-      "currentBytes": 277248,
-      "currentNote": "270.7 KB gz at ARIA Group 3 partial-head (was 263.6 KB at Group 2 head; tracks fullBundleJs + fullBundleCss growth — Group 3a added ~7 KB so far)"
+      "ceilingBytes": 317440,
+      "warnBytes": 307200,
+      "currentBytes": 298086,
+      "currentNote": "291.1 KB gz at ARIA epic head (was 270.7 KB at Group 3 partial-head; tracks fullBundleJs + fullBundleCss growth)."
     }
   }
 }

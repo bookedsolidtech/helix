@@ -695,4 +695,46 @@ describe('hx-badge', () => {
       expect(badge.getAttribute('aria-live')).toBe('polite');
     });
   });
+
+  // ─── Group 9: per-variant forced-colors fallbacks ───
+
+  describe('Group 9 forced-colors per-variant fallbacks', () => {
+    function collectForcedColorsRules(el: HTMLElement): string {
+      const sheets = el.shadowRoot!.adoptedStyleSheets;
+      let text = '';
+      for (const sheet of sheets) {
+        for (const rule of sheet.cssRules) {
+          if (rule.cssText.includes('forced-colors')) {
+            text += rule.cssText;
+          }
+        }
+      }
+      return text;
+    }
+
+    it('includes per-variant border-style for success/warning/error/info under forced-colors', async () => {
+      const el = await fixture<HxBadge>('<hx-badge variant="success">3</hx-badge>');
+      const rules = collectForcedColorsRules(el);
+      expect(rules).toContain('.badge--success');
+      expect(rules).toContain('.badge--warning');
+      expect(rules).toContain('.badge--error');
+      expect(rules).toContain('.badge--info');
+    });
+
+    it('uses distinct border-style values per semantic variant', async () => {
+      const el = await fixture<HxBadge>('<hx-badge>x</hx-badge>');
+      const rules = collectForcedColorsRules(el);
+      // Each semantic variant should reference its own border-style for HCM distinction.
+      expect(rules).toMatch(/\.badge--success[^}]*solid/);
+      expect(rules).toMatch(/\.badge--warning[^}]*dashed/);
+      expect(rules).toMatch(/\.badge--error[^}]*double/);
+      expect(rules).toMatch(/\.badge--info[^}]*dotted/);
+    });
+
+    it('forces forced-color-adjust:none on .badge so the variant fallback survives HCM', async () => {
+      const el = await fixture<HxBadge>('<hx-badge>x</hx-badge>');
+      const rules = collectForcedColorsRules(el);
+      expect(rules).toContain('forced-color-adjust');
+    });
+  });
 });

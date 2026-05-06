@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HelixDrawer } from './hx-drawer.js';
+import { HelixDrawer } from './hx-drawer.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -318,21 +318,41 @@ describe('hx-drawer', () => {
     });
   });
 
-  // ─── ARIA (3) ───
+  // ─── ARIA: host-canonical (Group 4 round-1) ───
 
-  describe('ARIA', () => {
-    it('overlay container has role="dialog"', async () => {
-      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+  describe('ARIA — host-canonical', () => {
+    type InternalsWithIdrefRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+      ariaDescribedByElements: Element[] | null;
+    };
+    type DrawerInternalsAccess = HelixDrawer & { _internals: ElementInternals };
+
+    it('host carries role="dialog" via ElementInternals', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
       await el.updateComplete;
-      const overlay = shadowQuery(el, '[part="overlay"]');
-      expect(overlay?.getAttribute('role')).toBe('dialog');
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.role).toBe('dialog');
     });
 
-    it('overlay container has aria-modal="true"', async () => {
+    it('host carries aria-modal="true" via ElementInternals', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaModal).toBe('true');
+    });
+
+    it('inner overlay does NOT carry role on the modern path', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
       const overlay = shadowQuery(el, '[part="overlay"]');
-      expect(overlay?.getAttribute('aria-modal')).toBe('true');
+      expect(overlay?.hasAttribute('role')).toBe(false);
+    });
+
+    it('inner overlay does NOT carry aria-modal on the modern path', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+      await el.updateComplete;
+      const overlay = shadowQuery(el, '[part="overlay"]');
+      expect(overlay?.hasAttribute('aria-modal')).toBe(false);
     });
 
     it('close button has aria-label="Close drawer"', async () => {
@@ -340,6 +360,253 @@ describe('hx-drawer', () => {
       await el.updateComplete;
       const closeBtn = shadowQuery(el, '[part="close-button"]');
       expect(closeBtn?.getAttribute('aria-label')).toBe('Close drawer');
+    });
+
+    it('label property is forwarded to internals.ariaLabel as fallback name', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer label="Patient details"></hx-drawer>');
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaLabel).toBe('Patient details');
+    });
+
+    it('hard-coded "Drawer" name is forwarded when no other naming source exists', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaLabel).toBe('Drawer');
+    });
+
+    it('host aria-label overrides label property in internals.ariaLabel', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer label="Default" aria-label="Patient alert"></hx-drawer>',
+      );
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaLabel).toBe('Patient alert');
+    });
+
+    it('slotted label projects into internals.ariaLabelledByElements (modern path)', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer><h2 slot="label">Patient Alert</h2></hx-drawer>',
+      );
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      const titleEl = shadowQuery(el, '[part="title"]');
+      // Slotted label flows the slotted root into the IDL refs (same content
+      // assigned to the inner heading via slot projection).
+      const refs = internals.ariaLabelledByElements;
+      expect(refs).not.toBeNull();
+      expect(refs!.length).toBeGreaterThan(0);
+      // The slotted h2 itself appears in the refs (consumer light-DOM).
+      const slotted = el.querySelector('[slot="label"]');
+      expect(refs!.includes(slotted!)).toBe(true);
+      // Sanity: the inner title part still exists for the fallback path.
+      expect(titleEl).toBeTruthy();
+    });
+
+    it('slotted label flattened text is reflected as fallback internals.ariaLabel', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer><span slot="label">Composite Title</span></hx-drawer>',
+      );
+      await el.updateComplete;
+      // Allow microtask slotchange to flush.
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      // For slotted labels we set BOTH internals.ariaLabelledByElements
+      // (live element ref so AT walking IDL refs sees the projected node)
+      // AND internals.ariaLabel (flattened text fallback so AT that doesn't
+      // walk IDL refs still has a name). `null`-out of ariaLabel is reserved
+      // for consumer aria-labelledby — see the "consumer aria-labelledby"
+      // test where IDREF resolution is the canonical name source.
+      expect(internals.ariaLabel).toBe('Composite Title');
+    });
+
+    it('multi-node slotted label aggregates into internals.ariaLabelledByElements', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer><svg slot="label" aria-hidden="true"><title>icon</title></svg><span slot="label">Patient</span></hx-drawer>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      const refs = internals.ariaLabelledByElements;
+      // Hidden svg is filtered from IDL refs per AccName 1.2 §4.3.10; the
+      // visible span survives.
+      expect(refs).not.toBeNull();
+      const span = el.querySelector('span[slot="label"]');
+      expect(refs!.includes(span!)).toBe(true);
+      const svg = el.querySelector('svg[slot="label"]');
+      expect(refs!.includes(svg!)).toBe(false);
+    });
+
+    it('consumer aria-labelledby resolves to light-DOM element via IDL refs', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<div><h1 id="patient-name">Patient: J. Doe</h1><hx-drawer aria-labelledby="patient-name"></hx-drawer></div>',
+      );
+      const drawer = el.querySelector('hx-drawer') as HelixDrawer;
+      await drawer.updateComplete;
+      const internals = (drawer as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      const refs = internals.ariaLabelledByElements;
+      expect(refs).not.toBeNull();
+      const labelEl = el.querySelector('#patient-name');
+      expect(refs!.includes(labelEl!)).toBe(true);
+      // When labelledby resolves, internals.ariaLabel is null (avoids erasing
+      // the IDL-ref resolution).
+      expect((drawer as DrawerInternalsAccess)._internals.ariaLabel).toBeNull();
+    });
+
+    it('consumer aria-labelledby typo falls back to label property', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer label="Fallback name" aria-labelledby="nonexistent-id"></hx-drawer>',
+      );
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      // Typo did not resolve; fallback flows to label property.
+      expect(internals.ariaLabel).toBe('Fallback name');
+      const refs = (internals as InternalsWithIdrefRefs).ariaLabelledByElements;
+      // Filter on visible elements only — refs may be null or empty.
+      expect(refs === null || refs.length === 0).toBe(true);
+    });
+
+    it('consumer aria-describedby resolves to light-DOM element via IDL refs', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<div><p id="patient-summary">Summary text</p><hx-drawer aria-describedby="patient-summary"></hx-drawer></div>',
+      );
+      const drawer = el.querySelector('hx-drawer') as HelixDrawer;
+      await drawer.updateComplete;
+      const internals = (drawer as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      const refs = internals.ariaDescribedByElements;
+      expect(refs).not.toBeNull();
+      const descEl = el.querySelector('#patient-summary');
+      expect(refs!.includes(descEl!)).toBe(true);
+    });
+
+    it('consumer aria-describedby retraction clears the IDL refs', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<div><p id="d">Desc</p><hx-drawer aria-describedby="d"></hx-drawer></div>',
+      );
+      const drawer = el.querySelector('hx-drawer') as HelixDrawer;
+      await drawer.updateComplete;
+      const internals = (drawer as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      expect(internals.ariaDescribedByElements?.length).toBeGreaterThan(0);
+      drawer.removeAttribute('aria-describedby');
+      // Mutation observer is microtask; await one frame.
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      await drawer.updateComplete;
+      const after = internals.ariaDescribedByElements;
+      expect(after === null || after.length === 0).toBe(true);
+    });
+
+    it('consumer description text is mirrored into the in-shadow consumer-desc span', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<div><p id="d">Description text</p><hx-drawer aria-describedby="d"></hx-drawer></div>',
+      );
+      const drawer = el.querySelector('hx-drawer') as HelixDrawer;
+      await drawer.updateComplete;
+      const span = drawer.shadowRoot?.querySelector('[id$="-consumer-desc"]');
+      expect(span).toBeTruthy();
+      expect(span!.textContent).toBe('Description text');
+    });
+
+    it('inner overlay aria-describedby chains the consumer-desc span only when description is non-empty', async () => {
+      const elNo = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
+      await elNo.updateComplete;
+      const overlayNo = shadowQuery(elNo, '[part="overlay"]');
+      expect(overlayNo?.hasAttribute('aria-describedby')).toBe(false);
+
+      const el = await fixture<HelixDrawer>(
+        '<div><p id="d2">Desc</p><hx-drawer open aria-describedby="d2"></hx-drawer></div>',
+      );
+      const drawer = el.querySelector('hx-drawer') as HelixDrawer;
+      await drawer.updateComplete;
+      const overlay = shadowQuery(drawer, '[part="overlay"]');
+      const spanId = drawer.shadowRoot
+        ?.querySelector('[id$="-consumer-desc"]')
+        ?.getAttribute('id');
+      expect(overlay?.getAttribute('aria-describedby')).toBe(spanId);
+    });
+
+    it('label slot in-place text mutation re-flows the host name', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer><span slot="label">First</span></hx-drawer>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
+      const span = el.querySelector('span[slot="label"]') as HTMLElement;
+      span.textContent = 'Second';
+      // MutationObserver is microtask.
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      const refs = internals.ariaLabelledByElements;
+      const haveRefs = !!refs && refs.length > 0;
+      if (!haveRefs) {
+        // Fallback path mirrors flattened text.
+        expect(internals.ariaLabel).toBe('Second');
+      } else {
+        // Modern path: refs include the span; the text at AT walk time is "Second".
+        expect(refs!.includes(span)).toBe(true);
+      }
+    });
+
+    it('external aria-labelledby target text mutation re-syncs', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<div><h1 id="ext">Original</h1><hx-drawer aria-labelledby="ext"></hx-drawer></div>',
+      );
+      const drawer = el.querySelector('hx-drawer') as HelixDrawer;
+      await drawer.updateComplete;
+      const labelEl = el.querySelector('#ext') as HTMLElement;
+      labelEl.textContent = 'Updated';
+      await new Promise((r) => requestAnimationFrame(() => r(undefined)));
+      await drawer.updateComplete;
+      const internals = (drawer as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      // Modern path keeps the live element ref; fallback flattens new text.
+      const refs = internals.ariaLabelledByElements;
+      if (refs && refs.length > 0) {
+        expect(refs.includes(labelEl)).toBe(true);
+      } else {
+        expect(internals.ariaLabel).toBe('Updated');
+      }
+    });
+
+    it('legacy fallback path writes role/aria-modal-equivalent name onto inner overlay', async () => {
+      // Force the legacy path before connect so the test reflects no-IDL-ref engines.
+      const Ctor = (HelixDrawer as unknown as { __testSupportsIdrefRefsOverride: boolean | null });
+      Ctor.__testSupportsIdrefRefsOverride = false;
+      try {
+        const el = await fixture<HelixDrawer>(
+          '<hx-drawer open label="Legacy fallback name"></hx-drawer>',
+        );
+        await el.updateComplete;
+        const overlay = shadowQuery(el, '[part="overlay"]');
+        // Fallback path projects the resolved name onto the inner overlay so AT
+        // walking down still finds an announceable name.
+        expect(overlay?.getAttribute('aria-label')).toBe('Legacy fallback name');
+        // Host-canonical role/aria-modal still ride on internals only — never
+        // duplicated to the inner overlay.
+        expect(overlay?.hasAttribute('role')).toBe(false);
+        expect(overlay?.hasAttribute('aria-modal')).toBe(false);
+      } finally {
+        Ctor.__testSupportsIdrefRefsOverride = null;
+      }
+    });
+
+    it('legacy fallback path uses internal title id for slotted label aria-labelledby', async () => {
+      const Ctor = (HelixDrawer as unknown as { __testSupportsIdrefRefsOverride: boolean | null });
+      Ctor.__testSupportsIdrefRefsOverride = false;
+      try {
+        const el = await fixture<HelixDrawer>(
+          '<hx-drawer open><span slot="label">Slotted Title</span></hx-drawer>',
+        );
+        await el.updateComplete;
+        await el.updateComplete;
+        const overlay = shadowQuery(el, '[part="overlay"]');
+        const titleEl = shadowQuery(el, '[part="title"]');
+        const titleId = titleEl?.getAttribute('id');
+        expect(overlay?.getAttribute('aria-labelledby')).toBe(titleId);
+        expect(overlay?.hasAttribute('aria-label')).toBe(false);
+      } finally {
+        Ctor.__testSupportsIdrefRefsOverride = null;
+      }
     });
   });
 
@@ -541,63 +808,66 @@ describe('hx-drawer', () => {
     });
   });
 
-  // ─── ARIA Label Fallback (3) ───
+  // ─── ARIA Label Fallback — host-canonical (Group 4 round-1) ───
 
   describe('ARIA Label Fallback', () => {
-    it('uses aria-labelledby when label slot is populated', async () => {
+    type InternalsWithIdrefRefs = ElementInternals & {
+      ariaLabelledByElements: Element[] | null;
+    };
+    type DrawerInternalsAccess = HelixDrawer & { _internals: ElementInternals };
+
+    it('slotted label projects into internals.ariaLabelledByElements', async () => {
       const el = await fixture<HelixDrawer>(
         '<hx-drawer open><span slot="label">Patient Info</span></hx-drawer>',
       );
       await el.updateComplete;
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals as InternalsWithIdrefRefs;
+      const refs = internals.ariaLabelledByElements;
+      const span = el.querySelector('span[slot="label"]');
+      expect(refs).not.toBeNull();
+      expect(refs!.includes(span!)).toBe(true);
+    });
 
+    it('inner overlay does NOT carry aria-labelledby/aria-label when slotted label is present (modern path)', async () => {
+      const el = await fixture<HelixDrawer>(
+        '<hx-drawer open><span slot="label">Patient Info</span></hx-drawer>',
+      );
+      await el.updateComplete;
+      await el.updateComplete;
       const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
-      expect(overlay?.hasAttribute('aria-labelledby')).toBe(true);
+      // Modern path: host-canonical — overlay carries neither attribute.
+      expect(overlay?.hasAttribute('aria-labelledby')).toBe(false);
       expect(overlay?.hasAttribute('aria-label')).toBe(false);
     });
 
-    it('aria-labelledby references an element that exists in the shadow DOM', async () => {
-      const el = await fixture<HelixDrawer>(
-        '<hx-drawer open><span slot="label">Patient Info</span></hx-drawer>',
-      );
-      await el.updateComplete;
-
-      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
-      const labelledById = overlay?.getAttribute('aria-labelledby');
-      expect(labelledById).toBeTruthy();
-      // The referenced ID must resolve to an element inside the same shadow root
-      const referencedEl = el.shadowRoot?.getElementById(labelledById!);
-      expect(referencedEl).toBeTruthy();
-    });
-
-    it('does not set aria-labelledby when noHeader=true — title element not rendered', async () => {
-      // When noHeader=true the title element (which holds _titleId) is not rendered.
-      // The component must fall back to aria-label so the dialog always has an accessible name.
+    it('noHeader=true with label property — fallback name flows via internals.ariaLabel', async () => {
+      // When noHeader=true the title element is not rendered. The host-canonical
+      // pipeline routes the accessible name via internals.ariaLabel (modern path).
       const el = await fixture<HelixDrawer>(
         '<hx-drawer open no-header label="Patient Record"></hx-drawer>',
       );
       await el.updateComplete;
-
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaLabel).toBe('Patient Record');
       const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
-      // Must NOT have aria-labelledby (title element absent — reference would be broken)
+      // Inner overlay carries neither attribute on the modern path.
       expect(overlay?.hasAttribute('aria-labelledby')).toBe(false);
-      // Must fall back to aria-label for an accessible name
-      expect(overlay?.getAttribute('aria-label')).toBe('Patient Record');
+      expect(overlay?.hasAttribute('aria-label')).toBe(false);
     });
 
-    it('uses aria-label from label property when no label slot', async () => {
+    it('label property flows to internals.ariaLabel when no label slot', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open label="Settings Panel"></hx-drawer>');
       await el.updateComplete;
-
-      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
-      expect(overlay?.getAttribute('aria-label')).toBe('Settings Panel');
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaLabel).toBe('Settings Panel');
     });
 
-    it('falls back to aria-label="Drawer" when no label slot or property', async () => {
+    it('falls back to internals.ariaLabel="Drawer" when no slot or property', async () => {
       const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
-
-      const overlay = el.shadowRoot?.querySelector('[part="overlay"]');
-      expect(overlay?.getAttribute('aria-label')).toBe('Drawer');
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaLabel).toBe('Drawer');
     });
   });
 

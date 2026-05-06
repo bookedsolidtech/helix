@@ -15,6 +15,18 @@ export type { HxProgressBarProps };
 
 /**
  * A linear progress indicator for determinate and indeterminate states.
+
+Group 7 host-canonical: `role="progressbar"` is mirrored onto the **host**
+via `_internals.role` (cross-shadow IDREF wiring) AND kept on the inner
+`[role="progressbar"]` track for legacy AT and consumer queries. This is
+the hx-progress-ring dual-surface pattern (Group 7 gold-standard).
+Consumer-supplied `aria-labelledby` / `aria-describedby` on the host
+resolves through the shared IDREF mirror so cross-shadow naming reaches
+the announced surface even when the labels live in another shadow tree.
+
+The internal `aria-live="polite"` announcer for the "Complete" milestone
+is preserved (`role="progressbar"` does NOT imply a live region — an
+explicit live announcer is required for value-update announcements).
  *
  * @example
  * ```tsx

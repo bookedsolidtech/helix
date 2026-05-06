@@ -410,4 +410,79 @@ describe('hx-link', () => {
       expect(span.classList.contains('link--default')).toBe(false);
     });
   });
+
+  // ─── ARIA Group 8 round-1: mixinDelegatesAria + i18n external label ───
+
+  describe('ARIA Group 8 — mixinDelegatesAria adoption', () => {
+    it('moves consumer aria-current to data-aria-current and projects onto inner <a>', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="/dashboard" aria-current="page">Dashboard</hx-link>',
+      );
+      await el.updateComplete;
+      // Mixin moves aria-current → data-aria-current on host.
+      expect(el.hasAttribute('aria-current')).toBe(false);
+      expect(el.getAttribute('data-aria-current')).toBe('page');
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('aria-current')).toBe('page');
+    });
+
+    it('projects aria-describedby onto inner <a>', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="/x" aria-describedby="hint">Link</hx-link>',
+      );
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('aria-describedby')).toBe('hint');
+    });
+
+    it('projects aria-label onto inner <a> (host stays absent from a11y tree)', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="/x" aria-label="Read more about pricing">More</hx-link>',
+      );
+      await el.updateComplete;
+      // Host loses aria-label (mixin moves to data-aria-label) — prevents
+      // double-announce.
+      expect(el.hasAttribute('aria-label')).toBe(false);
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(anchor.getAttribute('aria-label')).toBe('Read more about pricing');
+    });
+
+    it('projects aria-label + aria-describedby onto disabled <span role="link">', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link disabled aria-label="Submit (disabled)" aria-describedby="reason">Submit</hx-link>',
+      );
+      await el.updateComplete;
+      const span = shadowQuery<HTMLSpanElement>(el, 'span[role="link"]')!;
+      expect(span.getAttribute('aria-label')).toBe('Submit (disabled)');
+      expect(span.getAttribute('aria-describedby')).toBe('reason');
+    });
+  });
+
+  describe('ARIA Group 8 — externalLabel i18n property', () => {
+    it('uses the default English string when external-label is not set', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="/x" target="_blank">Docs</hx-link>',
+      );
+      await el.updateComplete;
+      const srOnly = shadowQuery(el, '.sr-only')!;
+      expect(srOnly.textContent).toBe('(opens in new tab)');
+    });
+
+    it('honours a localised external-label override', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="/x" target="_blank" external-label="(s’ouvre dans un nouvel onglet)">Docs</hx-link>',
+      );
+      await el.updateComplete;
+      const srOnly = shadowQuery(el, '.sr-only')!;
+      expect(srOnly.textContent).toBe('(s’ouvre dans un nouvel onglet)');
+    });
+
+    it('does not render the external indicator when target is not _blank', async () => {
+      const el = await fixture<HelixLink>(
+        '<hx-link href="/x" external-label="(opens in new tab)">Docs</hx-link>',
+      );
+      await el.updateComplete;
+      expect(shadowQuery(el, '.sr-only')).toBeNull();
+    });
+  });
 });

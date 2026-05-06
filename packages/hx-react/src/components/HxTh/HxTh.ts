@@ -16,6 +16,12 @@ export type { HxThProps };
 /**
  * Semantic table header cell. Must be a child of `hx-tr`.
 Supports sortable columns with accessible sort state.
+
+Group 7 host-canonical: `role="columnheader"` lives on the **host** via
+`_internals.role`. The host carries `aria-sort` reflecting the current
+sort direction (when `sortable` is true). The sort `<button>` aria-label
+incorporates the slotted column text so AT users hear "Sort by Patient
+name, currently sorted ascending" rather than just "Sort ascending".
  *
  * @example
  * ```tsx

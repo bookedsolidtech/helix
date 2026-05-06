@@ -50,4 +50,6 @@ internal trigger button's `aria-label`. */
   // Event callbacks
   /** Dispatched when the selected option changes. */
   onHxChange?: (event: Event) => void;
+  /** Platform constraint-validation event fired when checkValidity() / reportValidity() determine the value is invalid (form-associated component contract via ElementInternals.setValidity). */
+  onInvalid?: (event: Event) => void;
 }

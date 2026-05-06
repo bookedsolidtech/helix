@@ -16,10 +16,17 @@ export interface HxTabsProps {
   orientation?: 'horizontal' | 'vertical';
   /** Controls how keyboard navigation activates tabs.
 In `automatic` mode, focus also activates the tab.
-In `manual` mode, focus moves independently; Space or Enter activates. */
+In `manual` mode, focus moves independently; Space or Enter activates.
+
+Group 5a default: `manual` — safer for healthcare patterns where panel
+content may be heavy or announce updates via live regions. APG explicitly
+allows both modes; manual avoids disorienting auto-activation when users
+scan tabs with arrow keys. */
   activation?: 'manual' | 'automatic';
-  /** Accessible label for the tablist. Rendered as `aria-label` on the tablist container.
-Provide a brief description of what the tabs represent (e.g., "Patient record sections"). */
+  /** Accessible label for the tablist. Drives the host `internals.ariaLabel`.
+Provide a brief description of what the tabs represent (e.g., "Patient
+record sections"). Consumer `aria-label` / `aria-labelledby` on the host
+override this property when present. */
   label?: string;
   /** Gets or sets the zero-based index of the currently selected tab.
 Setting this programmatically activates the tab at the given index.
