@@ -25,6 +25,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  *
  * @csspart button - The native button or anchor element.
  * @csspart icon - The icon container span wrapping the default slot.
+ * @csspart spinner - The loading spinner SVG element shown when `loading` is true.
  *
  * @cssprop [--hx-icon-button-bg=transparent] - Button background color.
  * @cssprop [--hx-icon-button-color=var(--hx-color-primary-500)] - Icon color.

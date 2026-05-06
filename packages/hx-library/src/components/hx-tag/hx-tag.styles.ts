@@ -152,10 +152,33 @@ export const helixTagStyles = css`
   @media (forced-colors: active) {
     .tag {
       border-color: CanvasText;
+      forced-color-adjust: none;
+      background-color: Canvas;
+      color: CanvasText;
     }
 
     .tag__remove-button {
       color: ButtonText;
+    }
+
+    /* Per-semantic-variant forced-colors fallbacks. The visually-hidden
+       semantic variant label (.tag__variant-label) keeps AT users
+       informed; these blocks restore visual semantic distinction for
+       sighted users in HCM where bg/color collapse to system defaults.
+       Pattern: distinct border-style per variant (matches hx-badge). */
+    .tag--success {
+      border-style: solid;
+      border-width: 2px;
+    }
+
+    .tag--warning {
+      border-style: dashed;
+      border-width: 2px;
+    }
+
+    .tag--danger {
+      border-style: double;
+      border-width: 3px;
     }
   }
 `;

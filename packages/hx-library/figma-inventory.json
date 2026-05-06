@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-05T23:44:52.313Z",
+  "generatedAt": "2026-05-06T01:02:37.141Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.3.1",
   "tokensVersion": "3.3.1",
@@ -11459,6 +11459,17 @@
             "true"
           ],
           "default": "false"
+        },
+        {
+          "figmaAxisName": "loading",
+          "cemAttribute": "loading",
+          "cemFieldName": "loading",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ],
       "textProperties": [
@@ -11505,6 +11516,10 @@
         {
           "description": "The icon container span wrapping the default slot.",
           "name": "icon"
+        },
+        {
+          "description": "The loading spinner SVG element shown when `loading` is true.",
+          "name": "spinner"
         }
       ],
       "events": [
@@ -11981,6 +11996,12 @@
           "cemAttribute": "rel",
           "type": "text",
           "defaultValue": "undefined"
+        },
+        {
+          "figmaPropertyName": "externalLabel",
+          "cemAttribute": "external-label",
+          "type": "text",
+          "defaultValue": "(opens in new tab)"
         }
       ],
       "slots": [

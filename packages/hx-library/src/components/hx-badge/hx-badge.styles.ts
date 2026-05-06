@@ -203,6 +203,9 @@ export const helixBadgeStyles = css`
   @media (forced-colors: active) {
     .badge {
       border: 1px solid CanvasText;
+      forced-color-adjust: none;
+      background-color: Canvas;
+      color: CanvasText;
     }
 
     .badge--pulse {
@@ -211,6 +214,31 @@ export const helixBadgeStyles = css`
 
     .badge__remove-button {
       color: ButtonText;
+    }
+
+    /* Per-semantic-variant forced-colors fallbacks. The visually-hidden
+       semantic variant label (.badge__variant-label) keeps AT users
+       informed; these blocks restore visual semantic distinction for
+       sighted users in HCM where bg/color collapse to system defaults.
+       Pattern: distinct border-style per variant. */
+    .badge--success {
+      border-style: solid;
+      border-width: 2px;
+    }
+
+    .badge--warning {
+      border-style: dashed;
+      border-width: 2px;
+    }
+
+    .badge--error {
+      border-style: double;
+      border-width: 3px;
+    }
+
+    .badge--info {
+      border-style: dotted;
+      border-width: 2px;
     }
   }
 `;

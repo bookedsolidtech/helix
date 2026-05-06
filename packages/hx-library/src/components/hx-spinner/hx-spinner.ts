@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
@@ -107,6 +107,45 @@ export class HelixSpinner extends HelixElement {
       devWarn('hx-spinner', 'The "size" attribute is deprecated. Use "hx-size" instead.');
       this.size = legacySize;
     }
+    this._syncHostAriaSemantics();
+  }
+
+  override updated(changedProperties: PropertyValues<this>): void {
+    super.updated(changedProperties);
+    if (changedProperties.has('decorative') || changedProperties.has('label')) {
+      this._syncHostAriaSemantics();
+    }
+  }
+
+  /**
+   * Group 9 host-canonical migration: mirror `role="status"` / `"presentation"`
+   * and `aria-label` onto the host via `ElementInternals` so AT walks the host
+   * surface as the canonical loading indicator. The inner `<div>` keeps the
+   * legacy role + aria-label so consumer queries and pre-host-canonical AT
+   * still resolve. Modern path: host is canonical; legacy path: dual-surface.
+   *
+   * Also fires a devWarn when the spinner is non-decorative AND the label is
+   * empty (silent unnamed `role="status"` is a WCAG 4.1.2 failure).
+   * @internal
+   */
+  private _syncHostAriaSemantics(): void {
+    const internals = this._internals;
+    if (this.decorative) {
+      internals.role = 'presentation';
+      internals.ariaLabel = null;
+      return;
+    }
+    internals.role = 'status';
+    const trimmed = (this.label ?? '').trim();
+    if (!trimmed) {
+      devWarn(
+        'hx-spinner',
+        'Non-decorative spinner has an empty `label`. role="status" requires an accessible name (WCAG 4.1.2). Provide a `label` value or set `decorative` to suppress AT announcements.',
+      );
+      internals.ariaLabel = null;
+      return;
+    }
+    internals.ariaLabel = trimmed;
   }
 
   /** @internal */
