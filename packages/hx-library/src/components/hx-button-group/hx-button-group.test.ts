@@ -516,6 +516,20 @@ describe('hx-button-group', () => {
       }
     });
 
+    // CodeRabbit SHOULD-FIX (PR #1649 follow-up) — consumer role conflict.
+    it('defers to consumer-set role="toolbar" instead of overwriting with "group"', async () => {
+      const el = await fixture<HelixButtonGroup>(`
+        <hx-button-group role="toolbar" label="Editor toolbar">
+          <hx-button variant="secondary">Bold</hx-button>
+        </hx-button-group>
+      `);
+      await el.updateComplete;
+      const internals = (el as unknown as { _internals: ElementInternals })._internals;
+      // Consumer's role wins on both surfaces — no diverging signals.
+      expect(internals.role).toBe('toolbar');
+      expect(el.getAttribute('role')).toBe('toolbar');
+    });
+
     it('emits the missing-label devWarn at most once across reconnects', async () => {
       const original = console.warn;
       let warnCount = 0;
