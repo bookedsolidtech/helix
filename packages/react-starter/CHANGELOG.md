@@ -1,5 +1,32 @@
 # @helixui/react-starter
 
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies [8e026a3]
+- Updated dependencies [1a82b8d]
+- Updated dependencies [0de77f8]
+- Updated dependencies [c66503f]
+- Updated dependencies [8876409]
+- Updated dependencies [bd52f5f]
+- Updated dependencies [69de082]
+- Updated dependencies [174c2b9]
+- Updated dependencies [158c706]
+- Updated dependencies [1eedfee]
+- Updated dependencies [b64b6cc]
+- Updated dependencies [4235d63]
+- Updated dependencies [2143bb9]
+- Updated dependencies [93342cd]
+- Updated dependencies [e1ad574]
+- Updated dependencies [2a790dd]
+- Updated dependencies [32cef7d]
+- Updated dependencies [5ae29a2]
+- Updated dependencies [5a15e9e]
+- Updated dependencies [396ad82]
+  - @helixui/library@3.4.0
+  - @helixui/react@3.4.0
+
 ## 0.0.9
 
 ### Patch Changes
