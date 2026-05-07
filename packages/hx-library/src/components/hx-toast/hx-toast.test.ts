@@ -1038,6 +1038,79 @@ describe('toast() utility', () => {
     expect(burst[5]!.open).toBe(true);
   });
 
+  it('keeps stackLimit cap when every survivor + every pending hide is already claimed (codex p2)', async () => {
+    // (codex p2) Saturation gap in the longer-burst fallback. When the
+    // burst is large enough that every visible survivor is already in
+    // `_pendingDisplacements` AND every entry in `_pendingHideDeadlines`
+    // is paired with an earlier queued append, the previous fallback
+    // path bailed out (`break`) — leaving the new toast on the
+    // immediate-show path and briefly exceeding `stackLimit`. Fix:
+    // queue the new toast at `max(allDeadlines) + 1ms` so it joins the
+    // back of the queue and the cap is preserved across the entire
+    // burst timeline.
+    const placement = 'top-end';
+    document
+      .querySelectorAll(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    // Burst of 7 against stackLimit=3. The 7th call lands AFTER every
+    // survivor has been claimed by calls 4-6 AND every pending-hide is
+    // already paired with a queued append, exercising the saturation
+    // path the fix protects. Use persistent toasts (duration=0) so
+    // auto-dismiss does not race the test sampling window.
+    const burst: HelixToast[] = [];
+    for (let i = 1; i <= 7; i++) {
+      const el = toast({ message: `Saturate ${i}`, placement, duration: 0 });
+      burst.push(el);
+      // eslint-disable-next-line no-await-in-loop
+      await el.updateComplete;
+    }
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+
+    // Poll across the entire timeline. The visible count must NEVER
+    // exceed `stackLimit` at any sample, including across the chained
+    // displacement / append fire times.
+    const samples: number[] = [];
+    const POLL_INTERVAL_MS = 50;
+    const TOTAL_WINDOW_MS = 4000; // > MIN_DISPLAY_MS * 2 + buffer
+    const start = Date.now();
+    while (Date.now() - start < TOTAL_WINDOW_MS) {
+      const visible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
+      samples.push(visible.length);
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+    }
+    const overCap = samples.filter((n) => n > stack.stackLimit);
+    expect(
+      overCap.length,
+      `cap held across timeline: expected 0 over-cap samples, got ${overCap.length} (max=${Math.max(...samples)})`,
+    ).toBe(0);
+
+    // Settle: with duration=0 (persistent) toasts, the chain stops
+    // auto-dismissing at the synthesized displacement. Final visible
+    // count must equal stackLimit, with the THREE newest toasts
+    // (burst[4], burst[5], burst[6]) showing — burst[3] was the synth
+    // displacement victim.
+    await new Promise((r) => setTimeout(r, 1000));
+    for (const el of burst) {
+      // eslint-disable-next-line no-await-in-loop
+      await el.updateComplete;
+    }
+    const settledVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(
+      settledVisible.length,
+      `settled: expected exactly ${stack.stackLimit} visible, got ${settledVisible.length}`,
+    ).toBe(stack.stackLimit);
+    expect(burst[4]!.open).toBe(true);
+    expect(burst[5]!.open).toBe(true);
+    expect(burst[6]!.open).toBe(true);
+  });
+
   // ─── Cancellation lifecycle invariants (codex p1 round-2 holistic) ───
   //
   // The 5 tests below pin the per-deferred-toast state machine. Each one

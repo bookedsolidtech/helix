@@ -333,6 +333,16 @@ export function toast(options: ToastOptions): HelixToast {
   // list has at most one entry — the round-1 fix keeps overflow at 1 per
   // call — but the array form is honest about the loop shape.
   const scheduledDisplacements: DisplacementClaim[] = [];
+  // (codex p2 saturation) Synth displacement scheduled by the
+  // saturation fallback path. The synth timer picks its victim
+  // dynamically at fire time (since there is no eligible target at
+  // schedule time); cancellation only needs to clear the timer and pop
+  // the synth hide-deadline. Stored separately because the displacement
+  // record requires a real `target: HelixToast` reference, which we use
+  // `toastEl` for (the new toast itself acts as the placeholder — it is
+  // never in `_pendingDisplacements`, so the `delete()` in
+  // `cancelDeferredToast` is a no-op).
+  const synthDisplacements: { fireAt: number; timerId: ReturnType<typeof setTimeout> }[] = [];
   if (stack.stackLimit > 0) {
     const openToasts = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
     // Treat anything already queued for displacement as already-hiding so we
@@ -412,15 +422,58 @@ export function toast(options: ToastOptions): HelixToast {
         const idx = availableHideDeadlines.indexOf(claimed);
         if (idx >= 0) availableHideDeadlines.splice(idx, 1);
       }
-      const nextFreeAt = availableHideDeadlines[0];
+      let nextFreeAt = availableHideDeadlines[0];
       if (nextFreeAt === undefined) {
-        // Pathological case: stackLimit > 0 and overflow > 0 but no
-        // displacement target AND no pending hide left to claim. This
-        // should be unreachable because overflow accounts for survivors +
-        // queued-appends + 1 ≤ stackLimit; if there are queued appends we
-        // must have pending hides. Bail rather than silently bypass the
-        // limit.
-        break;
+        // (codex p2) Max-burst saturation: every visible survivor is
+        // already in `_pendingDisplacements` AND every pending hide slot
+        // is paired with a queued append. The stack is fully reserved
+        // for the next MIN_DISPLAY_MS window — there is no existing
+        // hide-deadline this toast can ride.
+        //
+        // Without action, the previous code path bailed (`break`),
+        // leaving the new toast on the immediate-show path and briefly
+        // exceeding `stackLimit`. Fix: synthesize a future displacement
+        // by deferring against the LATEST queued-append deadline +
+        // MIN_DISPLAY_MS — that is the soonest moment at which the
+        // queued chain frees up and a fresh displacement is legal.
+        //
+        // We also schedule a real hide at that moment that picks the
+        // oldest open toast dynamically. By the time it fires, every
+        // toast in the burst chain ahead of us has promoted, lived its
+        // MIN_DISPLAY_MS, and is eligible to be displaced. Pushing the
+        // synthesized deadline into `_pendingHideDeadlines` keeps the
+        // queue accounting consistent with the survivor-branch shape so
+        // any later saturation-burst call observes a coherent timeline.
+        const allDeadlines: number[] = [];
+        for (const ts of allHideDeadlines) allDeadlines.push(ts);
+        for (const ts of allAppendDeadlines) allDeadlines.push(ts);
+        for (const ts of claimedHideTimestamps) allDeadlines.push(ts);
+        if (allDeadlines.length === 0) {
+          // Truly pathological: overflow > 0 with no deadlines anywhere.
+          // Bail rather than guess.
+          break;
+        }
+        nextFreeAt = Math.max(...allDeadlines) + MIN_DISPLAY_MS;
+        const synthFireAt = nextFreeAt;
+        const synthRemaining = synthFireAt - Date.now();
+        const stackRef = stack;
+        pushDeadline(_pendingHideDeadlines, stackRef, synthFireAt);
+        const synthTimerId = setTimeout(() => {
+          popDeadline(_pendingHideDeadlines, stackRef, synthFireAt);
+          // Pick the oldest-still-open toast at fire time. By
+          // construction every queued chain ahead has had time to
+          // promote and live MIN_DISPLAY_MS, so the oldest open is
+          // always displaceable.
+          const liveOpen = [...stackRef.querySelectorAll<HelixToast>('hx-toast')].filter(
+            (t) => t.open && !_pendingDisplacements.has(t),
+          );
+          const victim = liveOpen[0];
+          if (victim) victim.hide();
+        }, synthRemaining);
+        // Defer attachment to the deferred record until after `toastEl`
+        // is created. Cancellation will clearTimeout this id and pop
+        // the synth hide-deadline.
+        synthDisplacements.push({ fireAt: synthFireAt, timerId: synthTimerId });
       }
       claimedHideTimestamps.push(nextFreeAt);
       const remaining = nextFreeAt - Date.now();
@@ -487,6 +540,18 @@ export function toast(options: ToastOptions): HelixToast {
       }
       originalHide();
     };
+  }
+
+  // (codex p2 saturation) Promote any synth displacements scheduled by
+  // the saturation-fallback path into full `DisplacementClaim` entries
+  // so the cancellation helper unwinds them via the same code path as
+  // survivor-branch displacements. The `target` placeholder is `toastEl`
+  // — it is never inserted into `_pendingDisplacements`, so the
+  // `_pendingDisplacements.delete(target)` call in `cancelDeferredToast`
+  // is a no-op while the `clearTimeout` + `popDeadline` calls do their
+  // real work (preventing an orphaned hide of an unrelated victim).
+  for (const synth of synthDisplacements) {
+    scheduledDisplacements.push({ target: toastEl, fireAt: synth.fireAt, timerId: synth.timerId });
   }
 
   // Append the toast to the stack synchronously so the host element is
