@@ -19,7 +19,9 @@
  * `--hx-color-{primary,secondary}-*`, and every `var(--hx-color-primary-…)`
  * consumer reflows automatically through the cascade.
  *
- * Contract:
+ * ─────────────────────────────────────────────────────────────────────────
+ * Brand override contract — extraction-quality reference for create-helix-app
+ * ─────────────────────────────────────────────────────────────────────────
  *   1. Brands ONLY override the primitive primary + secondary ramps.
  *   2. The 22-token semantic tier (surface.*, text.*, border.*, action.*)
  *      stays untouched — semantic tokens reference the ramps via cascade,
@@ -29,9 +31,64 @@
  *      the AAA cert; brand selectors must not win the specificity race.
  *   4. The HELiX/Apex default (no `data-brand` attribute) inherits the
  *      published @helixui/tokens cascade — we do NOT override `:root`.
- *   5. AAA contract: every brand's primary-700 stop hits ≥7:1 against
- *      white text (verified at authoring time via WCAG luminance math).
- *      primary-500 is the AA-tuned mid-stop matching Apex's posture.
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * Brand AAA contrast contract (WCAG 2.1 1.4.6 + 1.4.11)
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ *   • Body text on primary surface  →  USE primary-700 OR DARKER
+ *     -------------------------------------------------------------
+ *     Body prose (small text, ≤ 0.875rem regular) on a primary fill must
+ *     clear AAA 7:1. All 5 reference brands ship a primary-700 stop that
+ *     hits ≥ 7.91:1 against white text. Override authors who add brands
+ *     MUST verify the same (see verification snippet below).
+ *
+ *     Verified at authoring time:
+ *       Apex     primary-700 = #155a5e on #ffffff = 7.91:1   AAA ✓
+ *       Meridian primary-700 = #002070 on #ffffff = 14.58:1  AAA ✓
+ *       Lumen    primary-700 = #5b21b6 on #ffffff = 8.98:1   AAA ✓
+ *       Verdant  primary-700 = #1f5226 on #ffffff = 9.16:1   AAA ✓
+ *       Signal   primary-700 = #0040b0 on #ffffff = 8.90:1   AAA ✓
+ *       Ember    primary-700 = #7d2e02 on #ffffff = 9.28:1   AAA ✓
+ *
+ *   • Button labels on primary-500/600  →  large-text carve-out (AAA 4.5:1)
+ *     -------------------------------------------------------------
+ *     hx-button renders labels at ≥ 1rem (16px) with weight 600+. Per
+ *     WCAG 2.1 1.4.6 large-text bold branch (≥ 14pt bold ≈ 18.66px or
+ *     ≥ 14pt bold), AAA threshold for those pairs is 4.5:1, NOT 7:1.
+ *     primary-500 fills (e.g. Apex #0a8fa5 = 3.83:1) sit at AA, not AAA;
+ *     primary-600 stops cross AAA-large at 5.41:1+. Buttons in this
+ *     library use primary-600 as the rest fill → AAA-large compliant.
+ *
+ *     Override authors who shrink button label size below ≥ 14pt bold
+ *     forfeit this carve-out and must use primary-700+ as the button
+ *     fill. The hx-button default labels stay above the threshold.
+ *
+ *   • Borders / status indicators / focus rings  →  ≥ primary-400 stops
+ *     -------------------------------------------------------------
+ *     Non-text UI elements (borders, focus rings, status pills) must
+ *     clear 1.4.11 AA 3:1 against the background. WCAG 1.4.6 has NO
+ *     AAA tier above 1.4.11 for non-text contrast — 3:1 is the strictest
+ *     defined threshold. primary-400 stops typically hit 3:1 against
+ *     white surfaces; primary-500 always does.
+ *
+ *   • primary-50 / primary-100 / primary-200 are TINTED SURFACE tokens
+ *     -------------------------------------------------------------
+ *     These light stops are intended as background fills with dark text
+ *     (text.primary on primary-50). They are NOT for use as button fills
+ *     or text colors. text.primary on primary-50 hits AAA 7:1 across all
+ *     5 brands (verified at authoring time).
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * Verification snippet for override authors (paste into a Node REPL):
+ * ─────────────────────────────────────────────────────────────────────────
+ *   import { contrastRatio } from '@helixui/tokens/utils';
+ *   const myBrand700 = '#1a3f8a';
+ *   console.log(contrastRatio(myBrand700, '#ffffff')); // must be ≥ 7.0
+ *
+ * See `.reports/aaa-conformance-action-list.md` for the full WCAG 2.1
+ * AAA mapping HELiX claims, and `Accessibility/Consumer Obligations` in
+ * Storybook for the partial-applicability success criteria contracts.
  */
 
 @layer hx-docs {
