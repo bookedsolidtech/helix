@@ -27,10 +27,10 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
 <section>
   <SectionHead title="At a glance" meta="WCAG 2.1 · evidence-backed" />
   <div className="hx-docs-stats">
-    <StatCard num="17" label="Success criteria tracked" sub="A · AA · AAA highlights" />
+    <StatCard num="21" label="Success criteria tracked" sub="A · AA · AAA highlights" />
     <StatCard num="7" label="Release-quality gates" sub="all green or no merge" />
     <StatCard num="0" unit=" gaps" label="Untested SCs in P0" sub="every row has a method" />
-    <StatCard num="2.1" label="WCAG version" sub="2.2 audit Q3 2026" />
+    <StatCard num="2.1" label="WCAG version" sub="2.2 audit pending" />
   </div>
 </section>
 
@@ -126,8 +126,11 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
     Methods key: <strong>axe-core</strong> = rule run in the per-story a11y addon; <strong>play()</strong>{' '}
     = Storybook interaction test (Vitest browser mode); <strong>VRT</strong> = visual regression
     snapshot; <strong>contrast-report.json</strong> = packages/hx-tokens contrast scan; <strong>manual</strong>{' '}
-    = expert review, no automated rule covers this SC reliably (W3C has documented axe coverage
-    estimated at roughly 30-40% of WCAG criteria).
+    = expert review, no automated rule covers this SC reliably. Per{' '}
+    <a href="https://www.deque.com/automated-accessibility-coverage-report/">Deque's automated-coverage research</a>
+    {/* source: https://www.deque.com/automated-accessibility-coverage-report/ (verified 2026-05-07) */}
+    , axe-core surfaces ~57% of accessibility issues found in real-world audits — but only the
+    subset of WCAG SCs whose violations have a deterministic machine signature.
   </p>
 </section>
 
@@ -295,12 +298,13 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
       gap: 16,
     }}
   >
-    <DocsCard title="WCAG 2.2" tag="audit pending Q3 2026">
+    <DocsCard title="WCAG 2.2" tag="audit pending — projection">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
         HELiX targets WCAG 2.1. The 2.2 additions (Focus Not Obscured, Dragging Movements, Target
         Size minimum) are tracked but not formally claimed until the cert artifacts ship. Several
         2.2 SCs (notably 2.5.8 Target Size minimum 24×24) are already met via the AAA 2.5.5 ≥44×44
-        rule we hit today.
+        rule we hit today. WCAG&nbsp;2.2 audit is a planned milestone — date set when artifact
+        owners commit to a release.
       </p>
     </DocsCard>
     <DocsCard title="Cognitive AAA SCs" tag="3.1.5 · 3.1.6 · scope-limited">
@@ -310,11 +314,13 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
         app owns the content that fulfills them.
       </p>
     </DocsCard>
-    <DocsCard title="VPAT 2.5" tag="in-flight · expected Q2 2026">
+    <DocsCard title="VPAT 2.5" tag="scaffolded · publish on P0 cert">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
-        A formal VPAT 2.5 (per the ITI ICT Accessibility Testing Initiative template) is in
-        preparation for the P0 surface. Until it ships, the SC ledger above is the machine-checkable
-        substitute and is updated on every release.
+        A formal <a href="https://www.itic.org/policy/accessibility/vpat">VPAT&nbsp;2.5</a>
+        {/* source: https://www.itic.org/policy/accessibility/vpat (verified 2026-05-07) */} (ITI
+        ICT Accessibility Testing Initiative template) is scaffolded for the P0 surface and
+        publishes when the P0 components reach AAA cert in production. Until then, the SC ledger
+        above is the machine-checkable substitute and is updated on every release.
       </p>
     </DocsCard>
   </div>

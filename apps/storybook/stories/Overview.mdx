@@ -13,9 +13,13 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
   lede={
     <>
       <strong>HELiX</strong> is a Lit&nbsp;3.x web component library for organizations where a
-      software failure can impact patient care. Where USWDS publishes a Level&nbsp;AA conformance
-      claim, HELiX targets <strong>WCAG&nbsp;2.1&nbsp;Level&nbsp;AAA on its P0 surface</strong> —
-      and we ship the contrast ledger, the keyboard contracts, and the VPAT to prove it.
+      software failure can impact patient care. USWDS works to{' '}
+      <a href="https://designsystem.digital.gov/documentation/accessibility/">
+        WCAG&nbsp;2.1&nbsp;Level&nbsp;AA
+      </a>
+      {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
+      ; HELiX targets <strong>WCAG&nbsp;2.1&nbsp;Level&nbsp;AAA on its P0 surface</strong> — and we
+      ship the contrast ledger, the keyboard contracts, and the VPAT to prove it.
     </>
   }
 />
@@ -24,7 +28,7 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
   <SectionHead title="The AAA cert posture" meta="WCAG 2.1 · differentiation surface" />
   <div className="hx-docs-stats">
     <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
-    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 in flight" />
+    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 scaffolded" />
     <StatCard num="100" unit="%" label="forced-colors coverage" sub="every interactive primitive" />
     <StatCard num="0" label="axe-core violations" sub="critical + serious" />
   </div>
@@ -43,9 +47,14 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
       <span className="hx-docs-pillar-tag">USWDS · AA</span>
       <h3>The federal floor.</h3>
       <p>
-        The U.S. Web Design System publishes a <strong>Level AA</strong> conformance claim for its
-        44 core components — the legal floor for Section&nbsp;508. That posture is correct for civic
-        services with a broad-public remit and risk-averse delivery cadence.
+        The U.S. Web Design System works to <strong>WCAG&nbsp;2.1 Level AA</strong> and documents
+        conformance for 44 components of USWDS&nbsp;3.11.0 in its{' '}
+        <a href="https://designsystem.digital.gov/documentation/accessibility/">
+          VPAT&nbsp;2.5 (May&nbsp;2025)
+        </a>
+        {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
+        . AAA is named in their docs as an aspirational direction, not a current claim. That posture
+        is correct for civic services with a broad-public remit and risk-averse delivery cadence.
       </p>
     </article>
     <article className="hx-docs-pillar">

@@ -20,11 +20,14 @@ import '@helixui/library/components/hx-icon-button';
   title="WCAG 2.1 AAA is the target. AA is the floor we never touch."
   lede={
     <>
-      HELiX is an OSS enterprise component library positioned alongside USWDS — and where USWDS
-      publishes a Level AA conformance claim, HELiX targets{' '}
-      <strong>Level AAA on its P0 surface</strong>. 163 contrast pairings graded across light, dark,
-      and high-contrast; 14 keyboard contracts; 22 ARIA patterns;{' '}
-      <strong>zero sub-AA tokens</strong>. Adding a token below the floor fails CI.
+      HELiX is an OSS enterprise component library positioned alongside USWDS — and where{' '}
+      <a href="https://designsystem.digital.gov/documentation/accessibility/">
+        USWDS works to Level AA
+      </a>
+      {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
+      , HELiX targets <strong>Level AAA on its P0 surface</strong>. 163 contrast pairings graded
+      across light, dark, and high-contrast; APG-aligned keyboard contracts on every interactive
+      primitive; <strong>zero sub-AA tokens</strong>. Adding a token below the floor fails CI.
     </>
   }
 />
@@ -33,7 +36,7 @@ import '@helixui/library/components/hx-icon-button';
   <SectionHead title="Coverage at a glance" meta="tokens 3.3.1 · regression-tested in CI" />
   <div className="hx-docs-stats">
     <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
-    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 in flight" />
+    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 scaffolded" />
     <StatCard num="3" label="Theme modes" sub="light · dark · high-contrast" />
     <StatCard num="0" label="axe-core violations" sub="critical + serious" />
   </div>
@@ -225,7 +228,7 @@ import '@helixui/library/components/hx-icon-button';
 </section>
 
 <section>
-  <SectionHead title="Keyboard contracts" meta="14 patterns · ARIA APG aligned" />
+  <SectionHead title="Keyboard contracts" meta="ARIA APG aligned" />
   <div
     style={{
       display: 'grid',
