@@ -1309,6 +1309,64 @@ describe('toast() utility', () => {
 
     expect(document.body.contains(el)).toBe(false);
   });
+
+  it('releases queued reservation when consumer calls .remove() during defer window (codex p2 round-10)', async () => {
+    // Behavioral probe identical in shape to the `t4.hide()` test above, but
+    // uses `t4.remove()` to bypass the consumer-facing `hide()` override.
+    // Without the per-toast removal observer, the `_pendingAppends` count
+    // stays incremented, the displacement claim hangs, and the follow-on
+    // `toast()` call observes a phantom queued slot — driving the visible
+    // count past stackLimit OR claiming a non-existent hide deadline.
+    //
+    // With the observer wired, removal is detected synchronously after the
+    // microtask completes; the canonical cancellation helper releases the
+    // slot reservation, unwinds the displacement, and the follow-on call
+    // behaves identically to a fresh 4th burst.
+    const placement = 'top-center';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    const t1 = toast({ message: 'Remove-1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Remove-2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Remove-3', placement });
+    await t3.updateComplete;
+
+    // Burst 4th — queued behind a deferred hide.
+    const t4 = toast({ message: 'Remove-4', placement });
+    await t4.updateComplete;
+    expect(t4.open).toBe(false);
+    expect(t4.style.display).toBe('none');
+
+    // Direct DOM removal — bypasses the consumer-facing hide() override.
+    t4.remove();
+    expect(t4.isConnected).toBe(false);
+
+    // The MutationObserver fires synchronously after the removal microtask;
+    // wait one microtask to let the observer callback settle before the
+    // follow-on probe.
+    await Promise.resolve();
+
+    // Follow-on toast — claims the slot t4 just released. If the queued
+    // reservation had not been freed, this call would observe a phantom
+    // queued append (survivors=3, queuedAppends=1, +1 new) and either
+    // overshoot the visible count or claim a stale hide deadline. With
+    // cleanup wired, the call observes (survivors=3, queuedAppends=0, +1
+    // new) and queues identically to a fresh 4th burst.
+    const t5 = toast({ message: 'Remove-5', placement });
+    await t5.updateComplete;
+    expect(t5.open).toBe(false);
+    expect(t5.style.display).toBe('none');
+
+    // Visible cap held throughout — never exceeds stackLimit.
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const visible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
+    expect(visible.length).toBe(stack.stackLimit);
+  });
 });
 
 // ─── disconnectedCallback timer cleanup (P2-03) ───

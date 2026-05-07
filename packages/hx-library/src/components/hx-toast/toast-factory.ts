@@ -89,6 +89,22 @@ interface DeferredRecord {
    * hide-deadline scheduled by an earlier call.
    */
   displacement: DisplacementClaim | null;
+  /**
+   * (codex p2 round-10) MutationObserver scoped to the parent stack that
+   * watches for THIS queued toast appearing in `removedNodes`. Without this,
+   * a consumer running `toastEl.remove()` (or detaching the parent) inside
+   * the defer window leaves the queued reservation in `_pendingAppends` and
+   * the displacement claim live until the timer eventually fires —
+   * displacement claim drift, follow-on `toast()` overshoots, the orphaned
+   * displacement timer eventually hides a still-needed survivor.
+   *
+   * The observer fires synchronously after the removal microtask completes,
+   * so cleanup runs before any follow-on `toast()` call observes a stale
+   * `_pendingAppends` count. Disconnected by both `promoteDeferredToShowing`
+   * (natural promotion path) and `cancelDeferredToast` (cancellation path)
+   * so the observer never lingers past the queued window.
+   */
+  removalObserver: MutationObserver | null;
 }
 
 const _deferredRecords = new WeakMap<HelixToast, DeferredRecord>();
@@ -179,9 +195,20 @@ function cancelDeferredToast(toastEl: HelixToast): void {
   const record = _deferredRecords.get(toastEl);
   if (!record || record.status !== 'queued') return;
 
-  // Mark cancelled FIRST so re-entry (e.g. from inside the timer callback)
-  // sees the terminal state and bails.
+  // Mark cancelled FIRST so re-entry (e.g. from inside the timer callback,
+  // or the removal observer firing on the same tick we're already in) sees
+  // the terminal state and bails.
   record.status = 'cancelled';
+
+  // Disconnect the parent-removal observer FIRST so its callback cannot
+  // re-enter `cancelDeferredToast` for the `toastEl.remove()` we're about
+  // to perform below. The status flip above already guards re-entry, but
+  // disconnecting also frees the observer's reference to the stack subtree
+  // immediately — no point keeping it armed for an already-cancelled record.
+  if (record.removalObserver !== null) {
+    record.removalObserver.disconnect();
+    record.removalObserver = null;
+  }
 
   // Clear the queued setTimeout so it cannot fire. (When cancellation is
   // triggered FROM that timer callback, timerId is set but the engine has
@@ -238,6 +265,15 @@ function promoteDeferredToShowing(toastEl: HelixToast, wireAutoRemove: () => voi
 
   record.status = 'showing';
   record.timerId = null;
+  // (codex p2 round-10) Disconnect the parent-removal observer — once the
+  // toast promotes to `showing`, its lifecycle is governed by the standard
+  // auto-dismiss / `hx-after-hide` path which already handles cleanup.
+  // Leaving the observer armed would leak a long-lived MutationObserver
+  // reference per shown toast.
+  if (record.removalObserver !== null) {
+    record.removalObserver.disconnect();
+    record.removalObserver = null;
+  }
   decrementPendingAppends(record.stack);
   popDeadline(_pendingAppendDeadlines, record.stack, record.fireAt);
 
@@ -494,8 +530,38 @@ export function toast(options: ToastOptions): HelixToast {
       fireAt: appendFireAt,
       timerId: null,
       displacement: ownedDisplacement,
+      removalObserver: null,
     };
     _deferredRecords.set(toastEl, record);
+
+    // (codex p2 round-10) Watch for direct DOM removal during the defer
+    // window. Without this, a consumer running `toastEl.remove()` (or
+    // detaching the parent stack) skips the `hide()` override AND the
+    // `setTimeout` does not run cleanup until the full `deferAppendMs`
+    // window elapses. Result: `_pendingAppends` stays incremented, the
+    // displacement claim hangs (the displaced survivor still hides on
+    // schedule even though no replacement is coming), follow-on
+    // `toast()` overshoots the stack limit, and a MutationObserver on
+    // the stack subtree leaks until the orphaned timer eventually fires.
+    //
+    // The observer fires synchronously after the removal microtask, so
+    // any follow-on `toast()` call observes the post-cleanup state.
+    // Cancellation routes through the canonical helper, which is
+    // idempotent (status check at the top) and disconnects this
+    // observer first.
+    const removalObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const removed of mutation.removedNodes) {
+          if (removed === toastEl) {
+            cancelDeferredToast(toastEl);
+            return;
+          }
+        }
+      }
+    });
+    removalObserver.observe(targetStack, { childList: true });
+    record.removalObserver = removalObserver;
+
     record.timerId = setTimeout(() => {
       // The setTimeout callback covers two paths:
       //
