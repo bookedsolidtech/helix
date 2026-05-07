@@ -861,6 +861,71 @@ describe('toast() utility', () => {
     expect(stillOpen.length).toBeLessThanOrEqual(3);
   });
 
+  it('caps visible toasts at stackLimit across a longer burst (codex p1 round-2)', async () => {
+    // (codex p1 round-2 longer-burst gap) The round-1 fix solved the
+    // 5-call-against-3 case by walking each survivor and queueing a
+    // deferred hide per overflow slot. But for bursts longer than
+    // (initial fill + stackLimit), every visible toast lands in
+    // `_pendingDisplacements` after the first batch of overflow calls;
+    // the next caller's `survivors[i]` returns undefined and the loop
+    // exits early — leaving the new toast on the immediate-show path
+    // and breaking the cap. Fix: when survivors are exhausted, the new
+    // toast must still be queued for the next free slot, taken from the
+    // pending-hide timeline.
+    const placement = 'top-start';
+    document
+      .querySelectorAll(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    // Burst of 6 against stackLimit = 3 (the default).
+    const burst: HelixToast[] = [];
+    for (let i = 1; i <= 6; i++) {
+      const el = toast({ message: `Burst ${i}`, placement });
+      burst.push(el);
+      // eslint-disable-next-line no-await-in-loop
+      await el.updateComplete;
+    }
+
+    // Mid-burst sample: visible count must NEVER exceed stackLimit, even
+    // before any deferred-hide timer fires. This is the key invariant
+    // the round-2 fix protects.
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const midBurstVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(
+      midBurstVisible.length,
+      `mid-burst: expected ≤${stack.stackLimit} visible, got ${midBurstVisible.length}`,
+    ).toBeLessThanOrEqual(stack.stackLimit);
+
+    // Wait long enough for ALL deferred displacements + queued appends
+    // to settle. The last queued append fires at most ~MIN_DISPLAY_MS
+    // after its scheduling, and scheduling drifts forward across the
+    // burst — give it a generous buffer.
+    await new Promise((r) => setTimeout(r, 2500));
+    for (const el of burst) {
+      // eslint-disable-next-line no-await-in-loop
+      await el.updateComplete;
+    }
+
+    // Settled: the three oldest are hidden; the three newest are visible.
+    const settledVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(
+      settledVisible.length,
+      `settled: expected exactly ${stack.stackLimit} visible, got ${settledVisible.length}`,
+    ).toBe(stack.stackLimit);
+    expect(burst[0]!.open).toBe(false);
+    expect(burst[1]!.open).toBe(false);
+    expect(burst[2]!.open).toBe(false);
+    expect(burst[3]!.open).toBe(true);
+    expect(burst[4]!.open).toBe(true);
+    expect(burst[5]!.open).toBe(true);
+  });
+
   it('removes the toast element from DOM after hx-after-hide fires', async () => {
     const el = toast({ message: 'Remove me', duration: 0, placement: 'top-start' });
     await el.updateComplete;

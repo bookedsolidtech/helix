@@ -52,6 +52,50 @@ const _pendingDisplacements = new WeakSet<HelixToast>();
 const _pendingAppends = new WeakMap<HelixToastStack, number>();
 
 /**
+ * @internal
+ * Per-stack ordered list of `Date.now()`-style timestamps when previously
+ * scheduled deferred-hide timers will fire, plus when previously queued
+ * appends will become visible. Used by longer-burst calls (codex p1 round-2)
+ * that exhaust the live survivor pool: when every existing survivor has
+ * already been picked for displacement by an earlier burst call, the next
+ * call has no fresh target to hide. The new toast must still be queued so
+ * the stack never exceeds `stackLimit`; we queue it for the NEXT free slot,
+ * which is the soonest of the pending hide deadlines that hasn't already
+ * been claimed by a queued append.
+ *
+ * Each scheduled hide opens one slot; each queued append claims one slot
+ * when its timer fires. We track both as monotonically-increasing arrays
+ * so the math is just "next deadline ≥ now". Entries are popped (shifted)
+ * when their corresponding timer fires.
+ */
+const _pendingHideDeadlines = new WeakMap<HelixToastStack, number[]>();
+const _pendingAppendDeadlines = new WeakMap<HelixToastStack, number[]>();
+
+/** @internal */
+function pushDeadline(map: WeakMap<HelixToastStack, number[]>, stack: HelixToastStack, ts: number) {
+  const list = map.get(stack);
+  if (list) {
+    list.push(ts);
+    list.sort((a, b) => a - b);
+  } else {
+    map.set(stack, [ts]);
+  }
+}
+
+/** @internal */
+function popDeadline(
+  map: WeakMap<HelixToastStack, number[]>,
+  stack: HelixToastStack,
+  ts: number,
+): void {
+  const list = map.get(stack);
+  if (!list) return;
+  const idx = list.indexOf(ts);
+  if (idx >= 0) list.splice(idx, 1);
+  if (list.length === 0) map.delete(stack);
+}
+
+/**
  * Imperatively create and display a toast notification.
  *
  * Creates a shared `hx-toast-stack` on `document.body` if one does not exist,
@@ -113,25 +157,81 @@ export function toast(options: ToastOptions): HelixToast {
     const survivors = openToasts.filter((t) => !_pendingDisplacements.has(t));
     const queuedAppends = _pendingAppends.get(stack) ?? 0;
     const overflow = survivors.length + queuedAppends + 1 - stack.stackLimit;
+
+    // Track which slots we've already accounted for in this call. Each
+    // displacement we schedule below frees one slot; each pending hide we
+    // claim from the existing timeline also frees one slot. The new toast
+    // claims the soonest free slot — its deferAppendMs is set to that
+    // deadline's remaining time (0 if a slot frees immediately).
+    const claimedHideTimestamps: number[] = [];
+
     for (let i = 0; i < overflow; i++) {
       const target = survivors[i];
-      if (!target) break;
-      const shownAt = _shownAt.get(target);
-      const elapsed = shownAt === undefined ? Number.POSITIVE_INFINITY : Date.now() - shownAt;
-      if (elapsed >= MIN_DISPLAY_MS) {
-        target.hide();
-      } else {
+      if (target) {
+        const shownAt = _shownAt.get(target);
+        const elapsed = shownAt === undefined ? Number.POSITIVE_INFINITY : Date.now() - shownAt;
+        if (elapsed >= MIN_DISPLAY_MS) {
+          target.hide();
+          // Slot frees synchronously; deferAppendMs stays at 0 unless a
+          // later iteration of this loop forces it higher.
+          continue;
+        }
         const remaining = MIN_DISPLAY_MS - elapsed;
+        const fireAt = Date.now() + remaining;
         _pendingDisplacements.add(target);
+        pushDeadline(_pendingHideDeadlines, stack, fireAt);
+        const stackRef = stack;
         setTimeout(() => {
           _pendingDisplacements.delete(target);
+          popDeadline(_pendingHideDeadlines, stackRef, fireAt);
           // Guard: only hide if still open (consumer may have hidden it manually)
           if (target.open) target.hide();
         }, remaining);
-        // Track the longest remaining window so we can hold the new toast's
-        // append until at least one slot has actually freed up.
+        claimedHideTimestamps.push(fireAt);
         if (remaining > deferAppendMs) deferAppendMs = remaining;
+        continue;
       }
+
+      // No live survivor available for this overflow slot: every visible
+      // toast is already queued for displacement by an earlier burst call.
+      // (codex p1 round-2: longer-burst gap.) Find the next free slot from
+      // the existing pending-hide timeline that we have not already
+      // claimed in this call or by an earlier queued append.
+      const allHideDeadlines = _pendingHideDeadlines.get(stack) ?? [];
+      const allAppendDeadlines = _pendingAppendDeadlines.get(stack) ?? [];
+      // A pending append CONSUMES a hide-slot when it fires, so any append
+      // deadline ≤ a hide deadline cancels that hide-slot from the pool of
+      // free slots available to *this* new toast. We pair them in
+      // chronological order: each append claims the next hide slot.
+      const availableHideDeadlines = [...allHideDeadlines].sort((a, b) => a - b);
+      const queuedAppendsPending = [...allAppendDeadlines].sort((a, b) => a - b);
+      // Pair each queued append with the soonest hide it depends on.
+      for (const appendAt of queuedAppendsPending) {
+        for (let j = 0; j < availableHideDeadlines.length; j++) {
+          if ((availableHideDeadlines[j] as number) <= appendAt) {
+            availableHideDeadlines.splice(j, 1);
+            break;
+          }
+        }
+      }
+      // Subtract slots claimed by THIS call's earlier loop iterations.
+      for (const claimed of claimedHideTimestamps) {
+        const idx = availableHideDeadlines.indexOf(claimed);
+        if (idx >= 0) availableHideDeadlines.splice(idx, 1);
+      }
+      const nextFreeAt = availableHideDeadlines[0];
+      if (nextFreeAt === undefined) {
+        // Pathological case: stackLimit > 0 and overflow > 0 but no
+        // displacement target AND no pending hide left to claim. This
+        // should be unreachable because overflow accounts for survivors +
+        // queued-appends + 1 ≤ stackLimit; if there are queued appends we
+        // must have pending hides. Bail rather than silently bypass the
+        // limit.
+        break;
+      }
+      claimedHideTimestamps.push(nextFreeAt);
+      const remaining = nextFreeAt - Date.now();
+      if (remaining > deferAppendMs) deferAppendMs = Math.max(0, remaining);
     }
   }
 
@@ -187,9 +287,14 @@ export function toast(options: ToastOptions): HelixToast {
     // never exceeds `stackLimit`.
     //
     // Track the queued show on the target stack so subsequent burst calls
-    // count it when computing overflow against `stackLimit`.
+    // count it when computing overflow against `stackLimit`. We also
+    // record this append's expected fire timestamp so the longer-burst
+    // gap-fix above (codex p1 round-2) knows which hide-slots are already
+    // claimed when it falls back to the pending-hide timeline.
     const targetStack = stack;
+    const appendFireAt = Date.now() + deferAppendMs;
     _pendingAppends.set(targetStack, (_pendingAppends.get(targetStack) ?? 0) + 1);
+    pushDeadline(_pendingAppendDeadlines, targetStack, appendFireAt);
     setTimeout(() => {
       const remaining = (_pendingAppends.get(targetStack) ?? 1) - 1;
       if (remaining > 0) {
@@ -197,6 +302,7 @@ export function toast(options: ToastOptions): HelixToast {
       } else {
         _pendingAppends.delete(targetStack);
       }
+      popDeadline(_pendingAppendDeadlines, targetStack, appendFireAt);
       // Guard: the consumer may have removed the toast before its slot
       // opened (e.g. test cleanup). Only show if still connected.
       if (toastEl.isConnected) {
