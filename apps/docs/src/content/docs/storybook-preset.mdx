@@ -222,6 +222,63 @@ export default preview;
 
 ## Patterns
 
+### Canonical `play()` interaction test
+
+Every component story under `packages/hx-library/src/components/*/hx-*.stories.ts`
+ships at least one `play()` block exercising the load-bearing UX path.
+`play()` runs both inline (when you visit the story in the canvas) and headlessly
+(under `pnpm --filter=@helixui/storybook run test` via `addon-vitest`). Pass/fail
+surfaces in the **Component tests (Vitest)** panel.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from 'lit';
+import { expect, fn, userEvent } from 'storybook/test';
+import './hx-button.js';
+
+const meta = {
+  title: 'Components/Button',
+  component: 'hx-button',
+} satisfies Meta;
+export default meta;
+type Story = StoryObj;
+
+export const ClickEvent: Story = {
+  args: { label: 'Verify Prescription' },
+  play: async ({ canvasElement }) => {
+    const hxButton = canvasElement.querySelector('hx-button')!;
+    const eventSpy = fn();
+    hxButton.addEventListener('hx-click', eventSpy);
+
+    // Reach into the shadow root for the focusable native element.
+    const innerButton = hxButton.shadowRoot!.querySelector('button')!;
+    await userEvent.click(innerButton);
+
+    await expect(eventSpy).toHaveBeenCalledTimes(1);
+    const evt = eventSpy.mock.calls[0][0] as CustomEvent;
+    await expect(evt.bubbles).toBe(true);
+    await expect(evt.composed).toBe(true);
+
+    hxButton.removeEventListener('hx-click', eventSpy);
+  },
+};
+```
+
+**Conventions used in every HELiX `play()` block:**
+
+- Imports from `'storybook/test'` (the SB10 entry point) — `expect`, `fn`,
+  `userEvent`, `within`, `waitFor`. Do **not** install `@storybook/test`
+  separately; it is bundled with `storybook` 10.x.
+- `canvasElement.querySelector('hx-*')` for the host. `host.shadowRoot!.querySelector(...)`
+  for the focusable native control. This is the documented test-utility
+  pattern in `packages/hx-library/src/test-utils.ts`.
+- Listener cleanup at the end of every block (`removeEventListener`) so
+  re-runs do not double-count.
+- Assertions on `bubbles` + `composed` for every `hx-*` event — the
+  shadow-boundary composition contract is load-bearing.
+- Disabled / loading paths assert that the event spy fires zero times. A
+  missing assertion is a regression target.
+
 ### AAA opt-in per story
 
 ```ts
@@ -239,6 +296,113 @@ export const HighContrastButton: Story = {
   },
 };
 ```
+
+### Scene composition story
+
+A "scene" is a full-page composition of multiple `hx-*` components. Scenes
+live under `apps/storybook/stories/patterns/scenes/<scene>.stories.ts` and
+ship with the same play-function rigor as component stories. They are the
+canonical reference for how to compose HELiX in a real consumer page. Every
+scene fulfills four contracts:
+
+1. **Real components only.** No mock divs. Every interactive surface is a
+   registered `hx-*` element. The first play() function asserts every
+   `data-testid` resolves to the expected `tagName.toLowerCase()`.
+2. **One render per file.** A `renderScene = () => html\`...\``factory is
+shared across every story export. Stories reuse the factory; only the`play()` body differs.
+3. **Theme + brand resilient.** No hardcoded colors. Every surface and text
+   color binds to a token (`--hx-color-text-primary`,
+   `--hx-color-surface-raised`, etc.). Cycling the theme/brand toolbar must
+   leave the layout intact.
+4. **Healthcare-flavored sample data.** Realistic but never PII. MRN numbers
+   are random, names are non-identifying, conditions are common.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from 'lit';
+import { expect, userEvent, within } from 'storybook/test';
+
+import '@helixui/library/components/hx-form';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-button';
+
+const meta = {
+  title: 'Patterns/Scenes/Patient Intake',
+  parameters: { layout: 'fullscreen' },
+  tags: ['autodocs'],
+} satisfies Meta;
+export default meta;
+type Story = StoryObj;
+
+const renderScene = () => html`
+  <div style="max-width: 720px; margin: 0 auto; padding: 32px 24px;">
+    <hx-form id="intake" novalidate>
+      <hx-text-input
+        data-testid="intake-first-name"
+        label="First name"
+        name="firstName"
+        required
+      ></hx-text-input>
+      <hx-button data-testid="intake-submit" type="submit" variant="primary">
+        Submit intake
+      </hx-button>
+    </hx-form>
+  </div>
+`;
+
+export const Default: Story = { render: renderScene };
+
+export const SubmitEmpty: Story = {
+  render: renderScene,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    let submitted = false;
+    canvasElement.querySelector('#intake')!.addEventListener('hx-submit', () => {
+      submitted = true;
+    });
+
+    const submit = canvas.getByTestId('intake-submit') as HTMLElement;
+    const innerSubmit = submit.shadowRoot!.querySelector('button')!;
+    await userEvent.click(innerSubmit);
+
+    // Empty required fields must block submission.
+    await expect(submitted).toBe(false);
+  },
+};
+```
+
+The reference scenes shipped in `apps/storybook/stories/patterns/scenes/`
+are:
+
+- `patient-intake.stories.ts` — `hx-form` validation + happy-path submission
+- `provider-dashboard.stories.ts` — layout density, `hx-data-table`,
+  shadow-boundary event composition
+- `settings.stories.ts` — `hx-tabs` navigation, `hx-switch` toggles, save/cancel
+
+## What test results to expect
+
+`pnpm --filter=@helixui/storybook run test` runs every `play()` block via
+`addon-vitest` and emits a per-story pass/fail. Three places surface the
+results:
+
+| Surface                  | What you see                                                                     |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| Storybook UI sidebar     | A green check / red ✗ next to each story id once the run completes.              |
+| Component tests panel    | Per-`play()` block: assertion count, the failing line on red, a "Re-run" button. |
+| CLI `pnpm run test` exit | Non-zero on any failed assertion. Match output is grouped by story title.        |
+
+A red **Component tests** panel with no inline failure usually means the
+story rendered but the `play()` block threw before reaching an assertion —
+inspect the browser devtools console (panel → ⋯ → "Open in canvas") for the
+stack trace.
+
+A panel that stays in `Initializing…` indicates `addon-vitest` did not
+register: confirm `apps/<your-app>/.storybook/vitest.setup.ts` exists and
+calls `setProjectAnnotations(...)` against the project's preview config.
+
+When a `play()` block exposes a real product bug (the assertion catches
+something the component did wrong), do **not** silence the assertion. Open
+a defect, link the failing story id, and let the failing test gate the fix.
 
 ### Figma embed per story
 
