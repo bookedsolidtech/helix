@@ -1,4 +1,4 @@
-import { aaaCertifiedPlugin } from './cem-plugins/aaa-certified.mjs';
+import { helixMetadataPlugin } from './cem-plugins/helix-metadata.mjs';
 
 /** @type {import('@custom-elements-manifest/analyzer').Options} */
 export default {
@@ -8,9 +8,12 @@ export default {
   litelement: true,
   dev: false,
   plugins: [
-    // AAA Cert Epic — Workstream A.3
-    // Reads `@aaa-certified [date]` JSDoc tags and emits `aaaCertified: true`
-    // (and optionally `aaaCertifiedDate`) on the matching class declaration.
-    aaaCertifiedPlugin(),
+    // AAA Cert Epic — Phase B.1 (rich metadata schema)
+    // Reads the @aaa-* / @keyboard-contract / @aria-pattern / @priority-tier /
+    // @figma-* / @phi-handles / etc. JSDoc tags and emits a structured
+    // `helixMeta: {...}` field on each class declaration. Also keeps the
+    // back-compat top-level `aaaCertified` / `aaaCertifiedDate` fields the
+    // 3.5.0 schema introduced.
+    helixMetadataPlugin(),
   ],
 };
