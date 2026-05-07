@@ -2,6 +2,7 @@ import '@helixui/tokens/tokens.css';
 import './docs/helix-docs.css';
 import './docs/brand-overrides.css';
 import './docs/force-states.css';
+import './docs/code-editor.css';
 import type { Preview } from '@storybook/web-components';
 import { setCustomElementsManifest } from '@storybook/web-components';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
@@ -80,6 +81,16 @@ const preview: Preview = {
       toc: {
         headingSelector: 'h2, h3',
         title: 'Table of Contents',
+      },
+      // Source block configuration. `format: 'dedent'` strips shared
+      // leading whitespace so auto-generated story source aligns with
+      // the gutter — matches the visual treatment of hand-written
+      // <CodeBlock> usage in MDX. The dark editor chrome on the
+      // rendered <pre> is provided by code-editor.css (.docblock-source
+      // / .sbdocs-pre selectors) so visual continuity holds without
+      // swapping the renderer.
+      source: {
+        format: 'dedent',
       },
     },
     options: {

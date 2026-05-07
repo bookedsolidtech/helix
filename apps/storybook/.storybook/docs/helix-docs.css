@@ -592,33 +592,14 @@
     color: var(--hx-color-text-link, #0f7078);
   }
 
-  /* ── Code block (mono surface) ────────────────────────────── */
-
-  .hx-docs-code {
-    margin: 0;
-    background: var(--hx-color-surface-sunken, #f1f3f5);
-    border: 1px solid var(--hx-color-border-subtle, #e9ecef);
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
-    font-size: 12px;
-    line-height: 1.55;
-    color: var(--hx-color-text-strong, #0d1825);
-    overflow-x: auto;
-    white-space: pre;
-  }
-
-  .hx-docs-code .k {
-    color: var(--hx-color-primary-700, #0a4f55);
-  }
-
-  .hx-docs-code .s {
-    color: var(--hx-color-text-muted, #6c757d);
-  }
-
-  [data-theme='dark'] .hx-docs-code .k {
-    color: var(--hx-color-primary-300, #5cb5bc);
-  }
+  /* ── Code block (legacy `.hx-docs-code`) ────────────────────
+   *
+   * Replaced by the Shiki-rendered `<CodeBlock>` / `<CodeTabs>` components
+   * (see `_components/CodeBlock.tsx` + `docs/code-editor.css`). The
+   * `.hx-docs-code` rule + `.k` / `.s` token classes were removed; if a
+   * stray `<pre className="hx-docs-code">` survives, it now falls back to
+   * UA defaults — visible enough that it's a clear refactor signal.
+   */
 
   /* ── Inline code ─────────────────────────────────────────── */
 
