@@ -472,6 +472,17 @@ export class HelixTabs extends HelixElement {
       .find((el): el is HelixTab => el instanceof Element && el.tagName.toLowerCase() === 'hx-tab');
     if (tab) {
       this._activateTab(tab);
+      // Host-canonical (Group 5a): hx-tab renders a `div[tabindex="-1"]`
+      // rather than a native button, so a click leaves activeElement on
+      // whatever the user clicked from. Without an explicit focus call,
+      // arrow/Home/End keyboard navigation has no anchor inside the
+      // tablist until the user tabs back in. `preventScroll: true` keeps
+      // the click from triggering a viewport scroll-into-view that the
+      // user did not request — the tab is already in view because the
+      // user just clicked it.
+      if (!tab.disabled) {
+        tab.focus({ preventScroll: true });
+      }
     }
   };
 
