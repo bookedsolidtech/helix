@@ -42,7 +42,6 @@ import {
  *   Layout/*           → layout       (the standalone root, not Foundations/Layout)
  *   Utilities/*        → utilities
  *   Infrastructure/*   → infrastructure
- *   Design Tokens/*    → design-tokens
  *   Drupal/*           → drupal
  *
  * Typed surface: `API_SidebarOptions` (storybook 10.3.6) — confirmed
@@ -57,7 +56,6 @@ addons.setConfig({
       'layout',
       'utilities',
       'infrastructure',
-      'design-tokens',
       'drupal',
     ],
   },

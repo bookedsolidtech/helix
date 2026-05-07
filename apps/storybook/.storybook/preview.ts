@@ -118,7 +118,16 @@ const preview: Preview = {
           'Accessibility',
           ['Overview', '*'],
           'Foundations',
-          ['Brand Registry', 'Color', 'Typography', 'Spacing', 'Iconography', 'Layout'],
+          [
+            'Brand Registry',
+            'Color',
+            'Typography',
+            'Spacing',
+            'Borders',
+            'Shadows',
+            'Iconography',
+            'Layout',
+          ],
           'Patterns',
           ['Forms', 'Feedback', 'Data display', 'Patterns', 'Scenes'],
           'Playground',
@@ -129,8 +138,6 @@ const preview: Preview = {
           'Layout', // layout primitives (Container, etc.) — distinct from Foundations/Layout
           'Utilities', // engineering-leaf utilities (StyleScope, etc.)
           'Infrastructure', // engineering-leaf infrastructure (Popup, Theme, etc.)
-          'Design Tokens',
-          ['Borders', 'Shadows', '*'],
           'Drupal',
         ],
       },
@@ -188,11 +195,49 @@ const preview: Preview = {
     // selector-based fallback for consumers whose components don't use Shadow DOM
     // attributes for state. Components in @helixui/library already expose
     // forced-state hooks via `force-states.css`; the addon stacks on top.
+    //
+    // Per-story override pattern:
+    //   parameters: { pseudo: { hover: true } }
     pseudo: {},
-    // Designs addon. Per-story `parameters.design` accepts `{ type: 'figma',
-    // url: '...' }` (or any embed URL). Setting an empty default here keeps
-    // the panel registered without a global frame.
-    design: {},
+    // Designs addon (@storybook/addon-designs).
+    //
+    // Why a non-empty default: the addon's panel renderer switches on
+    // `parameters.design.type`. An empty `{}` (or any object whose `type`
+    // is not one of `iframe | figma | sketch | figspec | image | link`)
+    // hits the switch's default branch and renders an "Invalid config
+    // type" placeholder in the right rail. That placeholder is the
+    // first thing a consumer sees when they open any story — it reads
+    // as a defect even though the addon is technically working.
+    //
+    // The fix is a preview-level default that satisfies the schema. We
+    // use the `link` config (no iframe / Figma frame, no design system
+    // dependency yet) so the panel surfaces a meaningful pointer to the
+    // component's source on GitHub until real Figma URLs land. Stories
+    // (or whole component metas) override this with `{ type: 'figma',
+    // url: '…' }` or `{ type: 'iframe', url: '…' }` as the design system
+    // catches up.
+    //
+    // Per-story override pattern:
+    //   parameters: {
+    //     design: { type: 'figma', url: 'https://www.figma.com/file/…' },
+    //   }
+    //
+    // Multi-frame override pattern (renders tabs in the panel):
+    //   parameters: {
+    //     design: [
+    //       { name: 'Light',  type: 'figma', url: '…?node-id=1' },
+    //       { name: 'Dark',   type: 'figma', url: '…?node-id=2' },
+    //     ],
+    //   }
+    design: {
+      type: 'link',
+      name: 'HELiX component source',
+      url: 'https://github.com/bookedsolidtech/helix/tree/main/packages/hx-library/src/components',
+      label: 'View component source on GitHub',
+      showArrow: true,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
   },
 
   initialGlobals: {
