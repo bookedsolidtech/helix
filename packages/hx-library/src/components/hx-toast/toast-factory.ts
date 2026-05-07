@@ -23,6 +23,76 @@ export interface ToastOptions {
  */
 const MIN_DISPLAY_MS = 1500;
 
+/**
+ * @internal
+ *
+ * Single coherent state machine per deferred toast (codex p1 round-2 holistic).
+ *
+ * ```
+ *   queued ── timer fires ──► showing ──► hiding ──► done
+ *      │
+ *      └── consumer hide() / DOM detach ──► cancelled ──► removed (terminal)
+ * ```
+ *
+ * Every state transition flows through ONE of two helpers:
+ *
+ *  - `promoteDeferredToShowing` — natural progression when the queued timer
+ *    fires. Pops the append-deadline, decrements `_pendingAppends`, clears
+ *    the inline `display: none` artifact, calls `show()`.
+ *  - `cancelDeferredToast` — terminal cancellation, whether triggered by a
+ *    consumer `.hide()` call inside the defer window OR by detecting a DOM
+ *    detach inside the timer callback. Pops the append-deadline, decrements
+ *    `_pendingAppends`, cancels the queued `setTimeout`, detaches the toast
+ *    element from the DOM, clears the inline `display: none` artifact, and
+ *    marks the deferred record as `cancelled` so the timer callback (if it
+ *    still fires) is a no-op.
+ *
+ * Concentrating cleanup in these two helpers prevents the per-call leaks
+ * that produced rounds 4–8 of codex findings (`_pendingAppends` drift,
+ * `_pendingAppendDeadlines` zombie entries, DOM-resident `display: none`
+ * elements, double-show on cancelled toasts).
+ */
+type DeferredStatus = 'queued' | 'showing' | 'cancelled';
+
+/**
+ * @internal
+ * Captures a single displacement that THIS queued toast owns — the hide
+ * timer it scheduled to free its slot. Recorded only for the survivor
+ * branch (where we created the timer); the longer-burst fallback path
+ * shares a previously-scheduled hide and stores `null` here.
+ *
+ * On cancellation we unwind the displacement: clearTimeout the hide
+ * timer, drop the target from `_pendingDisplacements`, and pop its
+ * `_pendingHideDeadlines` entry. Without this, decrementing the
+ * pending-append count alone leaves the survivor pool under-counted —
+ * the next `toast()` call sees fewer survivors than really exist and
+ * skips the deferred-show path, briefly exceeding `stackLimit`.
+ */
+interface DisplacementClaim {
+  target: HelixToast;
+  fireAt: number;
+  timerId: ReturnType<typeof setTimeout>;
+}
+
+interface DeferredRecord {
+  /** Current state in the lifecycle. */
+  status: DeferredStatus;
+  /** Owning stack — needed for queue accounting. */
+  stack: HelixToastStack;
+  /** Date.now()+deferAppendMs — used to pop the append-deadline timeline. */
+  fireAt: number;
+  /** Handle to the queued setTimeout so cancellation can clear it. */
+  timerId: ReturnType<typeof setTimeout> | null;
+  /**
+   * Displacement THIS queued toast owns (survivor branch only). `null` for
+   * the longer-burst fallback branch where this toast claimed an existing
+   * hide-deadline scheduled by an earlier call.
+   */
+  displacement: DisplacementClaim | null;
+}
+
+const _deferredRecords = new WeakMap<HelixToast, DeferredRecord>();
+
 /** @internal Tracks `show()` timestamps so the factory can defer displacement. */
 const _shownAt = new WeakMap<HelixToast, number>();
 
@@ -31,56 +101,31 @@ const _shownAt = new WeakMap<HelixToast, number>();
  * Tracks toasts that already have a deferred-hide scheduled so successive
  * `toast()` calls within the same MIN_DISPLAY_MS window do NOT pile multiple
  * timers on the same target while leaving newer overflow toasts untouched.
- *
- * (group-6 §5.5 burst-fix) Without this guard, a 5-call burst against a
- * limit-3 stack would schedule three hides on the SAME oldest toast (calls
- * 4, 5, and any subsequent within the window), and the stack would settle
- * at 4 visible toasts after the deferred hide fired — violating
- * `stackLimit`. The set + per-toast guard ensures each successive oldest
- * is hidden exactly once.
  */
 const _pendingDisplacements = new WeakSet<HelixToast>();
 
 /**
  * @internal
  * Per-stack count of toasts that have been created via `toast()` but whose
- * append-and-show is queued behind a deferred-hide (codex p2 stack-limit
- * fix). These toasts already "own" a future visible slot, so a subsequent
- * burst call must count them when deciding whether further displacement is
- * needed — otherwise the stack briefly exceeds `stackLimit`.
+ * append-and-show is queued behind a deferred-hide. These toasts already
+ * "own" a future visible slot, so a subsequent burst call must count them
+ * when deciding whether further displacement is needed — otherwise the
+ * stack briefly exceeds `stackLimit`.
+ *
+ * Mutated only by `promoteDeferredToShowing` and `cancelDeferredToast` so
+ * the count stays in lockstep with the deferred-record lifecycle.
  */
 const _pendingAppends = new WeakMap<HelixToastStack, number>();
 
 /**
  * @internal
- * Tracks deferred toasts whose `hide()` (or removal) was called by the
- * consumer during the defer window — i.e. before the queued `setTimeout`
- * fires `show()`. (codex p2 round-2.) Without this guard, the deferred
- * `show()` would still flip the toast visible after the consumer asked to
- * cancel it.
- *
- * Population strategy: when we enter the deferred-show path we wrap the
- * toast's `hide()` so a consumer call adds the element to this set. We also
- * check `isConnected` inside the timer callback to cover plain DOM removal.
- */
-const _cancelledDeferred = new WeakSet<HelixToast>();
-
-/**
- * @internal
  * Per-stack ordered list of `Date.now()`-style timestamps when previously
  * scheduled deferred-hide timers will fire, plus when previously queued
- * appends will become visible. Used by longer-burst calls (codex p1 round-2)
- * that exhaust the live survivor pool: when every existing survivor has
- * already been picked for displacement by an earlier burst call, the next
- * call has no fresh target to hide. The new toast must still be queued so
- * the stack never exceeds `stackLimit`; we queue it for the NEXT free slot,
- * which is the soonest of the pending hide deadlines that hasn't already
- * been claimed by a queued append.
- *
- * Each scheduled hide opens one slot; each queued append claims one slot
- * when its timer fires. We track both as monotonically-increasing arrays
- * so the math is just "next deadline ≥ now". Entries are popped (shifted)
- * when their corresponding timer fires.
+ * appends will become visible. Used by longer-burst calls that exhaust the
+ * live survivor pool: when every existing survivor has already been picked
+ * for displacement by an earlier burst call, the next call has no fresh
+ * target to hide. The new toast must still be queued so the stack never
+ * exceeds `stackLimit`; we queue it for the NEXT free slot.
  */
 const _pendingHideDeadlines = new WeakMap<HelixToastStack, number[]>();
 const _pendingAppendDeadlines = new WeakMap<HelixToastStack, number[]>();
@@ -107,6 +152,106 @@ function popDeadline(
   const idx = list.indexOf(ts);
   if (idx >= 0) list.splice(idx, 1);
   if (list.length === 0) map.delete(stack);
+}
+
+/** @internal Decrement the per-stack pending-append count (or clear at zero). */
+function decrementPendingAppends(stack: HelixToastStack): void {
+  const remaining = (_pendingAppends.get(stack) ?? 1) - 1;
+  if (remaining > 0) {
+    _pendingAppends.set(stack, remaining);
+  } else {
+    _pendingAppends.delete(stack);
+  }
+}
+
+/**
+ * @internal
+ * Cancels a deferred toast in any pre-`show()` state. Safe to call multiple
+ * times on the same element — the deferred-record check makes subsequent
+ * calls no-ops. Used by:
+ *
+ *  1. The consumer-facing `hide()` override installed during the defer window
+ *     (covers `t.hide()` mid-window).
+ *  2. The deferred `setTimeout` callback when it discovers a non-connected
+ *     element (covers plain `t.remove()` / parent removal).
+ */
+function cancelDeferredToast(toastEl: HelixToast): void {
+  const record = _deferredRecords.get(toastEl);
+  if (!record || record.status !== 'queued') return;
+
+  // Mark cancelled FIRST so re-entry (e.g. from inside the timer callback)
+  // sees the terminal state and bails.
+  record.status = 'cancelled';
+
+  // Clear the queued setTimeout so it cannot fire. (When cancellation is
+  // triggered FROM that timer callback, timerId is set but the engine has
+  // already dequeued it — clearTimeout on a fired id is a documented no-op.)
+  if (record.timerId !== null) {
+    clearTimeout(record.timerId);
+    record.timerId = null;
+  }
+
+  // Decrement the per-stack queue count so subsequent burst calls do not
+  // think this slot is still reserved.
+  decrementPendingAppends(record.stack);
+  popDeadline(_pendingAppendDeadlines, record.stack, record.fireAt);
+
+  // Unwind the displacement we owned, if any. Without this, the
+  // survivor-pool filter (`!_pendingDisplacements.has(t)`) keeps treating
+  // the displaced target as already-leaving — a follow-on `toast()` call
+  // observes too few survivors, skips the deferred-show path, and shows
+  // immediately. Result: stack briefly exceeds `stackLimit` until the
+  // orphaned displacement timer eventually fires. The fallback branch
+  // (longer-burst path) does not own a displacement (`displacement ===
+  // null`); it claimed an existing hide-deadline scheduled by an earlier
+  // call, so cancellation is just our own queue-bookkeeping.
+  if (record.displacement) {
+    const { target, fireAt, timerId } = record.displacement;
+    clearTimeout(timerId);
+    _pendingDisplacements.delete(target);
+    popDeadline(_pendingHideDeadlines, record.stack, fireAt);
+  }
+
+  // Clear the inline `display: none` we set during the defer window so a
+  // still-attached toast does not leave a zero-box artifact behind.
+  toastEl.style.removeProperty('display');
+
+  // Detach from DOM. A cancelled toast must not linger as a zombie element
+  // (codex p2 round-2 finding) — the public API contract is that the
+  // element is gone after `hide()` resolves, just like for shown toasts
+  // post-`hx-after-hide`.
+  toastEl.remove();
+
+  // Drop the record entirely; the toast has reached its terminal state.
+  _deferredRecords.delete(toastEl);
+}
+
+/**
+ * @internal
+ * Natural progression: the queued `setTimeout` fired and the slot is
+ * available. Pop the append-deadline, decrement the queue count, clear the
+ * inline `display: none`, and call `show()`.
+ */
+function promoteDeferredToShowing(toastEl: HelixToast, wireAutoRemove: () => void): void {
+  const record = _deferredRecords.get(toastEl);
+  if (!record || record.status !== 'queued') return;
+
+  record.status = 'showing';
+  record.timerId = null;
+  decrementPendingAppends(record.stack);
+  popDeadline(_pendingAppendDeadlines, record.stack, record.fireAt);
+
+  // Clearing display BEFORE show() ensures the toast is in layout flow on
+  // the same frame visibility activates — avoids a one-frame
+  // invisible-but-allocated layout window.
+  toastEl.style.removeProperty('display');
+  wireAutoRemove();
+  toastEl.show();
+  _shownAt.set(toastEl, Date.now());
+
+  // Showing toasts no longer need the deferred record — their lifecycle is
+  // now governed by the standard auto-dismiss / hx-after-hide path.
+  _deferredRecords.delete(toastEl);
 }
 
 /**
@@ -145,21 +290,13 @@ export function toast(options: ToastOptions): HelixToast {
   // (group-6 §5.5) Minimum display time prevents AT-clipping under rapid-fire
   // bursts. If a toast has not yet been on screen for MIN_DISPLAY_MS, defer
   // its hide until the remainder elapses; otherwise hide immediately.
-  //
-  // Burst-fix (round-1): previously this branch only inspected the single
-  // oldest toast, so calls 4..N within the same MIN_DISPLAY_MS window all
-  // scheduled hides on the same target. We now walk every overflow slot and
-  // use `_pendingDisplacements` to guarantee each successive oldest is
-  // hidden exactly once.
-  //
-  // Stack-limit fix (codex p2): even with deferred hides scheduled, the
-  // *new* toast was appended immediately — meaning a 4-call burst against
-  // a limit-3 stack briefly showed 4 toasts on screen for up to
-  // MIN_DISPLAY_MS, breaking the "maximum simultaneously visible" contract.
-  // We now compute the longest deferred-hide remainder across the chosen
-  // overflow targets and defer this new toast's append by that amount, so
-  // the count never exceeds `stackLimit` while still honoring MIN_DISPLAY_MS.
   let deferAppendMs = 0;
+  // Displacements scheduled by THIS call's overflow loop (survivor branch
+  // only). Captured per call so the deferred record below can take
+  // ownership of them and unwind them on cancellation. Practically this
+  // list has at most one entry — the round-1 fix keeps overflow at 1 per
+  // call — but the array form is honest about the loop shape.
+  const scheduledDisplacements: DisplacementClaim[] = [];
   if (stack.stackLimit > 0) {
     const openToasts = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
     // Treat anything already queued for displacement as already-hiding so we
@@ -195,13 +332,19 @@ export function toast(options: ToastOptions): HelixToast {
         _pendingDisplacements.add(target);
         pushDeadline(_pendingHideDeadlines, stack, fireAt);
         const stackRef = stack;
-        setTimeout(() => {
+        const timerId = setTimeout(() => {
           _pendingDisplacements.delete(target);
           popDeadline(_pendingHideDeadlines, stackRef, fireAt);
           // Guard: only hide if still open (consumer may have hidden it manually)
           if (target.open) target.hide();
         }, remaining);
         claimedHideTimestamps.push(fireAt);
+        // Record this displacement on a per-call list so the deferred
+        // record (created later, after the toast element exists) can take
+        // ownership of it for cancellation cleanup. Pre-existing deferred
+        // records on OTHER toasts are unaffected; this list resets per
+        // call.
+        scheduledDisplacements.push({ target, fireAt, timerId });
         if (remaining > deferAppendMs) deferAppendMs = remaining;
         continue;
       }
@@ -290,23 +433,22 @@ export function toast(options: ToastOptions): HelixToast {
     // pushes earlier toasts out of position and may be announced by some
     // ATs on insertion. `display: none` removes it from layout AND the
     // accessibility tree until `show()` flips it visible. The inline style
-    // is cleared inside the deferred `setTimeout` below so the natural
-    // `:host` display rule reasserts immediately before `show()` fires.
+    // is cleared inside the deferred `setTimeout` (or the cancellation
+    // helper) so the natural `:host` display rule reasserts.
     toastEl.style.display = 'none';
 
-    // (codex p2 round-2) Honor consumer-initiated cancellation during the
-    // defer window. Wrap the toast's `hide()` so calling it before the
-    // queued `setTimeout` fires marks the toast as cancelled. The deferred
-    // show callback below skips `show()` (and cleans up its inline display
-    // style) when this marker is present. Plain DOM removal is covered by
-    // the `isConnected` check in the same callback.
+    // Override `hide()` so a consumer call inside the defer window flows
+    // through the canonical cancellation helper. After cancellation the
+    // toast is no longer in the DOM (and its deferred record is gone), so
+    // any subsequent `hide()` calls fall through to the original
+    // implementation — which itself is a safe no-op on a detached toast.
     const originalHide = toastEl.hide.bind(toastEl);
     toastEl.hide = function deferredHide(this: HelixToast): void {
-      _cancelledDeferred.add(toastEl);
-      // Restore the host's natural display rule so a cancelled-then-removed
-      // toast does not leave a `display: none` artifact behind if the
-      // consumer keeps it attached for any reason.
-      toastEl.style.removeProperty('display');
+      const record = _deferredRecords.get(toastEl);
+      if (record?.status === 'queued') {
+        cancelDeferredToast(toastEl);
+        return;
+      }
       originalHide();
     };
   }
@@ -325,46 +467,58 @@ export function toast(options: ToastOptions): HelixToast {
     // `stackLimit` (max visible) and MIN_DISPLAY_MS (min lifetime). Until
     // then the toast is in the DOM but `open=false`, so the visible count
     // never exceeds `stackLimit`.
-    //
-    // Track the queued show on the target stack so subsequent burst calls
-    // count it when computing overflow against `stackLimit`. We also
-    // record this append's expected fire timestamp so the longer-burst
-    // gap-fix above (codex p1 round-2) knows which hide-slots are already
-    // claimed when it falls back to the pending-hide timeline.
     const targetStack = stack;
     const appendFireAt = Date.now() + deferAppendMs;
     _pendingAppends.set(targetStack, (_pendingAppends.get(targetStack) ?? 0) + 1);
     pushDeadline(_pendingAppendDeadlines, targetStack, appendFireAt);
-    setTimeout(() => {
-      const remaining = (_pendingAppends.get(targetStack) ?? 1) - 1;
-      if (remaining > 0) {
-        _pendingAppends.set(targetStack, remaining);
-      } else {
-        _pendingAppends.delete(targetStack);
-      }
-      popDeadline(_pendingAppendDeadlines, targetStack, appendFireAt);
-      // Guard: the consumer may have cancelled the toast before its slot
-      // opened — either by calling `hide()` (tracked via
-      // `_cancelledDeferred`) or by removing it from the DOM
-      // (`!isConnected`). In either case, skip `show()` and clean up the
-      // inline display style we applied during the defer window so the
-      // toast does not leave a `display: none` artifact behind.
-      // (codex p2 round-2.)
-      if (!toastEl.isConnected || _cancelledDeferred.has(toastEl)) {
-        toastEl.style.removeProperty('display');
-        _cancelledDeferred.delete(toastEl);
+
+    // Register the deferred record so `cancelDeferredToast` and
+    // `promoteDeferredToShowing` can drive a single coherent state machine.
+    // The timerId is filled in immediately below; the record is created
+    // first so cancellation reaching the lookup before assignment still
+    // sees a 'queued' status and works correctly.
+    //
+    // Take ownership of the displacement THIS call scheduled (survivor
+    // branch). Practically `scheduledDisplacements` has at most one entry
+    // per call — round-1 burst-fix keeps overflow at 1 — and the
+    // longer-burst fallback path schedules nothing here, instead reusing
+    // an existing hide-deadline. We pick the soonest entry (in case the
+    // shape ever changes) and leave any others orphaned (they'd still
+    // fire as plain hides; they aren't owned by THIS toast). The
+    // fallback path stores `displacement: null` so cancellation only
+    // unwinds our own queue bookkeeping.
+    const ownedDisplacement = scheduledDisplacements.length > 0 ? scheduledDisplacements[0]! : null;
+    const record: DeferredRecord = {
+      status: 'queued',
+      stack: targetStack,
+      fireAt: appendFireAt,
+      timerId: null,
+      displacement: ownedDisplacement,
+    };
+    _deferredRecords.set(toastEl, record);
+    record.timerId = setTimeout(() => {
+      // The setTimeout callback covers two paths:
+      //
+      //   1. Plain DOM removal. The consumer ran `toastEl.remove()` (or a
+      //      parent was detached) without going through `hide()`, so the
+      //      `hide()` override above never ran. Treat the missing
+      //      connection as cancellation — the canonical helper already
+      //      handles all bookkeeping idempotently.
+      //
+      //   2. Natural promotion. The defer window elapsed and the slot is
+      //      free. Promote 'queued' → 'showing'.
+      const currentRecord = _deferredRecords.get(toastEl);
+      if (!currentRecord || currentRecord.status === 'cancelled') {
+        // Already cancelled (consumer hide() during defer window). All
+        // bookkeeping was performed in `cancelDeferredToast`; nothing to
+        // do here.
         return;
       }
-      // (codex p2) Clear the inline `display: none` applied above so
-      // the natural `:host { display: block }` rule reasserts before
-      // `show()` flips `open=true`. The order here matters — clearing
-      // display BEFORE show() ensures the toast is in layout flow on
-      // the same frame visibility activates, avoiding a one-frame
-      // invisible-but-allocated layout window.
-      toastEl.style.removeProperty('display');
-      wireAutoRemove();
-      toastEl.show();
-      _shownAt.set(toastEl, Date.now());
+      if (!toastEl.isConnected) {
+        cancelDeferredToast(toastEl);
+        return;
+      }
+      promoteDeferredToShowing(toastEl, wireAutoRemove);
     }, deferAppendMs);
   } else {
     wireAutoRemove();

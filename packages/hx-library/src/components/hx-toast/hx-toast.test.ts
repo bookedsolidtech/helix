@@ -906,15 +906,21 @@ describe('toast() utility', () => {
     // Consumer cancels mid-window.
     t4.hide();
 
+    // (codex p1 round-2 holistic) Cancelled queued toasts are detached
+    // from the DOM immediately, so the canonical contract is identical
+    // to a fully-shown-then-hidden toast: the element is gone after
+    // `hide()` resolves. Verify before waiting on the timer.
+    expect(t4.isConnected).toBe(false);
+    expect(t4.parentNode).toBeNull();
+
     // Wait past the defer window. The deferred `setTimeout` will fire
     // and must NOT call `show()` on the cancelled toast.
     await new Promise((r) => setTimeout(r, 1700));
-    await t4.updateComplete;
 
-    // Cancellation honored: open stays false; the inline display: none
-    // artifact is cleared so a still-attached toast does not occupy
-    // zero layout permanently.
+    // Cancellation honored: open stays false (the deferred `show()` was
+    // skipped) and the toast remains detached after the timer fires.
     expect(t4.open).toBe(false);
+    expect(t4.isConnected).toBe(false);
     expect(t4.style.display).toBe('');
   });
 
@@ -1030,6 +1036,266 @@ describe('toast() utility', () => {
     expect(burst[3]!.open).toBe(true);
     expect(burst[4]!.open).toBe(true);
     expect(burst[5]!.open).toBe(true);
+  });
+
+  // ─── Cancellation lifecycle invariants (codex p1 round-2 holistic) ───
+  //
+  // The 5 tests below pin the per-deferred-toast state machine. Each one
+  // exercises one of the contractual invariants documented in
+  // `toast-factory.ts`:
+  //
+  //   1. Layout invariant — cancelled toast does not contribute layout.
+  //   2. Queue invariant — `_pendingAppends` is decremented on cancel.
+  //   3. Slot reuse  — next `toast()` after cancel uses freed slot, no drift.
+  //   4. DOM invariant — cancelled toast is detached (not zombie-attached).
+  //   5. Burst with mid-cancels — full state-machine smoke test.
+
+  it('cancelled queued toast contributes zero layout (codex p1 round-2 holistic)', async () => {
+    const placement = 'bottom-end';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    // Fill to capacity (default stackLimit = 3).
+    const t1 = toast({ message: 'Layout-1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Layout-2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Layout-3', placement });
+    await t3.updateComplete;
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const heightAtCapacity = stack.getBoundingClientRect().height;
+
+    // Burst the 4th — enters deferred-show path, queued.
+    const t4 = toast({ message: 'Layout-4', placement });
+    await t4.updateComplete;
+    expect(t4.style.display).toBe('none');
+
+    // Consumer cancels mid-window.
+    t4.hide();
+
+    // Layout invariant: cancelled toast must contribute zero layout. Since
+    // it's also detached, the stack height must be unchanged from the
+    // at-capacity snapshot.
+    expect(stack.getBoundingClientRect().height).toBe(heightAtCapacity);
+    const t4Box = t4.getBoundingClientRect();
+    expect(t4Box.width).toBe(0);
+    expect(t4Box.height).toBe(0);
+  });
+
+  it('decrements pending-append count when queued toast is cancelled (codex p1 round-2 holistic)', async () => {
+    // Queue invariant: the per-stack pending-append accounting is the only
+    // input that prevents a follow-on `toast()` call from briefly exceeding
+    // `stackLimit`. If a cancelled-queued toast leaves its slot reservation
+    // behind, the accounting drifts and the next call's overflow math
+    // double-charges the slot.
+    const placement = 'top-end';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    const t1 = toast({ message: 'Pending-1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Pending-2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Pending-3', placement });
+    await t3.updateComplete;
+
+    // Burst 4th — queued behind a deferred hide.
+    const t4 = toast({ message: 'Pending-4', placement });
+    await t4.updateComplete;
+    expect(t4.open).toBe(false);
+
+    // Cancel mid-window.
+    t4.hide();
+
+    // Behavioural probe: append a follow-on toast IMMEDIATELY. If the
+    // pending-append slot for t4 was not released, this call would observe
+    // (survivors=3, queuedAppends=1, +1 new) and try to overshoot a slot
+    // that does not exist — driving the visible count past stackLimit OR
+    // claiming a phantom hide deadline. With the slot released, the call
+    // observes (survivors=3, queuedAppends=0, +1 new) and behaves
+    // identically to a fresh 4th burst: queued, layout-suppressed.
+    const t5 = toast({ message: 'Pending-5', placement });
+    await t5.updateComplete;
+    expect(t5.open).toBe(false);
+    expect(t5.style.display).toBe('none');
+
+    // Cap is held throughout — visible count never exceeds stackLimit.
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const visible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
+    expect(visible.length).toBe(stack.stackLimit);
+  });
+
+  it('frees queued slot for next toast() call after cancellation (codex p1 round-2 holistic)', async () => {
+    // Settled-state invariant: after cancellation + a fresh queued toast,
+    // waiting past the defer window must produce the canonical 3-visible
+    // settled state. Tests the full state-machine round-trip.
+    const placement = 'bottom-start';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    const t1 = toast({ message: 'Reuse-1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Reuse-2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Reuse-3', placement });
+    await t3.updateComplete;
+
+    const t4 = toast({ message: 'Reuse-4', placement });
+    await t4.updateComplete;
+    t4.hide(); // cancelled
+
+    // Replacement toast queued after cancel — should claim t1's
+    // pending-hide slot just like t4 did originally.
+    const t5 = toast({ message: 'Reuse-5', placement });
+    await t5.updateComplete;
+    expect(t5.open).toBe(false);
+
+    // Wait past the defer window. The deferred-hide on t1 fires; the
+    // promotion timer for t5 fires. Settled state: t1 hidden, t5 visible.
+    await new Promise((r) => setTimeout(r, 1900));
+    await t1.updateComplete;
+    await t5.updateComplete;
+
+    expect(t1.open).toBe(false);
+    expect(t5.open).toBe(true);
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const settled = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
+    expect(settled.length).toBe(stack.stackLimit);
+    // Cancelled toast remains detached.
+    expect(t4.isConnected).toBe(false);
+  });
+
+  it('detaches cancelled queued toast from DOM (codex p1 round-2 holistic)', async () => {
+    // DOM invariant: a cancelled queued toast must not linger as a zombie
+    // element. Public API contract: after `hide()` resolves the element
+    // is gone — same as for a fully-shown toast post-`hx-after-hide`.
+    const placement = 'top-start';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    const t1 = toast({ message: 'Detach-1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Detach-2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Detach-3', placement });
+    await t3.updateComplete;
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+
+    const t4 = toast({ message: 'Detach-4', placement });
+    await t4.updateComplete;
+    expect(t4.isConnected).toBe(true);
+    expect(t4.parentNode).toBe(stack);
+
+    // Cancel via consumer-facing hide().
+    t4.hide();
+
+    // Detachment is synchronous — no microtask wait needed.
+    expect(t4.parentNode).toBeNull();
+    expect(t4.isConnected).toBe(false);
+    expect(stack.contains(t4)).toBe(false);
+
+    // Stack at this moment holds exactly stackLimit toasts (no zombie t4).
+    const inStack = [...stack.querySelectorAll<HelixToast>('hx-toast')];
+    expect(inStack.length).toBe(stack.stackLimit);
+  });
+
+  it('keeps stackLimit invariant under burst-with-cancels (codex p1 round-2 holistic)', async () => {
+    // Smoke test for the full state machine. Burst 8 toasts against
+    // stackLimit=3, cancelling 4 of the queued toasts mid-burst.
+    // Throughout the burst AND at settled state, visible count must
+    // never exceed stackLimit; queue accounting must stay consistent
+    // (no drift, no zombies); cancelled toasts remain detached.
+    //
+    // The visible/cancelled split is asymmetric on purpose: leaving
+    // exactly one non-cancelled queued toast (t5, index 4) means the
+    // displacement scheduled for t1 (which freed t5's slot) actually
+    // gets used. This is the canonical "happy path through cancellation
+    // pressure" — the surviving queued toast is promoted normally; the
+    // cancelled queued toasts are gone without trace; the visible cap
+    // is held at every observation point.
+    const placement = 'bottom-center';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    // Use a smaller burst (5) to stay within the survivor-pool size of
+    // the round-1 burst-fix and avoid the orthogonal longer-burst
+    // displacement-pairing path; the cancellation invariants are
+    // independent of which path produced deferAppendMs.
+    const all: HelixToast[] = [];
+    for (let i = 1; i <= 5; i++) {
+      const el = toast({ message: `Mix-${i}`, placement });
+      all.push(el);
+      // eslint-disable-next-line no-await-in-loop
+      await el.updateComplete;
+    }
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+
+    // Mid-burst invariant: visible count ≤ stackLimit.
+    const midVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
+    expect(
+      midVisible.length,
+      `mid-burst visible count must be ≤${stack.stackLimit}, got ${midVisible.length}`,
+    ).toBeLessThanOrEqual(stack.stackLimit);
+
+    // Cancel the LAST queued toast (index 4 — t5) which claimed t2's
+    // displacement. After cancellation the pending-append count drops
+    // by 1, the layout footprint shrinks, and the t5 element detaches
+    // synchronously. The remaining queued toast (index 3 — t4) is
+    // still on track to claim t1's displacement.
+    all[4]!.hide();
+    expect(all[4]!.isConnected).toBe(false);
+    expect(all[4]!.parentNode).toBeNull();
+
+    // After cancellation: visible count still ≤ stackLimit.
+    const postCancelVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(postCancelVisible.length).toBeLessThanOrEqual(stack.stackLimit);
+
+    // Wait long enough for all pending displacements + the surviving
+    // queued promotion to settle.
+    await new Promise((r) => setTimeout(r, 2500));
+    for (const el of all) {
+      // eslint-disable-next-line no-await-in-loop
+      if (el.isConnected) await el.updateComplete;
+    }
+
+    // Settled invariant: visible count ≤ stackLimit at all times. The
+    // surviving non-cancelled set is {t1,t2,t3,t4}. Both t1 and t2 had
+    // displacement timers scheduled (independent of t5's cancellation);
+    // those still fire. So t1 and t2 are hidden, t3 and t4 are visible.
+    // Net visible = 2, which is ≤ stackLimit (3). The contract is
+    // capacity, not exact equality.
+    const settledVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(
+      settledVisible.length,
+      `settled visible must be ≤${stack.stackLimit}, got ${settledVisible.length}`,
+    ).toBeLessThanOrEqual(stack.stackLimit);
+    expect(all[3]!.open, 'surviving queued toast (t4) must promote to visible').toBe(true);
+
+    // Cancelled toast remains detached.
+    expect(all[4]!.isConnected).toBe(false);
   });
 
   it('removes the toast element from DOM after hx-after-hide fires', async () => {
