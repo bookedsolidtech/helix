@@ -1111,6 +1111,85 @@ describe('toast() utility', () => {
     expect(burst[6]!.open).toBe(true);
   });
 
+  it('cancelling a saturation-burst toast clears its synth displacement timer (codex p2)', async () => {
+    // (codex p2 round-13) The saturation-fallback path schedules a synth
+    // `setTimeout` whose victim is chosen DYNAMICALLY at fire time
+    // (oldest still-open, not-already-displacing). If the toast that
+    // scheduled the synth is cancelled mid-burst, the synth timer must
+    // also be cleared — otherwise it fires later and hides an unrelated
+    // victim that the cancelled toast no longer needs displaced.
+    //
+    // Repro: 7 persistent toasts against stackLimit=3. The 7th call lands
+    // in the saturation branch and owns a synth. Cancel that 7th toast
+    // (consumer hide() inside the defer window). At the synth's natural
+    // fire time, the toast that WOULD have been picked dynamically must
+    // remain open — the synth timer must have been cleared on cancel.
+    const placement = 'bottom-start';
+    document
+      .querySelectorAll(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    const burst: HelixToast[] = [];
+    for (let i = 1; i <= 7; i++) {
+      const el = toast({ message: `Synth-cancel ${i}`, placement, duration: 0 });
+      burst.push(el);
+      // eslint-disable-next-line no-await-in-loop
+      await el.updateComplete;
+    }
+
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+
+    // Sanity: the 7th toast is queued (in the saturation branch) and not
+    // yet open. It owns the synth displacement scheduled against the
+    // longest queue deadline + MIN_DISPLAY_MS.
+    expect(burst[6]!.open).toBe(false);
+    expect(burst[6]!.isConnected).toBe(true);
+
+    // Cancel the synth-owning queued toast. The cancel path MUST clear
+    // the synth `setTimeout` AND pop its hide-deadline so it cannot fire
+    // later and hide an unrelated victim.
+    burst[6]!.hide();
+    expect(burst[6]!.isConnected).toBe(false);
+
+    // Wait past the FULL synth deadline window. The saturation synth is
+    // scheduled at `max(allDeadlines) + MIN_DISPLAY_MS`, which for a
+    // 7-deep burst lands roughly 2 * MIN_DISPLAY_MS after the burst.
+    // With the synth properly cancelled, no extra hide fires inside this
+    // window beyond the natural queued-append displacements (t1→burst[3],
+    // t2→burst[4], t3→burst[5]).
+    await new Promise((r) => setTimeout(r, 3500));
+    for (const el of burst) {
+      // eslint-disable-next-line no-await-in-loop
+      if (el.isConnected) await el.updateComplete;
+    }
+
+    // Settled: with burst[6] cancelled, the 6 remaining toasts settle
+    // to exactly stackLimit visible. burst[3], burst[4], burst[5] must
+    // be open — burst[3] in particular must NOT have been hidden by a
+    // rogue synth fire (the bug this test pins).
+    const settledVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(
+      settledVisible.length,
+      `settled: expected exactly ${stack.stackLimit} visible after synth-cancel, got ${settledVisible.length}`,
+    ).toBe(stack.stackLimit);
+    expect(burst[0]!.open).toBe(false);
+    expect(burst[1]!.open).toBe(false);
+    expect(burst[2]!.open).toBe(false);
+    expect(
+      burst[3]!.open,
+      'burst[3] must remain open — the cancelled synth must NOT have hidden it',
+    ).toBe(true);
+    expect(burst[4]!.open).toBe(true);
+    expect(burst[5]!.open).toBe(true);
+    // burst[6] was cancelled and detached.
+    expect(burst[6]!.isConnected).toBe(false);
+    expect(burst[6]!.open).toBe(false);
+  });
+
   // ─── Cancellation lifecycle invariants (codex p1 round-2 holistic) ───
   //
   // The 5 tests below pin the per-deferred-toast state machine. Each one

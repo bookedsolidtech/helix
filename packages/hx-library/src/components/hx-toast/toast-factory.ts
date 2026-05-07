@@ -74,6 +74,20 @@ interface DisplacementClaim {
   timerId: ReturnType<typeof setTimeout>;
 }
 
+/**
+ * @internal
+ * Captures a synth displacement scheduled by the saturation-fallback path.
+ * Unlike `DisplacementClaim`, the synth has no schedule-time `target` — its
+ * victim is picked dynamically when the timer fires (the oldest still-open,
+ * not-already-displacing toast). On cancellation we clear the timer and
+ * pop the synth hide-deadline; we deliberately do NOT touch
+ * `_pendingDisplacements` (no target was ever inserted).
+ */
+interface SynthDisplacementClaim {
+  fireAt: number;
+  timerId: ReturnType<typeof setTimeout>;
+}
+
 interface DeferredRecord {
   /** Current state in the lifecycle. */
   status: DeferredStatus;
@@ -89,6 +103,18 @@ interface DeferredRecord {
    * hide-deadline scheduled by an earlier call.
    */
   displacement: DisplacementClaim | null;
+  /**
+   * (codex p2) Synth displacements THIS queued toast scheduled via the
+   * saturation-fallback path. Tracked separately from `displacement`
+   * because synths have no schedule-time target — the victim is chosen at
+   * fire time. On cancellation each synth's timer is cleared and its
+   * hide-deadline popped from `_pendingHideDeadlines` so a later poll of
+   * the timeline does not see a phantom slot AND no stale `setTimeout`
+   * fires later to hide an unrelated victim that this cancelled toast
+   * never needed displaced. Empty array (not null) when there are none —
+   * keeps the cleanup loop branchless.
+   */
+  synthDisplacements: SynthDisplacementClaim[];
   /**
    * (codex p2 round-10) MutationObserver scoped to the parent stack that
    * watches for THIS queued toast appearing in `removedNodes`. Without this,
@@ -239,6 +265,22 @@ function cancelDeferredToast(toastEl: HelixToast): void {
     popDeadline(_pendingHideDeadlines, record.stack, fireAt);
   }
 
+  // (codex p2) Unwind any synth displacements THIS toast scheduled via
+  // the saturation-fallback path. Distinct from `record.displacement`
+  // because synths have no schedule-time `target` — the victim is chosen
+  // dynamically when the synth timer fires. Without this cleanup, a
+  // cancelled synth-owning toast leaves its synth `setTimeout` armed; at
+  // fire time it picks an UNRELATED still-open victim and hides it,
+  // even though the call that scheduled the synth no longer exists in
+  // the queue. The fix here clears each synth timer and pops its
+  // synthesized hide-deadline so the timeline stays consistent for any
+  // follow-on saturation-burst poll.
+  for (const synth of record.synthDisplacements) {
+    clearTimeout(synth.timerId);
+    popDeadline(_pendingHideDeadlines, record.stack, synth.fireAt);
+  }
+  record.synthDisplacements = [];
+
   // Clear the inline `display: none` we set during the defer window so a
   // still-attached toast does not leave a zero-box artifact behind.
   toastEl.style.removeProperty('display');
@@ -342,7 +384,7 @@ export function toast(options: ToastOptions): HelixToast {
   // `toastEl` for (the new toast itself acts as the placeholder — it is
   // never in `_pendingDisplacements`, so the `delete()` in
   // `cancelDeferredToast` is a no-op).
-  const synthDisplacements: { fireAt: number; timerId: ReturnType<typeof setTimeout> }[] = [];
+  const synthDisplacements: SynthDisplacementClaim[] = [];
   if (stack.stackLimit > 0) {
     const openToasts = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
     // Treat anything already queued for displacement as already-hiding so we
@@ -542,18 +584,6 @@ export function toast(options: ToastOptions): HelixToast {
     };
   }
 
-  // (codex p2 saturation) Promote any synth displacements scheduled by
-  // the saturation-fallback path into full `DisplacementClaim` entries
-  // so the cancellation helper unwinds them via the same code path as
-  // survivor-branch displacements. The `target` placeholder is `toastEl`
-  // — it is never inserted into `_pendingDisplacements`, so the
-  // `_pendingDisplacements.delete(target)` call in `cancelDeferredToast`
-  // is a no-op while the `clearTimeout` + `popDeadline` calls do their
-  // real work (preventing an orphaned hide of an unrelated victim).
-  for (const synth of synthDisplacements) {
-    scheduledDisplacements.push({ target: toastEl, fireAt: synth.fireAt, timerId: synth.timerId });
-  }
-
   // Append the toast to the stack synchronously so the host element is
   // connected and consumers awaiting `t.updateComplete` after `toast()`
   // resolve immediately. For the immediate-show path the very next line
@@ -589,12 +619,21 @@ export function toast(options: ToastOptions): HelixToast {
     // fallback path stores `displacement: null` so cancellation only
     // unwinds our own queue bookkeeping.
     const ownedDisplacement = scheduledDisplacements.length > 0 ? scheduledDisplacements[0]! : null;
+    // (codex p2) Take ownership of any synth displacements THIS call
+    // scheduled via the saturation-fallback path. Stored on the deferred
+    // record (not promoted into `scheduledDisplacements` with a phantom
+    // `target: toastEl`) so cancellation can unwind them via the synth
+    // cleanup loop in `cancelDeferredToast` without the misleading
+    // `_pendingDisplacements.delete(toastEl)` no-op the older shape
+    // implied. Each synth still claims a slot in `_pendingHideDeadlines`
+    // — cancellation pops them so the timeline stays consistent.
     const record: DeferredRecord = {
       status: 'queued',
       stack: targetStack,
       fireAt: appendFireAt,
       timerId: null,
       displacement: ownedDisplacement,
+      synthDisplacements: [...synthDisplacements],
       removalObserver: null,
     };
     _deferredRecords.set(toastEl, record);
