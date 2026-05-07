@@ -1,0 +1,270 @@
+{/* Accessibility / Focus Management.mdx — focus-ring contract, traps, restoration, roving tabindex */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  EyebrowHeading,
+  SectionHead,
+  StatCard,
+  DocsCard,
+  CodeBlock,
+  CodeTabs,
+  TokenRef,
+} from '../_components';
+import { FOCUS_RING_CSS, DIALOG_HTML, DIALOG_TS, ROVING_TABINDEX_TS } from './_snippets';
+
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-text-input';
+
+<Meta
+  title="Accessibility/Focus Management"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Accessibility · focus management"
+  title="A 2px ring you cannot lose. A trap that always returns you home."
+  lede={
+    <>
+      Every interactive HELiX surface has a focus-ring contract —{' '}
+      <strong>2px solid, 2px offset, AAA-graded against the surface beneath</strong>. Modal surfaces
+      trap focus while open and restore it to the trigger on close. Roving tabindex keeps groups
+      discoverable without flooding the Tab order. SC 2.4.7, 2.4.11, 2.4.13, 3.2.1.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="The focus-ring contract" meta="WCAG 2.4.7 / 2.4.11 / 2.4.13" />
+  <div className="hx-docs-stats">
+    <StatCard num="2" unit="px" label="Ring thickness" sub="solid · never dashed" />
+    <StatCard num="2" unit="px" label="Offset" sub="separates ring from element" />
+    <StatCard num="3" unit=":1" label="Min ring contrast" sub="against adjacent surface" />
+    <StatCard num="0" label="outline: none" sub="without a visible replacement" />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="The token" meta="single source of truth" />
+  <p className="hx-docs-card-body">
+    The focus ring is owned by one token, themed across light, dark, and high-contrast modes,
+    and consumed by every interactive primitive. Override at <code>:root</code> to retune for a
+    brand; the contract (thickness, offset, render path) is invariant.
+  </p>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 12,
+      marginTop: 16,
+    }}
+  >
+    <DocsCard title="Ring colour" tag="themed per mode">
+      <TokenRef token="--hx-color-focus-ring" variant="block" />
+    </DocsCard>
+    <DocsCard title="Forced-colors" tag="user palette wins">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        In <code>@media (forced-colors: active)</code> the ring switches to <code>Highlight</code>{' '}
+        with 2px offset. Author colour is overridden by the user agent.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="The render path" meta=":focus-visible only · never :focus" />
+  <p className="hx-docs-card-body">
+    HELiX renders the ring through <code>:focus-visible</code> exclusively — keyboard users see
+    it on Tab, mouse users do not see it on click. This is the WCAG-aligned heuristic the user
+    agent computes, not an author shortcut. Stories on this page can be inspected through the
+    Storybook pseudo-state toolbar to verify the rendered ring; flip{' '}
+    <code>:focus-visible</code> on the buttons below to see the contract live.
+  </p>
+
+<CodeBlock language="css" filename="hx-button.styles.ts" code={FOCUS_RING_CSS} />
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+      gap: 12,
+      marginTop: 16,
+    }}
+  >
+    <hx-button variant="primary" className="force-focus">
+      Primary
+    </hx-button>
+    <hx-button variant="secondary" className="force-focus">
+      Secondary
+    </hx-button>
+    <hx-button variant="ghost" className="force-focus">
+      Ghost
+    </hx-button>
+    <hx-button variant="danger" className="force-focus">
+      Danger
+    </hx-button>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Focus trapping in modal surfaces" meta="dialog · drawer · alert" />
+  <p className="hx-docs-card-body">
+    A modal surface owns the user's focus while open: Tab cycles within, Escape dismisses, and
+    the trigger that opened it receives focus when it closes. HELiX's <code>hx-dialog</code>{' '}
+    handles all three behaviours through the platform <code>&lt;dialog&gt;</code> element where
+    available, falling back to the same contract via composed-tree focus traversal.
+  </p>
+
+<CodeTabs
+  tabs={[
+    {
+      label: 'HTML',
+      language: 'html',
+      filename: 'modal-trigger.html',
+      code: DIALOG_HTML,
+    },
+    {
+      label: 'TypeScript',
+      language: 'ts',
+      filename: 'open-dialog.ts',
+      code: DIALOG_TS,
+    },
+  ]}
+  persistKey="dialog-trap"
+/>
+
+  <ol style={{ marginTop: 16, fontSize: 14, lineHeight: 1.7, paddingLeft: 20 }}>
+    <li>
+      <strong>Initial focus.</strong> First focusable element receives focus on open, unless the
+      consumer marks one with <code>autofocus</code> (recommended for primary input).
+    </li>
+    <li>
+      <strong>Trap.</strong> Tab past the last focusable wraps to the first; Shift+Tab past the
+      first wraps to the last. Focus never escapes to the page beneath.
+    </li>
+    <li>
+      <strong>Dismiss.</strong> Escape closes the dialog. Click on the backdrop closes only when{' '}
+      <code>dismissOnBackdrop</code> is enabled.
+    </li>
+    <li>
+      <strong>Restore.</strong> The trigger that opened the dialog receives focus on close. If
+      the trigger has been removed from the DOM, focus falls back to <code>document.body</code>{' '}
+      and a live region announces the close.
+    </li>
+  </ol>
+</section>
+
+<section>
+  <SectionHead title="Roving tabindex for groups" meta="tablist · menu · radio · toolbar" />
+  <p className="hx-docs-card-body">
+    A group of related controls (tabs, menu items, radio buttons, toolbar buttons) presents a{' '}
+    <strong>single Tab stop</strong>. Arrow keys move within; Tab leaves the group. This keeps
+    the page's Tab order discoverable instead of flooding the user with N stops per group.
+  </p>
+
+  <CodeBlock
+    language="ts"
+    filename="roving-tabindex-controller.ts"
+    code={ROVING_TABINDEX_TS}
+  />
+</section>
+
+<section>
+  <SectionHead title="Restore-on-close pattern" meta="popover · menu · drawer · toast" />
+  <p className="hx-docs-card-body">
+    Every transient surface (popover, menu, drawer, toast action) records the element that
+    triggered it and returns focus there on dismissal. This is independent of the modal trap —
+    even a non-modal popover restores focus, because losing focus mid-interaction is the
+    cardinal sin of dynamic UI.
+  </p>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+      marginTop: 16,
+    }}
+  >
+    <DocsCard title="Trigger removed mid-interaction" tag="rare but planned-for">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        If the trigger is removed (e.g. a row deleted while its action menu was open), HELiX
+        falls back to the closest surviving ancestor that owned the trigger, then to{' '}
+        <code> document.body</code> with a polite live-region announcement.
+      </p>
+    </DocsCard>
+    <DocsCard title="Multiple stacked surfaces" tag="modal-over-modal">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        Restoration unwinds the stack in LIFO order — the inner dialog returns to its trigger in
+        the outer dialog, which returns to its trigger on the page. No focus marooned in the
+        middle.
+      </p>
+    </DocsCard>
+    <DocsCard title="Toasts with actions" tag="non-modal · still restores">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        A toast with an action button records the focused element at toast-arrival time. After
+        the action resolves (or the toast dismisses), focus returns to where the user was —
+        their work is not interrupted.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="What we never do" meta="anti-patterns" />
+  <ul style={{ fontSize: 14, lineHeight: 1.7, paddingLeft: 20 }}>
+    <li>
+      <strong>
+        <code>outline: none</code> without a replacement.
+      </strong>{' '}
+      Removing the user-agent ring without authoring a visible substitute fails SC 2.4.7. Period.
+    </li>
+    <li>
+      <strong>Trap focus in non-modal widgets.</strong> A non-modal popover must let Tab leave;
+      otherwise it's a keyboard trap (SC 2.1.2).
+    </li>
+    <li>
+      <strong>Steal focus on render.</strong> A page or component that calls <code>.focus()</code>{' '}
+      without user intent disorients screen-reader users. Initial focus is reserved for modal opens.
+    </li>
+    <li>
+      <strong>Move focus on hover.</strong> Hover is not focus. Author components that respond to
+      hover with non-focus visual changes only.
+    </li>
+    <li>
+      <strong>Lose focus on async update.</strong> If a re-render removes the focused element, the
+      new render must restore focus — not let it fall through to <code>body</code>.
+    </li>
+  </ul>
+</section>
+
+<section>
+  <SectionHead title="Cross-references" meta="dig deeper" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <DocsCard title="Keyboard contracts" tag="Accessibility / Keyboard Contracts">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        APG-aligned keyboard pattern for every category — pairs with the focus contract here.
+      </p>
+    </DocsCard>
+    <DocsCard title="Forced colors" tag="Accessibility / Forced Colors">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        How the ring switches to <code>Highlight</code> in Windows High Contrast mode.
+      </p>
+    </DocsCard>
+    <DocsCard title="Contrast deep-dive" tag="Accessibility / Contrast Deep-Dive">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        The contrast math behind the focus-ring token across light, dark, and HC modes.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+</div>

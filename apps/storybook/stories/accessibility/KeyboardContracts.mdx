@@ -1,0 +1,288 @@
+{/* Accessibility / Keyboard Contracts.mdx — APG-aligned keyboard contracts per category */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from '../_components';
+import { TABS_KEYDOWN_TS } from './_snippets';
+
+import '@helixui/library/components/hx-button';
+
+export const KeyTable = ({ rows }) => (
+  <div style={{ width: '100%', display: 'grid', gap: 6, fontSize: 13, marginTop: 8 }}>
+    {rows.map(([keys, desc]) => (
+      <div
+        key={keys}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '160px 1fr',
+          gap: 12,
+          padding: '6px 0',
+          borderBottom: '1px dashed var(--hx-color-border-subtle)',
+        }}
+      >
+        <kbd
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            color: 'var(--hx-color-text-strong)',
+          }}
+        >
+          {keys}
+        </kbd>
+        <span style={{ color: 'var(--hx-color-text-secondary)' }}>{desc}</span>
+      </div>
+    ))}
+  </div>
+);
+
+<Meta
+  title="Accessibility/Keyboard Contracts"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Accessibility · keyboard contracts"
+  title="Every component has a keyboard contract. We borrowed it from APG."
+  lede={
+    <>
+      The W3C ARIA Authoring Practices Guide (APG) defines the canonical keyboard interaction
+      pattern for every common UI primitive. HELiX implements those contracts verbatim — Tab walks
+      the page, Arrow keys walk inside a widget, Enter / Space activate, Escape dismisses. No
+      bespoke keymaps. No "Helix special".
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="At a glance" meta="WCAG 2.1.1, 2.1.2, 2.4.3, 2.4.7, 2.4.13" />
+  <div className="hx-docs-stats">
+    <StatCard num="14" label="Component contracts" sub="all APG-aligned" />
+    <StatCard num="0" label="Keyboard traps" sub="WCAG 2.1.2 enforced" />
+    <StatCard num="100" unit="%" label="Tab-reachable" sub="every interactive element" />
+    <StatCard num="44" unit="px" label="Hit-target floor" sub="WCAG 2.5.5" />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Page-level keys" meta="apply everywhere, not per component" />
+  <p className="hx-docs-card-body">
+    These keys carry the user across the whole document — they are user-agent behaviour, not
+    component behaviour. Components must not capture them unless they are the canonical owner
+    (a dialog owns Escape; a modal owns Tab cycling).
+  </p>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+      gap: 16,
+      marginTop: 16,
+    }}
+  >
+    <DocsCard title="Navigation" tag="user-agent">
+      <KeyTable
+        rows={[
+          ['Tab', 'Move focus to next interactive element'],
+          ['Shift + Tab', 'Move focus to previous interactive element'],
+          ['F6 / Shift + F6', 'Cycle landmark regions (browser-dependent)'],
+        ]}
+      />
+    </DocsCard>
+    <DocsCard title="Activation" tag="primary action">
+      <KeyTable
+        rows={[
+          ['Enter', 'Activate primary action of focused element'],
+          ['Space', 'Activate buttons, toggle checkboxes / switches'],
+          ['Esc', 'Dismiss / cancel current transient surface'],
+        ]}
+      />
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Per-category contracts" meta="14 patterns · APG aligned" />
+
+<h3 style={{ marginTop: 32 }}>Buttons & toggles</h3>
+<p className="hx-docs-card-body">
+  <code>hx-button</code>, <code>hx-icon-button</code>, <code>hx-switch</code>,
+  <code>hx-checkbox</code>. Native HTML semantics — keyboard handled by the user agent.
+</p>
+<KeyTable
+  rows={[
+    ['Tab', 'Focus the control'],
+    ['Space', 'Activate / toggle'],
+    ['Enter', 'Activate (button only — Space is canonical for toggle)'],
+  ]}
+/>
+
+<h3 style={{ marginTop: 32 }}>Single-select listbox</h3>
+<p className="hx-docs-card-body">
+  <code>hx-select</code> (closed combobox + open listbox), <code>hx-radio-group</code>. Roving
+  tabindex inside the group; arrow keys move within, Tab leaves.
+</p>
+<KeyTable
+  rows={[
+    ['Tab', 'Move into / out of the group'],
+    ['↑ / ↓', 'Move within the listbox / radio group'],
+    ['Home / End', 'Jump to first / last option'],
+    ['Enter', 'Activate the focused option (combobox only)'],
+    ['Space', 'Toggle the focused option (radio only)'],
+    ['Esc', 'Close listbox without committing (combobox only)'],
+    ['A–Z', 'Type-ahead — focus first option starting with the letter'],
+  ]}
+/>
+
+<h3 style={{ marginTop: 32 }}>Tabs</h3>
+<p className="hx-docs-card-body">
+  <code>hx-tabs</code>. Manual activation by default — Arrow moves focus, Enter / Space activates.
+  APG's "automatic activation" variant is opt-in via attribute.
+</p>
+<KeyTable
+  rows={[
+    ['Tab', 'Move into the tablist, then into the active panel'],
+    ['← / →', 'Move focus between tabs (manual activation)'],
+    ['Home / End', 'Jump to first / last tab'],
+    ['Enter / Space', 'Activate the focused tab'],
+  ]}
+/>
+
+<h3 style={{ marginTop: 32 }}>Menu / menubar</h3>
+<p className="hx-docs-card-body">
+  <code>hx-menu</code>, <code>hx-menu-item</code>, <code>hx-overflow-menu</code>. Roving tabindex;
+  submenu opens with → / Enter, closes with ← / Esc.
+</p>
+<KeyTable
+  rows={[
+    ['↓ / ↑', 'Move focus between items'],
+    ['→', 'Open submenu of focused item'],
+    ['←', 'Close submenu and return focus to parent item'],
+    ['Enter / Space', 'Activate focused item'],
+    ['Esc', 'Close menu and restore focus to trigger'],
+    ['Home / End', 'Jump to first / last item'],
+    ['A–Z', 'Type-ahead'],
+  ]}
+/>
+
+<h3 style={{ marginTop: 32 }}>Dialog / drawer</h3>
+<p className="hx-docs-card-body">
+  <code>hx-dialog</code>, <code>hx-drawer</code>. Modal focus trap; Escape closes; focus restores to
+  the trigger.
+</p>
+<KeyTable
+  rows={[
+    ['Tab / Shift + Tab', 'Cycle within the dialog (focus trapped)'],
+    ['Esc', 'Dismiss the dialog'],
+    ['Enter', 'Activate primary button if focused'],
+  ]}
+/>
+
+<h3 style={{ marginTop: 32 }}>Disclosure / accordion</h3>
+<p className="hx-docs-card-body">
+  <code>hx-accordion</code>, <code>hx-disclosure</code>. The trigger is a button; the panel is a
+  sibling region. Multiple panels may be open at once unless single-select is enabled.
+</p>
+<KeyTable
+  rows={[
+    ['Tab', 'Move between accordion headers'],
+    ['Enter / Space', 'Toggle the focused panel'],
+    ['↓ / ↑', 'Move between accordion headers (within group)'],
+    ['Home / End', 'Jump to first / last header'],
+  ]}
+/>
+
+<h3 style={{ marginTop: 32 }}>Form field with popup</h3>
+<p className="hx-docs-card-body">
+  <code>hx-date-picker</code>, <code>hx-time-picker</code>, <code>hx-color-picker</code>. The field
+  stays focusable; the popup is opened with ↓ / Alt + ↓ and dismissed with Esc.
+</p>
+<KeyTable
+  rows={[
+    ['↓ / Alt + ↓', 'Open the popup'],
+    ['Esc', 'Close the popup without committing'],
+    ['Enter', 'Commit the focused value and close'],
+    ['Arrow keys', 'Navigate within the popup grid (date) or scale (time)'],
+    ['Page Up / Down', 'Jump by larger unit (month / hour)'],
+  ]}
+/>
+
+  <h3 style={{ marginTop: 32 }}>Application shortcuts</h3>
+  <p className="hx-docs-card-body">
+    Page-level shortcuts published by the consumer app. Helix's <code>hx-command-menu</code>
+    primitive opens via <kbd>⌘ K</kbd> / <kbd>Ctrl K</kbd> and exposes a registry consumers
+    populate. All shortcuts must be discoverable via a cheat sheet (typically <kbd>?</kbd>) and
+    user-remappable per WCAG 2.1.4.
+  </p>
+  <KeyTable
+    rows={[
+      ['/', 'Focus global search (consumer-defined)'],
+      ['?', 'Open keyboard cheat sheet'],
+      ['⌘ + K / Ctrl + K', 'Open command palette'],
+      ['Esc', 'Close any open command surface'],
+    ]}
+  />
+</section>
+
+<section>
+  <SectionHead title="The contract in code" meta="hx-tabs roving tabindex pattern" />
+  <p className="hx-docs-card-body">
+    Below is the canonical roving-tabindex implementation HELiX uses for tablists, menus, and
+    radio groups. The active item carries <code>tabindex="0"</code>; siblings carry
+    <code>tabindex="-1"</code>. Arrow keys shift the active index; Tab leaves the group.
+  </p>
+
+<CodeBlock language="ts" filename="hx-tabs.ts" code={TABS_KEYDOWN_TS} />
+
+</section>
+
+<section>
+  <SectionHead title="What we never do" meta="anti-patterns" />
+  <ul style={{ fontSize: 14, lineHeight: 1.7, paddingLeft: 20 }}>
+    <li>
+      <strong>Trap Tab inside a non-modal widget.</strong> Tab must always leave any non-modal
+      group; only modal dialogs trap. WCAG 2.1.2.
+    </li>
+    <li>
+      <strong>Reinvent Enter / Space.</strong> The activation key for a button is Space (canonical)
+      and Enter (form-submit semantics). Both must work.
+    </li>
+    <li>
+      <strong>Hide focus.</strong> No <code>outline: none</code> without a visible replacement —
+      ever. SC 2.4.7.
+    </li>
+    <li>
+      <strong>Mouse-only state.</strong> Hover-only menus, drag-only reordering — every gesture has
+      a keyboard equivalent.
+    </li>
+    <li>
+      <strong>Single-character shortcuts that aren't remappable.</strong> SC 2.1.4 requires a way to
+      turn off, remap, or activate-only-on-focus.
+    </li>
+  </ul>
+</section>
+
+<section>
+  <SectionHead title="Cross-references" meta="dig deeper" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <DocsCard title="Focus management" tag="Accessibility / Focus Management">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        How focus is contained, restored, and ringed across modal and roving-tabindex widgets.
+      </p>
+    </DocsCard>
+    <DocsCard title="W3C APG" tag="external · authoritative">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        The patterns here are direct ports of <code>w3c.github.io/aria-practices</code>. Treat APG
+        as the source of truth when adding a new component.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+</div>

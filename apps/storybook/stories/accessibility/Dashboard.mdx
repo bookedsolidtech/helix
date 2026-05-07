@@ -1,4 +1,4 @@
-{/* Accessibility / Overview.mdx — WCAG 2.1 AA panorama, lifted from dist patterns/13-a11y */}
+{/* Accessibility / Dashboard.mdx — AAA cert dashboard for the helix component surface */}
 
 import { Meta } from '@storybook/addon-docs/blocks';
 import { EyebrowHeading, SectionHead, StatCard, RatioCard, DocsCard } from '../_components';
@@ -9,29 +9,30 @@ import '@helixui/library/components/hx-text-input';
 import '@helixui/library/components/hx-icon-button';
 
 <Meta
-  title="Accessibility/Overview"
+  title="Accessibility/Dashboard"
   parameters={{ controls: { disable: true }, actions: { disable: true } }}
 />
 
 <div className="hx-docs">
 
 <EyebrowHeading
-  eyebrow="Accessibility · WCAG 2.1 AA"
-  title="The contrast bar isn't a goal. It's the floor."
+  eyebrow="Accessibility · AAA cert dashboard"
+  title="WCAG 2.1 AAA is the target. AA is the floor we never touch."
   lede={
     <>
-      HELiX is engineered for the <strong>May 2026 HHS Section&nbsp;504</strong> deadline. 47
-      contrast pairings, 14 keyboard contracts, 22 ARIA patterns — all verified by the regression
-      suite. Adding a token below the floor fails CI.
+      HELiX is the OSS enterprise alternative to USWDS — and where USWDS publishes a Level AA
+      conformance claim, HELiX targets <strong>Level AAA on its P0 surface</strong>. 163 contrast
+      pairings graded across light, dark, and high-contrast; 14 keyboard contracts; 22 ARIA
+      patterns; <strong>zero sub-AA tokens</strong>. Adding a token below the floor fails CI.
     </>
   }
 />
 
 <section>
-  <SectionHead title="Coverage at a glance" meta="3.2.2 release" />
+  <SectionHead title="Coverage at a glance" meta="tokens 3.3.1 · regression-tested in CI" />
   <div className="hx-docs-stats">
-    <StatCard num="47" unit="/47" label="Contrast pairings AA+" sub="regression-tested in CI" />
-    <StatCard num="44" unit="px" label="Touch target floor" sub="WCAG 2.5.5 enforced" />
+    <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
+    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 in flight" />
     <StatCard num="3" label="Theme modes" sub="light · dark · high-contrast" />
     <StatCard num="0" label="axe-core violations" sub="critical + serious" />
   </div>

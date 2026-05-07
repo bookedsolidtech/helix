@@ -116,7 +116,14 @@ const preview: Preview = {
         order: [
           'Overview',
           'Accessibility',
-          ['Overview', '*'],
+          [
+            'Dashboard',
+            'Forced Colors',
+            'Keyboard Contracts',
+            'Focus Management',
+            'Contrast Deep-Dive',
+            '*',
+          ],
           'Foundations',
           [
             'Brand Registry',
