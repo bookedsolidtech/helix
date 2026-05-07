@@ -12,6 +12,10 @@
 
   Both are sourced from Google Fonts to keep the preconnect target set
   to the same origin as the rest of helix's font tooling.
+
+  Note: `helix-docs.css` and `force-states.css` are imported through
+  `preview.ts` so Vite handles bundling and the @layer hx-docs cascade
+  is established before any MDX page mounts.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
