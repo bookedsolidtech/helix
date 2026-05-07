@@ -32,3 +32,7 @@ export type { TokenRefProps } from './TokenRef';
 export { ContrastMatrix } from './ContrastMatrix';
 export type { ContrastMatrixProps } from './ContrastMatrix';
 export { contrastRatio, gradeRatio } from './contrast';
+export { CodeBlock, CODE_BLOCK_THEME, CODE_BLOCK_BACKGROUND } from './CodeBlock';
+export type { CodeBlockProps, CodeBlockLanguage } from './CodeBlock';
+export { CodeTabs } from './CodeTabs';
+export type { CodeTabsProps, CodeTab } from './CodeTabs';
