@@ -44,7 +44,11 @@ import '@helixui/library/components/hx-badge';
   <div className="hx-docs-stats">
     <StatCard num="100" unit="%" label="Components covered" sub="every interactive primitive" />
     <StatCard num="7" label="System keywords used" sub="CanvasText · Canvas · Highlight · …" />
-    <StatCard num="0" label="forced-color-adjust: none" sub="we never opt out" />
+    <StatCard
+      num="scoped"
+      label="forced-color-adjust: none"
+      sub="opt-outs preserve focus rings + status indicators"
+    />
     <StatCard num="2" unit="px" label="Focus ring preserved" sub="renders as Highlight" />
   </div>
 </section>

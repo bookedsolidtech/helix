@@ -429,7 +429,13 @@ import '@helixui/library/components/hx-avatar';
           display: 'grid',
           gap: 16,
         }}
-        role={c.tone === 'danger' ? 'alertdialog' : 'dialog'}
+        // Visual mockup of an `hx-modal` recipe — the static article is not
+        // a real dialog (no aria-modal, no focus trap, mounted inline).
+        // Adding `role="dialog"` / `role="alertdialog"` would announce these
+        // decorative cards as live dialogs and trip axe `aria-dialog-name` /
+        // `aria-required-children` on a docs page that itself runs the AAA
+        // axe ruleset. The real recipe wires the role on `hx-modal`.
+        aria-label={`${c.label} mockup`}
       >
         <span className="hx-docs-card-tag">{c.label}</span>
         <h5 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.015em' }}>

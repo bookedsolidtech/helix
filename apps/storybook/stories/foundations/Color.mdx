@@ -10,6 +10,13 @@ import {
   ContrastMatrix,
 } from '../_components';
 
+// Side-effect imports register the custom elements used inline below
+// (`hx-button` in the Cascade walkthrough, `hx-alert` in the four Status
+// cards). MDX has no global element registration — every page imports the
+// components it renders, mirroring Dashboard.mdx / ForcedColors.mdx.
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-alert';
+
 <Meta
   title="Foundations/Color"
   parameters={{ controls: { disable: true }, actions: { disable: true } }}

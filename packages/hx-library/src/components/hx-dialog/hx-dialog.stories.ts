@@ -1164,8 +1164,8 @@ export const KeyboardNavigation: Story = {
 export const ContrastAAA: Story = {
   name: 'Contrast — AAA opt-in',
   render: () => html`
-    <hx-dialog open size="md" label="Confirm prescription transfer">
-      <h2 slot="heading">Confirm prescription transfer</h2>
+    <hx-dialog open modal heading="Confirm prescription transfer">
+      <h2 slot="header">Confirm prescription transfer</h2>
       <p>
         Transferring the active atorvastatin 20 mg prescription to <strong>HealthCo Pharmacy</strong>
         will cancel any pending refills at the current location.
