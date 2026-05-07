@@ -1,7 +1,7 @@
 {/* Overview.mdx — HELiX Storybook landing page (replaces Introduction.mdx) */}
 
 import { Meta } from '@storybook/addon-docs/blocks';
-import { EyebrowHeading, SectionHead, StatCard } from './_components';
+import { EyebrowHeading, SectionHead, StatCard, CodeBlock } from './_components';
 
 <Meta title="Overview" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
 
@@ -100,14 +100,20 @@ import { EyebrowHeading, SectionHead, StatCard } from './_components';
 
 <section>
   <SectionHead title="Coordinates" meta="links" />
-  <pre className="hx-docs-code"><span className="s">{`# install`}</span>
-{`npm i @helixui/library @helixui/tokens
+  <CodeBlock
+    language="bash"
+    filename="coordinates.sh"
+    code={`# install
+npm i @helixui/library @helixui/tokens
 
-`}<span className="s">{`# repo`}</span>
-{`https://github.com/bookedsolidtech/helix
+# repo
 
-`}<span className="s">{`# docs site`}</span>
-{`https://helix.bookedsolid.tech`}</pre>
+https://github.com/bookedsolidtech/helix
+
+# docs site
+
+https://helix.bookedsolid.tech`}
+/>
 
 </section>
 

@@ -1,7 +1,7 @@
 {/* BrandRegistry.mdx — Foundations / Brand Registry (white-label cascade) */}
 
 import { Meta } from '@storybook/addon-docs/blocks';
-import { EyebrowHeading, SectionHead } from '../_components';
+import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components';
 
 <Meta
   title="Foundations/Brand Registry"
@@ -160,77 +160,48 @@ import { EyebrowHeading, SectionHead } from '../_components';
 </section>
 
 <section>
-  <SectionHead title="Register a brand" meta="HelixBrandRegistry" />
-  <pre className="hx-docs-code">
-    <span className="k">HelixBrandRegistry</span>
-    {`.register(`}
-    <span className="s">{`'meridian'`}</span>
-    {`, {
-  `}
-    <span className="s">{`'--hx-color-primary-50'`}</span>
-    {`:  `}
-    <span className="s">{`'#EFF4FF'`}</span>
-    {`,
-  `}
-    <span className="s">{`'--hx-color-primary-100'`}</span>
-    {`: `}
-    <span className="s">{`'#DCE8FF'`}</span>
-    {`,
-  `}
-    <span className="s">{`// + 9 more primary stops`}</span>
-    {`
-  `}
-    <span className="s">{`'--hx-color-secondary-500'`}</span>
-    {`: `}
-    <span className="s">{`'#5B8AFF'`}</span>
-    {`,
-  `}
-    <span className="s">{`// + 10 more secondary stops`}</span>
-    {`
-});`}
-  </pre>
-</section>
-
-<section>
-  <SectionHead title="Apply in markup" meta="<hx-theme brand=…>" />
-  <pre className="hx-docs-code">
-    {`<`}
-    <span className="k">hx-theme</span>
-    {` brand=`}
-    <span className="s">{`"meridian"`}</span>
-    {`>
-  <`}
-    <span className="k">hx-button</span>
-    {` variant=`}
-    <span className="s">{`"primary"`}</span>
-    {`>
+  <SectionHead title="Register and apply" meta="HelixBrandRegistry · <hx-theme brand=…>" />
+  <CodeTabs
+    persistKey="brand-register"
+    tabs={[
+      {
+        label: 'JS',
+        language: 'js',
+        filename: 'register-meridian.js',
+        code: `HelixBrandRegistry.register('meridian', {
+  '--hx-color-primary-50':  '#EFF4FF',
+  '--hx-color-primary-100': '#DCE8FF',
+  // + 9 more primary stops
+  '--hx-color-secondary-500': '#5B8AFF',
+  // + 10 more secondary stops
+});`,
+      },
+      {
+        label: 'HTML',
+        language: 'html',
+        filename: 'apply-in-markup.html',
+        code: `<hx-theme brand="meridian">
+  <hx-button variant="primary">
     Schedule visit
-  </`}
-    <span className="k">hx-button</span>
-    {`>
-</`}
-    <span className="k">hx-theme</span>
-    {`>`}
-  </pre>
+  </hx-button>
+</hx-theme>`,
+      },
+    ]}
+  />
 </section>
 
 <section>
   <SectionHead title="Cascade rules" meta="brand · theme · semantic interplay" />
-  <pre className="hx-docs-code">
-    <span className="s">{`// 1. Brand merges over base on light/dark.`}</span>
-    {`
-`}
-    <span className="s">{`// 2. High-contrast SUPPRESSES brand —`}</span>
-    {`
-`}
-    <span className="s">{`//    AA-tuned tokens stay authoritative.`}</span>
-    {`
-`}
-    <span className="s">{`// 3. Required: 22 semantic tokens`}</span>
-    {`
-`}
-    <span className="s">{`//    (primary + secondary, 50→950).`}</span>
-  </pre>
+  <CodeBlock
+    language="js"
+    filename="cascade-rules.js"
+    showCopy={false}
+    code={`// 1. Brand merges over base on light/dark.
+// 2. High-contrast SUPPRESSES brand —
+//    AA-tuned tokens stay authoritative.
+// 3. Required: 22 semantic tokens
+//    (primary + secondary, 50→950).`}
+  />
 </section>
 
 </div>
