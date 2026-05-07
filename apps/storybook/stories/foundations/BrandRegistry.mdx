@@ -12,10 +12,13 @@ import { EyebrowHeading, SectionHead } from '../_components';
 
 <EyebrowHeading
   eyebrow="Brand registry"
-  title="One library. Every hospital system."
+  title="AAA-conformant. Brand-agnostic. Enterprise-ready."
   lede={
     <>
-      White-label without forking. Every brand registers a primary &amp; secondary ramp against
+      White-label without forking. HELiX is built to WCAG 2.1 AAA where it counts &mdash; the strict
+      accessibility posture that protects regulated industries (healthcare, financial services,
+      government, education) and any enterprise organization that cannot ship a frontend that
+      compromises compliance. Every brand registers a primary &amp; secondary ramp against
       <code> HelixBrandRegistry</code>; <code>{'<hx-theme brand="…">'}</code> applies it to every
       component in the subtree. Override <em>only what makes you, you</em>; the rest of the 22-token
       semantic tier inherits from the HELiX base.
@@ -26,7 +29,7 @@ import { EyebrowHeading, SectionHead } from '../_components';
 <section>
   <SectionHead title="Reference brands" meta="switch via the Brand toolbar above" />
   <p className="hx-docs-card-body">
-    Four reference brands ship with the dist&nbsp;v3.2.2 review bundle. Use the{' '}
+    Four reference brands ship with HELiX. Use the{' '}
     <strong>Brand</strong> toolbar at the top of this page to apply each one — the swatches and
     mock buttons below reflow immediately because they consume{' '}
     <code>{`--hx-color-primary-*`}</code> / <code>{`--hx-color-secondary-*`}</code> through the
@@ -34,10 +37,19 @@ import { EyebrowHeading, SectionHead } from '../_components';
   </p>
 
   <div className="hx-docs-pillars" style={{ marginTop: 24 }}>
-    <article className="hx-docs-pillar" data-brand-id="">
-      <span className="hx-docs-pillar-tag">helix-default</span>
-      <h3>HELiX Default</h3>
-      <p>Precision-cool teal. Primary <code>#0F7078</code>, secondary <code>#0F6B7E</code>.</p>
+    {/*
+      Each tile renders the primary ramp through `var(--hx-color-primary-N)`
+      scoped under a local `[data-brand="…"]` attribute, so the swatches
+      reflect the actual brand-overrides cascade. Toggling the Brand toolbar
+      above changes the top-level <html> data-brand and the tiles whose
+      data-brand value matches will reflow alongside it; the remaining
+      tiles remain locked to their own brand because the inner
+      `data-brand` selector wins on every nested subtree.
+    */}
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">helix-default · live</span>
+      <h3>HELiX Default (live)</h3>
+      <p>Precision-cool teal. Primary <code>#0F7078</code>, secondary <code>#0F6B7E</code>. This tile reflows when the Brand toolbar above changes — the cascade resolves through whatever brand is currently active on <code>:root</code>.</p>
       <div
         style={{
           display: 'grid',
@@ -54,7 +66,7 @@ import { EyebrowHeading, SectionHead } from '../_components';
       </div>
     </article>
 
-    <article className="hx-docs-pillar">
+    <article className="hx-docs-pillar" data-brand="meridian">
       <span className="hx-docs-pillar-tag">meridian</span>
       <h3>Meridian</h3>
       <p>Authoritative indigo. Primary <code>#003DA5</code>.</p>
@@ -68,13 +80,13 @@ import { EyebrowHeading, SectionHead } from '../_components';
           marginTop: 12,
         }}
       >
-        {['#EFF4FF','#DCE8FF','#BDD3FF','#90B4FF','#5B8AFF','#003DA5','#002D8A','#002070','#001559','#000D3D','#00061F'].map((c) => (
-          <span key={c} style={{ background: c }} />
+        {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+          <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
         ))}
       </div>
     </article>
 
-    <article className="hx-docs-pillar">
+    <article className="hx-docs-pillar" data-brand="evergreen">
       <span className="hx-docs-pillar-tag">evergreen</span>
       <h3>Evergreen</h3>
       <p>Calm, regional teal. Primary <code>#007878</code>.</p>
@@ -88,13 +100,13 @@ import { EyebrowHeading, SectionHead } from '../_components';
           marginTop: 12,
         }}
       >
-        {['#F0FDFC','#CCFBF1','#99F6E4','#5EEAD4','#2DD4BF','#007878','#006060','#004F4F','#003B3B','#002B2B','#001A1A'].map((c) => (
-          <span key={c} style={{ background: c }} />
+        {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+          <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
         ))}
       </div>
     </article>
 
-    <article className="hx-docs-pillar">
+    <article className="hx-docs-pillar" data-brand="lumen">
       <span className="hx-docs-pillar-tag">lumen</span>
       <h3>Lumen</h3>
       <p>Warm, optimistic violet. Primary <code>#7C3AED</code>.</p>
@@ -108,13 +120,21 @@ import { EyebrowHeading, SectionHead } from '../_components';
           marginTop: 12,
         }}
       >
-        {['#FAF5FF','#F3E8FF','#E9D5FF','#D8B4FE','#C084FC','#7C3AED','#6D28D9','#5B21B6','#4C1D95','#3B1478','#2E1065'].map((c) => (
-          <span key={c} style={{ background: c }} />
+        {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+          <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
         ))}
       </div>
     </article>
 
   </div>
+
+  <p className="hx-docs-card-body" style={{ marginTop: 24 }}>
+    <em>Live demonstration:</em> open the <strong>Brand</strong> toolbar at the top of this page
+    and select a different reference brand. The HELiX Default tile and the matching brand tile
+    above will reflow because they consume <code>{`--hx-color-primary-*`}</code> through the
+    same cascade. The other tiles remain locked to their own brand because each one scopes
+    <code> data-brand</code> on its own subtree.
+  </p>
 </section>
 
 <section>
