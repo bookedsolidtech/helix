@@ -299,9 +299,11 @@ const preview: Preview = {
 
     // Theme switching via data-theme attribute on <html>.
     // @helixui/tokens/tokens.css defines :root[data-theme="dark"] and
-    // :root[data-theme="high-contrast"] overrides, so this decorator
-    // activates them automatically. HELIX_THEME_MODES is the single
-    // source of truth — kept in sync with the manager chrome theme map.
+    // :root[data-theme="high-contrast"] overrides (the latter shares the
+    // token block with :root[data-hx-contrast="high"], so OS-level
+    // forced-colors and the Storybook toolbar reach the same cascade).
+    // HELIX_THEME_MODES is the single source of truth — kept in sync
+    // with the manager chrome theme map.
     withThemeByDataAttribute({
       themes: Object.fromEntries(HELIX_THEME_MODES.map((m) => [m, m])) as Record<
         (typeof HELIX_THEME_MODES)[number],
