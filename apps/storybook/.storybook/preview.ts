@@ -122,6 +122,7 @@ const preview: Preview = {
             'Keyboard Contracts',
             'Focus Management',
             'Contrast Deep-Dive',
+            'Success Criteria',
             '*',
           ],
           'Foundations',
