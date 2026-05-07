@@ -1,10 +1,10 @@
 /// <reference types="vitest/globals" />
 import { describe, it, expect } from 'vitest';
+import { aaaThresholdForRole } from '../aaa-thresholds.js';
 import tokens from '../tokens.json';
 import {
   ALL_MODES,
   PAIRS,
-  aaaThresholdForRole,
   buildModeMap,
   contrastRatio,
   resolveToHex,

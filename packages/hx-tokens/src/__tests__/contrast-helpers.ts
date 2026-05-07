@@ -6,8 +6,18 @@
  * computation and matrix without duplication. The test file re-imports from
  * here; behavior is unchanged.
  */
+import { aaaThresholdForRole, type PairRole } from '../aaa-thresholds.js';
 import tokens from '../tokens.json';
 import { isHexColor } from '../utils.js';
+
+// Re-export the public AAA helpers so existing test + script imports
+// resolved against this module continue to work without churn.
+// (codex p2 round-10) The canonical home is `../aaa-thresholds.js` so
+// downstream consumers of `@helixui/tokens` can import the helpers from
+// the package's public surface; this file remains a convenience facade
+// for the in-repo matrix module.
+export { aaaThresholdForRole };
+export type { PairRole };
 
 // ---------------------------------------------------------------------------
 // WCAG 2.0 contrast helpers
@@ -146,47 +156,6 @@ export function resolveToHex(
 // ---------------------------------------------------------------------------
 // The matrix
 // ---------------------------------------------------------------------------
-
-/**
- * The WCAG-applicable role of a contrast pair. Determines the AAA threshold
- * (1.4.6 Contrast Enhanced) applied by the report:
- *
- *   - `body-text`  → AAA ≥ 7.0:1 (small text, body prose, captions, link text,
- *                    inline messages, button labels, badge labels, callout
- *                    copy — anything below the WCAG large-text cutoff). Per
- *                    WCAG 2.1 1.4.6, large-scale text is 18 point regular
- *                    (≈24px) OR 14 point bold (≈18.66px bold). HELiX renders
- *                    button labels at ≥1rem (16px) — that's only 12pt, which
- *                    is below both the regular and the bold large-text
- *                    thresholds. Even at semibold (CSS weight 600), the spec
- *                    most authoritatively cites "bold" with weight ≥700 for
- *                    the 14pt-bold branch. Buttons therefore live in the
- *                    body-text tier and consumers wanting to clear AAA must
- *                    pick a brand stop where text-on-stop ≥ 7:1. See
- *                    ConsumerObligations.mdx.
- *   - `large-text` → AAA ≥ 4.5:1. Reserved for explicitly large headings or
- *                    display copy rendered at ≥24px regular / ≥18.66px true
- *                    bold (CSS weight ≥700). This codebase intentionally has
- *                    NO pairs in this tier — past misuse classified 16px
- *                    semibold button labels here, which the spec does not
- *                    permit. Kept as a type so future genuine large-display
- *                    pairs can opt in with the right rationale.
- *   - `ui-element` → AAA ≥ 3.0:1 (focus rings, borders, dividers, status
- *                    indicators, glyph-only icons, hover-state overlays).
- *                    1.4.6 *has no AAA tier for non-text contrast*; the AA
- *                    non-text floor from 1.4.11 (3:1) is the strictest tier
- *                    WCAG defines, so AAA is operationally equivalent to AA
- *                    for these pairs. We track them at 3:1 so the report's
- *                    AAA column is honest.
- */
-export type PairRole = 'body-text' | 'large-text' | 'ui-element';
-
-/** AAA threshold for a given role per WCAG 2.1 1.4.6 + 1.4.11. */
-export function aaaThresholdForRole(role: PairRole): number {
-  if (role === 'ui-element') return 3.0;
-  if (role === 'large-text') return 4.5;
-  return 7.0;
-}
 
 export interface PairSpec {
   /** Full CSS custom property name for the text token. */
