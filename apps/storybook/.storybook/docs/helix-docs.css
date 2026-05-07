@@ -41,15 +41,15 @@
   .hx-docs-eyebrow-heading {
     display: grid;
     grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
-    gap: 64px;
+    gap: 56px;
     align-items: end;
-    margin-bottom: 56px;
+    margin-bottom: 40px;
   }
 
   @media (max-width: 900px) {
     .hx-docs-eyebrow-heading {
       grid-template-columns: 1fr;
-      gap: 32px;
+      gap: 24px;
     }
   }
 
@@ -65,9 +65,12 @@
 
   .hx-docs-headline {
     margin: 0;
-    font-size: clamp(48px, 6vw, 96px);
+    /* Tuned for storybook docs canvas (~1200px max). The previous
+       clamp(48px, 6vw, 96px) hit 96px on wide screens and read as
+       marketing-fluff hero rather than enterprise-restrained. */
+    font-size: clamp(40px, 5vw, 72px);
     font-weight: 800;
-    line-height: 0.95;
+    line-height: 0.98;
     letter-spacing: -0.035em;
     color: var(--hx-color-text-primary, #0d1825);
     text-wrap: balance;
@@ -123,7 +126,9 @@
 
   .hx-docs section + section,
   .hx-docs > section + section {
-    margin-top: 56px;
+    /* 40px is the disciplined editorial standard across foundation +
+       pattern pages; 56px read as overscale on the storybook canvas. */
+    margin-top: 40px;
   }
 
   /* ── Stat cards (overview hero) ────────────────────────────── */
@@ -299,13 +304,16 @@
     border-radius: 8px;
     position: relative;
     cursor: pointer;
-    transition: transform var(--hx-duration-fast, 100ms)
-      var(--hx-easing-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+    /* Restrained enterprise hover: shadow-lift, no scale. The previous
+       spring-scale read as marketing-playful on a docs page. */
+    transition:
+      box-shadow var(--hx-duration-fast, 100ms) ease,
+      outline-color var(--hx-duration-fast, 100ms) ease;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     padding: 8px;
-    color: #ffffff;
+    color: var(--hx-color-neutral-50, #ffffff);
     font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
     font-size: 10px;
     line-height: 1.2;
@@ -316,9 +324,13 @@
   }
 
   .hx-docs-swatch:hover {
-    transform: scale(1.04);
     z-index: 1;
-    box-shadow: var(--hx-shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    box-shadow: var(--hx-shadow-md, 0 4px 6px rgba(13, 24, 37, 0.1));
+  }
+
+  .hx-docs-swatch:focus-visible {
+    outline: 2px solid var(--hx-color-focus-ring, #0f7078);
+    outline-offset: 2px;
   }
 
   .hx-docs-swatch[data-light='true'] {
@@ -339,8 +351,8 @@
     content: 'copied';
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    color: #ffffff;
+    background: rgba(13, 24, 37, 0.62);
+    color: var(--hx-color-neutral-50, #ffffff);
     display: grid;
     place-items: center;
     font-size: 11px;
@@ -586,11 +598,11 @@
     margin: 0;
     background: var(--hx-color-surface-sunken, #f1f3f5);
     border: 1px solid var(--hx-color-border-subtle, #e9ecef);
-    border-radius: 10px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 14px 16px;
     font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
     font-size: 12px;
-    line-height: 1.6;
+    line-height: 1.55;
     color: var(--hx-color-text-strong, #0d1825);
     overflow-x: auto;
     white-space: pre;
@@ -985,12 +997,7 @@
   /* ── Reduced motion ──────────────────────────────────────── */
 
   @media (prefers-reduced-motion: reduce) {
-    .hx-docs-swatch {
-      transition: none;
-    }
-    .hx-docs-swatch:hover {
-      transform: none;
-    }
+    .hx-docs-swatch,
     .hx-docs-pillar,
     .hx-docs-token-ref,
     .hx-docs-collapsible > summary::after {
