@@ -211,21 +211,43 @@
   border-right: 0;
 }
 
-.hx-docs-stat-num {
-  font-size: 56px;
+/*
+ * Stat-num + ratio-num typography cascade (post-2026-05 fix).
+ *
+ * Problem: addon-docs ships unlayered emotion CSS that injects a
+ * default `font-family` (a serif fallback) on `<dt>`, `<dd>`, `<div>`
+ * intermediates. Without an explicit family pin AND a parent-scoped
+ * selector at sufficient specificity, the giant numbers on the
+ * Dashboard rendered in the wrong family at the wrong weight — they
+ * existed in the DOM but failed to *pop*.
+ *
+ * Fix:
+ * - Selector chain `.hx-docs .hx-docs-stat-num` is (0,2,0), beating
+ *   addon-docs' typical `.sbdocs *` (0,1,0) selectors.
+ * - `font-family` set explicitly with the helix sans stack (don't
+ *   inherit — addon-docs may re-introduce a family at intermediates).
+ * - Sizes bumped to editorial-hero scale (64px / 44px) and weight to
+ *   800 to match `.hx-docs-headline`. The Dashboard is the AAA-cert
+ *   showcase; the numbers carry the message.
+ */
+.hx-docs .hx-docs-stat-num {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 64px;
   line-height: 1;
-  letter-spacing: -0.03em;
-  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-weight: 800;
   color: var(--hx-color-text-primary, #0d1825);
-  font-feature-settings: 'tnum';
+  font-feature-settings: 'tnum', 'cv11', 'ss01';
   margin: 0;
 }
 
-.hx-docs-stat-num small {
-  font-size: 24px;
+.hx-docs .hx-docs-stat-num small {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 26px;
   font-weight: 500;
   color: var(--hx-color-text-muted, #6c757d);
   margin-left: 4px;
+  letter-spacing: -0.01em;
 }
 
 .hx-docs-stat-label {
@@ -269,20 +291,23 @@
   line-height: 1.4;
 }
 
-.hx-docs-ratio-num {
-  font-size: 38px;
-  font-weight: 700;
+.hx-docs .hx-docs-ratio-num {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 44px;
+  font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--hx-color-text-primary, #0d1825);
-  font-feature-settings: 'tnum';
+  font-feature-settings: 'tnum', 'cv11', 'ss01';
 }
 
-.hx-docs-ratio-num small {
-  font-size: 16px;
+.hx-docs .hx-docs-ratio-num small {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 18px;
   font-weight: 500;
   color: var(--hx-color-text-muted, #6c757d);
   margin-left: 2px;
+  letter-spacing: -0.01em;
 }
 
 .hx-docs-grade-pill {
@@ -1027,6 +1052,234 @@
   font-size: 13px;
   color: var(--hx-color-text-secondary, #4a5562);
   line-height: 1.5;
+}
+
+/* ── Demo specimen (focus indicators, etc.) ───────────────
+ *
+ * Wraps a demo block whose visible chrome (e.g. the persistent focus
+ * ring on `.force-focus` button specimens) IS the demonstration.
+ * Without the framing, the static rings read as "this UI is broken";
+ * with it, the dashed perimeter + corner caption reads as
+ * "this is a specimen plate, the chrome is intentional".
+ *
+ * Pattern lifted from atlas-style design systems (USWDS color
+ * specimens, Material symbol specimens) where the demo container
+ * carries enough visual signal to register as "exhibit, not page".
+ */
+
+.hx-docs-specimen {
+  position: relative;
+  border: 1px dashed var(--hx-color-border-strong, #adb5bd);
+  border-radius: 14px;
+  padding: 32px 24px 24px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      transparent 11px,
+      var(--hx-color-surface-sunken, #f1f3f5) 11px,
+      var(--hx-color-surface-sunken, #f1f3f5) 12px
+    ),
+    var(--hx-color-surface-default, #ffffff);
+  background-blend-mode: normal;
+}
+
+.hx-docs-specimen-label {
+  position: absolute;
+  top: -8px;
+  left: 16px;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  padding: 0 10px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--hx-color-text-muted, #6c757d);
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 999px;
+  line-height: 1.8;
+}
+
+.hx-docs-specimen-caption {
+  margin: 0 0 20px;
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--hx-color-text-secondary, #4a5562);
+  max-width: 60ch;
+}
+
+.hx-docs-specimen-caption strong {
+  color: var(--hx-color-text-primary, #0d1825);
+  font-weight: 600;
+}
+
+.hx-docs-specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  padding: 24px 20px;
+  border-radius: 10px;
+}
+
+/* Side-by-side mode preview rows (light · dark · high-contrast).
+ * Each row reproduces the same demo under a different theme so
+ * focus-ring contrast can be eyeballed across modes in one view. */
+.hx-docs-specimen-modes {
+  display: grid;
+  gap: 12px;
+}
+
+.hx-docs-specimen-mode {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.hx-docs-specimen-mode[data-mode='light'] {
+  background: #ffffff;
+  color: #0d1825;
+}
+
+.hx-docs-specimen-mode[data-mode='dark'] {
+  background: #0d1825;
+  color: #f8f9fa;
+}
+
+.hx-docs-specimen-mode[data-mode='high-contrast'] {
+  background: #000000;
+  color: #ffff00;
+  border-color: #ffff00;
+}
+
+.hx-docs-specimen-mode-label {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.hx-docs-specimen-mode-stage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+@media (max-width: 720px) {
+  .hx-docs-specimen-mode {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* ── Success criteria + release-quality table styling ─────── */
+
+.hx-docs-sc-table {
+  display: grid;
+  gap: 6px;
+}
+
+.hx-docs-sc-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 90px 120px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--hx-color-surface-default, #ffffff);
+  border: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.hx-docs-sc-row[data-status='pass'] {
+  border-left: 3px solid var(--hx-color-success-500, #3b9e58);
+}
+
+.hx-docs-sc-row[data-status='in-progress'] {
+  border-left: 3px solid var(--hx-color-warning-500, #c2711c);
+}
+
+.hx-docs-sc-row[data-status='manual'] {
+  border-left: 3px solid var(--hx-color-info-500, #0c8beb);
+}
+
+.hx-docs-sc-num {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hx-color-text-strong, #0d1825);
+}
+
+.hx-docs-sc-name {
+  color: var(--hx-color-text-secondary, #4a5562);
+}
+
+.hx-docs-sc-name strong {
+  color: var(--hx-color-text-primary, #0d1825);
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.hx-docs-sc-method {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-sc-grade {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-align: center;
+  justify-self: end;
+  background: var(--hx-color-success-50, #e8f5ec);
+  color: var(--hx-color-success-text, #2a7341);
+  border: 1px solid var(--hx-color-success-500, #3b9e58);
+}
+
+.hx-docs-sc-grade[data-status='in-progress'] {
+  background: var(--hx-color-warning-50, #fdf3e3);
+  color: var(--hx-color-warning-700, #8a510f);
+  border-color: var(--hx-color-warning-500, #c2711c);
+}
+
+.hx-docs-sc-grade[data-status='manual'] {
+  background: var(--hx-color-info-50, #e6f4ff);
+  color: var(--hx-color-info-700, #0969c5);
+  border-color: var(--hx-color-info-500, #0c8beb);
+}
+
+@media (max-width: 720px) {
+  .hx-docs-sc-row {
+    grid-template-columns: 64px 1fr;
+    grid-template-areas:
+      'num   name'
+      'grade method';
+  }
+  .hx-docs-sc-num {
+    grid-area: num;
+  }
+  .hx-docs-sc-name {
+    grid-area: name;
+  }
+  .hx-docs-sc-grade {
+    grid-area: grade;
+    justify-self: start;
+  }
+  .hx-docs-sc-method {
+    grid-area: method;
+  }
 }
 
 /* ── Reduced motion ──────────────────────────────────────── */
