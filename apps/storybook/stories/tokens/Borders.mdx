@@ -385,8 +385,9 @@ export const widthTokens = getTokensByPrefix(borderTokens, '--hx-border-width-')
 
 export const widthDescriptions = {
   thin: 'Default for most element borders, input fields, and dividers.',
-  medium: 'Emphasis borders, focus rings, and active state indicators.',
+  medium: 'Emphasis borders and active state indicators.',
   thick: 'High-impact emphasis, section dividers, and brand accents.',
+  focus: ':focus-visible ring weight — paired with --hx-color-focus-ring.',
 };
 
 <div className="hx-token-borders">
@@ -460,8 +461,10 @@ export const widthDescriptions = {
 ## Border Widths
 
 <div className="hx-borders-section-desc">
-  Three border width tokens are available. Thin (1px) covers most element borders. Medium (2px) is
+  Four border width tokens are available. Thin (1px) covers most element borders. Medium (2px) is
   suited to focus rings and emphasis. Thick (3px) is for high-impact emphasis and brand accents.
+  Focus is reserved for the <code>:focus-visible</code> ring contract — themed across light, dark,
+  and high-contrast modes alongside its paired colour token.
 </div>
 
 <div className="hx-borders-width-grid">
