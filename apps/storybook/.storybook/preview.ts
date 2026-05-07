@@ -123,6 +123,7 @@ const preview: Preview = {
             'Focus Management',
             'Contrast Deep-Dive',
             'Success Criteria',
+            'Consumer Obligations',
             '*',
           ],
           'Foundations',
