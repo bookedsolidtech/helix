@@ -272,24 +272,49 @@ const preview: Preview = {
    * displayed "Light" / "Apex (default)" until the first decorator pass,
    * producing a one-frame UI flicker on every reload.
    *
+   * URL-globals precedence (codex P2, mirrors preview-head.html round-14
+   * fix): if the page URL has a `globals` parameter at all, the URL is
+   * AUTHORITATIVE — we do NOT hydrate from localStorage in that path.
+   * Otherwise a deep link like `?globals=theme:dark` (omitting brand)
+   * would let Storybook merge in the previously-stored brand for the
+   * missing key, defying the explicit URL state. Storybook still merges
+   * URL globals on top of these initialGlobals; defaulting to
+   * (`light`, empty brand) when URL is the source matches the FOUC
+   * script's behavior so canvas + toolbar agree on first frame.
+   *
    * Defensive: any localStorage failure (disabled, corrupted JSON,
    * unexpected shape) silently falls back to the historical defaults so
    * a broken storage state never prevents Storybook from booting.
    */
   initialGlobals: (() => {
+    let urlHasGlobals = false;
+    if (typeof window !== 'undefined') {
+      try {
+        urlHasGlobals = new URL(window.location.href).searchParams.has('globals');
+      } catch {
+        /* URL parse failure — treat as no URL hint, fall through to storage */
+        urlHasGlobals = false;
+      }
+    }
+
     let persisted: { theme?: unknown; brand?: unknown } | null = null;
-    try {
-      if (typeof window !== 'undefined') {
-        const raw = window.localStorage.getItem('helix:storybook:globals');
-        if (raw) {
-          const parsed: unknown = JSON.parse(raw);
-          if (parsed && typeof parsed === 'object') {
-            persisted = parsed as { theme?: unknown; brand?: unknown };
+    if (!urlHasGlobals) {
+      // Only consult localStorage when the URL is NOT the source of truth.
+      // When the URL has globals, missing keys must default — never
+      // resurrect from storage (matches preview-head.html precedence).
+      try {
+        if (typeof window !== 'undefined') {
+          const raw = window.localStorage.getItem('helix:storybook:globals');
+          if (raw) {
+            const parsed: unknown = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              persisted = parsed as { theme?: unknown; brand?: unknown };
+            }
           }
         }
+      } catch {
+        /* storage disabled or JSON broken — fall through to defaults */
       }
-    } catch {
-      /* storage disabled or JSON broken — fall through to defaults */
     }
     const theme =
       typeof persisted?.theme === 'string' && persisted.theme.length > 0
