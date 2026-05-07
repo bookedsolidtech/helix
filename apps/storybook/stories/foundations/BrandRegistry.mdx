@@ -50,80 +50,68 @@ import { EyebrowHeading, SectionHead } from '../_components';
       <span className="hx-docs-pillar-tag">apex · live</span>
       <h3>Apex (live)</h3>
       <p>Precision-cool teal. Primary <code>#0F7078</code>, secondary <code>#0F6B7E</code>. The cascade's reference posture — the AAA-tuned anchor every other brand inherits from. Override only the primary/secondary ramps; the 22-token semantic tier stays constant. This tile reflows when the Brand toolbar above changes; the others lock to their own subtree.</p>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(11, 1fr)',
-          height: 36,
-          borderRadius: 8,
-          overflow: 'hidden',
-          marginTop: 12,
-        }}
-      >
-        {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
-          <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
-        ))}
-      </div>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
     </article>
 
     <article className="hx-docs-pillar" data-brand="meridian">
       <span className="hx-docs-pillar-tag">meridian</span>
       <h3>Meridian</h3>
       <p>Authoritative indigo. Primary <code>#003DA5</code>, secondary deep navy. Built for institutional scale — financial services, federal portals, regulated enterprise where trust is the load-bearing brand attribute. Brand swap leaves all semantic surfaces, status colors, and the focus-ring contract identical to Apex.</p>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(11, 1fr)',
-          height: 36,
-          borderRadius: 8,
-          overflow: 'hidden',
-          marginTop: 12,
-        }}
-      >
-        {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
-          <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
-        ))}
-      </div>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
     </article>
 
     <article className="hx-docs-pillar" data-brand="evergreen">
       <span className="hx-docs-pillar-tag">evergreen</span>
       <h3>Evergreen</h3>
       <p>Calm regional teal. Primary <code>#007878</code>, secondary muted forest. Healthcare systems, education, and member-facing nonprofits where accessibility and warmth carry as much weight as identity. AAA contrast pairs preserved across light/dark/high-contrast modes.</p>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(11, 1fr)',
-          height: 36,
-          borderRadius: 8,
-          overflow: 'hidden',
-          marginTop: 12,
-        }}
-      >
-        {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
-          <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
-        ))}
-      </div>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
     </article>
 
     <article className="hx-docs-pillar" data-brand="lumen">
       <span className="hx-docs-pillar-tag">lumen</span>
       <h3>Lumen</h3>
       <p>Warm optimistic violet. Primary <code>#7C3AED</code>, secondary luminous magenta. Consumer-leaning enterprise surfaces — patient portals, member dashboards, retail-banking apps — where the brand needs to feel approachable without giving up the AAA conformance posture.</p>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(11, 1fr)',
-          height: 36,
-          borderRadius: 8,
-          overflow: 'hidden',
-          marginTop: 12,
-        }}
-      >
-        {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
-          <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
-        ))}
-      </div>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
     </article>
 
   </div>
