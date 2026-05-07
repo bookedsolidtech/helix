@@ -35,9 +35,9 @@ import { EyebrowHeading, SectionHead, StatCard } from './_components';
       <span className="hx-docs-pillar-tag">Accessibility · WCAG 2.1 AA</span>
       <h3>Contrast is a token contract, not a checklist.</h3>
       <p>
-        Every <code>text.on-{`{role}`}</code> token is paired with its surface and pinned to ≥
+        Every <code>{`text.on-{role}`}</code> token is paired with its surface and pinned to ≥
         4.5:1. Drift below the floor fails CI. Focus rings at <code>primary-600</code> on light,
-        <code> primary-400</code> on dark — both clear 1.4.11.
+        <code>{` primary-400`}</code> on dark — both clear 1.4.11.
       </p>
     </article>
     <article className="hx-docs-pillar">
@@ -45,9 +45,9 @@ import { EyebrowHeading, SectionHead, StatCard } from './_components';
       <h3>Primitive → semantic → component.</h3>
       <p>
         Override <code>--hx-color-primary-500</code> at <code>:root</code> and the entire system
-        reflows.
-        <code> action.*</code>, <code>surface.*</code>, <code>border.*</code> sit between the ramp
-        and the component — brands slot in at the semantic tier without touching component CSS.
+        reflows. <code>{`action.*`}</code>, <code>{`surface.*`}</code>, <code>{`border.*`}</code>{' '}
+        sit between the ramp and the component — brands slot in at the semantic tier without
+        touching component CSS.
       </p>
     </article>
     <article className="hx-docs-pillar">
@@ -55,8 +55,8 @@ import { EyebrowHeading, SectionHead, StatCard } from './_components';
       <h3>Light, dark, high-contrast — same tokens.</h3>
       <p>
         Mode is a single attribute on <code>:root</code>. Every token resolves through{' '}
-        <code>dark.*</code> and <code>high-contrast.*</code> overrides; AA is re-validated per mode,
-        so no surface goes dark without its on-token following.
+        <code>{`dark.*`}</code> and <code>{`high-contrast.*`}</code> overrides; AA is re-validated
+        per mode, so no surface goes dark without its on-token following.
       </p>
     </article>
   </div>
@@ -78,7 +78,7 @@ import { EyebrowHeading, SectionHead, StatCard } from './_components';
     <article className="hx-docs-pillar">
       <span className="hx-docs-pillar-tag">Components</span>
       <h3>
-        Real <code>hx-*</code> elements.
+        Real <code>{`hx-*`}</code> elements.
       </h3>
       <p>
         Each component ships with autodocs sourced from CEM — properties, attributes, slots, CSS
