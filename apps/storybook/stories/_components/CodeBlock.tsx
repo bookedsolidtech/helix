@@ -43,11 +43,19 @@ export const CODE_BLOCK_BACKGROUND = '#22272e' as const;
  *
  * Stored as a module-level promise so concurrent CodeBlock mounts share a
  * single highlighter instance (Shiki's grammar registry is expensive).
+ *
+ * Recovery semantics (codex P3): if `createHighlighterCore` rejects — for
+ * instance because the grammar/theme/wasm bundle could not be fetched —
+ * we clear the cached promise so the NEXT call retries from scratch
+ * rather than handing every future caller the same rejected promise.
+ * The catch only resets the cache; it does not swallow the rejection,
+ * so the original `await getHighlighter()` at the call site still sees
+ * the error and falls through to the plain-text fallback in `CodeBlock`.
  */
 let highlighterPromise: Promise<HighlighterCore> | null = null;
 function getHighlighter(): Promise<HighlighterCore> {
   if (highlighterPromise) return highlighterPromise;
-  highlighterPromise = createHighlighterCore({
+  const pending = createHighlighterCore({
     themes: [import('@shikijs/themes/github-dark-dimmed')],
     langs: [
       import('@shikijs/langs/html'),
@@ -61,6 +69,16 @@ function getHighlighter(): Promise<HighlighterCore> {
       import('@shikijs/langs/json'),
     ],
     engine: createOnigurumaEngine(import('shiki/wasm')),
+  });
+  highlighterPromise = pending;
+  // Clear the cache on rejection so the next mount retries initialization.
+  // Use a detached `.catch` (not chained back into `highlighterPromise`)
+  // so callers awaiting the original promise still observe the rejection
+  // and fall through to their fallback path.
+  pending.catch(() => {
+    if (highlighterPromise === pending) {
+      highlighterPromise = null;
+    }
   });
   return highlighterPromise;
 }
