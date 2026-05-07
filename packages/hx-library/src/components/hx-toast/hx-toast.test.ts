@@ -812,6 +812,67 @@ describe('toast() utility', () => {
     expect(settledVisible.length).toBe(stack.stackLimit);
   });
 
+  it('hides queued toast from layout flow during the deferred-show window (codex p2)', async () => {
+    // Regression: even after the queued toast was kept `open=false` to
+    // protect the visible-count cap, the element was still attached to
+    // the DOM with the natural `:host { display: block }` rule applying
+    // — so its outer wrapper occupied layout space, briefly pushed
+    // earlier toasts out of position, and could be announced by some
+    // ATs on insertion. Fix sets inline `display: none` on the queued
+    // toast for the duration of the defer window.
+    const placement = 'bottom-start';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    const t1 = toast({ message: 'L1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'L2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'L3', placement });
+    await t3.updateComplete;
+
+    // Snapshot the height of the stack at capacity, BEFORE the queued
+    // toast is appended. This is the layout footprint we expect to hold
+    // for the entire defer window.
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const heightAtCapacity = stack.getBoundingClientRect().height;
+
+    // Burst: 4th toast triggers the deferred-show path because t1 is
+    // still well inside its MIN_DISPLAY_MS window.
+    const t4 = toast({ message: 'L4', placement });
+    await t4.updateComplete;
+
+    // Mid-window assertions:
+    // 1. The queued toast is in the DOM (so `t.updateComplete` and
+    //    `isConnected` checks resolve).
+    // 2. It is `display: none` so it contributes zero layout.
+    // 3. Its own `getBoundingClientRect()` returns a 0×0 box.
+    // 4. The stack's overall height has not grown — the layout footprint
+    //    matches the at-capacity snapshot.
+    expect(t4.isConnected).toBe(true);
+    expect(t4.open).toBe(false);
+    expect(t4.style.display).toBe('none');
+    const t4Box = t4.getBoundingClientRect();
+    expect(t4Box.width).toBe(0);
+    expect(t4Box.height).toBe(0);
+    expect(stack.getBoundingClientRect().height).toBe(heightAtCapacity);
+
+    // After the deferred-show timer fires, the inline display style is
+    // cleared so the natural `:host { display: block }` rule applies
+    // and the toast joins the layout as the displaced one drops out.
+    await new Promise((r) => setTimeout(r, 1700));
+    await t1.updateComplete;
+    await t4.updateComplete;
+    expect(t4.open).toBe(true);
+    expect(t4.style.display).toBe('');
+    // The newly-shown toast must now occupy real layout space.
+    const t4PostBox = t4.getBoundingClientRect();
+    expect(t4PostBox.height).toBeGreaterThan(0);
+  });
+
   it('enforces stack limit under a rapid burst within MIN_DISPLAY_MS (group-6 codex round-1)', async () => {
     // (group-6 codex round-1 burst-fix) When more than one toast() call
     // arrives inside the 1500ms minimum-display window after the stack is

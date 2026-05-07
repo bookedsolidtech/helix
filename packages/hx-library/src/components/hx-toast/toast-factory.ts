@@ -269,6 +269,16 @@ export function toast(options: ToastOptions): HelixToast {
     };
     toastEl.addEventListener('hx-hide', swallowInitial, { once: true });
     toastEl.addEventListener('hx-after-hide', swallowInitial, { once: true });
+
+    // (codex p2) Hide the queued toast from layout flow during the defer
+    // window. Without this, the toast's `:host { display: block }` keeps
+    // it in the document layout even with `open=false` — its outer wrapper
+    // pushes earlier toasts out of position and may be announced by some
+    // ATs on insertion. `display: none` removes it from layout AND the
+    // accessibility tree until `show()` flips it visible. The inline style
+    // is cleared inside the deferred `setTimeout` below so the natural
+    // `:host` display rule reasserts immediately before `show()` fires.
+    toastEl.style.display = 'none';
   }
 
   // Append the toast to the stack synchronously so the host element is
@@ -306,6 +316,13 @@ export function toast(options: ToastOptions): HelixToast {
       // Guard: the consumer may have removed the toast before its slot
       // opened (e.g. test cleanup). Only show if still connected.
       if (toastEl.isConnected) {
+        // (codex p2) Clear the inline `display: none` applied above so
+        // the natural `:host { display: block }` rule reasserts before
+        // `show()` flips `open=true`. The order here matters — clearing
+        // display BEFORE show() ensures the toast is in layout flow on
+        // the same frame visibility activates, avoiding a one-frame
+        // invisible-but-allocated layout window.
+        toastEl.style.removeProperty('display');
         wireAutoRemove();
         toastEl.show();
         _shownAt.set(toastEl, Date.now());
