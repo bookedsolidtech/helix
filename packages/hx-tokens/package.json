@@ -38,7 +38,8 @@
     "build": "tsc && pnpm exec tsx scripts/generate-css.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "test": "vitest run"
+    "test": "vitest run",
+    "contrast:report": "tsx scripts/generate-contrast-report.ts"
   },
   "dependencies": {
     "lit": "^3.3.2"
