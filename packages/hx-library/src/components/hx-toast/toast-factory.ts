@@ -42,6 +42,16 @@ const _shownAt = new WeakMap<HelixToast, number>();
 const _pendingDisplacements = new WeakSet<HelixToast>();
 
 /**
+ * @internal
+ * Per-stack count of toasts that have been created via `toast()` but whose
+ * append-and-show is queued behind a deferred-hide (codex p2 stack-limit
+ * fix). These toasts already "own" a future visible slot, so a subsequent
+ * burst call must count them when deciding whether further displacement is
+ * needed — otherwise the stack briefly exceeds `stackLimit`.
+ */
+const _pendingAppends = new WeakMap<HelixToastStack, number>();
+
+/**
  * Imperatively create and display a toast notification.
  *
  * Creates a shared `hx-toast-stack` on `document.body` if one does not exist,
@@ -78,18 +88,31 @@ export function toast(options: ToastOptions): HelixToast {
   // bursts. If a toast has not yet been on screen for MIN_DISPLAY_MS, defer
   // its hide until the remainder elapses; otherwise hide immediately.
   //
-  // Burst-fix: previously this branch only inspected the single oldest toast,
-  // so calls 4..N within the same MIN_DISPLAY_MS window all scheduled hides
-  // on the same target while the stack settled at limit+(N-1) visible. Now we
-  // walk every overflow slot and use `_pendingDisplacements` to guarantee each
-  // successive oldest is hidden exactly once.
+  // Burst-fix (round-1): previously this branch only inspected the single
+  // oldest toast, so calls 4..N within the same MIN_DISPLAY_MS window all
+  // scheduled hides on the same target. We now walk every overflow slot and
+  // use `_pendingDisplacements` to guarantee each successive oldest is
+  // hidden exactly once.
+  //
+  // Stack-limit fix (codex p2): even with deferred hides scheduled, the
+  // *new* toast was appended immediately — meaning a 4-call burst against
+  // a limit-3 stack briefly showed 4 toasts on screen for up to
+  // MIN_DISPLAY_MS, breaking the "maximum simultaneously visible" contract.
+  // We now compute the longest deferred-hide remainder across the chosen
+  // overflow targets and defer this new toast's append by that amount, so
+  // the count never exceeds `stackLimit` while still honoring MIN_DISPLAY_MS.
+  let deferAppendMs = 0;
   if (stack.stackLimit > 0) {
     const openToasts = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter((t) => t.open);
     // Treat anything already queued for displacement as already-hiding so we
     // pick the next surviving oldest. Since the new toast is appended after
-    // this block, we must overshoot by 1 to cover it.
+    // this block, we must overshoot by 1 to cover it. We also count toasts
+    // that are already queued behind a deferred append on this same stack —
+    // they "own" a visible slot when their timer fires, so the displacement
+    // math must reserve room for them too.
     const survivors = openToasts.filter((t) => !_pendingDisplacements.has(t));
-    const overflow = survivors.length + 1 - stack.stackLimit;
+    const queuedAppends = _pendingAppends.get(stack) ?? 0;
+    const overflow = survivors.length + queuedAppends + 1 - stack.stackLimit;
     for (let i = 0; i < overflow; i++) {
       const target = survivors[i];
       if (!target) break;
@@ -105,27 +128,88 @@ export function toast(options: ToastOptions): HelixToast {
           // Guard: only hide if still open (consumer may have hidden it manually)
           if (target.open) target.hide();
         }, remaining);
+        // Track the longest remaining window so we can hold the new toast's
+        // append until at least one slot has actually freed up.
+        if (remaining > deferAppendMs) deferAppendMs = remaining;
       }
     }
   }
 
-  // Create toast element
+  // Create toast element. We attach the auto-remove `hx-after-hide` listener
+  // ONLY after the first `show()` has fired, otherwise the toast's initial
+  // mount with the default `open=false` causes its `updated()` to dispatch a
+  // spurious `hx-hide` → `hx-after-hide` chain that would self-remove the
+  // queued toast before its slot ever opens.
   const toastEl = document.createElement('hx-toast');
   toastEl.variant = options.variant ?? 'default';
   toastEl.duration = options.duration ?? 3000;
   toastEl.closable = true;
   toastEl.textContent = options.message;
 
-  // Remove from DOM after hiding
-  toastEl.addEventListener('hx-after-hide', () => {
-    _shownAt.delete(toastEl);
-    _pendingDisplacements.delete(toastEl);
-    toastEl.remove();
-  });
+  /** Wires the lifecycle hide listener — called once, the first time `show()` fires. */
+  const wireAutoRemove = (): void => {
+    toastEl.addEventListener('hx-after-hide', () => {
+      _shownAt.delete(toastEl);
+      _pendingDisplacements.delete(toastEl);
+      toastEl.remove();
+    });
+  };
 
+  if (deferAppendMs > 0) {
+    // Suppress the spurious initial `hx-hide` / `hx-after-hide` events that
+    // hx-toast's `updated()` dispatches when an element mounts with the
+    // default `open=false`. Consumers should only see hide events for
+    // toasts that actually showed; for a QUEUED toast the first real hide
+    // is its own auto-dismiss or the displaced-hide later. The listeners
+    // are `{ once: true }` so they fire exactly once on the spurious mount
+    // events and never interfere with subsequent legitimate hides.
+    const swallowInitial = (e: Event): void => {
+      e.stopImmediatePropagation();
+      e.stopPropagation();
+    };
+    toastEl.addEventListener('hx-hide', swallowInitial, { once: true });
+    toastEl.addEventListener('hx-after-hide', swallowInitial, { once: true });
+  }
+
+  // Append the toast to the stack synchronously so the host element is
+  // connected and consumers awaiting `t.updateComplete` after `toast()`
+  // resolve immediately. For the immediate-show path the very next line
+  // calls `show()` so the toast renders open on its first Lit update; for
+  // the deferred path the toast renders with `open=false` (queued) and
+  // flips open when the slot frees up.
   stack.appendChild(toastEl);
-  toastEl.show();
-  _shownAt.set(toastEl, Date.now());
+  if (deferAppendMs > 0) {
+    // Defer `show()` (which flips `open=true` and starts the auto-dismiss
+    // timer) by exactly the longest deferred-hide window so the new toast
+    // becomes visible as the displaced one disappears — preserving both
+    // `stackLimit` (max visible) and MIN_DISPLAY_MS (min lifetime). Until
+    // then the toast is in the DOM but `open=false`, so the visible count
+    // never exceeds `stackLimit`.
+    //
+    // Track the queued show on the target stack so subsequent burst calls
+    // count it when computing overflow against `stackLimit`.
+    const targetStack = stack;
+    _pendingAppends.set(targetStack, (_pendingAppends.get(targetStack) ?? 0) + 1);
+    setTimeout(() => {
+      const remaining = (_pendingAppends.get(targetStack) ?? 1) - 1;
+      if (remaining > 0) {
+        _pendingAppends.set(targetStack, remaining);
+      } else {
+        _pendingAppends.delete(targetStack);
+      }
+      // Guard: the consumer may have removed the toast before its slot
+      // opened (e.g. test cleanup). Only show if still connected.
+      if (toastEl.isConnected) {
+        wireAutoRemove();
+        toastEl.show();
+        _shownAt.set(toastEl, Date.now());
+      }
+    }, deferAppendMs);
+  } else {
+    wireAutoRemove();
+    toastEl.show();
+    _shownAt.set(toastEl, Date.now());
+  }
 
   return toastEl;
 }

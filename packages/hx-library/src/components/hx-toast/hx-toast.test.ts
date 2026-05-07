@@ -762,6 +762,56 @@ describe('toast() utility', () => {
     expect(t4.open).toBe(true);
   });
 
+  it('keeps visible count bounded by stackLimit during the deferred-hide window (codex p2)', async () => {
+    // Regression: previously, when a `toast()` call overflowed the stack
+    // while the oldest was still inside its MIN_DISPLAY_MS window, the
+    // displaced toast's hide was deferred but the new toast was appended
+    // and shown IMMEDIATELY — leaving 4 visible toasts on a limit-3 stack
+    // for up to MIN_DISPLAY_MS. Fix queues the new toast (open=false in
+    // the DOM) until the displaced slot actually frees up.
+    const placement = 'top-start';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    const t1 = toast({ message: 'Q1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Q2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Q3', placement });
+    await t3.updateComplete;
+    // Burst: appends a 4th toast while the stack is at capacity and t1 is
+    // well inside its MIN_DISPLAY_MS window.
+    const t4 = toast({ message: 'Q4', placement });
+    await t4.updateComplete;
+
+    // Mid-window: BEFORE the deferred displacement fires, visible count
+    // (t.open === true) must equal `stackLimit`, not stackLimit+1.
+    const stack = document.querySelector<HelixToastStack>(
+      `hx-toast-stack[placement="${placement}"]`,
+    )!;
+    const midWindowVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(midWindowVisible.length).toBeLessThanOrEqual(stack.stackLimit);
+    expect(midWindowVisible.length).toBe(stack.stackLimit);
+    // The queued toast (t4) is in the DOM but not yet open.
+    expect(t4.open).toBe(false);
+    expect(t4.isConnected).toBe(true);
+
+    // After the deferred-hide window elapses the queued toast should be
+    // shown and the displaced toast hidden.
+    await new Promise((r) => setTimeout(r, 1700));
+    await t1.updateComplete;
+    await t4.updateComplete;
+    expect(t1.open).toBe(false);
+    expect(t4.open).toBe(true);
+    const settledVisible = [...stack.querySelectorAll<HelixToast>('hx-toast')].filter(
+      (t) => t.open,
+    );
+    expect(settledVisible.length).toBe(stack.stackLimit);
+  });
+
   it('enforces stack limit under a rapid burst within MIN_DISPLAY_MS (group-6 codex round-1)', async () => {
     // (group-6 codex round-1 burst-fix) When more than one toast() call
     // arrives inside the 1500ms minimum-display window after the stack is
