@@ -90,6 +90,31 @@
   box-sizing: border-box;
 }
 
+/* ── Preview canvas: theme-cascade tracking ────────────────────────
+ *
+ * The Storybook addon-backgrounds normally pins the canvas background
+ * to a specific named token value; when that pin is set at boot, the
+ * canvas no longer follows the active `data-theme` cascade and flipping
+ * the theme toolbar leaves the canvas painted in the boot mode's
+ * surface (e.g. dark theme, light canvas).
+ *
+ * Fix: drive the canvas background from `var(--hx-color-surface-default)`
+ * directly, so it tracks `:root[data-theme="dark|high-contrast"]`
+ * automatically. `.sb-show-main` is Storybook's preview-iframe canvas
+ * wrapper; we cover both Story (`.sb-main-padded`, `.sb-main-fullscreen`,
+ * `.sb-main-centered`) and Docs render targets.
+ *
+ * Selecting a named entry from the backgrounds toolbar will inject an
+ * inline `background-color` on `.sb-show-main` and override this rule
+ * — that is the documented escape hatch for mode-mixed previews.
+ */
+.sb-show-main,
+.sb-show-main.sb-main-padded,
+.sb-show-main.sb-main-fullscreen,
+.sb-show-main.sb-main-centered {
+  background-color: var(--hx-color-surface-default, #ffffff);
+}
+
 /* ── Eyebrow heading (6/4 column split) ────────────────────── */
 
 .hx-docs-eyebrow-heading {

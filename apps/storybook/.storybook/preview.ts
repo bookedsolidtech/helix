@@ -178,9 +178,20 @@ const preview: Preview = {
       },
     },
     // Backgrounds map sourced from @helixui/tokens. Each entry resolves to
-    // the hex value of `surface.{default,raised,sunken}` in the named mode,
-    // so the canvas background tracks the active theme's surface palette
-    // even before the theme decorator applies the data-theme attribute.
+    // the hex value of `surface.{default,raised,sunken}` in the named mode.
+    //
+    // These entries remain available as MANUAL toolbar overrides (e.g. to
+    // preview a raised surface card against a dark canvas), but the
+    // *default* canvas background is NOT pinned to a specific mode here.
+    // Instead it is driven by `var(--hx-color-surface-default)` in
+    // `.storybook/docs/helix-docs.css` (`.sb-show-main` rule), so the
+    // canvas tracks the active `data-theme` cascade automatically. Without
+    // that, flipping the theme toolbar from light → dark left the canvas
+    // pinned to whichever mode booted first.
+    //
+    // Selecting any of the named entries from the backgrounds toolbar
+    // will still pin to that specific token value (escape hatch for
+    // mode-mixed previews); leaving it unset = "follow the cascade".
     backgrounds: {
       options: {
         ...helixBackgroundsForMode('light'),
@@ -286,10 +297,12 @@ const preview: Preview = {
         : 'light';
     const brand = typeof persisted?.brand === 'string' ? persisted.brand : '';
     return {
-      backgrounds: {
-        // Matches the helixBackgroundsForMode('light') key for surface.default.
-        value: 'surface-default-light',
-      },
+      // No `backgrounds.value` default: the canvas background is driven
+      // by `var(--hx-color-surface-default)` in helix-docs.css so it
+      // follows the active `data-theme` token cascade. Pinning a value
+      // here would freeze the canvas to the boot mode's surface and the
+      // theme toolbar would no longer flip the canvas color.
+      backgrounds: { value: undefined },
       theme,
       brand,
       viewport: { value: undefined, isRotated: false },
