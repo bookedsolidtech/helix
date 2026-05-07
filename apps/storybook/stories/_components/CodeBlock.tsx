@@ -126,8 +126,12 @@ export interface CodeBlockProps {
  * Accessibility:
  * - The copy button has an accessible name ("Copy code") via aria-label and
  *   announces state via aria-live polite region (sr-only span).
- * - `role="region"` on the wrapper with the filename (when present) as
- *   the accessible name lets AT users skip past code blocks.
+ * - `role="region"` on the wrapper is ONLY applied when an accessible name
+ *   is available (a filename, which becomes the labelledby target). Regions
+ *   without an accessible name pollute the AT landmarks tree with anonymous
+ *   entries, so we omit the role entirely in that case (codex P2). When a
+ *   filename is present, the labelled region lets AT users skip past code
+ *   blocks via landmark navigation.
  * - In `forced-colors` mode the chrome reverts to system colors so high-
  *   contrast users still see distinct surfaces; Shiki token colors are
  *   overridden by the UA, which is correct.
@@ -196,11 +200,16 @@ export function CodeBlock({
   // header bar and code surface read as one unit.
   const headerLabelId = React.useId();
   const labelledById = filename ? headerLabelId : undefined;
+  // Only assert role="region" when we actually have an accessible name to
+  // anchor it to. A region without aria-labelledby / aria-label is an
+  // unlabelled landmark — WCAG 2.4.6 / ARIA practice both flag those as
+  // noise in the accessibility tree (codex P2).
+  const wrapperRole = labelledById ? 'region' : undefined;
 
   return (
     <div
       className="hx-docs-code-editor"
-      role="region"
+      role={wrapperRole}
       aria-labelledby={labelledById}
       data-language={language}
     >
