@@ -26,6 +26,11 @@
       "import": "./dist/utils.js",
       "default": "./dist/utils.js"
     },
+    "./contrast-data": {
+      "types": "./dist/__generated__/contrast-report.d.ts",
+      "import": "./dist/__generated__/contrast-report.js",
+      "default": "./dist/__generated__/contrast-report.js"
+    },
     "./tokens.css": "./dist/tokens.css",
     "./dist/tokens.css": "./dist/tokens.css",
     "./tokens.json": "./src/tokens.json"

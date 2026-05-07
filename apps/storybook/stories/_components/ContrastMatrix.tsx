@@ -1,22 +1,25 @@
 import * as React from 'react';
 /*
- * JSON import resolved relative to packages/hx-tokens/.cache/. The file is
- * an artefact of `pnpm --filter=@helixui/tokens run contrast:report`; it is
- * gitignored at the workspace level but ships into the storybook bundle at
- * build time. Relative path avoids extending the published @helixui/tokens
- * exports map for an internal docs artefact.
+ * Contrast telemetry imported from `@helixui/tokens/contrast-data` — a
+ * committed, strongly-typed module emitted by the contrast:report script
+ * alongside the gitignored `.cache/contrast-report.json` inspection
+ * artefact. Importing the committed TS module (instead of the cache JSON)
+ * means Storybook builds in CI work without first running the generator,
+ * which is the only way the docs site can reliably ship.
  *
- * tsconfig.base.json has `resolveJsonModule: true`, so the import is typed.
+ * Regenerate via `pnpm --filter=@helixui/tokens run contrast:report` —
+ * the script writes both `src/__generated__/contrast-report.ts` (committed)
+ * and `.cache/contrast-report.json` (ad-hoc inspection only) in lockstep.
  */
-import contrastReport from '../../../../packages/hx-tokens/.cache/contrast-report.json';
+import { contrastReport } from '@helixui/tokens/contrast-data';
 import { TokenRef } from './TokenRef';
 
 /**
- * ContrastMatrix — renders the Phase 1 contrast-report.json artifact as a
+ * ContrastMatrix — renders the Phase 1 contrast-report data as a
  * styled table, color-graded with AAA / AA / sub-AA pills.
  *
  * Source:
- *   packages/hx-tokens/.cache/contrast-report.json
+ *   @helixui/tokens/contrast-data — committed TS module
  *   (regenerate via `pnpm --filter=@helixui/tokens run contrast:report`)
  *
  * Each row pairs a text token with a surface token across the active
