@@ -95,23 +95,36 @@ const preview: Preview = {
     },
     options: {
       // Sidebar grouping for the phase-c MDX surface.
+      //
+      // IA model: designer/stakeholder-facing pages float to the top
+      // (Overview → Accessibility → Foundations → Patterns →
+      // Playground), engineering reference settles to the bottom
+      // (Components → Tokens → Drupal). Accessibility is promoted to
+      // the second slot — the WCAG 2.1 AA / AAA story is the headline
+      // differentiator and must not be buried below the component fold.
+      //
       // Top-level categories are stable; nested arrays pin the inner
       // order. Kept narrow on the leaf level — `*` = "any other entry"
       // (alphabetic) — so newly authored stories slot in without an
       // explicit edit here.
+      //
+      // Pairs with `sidebar.collapsedRoots` in `.storybook/manager.ts`
+      // (Components, Tokens, Drupal collapsed by default) so a fresh
+      // visitor reads top-down through the editorial story before the
+      // engineering surface unrolls under them.
       storySort: {
         order: [
           'Overview',
-          'Foundations',
-          ['Brand Registry', 'Color', 'Typography', 'Spacing', 'Iconography', 'Layout'],
-          'Components',
-          '*', // alphabetic for component categories
-          'Patterns',
-          ['Forms', 'Feedback', 'Data display', 'Patterns', 'Scenes'],
           'Accessibility',
           ['Overview', '*'],
+          'Foundations',
+          ['Brand Registry', 'Color', 'Typography', 'Spacing', 'Iconography', 'Layout'],
+          'Patterns',
+          ['Forms', 'Feedback', 'Data display', 'Patterns', 'Scenes'],
           'Playground',
           ['Tokens', '*'],
+          'Components',
+          '*', // alphabetic for component categories
           'Tokens',
           ['Borders', 'Shadows', '*'],
           'Drupal',
