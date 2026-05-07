@@ -1,0 +1,228 @@
+{/* Forms.mdx — Patterns / Forms (composition recipes, real hx-* components) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, DocsCard } from '../_components';
+
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-textarea';
+import '@helixui/library/components/hx-select';
+import '@helixui/library/components/hx-checkbox';
+import '@helixui/library/components/hx-radio-group';
+import '@helixui/library/components/hx-switch';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-field';
+import '@helixui/library/components/hx-help-text';
+import '@helixui/library/components/hx-form';
+import '@helixui/library/components/hx-slider';
+import '@helixui/library/components/hx-number-input';
+import '@helixui/library/components/hx-file-upload';
+
+<Meta
+  title="Patterns/Forms"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Patterns · forms"
+  title="Form controls. Patient-safe defaults."
+  lede={
+    <>
+      Twelve control families. <strong>44&nbsp;px</strong> touch-target floor (WCAG&nbsp;2.5.5),
+      AA-tuned focus rings, error states with explicit ARIA, placeholder color tested for
+      distinctness across all three theme modes.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Input states" meta="hx-text-input · all five states on one row" />
+  <p style={{ color: 'var(--hx-color-text-secondary)', maxWidth: '70ch', marginBottom: 24 }}>
+    A single text input across rest, filled, error, success, and disabled. The same five-state
+    contract applies to every input-shaped control on this page.
+  </p>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <DocsCard title="rest" tag="placeholder visible">
+      <hx-text-input label="Member ID" placeholder="MBR-####" />
+    </DocsCard>
+    <DocsCard title="filled + helper" tag="hx-help-text slot">
+      <hx-text-input label="Member ID" value="MBR-1042">
+        <span slot="help-text">11 of 14 chars</span>
+      </hx-text-input>
+    </DocsCard>
+    <DocsCard title="error" tag="aria-invalid">
+      <hx-text-input
+        label="Member ID"
+        value="MBR-9831"
+        invalid
+        error-message="No member matches this ID."
+      />
+    </DocsCard>
+    <DocsCard title="success" tag="aria-describedby">
+      <hx-text-input label="Member ID" value="MBR-1042">
+        <span slot="help-text" style={{ color: 'var(--hx-color-success-text)' }}>
+          ✓ Verified with payer
+        </span>
+      </hx-text-input>
+    </DocsCard>
+    <DocsCard title="disabled" tag="not interactive">
+      <hx-text-input label="Member ID" value="MBR-1042" disabled />
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Patient intake" meta="hx-form · text · select · radio · checkbox" />
+  <hx-form
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 24,
+      padding: 24,
+      border: '1px solid var(--hx-color-border-default)',
+      borderRadius: 14,
+      background: 'var(--hx-color-surface-raised)',
+    }}
+  >
+    <article style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em' }}>
+        Demographics
+      </h3>
+      <span className="hx-docs-card-tag">hx-text-input · hx-select</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <hx-text-input label="First name" value="Jordan" />
+        <hx-text-input label="Last name" value="Reyes" />
+      </div>
+      <hx-text-input label="Date of birth" value="03 / 14 / 1989" required>
+        <span slot="help-text">Used to verify identity at check-in.</span>
+      </hx-text-input>
+      <hx-text-input
+        label="Member ID"
+        value="MBR-9831"
+        invalid
+        error-message="No member matches this ID. Check digits 4–8."
+      />
+      <hx-select label="Insurance plan" value="anthem">
+        <hx-option value="">Choose plan…</hx-option>
+        <hx-option value="anthem">Anthem Blue PPO</hx-option>
+        <hx-option value="kaiser">Kaiser HMO</hx-option>
+        <hx-option value="medicare">Medicare Part B</hx-option>
+      </hx-select>
+      <hx-radio-group label="Visit type" value="telehealth" name="visit-type">
+        <hx-radio value="in-person">In-person</hx-radio>
+        <hx-radio value="telehealth">Telehealth</hx-radio>
+        <hx-radio value="home">Home visit</hx-radio>
+      </hx-radio-group>
+    </article>
+    <article style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em' }}>
+        Consent &amp; preferences
+      </h3>
+      <span className="hx-docs-card-tag">hx-checkbox · hx-switch · hx-textarea</span>
+      <hx-checkbox checked>I consent to the use of my information per HIPAA.</hx-checkbox>
+      <hx-checkbox checked>Share my chart with referring physician.</hx-checkbox>
+      <hx-checkbox>Receive appointment reminders by SMS.</hx-checkbox>
+      <hx-switch checked>Send anonymous usage telemetry</hx-switch>
+      <hx-textarea
+        label="Allergies, current medications"
+        rows="3"
+        value="Sulfa antibiotics. Currently on lisinopril 10mg."
+      />
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
+        <hx-button variant="ghost">Save draft</hx-button>
+        <hx-button variant="primary">Submit intake</hx-button>
+      </div>
+    </article>
+  </hx-form>
+</section>
+
+<section>
+  <SectionHead title="Specialized inputs" meta="search · numeric · slider · file-upload" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 24,
+    }}
+  >
+    <DocsCard title="Adornments" tag="leading icon · trailing unit">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+        <hx-text-input label="Search patients" placeholder="Name, MRN, DOB…" />
+        <hx-number-input label="Weight" value="72" min="0">
+          <span slot="suffix">kg</span>
+        </hx-number-input>
+      </div>
+    </DocsCard>
+    <DocsCard title="Slider" tag="hx-slider · 0–10">
+      <div style={{ width: '100%' }}>
+        <hx-slider label="Pain level" min="0" max="10" value="6" />
+      </div>
+    </DocsCard>
+    <DocsCard title="File upload" tag="hx-file-upload">
+      <div style={{ width: '100%' }}>
+        <hx-file-upload label="Insurance card" accept="image/*" />
+      </div>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Vitals & dosage" meta="numeric grouping · units · read-only" />
+  <article
+    style={{
+      padding: 24,
+      border: '1px solid var(--hx-color-border-default)',
+      borderRadius: 14,
+      background: 'var(--hx-color-surface-raised)',
+      display: 'grid',
+      gap: 16,
+    }}
+  >
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+        gap: 12,
+      }}
+    >
+      <hx-number-input label="Systolic" value="128">
+        <span slot="suffix">mmHg</span>
+      </hx-number-input>
+      <hx-number-input label="Diastolic" value="84">
+        <span slot="suffix">mmHg</span>
+      </hx-number-input>
+      <hx-number-input label="Heart rate" value="72">
+        <span slot="suffix">bpm</span>
+      </hx-number-input>
+      <hx-number-input label="SpO₂" value="98">
+        <span slot="suffix">%</span>
+      </hx-number-input>
+      <hx-number-input label="Temperature" value="37.0" step="0.1">
+        <span slot="suffix">°C</span>
+      </hx-number-input>
+      <hx-number-input label="Weight" value="72.4" step="0.1">
+        <span slot="suffix">kg</span>
+      </hx-number-input>
+      <hx-number-input label="Height" value="175">
+        <span slot="suffix">cm</span>
+      </hx-number-input>
+      <hx-text-input label="BMI" value="23.6" readonly>
+        <span slot="help-text">computed</span>
+      </hx-text-input>
+    </div>
+    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+      <hx-button variant="ghost">Reset</hx-button>
+      <hx-button variant="secondary">Save as template</hx-button>
+      <hx-button variant="primary">Sign &amp; save</hx-button>
+    </div>
+  </article>
+</section>
+
+</div>

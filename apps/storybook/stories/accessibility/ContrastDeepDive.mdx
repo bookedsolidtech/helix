@@ -1,0 +1,224 @@
+{/* Accessibility / Contrast Deep-Dive.mdx — per-mode contrast rationale + the math */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  EyebrowHeading,
+  SectionHead,
+  StatCard,
+  ContrastMatrix,
+  DocsCard,
+  CodeBlock,
+} from '../_components';
+import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
+
+<Meta
+  title="Accessibility/Contrast Deep-Dive"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Accessibility · contrast deep-dive"
+  title="163 pairings, 3 modes, 0 below the floor — and we show our work."
+  lede={
+    <>
+      The Dashboard reports the headline numbers; this page is the underlying ledger. Every
+      text-on-surface pair across light, dark, and high-contrast — the measured ratio, the WCAG
+      threshold, the classification, and (where AA only) the rationale for not pushing to AAA.
+      Regenerate any time with <code>pnpm --filter=@helixui/tokens run contrast:report</code>.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Roll-up by mode" meta="tokens 3.3.1 · 0 sub-AA" />
+  <div className="hx-docs-stats">
+    <StatCard num="59" label="Light pairs" sub="29 AAA · 30 AA · 0 sub-AA" />
+    <StatCard num="58" label="Dark pairs" sub="31 AAA · 27 AA · 0 sub-AA" />
+    <StatCard num="46" label="HC pairs" sub="43 AAA · 3 AA · 0 sub-AA" />
+    <StatCard num="163" label="Total · 0 sub-AA" sub="103 AAA · 60 AA" />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="The thresholds" meta="WCAG 2.1 · 1.4.3, 1.4.6, 1.4.11" />
+  <p className="hx-docs-card-body">
+    HELiX classifies every pair against three thresholds. The matrix below colour-codes each
+    pair against these bands.
+  </p>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+      gap: 12,
+      marginTop: 16,
+    }}
+  >
+    {[
+      ['AA · normal text', '4.5 : 1', 'WCAG 1.4.3 — minimum text contrast'],
+      ['AA · large text', '3.0 : 1', '≥18pt regular or ≥14pt bold'],
+      ['AA · UI components', '3.0 : 1', 'WCAG 1.4.11 — borders, focus, icon affordances'],
+      ['AAA · normal text', '7.0 : 1', 'WCAG 1.4.6 — enhanced contrast (HELiX target)'],
+      ['AAA · large text', '4.5 : 1', 'WCAG 1.4.6 — enhanced large text'],
+    ].map(([label, ratio, source]) => (
+      <article
+        key={label}
+        style={{
+          background: 'var(--hx-color-surface-raised)',
+          border: '1px solid var(--hx-color-border-default)',
+          borderRadius: 12,
+          padding: 14,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
+        <strong style={{ fontSize: 13 }}>{label}</strong>
+        <code
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            color: 'var(--hx-color-text-strong)',
+          }}
+        >
+          {ratio}
+        </code>
+        <span style={{ fontSize: 12, color: 'var(--hx-color-text-secondary)' }}>{source}</span>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead
+    title="Light mode matrix"
+    meta="59 pairs · surface.{default,raised,sunken} backgrounds"
+  />
+  <p className="hx-docs-card-body">
+    Body text on every published surface, every status colour on its semantic surface, every
+    interactive border. Each row's ratio is computed with WCAG's relative-luminance formula on the
+    resolved hex value of both tokens.
+  </p>
+  <ContrastMatrix mode="light" />
+</section>
+
+<section>
+  <SectionHead title="Dark mode matrix" meta="58 pairs · re-graded for the dark surface palette" />
+  <p className="hx-docs-card-body">
+    Dark mode is not a colour invert — every text-on-surface pair is re-tuned. Some semantic roles
+    (success-text, warning-text) shift up the ramp in dark mode to maintain the AA floor; the matrix
+    shows the result.
+  </p>
+  <ContrastMatrix mode="dark" />
+</section>
+
+<section>
+  <SectionHead title="High-contrast matrix" meta="46 pairs · 91% AAA, 0 sub-AA" />
+  <p className="hx-docs-card-body">
+    High-contrast mode targets AAA on the structural surfaces and tightens the AA floor for
+    everything else. This is the mode to inspect when validating that HC consumers — including
+    Windows users on a forced-colors theme that defers to author CSS — get full readability.
+  </p>
+  <ContrastMatrix mode="high-contrast" />
+</section>
+
+<section>
+  <SectionHead title="Why some pairs sit at AA, not AAA" meta="the rationale" />
+  <p className="hx-docs-card-body">
+    A small number of HELiX pairs sit at AA (≥4.5 : 1) without crossing the AAA threshold (≥7 :
+    1). In every case, the pair is one of the four categories below. None of them ship below
+    the AA floor.
+  </p>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+      marginTop: 16,
+    }}
+  >
+    <DocsCard title="Status accent text" tag="success / warning / error">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        Status colours sit on a chromatic ramp (green / amber / red) that is hue-bound by
+        convention. Pushing to AAA would desaturate the cue past the point of recognition.
+        We hold AA + pair the colour with an icon and a text label so the cue is ≥3 channels.
+      </p>
+    </DocsCard>
+    <DocsCard title="Action button text" tag="primary on accent">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        White text on the brand accent (e.g. <code>action.primary.bg</code>) is AA. Lifting to
+        AAA would force every brand to a near-black accent — incompatible with the white-label
+        contract. Brands extending beyond the AAA floor opt in via the brand registry.
+      </p>
+    </DocsCard>
+    <DocsCard title="UI component borders" tag="≥3:1 floor, AAA N/A">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        WCAG 1.4.11 sets the bar at 3 : 1 for non-text UI components — there is no AAA tier for
+        borders, focus rings, or icon affordances. We measure them in the matrix anyway so the
+        floor is visible.
+      </p>
+    </DocsCard>
+    <DocsCard title="Muted secondary text" tag="metadata · 4.5 : 1+ floor">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        Tertiary metadata (timestamps, "12 results", trailing labels) sits between AA and AAA so
+        primary content reads first. Pushing all secondary text to AAA flattens the hierarchy.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="The math, briefly" meta="WCAG 2.1 relative-luminance formula" />
+  <p className="hx-docs-card-body">
+    The contrast generator turns each token's resolved hex into the WCAG 2.1 contrast ratio.
+    Below is the canonical implementation it uses — pure, deterministic, no dependency on a
+    colour library. Reproduce the matrix locally with this and the cached
+    <code> contrast-report.json</code>.
+  </p>
+
+<CodeBlock language="ts" filename="contrast.ts" code={CONTRAST_RATIO_TS} />
+
+</section>
+
+<section>
+  <SectionHead title="Regenerating the matrix" meta="single command, deterministic output" />
+  <CodeBlock
+    language="bash"
+    filename="regenerate-contrast-report.sh"
+    code={REGENERATE_CONTRAST_BASH}
+  />
+
+</section>
+
+<section>
+  <SectionHead title="Cross-references" meta="dig deeper" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <DocsCard title="Foundations / Color" tag="three-tier cascade">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        How the primitive ramps anchor the semantic surfaces that this matrix grades.
+      </p>
+    </DocsCard>
+    <DocsCard title="Forced colors" tag="Accessibility / Forced Colors">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        The matrix above is the author-mode ledger. Forced-colors mode delegates to the user palette
+        — see the forced-colors page for that contract.
+      </p>
+    </DocsCard>
+    <DocsCard title="Dashboard" tag="Accessibility / Dashboard">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        The roll-up of all the numbers above plus the rest of the AAA cert posture.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+</div>

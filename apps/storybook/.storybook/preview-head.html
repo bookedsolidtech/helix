@@ -1,6 +1,145 @@
+<!--
+  FOUC prevention.
+
+  Storybook's `addon-themes` decorator runs AFTER first paint, so without
+  this block the preview iframe paints once at default-light tokens before
+  the persisted theme/brand attributes apply. That produces a visible
+  flash on dark/high-contrast pages.
+
+  Resolution rules (codex p2):
+    - If the URL has a `globals` parameter at all, it is AUTHORITATIVE:
+      we read theme/brand only from URL keys present in that string;
+      missing keys default (theme→'light', brand→empty). We do NOT fall
+      back to localStorage in this case — otherwise a deep link like
+      `?globals=theme:dark` (omitting brand) would silently resurrect
+      the previously-stored brand instead of clearing it, defying the
+      explicit URL state.
+    - If the URL has NO `globals` parameter, we fall through to the
+      `localStorage["helix:storybook:globals"]` shadow maintained by the
+      preview decorators (see preview.ts). This preserves the
+      reload-survives-state UX for users who navigate without globals
+      in the URL.
+    - Final default: theme='light', no brand — matches initialGlobals.
+
+  The :root background-color is also primed to the surface-default token
+  so the very first paint is at least neutral instead of a stark white
+  rectangle behind the preview iframe.
+-->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var theme = '';
+      var brand = '';
+      var urlHasGlobals = false;
+
+      // 1. URL globals param: ?globals=theme:dark;brand:meridian
+      try {
+        var url = new URL(window.location.href);
+        urlHasGlobals = url.searchParams.has('globals');
+        var raw = url.searchParams.get('globals') || '';
+        raw.split(';').forEach(function (pair) {
+          var idx = pair.indexOf(':');
+          if (idx === -1) return;
+          var k = pair.slice(0, idx).trim();
+          var v = pair.slice(idx + 1).trim();
+          if (k === 'theme') theme = v;
+          else if (k === 'brand') brand = v;
+        });
+      } catch (_e) {
+        /* URL parse failure — treat as no URL hint, fall through */
+        urlHasGlobals = false;
+      }
+
+      // 2. localStorage shadow (set by preview.ts decorators).
+      //    Only consulted when the URL has NO `globals` parameter at
+      //    all. If the URL specifies any globals, missing keys must
+      //    default — never resurrect from storage — so a partial deep
+      //    link does not silently reapply the previously-stored value
+      //    for the omitted key.
+      if (!urlHasGlobals) {
+        try {
+          var stored = window.localStorage.getItem('helix:storybook:globals');
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (!theme && parsed && typeof parsed.theme === 'string') theme = parsed.theme;
+            if (!brand && parsed && typeof parsed.brand === 'string') brand = parsed.brand;
+          }
+        } catch (_e) {
+          /* storage disabled or JSON broken — fall through */
+        }
+      }
+
+      // 3. Default theme is 'light'; brand stays empty (HELiX default).
+      if (!theme) theme = 'light';
+
+      html.setAttribute('data-theme', theme);
+      if (brand) html.setAttribute('data-brand', brand);
+      else html.removeAttribute('data-brand');
+    } catch (_e) {
+      /* never throw from FOUC-prevention; the decorator will catch up */
+    }
+  })();
+</script>
+<style>
+  /*
+   * Pre-paint surface neutralizer. `color-scheme` lets the UA paint
+   * canvas/scrollbars in the right tone before any tokens load.
+   * Token fallback chain mirrors @helixui/tokens — if the token CSS
+   * has not yet hydrated, the hex fallback is the published light
+   * surface-default, which is closer to "right" than UA white.
+   */
+  :root {
+    color-scheme: light dark;
+    background-color: var(--hx-color-surface-default, #ffffff);
+  }
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    background-color: var(--hx-color-surface-default, #0d1825);
+  }
+  :root[data-theme='high-contrast'] {
+    color-scheme: dark;
+    background-color: var(--hx-color-surface-default, #000000);
+  }
+  /* Prevent the iframe from flashing stark white before tokens load.
+     Per-mode fallback hex matches the :root rules above so the body
+     paint matches the resolved theme even before tokens hydrate. */
+  html,
+  body {
+    background-color: var(--hx-color-surface-default, #ffffff);
+  }
+  html[data-theme='dark'],
+  html[data-theme='dark'] body {
+    background-color: var(--hx-color-surface-default, #0d1825);
+  }
+  html[data-theme='high-contrast'],
+  html[data-theme='high-contrast'] body {
+    background-color: var(--hx-color-surface-default, #000000);
+  }
+</style>
+
+<!--
+  Web fonts for the helix design language.
+
+  Inter (variable weights 300–900 incl. 800) is the primary prose face.
+  Weight 800 powers the editorial hero headline (clamp(48px, 6vw, 96px),
+  line-height 0.95, letter-spacing -0.035em) imported from the dist
+  review bundle (`/Users/himerus/Downloads/dist/foundation/04-type.html`).
+
+  JetBrains Mono is the engineering/eyebrow face — token names, code
+  samples, mono-meta annotations, force-state labels. Loaded with the
+  full 100..900 range so docs MDX can drive weight per surface.
+
+  Both are sourced from Google Fonts to keep the preconnect target set
+  to the same origin as the rest of helix's font tooling.
+
+  Note: `helix-docs.css` and `force-states.css` are imported through
+  `preview.ts` so Vite handles bundling and the @layer hx-docs cascade
+  is established before any MDX page mounts.
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
   rel="stylesheet"
 />

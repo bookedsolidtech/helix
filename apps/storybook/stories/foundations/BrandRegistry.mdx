@@ -1,0 +1,207 @@
+{/* BrandRegistry.mdx — Foundations / Brand Registry (white-label cascade) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components';
+
+<Meta
+  title="Foundations/Brand Registry"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Brand registry"
+  title="AAA-conformant. Brand-agnostic. Enterprise-ready."
+  lede={
+    <>
+      White-label without forking. HELiX is built to WCAG 2.1 AAA where it counts &mdash; the strict
+      accessibility posture that protects regulated industries (healthcare, financial services,
+      government, education) and any enterprise organization that cannot ship a frontend that
+      compromises compliance. Every brand registers a primary &amp; secondary ramp against
+      <code> HelixBrandRegistry</code>; <code>{'<hx-theme brand="…">'}</code> applies it to every
+      component in the subtree. Override <em>only what makes you, you</em>; the rest of the 22-token
+      semantic tier inherits from the HELiX base.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Reference brands" meta="switch via the Brand toolbar above" />
+  <p className="hx-docs-card-body">
+    Six reference brands ship with HELiX. Use the{' '}
+    <strong>Brand</strong> toolbar at the top of this page to apply each one — the swatches and
+    mock buttons below reflow immediately because they consume{' '}
+    <code>{`--hx-color-primary-*`}</code> / <code>{`--hx-color-secondary-*`}</code> through the
+    same cascade every component uses.
+  </p>
+
+  <div className="hx-docs-pillars" style={{ marginTop: 24 }}>
+    {/*
+      Each tile renders the primary ramp through `var(--hx-color-primary-N)`
+      scoped under a local `[data-brand="…"]` attribute, so the swatches
+      reflect the actual brand-overrides cascade. Toggling the Brand toolbar
+      above changes the top-level <html> data-brand and the tiles whose
+      data-brand value matches will reflow alongside it; the remaining
+      tiles remain locked to their own brand because the inner
+      `data-brand` selector wins on every nested subtree.
+    */}
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">apex · live</span>
+      <h3>Apex (live)</h3>
+      <p>Precision-cool teal. Primary-600 <code>#0F7078</code>, secondary-600 <code>#0F6B7E</code>. The cascade's reference posture — the AAA-tuned anchor every other brand inherits from. Healthcare-leaning by virtue of the AAA contract, but industry-agnostic by design. Override only the primary/secondary ramps; the 22-token semantic tier stays constant. White text on primary-700 <code>#0F6363</code> hits 7.03:1 (AAA body); white text on primary-600 hits 5.82:1 (AA body — clears the 4.5:1 1.4.3 floor but sits below 7:1, so default <code>hx-button</code> hover/active labels are AA, and primary-700 is the stop to use when AAA on buttons is required). This tile reflows when the Brand toolbar above changes; the others lock to their own subtree.</p>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
+    </article>
+
+    <article className="hx-docs-pillar" data-brand="meridian">
+      <span className="hx-docs-pillar-tag">meridian</span>
+      <h3>Meridian</h3>
+      <p>Authoritative indigo. Primary <code>#003DA5</code>, secondary deep teal-navy. Built for institutional scale — financial services, federal portals, regulated enterprise where trust is the load-bearing brand attribute. Brand swap leaves all semantic surfaces, status colors, and the focus-ring contract identical to Apex. AAA at primary-500 (9.50:1).</p>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
+    </article>
+
+    <article className="hx-docs-pillar" data-brand="lumen">
+      <span className="hx-docs-pillar-tag">lumen</span>
+      <h3>Lumen</h3>
+      <p>Warm optimistic violet. Primary <code>#7C3AED</code>, secondary luminous magenta. Consumer-leaning enterprise surfaces — patient portals, member dashboards, retail-banking apps — where the brand needs to feel approachable without giving up the AAA conformance posture. AAA at primary-700 (8.98:1).</p>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
+    </article>
+
+    <article className="hx-docs-pillar" data-brand="verdant">
+      <span className="hx-docs-pillar-tag">verdant</span>
+      <h3>Verdant</h3>
+      <p>Grounded forest moss. Primary <code>#1F5226</code>, secondary tawny gold. Sustainability programs, climate platforms, conservation nonprofits, and ESG reporting surfaces where the brand needs to read as <em>permanent</em> rather than performative. The earthy moss base avoids any teal/blue overlap with Apex or Meridian. AAA at primary-700 (9.16:1).</p>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
+    </article>
+
+    <article className="hx-docs-pillar" data-brand="signal">
+      <span className="hx-docs-pillar-tag">signal</span>
+      <h3>Signal</h3>
+      <p>Electric cobalt. Primary <code>#0040B0</code>, secondary saturated cyan. Tech, SaaS, and developer-platform surfaces where the brand needs to read as energetic and modern. Sits one notch brighter and more saturated than Meridian's institutional indigo — same hue family, distinctly different posture. AAA at primary-700 (8.90:1).</p>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
+    </article>
+
+    <article className="hx-docs-pillar" data-brand="ember">
+      <span className="hx-docs-pillar-tag">ember</span>
+      <h3>Ember</h3>
+      <p>Deep amber and terracotta. Primary <code>#7D2E02</code>, secondary slate. Energy, industrial, logistics, and high-vis utility surfaces where the brand needs warmth without sacrificing the AAA contract. Warm hues are notoriously difficult to pass AAA at mid-stops; Ember anchors at primary-700+ to keep text-on-primary legible. AAA at primary-700 (9.28:1).</p>
+      <footer className="hx-docs-pillar-footer">
+        <div className="hx-docs-pillar-ramp">
+          {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
+            <span key={s} style={{ background: `var(--hx-color-primary-${s})` }} />
+          ))}
+        </div>
+        <div className="hx-docs-pillar-ramp-meta">
+          <span>--hx-color-primary-*</span>
+          <span>50 → 950</span>
+        </div>
+      </footer>
+    </article>
+
+  </div>
+
+  <p className="hx-docs-card-body" style={{ marginTop: 24 }}>
+    <em>Live demonstration:</em> open the <strong>Brand</strong> toolbar at the top of this page
+    and select a different reference brand. The Apex tile and the matching brand tile
+    above will reflow because they consume <code>{`--hx-color-primary-*`}</code> through the
+    same cascade. The other tiles remain locked to their own brand because each one scopes
+    <code> data-brand</code> on its own subtree.
+  </p>
+</section>
+
+<section>
+  <SectionHead title="Register and apply" meta="HelixBrandRegistry · <hx-theme brand=…>" />
+  <CodeTabs
+    persistKey="brand-register"
+    tabs={[
+      {
+        label: 'JS',
+        language: 'js',
+        filename: 'register-meridian.js',
+        code: `HelixBrandRegistry.register('meridian', {
+  '--hx-color-primary-50':  '#EFF4FF',
+  '--hx-color-primary-100': '#DCE8FF',
+  // + 9 more primary stops
+  '--hx-color-secondary-500': '#5B8AFF',
+  // + 10 more secondary stops
+});`,
+      },
+      {
+        label: 'HTML',
+        language: 'html',
+        filename: 'apply-in-markup.html',
+        code: `<hx-theme brand="meridian">
+  <hx-button variant="primary">
+    Schedule visit
+  </hx-button>
+</hx-theme>`,
+      },
+    ]}
+  />
+</section>
+
+<section>
+  <SectionHead title="Cascade rules" meta="brand · theme · semantic interplay" />
+  <CodeBlock
+    language="js"
+    filename="cascade-rules.js"
+    showCopy={false}
+    code={`// 1. Brand merges over base on light/dark.
+// 2. High-contrast SUPPRESSES brand —
+//    AA-tuned tokens stay authoritative.
+// 3. Required: 22 semantic tokens
+//    (primary + secondary, 50→950).`}
+  />
+</section>
+
+</div>

@@ -1,0 +1,747 @@
+{/* Patterns.mdx — Patterns / Recipe library (Empty/Error/Search/Confirm/Wizard) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead } from '../_components';
+
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-alert';
+import '@helixui/library/components/hx-badge';
+import '@helixui/library/components/hx-avatar';
+
+<Meta
+  title="Patterns/Patterns"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Patterns · v3.2.2"
+  title="The shapes our same components keep forming."
+  lede={
+    <>
+      Patterns aren't new components — they're recipes. Every example below uses only documented{' '}
+      <code>{`action.*`}</code> and <code>{`surface.*`}</code> tokens. Themed brands and densities
+      pass through them automatically.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Index" meta="five recurring shapes" />
+  <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
+    {[
+      ['01', 'Empty states'],
+      ['02', 'Errors'],
+      ['03', 'Search'],
+      ['04', 'Confirmations'],
+      ['05', 'Wizards'],
+    ].map(([n, label]) => (
+      <span key={n} style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+        <span
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            color: 'var(--hx-color-text-muted)',
+            fontWeight: 600,
+          }}
+        >
+          {n}
+        </span>
+        <strong style={{ fontSize: 14 }}>{label}</strong>
+      </span>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="01 — Empty states" meta="three required parts · one primary action" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    Tell the user <em>where they are</em>, <em>why nothing's there</em>, and{' '}
+    <em>what one move would change that</em>. If you can't answer all three, you're showing a 404 —
+    not an empty state.
+  </p>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+      gap: 16,
+    }}
+  >
+    {[
+      [
+        'First-run · /appointments',
+        'No appointments scheduled',
+        "You don't have any upcoming visits yet. Pick a provider and we'll find the next available slot.",
+        'Book a visit',
+        'Browse providers',
+      ],
+      [
+        'No results · /search?q=warferin',
+        'No matches for "warferin"',
+        'Did you mean warfarin? Spelling variants match automatically. Try the class "anticoagulant" instead.',
+        'Search "warfarin"',
+        'Clear filters',
+      ],
+    ].map(([tag, title, body, primary, ghost]) => (
+      <article
+        key={title}
+        style={{
+          background: 'var(--hx-color-surface-raised)',
+          border: '1px solid var(--hx-color-border-default)',
+          borderRadius: 14,
+          padding: 32,
+          textAlign: 'center',
+          display: 'grid',
+          gap: 12,
+          justifyItems: 'center',
+        }}
+      >
+        <span className="hx-docs-card-tag">{tag}</span>
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            background: 'var(--hx-color-surface-sunken)',
+            color: 'var(--hx-color-text-muted)',
+            display: 'grid',
+            placeItems: 'center',
+            fontSize: 24,
+          }}
+        >
+          ◯
+        </div>
+        <h5 style={{ margin: 0, fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em' }}>
+          {title}
+        </h5>
+        <p
+          style={{
+            margin: 0,
+            color: 'var(--hx-color-text-secondary)',
+            fontSize: 13,
+            lineHeight: 1.5,
+            maxWidth: '40ch',
+          }}
+        >
+          {body}
+        </p>
+        <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+          <hx-button variant="primary" size="small">
+            {primary}
+          </hx-button>
+          <hx-button variant="ghost" size="small">
+            {ghost}
+          </hx-button>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="02 — Errors" meta="severity = color + icon + copy · never color alone" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    Errors come in three sizes. Inline (next to the field), block (between you and the next step),
+    and full-page (the request itself failed). All three share the AA-tuned status palette.
+  </p>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 12,
+    }}
+  >
+    <hx-alert variant="error" open>
+      <strong slot="title">Date of birth is invalid</strong>
+      February has 28 days in 1991. Please re-check the day.
+    </hx-alert>
+    <hx-alert variant="warning" open>
+      <strong slot="title">You're about to leave with unsaved work</strong>
+      Your last 3 entries haven't been saved. Stay on this page or save before leaving.
+    </hx-alert>
+    <hx-alert variant="info" open>
+      <strong slot="title">This page didn't load</strong>
+      Check the URL or head back home. If this keeps happening, contact the help desk with code{' '}
+      <code>RX-7741</code>.
+    </hx-alert>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="03 — Search" meta="input · scope · result list · single viewport" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    Three jobs visible together so the user never wonders where they are in the search. Highlights
+    borrow <code>warning-500</code> at 30% — same hue, lower commitment.
+  </p>
+  <article
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '220px 1fr',
+      gap: 24,
+      padding: 24,
+      border: '1px solid var(--hx-color-border-default)',
+      borderRadius: 14,
+      background: 'var(--hx-color-surface-raised)',
+    }}
+  >
+    <aside style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {[
+        [
+          'Type',
+          [
+            ['All', 14],
+            ['Providers', 6],
+            ['Conditions', 4],
+            ['Insurance', 2],
+          ],
+        ],
+        [
+          'Distance',
+          [
+            ['< 1 mi', 3],
+            ['< 5 mi', 9],
+            ['< 25 mi', 14],
+          ],
+        ],
+        [
+          'Availability',
+          [
+            ['Open today', 4],
+            ['This week', 11],
+            ['Telehealth', 7],
+          ],
+        ],
+      ].map(([group, opts]) => (
+        <div key={group}>
+          <h6
+            style={{
+              margin: '0 0 8px',
+              fontSize: 11,
+              fontFamily: 'var(--hx-font-family-mono)',
+              color: 'var(--hx-color-text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+            }}
+          >
+            {group}
+          </h6>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {opts.map(([label, count]) => (
+              <div
+                key={label}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: 13,
+                  padding: '4px 8px',
+                  borderRadius: 6,
+                }}
+              >
+                <span>{label}</span>
+                <span
+                  style={{
+                    color: 'var(--hx-color-text-muted)',
+                    fontFamily: 'var(--hx-font-family-mono)',
+                    fontSize: 11,
+                  }}
+                >
+                  {count}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </aside>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <hx-text-input value="park" placeholder="Search by name, specialty, condition…" />
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          fontSize: 13,
+          color: 'var(--hx-color-text-muted)',
+        }}
+      >
+        <span>
+          <strong style={{ color: 'var(--hx-color-text-primary)' }}>14 results</strong> for "park" ·
+          within 5 mi · open today
+        </span>
+        <span>
+          Sort: <strong style={{ color: 'var(--hx-color-text-primary)' }}>Best match</strong> ↓
+        </span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {[
+          [
+            'JP',
+            'Dr. Jennifer Park, MD',
+            'Cardiology · Anthem · 4.9 ★',
+            'success',
+            'Open today',
+            '0.6 mi',
+          ],
+          [
+            'MP',
+            'Dr. Michael Parker, DO',
+            'Family medicine · 4.7 ★',
+            'info',
+            'Next: Mon',
+            '1.4 mi',
+          ],
+          [
+            'SP',
+            'Parkside Pediatrics',
+            'Group practice · 4 providers',
+            'success',
+            'Open today',
+            '2.1 mi',
+          ],
+        ].map(([initials, nm, meta, badgeVariant, badgeText, dist]) => (
+          <div
+            key={nm}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '40px 1fr auto',
+              gap: 12,
+              padding: '12px 14px',
+              background: 'var(--hx-color-surface-default)',
+              border: '1px solid var(--hx-color-border-subtle)',
+              borderRadius: 10,
+              alignItems: 'center',
+            }}
+          >
+            <hx-avatar
+              initials={initials}
+              style={{
+                '--hx-avatar-bg': 'var(--hx-color-primary-600)',
+                '--hx-avatar-size': '40px',
+              }}
+            />
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{nm}</div>
+              <div style={{ fontSize: 12, color: 'var(--hx-color-text-muted)' }}>{meta}</div>
+            </div>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}
+            >
+              <hx-badge variant={badgeVariant}>{badgeText}</hx-badge>
+              <span
+                style={{
+                  fontFamily: 'var(--hx-font-family-mono)',
+                  fontSize: 11,
+                  color: 'var(--hx-color-text-muted)',
+                }}
+              >
+                {dist}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </article>
+</section>
+
+<section>
+  <SectionHead title="04 — Confirmations" meta="destructive · proceed · two recurring tones" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    A confirmation interrupts. Use it when the next action is <em>destructive</em>,{' '}
+    <em>expensive</em>, or <em>private</em> — never to recap a routine save.
+  </p>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+      gap: 16,
+    }}
+  >
+    {[
+      {
+        tone: 'danger',
+        label: 'Tone · destructive',
+        title: 'Cancel your visit with Dr. Park?',
+        body: 'Cancellations within 24 hours of the visit may be billed a $35 fee per your benefits plan.',
+        summary: [
+          ['When', 'Tomorrow · 10:30 AM'],
+          ['Where', 'Cardiology · Bldg 4'],
+        ],
+        ghost: 'Keep appointment',
+        primary: 'Cancel visit',
+        primaryVariant: 'danger',
+      },
+      {
+        tone: 'info',
+        label: 'Tone · proceed',
+        title: 'Send a new verification code?',
+        body: "We'll text a 6-digit code. The previous one will expire immediately.",
+        summary: [
+          ['Phone', '(***) ***-4218'],
+          ['Expires in', '10 minutes'],
+        ],
+        ghost: 'Not now',
+        primary: 'Send code',
+        primaryVariant: 'primary',
+      },
+    ].map((c) => (
+      <article
+        key={c.title}
+        style={{
+          background: 'var(--hx-color-surface-default)',
+          border: '1px solid var(--hx-color-border-default)',
+          borderRadius: 18,
+          boxShadow: 'var(--hx-shadow-xl)',
+          padding: 32,
+          display: 'grid',
+          gap: 16,
+        }}
+        // Visual mockup of an `hx-modal` recipe — the static article is not
+        // a real dialog (no aria-modal, no focus trap, mounted inline).
+        // Adding `role="dialog"` / `role="alertdialog"` would announce these
+        // decorative cards as live dialogs and trip axe `aria-dialog-name` /
+        // `aria-required-children` on a docs page that itself runs the AAA
+        // axe ruleset. The real recipe wires the role on `hx-modal`.
+        aria-label={`${c.label} mockup`}
+      >
+        <span className="hx-docs-card-tag">{c.label}</span>
+        <h5 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.015em' }}>
+          {c.title}
+        </h5>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            color: 'var(--hx-color-text-secondary)',
+            lineHeight: 1.55,
+          }}
+        >
+          {c.body}
+        </p>
+        <div
+          style={{
+            background: 'var(--hx-color-surface-sunken)',
+            borderRadius: 10,
+            padding: '14px 16px',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 10,
+          }}
+        >
+          {c.summary.map(([l, v]) => (
+            <div key={l} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span
+                style={{
+                  fontFamily: 'var(--hx-font-family-mono)',
+                  fontSize: 10,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  color: 'var(--hx-color-text-muted)',
+                }}
+              >
+                {l}
+              </span>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{v}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+          <hx-button variant="ghost" size="small">
+            {c.ghost}
+          </hx-button>
+          <hx-button variant={c.primaryVariant} size="small">
+            {c.primary}
+          </hx-button>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="05 — Wizards" meta="rail visible · auto-save · clear progress" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    Wizards trade speed for safety. Each step has a clear name, a back, and an exit. The rail is
+    always visible — users should never wonder how many more steps remain.
+  </p>
+  <article
+    style={{
+      borderRadius: 24,
+      border: '1px solid var(--hx-color-border-default)',
+      overflow: 'hidden',
+      display: 'grid',
+      gridTemplateColumns: '320px 1fr',
+      background: 'var(--hx-color-surface-default)',
+      boxShadow: 'var(--hx-shadow-lg)',
+      minHeight: 480,
+    }}
+  >
+    <aside
+      style={{
+        background:
+          'linear-gradient(180deg, var(--hx-color-action-primary-bg-hover, var(--hx-color-primary-700)), var(--hx-color-action-primary-bg, var(--hx-color-primary-600)))',
+        color: 'var(--hx-color-text-on-primary-strong, #fff)',
+        padding: '32px 28px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 24,
+      }}
+    >
+      <span
+        style={{
+          fontFamily: 'var(--hx-font-family-mono)',
+          fontSize: 11,
+          opacity: 0.8,
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+        }}
+      >
+        ▲ HELiX onboarding
+      </span>
+      <h4
+        style={{
+          margin: 0,
+          fontSize: 22,
+          fontWeight: 700,
+          letterSpacing: '-0.015em',
+          lineHeight: 1.2,
+        }}
+      >
+        Welcome, Jordan.
+        <br />
+        Let's get your account ready.
+      </h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
+        {[
+          ['done', '✓', 'Account', 'name · email · password'],
+          ['done', '✓', 'Identity', 'DOB · government ID'],
+          ['current', '3', 'Insurance', 'plan · member ID'],
+          ['upcoming', '4', 'Consents', 'HIPAA · billing'],
+        ].map(([state, dot, label, sub]) => (
+          <div
+            key={label}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '32px 1fr',
+              gap: 14,
+              padding: '12px 0',
+              alignItems: 'start',
+              opacity: state === 'upcoming' ? 0.6 : 1,
+            }}
+          >
+            <span
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background:
+                  state === 'done'
+                    ? '#fff'
+                    : state === 'current'
+                      ? 'transparent'
+                      : 'rgba(255,255,255,0.15)',
+                color:
+                  state === 'done'
+                    ? 'var(--hx-color-action-primary-bg, var(--hx-color-primary-600))'
+                    : '#fff',
+                border: state === 'current' ? '2px solid #fff' : '2px solid transparent',
+                display: 'grid',
+                placeItems: 'center',
+                fontFamily: 'var(--hx-font-family-mono)',
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              {dot}
+            </span>
+            <div style={{ paddingTop: 5 }}>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{label}</div>
+              <div
+                style={{
+                  fontSize: 11,
+                  opacity: 0.75,
+                  fontFamily: 'var(--hx-font-family-mono)',
+                  marginTop: 2,
+                }}
+              >
+                {sub}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </aside>
+    <div style={{ padding: '40px 48px 32px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <span
+        style={{
+          fontFamily: 'var(--hx-font-family-mono)',
+          fontSize: 11,
+          color: 'var(--hx-color-text-muted)',
+        }}
+      >
+        Step 3 of 4 · Insurance
+      </span>
+      <h3
+        style={{
+          margin: 0,
+          fontSize: 28,
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.1,
+        }}
+      >
+        Add your primary insurance.
+      </h3>
+      <p
+        style={{
+          fontSize: 14,
+          color: 'var(--hx-color-text-secondary)',
+          lineHeight: 1.55,
+          maxWidth: '50ch',
+          margin: 0,
+        }}
+      >
+        We'll verify eligibility in the background — you don't need to wait. If something doesn't
+        look right, you can update later in Settings.
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <hx-text-input label="Insurance plan" value="Anthem PPO" />
+        <hx-text-input label="Member ID" value="XJK-449821" />
+        <hx-text-input label="Group #" placeholder="Optional">
+          <span slot="help-text">Found above your name on the card.</span>
+        </hx-text-input>
+        <hx-text-input label="Relationship to subscriber" value="Self" />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingTop: 16,
+          borderTop: '1px solid var(--hx-color-border-subtle)',
+          marginTop: 'auto',
+        }}
+      >
+        <hx-button variant="ghost">← Back</hx-button>
+        <span
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 11,
+            color: 'var(--hx-color-text-muted)',
+          }}
+        >
+          3 / 4 · auto-saved
+        </span>
+        <hx-button variant="primary">Continue →</hx-button>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section>
+  <SectionHead title="The four rules" meta="patterns are discoveries, not decrees" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+      gap: 16,
+    }}
+  >
+    {[
+      [
+        'Rule 01',
+        'Compose, don’t fork.',
+        'If a pattern needs a new component, escalate — don’t bake it into the recipe.',
+      ],
+      [
+        'Rule 02',
+        'Severity ≠ color alone.',
+        'Always pair color with icon and copy. Color-blind users matter.',
+      ],
+      [
+        'Rule 03',
+        'One primary, ever.',
+        "Multiple primaries means you haven't decided yet. Decide.",
+      ],
+      [
+        'Rule 04',
+        'Auto-save where you can.',
+        'Wizards, drafts, multi-page forms. Recoverable beats perfect.',
+      ],
+    ].map(([n, t, body]) => (
+      <article
+        key={n}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          paddingTop: 16,
+          borderTop: '1px solid var(--hx-color-border-default)',
+        }}
+      >
+        <span
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            color: 'var(--hx-color-primary-700)',
+            fontWeight: 700,
+          }}
+        >{`— ${n}`}</span>
+        <strong style={{ fontSize: 15, fontWeight: 600 }}>{t}</strong>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 14,
+            color: 'var(--hx-color-text-secondary)',
+            lineHeight: 1.55,
+          }}
+        >
+          {body}
+        </p>
+      </article>
+    ))}
+  </div>
+</section>
+
+</div>

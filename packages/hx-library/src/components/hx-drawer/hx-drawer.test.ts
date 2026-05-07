@@ -327,18 +327,51 @@ describe('hx-drawer', () => {
     };
     type DrawerInternalsAccess = HelixDrawer & { _internals: ElementInternals };
 
-    it('host carries role="dialog" via ElementInternals', async () => {
-      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+    it('host carries role="dialog" via ElementInternals when open', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
       const internals = (el as DrawerInternalsAccess)._internals;
       expect(internals.role).toBe('dialog');
     });
 
-    it('host carries aria-modal="true" via ElementInternals', async () => {
-      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+    it('host carries aria-modal="true" via ElementInternals when open', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer open></hx-drawer>');
       await el.updateComplete;
       const internals = (el as DrawerInternalsAccess)._internals;
       expect(internals.ariaModal).toBe('true');
+    });
+
+    it('closed drawer does NOT expose role="dialog" to the accessibility tree', async () => {
+      // Regression: post-host-canonical, a closed drawer was leaking
+      // role=dialog to AT before the consumer ever flipped `open`. The host
+      // must be invisible to the AT tree until open lifts.
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.role).toBeNull();
+    });
+
+    it('closed drawer does NOT expose aria-modal to the accessibility tree', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.ariaModal).toBeNull();
+    });
+
+    it('toggling open lifts then retracts host dialog semantics', async () => {
+      const el = await fixture<HelixDrawer>('<hx-drawer></hx-drawer>');
+      await el.updateComplete;
+      const internals = (el as DrawerInternalsAccess)._internals;
+      expect(internals.role).toBeNull();
+      expect(internals.ariaModal).toBeNull();
+      el.open = true;
+      await el.updateComplete;
+      expect(internals.role).toBe('dialog');
+      expect(internals.ariaModal).toBe('true');
+      el.open = false;
+      await el.updateComplete;
+      expect(internals.role).toBeNull();
+      expect(internals.ariaModal).toBeNull();
     });
 
     it('inner overlay does NOT carry role on the modern path', async () => {
