@@ -13,8 +13,14 @@
       var html = document.documentElement;
       var theme = '';
       var brand = '';
+      // URL globals are AUTHORITATIVE when present — partial keys fall
+      // through to defaults (NOT to localStorage). Mirrors the preview-
+      // head precedence rule so reload behavior is consistent across
+      // manager + preview iframes.
+      var urlHasGlobals = false;
       try {
         var url = new URL(window.location.href);
+        urlHasGlobals = url.searchParams.has('globals');
         var raw = url.searchParams.get('globals') || '';
         raw.split(';').forEach(function (pair) {
           var idx = pair.indexOf(':');
@@ -25,9 +31,9 @@
           else if (k === 'brand') brand = v;
         });
       } catch (_e) {
-        /* fall through */
+        urlHasGlobals = false;
       }
-      if (!theme || !brand) {
+      if (!urlHasGlobals) {
         try {
           var stored = window.localStorage.getItem('helix:storybook:globals');
           if (stored) {

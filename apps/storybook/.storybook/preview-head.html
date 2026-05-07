@@ -101,10 +101,20 @@
     color-scheme: dark;
     background-color: var(--hx-color-surface-default, #000000);
   }
-  /* Prevent the iframe from flashing stark white before tokens load. */
+  /* Prevent the iframe from flashing stark white before tokens load.
+     Per-mode fallback hex matches the :root rules above so the body
+     paint matches the resolved theme even before tokens hydrate. */
   html,
   body {
     background-color: var(--hx-color-surface-default, #ffffff);
+  }
+  html[data-theme='dark'],
+  html[data-theme='dark'] body {
+    background-color: var(--hx-color-surface-default, #0d1825);
+  }
+  html[data-theme='high-contrast'],
+  html[data-theme='high-contrast'] body {
+    background-color: var(--hx-color-surface-default, #000000);
   }
 </style>
 
