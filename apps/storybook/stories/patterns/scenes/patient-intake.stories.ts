@@ -78,7 +78,7 @@ const renderIntakeForm = () => html`
       </p>
     </header>
 
-    <hx-form id="intake-form" novalidate>
+    <hx-form id="intake-form">
       <hx-card variant="default" elevation="raised" style="display: block;">
         <span slot="heading">Personal information</span>
 
@@ -218,9 +218,17 @@ export const Default: Story = {
 // ─────────────────────────────────────────────────
 
 /**
- * Click submit on an empty form. Native HTML constraint validation surfaces
- * the first invalid field. We assert that no submit event ever fires when
- * required fields are blank — the form blocks submission entirely.
+ * Click submit on an empty form and verify the application-level validation
+ * flow: `hx-form` runs its own `checkValidity()` against every named
+ * `hx-*` field, dispatches `hx-invalid` when required fields are blank,
+ * and *does not* dispatch `hx-submit`. This is the contract a consumer
+ * relies on — submission is blocked by HELiX validation, not by the
+ * browser silently swallowing the submit event.
+ *
+ * The form intentionally omits `novalidate` so `hx-form` runs its
+ * validity pass; `hx-form` calls `reportValidity()` internally to surface
+ * the first invalid field and dispatches a structured `hx-invalid` event
+ * with a list of errors keyed by field name.
  */
 export const SubmitEmpty: Story = {
   render: renderIntakeForm,
@@ -232,8 +240,12 @@ export const SubmitEmpty: Story = {
     await expect(form).toBeTruthy();
 
     let submitted = false;
+    let invalidEvent: CustomEvent | null = null;
     form.addEventListener('hx-submit', () => {
       submitted = true;
+    });
+    form.addEventListener('hx-invalid', (event: Event) => {
+      invalidEvent = event as CustomEvent;
     });
 
     const submit = canvas.getByTestId('intake-submit');
@@ -243,8 +255,14 @@ export const SubmitEmpty: Story = {
     await expect(innerSubmit).toBeTruthy();
     await userEvent.click(innerSubmit!);
 
-    // Empty required fields → form must NOT have dispatched hx-submit
+    // hx-form's validation pass blocks submission and reports the failure:
+    //   - hx-submit MUST NOT fire (application logic prevents it)
+    //   - hx-invalid MUST fire with at least one error (the contract a
+    //     consumer wires their error UI to)
     await expect(submitted).toBe(false);
+    await expect(invalidEvent).not.toBeNull();
+    await expect(Array.isArray(invalidEvent!.detail?.errors)).toBe(true);
+    await expect(invalidEvent!.detail.errors.length).toBeGreaterThan(0);
   },
 };
 
