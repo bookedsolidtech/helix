@@ -32,13 +32,50 @@ function parseHex(input: string): { r: number; g: number; b: number } | null {
   return null;
 }
 
+function parseRgb(input: string): { r: number; g: number; b: number } | null {
+  // Browsers normalize getComputedStyle color values to either
+  //   rgb(R, G, B)
+  //   rgba(R, G, B, A)
+  //   rgb(R G B)              (color-4 syntax in newer engines)
+  //   rgb(R G B / A)          (color-4 syntax in newer engines)
+  // Match all four with a permissive regex, bytes only (we ignore alpha
+  // because contrast computation here assumes opaque foreground/background;
+  // tokens are designed against opaque surfaces).
+  const match = /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/i.exec(input.trim());
+  if (!match) return null;
+  const r = Number(match[1]);
+  const g = Number(match[2]);
+  const b = Number(match[3]);
+  if ([r, g, b].some((n) => Number.isNaN(n) || n < 0 || n > 255)) return null;
+  return { r, g, b };
+}
+
+/**
+ * Normalize an arbitrary CSS color string to an uppercase `#RRGGBB` hex
+ * value. Accepts hex (`#RGB`, `#RRGGBB`, `#RRGGBBAA`) and rgb()/rgba()
+ * forms — the two shapes `getComputedStyle` produces for resolved tokens
+ * across every browser we care about. Returns the empty string when the
+ * value cannot be parsed; callers must handle that path explicitly.
+ */
+export function cssColorToHex(input: string): string {
+  if (!input) return '';
+  const trimmed = input.trim();
+  const rgb = trimmed.startsWith('#') ? parseHex(trimmed) : parseRgb(trimmed);
+  if (!rgb) return '';
+  const toHex = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
+  return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
+}
+
 function channelLuminance(byte: number): number {
   const c = byte / 255;
   return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
 }
 
-function relativeLuminance(hex: string): number {
-  const rgb = parseHex(hex);
+function relativeLuminance(value: string): number {
+  const trimmed = value.trim();
+  const rgb = trimmed.startsWith('#')
+    ? parseHex(trimmed)
+    : (parseRgb(trimmed) ?? parseHex(trimmed));
   if (!rgb) return 0;
   return (
     0.2126 * channelLuminance(rgb.r) +
@@ -48,12 +85,14 @@ function relativeLuminance(hex: string): number {
 }
 
 /**
- * WCAG contrast ratio between two hex colors. Returns 1.0 when either
- * value cannot be parsed.
+ * WCAG contrast ratio between two CSS color values. Accepts hex
+ * (`#RGB`, `#RRGGBB`) or `rgb()`/`rgba()` strings — both shapes are
+ * produced by `getComputedStyle` when reading resolved CSS custom
+ * properties. Returns 1.0 when either value cannot be parsed.
  */
-export function contrastRatio(hexA: string, hexB: string): number {
-  const a = relativeLuminance(hexA);
-  const b = relativeLuminance(hexB);
+export function contrastRatio(colorA: string, colorB: string): number {
+  const a = relativeLuminance(colorA);
+  const b = relativeLuminance(colorB);
   const lighter = Math.max(a, b);
   const darker = Math.min(a, b);
   return (lighter + 0.05) / (darker + 0.05);
