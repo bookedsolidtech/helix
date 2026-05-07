@@ -9,6 +9,10 @@
  * generator emits this file and the gitignored `.cache/contrast-report.json`
  * artefact in lockstep, so the JSON cache stays available for ad-hoc
  * inspection without becoming a build-time dependency.
+ *
+ * The `generatedAt` wall-clock field is intentionally absent from this
+ * module; consult `tokenVersion` (or the gitignored JSON cache) for
+ * regeneration freshness signals.
  */
 
 export type ContrastClassification = 'aaa' | 'aa' | 'subAA';
@@ -43,13 +47,11 @@ export interface ContrastModeReport {
 }
 
 export interface ContrastReport {
-  readonly generatedAt: string;
   readonly tokenVersion: string;
   readonly modes: Readonly<Record<ContrastModeKey, ContrastModeReport>>;
 }
 
 export const contrastReport: ContrastReport = {
-  generatedAt: 'tracked-via-tokenVersion',
   tokenVersion: '3.3.1',
   modes: {
     light: {
