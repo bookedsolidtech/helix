@@ -88,8 +88,18 @@ export function cleanup(): void {
 }
 
 /**
- * Runs axe-core WCAG 2.1 AA accessibility audit on a component.
- * Returns the axe results object. Throws if critical violations found.
+ * Runs an axe-core accessibility audit on a component. Returns the axe results object.
+ *
+ * **Conformance level (AAA Cert Epic — Workstream B.1):**
+ *
+ * `level` controls which WCAG tag bucket is added to the axe `runOnly` list:
+ * - `'aa'` (default) — runs `wcag2a` + `wcag2aa` + `best-practice`. Healthcare AA mandate.
+ *   Behaviour identical to the pre-AAA-epic baseline; all existing tests stay AA-only.
+ * - `'aaa'` — runs `wcag2a` + `wcag2aa` + `wcag2aaa` + `best-practice`. Used by the
+ *   per-component AAA certification audits in Workstream B.3. Opt-in only — never the default.
+ *
+ * AA tags are always included even at `level: 'aaa'` so that AAA tests still surface any
+ * baseline regressions; AAA stacks on top of AA, never replaces it.
  *
  * @param el - The host element to audit.
  * @param options.rules - Optional axe rule overrides.
@@ -97,18 +107,32 @@ export function cleanup(): void {
  *   its shadow root. Required for components that set ARIA roles on the host element itself
  *   (e.g. `role="list"` on `hx-breadcrumb`), so axe can traverse the full composed tree and
  *   resolve aria-required-parent relationships across shadow boundaries.
+ * @param options.level - WCAG conformance level to assert. Defaults to `'aa'`.
+ *   Set to `'aaa'` only when the component has earned `@aaa-certified` per the
+ *   AAA Cert Epic (B.3) audit. Default behaviour is unchanged from the AA baseline.
  */
 export async function checkA11y(
   el: HTMLElement,
-  options?: { rules?: Record<string, { enabled: boolean }>; useElement?: boolean },
+  options?: {
+    rules?: Record<string, { enabled: boolean }>;
+    useElement?: boolean;
+    level?: 'aa' | 'aaa';
+  },
 ): Promise<{ violations: AxeViolation[]; passes: AxePass[] }> {
   const axe = await import('axe-core');
 
   const context = options?.useElement ? el : (el.shadowRoot ?? el);
+  const tags: string[] = ['wcag2a', 'wcag2aa', 'best-practice'];
+  if (options?.level === 'aaa') {
+    // Insert before 'best-practice' so axe's tag groups stay roughly conformance-ordered;
+    // axe does not require a specific order, this is purely cosmetic for log output.
+    tags.splice(2, 0, 'wcag2aaa');
+  }
+
   const results = await axe.default.run(context as unknown as Node, {
     runOnly: {
       type: 'tag',
-      values: ['wcag2a', 'wcag2aa', 'best-practice'],
+      values: tags,
     },
     rules: options?.rules,
   });

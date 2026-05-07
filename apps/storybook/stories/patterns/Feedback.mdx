@@ -1,0 +1,172 @@
+{/* Feedback.mdx — Patterns / Feedback (real hx-* components, status palette) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, DocsCard } from '../_components';
+
+import '@helixui/library/components/hx-toast';
+import '@helixui/library/components/hx-alert';
+import '@helixui/library/components/hx-progress-bar';
+import '@helixui/library/components/hx-progress-ring';
+import '@helixui/library/components/hx-skeleton';
+import '@helixui/library/components/hx-button';
+
+<Meta
+  title="Patterns/Feedback"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Patterns · feedback"
+  title="Talk to clinicians clearly. Then get out of the way."
+  lede={
+    <>
+      Toasts route through <code>surface.{`{success,danger,warning,info}-strong`}</code> with paired
+      text-on-strong tokens — AA holds in light, dark, and high-contrast. Alerts, progress, and
+      skeletons share the same status palette.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Toast" meta="hx-toast · auto-dismiss" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <hx-toast variant="success" open>
+      <strong>Chart saved.</strong>
+      <div>Visit #4198 — synced 0.4s ago.</div>
+    </hx-toast>
+    <hx-toast variant="info" open>
+      <strong>Two records merged.</strong>
+      <div>Reviewed by Dr. Park — undo within 30s.</div>
+    </hx-toast>
+    <hx-toast variant="warning" open>
+      <strong>Verify patient ID.</strong>
+      <div>DOB does not match insurance record.</div>
+    </hx-toast>
+    <hx-toast variant="danger" open>
+      <strong>Connection lost.</strong>
+      <div>Last sync 3 min ago. Reconnecting…</div>
+    </hx-toast>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Inline alert" meta="hx-alert · variant=info|success|warning|error" />
+  <div style={{ display: 'grid', gap: 12 }}>
+    <hx-alert variant="info" open>
+      <strong slot="title">This visit was opened in another tab</strong>
+      Edits made here will not sync until you bring this window forward. Pick up where you left off,
+      or close this tab to release the lock.
+      <div slot="actions">
+        <hx-button variant="ghost" size="small">
+          Take over
+        </hx-button>
+      </div>
+    </hx-alert>
+    <hx-alert variant="warning" open>
+      <strong slot="title">Lab results are 11 days old</strong>
+      Order new bloodwork before completing this assessment. The patient's last CBC was drawn on
+      April&nbsp;26.
+      <div slot="actions">
+        <hx-button variant="ghost" size="small">
+          Order labs
+        </hx-button>
+      </div>
+    </hx-alert>
+    <hx-alert variant="error" open>
+      <strong slot="title">Could not save chart</strong>
+      Required field <em>Allergies</em> is empty and chief complaint contains characters not allowed
+      in HL7. Fix below and retry.
+      <div slot="actions">
+        <hx-button variant="ghost" size="small">
+          Show errors
+        </hx-button>
+      </div>
+    </hx-alert>
+    <hx-alert variant="success" open>
+      <strong slot="title">Insurance verified</strong>
+      Anthem Blue PPO confirmed eligible. Copay $35, deductible met for 2026.
+    </hx-alert>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Progress" meta="hx-progress-bar · hx-progress-ring · hx-skeleton" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <DocsCard title="Chart upload" tag="62% · 3 of 5 sections">
+      <div style={{ width: '100%' }}>
+        <hx-progress-bar value="62" />
+      </div>
+    </DocsCard>
+    <DocsCard title="Insurance verification" tag="complete">
+      <div style={{ width: '100%' }}>
+        <hx-progress-bar variant="success" value="100" />
+      </div>
+    </DocsCard>
+    <DocsCard title="Lab order routing" tag="queued · retrying">
+      <div style={{ width: '100%' }}>
+        <hx-progress-bar variant="warning" value="28" />
+      </div>
+    </DocsCard>
+    <DocsCard title="Visit status" tag="hx-progress-ring">
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+        <hx-progress-ring value="62" />
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--hx-color-text-strong)' }}>
+            Triage complete
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--hx-color-text-muted)' }}>
+            Awaiting attending sign-off
+          </div>
+        </div>
+      </div>
+    </DocsCard>
+    <DocsCard title="Loading patient list" tag="hx-skeleton">
+      <div style={{ display: 'grid', gap: 12, width: '100%' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '56px 1fr',
+            gap: 16,
+            alignItems: 'center',
+          }}
+        >
+          <hx-skeleton variant="circle" style={{ width: 56, height: 56 }} />
+          <div style={{ display: 'grid', gap: 8 }}>
+            <hx-skeleton variant="text" />
+            <hx-skeleton variant="text" style={{ width: '60%' }} />
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '56px 1fr',
+            gap: 16,
+            alignItems: 'center',
+          }}
+        >
+          <hx-skeleton variant="circle" style={{ width: 56, height: 56 }} />
+          <div style={{ display: 'grid', gap: 8 }}>
+            <hx-skeleton variant="text" />
+            <hx-skeleton variant="text" style={{ width: '60%' }} />
+          </div>
+        </div>
+      </div>
+    </DocsCard>
+  </div>
+</section>
+
+</div>

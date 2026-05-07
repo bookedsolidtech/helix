@@ -1,0 +1,271 @@
+{/* Layout.mdx — Foundations / Layout (12-col grid · breakpoints · containers · templates) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, StatCard } from '../_components';
+
+<Meta
+  title="Foundations/Layout"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+export const BREAKPOINTS = [
+  { key: '— sm', width: '<640px', desc: 'Phones, narrow web views. Single column, 16px gutter.' },
+  { key: 'sm', width: '640px', desc: 'Phablets. Two-up tiles, sticky headers.' },
+  { key: 'md', width: '768px', desc: 'Small tablets. Side-nav collapses to drawer.' },
+  { key: 'lg', width: '1024px', desc: 'Standard laptops. Full app shell, 24px gutter.' },
+  {
+    key: 'xl · 2xl',
+    width: '1280+px',
+    desc: 'Wide desktop. Three-pane and beyond. Max content holds.',
+  },
+];
+
+export const CONTAINERS = [
+  { name: 'narrow', desc: '48rem · prose, forms, dialogs', width: 33 },
+  { name: 'md', desc: '768px · single-pane app', width: 51 },
+  { name: 'lg', desc: '1024px · two-pane app', width: 68 },
+  { name: 'content', desc: '72rem · marketing, dashboards', width: 80 },
+  { name: 'xl', desc: '1280px · wide layouts', width: 90 },
+];
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Layout · grid · density"
+  title="The grid is opinionated. The page templates aren't."
+  lede={
+    <>
+      HELiX runs on a 12-column fluid grid with 24px gutters and a strict 4/8 spacing scale. Five
+      page templates absorb 90% of product surfaces; three density modes adapt the same components
+      for crowded screens.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="The 12-column grid" meta="24px gutters · 4/8 spacing scale" />
+  <div
+    style={{
+      background: 'var(--hx-color-surface-raised)',
+      border: '1px solid var(--hx-color-border-default)',
+      borderRadius: 14,
+      padding: 24,
+    }}
+  >
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 8 }}>
+      {Array.from({ length: 12 }, (_, i) => (
+        <div
+          key={i}
+          style={{
+            height: 48,
+            borderRadius: 6,
+            background: 'var(--hx-color-primary-100)',
+            display: 'grid',
+            placeItems: 'center',
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 11,
+            color: 'var(--hx-color-primary-700)',
+          }}
+        >
+          {i + 1}
+        </div>
+      ))}
+    </div>
+  </div>
+  <div className="hx-docs-stats" style={{ marginTop: 16 }}>
+    <StatCard num="12" label="Columns" sub="fluid · ratio-stable" />
+    <StatCard num="24" unit="px" label="Gutter" sub="space-6 · matches body" />
+    <StatCard num="64" unit="px" label="Page margin" sub="space-16 · >lg" />
+    <StatCard num="1480" unit="px" label="Max content" sub="container.content" />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Breakpoints" meta="mobile-first · 5 stops" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+      gap: 12,
+    }}
+  >
+    {BREAKPOINTS.map((bp) => (
+      <div key={bp.key} className="hx-docs-card">
+        <div className="hx-docs-card-head">
+          <h4 className="hx-docs-card-title">{bp.key}</h4>
+          <span className="hx-docs-card-tag">{bp.width}</span>
+        </div>
+        <p className="hx-docs-card-body">{bp.desc}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Containers" meta="named width tokens" />
+  <p className="hx-docs-card-body">
+    Don't hard-code <code>max-width</code>. Reach for a container token so reflow at large
+    breakpoints stays consistent across pages.
+  </p>
+  <div
+    style={{
+      border: '1px solid var(--hx-color-border-default)',
+      background: 'var(--hx-color-surface-default)',
+      borderRadius: 14,
+      padding: 24,
+      marginTop: 16,
+    }}
+  >
+    {CONTAINERS.map((c, i) => (
+      <div
+        key={c.name}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '100px 1fr',
+          gap: 16,
+          alignItems: 'center',
+          padding: '8px 0',
+          borderTop: i === 0 ? 'none' : '1px solid var(--hx-color-border-subtle)',
+        }}
+      >
+        <code
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            fontWeight: 700,
+            color: 'var(--hx-color-action-secondary-fg)',
+          }}
+        >
+          {c.name}
+        </code>
+        <div
+          style={{
+            height: 24,
+            background: 'var(--hx-color-action-primary-bg)',
+            borderRadius: 4,
+            color: '#fff',
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 11,
+            display: 'grid',
+            placeItems: 'center start',
+            paddingLeft: 10,
+            width: `${c.width}%`,
+          }}
+        >
+          {c.desc}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Page templates" meta="absorb 90% of product surfaces" />
+  <p className="hx-docs-card-body">
+    Not every screen is unique. Reach for one of these first — they're the silhouettes that make a
+    HELiX product feel like a HELiX product.
+  </p>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+      marginTop: 16,
+    }}
+  >
+    {[
+      { name: 'Marketing · public', tag: 'container.content' },
+      { name: 'App shell · authenticated', tag: 'side-nav + main + aside' },
+      { name: 'Detail · entity record', tag: 'title + meta sidebar' },
+      { name: 'Form · single task', tag: 'container.narrow' },
+      { name: 'Dashboard · stat-grid', tag: 'container.lg' },
+    ].map((tpl) => (
+      <div key={tpl.name} className="hx-docs-card">
+        <div className="hx-docs-card-head">
+          <h4 className="hx-docs-card-title">{tpl.name}</h4>
+          <span className="hx-docs-card-tag">{tpl.tag}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Density modes" meta="comfortable · default · compact" />
+  <p className="hx-docs-card-body">
+    A patient kiosk and a billing reconciliation grid both use HELiX, but they shouldn't share the
+    same row height. Density adjusts internal padding (never font-size, never touch-target) so the
+    same components feel right at every information density.
+  </p>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+      marginTop: 16,
+    }}
+  >
+    {[
+      { name: 'Comfortable', pad: 14, tag: 'patient kiosk' },
+      { name: 'Default', pad: 10, tag: 'general product' },
+      { name: 'Compact', pad: 6, tag: 'EHR / billing only' },
+    ].map((d) => (
+      <div key={d.name} className="hx-docs-card">
+        <div className="hx-docs-card-head">
+          <h4 className="hx-docs-card-title">{d.name}</h4>
+          <span className="hx-docs-card-tag">{d.tag}</span>
+        </div>
+        <ul
+          style={{
+            listStyle: 'none',
+            margin: 0,
+            padding: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+          }}
+        >
+          {['Jordan Reyes', 'Sasha Kelley', 'Marcus Pham'].map((p) => (
+            <li
+              key={p}
+              style={{
+                padding: `${d.pad}px 14px`,
+                background: 'var(--hx-color-surface-default)',
+                border: '1px solid var(--hx-color-border-subtle)',
+                borderRadius: 6,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+              }}
+            >
+              <span
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  background: 'var(--hx-color-primary-200)',
+                  color: 'var(--hx-color-primary-700)',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontFamily: 'var(--hx-font-family-mono)',
+                  fontSize: 11,
+                  fontWeight: 700,
+                }}
+              >
+                {p
+                  .split(' ')
+                  .map((w) => w[0])
+                  .join('')}
+              </span>
+              <span style={{ flex: 1, fontSize: 14, color: 'var(--hx-color-text-primary)' }}>
+                {p}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</section>
+
+</div>

@@ -1,0 +1,333 @@
+/*
+ * helix Storybook — code-editor chrome.
+ *
+ * Dark editor surface for Shiki-rendered code blocks. Chrome is intentionally
+ * locked to a dark surface even in light theme mode — this matches industry
+ * docs conventions (Stripe, Vercel, MDN) where prose is light and code is
+ * always dark for readability.
+ *
+ * Background hex (#22272e) is sourced directly from the bundled
+ * `github-dark-dimmed` Shiki theme. If you change the theme in
+ * `_components/CodeBlock.tsx` (CODE_BLOCK_THEME / CODE_BLOCK_BACKGROUND),
+ * mirror it here.
+ *
+ * Cascade:
+ * - Outside @layer hx-docs so these styles apply to autodoc Source blocks
+ *   too. The `[data-language]` and `.hx-docs-code-editor` selectors are
+ *   specific enough that they don't bleed into other surfaces.
+ *
+ * Accessibility (AAA epic — verified ratios at #22272e body / #1c2128 header):
+ * - Body token text         #adbac7 on #22272e =  7.60:1  (AAA body)
+ * - Header filename / active tab #cdd9e5 on #1c2128 = 11.29:1  (AAA)
+ * - Inactive tab text       #a3afbd on #1c2128 =  7.26:1  (AAA)
+ * - Language pill text      #cdd9e5 on #2d333b =  8.89:1  (AAA)
+ * - Copied-state copy text  #6cb6ff on #1c2128 =  7.53:1  (AAA)
+ * Earlier drafts used #768390 for inactive tabs (4.18:1 — failed AA) and
+ * #adbac7 inside the language pill (6.45:1 — AA, not AAA); both were lifted
+ * to clear the AAA bar required by this epic.
+ * - `forced-colors` mode releases all custom colors so the OS palette wins.
+ * - `prefers-reduced-motion` neutralizes the copy "flash" and tab transition.
+ */
+
+/* ── Editor surface (wrapper) ──────────────────────────────────────── */
+
+.hx-docs-code-editor {
+  display: block;
+  margin: 0 0 16px;
+  background: #22272e;
+  color: #adbac7;
+  border: 1px solid #2d333b;
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  /* Forced-colors release: let the OS pick. */
+  forced-color-adjust: auto;
+}
+
+/* ── Header chrome (filename · language · copy) ───────────────────── */
+
+.hx-docs-code-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #1c2128;
+  border-bottom: 1px solid #2d333b;
+  min-height: 36px;
+}
+
+.hx-docs-code-editor-filename {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1;
+  color: #cdd9e5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hx-docs-code-editor-filename-placeholder {
+  display: inline-block;
+  /* Reserve baseline so the header height stays stable even with no filename. */
+  min-height: 14px;
+}
+
+.hx-docs-code-editor-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.hx-docs-code-editor-language {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #2d333b;
+  /* AAA: #cdd9e5 on #2d333b = 8.89:1 (was #adbac7 → 6.45:1, AA only). */
+  color: #cdd9e5;
+  border-radius: 999px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  user-select: none;
+}
+
+.hx-docs-code-editor-copy {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  color: #adbac7;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    background-color var(--hx-duration-fast, 100ms) ease,
+    border-color var(--hx-duration-fast, 100ms) ease,
+    color var(--hx-duration-fast, 100ms) ease;
+}
+
+.hx-docs-code-editor-copy:hover {
+  background: #2d333b;
+  color: #cdd9e5;
+}
+
+.hx-docs-code-editor-copy:focus-visible {
+  outline: 2px solid var(--hx-color-focus, #58a6ff);
+  outline-offset: 2px;
+}
+
+.hx-docs-code-editor-copy[data-copied] {
+  color: #6cb6ff;
+  background: #1c2128;
+}
+
+/* ── Tab strip (CodeTabs) ─────────────────────────────────────────── */
+
+.hx-docs-code-editor-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: #1c2128;
+  border-bottom: 1px solid #2d333b;
+  /* Allow horizontal overflow on narrow viewports rather than wrapping. */
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.hx-docs-code-editor-tab {
+  appearance: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: transparent;
+  /* AAA: #a3afbd on #1c2128 = 7.26:1 (was #768390 → 4.18:1, failed AA). */
+  color: #a3afbd;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--hx-duration-fast, 100ms) ease,
+    border-color var(--hx-duration-fast, 100ms) ease;
+}
+
+.hx-docs-code-editor-tab:hover {
+  color: #cdd9e5;
+}
+
+.hx-docs-code-editor-tab:focus-visible {
+  outline: 2px solid var(--hx-color-focus, #58a6ff);
+  outline-offset: -2px;
+}
+
+.hx-docs-code-editor-tab[data-active] {
+  color: #cdd9e5;
+  border-bottom-color: #6cb6ff;
+}
+
+/*
+ * The tabbed wrapper hides the inner CodeBlock's editor border-radius/border
+ * so the entire unit reads as one editor (one outer border, one rounded
+ * corner set on the wrapper).
+ */
+.hx-docs-code-editor--tabbed > .hx-docs-code-editor-tabpanel > .hx-docs-code-editor {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+/*
+ * The CodeBlock inside a CodeTabs panel shouldn't render its own header
+ * filename row when the tab strip is already labelling the unit — but we
+ * still want the language pill + copy button. The inner header is kept;
+ * its border-bottom matches the tab strip border so they read continuously.
+ */
+
+/* ── Code body (Shiki output) ─────────────────────────────────────── */
+
+.hx-docs-code-editor-body {
+  /*
+   * Shiki emits its own <pre> with inline `background-color`. We DO NOT
+   * override Shiki's inline style because the editor surface is already
+   * matched to it (#22272e). If the theme changes, both must change.
+   */
+  overflow: auto;
+}
+
+.hx-docs-code-editor-body pre.shiki {
+  margin: 0;
+  padding: 16px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 13px;
+  line-height: 1.55;
+  /* Shiki sets background inline. Don't fight it — let it own the canvas. */
+}
+
+.hx-docs-code-editor-body pre.shiki code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Loading-state fallback before Shiki resolves. */
+.hx-docs-code-editor-body pre.shiki-loading {
+  margin: 0;
+  padding: 16px;
+  background: #22272e;
+  color: #adbac7;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* Screen-reader-only utility for the live-region announcement. */
+.hx-docs-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-docs-code-editor-copy,
+  .hx-docs-code-editor-tab {
+    transition: none;
+  }
+}
+
+/* ── Forced-colors / Windows High Contrast ────────────────────────── */
+
+@media (forced-colors: active) {
+  .hx-docs-code-editor,
+  .hx-docs-code-editor-header,
+  .hx-docs-code-editor-tabs {
+    background: Canvas;
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+
+  .hx-docs-code-editor-language,
+  .hx-docs-code-editor-copy,
+  .hx-docs-code-editor-tab {
+    background: ButtonFace;
+    color: ButtonText;
+    border-color: ButtonText;
+  }
+
+  .hx-docs-code-editor-copy:focus-visible,
+  .hx-docs-code-editor-tab:focus-visible {
+    outline: 2px solid Highlight;
+  }
+
+  .hx-docs-code-editor-tab[data-active] {
+    color: HighlightText;
+    background: Highlight;
+    border-bottom-color: Highlight;
+  }
+}
+
+/*
+ * ── Storybook autodoc Source block integration ─────────────────────
+ *
+ * Storybook's <Source> block (used in autodocs to render auto-generated
+ * story source) emits its own <pre> with class `docblock-source` (or
+ * similar internal classes depending on version). We restyle that surface
+ * to match the helix dark editor chrome so visual continuity is preserved
+ * between hand-written MDX <CodeBlock> and auto-rendered story source.
+ *
+ * Verified against @storybook/addon-docs 10.3.6 — the Source block renders
+ * into a wrapper with the `docs-source` class and an inner <pre>.
+ */
+.docblock-source,
+.sbdocs-pre,
+.sbdocs .docblock-source,
+.sbdocs pre[class*='source'] {
+  background: #22272e !important;
+  color: #adbac7 !important;
+  border: 1px solid #2d333b !important;
+  border-radius: 8px !important;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace) !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+.docblock-source code,
+.sbdocs-pre code {
+  background: transparent !important;
+  color: inherit !important;
+  font-family: inherit !important;
+}
+
+@media (forced-colors: active) {
+  .docblock-source,
+  .sbdocs-pre {
+    background: Canvas !important;
+    color: CanvasText !important;
+    border-color: CanvasText !important;
+  }
+}

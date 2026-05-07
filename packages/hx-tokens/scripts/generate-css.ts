@@ -93,8 +93,11 @@ if (darkEntries.length > 0) {
 if (hcEntries.length > 0) {
   // Block 4: @media prefers-contrast: more — auto high-contrast mode
   // Only applies when the user has NOT explicitly set data-hx-contrast="normal"
+  // or data-theme="light"/"dark" (those opt out of OS-driven HC promotion).
   lines.push(`@media (prefers-contrast: more) {`);
-  lines.push(`  :root:not([data-hx-contrast="normal"]) {`);
+  lines.push(
+    `  :root:not([data-hx-contrast="normal"]):not([data-theme="light"]):not([data-theme="dark"]) {`,
+  );
   for (const t of hcEntries) {
     lines.push(`    ${t.name}: ${t.value};`);
   }
@@ -102,8 +105,26 @@ if (hcEntries.length > 0) {
   lines.push(`}`);
   lines.push(``);
 
-  // Block 5: [data-hx-contrast="high"] — manual high-contrast override
-  lines.push(`:root[data-hx-contrast="high"] {`);
+  // Block 5: manual high-contrast override.
+  //
+  // Two selectors flip the same token cascade:
+  //
+  //   - `[data-hx-contrast="high"]` — original orthogonal contrast attribute,
+  //     stackable on top of `data-theme` (e.g. dark + high-contrast).
+  //   - `[data-theme="high-contrast"]` — third value on the canonical theme
+  //     attribute. Storybook's @storybook/addon-themes withThemeByDataAttribute
+  //     toolbar drives the three modes (light/dark/high-contrast) through this
+  //     attribute; without this selector the toolbar would set the attribute
+  //     but the token cascade would not flip, leaving HC mode visually
+  //     identical to whichever mode preceded it. Consumers who want a manual
+  //     HC toggle (brand registries doing forced-color emulation, Storybook
+  //     docs, audit tooling) get a single attribute that mirrors the
+  //     light/dark convention.
+  //
+  // Both selectors share the same token block so the two driver paths are
+  // always equivalent. The grouped selector means a brand-overrides
+  // stylesheet can target either driver and reach the same HC fallback.
+  lines.push(`:root[data-hx-contrast="high"],\n:root[data-theme="high-contrast"] {`);
   for (const t of hcEntries) {
     lines.push(`  ${t.name}: ${t.value};`);
   }

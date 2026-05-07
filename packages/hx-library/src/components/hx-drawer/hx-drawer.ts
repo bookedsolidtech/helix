@@ -446,11 +446,13 @@ export class HelixDrawer extends HelixElement {
         : supportsIdrefElementReferences(this._internals);
 
     // Establish host-canonical ARIA semantics BEFORE first paint. The host
-    // carries `role="dialog"` and (when modal) `aria-modal="true"` via
-    // ElementInternals so consumers and AT see the dialog surface even before
-    // any IDREF resolution lands.
-    this._internals.role = 'dialog';
-    this._internals.ariaModal = 'true';
+    // carries `role="dialog"` and `aria-modal="true"` via ElementInternals,
+    // but ONLY while the drawer is open — a CLOSED drawer is invisible to AT
+    // and must not surface a "modal dialog" announcement before the consumer
+    // ever flips `open`. Initial state is gated through
+    // `_syncHostDialogSemantics()`, which is called from `connectedCallback`
+    // (here) and on every `open` change in `updated()`.
+    this._syncHostDialogSemantics();
 
     // Install the dedicated `aria-describedby` retraction observer BEFORE the
     // seeded `_syncHostAriaSemantics()` call below — mirrors hx-combobox
@@ -506,6 +508,10 @@ export class HelixDrawer extends HelixElement {
     super.updated(changedProperties);
 
     if (changedProperties.has('open')) {
+      // Lift role=dialog + aria-modal onto the host BEFORE the open animation
+      // begins so AT announces the dialog surface as it appears; retract
+      // them after close so a closed drawer is invisible to the AT tree.
+      this._syncHostDialogSemantics();
       if (this.open) {
         this._openDrawer();
       } else {
@@ -994,6 +1000,32 @@ export class HelixDrawer extends HelixElement {
   }
 
   /**
+   * Gates `role="dialog"` + `aria-modal="true"` on the host's
+   * `ElementInternals` behind the `open` boolean. A closed drawer must NOT
+   * surface as a modal dialog to the accessibility tree — otherwise screen
+   * readers announce an invisible modal before the consumer ever opens it
+   * (regression introduced when the ARIA surface moved from the inner
+   * overlay to the host in group-4 round-1).
+   *
+   * Open  → `role = 'dialog'`, `ariaModal = 'true'`
+   * Closed → `role = null`, `ariaModal = null` (cleared from the AT tree)
+   *
+   * Called from `connectedCallback()` (initial state) and from `updated()`
+   * whenever `open` changes. Idempotent: writing the same value twice is a
+   * no-op for both AT and the accessibility tree builder.
+   * @internal
+   */
+  private _syncHostDialogSemantics(): void {
+    if (this.open) {
+      this._internals.role = 'dialog';
+      this._internals.ariaModal = 'true';
+    } else {
+      this._internals.role = null;
+      this._internals.ariaModal = null;
+    }
+  }
+
+  /**
    * Resolves consumer-supplied label/description IDREFs on the host and
    * projects the canonical dialog ARIA onto the **host** via
    * `ElementInternals` (modern path) and onto the inner overlay via attribute
@@ -1027,11 +1059,13 @@ export class HelixDrawer extends HelixElement {
    */
   private _syncHostAriaSemantics(): void {
     const internals = this._internals;
-    // The host's canonical role + modal flag are seeded in `connectedCallback`.
-    // We do NOT rewrite them on every sync — they are stable for the
-    // component's lifetime and rewriting them on every render shifts focus
-    // tracking on some Chromium / WebKit builds (idempotent writes can still
-    // re-enter the AT layer's accessibility tree builder).
+    // The host's canonical role + modal flag are managed separately by
+    // `_syncHostDialogSemantics()` — they are gated on `this.open` so a
+    // CLOSED drawer is invisible to the accessibility tree (no orphan
+    // `role="dialog"` / `aria-modal="true"` before the consumer flips open).
+    // Naming/description state below is independent of open-state because
+    // the resolved label still composes correctly while closed and the
+    // dialog surface only becomes visible to AT when role/aria-modal lift.
 
     // Refresh the consumer baseline. The host attribute IS the live source
     // of truth — `null` authentically represents consumer retraction.

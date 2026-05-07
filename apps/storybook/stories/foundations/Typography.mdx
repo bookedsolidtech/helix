@@ -1,0 +1,254 @@
+{/* Typography.mdx — Foundations / Typography (replaces tokens/Typography.mdx) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead } from '../_components';
+
+<Meta
+  title="Foundations/Typography"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+export const SCALE = [
+  { token: '5xl', px: '48px', text: 'Display headline' },
+  { token: '4xl', px: '36px', text: 'Page title' },
+  { token: '3xl', px: '30px', text: 'Section heading' },
+  { token: '2xl', px: '24px', text: 'Card heading' },
+  { token: 'xl', px: '20px', text: 'Subheading' },
+  { token: 'lg', px: '18px', text: 'Body large' },
+  { token: 'md', px: '16px', text: 'Body — default reading size' },
+  { token: 'sm', px: '14px', text: 'Secondary body, dense tables' },
+  { token: 'xs', px: '12px', text: 'Captions, helper text, labels' },
+  { token: '2xs', px: '10px', text: 'Micro / chart axis' },
+];
+
+export const WEIGHTS = [
+  { weight: 300, name: 'light' },
+  { weight: 400, name: 'normal' },
+  { weight: 500, name: 'medium' },
+  { weight: 600, name: 'semibold' },
+  { weight: 700, name: 'bold' },
+  { weight: 800, name: 'extrabold' },
+];
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Typography"
+  title="Inter for prose. JetBrains Mono for code."
+  lede={
+    <>
+      Two families, ten sizes, six weights. Inter handles every reading surface — clinical density,
+      charts, dense tables — with OpenType variants tuned on (<code>cv11</code>, <code>ss01</code>)
+      for unambiguous numerals.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Families" meta="--hx-font-family-{sans,mono}" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+      gap: 24,
+    }}
+  >
+    <div className="hx-docs-card">
+      <div className="hx-docs-card-head">
+        <h4 className="hx-docs-card-title">--hx-font-family-sans</h4>
+        <span className="hx-docs-card-tag">Inter</span>
+      </div>
+      <div
+        style={{
+          fontFamily: 'var(--hx-font-family-sans, Inter, system-ui, sans-serif)',
+          fontSize: 56,
+          lineHeight: 1,
+          letterSpacing: '-0.025em',
+          fontWeight: 700,
+          color: 'var(--hx-color-text-primary)',
+        }}
+      >
+        Aa Bb Cc Gg 0123
+      </div>
+      <p className="hx-docs-card-body">'Inter' · system fallback chain</p>
+    </div>
+    <div className="hx-docs-card">
+      <div className="hx-docs-card-head">
+        <h4 className="hx-docs-card-title">--hx-font-family-mono</h4>
+        <span className="hx-docs-card-tag">JetBrains Mono</span>
+      </div>
+      <div
+        style={{
+          fontFamily: 'var(--hx-font-family-mono, "JetBrains Mono", ui-monospace, monospace)',
+          fontSize: 56,
+          lineHeight: 1,
+          letterSpacing: 0,
+          fontWeight: 600,
+          color: 'var(--hx-color-text-primary)',
+        }}
+      >
+        Aa Bb Cc Gg 0123
+      </div>
+      <p className="hx-docs-card-body">'JetBrains Mono' · ui-monospace fallback</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Type scale" meta="--hx-font-size-{2xs…5xl} · 16px root" />
+  <div style={{ borderTop: '1px solid var(--hx-color-border-subtle)' }}>
+    {SCALE.map((s) => (
+      <div
+        key={s.token}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '120px 80px 1fr',
+          gap: 24,
+          alignItems: 'baseline',
+          padding: '18px 0',
+          borderBottom: '1px solid var(--hx-color-border-subtle)',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 11,
+            color: 'var(--hx-color-text-muted)',
+          }}
+        >
+          font-size-{s.token}
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 11,
+            color: 'var(--hx-color-text-muted)',
+            textAlign: 'right',
+          }}
+        >
+          {s.px}
+        </div>
+        <div
+          style={{
+            color: 'var(--hx-color-text-primary)',
+            letterSpacing: '-0.015em',
+            lineHeight: 1.15,
+            fontSize: `var(--hx-font-size-${s.token})`,
+          }}
+        >
+          {s.text}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Weights" meta="--hx-font-weight-*" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+      gap: 12,
+    }}
+  >
+    {WEIGHTS.map((w) => (
+      <div key={w.weight} className="hx-docs-card">
+        <div
+          style={{
+            fontSize: 36,
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+            fontWeight: w.weight,
+            color: 'var(--hx-color-text-primary)',
+          }}
+        >
+          Aa
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 10,
+            color: 'var(--hx-color-text-muted)',
+            marginTop: 8,
+          }}
+        >
+          <span>{w.name}</span>
+          <span>{w.weight}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Heading + body pairing" meta="heading.* & body.* tokens" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+      gap: 24,
+    }}
+  >
+    <div className="hx-docs-card">
+      <h3
+        style={{
+          margin: '0 0 8px',
+          fontSize: 32,
+          lineHeight: 1.15,
+          letterSpacing: '-0.025em',
+          fontWeight: 700,
+          color: 'var(--hx-color-text-primary)',
+        }}
+      >
+        The mandate is May.
+      </h3>
+      <p style={{ margin: 0, color: 'var(--hx-color-text-secondary)', lineHeight: 1.6 }}>
+        HHS Section 504 requires WCAG 2.1 AA for healthcare organizations by May 2026. Every HELiX
+        component is keyboard-navigable, screen-reader compatible, and tested with axe-core.
+      </p>
+      <div
+        style={{
+          marginTop: 16,
+          fontFamily: 'var(--hx-font-family-mono)',
+          fontSize: 11,
+          color: 'var(--hx-color-text-muted)',
+        }}
+      >
+        heading 32 / 1.15 / -0.025em · body 16 / 1.6
+      </div>
+    </div>
+    <div className="hx-docs-card">
+      <h3
+        style={{
+          margin: '0 0 8px',
+          fontSize: 32,
+          lineHeight: 1.15,
+          letterSpacing: '-0.025em',
+          fontWeight: 700,
+          color: 'var(--hx-color-text-primary)',
+        }}
+      >
+        Built on web standards.
+      </h3>
+      <p style={{ margin: 0, color: 'var(--hx-color-text-secondary)', lineHeight: 1.6 }}>
+        Lit 3.x, Shadow DOM, CSS Parts, ElementInternals — the platform, not a framework. Drops into
+        React, Angular, Vue, or Drupal without an adapter library.
+      </p>
+      <div
+        style={{
+          marginTop: 16,
+          fontFamily: 'var(--hx-font-family-mono)',
+          fontSize: 11,
+          color: 'var(--hx-color-text-muted)',
+        }}
+      >
+        heading.font-weight: bold · letter-spacing: tight
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>

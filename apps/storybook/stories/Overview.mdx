@@ -1,0 +1,178 @@
+{/* Overview.mdx — HELiX Storybook landing page (AAA-led pitch) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_components';
+
+<Meta title="Overview" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="HELiX · v0.1.0"
+  title="The OSS enterprise alternative to USWDS — engineered to clear AAA, not just AA."
+  lede={
+    <>
+      <strong>HELiX</strong> is a Lit&nbsp;3.x web component library for organizations where a
+      software failure can impact patient care. USWDS works to{' '}
+      <a href="https://designsystem.digital.gov/documentation/accessibility/">
+        WCAG&nbsp;2.1&nbsp;Level&nbsp;AA
+      </a>
+      {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
+      ; HELiX targets <strong>WCAG&nbsp;2.1&nbsp;Level&nbsp;AAA on its P0 surface</strong> — and we
+      ship the contrast ledger, the keyboard contracts, and the VPAT to prove it.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="The AAA cert posture" meta="WCAG 2.1 · differentiation surface" />
+  <div className="hx-docs-stats">
+    <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
+    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 scaffolded" />
+    <StatCard num="100" unit="%" label="forced-colors coverage" sub="every interactive primitive" />
+    <StatCard num="0" label="axe-core violations" sub="critical + serious" />
+  </div>
+  <p className="hx-docs-card-body" style={{ marginTop: 16, maxWidth: '70ch' }}>
+    The full ledger lives in <strong>Accessibility / Dashboard</strong>. The supplemental pages
+    cover forced-colors emulation, the APG-aligned keyboard contracts, focus-management patterns,
+    and the per-mode contrast deep-dive — every claim above is verifiable against the regression
+    suite.
+  </p>
+</section>
+
+<section>
+  <SectionHead title="Why AAA, not AA" meta="positioning · the gap that exists today" />
+  <div className="hx-docs-pillars">
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">USWDS · AA</span>
+      <h3>The federal floor.</h3>
+      <p>
+        The U.S. Web Design System works to <strong>WCAG&nbsp;2.1 Level AA</strong> and documents
+        conformance for 44 components of USWDS&nbsp;3.11.0 in its{' '}
+        <a href="https://designsystem.digital.gov/documentation/accessibility/">
+          VPAT&nbsp;2.5 (May&nbsp;2025)
+        </a>
+        {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
+        . AAA is named in their docs as an aspirational direction, not a current claim. That posture
+        is correct for civic services with a broad-public remit and risk-averse delivery cadence.
+      </p>
+    </article>
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">HELiX · AAA-targeted</span>
+      <h3>Healthcare-grade headroom.</h3>
+      <p>
+        Healthcare providers, claims systems, and patient-facing portals operate above the federal
+        floor — both because patients use assistive tech at a higher rate and because regulators
+        expect <em>headroom</em>. HELiX targets <strong>Level AAA on its P0 surface</strong>
+        and publishes the per-component VPAT so consumers can stake their own claim.
+      </p>
+    </article>
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">OSS · enterprise</span>
+      <h3>Vendor-neutral, AGPL-clean.</h3>
+      <p>
+        Every token, every component, every test ships under an OSS licence with a healthcare
+        warranty model attached. White-label brand registry, three-tier token cascade, Drupal and
+        React wrappers — built so an enterprise team can extend without forking.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Pillars" meta="why this exists" />
+  <div className="hx-docs-pillars">
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">Accessibility · WCAG 2.1 AAA target</span>
+      <h3>Contrast is a token contract, not a checklist.</h3>
+      <p>
+        Every <code>{`text.on-{role}`}</code> token is paired with its surface and pinned to ≥ 4.5 :
+        1 (AA floor). 103 of 163 graded pairs sit at ≥ 7 : 1 (AAA), with the remainder cleared at
+        AA; drift below the floor fails CI. Focus rings clear 1.4.11 in every mode, including
+        forced-colors.
+      </p>
+    </article>
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">Three-tier tokens</span>
+      <h3>Primitive → semantic → component.</h3>
+      <p>
+        Override <code>--hx-color-primary-500</code> at <code>:root</code> and the entire system
+        reflows. <code>{`action.*`}</code>, <code>{`surface.*`}</code>, <code>{`border.*`}</code>{' '}
+        sit between the ramp and the component — brands slot in at the semantic tier without
+        touching component CSS.
+      </p>
+    </article>
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">Themeable by design</span>
+      <h3>Light, dark, high-contrast — same tokens.</h3>
+      <p>
+        Mode is a single attribute on <code>:root</code>. Every token resolves through{' '}
+        <code>{`dark.*`}</code> and <code>{`high-contrast.*`}</code> overrides; AA is re-validated
+        per mode, so no surface goes dark without its on-token following.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Where to go next" meta="storybook sidebar" />
+  <div className="hx-docs-pillars">
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">Accessibility</span>
+      <h3>Start here for the AAA story.</h3>
+      <p>
+        <strong>Accessibility / Dashboard</strong> for the cert roll-up,{' '}
+        <strong>Forced Colors</strong> for the Windows HC contract,{' '}
+        <strong>Keyboard Contracts</strong> for APG-aligned interaction patterns,{' '}
+        <strong>Focus Management</strong> for the ring + trap + restore contract,{' '}
+        <strong>Contrast Deep-Dive</strong> for the per-mode ledger.
+      </p>
+    </article>
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">Foundations</span>
+      <h3>Tokens, type, spacing, brands.</h3>
+      <p>
+        <strong>Foundations / Color</strong> for the 8 ramps × 11 stops, then{' '}
+        <strong>Brand Registry</strong> for the white-label contract, then{' '}
+        <strong>Typography</strong>, <strong>Spacing</strong>, <strong>Iconography</strong>,{' '}
+        <strong>Layout</strong>.
+      </p>
+    </article>
+    <article className="hx-docs-pillar">
+      <span className="hx-docs-pillar-tag">Components</span>
+      <h3>
+        Real <code>{`hx-*`}</code> elements.
+      </h3>
+      <p>
+        Each component ships with autodocs sourced from CEM — properties, attributes, slots, CSS
+        parts, CSS custom properties, events. Try the variant controls to see force-state matrices
+        update live.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Coordinates" meta="links" />
+  <CodeBlock
+    language="bash"
+    filename="coordinates.sh"
+    code={`# install
+npm i @helixui/library @helixui/tokens
+
+# repo
+
+https://github.com/bookedsolidtech/helix
+
+# docs site
+
+https://helix.bookedsolid.tech
+
+# VPAT 2.5 — the conformance artefact
+
+https://helix.bookedsolid.tech/accessibility/vpat-2.5`}
+/>
+
+</section>
+
+</div>
