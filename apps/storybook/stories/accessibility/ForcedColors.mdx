@@ -1,0 +1,259 @@
+{/* Accessibility / Forced Colors.mdx — forced-colors mode contract for the helix component surface */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  EyebrowHeading,
+  SectionHead,
+  StatCard,
+  DocsCard,
+  CodeBlock,
+  CodeTabs,
+} from '../_components';
+import {
+  FORCED_COLORS_BUTTON_CSS,
+  FORCED_COLORS_DONT_CSS,
+  FORCED_COLORS_DO_CSS,
+} from './_snippets';
+
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-badge';
+
+<Meta
+  title="Accessibility/Forced Colors"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Accessibility · forced-colors"
+  title="Windows High Contrast is a first-class mode, not a fallback."
+  lede={
+    <>
+      When a user enables Windows High Contrast (or any other forced-colors theme), the browser
+      overrides author colors with a small palette of <strong>system color keywords</strong>. HELiX
+      components honour that contract: every interactive surface remains identifiable, every focus
+      ring stays visible, every state stays distinguishable — without leaking author colors that
+      would defeat the user's stylesheet.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="The forced-colors contract" meta="WCAG 2.1 · 1.4.1, 1.4.11, 2.4.7, 2.4.13" />
+  <div className="hx-docs-stats">
+    <StatCard num="100" unit="%" label="Components covered" sub="every interactive primitive" />
+    <StatCard num="7" label="System keywords used" sub="CanvasText · Canvas · Highlight · …" />
+    <StatCard
+      num="scoped"
+      label="forced-color-adjust: none"
+      sub="opt-outs preserve focus rings + status indicators"
+    />
+    <StatCard num="2" unit="px" label="Focus ring preserved" sub="renders as Highlight" />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="System color keywords we rely on" meta="CSS Color Module 4" />
+  <p className="hx-docs-card-body">
+    Forced-colors mode swaps your declared colors for one of seven user-controlled keywords.
+    HELiX's component CSS selects the right keyword by role inside an{' '}
+    <code>@media (forced-colors: active)</code> block, so the component still communicates
+    structure even when the author palette is gone.
+  </p>
+
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+      gap: 12,
+      marginTop: 16,
+    }}
+  >
+    {[
+      ['CanvasText', 'Default text colour', 'Body copy, labels, headings'],
+      ['Canvas', 'Default background', 'Surfaces, panels, page background'],
+      ['LinkText', 'Unvisited link', 'Anchor text, action links'],
+      ['VisitedText', 'Visited link', 'Anchors after navigation'],
+      ['ButtonText', 'Button label', 'Button + form-control text'],
+      ['ButtonFace', 'Button background', 'Button + form-control surfaces'],
+      ['Highlight', 'Selection / focus accent', 'Focus rings, selected items, active states'],
+    ].map(([keyword, role, where]) => (
+      <article
+        key={keyword}
+        style={{
+          background: 'var(--hx-color-surface-raised)',
+          border: '1px solid var(--hx-color-border-default)',
+          borderRadius: 12,
+          padding: 14,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+        }}
+      >
+        <code
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            color: 'var(--hx-color-text-strong)',
+            fontWeight: 600,
+          }}
+        >
+          {keyword}
+        </code>
+        <strong style={{ fontSize: 13 }}>{role}</strong>
+        <span style={{ fontSize: 12, color: 'var(--hx-color-text-secondary)' }}>{where}</span>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="What a component looks like in forced-colors" meta="hx-button, lit" />
+  <p className="hx-docs-card-body">
+    The pattern below is the canonical HELiX <code>@media (forced-colors: active)</code> block.
+    The author CSS still resolves all the design-token cascading; the forced-colors block layers
+    on top, mapping the resolved roles to system keywords. Notice we never reach for{' '}
+    <code>forced-color-adjust: none</code> — every keyword is supplied by the user agent, so the
+    user's stylesheet wins.
+  </p>
+
+  <CodeBlock language="css" filename="hx-button.styles.ts" code={FORCED_COLORS_BUTTON_CSS} />
+</section>
+
+<section>
+  <SectionHead title="Live preview" meta="emulate to see it" />
+  <p className="hx-docs-card-body">
+    The buttons below render with the standard HELiX token palette. To verify the forced-colors
+    mapping, use Chrome DevTools <strong>Rendering panel → Emulate CSS media feature
+    forced-colors: active</strong>, or enable <strong>Settings → Accessibility → High Contrast
+    mode</strong> on Windows. In forced-colors mode the buttons render with the user's chosen
+    palette; the focus ring stays at <code>Highlight</code> with 2px offset.
+  </p>
+
+  <div className="hx-docs-specimen" style={{ marginTop: 12 }}>
+    <span className="hx-docs-specimen-label">Demo specimen · standard mode</span>
+    <p className="hx-docs-specimen-caption">
+      ↓ Buttons below render with the standard HELiX token palette. Toggle the DevTools
+      forced-colors emulator (or your OS HC theme) to see the same elements re-render against
+      <code>ButtonFace</code> / <code>Highlight</code> — the contract holds in both directions.
+      The <strong>Focused</strong> variant has its <code>:focus-visible</code> ring forced open
+      so the AAA-graded outline reads even on the still page.
+    </p>
+    <div className="hx-docs-specimen-grid">
+      <hx-button variant="primary">Primary action</hx-button>
+      <hx-button variant="secondary">Secondary</hx-button>
+      <hx-button variant="ghost">Ghost</hx-button>
+      <hx-button variant="danger">Danger</hx-button>
+      <hx-button variant="primary" disabled>
+        Disabled
+      </hx-button>
+      <hx-button variant="primary" className="force-focus">
+        Focused
+      </hx-button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="How to test" meta="three reliable paths" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <DocsCard title="Chrome / Edge DevTools" tag="fastest, cross-platform">
+      <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.6 }}>
+        <li>
+          Open DevTools → <em>Rendering</em> tab
+        </li>
+        <li>
+          Find <em>Emulate CSS media feature forced-colors</em>
+        </li>
+        <li>
+          Switch to <strong>active</strong>
+        </li>
+        <li>
+          Combine with <em>prefers-color-scheme: dark</em> for HC dark
+        </li>
+      </ol>
+    </DocsCard>
+    <DocsCard title="Windows High Contrast" tag="real palette, real users">
+      <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.6 }}>
+        <li>Settings → Accessibility → Contrast themes</li>
+        <li>
+          Pick <strong>Aquatic</strong>, <strong>Desert</strong>, <strong>Dusk</strong>, or
+          <strong> Night sky</strong>
+        </li>
+        <li>Components inherit the chosen theme's keywords</li>
+        <li>Verify all interactive elements stay distinguishable</li>
+      </ol>
+    </DocsCard>
+    <DocsCard title="Firefox" tag="prefers-contrast: more">
+      <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.6 }}>
+        <li>
+          about:config → <code>ui.systemUsesDarkTheme = 1</code>
+        </li>
+        <li>
+          Enable <strong>Always use system colors</strong> in Settings
+        </li>
+        <li>Pair with the OS HC theme for full coverage</li>
+      </ol>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead
+    title="Anti-patterns we never ship"
+    meta="things that defeat the user's stylesheet"
+  />
+  <CodeTabs
+    tabs={[
+      {
+        label: "Don't",
+        language: 'css',
+        filename: 'never-do-this.css',
+        code: FORCED_COLORS_DONT_CSS,
+      },
+      {
+        label: 'Do',
+        language: 'css',
+        filename: 'helix-pattern.css',
+        code: FORCED_COLORS_DO_CSS,
+      },
+    ]}
+    persistKey="forced-colors-pattern"
+  />
+</section>
+
+<section>
+  <SectionHead title="Cross-references" meta="dig deeper" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <DocsCard title="Dashboard" tag="Accessibility / Dashboard">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        Roll-up of the AAA cert posture, contrast pairings, and success-criteria coverage.
+      </p>
+    </DocsCard>
+    <DocsCard title="Contrast deep-dive" tag="Accessibility / Contrast Deep-Dive">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        Every text-on-surface pair, per mode, with the math and the rationale for AA-only pairs.
+      </p>
+    </DocsCard>
+    <DocsCard title="Focus management" tag="Accessibility / Focus Management">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        How the 2px focus ring contract interacts with <code>Highlight</code> in forced-colors.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+</div>

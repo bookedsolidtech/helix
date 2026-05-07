@@ -1,0 +1,518 @@
+---
+title: Storybook preset
+description: The canonical Storybook addon set HELiX recommends for every consumer application — what to install, why, and how to wire it.
+---
+
+## Overview
+
+HELiX dogfoods a single Storybook addon set across `apps/storybook` and every
+consumer scaffold produced by `create-helix-app`. This page is the source of
+truth for that set. It exists so that:
+
+- Every HELiX consumer ships with the same a11y, theming, design-token, and
+  testing surface out of the box.
+- Story authors can rely on the same toolbar entries (theme, brand, viewport,
+  pseudo-state) regardless of which app they are working in.
+- VRT, Figma embeds, and pseudo-state previews are zero-configuration the
+  moment a project is generated.
+
+The list is curated against **Storybook 10.3.x**. Storybook 10 absorbed
+`addon-viewport`, `addon-actions`, `addon-measure`, and `addon-outline` into
+the core — do **not** install the standalone packages. They are deprecated
+empty stubs against SB10.
+
+## Required addons
+
+These are part of every HELiX-flavored Storybook. `create-helix-app` installs
+them automatically.
+
+| Package                         | Version   | Purpose                                                                                  |
+| ------------------------------- | --------- | ---------------------------------------------------------------------------------------- |
+| `@storybook/addon-a11y`         | `^10.3.6` | axe-core panel per story. Default `color-contrast` rule (WCAG AA) on every story.        |
+| `@storybook/addon-docs`         | `^10.3.6` | Autodocs + MDX. Renders the CEM-driven API tables for every component.                   |
+| `@storybook/addon-vitest`       | `^10.3.6` | Story-level tests via `portable-stories`. Coverage via Vitest's V8 coverage.             |
+| `@storybook/addon-themes`       | `^10.3.6` | Theme toolbar. HELiX wires the 3-mode `data-theme` switcher (light / dark / hc).         |
+| `@storybook/addon-links`        | `^10.3.6` | Cross-story navigation, used by the foundations index pages.                             |
+| `@storybook/addon-designs`      | `^11.1.3` | Figma frame embeds in autodocs. Per-story `parameters.design = { type, url }`.           |
+| `storybook-addon-pseudo-states` | `^10.3.6` | Toolbar to force `:hover`, `:focus`, `:focus-visible`, `:active` across stories.         |
+| `@chromatic-com/storybook`      | `^5.1.2`  | Chromatic VRT capture hooks. Inert without a project token; safe to register by default. |
+
+### Why each entry is required
+
+**`@storybook/addon-a11y`** — Healthcare consumers ship under WCAG 2.1 AA at
+minimum. Running axe-core on every story keeps regressions visible during
+authoring. HELiX upgrades the default `color-contrast` rule to
+`color-contrast-enhanced` (AAA) on a per-story basis via
+`parameters.a11y.config.rules`.
+
+**`@storybook/addon-docs`** — The CEM (`custom-elements.json`) emitted by
+`@helixui/library` is the source of truth for component APIs. addon-docs
+renders that manifest as autodocs tables. Without it, the docs surface
+collapses to hand-written prose.
+
+**`@storybook/addon-vitest`** — The modern test path for Storybook 10.
+`portable-stories` lets a Vitest browser-mode test re-mount any story
+without a separate test-runner process. This is preferred over the
+deprecated `@storybook/test-runner` Playwright runner. Coverage is wired
+through Vitest's V8 coverage; `@storybook/addon-coverage` is **not**
+needed in this configuration.
+
+**`@storybook/addon-themes`** — `withThemeByDataAttribute` flips
+`data-theme` on `<html>`, which is the contract `@helixui/tokens` reads to
+swap between light / dark / high-contrast modes. The same decorator is
+used by every HELiX consumer; consistency matters when Phase C MDX docs
+embed cross-app live previews.
+
+**`@storybook/addon-links`** — Required by the foundations index and
+brand-registry MDX pages, which jump between `Foundations/Color`,
+`Foundations/Typography`, and `Components/*` without leaving the canvas.
+
+**`@storybook/addon-designs`** — Design-driven components ship with a
+canonical Figma frame. Embedding it in autodocs keeps the design source
+adjacent to the implementation; consumers do not have to switch tabs to
+verify a token mapping.
+
+**`storybook-addon-pseudo-states`** — The HELiX library exposes a shared
+`force-states.css` hook for forcing pseudo-state styling in stories. The
+addon adds the toolbar UX on top, so any story (not just the ones that
+import `force-states.css`) gets a one-click `:hover` / `:focus` toggle.
+The two layers stack — the toolbar is non-destructive.
+
+**`@chromatic-com/storybook`** — Visual regression testing. The capture
+hooks ship registered so projects can opt into Chromatic by setting
+`CHROMATIC_PROJECT_TOKEN`; without it, the addon is inert. No commercial
+lock-in — the addon registration is free, and projects that prefer Percy
+or Loki can replace this entry without disturbing the rest of the set.
+
+## Rejected and deferred candidates
+
+| Package                        | Status    | Reason                                                                               |
+| ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
+| `@storybook/addon-essentials`  | Removed   | Storybook 10 broke this into core + standalone addons. Do not install.               |
+| `@storybook/addon-viewport`    | Core      | Bundled in SB10 core. Configure via `parameters.viewport`.                           |
+| `@storybook/addon-actions`     | Core      | Bundled in SB10 core. Configure via `parameters.actions`.                            |
+| `@storybook/addon-measure`     | Core      | Bundled in SB10 core.                                                                |
+| `@storybook/addon-outline`     | Core      | Bundled in SB10 core.                                                                |
+| `@storybook/addon-coverage`    | Redundant | `@storybook/addon-vitest` already provides V8 coverage.                              |
+| `@storybook/addon-jest`        | SB9 only  | Latest is `9.1.12`; peer-deps `storybook@^9`. Replaced by `addon-vitest` for SB10.   |
+| `@storybook/addon-storysource` | SB8 only  | Latest is `8.6.14`; peer-deps `storybook@^8`. Not maintained for SB10.               |
+| `@storybook/addon-mdx-gfm`     | SB8 only  | Latest is `8.6.14`. SB10 MDX renderer handles GFM natively.                          |
+| `@storybook/test-runner`       | Optional  | Playwright-based runner. Overlaps with `addon-vitest`; opt-in for CI only if needed. |
+
+## Configuration
+
+### `.storybook/main.ts`
+
+```ts
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+import type { StorybookConfig } from '@storybook/web-components-vite';
+
+const config: StorybookConfig = {
+  stories: ['../src/**/*.stories.@(ts|tsx)', '../stories/**/*.mdx'],
+
+  addons: [
+    getAbsolutePath('@storybook/addon-a11y'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-vitest'),
+    getAbsolutePath('@storybook/addon-links'),
+    getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath('@storybook/addon-designs'),
+    getAbsolutePath('storybook-addon-pseudo-states'),
+    getAbsolutePath('@chromatic-com/storybook'),
+  ],
+
+  framework: {
+    name: getAbsolutePath('@storybook/web-components-vite'),
+    options: {},
+  },
+
+  core: { disableTelemetry: true },
+};
+
+export default config;
+
+function getAbsolutePath(value: string): string {
+  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
+}
+```
+
+### `.storybook/preview.ts`
+
+```ts
+import '@helixui/tokens/tokens.css';
+import type { Preview } from '@storybook/web-components';
+import { setCustomElementsManifest } from '@storybook/web-components';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import { html } from 'lit';
+import customElements from '@helixui/library/custom-elements.json';
+
+setCustomElementsManifest(customElements);
+
+const preview: Preview = {
+  parameters: {
+    controls: { expanded: true, sort: 'requiredFirst' },
+
+    // axe-core. Default = WCAG 2.1 AA via the `color-contrast` rule. Stories
+    // that are AAA-certified upgrade by toggling the rule on a per-story basis.
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: true }],
+      },
+    },
+
+    // SB10 core viewport addon. Provide your own breakpoint map.
+    viewport: {
+      options: {
+        /* ... */
+      },
+    },
+
+    // SB10 core actions addon. Auto-detect `hx-*` event args.
+    actions: { argTypesRegex: '^hx-.*' },
+
+    // Pseudo-states registers on an empty default; per-story overrides
+    // supply the forced state.
+    pseudo: {},
+
+    // addon-designs panel renderer switches on `parameters.design.type`.
+    // An empty `{}` (or any object whose `type` is not one of
+    // `iframe | figma | sketch | figspec | image | link`) hits the
+    // switch's default branch and renders an "Invalid config type"
+    // placeholder. Set a preview-level default with a valid `type` so
+    // every story inherits a usable panel even before real Figma frames
+    // land. We use `type: 'link'` because it has zero dependencies on
+    // an external design system and surfaces a meaningful pointer
+    // (component source) until Figma URLs are wired per-story.
+    design: {
+      type: 'link',
+      name: 'HELiX component source',
+      url: 'https://github.com/<org>/<repo>/tree/main/packages/hx-library/src/components',
+      label: 'View component source on GitHub',
+      showArrow: true,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+  },
+
+  initialGlobals: {
+    theme: 'light',
+    brand: '',
+  },
+
+  decorators: [
+    withThemeByDataAttribute({
+      themes: { light: 'light', dark: 'dark', 'high-contrast': 'high-contrast' },
+      defaultTheme: 'light',
+      attributeName: 'data-theme',
+    }),
+    (story, ctx) => {
+      const brand = (ctx.globals.brand as string) ?? '';
+      if (typeof document !== 'undefined') {
+        if (brand) document.documentElement.setAttribute('data-brand', brand);
+        else document.documentElement.removeAttribute('data-brand');
+      }
+      return story();
+    },
+  ],
+};
+
+export default preview;
+```
+
+## Patterns
+
+### Canonical `play()` interaction test
+
+Every component story under `packages/hx-library/src/components/*/hx-*.stories.ts`
+ships at least one `play()` block exercising the load-bearing UX path.
+`play()` runs both inline (when you visit the story in the canvas) and headlessly
+(under `pnpm --filter=@helixui/storybook run test` via `addon-vitest`). Pass/fail
+surfaces in the **Component tests (Vitest)** panel.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from 'lit';
+import { expect, fn, userEvent } from 'storybook/test';
+import './hx-button.js';
+
+const meta = {
+  title: 'Components/Button',
+  component: 'hx-button',
+} satisfies Meta;
+export default meta;
+type Story = StoryObj;
+
+export const ClickEvent: Story = {
+  args: { label: 'Verify Prescription' },
+  play: async ({ canvasElement }) => {
+    const hxButton = canvasElement.querySelector('hx-button')!;
+    const eventSpy = fn();
+    hxButton.addEventListener('hx-click', eventSpy);
+
+    // Reach into the shadow root for the focusable native element.
+    const innerButton = hxButton.shadowRoot!.querySelector('button')!;
+    await userEvent.click(innerButton);
+
+    await expect(eventSpy).toHaveBeenCalledTimes(1);
+    const evt = eventSpy.mock.calls[0][0] as CustomEvent;
+    await expect(evt.bubbles).toBe(true);
+    await expect(evt.composed).toBe(true);
+
+    hxButton.removeEventListener('hx-click', eventSpy);
+  },
+};
+```
+
+**Conventions used in every HELiX `play()` block:**
+
+- Imports from `'storybook/test'` (the SB10 entry point) — `expect`, `fn`,
+  `userEvent`, `within`, `waitFor`. Do **not** install `@storybook/test`
+  separately; it is bundled with `storybook` 10.x.
+- `canvasElement.querySelector('hx-*')` for the host. `host.shadowRoot!.querySelector(...)`
+  for the focusable native control. This is the documented test-utility
+  pattern in `packages/hx-library/src/test-utils.ts`.
+- Listener cleanup at the end of every block (`removeEventListener`) so
+  re-runs do not double-count.
+- Assertions on `bubbles` + `composed` for every `hx-*` event — the
+  shadow-boundary composition contract is load-bearing.
+- Disabled / loading paths assert that the event spy fires zero times. A
+  missing assertion is a regression target.
+
+### AAA opt-in per story
+
+```ts
+export const HighContrastButton: Story = {
+  args: { variant: 'primary' },
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'color-contrast-enhanced', enabled: true },
+        ],
+      },
+    },
+  },
+};
+```
+
+### Scene composition story
+
+A "scene" is a full-page composition of multiple `hx-*` components. Scenes
+live under `apps/storybook/stories/patterns/scenes/<scene>.stories.ts` and
+ship with the same play-function rigor as component stories. They are the
+canonical reference for how to compose HELiX in a real consumer page. Every
+scene fulfills four contracts:
+
+1. **Real components only.** No mock divs. Every interactive surface is a
+   registered `hx-*` element. The first play() function asserts every
+   `data-testid` resolves to the expected `tagName.toLowerCase()`.
+2. **One render per file.** A `renderScene = () => html\`...\``factory is
+shared across every story export. Stories reuse the factory; only the`play()` body differs.
+3. **Theme + brand resilient.** No hardcoded colors. Every surface and text
+   color binds to a token (`--hx-color-text-primary`,
+   `--hx-color-surface-raised`, etc.). Cycling the theme/brand toolbar must
+   leave the layout intact.
+4. **Healthcare-flavored sample data.** Realistic but never PII. MRN numbers
+   are random, names are non-identifying, conditions are common.
+
+```ts
+import type { Meta, StoryObj } from '@storybook/web-components';
+import { html } from 'lit';
+import { expect, userEvent, within } from 'storybook/test';
+
+import '@helixui/library/components/hx-form';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-button';
+
+const meta = {
+  title: 'Patterns/Scenes/Patient Intake',
+  parameters: { layout: 'fullscreen' },
+  tags: ['autodocs'],
+} satisfies Meta;
+export default meta;
+type Story = StoryObj;
+
+const renderScene = () => html`
+  <div style="max-width: 720px; margin: 0 auto; padding: 32px 24px;">
+    <hx-form id="intake" novalidate>
+      <hx-text-input
+        data-testid="intake-first-name"
+        label="First name"
+        name="firstName"
+        required
+      ></hx-text-input>
+      <hx-button data-testid="intake-submit" type="submit" variant="primary">
+        Submit intake
+      </hx-button>
+    </hx-form>
+  </div>
+`;
+
+export const Default: Story = { render: renderScene };
+
+export const SubmitEmpty: Story = {
+  render: renderScene,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    let submitted = false;
+    canvasElement.querySelector('#intake')!.addEventListener('hx-submit', () => {
+      submitted = true;
+    });
+
+    const submit = canvas.getByTestId('intake-submit') as HTMLElement;
+    const innerSubmit = submit.shadowRoot!.querySelector('button')!;
+    await userEvent.click(innerSubmit);
+
+    // Empty required fields must block submission.
+    await expect(submitted).toBe(false);
+  },
+};
+```
+
+The reference scenes shipped in `apps/storybook/stories/patterns/scenes/`
+are:
+
+- `patient-intake.stories.ts` — `hx-form` validation + happy-path submission
+- `provider-dashboard.stories.ts` — layout density, `hx-data-table`,
+  shadow-boundary event composition
+- `settings.stories.ts` — `hx-tabs` navigation, `hx-switch` toggles, save/cancel
+
+## What test results to expect
+
+`pnpm --filter=@helixui/storybook run test` runs every `play()` block via
+`addon-vitest` and emits a per-story pass/fail. Three places surface the
+results:
+
+| Surface                  | What you see                                                                     |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| Storybook UI sidebar     | A green check / red ✗ next to each story id once the run completes.              |
+| Component tests panel    | Per-`play()` block: assertion count, the failing line on red, a "Re-run" button. |
+| CLI `pnpm run test` exit | Non-zero on any failed assertion. Match output is grouped by story title.        |
+
+A red **Component tests** panel with no inline failure usually means the
+story rendered but the `play()` block threw before reaching an assertion —
+inspect the browser devtools console (panel → ⋯ → "Open in canvas") for the
+stack trace.
+
+A panel that stays in `Initializing…` indicates `addon-vitest` did not
+register: confirm `apps/<your-app>/.storybook/vitest.setup.ts` exists and
+calls `setProjectAnnotations(...)` against the project's preview config.
+
+When a `play()` block exposes a real product bug (the assertion catches
+something the component did wrong), do **not** silence the assertion. Open
+a defect, link the failing story id, and let the failing test gate the fix.
+
+### Figma embed per story
+
+```ts
+export const Default: Story = {
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/<id>/<file>?node-id=<frame>',
+    },
+  },
+};
+```
+
+### Pseudo-state in MDX docs
+
+```ts
+export const Hover: Story = {
+  parameters: { pseudo: { hover: true } },
+};
+
+export const FocusVisible: Story = {
+  parameters: { pseudo: { focusVisible: true } },
+};
+```
+
+### Multi-frame design panel
+
+When a component has light/dark Figma frames (or before/after states), pass an
+array — the panel renders each entry as a tab.
+
+```ts
+export const Default: Story = {
+  parameters: {
+    design: [
+      { name: 'Light', type: 'figma', url: 'https://www.figma.com/file/<id>?node-id=1' },
+      { name: 'Dark', type: 'figma', url: 'https://www.figma.com/file/<id>?node-id=2' },
+    ],
+  },
+};
+```
+
+## Panel expectations
+
+Every consumer scaffold must surface meaningful UI in each panel out of the
+box. Use this matrix to verify a freshly generated `create-helix-app` project
+before shipping.
+
+| Panel                    | What to expect                                                                               | Failure mode                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Controls                 | Args table, sorted required-first, populated from CEM properties.                            | Empty table → CEM not registered or component prefix off.            |
+| Actions                  | `hx-*` events surfaced live as the user interacts.                                           | Empty after interaction → event prefix mismatch.                     |
+| Accessibility            | axe-core results: pass count + violation list per rule.                                      | "Initializing…" forever → addon-a11y not in `addons[]`.              |
+| Docs                     | Autodocs page with API tables (props, events, slots, CSS parts, CSS custom properties).      | Empty tables → CEM not built; run `pnpm cem`.                        |
+| Component tests (Vitest) | Pass/fail counts per `play()` block; click a row to re-run.                                  | "Tests not found" → `vitest.setup.ts` missing.                       |
+| Design                   | Either the Figma frame, an iframe preview, or the canonical link card (preview default).     | "Invalid config type" → `parameters.design` malformed.               |
+| Pseudo-states (toolbar)  | Toggle buttons for `:hover`, `:focus`, `:focus-visible`, `:active`, `:visited`, `:target`.   | Toolbar empty → addon not registered.                                |
+| Theme (toolbar)          | 3-mode switcher: light / dark / high-contrast.                                               | Single mode only → `withThemeByDataAttribute` not wired.             |
+| Brand (toolbar)          | Brand registry switcher (HELiX ships 6: Apex / Meridian / Lumen / Verdant / Signal / Ember). | Toolbar empty → `globalTypes.brand` not set.                         |
+| Viewport (toolbar)       | Token-aligned breakpoints (`sm`, `md`, `lg`, `xl`, `2xl`) + mobile aliases.                  | Default Storybook viewports → `parameters.viewport.options` not set. |
+| Chromatic capture        | Silent. Active only when `CHROMATIC_PROJECT_TOKEN` env var is set.                           | Visible error → token malformed; remove if not in use.               |
+
+### Why the `design` panel is the canary
+
+The most common failure mode for a new HELiX consumer is the "Invalid config
+type" message in the design panel. It appears when `parameters.design` is
+empty (`{}`) or when a story sets `parameters.design` to an object whose
+`type` field is not one of the six valid values (`iframe`, `figma`, `sketch`,
+`figspec`, `image`, `link`). The preview-level default in this preset
+(`type: 'link'`) prevents this — but if you remove it, every story regresses
+to the error state simultaneously.
+
+## Migration
+
+### From a vanilla `create-helix-app` scaffold
+
+Versions of `create-helix-app` published before `2026-05` shipped only the
+five required addons (`a11y`, `docs`, `vitest`, `themes`, `links`). To bring
+an existing scaffold in line with this preset:
+
+```bash
+pnpm --filter=<your-storybook-app> add -D \
+  "@storybook/addon-designs@^11.1.3" \
+  "storybook-addon-pseudo-states@^10.3.6" \
+  "@chromatic-com/storybook@^5.1.2"
+```
+
+Then add the three entries to the `addons` array in `.storybook/main.ts`.
+`pseudo-states` and `chromatic` register on empty defaults and become
+visible as soon as a story sets the corresponding parameter.
+
+`addon-designs` is the exception — it requires a non-empty
+`parameters.design` with a valid `type` (see the canonical default in the
+preview snippet above). Copy that block into your `.storybook/preview.ts`
+verbatim and adjust the `url` to point at your repository's component
+source. Without this, every story renders an "Invalid config type"
+placeholder in the right rail.
+
+### From Storybook 8 / 9
+
+Drop these packages first; they are not compatible with SB10 and the
+package's latest version still pins to the prior major:
+
+- `@storybook/addon-essentials`
+- `@storybook/addon-viewport`
+- `@storybook/addon-actions`
+- `@storybook/addon-measure`
+- `@storybook/addon-outline`
+- `@storybook/addon-jest`
+- `@storybook/addon-storysource`
+- `@storybook/addon-mdx-gfm`
+
+Then follow the migration steps above.

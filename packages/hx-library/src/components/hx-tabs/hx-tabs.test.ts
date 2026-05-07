@@ -20,7 +20,6 @@ function getInternals(el: HTMLElement): ElementInternals {
   return (el as unknown as { _internals: ElementInternals })._internals;
 }
 
-
 // ─── Fixture Helpers ───────────────────────────────────────────────────────────
 
 const DEFAULT_TABS_HTML = `
@@ -224,6 +223,51 @@ describe('hx-tabs', () => {
       assertEl(btnAlpha, '[part=tab]').click();
       await el.updateComplete;
       expect(eventFired).toBe(false);
+    });
+
+    it('clicking a tab moves focus to the clicked tab (host-canonical roving tabstop)', async () => {
+      // Regression: on the host-canonical path hx-tab renders a
+      // div[tabindex="-1"], so clicking a tab without an explicit focus
+      // call leaves document.activeElement on whatever the user clicked
+      // from. Arrow/Home/End would then have no anchor inside the
+      // tablist until the user tabbed back in.
+      const el = await fixture<HelixTabs>(DEFAULT_TABS_HTML);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      // Park focus outside the tablist on a known sibling control.
+      const sibling = document.createElement('button');
+      sibling.textContent = 'sibling';
+      el.parentElement?.insertBefore(sibling, el);
+      sibling.focus();
+      expect(document.activeElement).toBe(sibling);
+      const btnBeta = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnBeta, '[part=tab]').click();
+      await el.updateComplete;
+      // The hx-tab host (single roving tabstop) is now the active element.
+      expect(document.activeElement).toBe(tabs[1]);
+      sibling.remove();
+    });
+
+    it('clicking a disabled tab does not move focus', async () => {
+      // Disabled tabs are not activated and must not steal focus on click.
+      const el = await fixture<HelixTabs>(`
+        <hx-tabs>
+          <hx-tab slot="tab" panel="a">A</hx-tab>
+          <hx-tab slot="tab" panel="b" disabled>B</hx-tab>
+          <hx-tab-panel id="a">A panel</hx-tab-panel>
+          <hx-tab-panel id="b">B panel</hx-tab-panel>
+        </hx-tabs>
+      `);
+      const tabs = Array.from(el.querySelectorAll('hx-tab')) as HelixTab[];
+      const sibling = document.createElement('button');
+      sibling.textContent = 'sibling';
+      el.parentElement?.insertBefore(sibling, el);
+      sibling.focus();
+      const btnB = shadowQuery<HTMLElement>(tabs[1], '[part="tab"]');
+      assertEl(btnB, '[part=tab]').click();
+      await el.updateComplete;
+      // Disabled tab did not pull focus.
+      expect(document.activeElement).not.toBe(tabs[1]);
+      sibling.remove();
     });
   });
 

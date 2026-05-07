@@ -11,6 +11,12 @@ export {
 } from './brand-registry.js';
 export type { BrandTokenMap, BrandValidationResult } from './types/brand.js';
 
+// AAA contrast classification helpers — public surface so downstream
+// consumers can run their own AAA-aware contrast checks against the
+// canonical role taxonomy. (codex p2 round-10)
+export { aaaThresholdForRole } from './aaa-thresholds.js';
+export type { PairRole } from './aaa-thresholds.js';
+
 function isTokenDefinition(obj: unknown): obj is TokenDefinition {
   return typeof obj === 'object' && obj !== null && 'value' in obj;
 }

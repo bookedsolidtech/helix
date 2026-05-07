@@ -1,0 +1,923 @@
+{/* Scenes.mdx — Patterns / Scenes (four full-page compositions) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead } from '../_components';
+
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-badge';
+import '@helixui/library/components/hx-avatar';
+import '@helixui/library/components/hx-switch';
+
+<Meta
+  title="Patterns/Scenes"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+export const SceneFrame = ({ url, badge, children }) => (
+  <div
+    style={{
+      border: '1px solid var(--hx-color-border-default)',
+      borderRadius: 16,
+      overflow: 'hidden',
+      background: 'var(--hx-color-surface-default)',
+      boxShadow: 'var(--hx-shadow-md)',
+    }}
+  >
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '10px 16px',
+        borderBottom: '1px solid var(--hx-color-border-subtle)',
+        background: 'var(--hx-color-surface-sunken)',
+        fontFamily: 'var(--hx-font-family-mono)',
+        fontSize: 11,
+      }}
+    >
+      <div style={{ display: 'flex', gap: 5 }}>
+        {['#ff5f57', '#febc2e', '#28c840'].map((c) => (
+          <span key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c }} />
+        ))}
+      </div>
+      <span style={{ color: 'var(--hx-color-text-muted)' }}>{url}</span>
+      <span
+        style={{
+          marginLeft: 'auto',
+          padding: '2px 8px',
+          borderRadius: 999,
+          background: 'var(--hx-color-info-50)',
+          color: 'var(--hx-color-info-700)',
+          fontSize: 10,
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+        }}
+      >
+        {badge}
+      </span>
+    </div>
+    <div>{children}</div>
+  </div>
+);
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Patterns · scenes"
+  title="The shapes our same components keep forming, end-to-end."
+  lede={
+    <>
+      Four full-page compositions assembled from documented <code>{`hx-*`}</code> components and{' '}
+      <code>{`action.*`}</code> + <code>{`surface.*`}</code> tokens. No scene introduces a new
+      component or token — these are <strong>recipes</strong>, not new dishes.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="01 — Marketing landing" meta="Scene · public · /" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    First impression. Hero with brand color saturation, hero-card surrogates that show the
+    experience, trust row, and 3-up feature grid. All buttons are stock <code>hx-button</code>; the
+    pill is <code>hx-badge</code> in disguise.
+  </p>
+  <SceneFrame url="helix.health" badge="Public">
+    <nav
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '20px 32px',
+        borderBottom: '1px solid var(--hx-color-border-subtle)',
+      }}
+    >
+      <strong
+        style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 16, fontWeight: 700 }}
+      >
+        <span
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            background: 'var(--hx-color-action-primary-bg, var(--hx-color-primary-600))',
+            color: '#fff',
+            display: 'grid',
+            placeItems: 'center',
+          }}
+        >
+          H
+        </span>
+        HELiX Health
+      </strong>
+      <div
+        style={{ display: 'flex', gap: 28, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}
+      >
+        <span>For patients</span>
+        <span>For providers</span>
+        <span>About</span>
+        <span>Pricing</span>
+        <span>Help</span>
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <hx-button variant="ghost" size="small">
+          Sign in
+        </hx-button>
+        <hx-button variant="primary" size="small">
+          Get started
+        </hx-button>
+      </div>
+    </nav>
+    <div
+      style={{
+        padding: '64px 32px',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 7fr) minmax(0, 5fr)',
+        gap: 48,
+        alignItems: 'center',
+      }}
+    >
+      <div>
+        <hx-badge variant="info">Now in 14 states · accepts most major plans</hx-badge>
+        <h2
+          style={{
+            margin: '20px 0 16px',
+            fontSize: 'clamp(36px, 5vw, 64px)',
+            fontWeight: 800,
+            letterSpacing: '-0.035em',
+            lineHeight: 1.0,
+          }}
+        >
+          Care that{' '}
+          <em
+            style={{
+              fontStyle: 'normal',
+              color: 'var(--hx-color-action-primary-bg, var(--hx-color-primary-600))',
+            }}
+          >
+            follows you
+          </em>
+          , not the other way around.
+        </h2>
+        <p
+          style={{
+            color: 'var(--hx-color-text-secondary)',
+            fontSize: 16,
+            lineHeight: 1.55,
+            maxWidth: '46ch',
+            margin: 0,
+          }}
+        >
+          Same-day appointments, your records in one place, and a care team that actually answers.
+          Built around how you live — not how a hospital was organized in 1974.
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            gap: 12,
+            marginTop: 24,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
+          <hx-button variant="primary" size="large">
+            Book your first visit
+          </hx-button>
+          <hx-button variant="secondary" size="large">
+            See how it works
+          </hx-button>
+          <span style={{ fontSize: 12, color: 'var(--hx-color-text-muted)' }}>
+            ✓ No commitment · cancel anytime
+          </span>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            gap: 32,
+            marginTop: 32,
+            paddingTop: 24,
+            borderTop: '1px solid var(--hx-color-border-subtle)',
+          }}
+        >
+          {[
+            ['2.4M', 'Visits delivered'],
+            ['4.8★', 'Avg. rating · 38k reviews'],
+            ['< 18min', 'Median time-to-care'],
+          ].map(([n, l]) => (
+            <div key={l}>
+              <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>{n}</div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--hx-color-text-muted)',
+                  fontFamily: 'var(--hx-font-family-mono)',
+                }}
+              >
+                {l}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: 'grid', gap: 12 }}>
+        {[
+          ['JR', 'Jordan Reyes', 'Visit · Tomorrow 10:30', 'success', 'Confirmed'],
+          ['DR', 'Dr. Park, Cardiology', '"Labs look great. Talk Friday?"', 'info', '2 messages'],
+          ['VL', 'Resting heart rate · 68 bpm', 'Updated 4 minutes ago', 'success', 'Normal'],
+        ].map(([initials, nm, meta, badgeVariant, badgeText]) => (
+          <article
+            key={nm}
+            style={{
+              background: 'var(--hx-color-surface-raised)',
+              border: '1px solid var(--hx-color-border-default)',
+              borderRadius: 14,
+              padding: 16,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              boxShadow: 'var(--hx-shadow-sm)',
+            }}
+          >
+            <hx-avatar
+              initials={initials}
+              style={{ '--hx-avatar-bg': 'var(--hx-color-primary-600)' }}
+            />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{nm}</div>
+              <div style={{ fontSize: 12, color: 'var(--hx-color-text-muted)' }}>{meta}</div>
+            </div>
+            <hx-badge variant={badgeVariant}>{badgeText}</hx-badge>
+          </article>
+        ))}
+      </div>
+    </div>
+  </SceneFrame>
+</section>
+
+<section>
+  <SectionHead title="02 — Patient portal · home" meta="Scene · authenticated · /home" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    App-shell template. Inverse rail (<code>surface.inverse</code>) on the left; greeting card uses
+    the brand primary as a hero surface; quick-stat cards and timeline use the same{' '}
+    <code>hx-card</code> primitive at three different densities.
+  </p>
+  <SceneFrame url="helix.health/home" badge="Auth">
+    <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', minHeight: 480 }}>
+      <aside
+        style={{
+          background: 'var(--hx-color-surface-inverse, #0d1825)',
+          color: 'var(--hx-color-text-on-inverse, #f8f9fa)',
+          padding: '24px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+        }}
+      >
+        <strong
+          style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, marginBottom: 16 }}
+        >
+          <span
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              background: 'var(--hx-color-action-primary-bg, var(--hx-color-primary-500))',
+              display: 'grid',
+              placeItems: 'center',
+              fontSize: 12,
+            }}
+          >
+            H
+          </span>
+          HELiX
+        </strong>
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 10,
+            opacity: 0.6,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginTop: 8,
+            marginBottom: 4,
+          }}
+        >
+          For you
+        </div>
+        {['Home', 'Appointments', 'Messages (2)', 'Prescriptions', 'Records'].map((label, i) => (
+          <a
+            key={label}
+            style={{
+              display: 'block',
+              padding: '8px 12px',
+              borderRadius: 6,
+              fontSize: 13,
+              color: i === 0 ? '#fff' : 'rgba(255,255,255,0.75)',
+              background: i === 0 ? 'rgba(255,255,255,0.1)' : 'transparent',
+              textDecoration: 'none',
+            }}
+          >
+            {label}
+          </a>
+        ))}
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 10,
+            opacity: 0.6,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginTop: 16,
+            marginBottom: 4,
+          }}
+        >
+          Account
+        </div>
+        {['Billing', 'Settings'].map((label) => (
+          <a
+            key={label}
+            style={{
+              display: 'block',
+              padding: '8px 12px',
+              borderRadius: 6,
+              fontSize: 13,
+              color: 'rgba(255,255,255,0.75)',
+              textDecoration: 'none',
+            }}
+          >
+            {label}
+          </a>
+        ))}
+      </aside>
+      <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em' }}>
+              Good morning,{' '}
+              <em
+                style={{
+                  fontStyle: 'normal',
+                  color: 'var(--hx-color-action-primary-bg, var(--hx-color-primary-600))',
+                }}
+              >
+                Jordan
+              </em>
+              .
+            </h2>
+            <div
+              style={{
+                fontSize: 12,
+                color: 'var(--hx-color-text-muted)',
+                fontFamily: 'var(--hx-font-family-mono)',
+                marginTop: 4,
+              }}
+            >
+              Tuesday · May 12 · 1 visit tomorrow · 2 messages waiting
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>Jordan Reyes</div>
+              <div
+                style={{
+                  fontSize: 11,
+                  color: 'var(--hx-color-text-muted)',
+                  fontFamily: 'var(--hx-font-family-mono)',
+                }}
+              >
+                Patient · MRN-849172
+              </div>
+            </div>
+            <hx-avatar initials="JR" style={{ '--hx-avatar-bg': 'var(--hx-color-primary-600)' }} />
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 16 }}>
+          <article
+            style={{
+              background: 'var(--hx-color-action-primary-bg, var(--hx-color-primary-600))',
+              color: 'var(--hx-color-text-on-primary-strong, #fff)',
+              borderRadius: 14,
+              padding: 20,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'var(--hx-font-family-mono)',
+                fontSize: 10,
+                opacity: 0.85,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+              }}
+            >
+              — Next visit
+            </span>
+            <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em' }}>
+              Cardiology check-in with Dr. Park
+            </div>
+            <div
+              style={{ fontSize: 12, opacity: 0.85, display: 'flex', gap: 16, flexWrap: 'wrap' }}
+            >
+              <span>Tomorrow · 10:30 AM</span>
+              <span>Bldg 4, Rm 217</span>
+              <span>30 min</span>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <hx-button variant="ghost" size="small">
+                Get directions
+              </hx-button>
+              <hx-button variant="ghost" size="small">
+                Reschedule
+              </hx-button>
+            </div>
+          </article>
+          <article
+            style={{
+              background: 'var(--hx-color-surface-raised)',
+              border: '1px solid var(--hx-color-border-default)',
+              borderRadius: 14,
+              padding: 20,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+            }}
+          >
+            <span className="hx-docs-card-tag">— Care plan</span>
+            <div
+              style={{
+                fontSize: 32,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                fontFeatureSettings: '"tnum"',
+              }}
+            >
+              3
+              <small style={{ fontSize: 14, fontWeight: 500, color: 'var(--hx-color-text-muted)' }}>
+                {' '}
+                / 4
+              </small>
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--hx-color-text-secondary)' }}>
+              Medications taken on schedule today.
+            </div>
+          </article>
+          <article
+            style={{
+              background: 'var(--hx-color-surface-raised)',
+              border: '1px solid var(--hx-color-border-default)',
+              borderRadius: 14,
+              padding: 20,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+            }}
+          >
+            <span className="hx-docs-card-tag">— This week</span>
+            <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: '-0.02em' }}>$0.00</div>
+            <div style={{ fontSize: 12, color: 'var(--hx-color-text-secondary)' }}>
+              Outstanding balance. Last paid Apr&nbsp;28.
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </SceneFrame>
+</section>
+
+<section>
+  <SectionHead
+    title="03 — Account & accessibility"
+    meta="Scene · authenticated · /settings/accessibility"
+  />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    Settings let users opt into the design-system features that the system already supports —
+    themes, density, motion, type scale. Each row pairs a clear label, a one-line description, and a
+    single control (<code>hx-switch</code>, segmented buttons, swatch row).
+  </p>
+  <SceneFrame url="helix.health/settings/accessibility" badge="Auth">
+    <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', minHeight: 380 }}>
+      <aside
+        style={{
+          background: 'var(--hx-color-surface-sunken)',
+          padding: '24px 16px',
+          borderRight: '1px solid var(--hx-color-border-subtle)',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 10,
+            color: 'var(--hx-color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            marginBottom: 8,
+          }}
+        >
+          Account
+        </div>
+        {['Profile', 'Login & security', 'Notifications', 'Insurance'].map((l) => (
+          <div
+            key={l}
+            style={{ padding: '6px 8px', fontSize: 13, color: 'var(--hx-color-text-secondary)' }}
+          >
+            {l}
+          </div>
+        ))}
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 10,
+            color: 'var(--hx-color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            marginTop: 16,
+            marginBottom: 8,
+          }}
+        >
+          Preferences
+        </div>
+        {['Accessibility', 'Language & region', 'Privacy'].map((l, i) => (
+          <div
+            key={l}
+            style={{
+              padding: '6px 8px',
+              fontSize: 13,
+              borderRadius: 6,
+              background: i === 0 ? 'var(--hx-color-surface-default)' : 'transparent',
+              color: i === 0 ? 'var(--hx-color-text-primary)' : 'var(--hx-color-text-secondary)',
+              fontWeight: i === 0 ? 600 : 400,
+            }}
+          >
+            {l}
+          </div>
+        ))}
+      </aside>
+      <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>
+          Accessibility
+        </h2>
+        <p
+          style={{
+            margin: 0,
+            color: 'var(--hx-color-text-secondary)',
+            fontSize: 13,
+            lineHeight: 1.55,
+          }}
+        >
+          Make HELiX work for the way <em>you</em> work. Every option here uses real design-system
+          tokens — there's no separate "accessible mode," because accessibility is the default.
+        </p>
+        {[
+          [
+            'Display',
+            [
+              [
+                'Theme',
+                'Light, dark, or follow your device.',
+                'segmented',
+                ['Light', 'System', 'Dark'],
+                1,
+              ],
+              [
+                'High contrast',
+                'Increases the contrast of borders, focus rings, and disabled states.',
+                'switch',
+                false,
+              ],
+            ],
+          ],
+          [
+            'Reading',
+            [
+              [
+                'Type size',
+                'Scales body and label text together.',
+                'segmented',
+                ['Aa', 'Aa', 'Aa', 'Aa'],
+                1,
+              ],
+              [
+                'Density',
+                'Comfortable spreads things out. Compact is dense for keyboard-heavy workflows.',
+                'segmented',
+                ['Comfortable', 'Default', 'Compact'],
+                1,
+              ],
+            ],
+          ],
+          [
+            'Motion',
+            [
+              ['Reduced motion', 'Skip non-essential transitions.', 'switch', true],
+              ['Always show focus', 'Keep the focus ring visible at all times.', 'switch', true],
+            ],
+          ],
+        ].map(([sectionTitle, rows]) => (
+          <div key={sectionTitle}>
+            <h3
+              style={{
+                margin: '0 0 12px',
+                fontSize: 13,
+                fontFamily: 'var(--hx-font-family-mono)',
+                color: 'var(--hx-color-text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                fontWeight: 600,
+              }}
+            >
+              {sectionTitle}
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {rows.map(([label, desc, kind, ...rest]) => (
+                <div
+                  key={label}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    gap: 16,
+                    padding: '12px 16px',
+                    background: 'var(--hx-color-surface-default)',
+                    border: '1px solid var(--hx-color-border-subtle)',
+                    borderRadius: 10,
+                    alignItems: 'center',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{label}</div>
+                    <div style={{ fontSize: 12, color: 'var(--hx-color-text-muted)' }}>{desc}</div>
+                  </div>
+                  {kind === 'switch' ? (
+                    <hx-switch checked={rest[0] || undefined} />
+                  ) : (
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        background: 'var(--hx-color-surface-sunken)',
+                        padding: 3,
+                        borderRadius: 6,
+                        gap: 2,
+                      }}
+                    >
+                      {rest[0].map((opt, i) => (
+                        <span
+                          key={opt + i}
+                          style={{
+                            padding: '5px 10px',
+                            fontSize: 12,
+                            borderRadius: 4,
+                            background:
+                              i === rest[1] ? 'var(--hx-color-surface-default)' : 'transparent',
+                            color:
+                              i === rest[1]
+                                ? 'var(--hx-color-text-primary)'
+                                : 'var(--hx-color-text-secondary)',
+                            fontWeight: i === rest[1] ? 600 : 400,
+                            boxShadow: i === rest[1] ? 'var(--hx-shadow-sm)' : 'none',
+                          }}
+                        >
+                          {opt}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </SceneFrame>
+</section>
+
+<section>
+  <SectionHead title="04 — Help center" meta="Scene · public · /help" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    Search-first home. Categories below; popular questions in a 2-up. Reuses the search pattern from
+    the Patterns page, the <code>hx-card</code> primitive, and the inverse-CTA closer pattern.
+  </p>
+  <SceneFrame url="helix.health/help" badge="Public">
+    <div
+      style={{
+        padding: '48px 32px',
+        textAlign: 'center',
+        background: 'var(--hx-color-surface-sunken)',
+      }}
+    >
+      <h2 style={{ margin: 0, fontSize: 36, fontWeight: 700, letterSpacing: '-0.025em' }}>
+        How can we help?
+      </h2>
+      <p style={{ marginTop: 8, color: 'var(--hx-color-text-secondary)' }}>
+        Search 240+ guides, or browse by topic.
+      </p>
+      <div style={{ maxWidth: 560, margin: '24px auto 0' }}>
+        <hx-text-input placeholder="Try: refill medication, billing, telehealth setup…" />
+      </div>
+      <div style={{ marginTop: 12, fontSize: 12, color: 'var(--hx-color-text-muted)' }}>
+        Popular: <a style={{ color: 'var(--hx-color-text-link)' }}>Set up telehealth</a> ·{' '}
+        <a style={{ color: 'var(--hx-color-text-link)' }}>Request a refill</a> ·{' '}
+        <a style={{ color: 'var(--hx-color-text-link)' }}>Pay a bill</a> ·{' '}
+        <a style={{ color: 'var(--hx-color-text-link)' }}>Add insurance</a>
+      </div>
+    </div>
+    <div style={{ padding: 32 }}>
+      <h3
+        style={{
+          margin: '0 0 16px',
+          fontSize: 12,
+          fontFamily: 'var(--hx-font-family-mono)',
+          color: 'var(--hx-color-text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+        }}
+      >
+        — Browse by topic
+      </h3>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: 12,
+        }}
+      >
+        {[
+          'Visits & scheduling',
+          'Messages',
+          'Prescriptions',
+          'Records',
+          'Billing & insurance',
+          'Account & security',
+        ].map((t) => (
+          <article
+            key={t}
+            style={{
+              background: 'var(--hx-color-surface-raised)',
+              border: '1px solid var(--hx-color-border-default)',
+              borderRadius: 12,
+              padding: 16,
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            {t}
+          </article>
+        ))}
+      </div>
+      <h3
+        style={{
+          margin: '24px 0 16px',
+          fontSize: 12,
+          fontFamily: 'var(--hx-font-family-mono)',
+          color: 'var(--hx-color-text-muted)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.06em',
+        }}
+      >
+        — Popular questions
+      </h3>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 12,
+        }}
+      >
+        {[
+          ['How do I set up a telehealth visit?', '4 steps · 2 min read'],
+          ['Why was I charged a copay?', 'Billing · 3 min read'],
+          ['Can I share records with another provider?', 'Privacy · 1 min read'],
+          ['What if I miss a prescription refill?', 'Prescriptions · 2 min read'],
+        ].map(([q, m]) => (
+          <article
+            key={q}
+            style={{
+              background: 'var(--hx-color-surface-default)',
+              border: '1px solid var(--hx-color-border-subtle)',
+              borderRadius: 12,
+              padding: 16,
+            }}
+          >
+            <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{q}</div>
+            <div
+              style={{
+                fontSize: 11,
+                color: 'var(--hx-color-text-muted)',
+                fontFamily: 'var(--hx-font-family-mono)',
+              }}
+            >
+              {m}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </SceneFrame>
+</section>
+
+<section>
+  <SectionHead title="05 — Interactive scenes" meta="Stories · play() tests · Patterns/Scenes/*" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    The four scenes above are <strong>visual recipes</strong> rendered in MDX. The three scenes
+    below ship as full <code>.stories.ts</code> files under <code>Patterns/Scenes/*</code> — they
+    are interactive, testable, and exercised by <code>play()</code> functions. Use them as the
+    canonical reference when scaffolding a new scene in your own consumer Storybook.
+  </p>
+  <ul
+    style={{
+      listStyle: 'none',
+      padding: 0,
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+      gap: 12,
+    }}
+  >
+    {[
+      [
+        'Patient Intake',
+        'patterns-scenes-patient-intake--default',
+        'hx-form + hx-text-input + hx-select + hx-radio-group + hx-checkbox + hx-button. Validates required fields and surfaces submit FormData.',
+      ],
+      [
+        'Provider Dashboard',
+        'patterns-scenes-provider-dashboard--default',
+        'hx-card grid + hx-stat tiles + hx-data-table + hx-button. Demonstrates layout density and shadow-boundary event composition.',
+      ],
+      [
+        'Settings',
+        'patterns-scenes-settings--default',
+        'hx-tabs + hx-card + hx-switch + hx-select + hx-button. Tab navigation, boolean toggles, and a save/cancel flow.',
+      ],
+    ].map(([title, storyId, blurb]) => (
+      <li
+        key={title}
+        style={{
+          background: 'var(--hx-color-surface-raised)',
+          border: '1px solid var(--hx-color-border-default)',
+          borderRadius: 12,
+          padding: 16,
+        }}
+      >
+        <a
+          href={`?path=/story/${storyId}`}
+          style={{ color: 'var(--hx-color-text-link)', fontSize: 14, fontWeight: 600 }}
+        >
+          {title} →
+        </a>
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 12,
+            color: 'var(--hx-color-text-secondary)',
+            lineHeight: 1.5,
+          }}
+        >
+          {blurb}
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+</div>

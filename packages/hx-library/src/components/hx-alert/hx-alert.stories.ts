@@ -1590,9 +1590,42 @@ export const PatientSafetyStack: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     variant: 'info',
     message: 'Your session will expire in 15 minutes. Please save your work.',
+  },
+};
+
+// ─────────────────────────────────────────────────
+// AAA OPT-IN — color-contrast-enhanced (WCAG 2.1 AAA)
+// ─────────────────────────────────────────────────
+
+/**
+ * Opt this story into AAA-level contrast checking. The default preview
+ * registers `color-contrast` (AA, 4.5:1). This per-story override disables
+ * AA and enables `color-contrast-enhanced` (AAA, 7:1). Inspect the
+ * Accessibility panel to confirm alert message text passes AAA against
+ * the variant background — info / success / warning / error all surface
+ * as findings here when contrast falls short.
+ */
+export const ContrastAAA: Story = {
+  name: 'Contrast — AAA opt-in',
+  args: {
+    variant: 'warning',
+    message: 'Lab result outside reference range. Schedule a follow-up within 7 days.',
+  },
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'color-contrast-enhanced', enabled: true },
+        ],
+      },
+    },
   },
 };

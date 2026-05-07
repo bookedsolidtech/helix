@@ -1149,3 +1149,42 @@ export const KeyboardNavigation: Story = {
     await expect(nativeDialog?.hasAttribute('aria-labelledby')).toBe(true);
   },
 };
+
+// ─────────────────────────────────────────────────
+// AAA OPT-IN — color-contrast-enhanced (WCAG 2.1 AAA)
+// ─────────────────────────────────────────────────
+
+/**
+ * Opt this story into AAA-level contrast checking. The default preview
+ * registers `color-contrast` (AA, 4.5:1). This per-story override disables
+ * AA and enables `color-contrast-enhanced` (AAA, 7:1). Inspect the
+ * Accessibility panel to confirm heading text, body copy, and overlay
+ * scrim contrast all pass AAA against the dialog's default surface.
+ */
+export const ContrastAAA: Story = {
+  name: 'Contrast — AAA opt-in',
+  render: () => html`
+    <hx-dialog open modal heading="Confirm prescription transfer">
+      <h2 slot="header">Confirm prescription transfer</h2>
+      <p>
+        Transferring the active atorvastatin 20 mg prescription to <strong>HealthCo Pharmacy</strong>
+        will cancel any pending refills at the current location.
+      </p>
+      <p>This action cannot be undone after the new prescription is filled.</p>
+      <div slot="footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <hx-button variant="ghost">Keep at current pharmacy</hx-button>
+        <hx-button variant="primary">Transfer prescription</hx-button>
+      </div>
+    </hx-dialog>
+  `,
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'color-contrast-enhanced', enabled: true },
+        ],
+      },
+    },
+  },
+};

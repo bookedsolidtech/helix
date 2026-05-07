@@ -26,6 +26,11 @@
       "import": "./dist/utils.js",
       "default": "./dist/utils.js"
     },
+    "./contrast-data": {
+      "types": "./dist/__generated__/contrast-report.d.ts",
+      "import": "./dist/__generated__/contrast-report.js",
+      "default": "./dist/__generated__/contrast-report.js"
+    },
     "./tokens.css": "./dist/tokens.css",
     "./dist/tokens.css": "./dist/tokens.css",
     "./tokens.json": "./src/tokens.json"
@@ -35,10 +40,12 @@
     "src/tokens.json"
   ],
   "scripts": {
+    "prebuild": "pnpm run contrast:report",
     "build": "tsc && pnpm exec tsx scripts/generate-css.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "test": "vitest run"
+    "test": "vitest run",
+    "contrast:report": "tsx scripts/generate-contrast-report.ts"
   },
   "dependencies": {
     "lit": "^3.3.2"

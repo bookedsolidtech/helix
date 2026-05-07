@@ -1,0 +1,1319 @@
+/*
+ * helix-docs.css — shared docs stylesheet for Storybook MDX pages.
+ *
+ * Imported once via preview-head.html so every MDX page in
+ * apps/storybook/stories/ inherits the helix editorial idioms (mono
+ * eyebrows, section heads, stat cards, surface cards, ratio cards,
+ * docs cards, demo zones) without re-declaring them.
+ *
+ * Scoped under `.hx-docs`. Anything inside `<div class="hx-docs">…</div>`
+ * in MDX picks these up; anything outside is untouched.
+ *
+ * Source idioms: /Users/himerus/Downloads/dist/foundation/01-overview.html,
+ * /Users/himerus/Downloads/dist/foundation/03-colors.html,
+ * /Users/himerus/Downloads/dist/foundation/04-type.html,
+ * /Users/himerus/Downloads/dist/patterns/13-a11y.html.
+ *
+ * Cascade strategy (post-2026-05 typography fix):
+ * - These rules are intentionally NOT wrapped in `@layer hx-docs`.
+ *   addon-docs ships its own typography defaults as unlayered emotion
+ *   CSS injected at runtime; per the CSS cascade spec, unlayered
+ *   styles BEAT layered styles regardless of source order. Wrapping
+ *   ours in `@layer hx-docs` made addon-docs' default `<h1>` font
+ *   (a serif fallback) win against `.hx-docs-headline` and the
+ *   editorial Inter 800 hero never rendered. Removing the layer
+ *   wrap puts us on equal cascade footing with addon-docs and the
+ *   `.hx-docs` container scope keeps us from leaking into chrome.
+ * - Explicit `font-family` is set on every prose surface (h1-h6, p,
+ *   ul/ol, pre, code, table) under `.hx-docs` so addon-docs cannot
+ *   re-introduce a font-family on intermediate elements between
+ *   `.hx-docs` and our class-targeted children.
+ * - `code-editor.css` already lives outside any layer (Shiki chrome
+ *   relies on the same trick to override addon-docs Source blocks).
+ */
+
+/* ── Typography lock ────────────────────────────────────────────
+ *
+ * Pin the helix font stack on every prose surface inside `.hx-docs`
+ * so addon-docs' emotion typography defaults cannot win the cascade.
+ * The selector chain `.hx-docs h1` is (0,1,1) which beats addon-docs'
+ * `.sbdocs h1` (0,1,1) by virtue of being declared later in the
+ * preview's stylesheet ordering, and class-named children below
+ * (`.hx-docs-headline`, `.hx-docs-eyebrow`, etc.) inherit through
+ * `font-family: inherit` defaults on the elements they wrap.
+ */
+
+.hx-docs,
+.hx-docs h1,
+.hx-docs h2,
+.hx-docs h3,
+.hx-docs h4,
+.hx-docs h5,
+.hx-docs h6,
+.hx-docs p,
+.hx-docs ul,
+.hx-docs ol,
+.hx-docs li,
+.hx-docs blockquote,
+.hx-docs table,
+.hx-docs th,
+.hx-docs td,
+.hx-docs label,
+.hx-docs button,
+.hx-docs a {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+}
+
+.hx-docs pre,
+.hx-docs code,
+.hx-docs kbd,
+.hx-docs samp,
+.hx-docs tt {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+}
+
+/* ── Container ─────────────────────────────────────────────── */
+
+.hx-docs {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  color: var(--hx-color-text-primary, #0d1825);
+  line-height: 1.5;
+  background: var(--hx-color-surface-default, #ffffff);
+}
+
+.hx-docs *,
+.hx-docs *::before,
+.hx-docs *::after {
+  box-sizing: border-box;
+}
+
+/* ── Preview canvas: theme-cascade tracking ────────────────────────
+ *
+ * The Storybook addon-backgrounds normally pins the canvas background
+ * to a specific named token value; when that pin is set at boot, the
+ * canvas no longer follows the active `data-theme` cascade and flipping
+ * the theme toolbar leaves the canvas painted in the boot mode's
+ * surface (e.g. dark theme, light canvas).
+ *
+ * Fix: drive the canvas background from `var(--hx-color-surface-default)`
+ * directly, so it tracks `:root[data-theme="dark|high-contrast"]`
+ * automatically. `.sb-show-main` is Storybook's preview-iframe canvas
+ * wrapper; we cover both Story (`.sb-main-padded`, `.sb-main-fullscreen`,
+ * `.sb-main-centered`) and Docs render targets.
+ *
+ * Selecting a named entry from the backgrounds toolbar will inject an
+ * inline `background-color` on `.sb-show-main` and override this rule
+ * — that is the documented escape hatch for mode-mixed previews.
+ */
+.sb-show-main,
+.sb-show-main.sb-main-padded,
+.sb-show-main.sb-main-fullscreen,
+.sb-show-main.sb-main-centered {
+  background-color: var(--hx-color-surface-default, #ffffff);
+}
+
+/* ── Eyebrow heading (6/4 column split) ────────────────────── */
+
+.hx-docs-eyebrow-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
+  gap: 56px;
+  align-items: end;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 900px) {
+  .hx-docs-eyebrow-heading {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.hx-docs-eyebrow {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hx-color-text-muted, #6c757d);
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+
+.hx-docs-headline {
+  margin: 0;
+  /* Tuned for storybook docs canvas (~1200px max). The previous
+     clamp(48px, 6vw, 96px) hit 96px on wide screens and read as
+     marketing-fluff hero rather than enterprise-restrained. */
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  color: var(--hx-color-text-primary, #0d1825);
+  text-wrap: balance;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+.hx-docs-lede {
+  color: var(--hx-color-text-secondary, #4a5562);
+  line-height: 1.6;
+  font-size: 16px;
+  max-width: 50ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.hx-docs-lede strong {
+  color: var(--hx-color-text-primary, #0d1825);
+  font-weight: 600;
+}
+
+.hx-docs-lede code {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 13px;
+  color: var(--hx-color-text-link, #0f7078);
+}
+
+/* ── Section head ──────────────────────────────────────────── */
+
+.hx-docs-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hx-docs-section-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-section-meta {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs section + section,
+.hx-docs > section + section {
+  /* 40px is the disciplined editorial standard across foundation +
+     pattern pages; 56px read as overscale on the storybook canvas. */
+  margin-top: 40px;
+}
+
+/* ── Stat cards (overview hero) ────────────────────────────── */
+
+.hx-docs-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-bottom: 1px solid var(--hx-color-border-default, #dee2e6);
+}
+
+@media (max-width: 720px) {
+  .hx-docs-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.hx-docs-stat {
+  padding: 32px 28px;
+  border-right: 1px solid var(--hx-color-border-default, #dee2e6);
+  background: transparent;
+}
+
+.hx-docs-stat:last-child {
+  border-right: 0;
+}
+
+/*
+ * Stat-num + ratio-num typography cascade (post-2026-05 fix).
+ *
+ * Problem: addon-docs ships unlayered emotion CSS that injects a
+ * default `font-family` (a serif fallback) on `<dt>`, `<dd>`, `<div>`
+ * intermediates. Without an explicit family pin AND a parent-scoped
+ * selector at sufficient specificity, the giant numbers on the
+ * Dashboard rendered in the wrong family at the wrong weight — they
+ * existed in the DOM but failed to *pop*.
+ *
+ * Fix:
+ * - Selector chain `.hx-docs .hx-docs-stat-num` is (0,2,0), beating
+ *   addon-docs' typical `.sbdocs *` (0,1,0) selectors.
+ * - `font-family` set explicitly with the helix sans stack (don't
+ *   inherit — addon-docs may re-introduce a family at intermediates).
+ * - Sizes bumped to editorial-hero scale (64px / 44px) and weight to
+ *   800 to match `.hx-docs-headline`. The Dashboard is the AAA-cert
+ *   showcase; the numbers carry the message.
+ */
+.hx-docs .hx-docs-stat-num {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  color: var(--hx-color-text-primary, #0d1825);
+  font-feature-settings: 'tnum', 'cv11', 'ss01';
+  margin: 0;
+}
+
+.hx-docs .hx-docs-stat-num small {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--hx-color-text-muted, #6c757d);
+  margin-left: 4px;
+  letter-spacing: -0.01em;
+}
+
+.hx-docs-stat-label {
+  margin-top: 12px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-stat-sub {
+  margin-top: 4px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+/* ── Ratio cards (a11y contrast matrix) ────────────────────── */
+
+.hx-docs-ratio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.hx-docs-ratio-card {
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hx-docs-ratio-pair {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-muted, #6c757d);
+  line-height: 1.4;
+}
+
+.hx-docs .hx-docs-ratio-num {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--hx-color-text-primary, #0d1825);
+  font-feature-settings: 'tnum', 'cv11', 'ss01';
+}
+
+.hx-docs .hx-docs-ratio-num small {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--hx-color-text-muted, #6c757d);
+  margin-left: 2px;
+  letter-spacing: -0.01em;
+}
+
+.hx-docs-grade-pill {
+  align-self: flex-start;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.hx-docs-grade-pill[data-grade='AAA'] {
+  background: var(--hx-color-success-50, #e8f5ec);
+  color: var(--hx-color-success-700, #2a7341);
+  border: 1px solid var(--hx-color-success-500, #3b9e58);
+}
+
+.hx-docs-grade-pill[data-grade='AA'] {
+  background: var(--hx-color-info-50, #e6f4ff);
+  color: var(--hx-color-info-700, #0969c5);
+  border: 1px solid var(--hx-color-info-500, #0c8beb);
+}
+
+.hx-docs-grade-pill[data-grade='AA-large'] {
+  background: var(--hx-color-warning-50, #fdf3e3);
+  color: var(--hx-color-warning-700, #8a510f);
+  border: 1px solid var(--hx-color-warning-500, #c2711c);
+}
+
+.hx-docs-grade-pill[data-grade='Fail'] {
+  background: var(--hx-color-error-50, #fce9e7);
+  color: var(--hx-color-error-700, #a3322a);
+  border: 1px solid var(--hx-color-error-500, #e5493e);
+}
+
+/* ── Token swatch grid ─────────────────────────────────────── */
+
+.hx-docs-ramp-row {
+  display: grid;
+  grid-template-columns: 140px repeat(11, minmax(0, 1fr));
+  gap: 6px;
+  align-items: stretch;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .hx-docs-ramp-row {
+    grid-template-columns: 100px repeat(11, minmax(0, 1fr));
+  }
+}
+
+.hx-docs-ramp-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-ramp-label small {
+  color: var(--hx-color-text-muted, #6c757d);
+  font-weight: 400;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.hx-docs-swatch {
+  aspect-ratio: 1 / 1.05;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  /* Restrained enterprise hover: shadow-lift, no scale. The previous
+     spring-scale read as marketing-playful on a docs page. */
+  transition:
+    box-shadow var(--hx-duration-fast, 100ms) ease,
+    outline-color var(--hx-duration-fast, 100ms) ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8px;
+  color: var(--hx-color-neutral-50, #ffffff);
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  line-height: 1.2;
+  overflow: hidden;
+  border: 0;
+  appearance: none;
+  text-align: left;
+}
+
+.hx-docs-swatch:hover {
+  z-index: 1;
+  box-shadow: var(--hx-shadow-md, 0 4px 6px rgba(13, 24, 37, 0.1));
+}
+
+.hx-docs-swatch:focus-visible {
+  outline: 2px solid var(--hx-color-focus-ring, #0f7078);
+  outline-offset: 2px;
+}
+
+.hx-docs-swatch[data-light='true'] {
+  color: var(--hx-color-neutral-900, #0d1825);
+}
+
+.hx-docs-swatch-step {
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.hx-docs-swatch-hex {
+  opacity: 0.85;
+  font-size: 9px;
+}
+
+.hx-docs-swatch.is-copied::after {
+  content: 'copied';
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 24, 37, 0.62);
+  color: var(--hx-color-neutral-50, #ffffff);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  border-radius: inherit;
+}
+
+/* ── Surface card ──────────────────────────────────────────── */
+
+.hx-docs-surface-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.hx-docs-surface-card {
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+}
+
+.hx-docs-surface-card strong {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hx-docs-surface-ratio {
+  font-weight: 600;
+}
+
+/* ── Docs card (title + tag + demo) ───────────────────────── */
+
+.hx-docs-card {
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hx-docs-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hx-docs-card-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-card-tag {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  color: var(--hx-color-text-muted, #6c757d);
+  text-transform: lowercase;
+}
+
+.hx-docs-card-body {
+  margin: 0;
+  color: var(--hx-color-text-secondary, #4a5562);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.hx-docs-card-demo {
+  border: 1px dashed var(--hx-color-border-default, #dee2e6);
+  background: var(--hx-color-surface-default, #ffffff);
+  border-radius: 10px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-height: 80px;
+}
+
+/* ── State matrix grid ─────────────────────────────────────── */
+
+.hx-docs-state-matrix {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+}
+
+.hx-docs-state-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 18px;
+  background: var(--hx-color-surface-default, #ffffff);
+  border-radius: 10px;
+  border: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  min-height: 88px;
+}
+
+.hx-docs-state-lbl {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-col-head {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-muted, #6c757d);
+  padding: 0 0 4px;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+/* ── Pillar cards (overview / brand registry) ──────────────── */
+
+/*
+ * Full-width horizontal rows at desktop. Cards stack vertically on
+ * narrow viewports via the breakpoint below. The previous
+ * `repeat(auto-fit, minmax(280px, 1fr))` rendered as 3-up at typical
+ * desktop widths; full-width rows give each brand card the breathing
+ * room to read editorial-first rather than tile-grid.
+ */
+.hx-docs-pillars {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.hx-docs-pillar {
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 16px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition:
+    border-color var(--hx-duration-fast, 100ms) ease,
+    box-shadow var(--hx-duration-fast, 100ms) ease;
+}
+
+.hx-docs-pillar:hover {
+  border-color: var(--hx-color-border-strong, #adb5bd);
+  box-shadow: var(--hx-shadow-sm, 0 1px 2px rgba(13, 24, 37, 0.06));
+}
+
+.hx-docs-pillar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hx-docs-pillar-ramp {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  height: 32px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/*
+ * Quiet annotation under the swatch ramp — must not compete with
+ * the swatch row visually. 9px / 0.06em sits below the 10px / 0.08em
+ * eyebrow scale used elsewhere, signalling "footnote, not heading".
+ */
+.hx-docs-pillar-ramp-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-pillar-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hx-color-primary-700, #0a4f55);
+}
+
+.hx-docs-pillar-tag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hx-color-primary-500, #0f7078);
+}
+
+[data-theme='dark'] .hx-docs-pillar-tag {
+  color: var(--hx-color-primary-300, #5cb5bc);
+}
+
+.hx-docs-pillar h3 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-pillar p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--hx-color-text-secondary, #4a5562);
+  text-wrap: pretty;
+}
+
+.hx-docs-pillar code {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  color: var(--hx-color-text-link, #0f7078);
+}
+
+/* ── Code block (legacy `.hx-docs-code`) ────────────────────
+ *
+ * Replaced by the Shiki-rendered `<CodeBlock>` / `<CodeTabs>` components
+ * (see `_components/CodeBlock.tsx` + `docs/code-editor.css`). The
+ * `.hx-docs-code` rule + `.k` / `.s` token classes were removed; if a
+ * stray `<pre className="hx-docs-code">` survives, it now falls back to
+ * UA defaults — visible enough that it's a clear refactor signal.
+ */
+
+/* ── Inline code ─────────────────────────────────────────── */
+
+.hx-docs code:not(pre code) {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 0.9em;
+  background: var(--hx-color-surface-sunken, #f1f3f5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--hx-color-text-strong, #0d1825);
+}
+
+/* ── Token reference chip (click-to-copy in prose / tables) ─ */
+
+.hx-docs-token-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  appearance: none;
+  border: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  background: var(--hx-color-surface-sunken, #f1f3f5);
+  color: var(--hx-color-text-strong, #0d1825);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition:
+    background-color var(--hx-duration-fast, 100ms) ease,
+    border-color var(--hx-duration-fast, 100ms) ease,
+    color var(--hx-duration-fast, 100ms) ease;
+  text-align: left;
+}
+
+.hx-docs-token-ref--block {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.hx-docs-token-ref:hover,
+.hx-docs-token-ref:focus-visible {
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  border-color: var(--hx-color-primary-500, #0f7078);
+  color: var(--hx-color-text-link, #0f7078);
+}
+
+.hx-docs-token-ref:focus-visible {
+  outline: 2px solid var(--hx-color-focus-ring, #0f7078);
+  outline-offset: 2px;
+}
+
+.hx-docs-token-ref-state {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-token-ref.is-copied {
+  background: var(--hx-color-success-50, #e8f5ec);
+  border-color: var(--hx-color-success-500, #3b9e58);
+  color: var(--hx-color-success-700, #2a7341);
+}
+.hx-docs-token-ref.is-copied .hx-docs-token-ref-state {
+  color: var(--hx-color-success-700, #2a7341);
+}
+
+/* ── Cascade walkthrough (single concrete example) ────────── */
+
+.hx-docs-cascade {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .hx-docs-cascade {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hx-docs-cascade-stages {
+  display: grid;
+  gap: 16px;
+}
+
+.hx-docs-cascade-stage {
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 12px;
+  padding: 20px;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  display: grid;
+  gap: 10px;
+}
+
+.hx-docs-cascade-stage[data-tier='primitive'] {
+  border-left: 3px solid var(--hx-color-neutral-400, #94a3b8);
+}
+.hx-docs-cascade-stage[data-tier='semantic'] {
+  border-left: 3px solid var(--hx-color-info-500, #0c8beb);
+}
+.hx-docs-cascade-stage[data-tier='component'] {
+  border-left: 3px solid var(--hx-color-primary-500, #0f7078);
+}
+
+.hx-docs-cascade-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-cascade-stage h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-cascade-stage p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--hx-color-text-secondary, #4a5562);
+  line-height: 1.5;
+}
+
+.hx-docs-cascade-result {
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 12px;
+  padding: 24px;
+  background: var(--hx-color-surface-default, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hx-docs-cascade-result-label {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+/* ── Status color cards (real components) ─────────────────── */
+
+.hx-docs-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.hx-docs-status-card {
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 14px;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+}
+
+.hx-docs-status-card[data-status='success'] {
+  border-top: 3px solid var(--hx-color-success-500, #3b9e58);
+}
+.hx-docs-status-card[data-status='warning'] {
+  border-top: 3px solid var(--hx-color-warning-500, #c2711c);
+}
+.hx-docs-status-card[data-status='error'] {
+  border-top: 3px solid var(--hx-color-error-500, #e5493e);
+}
+.hx-docs-status-card[data-status='info'] {
+  border-top: 3px solid var(--hx-color-info-500, #0c8beb);
+}
+
+.hx-docs-status-card h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-status-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--hx-color-text-secondary, #4a5562);
+  line-height: 1.5;
+}
+
+.hx-docs-status-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* ── Contrast matrix table ────────────────────────────────── */
+
+.hx-docs-matrix-stack {
+  display: grid;
+  gap: 32px;
+}
+
+.hx-docs-matrix-section {
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+}
+
+.hx-docs-matrix-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--hx-color-border-default, #dee2e6);
+  background: var(--hx-color-surface-default, #ffffff);
+}
+
+.hx-docs-matrix-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-matrix-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.hx-docs-matrix-total {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-matrix-table-wrap {
+  overflow-x: auto;
+}
+
+.hx-docs-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.hx-docs-matrix-table th {
+  text-align: left;
+  padding: 10px 16px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hx-color-text-muted, #6c757d);
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  border-bottom: 1px solid var(--hx-color-border-subtle, #e9ecef);
+}
+
+.hx-docs-matrix-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  vertical-align: middle;
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-matrix-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.hx-docs-matrix-pair-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hx-docs-matrix-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.hx-docs-matrix-pair-label {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-secondary, #4a5562);
+}
+
+.hx-docs-matrix-ratio {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-weight: 700;
+  font-feature-settings: 'tnum';
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-docs-matrix-ratio small {
+  font-weight: 400;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+/* ── Collapsible primitives section ──────────────────────── */
+
+.hx-docs-collapsible {
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 14px;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  padding: 0;
+  overflow: hidden;
+}
+
+.hx-docs-collapsible > summary {
+  cursor: pointer;
+  padding: 16px 20px;
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--hx-color-text-primary, #0d1825);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+  user-select: none;
+}
+
+.hx-docs-collapsible > summary::-webkit-details-marker {
+  display: none;
+}
+
+.hx-docs-collapsible > summary::after {
+  content: '+';
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 18px;
+  color: var(--hx-color-text-muted, #6c757d);
+  transition: transform var(--hx-duration-fast, 100ms) ease;
+}
+
+.hx-docs-collapsible[open] > summary::after {
+  content: '−';
+}
+
+.hx-docs-collapsible-body {
+  padding: 24px 20px;
+  border-top: 1px solid var(--hx-color-border-default, #dee2e6);
+  background: var(--hx-color-surface-default, #ffffff);
+  display: grid;
+  gap: 24px;
+}
+
+.hx-docs-collapsible-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--hx-color-text-secondary, #4a5562);
+  line-height: 1.5;
+}
+
+/* ── Demo specimen (focus indicators, etc.) ───────────────
+ *
+ * Wraps a demo block whose visible chrome (e.g. the persistent focus
+ * ring on `.force-focus` button specimens) IS the demonstration.
+ * Without the framing, the static rings read as "this UI is broken";
+ * with it, the dashed perimeter + corner caption reads as
+ * "this is a specimen plate, the chrome is intentional".
+ *
+ * Pattern lifted from atlas-style design systems (USWDS color
+ * specimens, Material symbol specimens) where the demo container
+ * carries enough visual signal to register as "exhibit, not page".
+ */
+
+.hx-docs-specimen {
+  position: relative;
+  border: 1px dashed var(--hx-color-border-strong, #adb5bd);
+  border-radius: 14px;
+  padding: 32px 24px 24px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      transparent 11px,
+      var(--hx-color-surface-sunken, #f1f3f5) 11px,
+      var(--hx-color-surface-sunken, #f1f3f5) 12px
+    ),
+    var(--hx-color-surface-default, #ffffff);
+  background-blend-mode: normal;
+}
+
+.hx-docs-specimen-label {
+  position: absolute;
+  top: -8px;
+  left: 16px;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  padding: 0 10px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--hx-color-text-muted, #6c757d);
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 999px;
+  line-height: 1.8;
+}
+
+.hx-docs-specimen-caption {
+  margin: 0 0 20px;
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--hx-color-text-secondary, #4a5562);
+  max-width: 60ch;
+}
+
+.hx-docs-specimen-caption strong {
+  color: var(--hx-color-text-primary, #0d1825);
+  font-weight: 600;
+}
+
+.hx-docs-specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  background: var(--hx-color-surface-raised, #f8f9fa);
+  padding: 24px 20px;
+  border-radius: 10px;
+}
+
+/* Side-by-side mode preview rows (light · dark · high-contrast).
+ * Each row reproduces the same demo under a different theme so
+ * focus-ring contrast can be eyeballed across modes in one view. */
+.hx-docs-specimen-modes {
+  display: grid;
+  gap: 12px;
+}
+
+.hx-docs-specimen-mode {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.hx-docs-specimen-mode[data-mode='light'] {
+  background: #ffffff;
+  color: #0d1825;
+}
+
+.hx-docs-specimen-mode[data-mode='dark'] {
+  background: #0d1825;
+  color: #f8f9fa;
+}
+
+.hx-docs-specimen-mode[data-mode='high-contrast'] {
+  background: #000000;
+  color: #ffff00;
+  border-color: #ffff00;
+}
+
+.hx-docs-specimen-mode-label {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.hx-docs-specimen-mode-stage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+@media (max-width: 720px) {
+  .hx-docs-specimen-mode {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* ── Success criteria + release-quality table styling ─────── */
+
+.hx-docs-sc-table {
+  display: grid;
+  gap: 6px;
+}
+
+.hx-docs-sc-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 90px 120px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--hx-color-surface-default, #ffffff);
+  border: 1px solid var(--hx-color-border-subtle, #e9ecef);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.hx-docs-sc-row[data-status='pass'] {
+  border-left: 3px solid var(--hx-color-success-500, #3b9e58);
+}
+
+.hx-docs-sc-row[data-status='in-progress'] {
+  border-left: 3px solid var(--hx-color-warning-500, #c2711c);
+}
+
+.hx-docs-sc-row[data-status='manual'] {
+  border-left: 3px solid var(--hx-color-info-500, #0c8beb);
+}
+
+.hx-docs-sc-num {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hx-color-text-strong, #0d1825);
+}
+
+.hx-docs-sc-name {
+  color: var(--hx-color-text-secondary, #4a5562);
+}
+
+.hx-docs-sc-name strong {
+  color: var(--hx-color-text-primary, #0d1825);
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.hx-docs-sc-method {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+.hx-docs-sc-grade {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-align: center;
+  justify-self: end;
+  background: var(--hx-color-success-50, #e8f5ec);
+  color: var(--hx-color-success-text, #2a7341);
+  border: 1px solid var(--hx-color-success-500, #3b9e58);
+}
+
+.hx-docs-sc-grade[data-status='in-progress'] {
+  background: var(--hx-color-warning-50, #fdf3e3);
+  color: var(--hx-color-warning-700, #8a510f);
+  border-color: var(--hx-color-warning-500, #c2711c);
+}
+
+.hx-docs-sc-grade[data-status='manual'] {
+  background: var(--hx-color-info-50, #e6f4ff);
+  color: var(--hx-color-info-700, #0969c5);
+  border-color: var(--hx-color-info-500, #0c8beb);
+}
+
+@media (max-width: 720px) {
+  .hx-docs-sc-row {
+    grid-template-columns: 64px 1fr;
+    grid-template-areas:
+      'num   name'
+      'grade method';
+  }
+  .hx-docs-sc-num {
+    grid-area: num;
+  }
+  .hx-docs-sc-name {
+    grid-area: name;
+  }
+  .hx-docs-sc-grade {
+    grid-area: grade;
+    justify-self: start;
+  }
+  .hx-docs-sc-method {
+    grid-area: method;
+  }
+}
+
+/* ── Reduced motion ──────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-docs-swatch,
+  .hx-docs-pillar,
+  .hx-docs-token-ref,
+  .hx-docs-collapsible > summary::after {
+    transition: none;
+  }
+}
