@@ -89,6 +89,54 @@ This is **not** Anthropic's "Claude Design" team output. The user's "I'm not the
 
 ---
 
+## 1.5 Treatment decision (locked 2026-05-06)
+
+**Option A: port the dist pages into MDX wholesale.** Lift HTML+CSS into Storybook MDX, replace asset paths with imports, swap mocked component HTML for real `hx-*` components, drive the editorial pages from the same theme switcher and tokens that drive the components themselves. Adopt full Storybook idioms — the bundle's own `helix-shell.js` toolbar pill is replaced by Storybook's toolbar, the iframe-shell index is replaced by Storybook's manager UI, the brand+theme `data-*` swap moves into `addon-themes`.
+
+Why not B (iframe the static dist pages): two sources of truth forever (iframe markup ages independently of token changes), demos use static HTML rather than real components, and the iframe shell duplicates Storybook's own chrome.
+
+Why not C (hybrid): foundations + components share the same visual idioms (eyebrow, section-head, mono-meta, contrast cards) — splitting them across iframe vs MDX leaves us maintaining the idioms in two places.
+
+### 15 dist pages → Storybook primary pages
+
+| Dist page | Storybook home | Treatment |
+|---|---|---|
+| `01-overview` | `Docs/Overview` (rewrites `Introduction.mdx`) | MDX with eyebrow + stat cards |
+| `02-brand` | `Foundations/Brand registry` | MDX with live brand switcher (extends `addon-themes`) |
+| `03-colors` | `Foundations/Color` (replaces `tokens/Colors.mdx`) | MDX using shared `<TokenSwatchGrid>` + `<SurfaceCard>` blocks |
+| `04-type` | `Foundations/Typography` (replaces `tokens/Typography.mdx`) | MDX |
+| `05-spacing` | `Foundations/Spacing & Density` (replaces `tokens/Spacing.mdx`) | MDX |
+| `06-iconography` | `Foundations/Iconography` | MDX |
+| `07-buttons` | `Components/Button` Docs tab | Force-state matrix becomes shared `<StateMatrix>` block, applied via custom autodocs template |
+| `08-forms` | `Patterns/Forms` | MDX composition story |
+| `09-feedback` | `Patterns/Feedback` | MDX |
+| `10-data-display` | `Patterns/Data display` | MDX |
+| `11-patterns` | `Patterns/Empty · Error · Search · Confirm · Wizard` | MDX |
+| `12-layout` | `Foundations/Layout` | MDX |
+| `13-a11y` | `Accessibility/Overview` (pairs with VPAT page) | MDX, contrast matrix is the AAA-cert dashboard |
+| `14-scenes` | `Patterns/Scenes` | MDX with iframe escape hatches for full-page compositions |
+| `15-playground` | `Playground/Tokens` | Story (not MDX) — live controls drive `--hx-*` overrides |
+
+### Mining inventory (idioms to lift)
+
+- **Editorial hero**: `clamp(48px, 6vw, 96px)` weight 800 line-height 0.95 letter-spacing -0.035em — `<EyebrowHeading>` shared component
+- **6/4 column split header**: content-left, lede-right — `<SplitHeader>` shared component
+- **Mono eyebrow**: 11px uppercase letter-spacing 0.08em — CSS class `.hx-docs-eyebrow`
+- **Section-head + mono-meta**: h2 baseline-aligned with `--hx-color-{role}-{50…950}` annotation, divider underneath — `<SectionHead title="..." meta="..." />`
+- **Stat cards**: 38px tabular numerals, mono sublabel, surface-raised — `<StatCard num="..." label="..." sub="..." />`
+- **Ratio matrix**: AAA/AA/AA-large pills, contrast as headline number — `<RatioCard pair={...} ratio={...} grade={...} />`
+- **Force-state classes**: `.force-hover` `.force-active` `.force-focus` visually cheats interactive states — solves the "can't screenshot hover" problem in static autodocs
+- **Card-with-demo**: title/tag/p + dashed `.demo` zone — `<DocsCard title="..." tag="..." demo={...} />`
+- **`color-mix(in oklch, ...)` tinted variants** — used inline in MDX, no shared abstraction needed
+- **Spring-eased hover**: `transform: scale(1.04)` with `--hx-easing-spring` — single CSS class
+- **Numbered sidebar**: 01-overview, 02-brand, 03-colors... — encoded in `preview.ts` `options.storySort.order` array
+
+### Force-state CSS module
+
+The `.force-hover` / `.force-active` / `.force-focus` trick from `dist/components/07-buttons.html` lifts as a single shared stylesheet at `apps/storybook/.storybook/docs/force-states.css`, imported once in `preview-head.html`. Each component's own `.styles.ts` already encodes its hover/active/focus styles via `:hover` / `:active` / `:focus-visible` — the force-state CSS just bumps the same rule precedence onto the static `.force-*` classes. ~30 lines total.
+
+---
+
 ## 2. Helix Storybook current state
 
 ### Versions and addons (`apps/storybook/package.json`)
@@ -292,11 +340,7 @@ Acceptance: `create-helix-app my-test && cd my-test && pnpm dev:storybook` opens
 
 Before Phase A starts, confirm:
 
-1. **Mining ratio from the bundle.** Three positions on the spectrum:
-   - **Heavy adoption**: lift the eyebrow pattern, the floating-pill switcher (relocated to Storybook toolbar), the contrast annotations, the state-matrix trick, the token playground, and the section grouping.
-   - **Foundation only**: lift the visual language for the docs tab (eyebrow, contrast annotations, token playground) but keep all chrome stock Storybook.
-   - **Token tables only**: lift just the swatch grid + contrast annotations into the existing token MDX pages; leave everything else.
-   - **Recommendation**: heavy adoption. The bundle's strongest assets are the three things stock Storybook does worst (token playground, contrast annotations, state matrix).
+1. **Mining ratio from the bundle.** Resolved 2026-05-06 → **heavy adoption (Option A)**, see §1.5. All 15 pages port into MDX. Floating-pill switcher relocates to Storybook toolbar via `addon-themes` 3-mode wiring. Iframe-shell `index.html` replaced by Storybook's manager UI. Force-state classes lift as shared CSS module. Token playground becomes a real Storybook story driving `--hx-*` overrides via Controls.
 
 2. **Storybook deployment target.** Currently `apps/storybook/vercel.json` exists, suggesting Vercel. Confirm vs Cloudflare Pages or GitHub Pages — affects build output dir conventions and headers.
 
