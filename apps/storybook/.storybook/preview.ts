@@ -125,10 +125,13 @@ const preview: Preview = {
           ['Tokens', '*'],
           'Components',
           '*', // alphabetic for component categories
-          'Tokens',
+          'Healthcare', // healthcare-domain components (e.g. hx-patient-banner)
+          'Layout', // layout primitives (Container, etc.) — distinct from Foundations/Layout
+          'Utilities', // engineering-leaf utilities (StyleScope, etc.)
+          'Infrastructure', // engineering-leaf infrastructure (Popup, Theme, etc.)
+          'Design Tokens',
           ['Borders', 'Shadows', '*'],
           'Drupal',
-          '*',
         ],
       },
     },

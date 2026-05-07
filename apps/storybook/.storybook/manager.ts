@@ -29,19 +29,21 @@ import {
 /**
  * Sidebar IA — collapsed roots.
  *
- * Engineering-reference roots (Components, Tokens, Drupal) collapse by
- * default so a fresh visitor reads the editorial story top-down
- * (Overview → Accessibility → Foundations → Patterns → Playground)
- * before the engineering surface unrolls beneath them. Pairs with
- * `options.storySort.order` in `.storybook/preview.ts`.
+ * Engineering-reference roots collapse by default so a fresh visitor
+ * reads the editorial story top-down (Overview → Accessibility →
+ * Foundations → Patterns → Playground) before the engineering surface
+ * unrolls beneath them. Pairs with `options.storySort.order` in
+ * `.storybook/preview.ts`.
  *
  * Root IDs are derived from the top-level title segment by
- * Storybook's `sanitize()` helper — lowercased + hyphenated. The
- * three roots here map to titles `Components/*`, `Tokens/*`,
- * `Drupal/*` which sanitize to `components`, `tokens`, `drupal`. If
- * a future top-level category is added with multiple words (e.g.
- * `Design Tokens`), use the lowercase-hyphenated form
- * (`design-tokens`).
+ * Storybook's `sanitize()` helper — lowercased + hyphenated. Mapping:
+ *   Components/*       → components
+ *   Healthcare/*       → healthcare
+ *   Layout/*           → layout       (the standalone root, not Foundations/Layout)
+ *   Utilities/*        → utilities
+ *   Infrastructure/*   → infrastructure
+ *   Design Tokens/*    → design-tokens
+ *   Drupal/*           → drupal
  *
  * Typed surface: `API_SidebarOptions` (storybook 10.3.6) — confirmed
  * `collapsedRoots: string[]` is the official, supported API.
@@ -49,7 +51,15 @@ import {
 addons.setConfig({
   theme: helixLightTheme,
   sidebar: {
-    collapsedRoots: ['components', 'tokens', 'drupal'],
+    collapsedRoots: [
+      'components',
+      'healthcare',
+      'layout',
+      'utilities',
+      'infrastructure',
+      'design-tokens',
+      'drupal',
+    ],
   },
 });
 
