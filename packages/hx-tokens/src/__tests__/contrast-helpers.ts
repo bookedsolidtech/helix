@@ -270,20 +270,30 @@ export const PAIRS: PairSpec[] = [
     role: 'body-text',
     label: 'text.muted on surface.raised',
   },
-  // Placeholder text is a UI affordance (form-control hint), not body prose;
-  // WCAG 1.4.11 non-text floor (3:1) applies, no AAA tier above it.
+  // Placeholder text is readable text inside a form control. WCAG 1.4.3 covers
+  // *all* text content unless explicitly exempted (logos, decorative,
+  // incidental, inactive-control text); placeholder text is none of those.
+  // Classify as body-text so the AAA report holds it to the 7:1 ceiling
+  // honestly. The AA *gate* threshold is held at the 1.4.11 non-text floor
+  // (3:1) here because the active palette's light-mode placeholder
+  // (neutral-500 = #66787B) clears 5.05:1 on surface.default but only 4.32:1
+  // on surface.raised — below the WCAG 1.4.3 4.5:1 small-text floor. Bumping
+  // the AA gate to 4.5 requires a token-design conversation to lift the
+  // light-mode placeholder color (analogous to the dark-mode bump from
+  // neutral-500 → neutral-400 documented in tokens.json). Tracked as a
+  // follow-up; this commit fixes only the AAA misclassification (codex P1).
   {
     text: '--hx-color-text-placeholder',
     surface: '--hx-color-surface-default',
     threshold: 3.0,
-    role: 'ui-element',
+    role: 'body-text',
     label: 'text.placeholder on surface.default',
   },
   {
     text: '--hx-color-text-placeholder',
     surface: '--hx-color-surface-raised',
     threshold: 3.0,
-    role: 'ui-element',
+    role: 'body-text',
     label: 'text.placeholder on surface.raised',
   },
   {

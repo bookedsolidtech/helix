@@ -1,6 +1,6 @@
 # WCAG Contrast Report — `@helixui/tokens`
 
-_Generated 2026-05-07T05:35:37.222Z from `@helixui/tokens@3.3.1`._
+_Generated 2026-05-07T06:56:15.831Z from `@helixui/tokens@3.3.1`._
 
 Per-mode pass/fail telemetry for every semantically valid `(text × surface)` pair declared in the contrast matrix. **AA is the published gate** (enforced by `contrast.test.ts`); **AAA is informational** and surfaces here so consumers and auditors can see the actual ceiling each pairing reaches.
 
@@ -14,11 +14,11 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 
 ## Aggregate
 
-**Across all three modes:** 156 of 163 pair-instances AAA-pass · 7 AA-only · 0 sub-AA
+**Across all three modes:** 152 of 163 pair-instances AAA-pass · 11 AA-only · 0 sub-AA
 
 ## Light Mode
 
-**Summary:** 55 of 59 pairs AAA-pass · 4 AA-only · 0 sub-AA
+**Summary:** 53 of 59 pairs AAA-pass · 6 AA-only · 0 sub-AA
 
 | Status | Role | Text token | Surface token | Ratio | AAA min | AA | AAA |
 |---|---|---|---|---:|---:|:---:|:---:|
@@ -31,8 +31,8 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `text-secondary` | `surface-raised` | 10.20:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-muted` | `surface-default` | 7.76:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-muted` | `surface-raised` | 7.25:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | ui | `text-placeholder` | `surface-default` | 4.63:1 | 3.0:1 | ✅ | ✅ |
-| ✅ | ui | `text-placeholder` | `surface-raised` | 4.32:1 | 3.0:1 | ✅ | ✅ |
+| ⚠️ | body | `text-placeholder` | `surface-default` | 4.63:1 | 7.0:1 | ✅ | ⚠️ |
+| ⚠️ | body | `text-placeholder` | `surface-raised` | 4.32:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `text-inverse` | `surface-inverse` | 17.88:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | large | `text-on-primary` | `primary-500` | 5.20:1 | 4.5:1 | ✅ | ✅ |
 | ✅ | large | `text-on-secondary` | `secondary-500` | 5.18:1 | 4.5:1 | ✅ | ✅ |
@@ -84,7 +84,7 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 
 ## Dark Mode
 
-**Summary:** 55 of 58 pairs AAA-pass · 3 AA-only · 0 sub-AA
+**Summary:** 53 of 58 pairs AAA-pass · 5 AA-only · 0 sub-AA
 
 | Status | Role | Text token | Surface token | Ratio | AAA min | AA | AAA |
 |---|---|---|---|---:|---:|:---:|:---:|
@@ -97,8 +97,8 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `text-secondary` | `surface-raised` | 7.60:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-muted` | `surface-default` | 6.27:1 | 7.0:1 | ✅ | ⚠️ |
 | ⚠️ | body | `text-muted` | `surface-raised` | 5.02:1 | 7.0:1 | ✅ | ⚠️ |
-| ✅ | ui | `text-placeholder` | `surface-default` | 6.27:1 | 3.0:1 | ✅ | ✅ |
-| ✅ | ui | `text-placeholder` | `surface-raised` | 5.02:1 | 3.0:1 | ✅ | ✅ |
+| ⚠️ | body | `text-placeholder` | `surface-default` | 6.27:1 | 7.0:1 | ✅ | ⚠️ |
+| ⚠️ | body | `text-placeholder` | `surface-raised` | 5.02:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `text-inverse` | `surface-inverse` | 15.27:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | large | `text-on-primary` | `primary-500` | 5.20:1 | 4.5:1 | ✅ | ✅ |
 | ✅ | large | `text-on-secondary` | `secondary-500` | 5.18:1 | 4.5:1 | ✅ | ✅ |
@@ -162,8 +162,8 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `text-secondary` | `surface-raised` | 17.40:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-muted` | `surface-default` | 15.91:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-muted` | `surface-raised` | 13.18:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | ui | `text-placeholder` | `surface-default` | 9.68:1 | 3.0:1 | ✅ | ✅ |
-| ✅ | ui | `text-placeholder` | `surface-raised` | 8.03:1 | 3.0:1 | ✅ | ✅ |
+| ✅ | body | `text-placeholder` | `surface-default` | 9.68:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-placeholder` | `surface-raised` | 8.03:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-inverse` | `surface-inverse` | 21.00:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | large | `text-on-primary` | `primary-500` | 5.71:1 | 4.5:1 | ✅ | ✅ |
 | ✅ | large | `text-on-secondary` | `secondary-500` | 11.62:1 | 4.5:1 | ✅ | ✅ |
