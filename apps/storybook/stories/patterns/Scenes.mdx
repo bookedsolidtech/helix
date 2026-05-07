@@ -848,4 +848,76 @@ export const SceneFrame = ({ url, badge, children }) => (
   </SceneFrame>
 </section>
 
+<section>
+  <SectionHead title="05 — Interactive scenes" meta="Stories · play() tests · Patterns/Scenes/*" />
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
+    The four scenes above are <strong>visual recipes</strong> rendered in MDX. The three scenes
+    below ship as full <code>.stories.ts</code> files under <code>Patterns/Scenes/*</code> — they
+    are interactive, testable, and exercised by <code>play()</code> functions. Use them as the
+    canonical reference when scaffolding a new scene in your own consumer Storybook.
+  </p>
+  <ul
+    style={{
+      listStyle: 'none',
+      padding: 0,
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+      gap: 12,
+    }}
+  >
+    {[
+      [
+        'Patient Intake',
+        'patterns-scenes-patient-intake--default',
+        'hx-form + hx-text-input + hx-select + hx-radio-group + hx-checkbox + hx-button. Validates required fields and surfaces submit FormData.',
+      ],
+      [
+        'Provider Dashboard',
+        'patterns-scenes-provider-dashboard--default',
+        'hx-card grid + hx-stat tiles + hx-data-table + hx-button. Demonstrates layout density and shadow-boundary event composition.',
+      ],
+      [
+        'Settings',
+        'patterns-scenes-settings--default',
+        'hx-tabs + hx-card + hx-switch + hx-select + hx-button. Tab navigation, boolean toggles, and a save/cancel flow.',
+      ],
+    ].map(([title, storyId, blurb]) => (
+      <li
+        key={title}
+        style={{
+          background: 'var(--hx-color-surface-raised)',
+          border: '1px solid var(--hx-color-border-default)',
+          borderRadius: 12,
+          padding: 16,
+        }}
+      >
+        <a
+          href={`?path=/story/${storyId}`}
+          style={{ color: 'var(--hx-color-text-link)', fontSize: 14, fontWeight: 600 }}
+        >
+          {title} →
+        </a>
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 12,
+            color: 'var(--hx-color-text-secondary)',
+            lineHeight: 1.5,
+          }}
+        >
+          {blurb}
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
 </div>
