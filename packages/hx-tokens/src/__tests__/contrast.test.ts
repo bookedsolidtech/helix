@@ -4,6 +4,7 @@ import tokens from '../tokens.json';
 import {
   ALL_MODES,
   PAIRS,
+  aaaThresholdForRole,
   buildModeMap,
   contrastRatio,
   resolveToHex,
@@ -77,8 +78,10 @@ describe('contrast regression matrix (WCAG 2.1 AA)', () => {
           const surfaceHex = resolveToHex(pair.surface, modeMap, mode);
           const ratio = contrastRatio(textHex, surfaceHex);
 
-          // Track AAA misses for an informational summary.
-          const aaaThreshold = pair.threshold === 4.5 ? 7.0 : 4.5;
+          // Track AAA misses for an informational summary. Threshold is
+          // role-aware per WCAG 2.1 1.4.6: body-text 7:1, large-text 4.5:1,
+          // ui-element 3:1 (1.4.11 floor — no AAA tier above).
+          const aaaThreshold = aaaThresholdForRole(pair.role ?? 'body-text');
           if (ratio < aaaThreshold) {
             aaaMisses.push({
               mode,

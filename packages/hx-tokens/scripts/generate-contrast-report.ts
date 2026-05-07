@@ -9,9 +9,16 @@
  *   - `.cache/contrast-report.json` — machine-readable JSON for tooling
  *     (Figma plugin, Admin Dashboard, audit pipelines).
  *
- * AAA classification is threshold-aware:
- *   - body-text pairs (AA threshold 4.5) → AAA pass at ≥ 7.0:1
- *   - UI/large-text pairs (AA threshold 3.0) → AAA pass at ≥ 4.5:1
+ * AAA classification is **role-aware**, mapping to WCAG 2.1 1.4.6 + 1.4.11:
+ *   - `body-text`  → AAA pass at ≥ 7.0:1 (small text, body prose, inline links)
+ *   - `large-text` → AAA pass at ≥ 4.5:1 (button labels ≥1rem semibold, status
+ *                    callouts, badge labels — WCAG large-text bold branch)
+ *   - `ui-element` → AAA pass at ≥ 3.0:1 (focus rings, borders, status fills,
+ *                    placeholder text — 1.4.6 has no AAA tier above 1.4.11)
+ *
+ * Each pair in `PAIRS` carries a `role` field documenting the carve-out.
+ * Pairs without an explicit role default to `body-text` (the strictest tier)
+ * so unannotated pairs are not silently downgraded.
  *
  * The AA gate (contrast.test.ts) is the floor; this report is the AAA telemetry
  * layer that surfaces ratios consumers and auditors can act on.
@@ -23,7 +30,9 @@ import { fileURLToPath } from 'node:url';
 import {
   ALL_MODES,
   PAIRS,
+  aaaThresholdForRole,
   type ContrastMode,
+  type PairRole,
   type PairSpec,
   buildModeMap,
   contrastRatio,
@@ -44,6 +53,7 @@ interface PairResult {
   ratio: number;
   threshold: number;
   aaaThreshold: number;
+  role: PairRole;
   classification: Classification;
 }
 
@@ -71,12 +81,6 @@ function classify(ratio: number, threshold: number, aaaThreshold: number): Class
   return 'subAA';
 }
 
-function aaaThresholdFor(threshold: number): number {
-  // WCAG 2.1: AAA body-text 7.0:1 (when AA = 4.5); AAA large-text/UI 4.5:1
-  // (when AA = 3.0). Anything else falls back to body-text AAA.
-  return threshold === 3 || threshold === 3.0 ? 4.5 : 7.0;
-}
-
 function evaluatePair(
   pair: PairSpec,
   mode: ContrastMode,
@@ -85,7 +89,12 @@ function evaluatePair(
   const textHex = resolveToHex(pair.text, modeMap, mode);
   const surfaceHex = resolveToHex(pair.surface, modeMap, mode);
   const ratio = contrastRatio(textHex, surfaceHex);
-  const aaaThreshold = aaaThresholdFor(pair.threshold);
+  // Default to body-text (the strictest 7:1 AAA tier) for any pair that
+  // hasn't been explicitly classified. This errs on the side of honesty:
+  // unannotated pairs surface as AA-only rather than silently being
+  // promoted by a friendly default.
+  const role: PairRole = pair.role ?? 'body-text';
+  const aaaThreshold = aaaThresholdForRole(role);
   return {
     text: pair.text,
     surface: pair.surface,
@@ -95,6 +104,7 @@ function evaluatePair(
     ratio,
     threshold: pair.threshold,
     aaaThreshold,
+    role,
     classification: classify(ratio, pair.threshold, aaaThreshold),
   };
 }
@@ -156,6 +166,12 @@ function modeHeading(mode: ContrastMode): string {
   return mode === 'light' ? 'Light Mode' : 'Dark Mode';
 }
 
+function roleLabel(role: PairRole): string {
+  if (role === 'body-text') return 'body';
+  if (role === 'large-text') return 'large';
+  return 'ui';
+}
+
 function renderModeSection(mode: ContrastMode, report: ModeReport): string {
   const { summary, pairs } = report;
   const lines: string[] = [];
@@ -165,12 +181,13 @@ function renderModeSection(mode: ContrastMode, report: ModeReport): string {
     `**Summary:** ${summary.aaa} of ${summary.total} pairs AAA-pass · ${summary.aa} AA-only · ${summary.subAA} sub-AA`,
   );
   lines.push('');
-  lines.push('| Status | Text token | Surface token | Ratio | AA | AAA |');
-  lines.push('|---|---|---|---:|:---:|:---:|');
+  lines.push('| Status | Role | Text token | Surface token | Ratio | AAA min | AA | AAA |');
+  lines.push('|---|---|---|---|---:|---:|:---:|:---:|');
   for (const p of pairs) {
     const ratioStr = `${p.ratio.toFixed(2)}:1`;
+    const aaaMin = `${p.aaaThreshold.toFixed(1)}:1`;
     lines.push(
-      `| ${gradeIcon(p.classification)} | \`${shortToken(p.text)}\` | \`${shortToken(p.surface)}\` | ${ratioStr} | ${aaIcon(p.classification)} | ${aaaIcon(p.classification)} |`,
+      `| ${gradeIcon(p.classification)} | ${roleLabel(p.role)} | \`${shortToken(p.text)}\` | \`${shortToken(p.surface)}\` | ${ratioStr} | ${aaaMin} | ${aaIcon(p.classification)} | ${aaaIcon(p.classification)} |`,
     );
   }
   lines.push('');
@@ -187,12 +204,21 @@ function renderMarkdown(report: FullReport): string {
     'Per-mode pass/fail telemetry for every semantically valid `(text × surface)` pair declared in the contrast matrix. **AA is the published gate** (enforced by `contrast.test.ts`); **AAA is informational** and surfaces here so consumers and auditors can see the actual ceiling each pairing reaches.',
   );
   lines.push('');
-  lines.push('Thresholds (WCAG 2.1):');
+  lines.push('Thresholds (WCAG 2.1, **role-aware**):');
   lines.push('');
-  lines.push('- Body text — AA ≥ 4.5:1, AAA ≥ 7.0:1');
-  lines.push('- UI / large text — AA ≥ 3.0:1, AAA ≥ 4.5:1');
+  lines.push(
+    '- `body` — body text, prose, inline links: AA ≥ 4.5:1 (1.4.3), **AAA ≥ 7.0:1** (1.4.6)',
+  );
+  lines.push(
+    '- `large` — button labels (≥1rem semibold), status callouts: AA ≥ 3.0:1, **AAA ≥ 4.5:1** (1.4.6 large-text bold branch — `≥14pt bold`)',
+  );
+  lines.push(
+    '- `ui` — focus rings, borders, status fills, placeholders: AA ≥ 3.0:1 (1.4.11), **AAA ≥ 3.0:1** (1.4.6 has no AAA tier above 1.4.11 for non-text)',
+  );
   lines.push('');
-  lines.push('Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure)');
+  lines.push(
+    'Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). The `Role` column documents the WCAG carve-out applied to each pair; the `AAA min` column shows the role-specific AAA threshold the pair was scored against.',
+  );
   lines.push('');
 
   // Top-level rollup
