@@ -4,6 +4,7 @@ import { setCustomElementsManifest } from '@storybook/web-components';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { html } from 'lit';
 import customElements from '@helixui/library/custom-elements.json';
+import { helixBackgroundsForMode, HELIX_THEME_MODES } from './manager-theme';
 
 // Register the Custom Elements Manifest so autodocs API tables
 // are populated with properties, events, slots, CSS parts, and
@@ -117,11 +118,15 @@ const preview: Preview = {
         ],
       },
     },
+    // Backgrounds map sourced from @helixui/tokens. Each entry resolves to
+    // the hex value of `surface.{default,raised,sunken}` in the named mode,
+    // so the canvas background tracks the active theme's surface palette
+    // even before the theme decorator applies the data-theme attribute.
     backgrounds: {
       options: {
-        light: { name: 'light', value: '#ffffff' },
-        grey: { name: 'grey', value: '#f8f9fa' },
-        dark: { name: 'dark', value: '#212529' },
+        ...helixBackgroundsForMode('light'),
+        ...helixBackgroundsForMode('dark'),
+        ...helixBackgroundsForMode('high-contrast'),
       },
     },
     // Viewport addon (Storybook 10 core-bundled). Surfaces the responsive
@@ -139,7 +144,8 @@ const preview: Preview = {
 
   initialGlobals: {
     backgrounds: {
-      value: 'light',
+      // Matches the helixBackgroundsForMode('light') key for surface.default.
+      value: 'surface-default-light',
     },
     theme: 'light',
     viewport: { value: undefined, isRotated: false },
@@ -150,13 +156,15 @@ const preview: Preview = {
     (story) => html`<div style="padding: 2rem;">${story()}</div>`,
 
     // Theme switching via data-theme attribute on <html>.
-    // @helixui/tokens/tokens.css defines :root[data-theme="dark"]
-    // overrides, so this decorator activates them automatically.
+    // @helixui/tokens/tokens.css defines :root[data-theme="dark"] and
+    // :root[data-theme="high-contrast"] overrides, so this decorator
+    // activates them automatically. HELIX_THEME_MODES is the single
+    // source of truth — kept in sync with the manager chrome theme map.
     withThemeByDataAttribute({
-      themes: {
-        light: 'light',
-        dark: 'dark',
-      },
+      themes: Object.fromEntries(HELIX_THEME_MODES.map((m) => [m, m])) as Record<
+        (typeof HELIX_THEME_MODES)[number],
+        (typeof HELIX_THEME_MODES)[number]
+      >,
       defaultTheme: 'light',
       attributeName: 'data-theme',
     }),
