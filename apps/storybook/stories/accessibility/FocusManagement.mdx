@@ -85,26 +85,27 @@ import '@helixui/library/components/hx-text-input';
 
 <CodeBlock language="css" filename="hx-button.styles.ts" code={FOCUS_RING_CSS} />
 
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-      gap: 12,
-      marginTop: 16,
-    }}
-  >
-    <hx-button variant="primary" className="force-focus">
-      Primary
-    </hx-button>
-    <hx-button variant="secondary" className="force-focus">
-      Secondary
-    </hx-button>
-    <hx-button variant="ghost" className="force-focus">
-      Ghost
-    </hx-button>
-    <hx-button variant="danger" className="force-focus">
-      Danger
-    </hx-button>
+  <div className="hx-docs-specimen" style={{ marginTop: 16 }}>
+    <span className="hx-docs-specimen-label">Demo specimen · :focus-visible forced</span>
+    <p className="hx-docs-specimen-caption">
+      ↓ The borders below <strong>ARE</strong> the focus ring rendered statically. Same 2px solid
+      ring, same 2px offset, same token across every variant — proving the contract is uniform
+      regardless of intent.
+    </p>
+    <div className="hx-docs-specimen-grid">
+      <hx-button variant="primary" className="force-focus">
+        Primary
+      </hx-button>
+      <hx-button variant="secondary" className="force-focus">
+        Secondary
+      </hx-button>
+      <hx-button variant="ghost" className="force-focus">
+        Ghost
+      </hx-button>
+      <hx-button variant="danger" className="force-focus">
+        Danger
+      </hx-button>
+    </div>
   </div>
 </section>
 

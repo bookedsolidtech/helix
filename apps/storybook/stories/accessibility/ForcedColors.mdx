@@ -127,24 +127,27 @@ import '@helixui/library/components/hx-badge';
     palette; the focus ring stays at <code>Highlight</code> with 2px offset.
   </p>
 
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-      gap: 12,
-      marginTop: 12,
-    }}
-  >
-    <hx-button variant="primary">Primary action</hx-button>
-    <hx-button variant="secondary">Secondary</hx-button>
-    <hx-button variant="ghost">Ghost</hx-button>
-    <hx-button variant="danger">Danger</hx-button>
-    <hx-button variant="primary" disabled>
-      Disabled
-    </hx-button>
-    <hx-button variant="primary" className="force-focus">
-      Focused
-    </hx-button>
+  <div className="hx-docs-specimen" style={{ marginTop: 12 }}>
+    <span className="hx-docs-specimen-label">Demo specimen · standard mode</span>
+    <p className="hx-docs-specimen-caption">
+      ↓ Buttons below render with the standard HELiX token palette. Toggle the DevTools
+      forced-colors emulator (or your OS HC theme) to see the same elements re-render against
+      <code>ButtonFace</code> / <code>Highlight</code> — the contract holds in both directions.
+      The <strong>Focused</strong> variant has its <code>:focus-visible</code> ring forced open
+      so the AAA-graded outline reads even on the still page.
+    </p>
+    <div className="hx-docs-specimen-grid">
+      <hx-button variant="primary">Primary action</hx-button>
+      <hx-button variant="secondary">Secondary</hx-button>
+      <hx-button variant="ghost">Ghost</hx-button>
+      <hx-button variant="danger">Danger</hx-button>
+      <hx-button variant="primary" disabled>
+        Disabled
+      </hx-button>
+      <hx-button variant="primary" className="force-focus">
+        Focused
+      </hx-button>
+    </div>
   </div>
 </section>
 
