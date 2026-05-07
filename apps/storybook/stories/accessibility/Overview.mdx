@@ -38,7 +38,10 @@ import '@helixui/library/components/hx-icon-button';
 </section>
 
 <section>
-  <SectionHead title="Token contrast matrix" meta="measured on light surface · WCAG 1.4.3 / 1.4.11" />
+  <SectionHead
+    title="Token contrast matrix"
+    meta="measured on light surface · WCAG 1.4.3 / 1.4.11"
+  />
   <div className="hx-docs-ratio-grid">
     <RatioCard pair="text-primary on default" ratio={21.0} grade="AAA" />
     <RatioCard pair="text-secondary on default" ratio={10.9} grade="AAA" />
@@ -53,7 +56,13 @@ import '@helixui/library/components/hx-icon-button';
 
 <section>
   <SectionHead title="Focus indicators" meta="2px ring · 2px offset · :focus-visible only" />
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+      gap: 12,
+    }}
+  >
     <hx-button variant="primary" className="force-focus">
       Primary · focused
     </hx-button>
@@ -71,12 +80,26 @@ import '@helixui/library/components/hx-icon-button';
 
 <section>
   <SectionHead title="Never color alone" meta="WCAG 1.4.1 · status conveyed by ≥2 channels" />
-  <p style={{ color: 'var(--hx-color-text-secondary)', maxWidth: '70ch', marginBottom: 24, fontSize: 14, lineHeight: 1.6 }}>
+  <p
+    style={{
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
+      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 1.6,
+    }}
+  >
     Every status signal in HELiX combines color with at least one other channel: an icon, a text
     label, a shape, or a position. A user with red-green color blindness sees the same information
     as everyone else.
   </p>
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+      gap: 16,
+    }}
+  >
     <DocsCard title="Status badges" tag="color + dot + text">
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <hx-badge variant="success">✓ Verified</hx-badge>
@@ -87,22 +110,49 @@ import '@helixui/library/components/hx-icon-button';
     </DocsCard>
     <DocsCard title="Form validation" tag="color + icon + message">
       <div style={{ display: 'grid', gap: 6, fontSize: 13, width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--hx-color-success-text)' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            color: 'var(--hx-color-success-text)',
+          }}
+        >
           <span>✓</span>
           <span>Email format valid</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--hx-color-warning-700)' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            color: 'var(--hx-color-warning-700)',
+          }}
+        >
           <span>⚠</span>
           <span>Password could be stronger</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--hx-color-error-text)' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            color: 'var(--hx-color-error-text)',
+          }}
+        >
           <span>×</span>
           <span>Member ID not found</span>
         </div>
       </div>
     </DocsCard>
     <DocsCard title="Charts & data" tag="color + pattern + label">
-      <svg viewBox="0 0 200 80" width="200" height="80" role="img" aria-label="Triage outcomes by category">
+      <svg
+        viewBox="0 0 200 80"
+        width="200"
+        height="80"
+        role="img"
+        aria-label="Triage outcomes by category"
+      >
         <defs>
           <pattern id="p1" width="6" height="6" patternUnits="userSpaceOnUse">
             <line x1="0" y1="6" x2="6" y2="0" stroke="currentColor" strokeWidth="1.4" />
@@ -122,9 +172,15 @@ import '@helixui/library/components/hx-icon-button';
         <g style={{ color: 'var(--hx-color-error-600)' }}>
           <rect x="140" y="50" width="50" height="20" fill="currentColor" opacity="0.85" />
         </g>
-        <text x="35" y="78" textAnchor="middle" fontSize="8" fill="currentColor">Routine</text>
-        <text x="100" y="78" textAnchor="middle" fontSize="8" fill="currentColor">Urgent</text>
-        <text x="165" y="78" textAnchor="middle" fontSize="8" fill="currentColor">Critical</text>
+        <text x="35" y="78" textAnchor="middle" fontSize="8" fill="currentColor">
+          Routine
+        </text>
+        <text x="100" y="78" textAnchor="middle" fontSize="8" fill="currentColor">
+          Urgent
+        </text>
+        <text x="165" y="78" textAnchor="middle" fontSize="8" fill="currentColor">
+          Critical
+        </text>
       </svg>
     </DocsCard>
   </div>
@@ -132,7 +188,13 @@ import '@helixui/library/components/hx-icon-button';
 
 <section>
   <SectionHead title="Keyboard contracts" meta="14 patterns · ARIA APG aligned" />
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
     <DocsCard title="Within a component" tag="menu, listbox, combobox, tabs">
       <div style={{ width: '100%', display: 'grid', gap: 6, fontSize: 13 }}>
         {[
@@ -145,8 +207,23 @@ import '@helixui/library/components/hx-icon-button';
           ['Enter', 'Activate primary action'],
           ['Esc', 'Dismiss popover / cancel edit'],
         ].map(([keys, desc]) => (
-          <div key={keys} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 12, padding: '4px 0', borderBottom: '1px dashed var(--hx-color-border-subtle)' }}>
-            <kbd style={{ fontFamily: 'var(--hx-font-family-mono)', fontSize: 11, color: 'var(--hx-color-text-strong)' }}>
+          <div
+            key={keys}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '120px 1fr',
+              gap: 12,
+              padding: '4px 0',
+              borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            }}
+          >
+            <kbd
+              style={{
+                fontFamily: 'var(--hx-font-family-mono)',
+                fontSize: 11,
+                color: 'var(--hx-color-text-strong)',
+              }}
+            >
               {keys}
             </kbd>
             <span style={{ color: 'var(--hx-color-text-secondary)' }}>{desc}</span>
@@ -164,8 +241,23 @@ import '@helixui/library/components/hx-icon-button';
           ['⌘ + k', 'Open command palette'],
           ['⌘ + s', 'Save current chart'],
         ].map(([keys, desc]) => (
-          <div key={keys} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 12, padding: '4px 0', borderBottom: '1px dashed var(--hx-color-border-subtle)' }}>
-            <kbd style={{ fontFamily: 'var(--hx-font-family-mono)', fontSize: 11, color: 'var(--hx-color-text-strong)' }}>
+          <div
+            key={keys}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '120px 1fr',
+              gap: 12,
+              padding: '4px 0',
+              borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            }}
+          >
+            <kbd
+              style={{
+                fontFamily: 'var(--hx-font-family-mono)',
+                fontSize: 11,
+                color: 'var(--hx-color-text-strong)',
+              }}
+            >
               {keys}
             </kbd>
             <span style={{ color: 'var(--hx-color-text-secondary)' }}>{desc}</span>
@@ -178,7 +270,13 @@ import '@helixui/library/components/hx-icon-button';
 
 <section>
   <SectionHead title="Focus management" meta="trap · restore · skip · roving tabindex" />
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+      gap: 16,
+    }}
+  >
     <DocsCard title="Modal focus trap" tag="aria-modal · focus contained">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
         Tab cycles within an open dialog. Esc returns focus to the trigger that opened it. Helix's{' '}
@@ -202,8 +300,13 @@ import '@helixui/library/components/hx-icon-button';
 </section>
 
 <section>
-  <SectionHead title="Success criteria covered" meta="WCAG 2.1 Level A & AA · selected highlights" />
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
+  <SectionHead
+    title="Success criteria covered"
+    meta="WCAG 2.1 Level A & AA · selected highlights"
+  />
+  <div
+    style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}
+  >
     {[
       ['1.1.1', 'Non-text content — alt + aria-label', 'A'],
       ['1.3.1', 'Info & relationships — semantic landmarks', 'A'],
@@ -236,7 +339,14 @@ import '@helixui/library/components/hx-icon-button';
           borderRadius: 8,
         }}
       >
-        <span style={{ fontFamily: 'var(--hx-font-family-mono)', fontSize: 12, color: 'var(--hx-color-text-strong)', fontWeight: 600 }}>
+        <span
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            color: 'var(--hx-color-text-strong)',
+            fontWeight: 600,
+          }}
+        >
           {num}
         </span>
         <span style={{ fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>{name}</span>
@@ -260,7 +370,13 @@ import '@helixui/library/components/hx-icon-button';
 
 <section>
   <SectionHead title="Release quality bar" meta="7 gates · all green or no merge" />
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+      gap: 12,
+    }}
+  >
     {[
       ['axe-core', '0 critical, 0 serious'],
       ['Contrast', 'All pairings ≥ AA floor'],

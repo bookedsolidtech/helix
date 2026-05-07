@@ -82,14 +82,27 @@ const preview: Preview = {
       },
     },
     options: {
+      // Sidebar grouping for the phase-c MDX surface.
+      // Top-level categories are stable; nested arrays pin the inner
+      // order. Kept narrow on the leaf level — `*` = "any other entry"
+      // (alphabetic) — so newly authored stories slot in without an
+      // explicit edit here.
       storySort: {
         order: [
-          'Welcome Center',
-          ['Introduction', '*'],
-          'Design Tokens',
-          ['Colors', 'Spacing', 'Typography', 'Borders', 'Shadows'],
+          'Overview',
+          'Foundations',
+          ['Brand Registry', 'Color', 'Typography', 'Spacing', 'Iconography', 'Layout'],
           'Components',
-          ['Button', 'Card', 'Text Input', '*'],
+          '*', // alphabetic for component categories
+          'Patterns',
+          ['Forms', 'Feedback', 'Data display', 'Patterns', 'Scenes'],
+          'Accessibility',
+          ['Overview', '*'],
+          'Playground',
+          ['Tokens', '*'],
+          'Tokens',
+          ['Borders', 'Shadows', '*'],
+          'Drupal',
           '*',
         ],
       },
