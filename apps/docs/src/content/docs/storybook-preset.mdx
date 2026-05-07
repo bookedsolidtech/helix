@@ -171,10 +171,28 @@ const preview: Preview = {
     // SB10 core actions addon. Auto-detect `hx-*` event args.
     actions: { argTypesRegex: '^hx-.*' },
 
-    // Pseudo-states + designs panels register on empty defaults; per-story
-    // overrides supply the actual frame URL or the forced state.
+    // Pseudo-states registers on an empty default; per-story overrides
+    // supply the forced state.
     pseudo: {},
-    design: {},
+
+    // addon-designs panel renderer switches on `parameters.design.type`.
+    // An empty `{}` (or any object whose `type` is not one of
+    // `iframe | figma | sketch | figspec | image | link`) hits the
+    // switch's default branch and renders an "Invalid config type"
+    // placeholder. Set a preview-level default with a valid `type` so
+    // every story inherits a usable panel even before real Figma frames
+    // land. We use `type: 'link'` because it has zero dependencies on
+    // an external design system and surfaces a meaningful pointer
+    // (component source) until Figma URLs are wired per-story.
+    design: {
+      type: 'link',
+      name: 'HELiX component source',
+      url: 'https://github.com/<org>/<repo>/tree/main/packages/hx-library/src/components',
+      label: 'View component source on GitHub',
+      showArrow: true,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
   },
 
   initialGlobals: {
@@ -247,6 +265,52 @@ export const FocusVisible: Story = {
 };
 ```
 
+### Multi-frame design panel
+
+When a component has light/dark Figma frames (or before/after states), pass an
+array — the panel renders each entry as a tab.
+
+```ts
+export const Default: Story = {
+  parameters: {
+    design: [
+      { name: 'Light', type: 'figma', url: 'https://www.figma.com/file/<id>?node-id=1' },
+      { name: 'Dark', type: 'figma', url: 'https://www.figma.com/file/<id>?node-id=2' },
+    ],
+  },
+};
+```
+
+## Panel expectations
+
+Every consumer scaffold must surface meaningful UI in each panel out of the
+box. Use this matrix to verify a freshly generated `create-helix-app` project
+before shipping.
+
+| Panel                    | What to expect                                                                               | Failure mode                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Controls                 | Args table, sorted required-first, populated from CEM properties.                            | Empty table → CEM not registered or component prefix off.            |
+| Actions                  | `hx-*` events surfaced live as the user interacts.                                           | Empty after interaction → event prefix mismatch.                     |
+| Accessibility            | axe-core results: pass count + violation list per rule.                                      | "Initializing…" forever → addon-a11y not in `addons[]`.              |
+| Docs                     | Autodocs page with API tables (props, events, slots, CSS parts, CSS custom properties).      | Empty tables → CEM not built; run `pnpm cem`.                        |
+| Component tests (Vitest) | Pass/fail counts per `play()` block; click a row to re-run.                                  | "Tests not found" → `vitest.setup.ts` missing.                       |
+| Design                   | Either the Figma frame, an iframe preview, or the canonical link card (preview default).     | "Invalid config type" → `parameters.design` malformed.               |
+| Pseudo-states (toolbar)  | Toggle buttons for `:hover`, `:focus`, `:focus-visible`, `:active`, `:visited`, `:target`.   | Toolbar empty → addon not registered.                                |
+| Theme (toolbar)          | 3-mode switcher: light / dark / high-contrast.                                               | Single mode only → `withThemeByDataAttribute` not wired.             |
+| Brand (toolbar)          | Brand registry switcher (HELiX ships 6: Apex / Meridian / Lumen / Verdant / Signal / Ember). | Toolbar empty → `globalTypes.brand` not set.                         |
+| Viewport (toolbar)       | Token-aligned breakpoints (`sm`, `md`, `lg`, `xl`, `2xl`) + mobile aliases.                  | Default Storybook viewports → `parameters.viewport.options` not set. |
+| Chromatic capture        | Silent. Active only when `CHROMATIC_PROJECT_TOKEN` env var is set.                           | Visible error → token malformed; remove if not in use.               |
+
+### Why the `design` panel is the canary
+
+The most common failure mode for a new HELiX consumer is the "Invalid config
+type" message in the design panel. It appears when `parameters.design` is
+empty (`{}`) or when a story sets `parameters.design` to an object whose
+`type` field is not one of the six valid values (`iframe`, `figma`, `sketch`,
+`figspec`, `image`, `link`). The preview-level default in this preset
+(`type: 'link'`) prevents this — but if you remove it, every story regresses
+to the error state simultaneously.
+
 ## Migration
 
 ### From a vanilla `create-helix-app` scaffold
@@ -263,9 +327,15 @@ pnpm --filter=<your-storybook-app> add -D \
 ```
 
 Then add the three entries to the `addons` array in `.storybook/main.ts`.
-No other configuration changes are required — the addons register on empty
-defaults and become visible as soon as a story sets the corresponding
-parameter.
+`pseudo-states` and `chromatic` register on empty defaults and become
+visible as soon as a story sets the corresponding parameter.
+
+`addon-designs` is the exception — it requires a non-empty
+`parameters.design` with a valid `type` (see the canonical default in the
+preview snippet above). Copy that block into your `.storybook/preview.ts`
+verbatim and adjust the `url` to point at your repository's component
+source. Without this, every story renders an "Invalid config type"
+placeholder in the right rail.
 
 ### From Storybook 8 / 9
 
