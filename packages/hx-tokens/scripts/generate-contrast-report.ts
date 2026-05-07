@@ -10,11 +10,17 @@
  *     (Figma plugin, Admin Dashboard, audit pipelines).
  *
  * AAA classification is **role-aware**, mapping to WCAG 2.1 1.4.6 + 1.4.11:
- *   - `body-text`  → AAA pass at ≥ 7.0:1 (small text, body prose, inline links)
- *   - `large-text` → AAA pass at ≥ 4.5:1 (button labels ≥1rem semibold, status
- *                    callouts, badge labels — WCAG large-text bold branch)
+ *   - `body-text`  → AAA pass at ≥ 7.0:1 (small text, body prose, inline
+ *                    links, button labels, badge labels, status callouts —
+ *                    everything below the strict large-text floor of 24px
+ *                    regular / 18.66px true-bold weight ≥700)
+ *   - `large-text` → AAA pass at ≥ 4.5:1 (reserved for explicitly large
+ *                    headings or display copy at ≥24px regular / ≥18.66px
+ *                    weight-700 bold; this codebase has no pairs in this
+ *                    tier — 16px semibold button labels do NOT qualify)
  *   - `ui-element` → AAA pass at ≥ 3.0:1 (focus rings, borders, status fills,
- *                    placeholder text — 1.4.6 has no AAA tier above 1.4.11)
+ *                    placeholder backgrounds — 1.4.6 has no AAA tier above
+ *                    1.4.11 for non-text contrast)
  *
  * Each pair in `PAIRS` carries a `role` field documenting the carve-out.
  * Pairs without an explicit role default to `body-text` (the strictest tier)
@@ -207,13 +213,13 @@ function renderMarkdown(report: FullReport): string {
   lines.push('Thresholds (WCAG 2.1, **role-aware**):');
   lines.push('');
   lines.push(
-    '- `body` — body text, prose, inline links: AA ≥ 4.5:1 (1.4.3), **AAA ≥ 7.0:1** (1.4.6)',
+    '- `body` — body text, prose, inline links, **button labels, badge labels, status callouts**: AA ≥ 4.5:1 (1.4.3), **AAA ≥ 7.0:1** (1.4.6). 16px semibold does NOT qualify for the large-text carve-out under WCAG 2.1 1.4.6 (which requires 24px regular OR 18.66px weight-700 bold).',
   );
   lines.push(
-    '- `large` — button labels (≥1rem semibold), status callouts: AA ≥ 3.0:1, **AAA ≥ 4.5:1** (1.4.6 large-text bold branch — `≥14pt bold`)',
+    '- `large` — explicitly large headings or display copy at ≥24px regular / ≥18.66px true-bold (CSS weight ≥700): AA ≥ 3.0:1, **AAA ≥ 4.5:1** (1.4.6 large-text branch). This codebase intentionally has no pairs in this tier today.',
   );
   lines.push(
-    '- `ui` — focus rings, borders, status fills, placeholders: AA ≥ 3.0:1 (1.4.11), **AAA ≥ 3.0:1** (1.4.6 has no AAA tier above 1.4.11 for non-text)',
+    '- `ui` — focus rings, borders, status fills, non-text indicators: AA ≥ 3.0:1 (1.4.11), **AAA ≥ 3.0:1** (1.4.6 has no AAA tier above 1.4.11 for non-text)',
   );
   lines.push('');
   lines.push(

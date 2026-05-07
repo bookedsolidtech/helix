@@ -152,16 +152,25 @@ export function resolveToHex(
  * (1.4.6 Contrast Enhanced) applied by the report:
  *
  *   - `body-text`  → AAA ≥ 7.0:1 (small text, body prose, captions, link text,
- *                    inline messages — anything below the WCAG large-text
- *                    cutoff of 18pt regular / 14pt bold ≈ 18.66px / 24px).
- *   - `large-text` → AAA ≥ 4.5:1 (heading text, button labels rendered at
- *                    ≥18.66px bold, badge labels, callout strong text). Per
- *                    WCAG 2.1 1.4.6: "large-scale text" is 18 point or 14
- *                    point bold (https://www.w3.org/TR/WCAG21/#dfn-large-scale).
- *                    HELiX `hx-button` renders labels at 0.875rem/1rem with
- *                    600+ weight — a 1rem (16px) bold label clears the bold
- *                    threshold of 14pt (≈18.66px) at the spec's *bold*
- *                    branch. We document this carve-out at the pair site.
+ *                    inline messages, button labels, badge labels, callout
+ *                    copy — anything below the WCAG large-text cutoff). Per
+ *                    WCAG 2.1 1.4.6, large-scale text is 18 point regular
+ *                    (≈24px) OR 14 point bold (≈18.66px bold). HELiX renders
+ *                    button labels at ≥1rem (16px) — that's only 12pt, which
+ *                    is below both the regular and the bold large-text
+ *                    thresholds. Even at semibold (CSS weight 600), the spec
+ *                    most authoritatively cites "bold" with weight ≥700 for
+ *                    the 14pt-bold branch. Buttons therefore live in the
+ *                    body-text tier and consumers wanting to clear AAA must
+ *                    pick a brand stop where text-on-stop ≥ 7:1. See
+ *                    ConsumerObligations.mdx.
+ *   - `large-text` → AAA ≥ 4.5:1. Reserved for explicitly large headings or
+ *                    display copy rendered at ≥24px regular / ≥18.66px true
+ *                    bold (CSS weight ≥700). This codebase intentionally has
+ *                    NO pairs in this tier — past misuse classified 16px
+ *                    semibold button labels here, which the spec does not
+ *                    permit. Kept as a type so future genuine large-display
+ *                    pairs can opt in with the right rationale.
  *   - `ui-element` → AAA ≥ 3.0:1 (focus rings, borders, dividers, status
  *                    indicators, glyph-only icons, hover-state overlays).
  *                    1.4.6 *has no AAA tier for non-text contrast*; the AA
@@ -303,63 +312,66 @@ export const PAIRS: PairSpec[] = [
     role: 'body-text',
     label: 'text.inverse on surface.inverse',
   },
-  // Button labels on brand fills — large-text per WCAG 2.1 1.4.6.
-  // hx-button renders labels at ≥1rem (16px) with weight ≥600 ("semibold").
-  // WCAG large-text branch: ≥14pt bold ≈ 18.66px bold; CSS 600 is the
-  // accepted threshold for "bold" in browser computed styles. AAA 4.5:1.
-  // See ConsumerObligations.mdx for the consumer's obligation to keep
-  // button slot content in ≥1rem semibold (the default — overriding it
-  // shrinks the carve-out).
+  // Button labels on brand fills — classified as body-text (AAA 7:1).
+  // hx-button renders labels at ≥1rem (16px), which is 12pt — below the
+  // WCAG 2.1 1.4.6 large-text floor of 18pt regular (≈24px) OR 14pt bold
+  // (≈18.66px bold, CSS weight ≥700). 16px semibold (CSS 600) does not
+  // qualify for the large-text carve-out under the strict spec reading,
+  // so AA stays at 4.5:1 (small-text floor) and AAA is held at 7:1.
+  // Consumers needing AAA on buttons must pick a brand stop where the
+  // resolved text-on-stop ratio clears 7:1 (typically primary-700+).
+  // See ConsumerObligations.mdx for the consumer guidance.
   {
     text: '--hx-color-text-on-primary',
     surface: '--hx-color-primary-500',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary on primary-500',
   },
   {
     text: '--hx-color-text-on-secondary',
     surface: '--hx-color-secondary-500',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-secondary on secondary-500',
   },
   {
     text: '--hx-color-text-on-success',
     surface: '--hx-color-success-500',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-success on success-500',
   },
   {
     text: '--hx-color-text-on-warning',
     surface: '--hx-color-warning-500',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-warning on warning-500',
   },
   {
     text: '--hx-color-text-on-error',
     surface: '--hx-color-error-500',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error on error-500',
   },
   {
     text: '--hx-color-text-on-info',
     surface: '--hx-color-info-500',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-info on info-500',
   },
-  // Button hover/pressed surfaces with neutral-0 label — large-text role.
-  // These are the hover/active states of the primary/secondary buttons,
-  // labels still rendered ≥1rem semibold.
+  // Button hover/pressed surfaces with neutral-0 label — body-text role.
+  // Hover/active states of the primary/secondary buttons; labels still
+  // render at ≥1rem semibold which (per the body-text rationale above)
+  // does not clear the WCAG large-text floor. AAA 7:1.
   {
     text: '--hx-color-neutral-0',
     surface: '--hx-color-primary-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on primary-600 (hover surface floor)',
     modes: ['light', 'dark'],
   },
@@ -367,7 +379,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-primary-700',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on primary-700 (pressed surface floor)',
     modes: ['light', 'dark'],
   },
@@ -375,7 +387,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-secondary-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on secondary-600',
     modes: ['light', 'dark'],
   },
@@ -383,7 +395,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-secondary-700',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on secondary-700',
     modes: ['light', 'dark'],
   },
@@ -403,7 +415,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-success-700',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on success-700',
     modes: ['light', 'dark'],
   },
@@ -419,7 +431,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-warning-700',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on warning-700',
     modes: ['light', 'dark'],
   },
@@ -427,7 +439,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-error-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on error-600 (danger hover floor)',
     modes: ['light', 'dark'],
   },
@@ -435,7 +447,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-error-700',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on error-700',
     modes: ['light', 'dark'],
   },
@@ -443,7 +455,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-info-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on info-600',
     modes: ['light', 'dark'],
   },
@@ -451,16 +463,17 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-neutral-0',
     surface: '--hx-color-info-700',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'neutral-0 on info-700',
     modes: ['light', 'dark'],
   },
-  // High-contrast bright button fills — large-text (button labels).
+  // High-contrast bright button fills — body-text (button labels at 16px
+  // semibold; below the 14pt-bold large-text floor).
   {
     text: '--hx-color-text-on-primary',
     surface: '--hx-color-primary-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary on primary-600 (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -468,7 +481,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-secondary',
     surface: '--hx-color-secondary-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-secondary on secondary-600 (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -476,7 +489,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-success',
     surface: '--hx-color-success-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-success on success-600 (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -484,7 +497,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-warning',
     surface: '--hx-color-warning-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-warning on warning-600 (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -492,7 +505,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-error',
     surface: '--hx-color-error-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error on error-600 (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -500,17 +513,17 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-info',
     surface: '--hx-color-info-600',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-info on info-600 (HC bright fill)',
     modes: ['high-contrast'],
   },
   // Action.primary / action.danger button labels in hover/active states —
-  // large-text (button labels at ≥1rem semibold).
+  // body-text (button labels at ≥1rem semibold; below large-text floor).
   {
     text: '--hx-color-text-on-primary-strong',
     surface: '--hx-color-action-primary-bg-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary-strong on action.primary.bg-hover',
     modes: ['light', 'dark'],
   },
@@ -518,7 +531,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-primary-strong',
     surface: '--hx-color-action-primary-bg-active',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary-strong on action.primary.bg-active',
     modes: ['light', 'dark'],
   },
@@ -526,7 +539,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-primary-strong',
     surface: '--hx-color-action-primary-bg-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary-strong on action.primary.bg-hover (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -534,7 +547,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-primary-strong',
     surface: '--hx-color-action-primary-bg-active',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary-strong on action.primary.bg-active (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -542,7 +555,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-error-strong',
     surface: '--hx-color-action-danger-bg-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error-strong on action.danger.bg-hover',
     modes: ['light', 'dark'],
   },
@@ -550,7 +563,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-error-strong',
     surface: '--hx-color-action-danger-bg-active',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error-strong on action.danger.bg-active',
     modes: ['light', 'dark'],
   },
@@ -558,7 +571,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-error-strong',
     surface: '--hx-color-action-danger-bg-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error-strong on action.danger.bg-hover (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -566,7 +579,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-error-strong',
     surface: '--hx-color-action-danger-bg-active',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error-strong on action.danger.bg-active (HC bright fill)',
     modes: ['high-contrast'],
   },
@@ -591,7 +604,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-primary',
     surface: '--hx-color-action-primary-bg-inverted-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary on action.primary.bg-inverted-hover (inverted hover/active fg)',
     modes: ['light', 'dark'],
   },
@@ -599,7 +612,7 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-error',
     surface: '--hx-color-action-danger-bg-inverted-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error on action.danger.bg-inverted-hover (inverted hover/active fg)',
     modes: ['light', 'dark'],
   },
@@ -607,30 +620,30 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-text-on-primary',
     surface: '--hx-color-action-primary-bg',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary on action.primary.bg',
   },
   {
     text: '--hx-color-text-on-error',
     surface: '--hx-color-action-danger-bg',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error on action.danger.bg',
   },
-  // Secondary / ghost button labels — large-text. Buttons render labels at
-  // ≥1rem semibold; the WCAG large-text bold branch applies.
+  // Secondary / ghost button labels — body-text. 16px semibold sits below
+  // the WCAG large-text floor (24px regular / 18.66px true-bold weight ≥700).
   {
     text: '--hx-color-action-secondary-fg',
     surface: '--hx-color-surface-default',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'action.secondary.fg on surface.default',
   },
   {
     text: '--hx-color-action-secondary-fg',
     surface: '--hx-color-action-secondary-bg-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'action.secondary.fg on action.secondary.bg-hover',
     modes: ['light', 'dark'],
   },
@@ -638,14 +651,14 @@ export const PAIRS: PairSpec[] = [
     text: '--hx-color-action-ghost-fg',
     surface: '--hx-color-surface-default',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'action.ghost.fg on surface.default',
   },
   {
     text: '--hx-color-action-ghost-fg',
     surface: '--hx-color-action-ghost-bg-hover',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'action.ghost.fg on action.ghost.bg-hover',
     modes: ['light', 'dark'],
   },
@@ -666,34 +679,35 @@ export const PAIRS: PairSpec[] = [
     label: 'action.secondary.border on action.secondary.bg-hover',
     modes: ['light', 'dark'],
   },
-  // Status callout text on solid status surfaces — large-text. These render
-  // in alerts/banners as bold ≥1rem callout copy; not body prose.
+  // Status callout text on solid status surfaces — body-text. Alerts/banners
+  // render callout copy at ≥1rem semibold which (per the body-text rationale
+  // above) does not clear the WCAG large-text floor. AAA 7:1 applies.
   {
     text: '--hx-color-text-on-success-strong',
     surface: '--hx-color-surface-success-strong',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-success-strong on surface.success-strong',
   },
   {
     text: '--hx-color-text-on-warning',
     surface: '--hx-color-surface-warning-strong',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-warning on surface.warning-strong',
   },
   {
     text: '--hx-color-text-on-error-strong',
     surface: '--hx-color-surface-danger-strong',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-error-strong on surface.danger-strong',
   },
   {
     text: '--hx-color-text-on-primary-strong',
     surface: '--hx-color-surface-info-strong',
     threshold: 4.5,
-    role: 'large-text',
+    role: 'body-text',
     label: 'text.on-primary-strong on surface.info-strong',
   },
   // Inline link text in body prose — body-text (small text in paragraphs).
