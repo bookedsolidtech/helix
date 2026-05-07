@@ -50,14 +50,7 @@ import {
 addons.setConfig({
   theme: helixLightTheme,
   sidebar: {
-    collapsedRoots: [
-      'components',
-      'healthcare',
-      'layout',
-      'utilities',
-      'infrastructure',
-      'drupal',
-    ],
+    collapsedRoots: ['components', 'healthcare', 'layout', 'utilities', 'infrastructure', 'drupal'],
   },
 });
 
