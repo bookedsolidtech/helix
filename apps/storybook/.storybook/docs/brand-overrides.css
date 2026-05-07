@@ -26,9 +26,12 @@
  *   2. The 22-token semantic tier (surface.*, text.*, border.*, action.*)
  *      stays untouched — semantic tokens reference the ramps via cascade,
  *      so they recompute automatically on brand change.
- *   3. High-contrast SUPPRESSES brand. The hx-color-primary-* values for
- *      `[data-theme="high-contrast"]` are AAA-tuned and load-bearing for
- *      the AAA cert; brand selectors must not win the specificity race.
+ *   3. High-contrast SUPPRESSES brand. The hx-color-primary-* AND
+ *      hx-color-secondary-* values for `[data-theme="high-contrast"]` are
+ *      AAA-tuned and load-bearing for the AAA cert; brand selectors must
+ *      not win the specificity race on either ramp. Suppressing only one
+ *      of the two leaks brand expression into HC surfaces (e.g. Verdant's
+ *      tawny gold, Lumen's rose) and breaks the HC contract.
  *   4. The HELiX/Apex default (no `data-brand` attribute) inherits the
  *      published @helixui/tokens cascade — we do NOT override `:root`.
  *
@@ -259,5 +262,30 @@
     --hx-color-primary-800: #ffff00;
     --hx-color-primary-900: #ffff00;
     --hx-color-primary-950: #ffff00;
+
+    /*
+     * Secondary ramp must be suppressed too. Without this reset the
+     * brand's secondary stops (Verdant's tawny gold, Lumen's rose,
+     * Ember's slate, etc.) leak into HC surfaces — any component that
+     * paints from --hx-color-secondary-* (status fills, info badges,
+     * link-visited treatments) re-introduces brand expression on top
+     * of an HC contract that promises system colours only.
+     *
+     * Mirrors the primary-ramp treatment: low stops fall back to the
+     * AAA-tuned neutral cascade; mid + high stops collapse to the same
+     * #ffff00 HC focus colour as primary so any UI surface that paints
+     * from secondary stays inside the HC contrast envelope.
+     */
+    --hx-color-secondary-50: var(--hx-color-neutral-50);
+    --hx-color-secondary-100: var(--hx-color-neutral-100);
+    --hx-color-secondary-200: var(--hx-color-neutral-200);
+    --hx-color-secondary-300: var(--hx-color-neutral-300);
+    --hx-color-secondary-400: var(--hx-color-neutral-400);
+    --hx-color-secondary-500: #ffff00;
+    --hx-color-secondary-600: #ffff00;
+    --hx-color-secondary-700: #ffff00;
+    --hx-color-secondary-800: #ffff00;
+    --hx-color-secondary-900: #ffff00;
+    --hx-color-secondary-950: #ffff00;
   }
 }
