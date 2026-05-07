@@ -37,8 +37,19 @@ const CASCADE_ATTRS = ['data-theme', 'data-brand'];
  * `getPropertyValue`.
  */
 function isColorToken(tokenName: string): boolean {
+  // Three rules:
+  //   1. `color-…` namespace tokens (semantic + primitive ramps).
+  //   2. `bg-…` / `fg-…` shorthand tokens — these are always color values.
+  //   3. Any token containing `-color-` (e.g. `--hx-border-color-default`,
+  //      `--hx-shadow-color-strong`).
+  // The previous broad alternation `(bg|fg|border|shadow|outline)-` was wrong:
+  // `--hx-shadow-md` resolves to a box-shadow string, `--hx-border-width-thin`
+  // to a length — both invalid as `color: var(--…)`. The probe path silently
+  // falls back to the inherited `color` and returns the wrong rgb() triplet.
   return (
-    /(^|--hx-)color-/i.test(tokenName) || /(^|-)(bg|fg|border|shadow|outline)-/i.test(tokenName)
+    /(^|--hx-)color-/i.test(tokenName) ||
+    /(^|-)(bg|fg)-/i.test(tokenName) ||
+    /-color-/i.test(tokenName)
   );
 }
 

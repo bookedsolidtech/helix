@@ -185,19 +185,35 @@ export function CodeTabs({ tabs, defaultTab, persistKey, showCopy = true }: Code
           );
         })}
       </div>
-      <div
-        role="tabpanel"
-        id={`${groupId}-panel-${safeActive}`}
-        aria-labelledby={`${groupId}-tab-${safeActive}`}
-        className="hx-docs-code-editor-tabpanel"
-      >
-        <CodeBlock
-          code={current.code}
-          language={current.language}
-          filename={current.filename}
-          showCopy={showCopy}
-        />
-      </div>
+      {tabs.map((tab, idx) => {
+        const isActivePanel = idx === safeActive;
+        // Render ALL panels in the DOM so every tab's `aria-controls`
+        // resolves to a real element (APG manual-activation tabs pattern).
+        // Inactive panels are hidden via the `hidden` attribute, which both
+        // visually hides them and removes them from the AT tree. We still
+        // gate the inner CodeBlock to the active panel so Shiki only
+        // highlights the visible source — the empty placeholder keeps the
+        // aria-controls reference valid without paying the highlighter cost.
+        return (
+          <div
+            key={`panel-${idx}`}
+            role="tabpanel"
+            id={`${groupId}-panel-${idx}`}
+            aria-labelledby={`${groupId}-tab-${idx}`}
+            className="hx-docs-code-editor-tabpanel"
+            hidden={!isActivePanel}
+          >
+            {isActivePanel && (
+              <CodeBlock
+                code={tab.code}
+                language={tab.language}
+                filename={tab.filename}
+                showCopy={showCopy}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

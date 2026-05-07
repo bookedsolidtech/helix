@@ -80,7 +80,11 @@ function getHighlighter(): Promise<HighlighterCore> {
       highlighterPromise = null;
     }
   });
-  return highlighterPromise;
+  // Return the local `pending` rather than re-reading `highlighterPromise`:
+  // the .catch() closure above writes to the outer `let`, which invalidates
+  // TS strict-mode narrowing — the read would resolve to
+  // `Promise<HighlighterCore> | null`, not the function's declared return.
+  return pending;
 }
 
 /**
