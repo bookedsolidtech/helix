@@ -28,8 +28,58 @@ import * as React from 'react';
 
 const CASCADE_ATTRS = ['data-theme', 'data-brand'];
 
+/**
+ * Heuristic: a token name that looks like a color reference. Aliased color
+ * tokens (e.g. `--hx-color-primary-500: var(--apex-primary-500)`) require
+ * the render-and-measure probe below — `getPropertyValue` returns the literal
+ * `var(...)` chain, not the resolved color. Non-color tokens (spacing,
+ * radius, font-size, …) are scalar lengths/strings and read fine via
+ * `getPropertyValue`.
+ */
+function isColorToken(tokenName: string): boolean {
+  return (
+    /(^|--hx-)color-/i.test(tokenName) || /(^|-)(bg|fg|border|shadow|outline)-/i.test(tokenName)
+  );
+}
+
+/**
+ * Resolve an aliased CSS custom property to its computed `rgb(...)` value
+ * by mounting a hidden probe element, applying `color: var(<token>)`, and
+ * reading `getComputedStyle(probe).color`. Browsers fully resolve var()
+ * chains for actual rendered properties, so even multi-hop aliases come
+ * back as `rgb(r, g, b)` (or `rgba(...)`) — directly consumable by the
+ * `parseRgb` helper in `contrast.ts`.
+ *
+ * The probe is mounted under `target` (default `document.body`) so it
+ * inherits the same cascade as the consuming element, then removed
+ * synchronously in a `finally` block.
+ */
+function probeColorToken(tokenName: string, target: HTMLElement | null): string {
+  if (typeof window === 'undefined') return '';
+  const host = target ?? document.body;
+  if (!host) return '';
+  const probe = document.createElement('span');
+  probe.style.color = `var(${tokenName})`;
+  probe.style.position = 'absolute';
+  probe.style.visibility = 'hidden';
+  probe.style.pointerEvents = 'none';
+  probe.style.width = '0';
+  probe.style.height = '0';
+  host.appendChild(probe);
+  try {
+    return getComputedStyle(probe).color || '';
+  } finally {
+    probe.remove();
+  }
+}
+
 function readToken(tokenName: string, target: HTMLElement | null): string {
   if (typeof window === 'undefined') return '';
+  if (isColorToken(tokenName)) {
+    const resolved = probeColorToken(tokenName, target);
+    if (resolved) return resolved;
+    // Fall through if probe failed (e.g. document.body not yet available).
+  }
   const el = target ?? document.documentElement;
   return getComputedStyle(el).getPropertyValue(tokenName).trim();
 }
