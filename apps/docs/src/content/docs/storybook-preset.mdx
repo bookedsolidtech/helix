@@ -1,0 +1,284 @@
+---
+title: Storybook preset
+description: The canonical Storybook addon set HELiX recommends for every consumer application — what to install, why, and how to wire it.
+---
+
+## Overview
+
+HELiX dogfoods a single Storybook addon set across `apps/storybook` and every
+consumer scaffold produced by `create-helix-app`. This page is the source of
+truth for that set. It exists so that:
+
+- Every HELiX consumer ships with the same a11y, theming, design-token, and
+  testing surface out of the box.
+- Story authors can rely on the same toolbar entries (theme, brand, viewport,
+  pseudo-state) regardless of which app they are working in.
+- VRT, Figma embeds, and pseudo-state previews are zero-configuration the
+  moment a project is generated.
+
+The list is curated against **Storybook 10.3.x**. Storybook 10 absorbed
+`addon-viewport`, `addon-actions`, `addon-measure`, and `addon-outline` into
+the core — do **not** install the standalone packages. They are deprecated
+empty stubs against SB10.
+
+## Required addons
+
+These are part of every HELiX-flavored Storybook. `create-helix-app` installs
+them automatically.
+
+| Package                         | Version   | Purpose                                                                                  |
+| ------------------------------- | --------- | ---------------------------------------------------------------------------------------- |
+| `@storybook/addon-a11y`         | `^10.3.6` | axe-core panel per story. Default `color-contrast` rule (WCAG AA) on every story.        |
+| `@storybook/addon-docs`         | `^10.3.6` | Autodocs + MDX. Renders the CEM-driven API tables for every component.                   |
+| `@storybook/addon-vitest`       | `^10.3.6` | Story-level tests via `portable-stories`. Coverage via Vitest's V8 coverage.             |
+| `@storybook/addon-themes`       | `^10.3.6` | Theme toolbar. HELiX wires the 3-mode `data-theme` switcher (light / dark / hc).         |
+| `@storybook/addon-links`        | `^10.3.6` | Cross-story navigation, used by the foundations index pages.                             |
+| `@storybook/addon-designs`      | `^11.1.3` | Figma frame embeds in autodocs. Per-story `parameters.design = { type, url }`.           |
+| `storybook-addon-pseudo-states` | `^10.3.6` | Toolbar to force `:hover`, `:focus`, `:focus-visible`, `:active` across stories.         |
+| `@chromatic-com/storybook`      | `^5.1.2`  | Chromatic VRT capture hooks. Inert without a project token; safe to register by default. |
+
+### Why each entry is required
+
+**`@storybook/addon-a11y`** — Healthcare consumers ship under WCAG 2.1 AA at
+minimum. Running axe-core on every story keeps regressions visible during
+authoring. HELiX upgrades the default `color-contrast` rule to
+`color-contrast-enhanced` (AAA) on a per-story basis via
+`parameters.a11y.config.rules`.
+
+**`@storybook/addon-docs`** — The CEM (`custom-elements.json`) emitted by
+`@helixui/library` is the source of truth for component APIs. addon-docs
+renders that manifest as autodocs tables. Without it, the docs surface
+collapses to hand-written prose.
+
+**`@storybook/addon-vitest`** — The modern test path for Storybook 10.
+`portable-stories` lets a Vitest browser-mode test re-mount any story
+without a separate test-runner process. This is preferred over the
+deprecated `@storybook/test-runner` Playwright runner. Coverage is wired
+through Vitest's V8 coverage; `@storybook/addon-coverage` is **not**
+needed in this configuration.
+
+**`@storybook/addon-themes`** — `withThemeByDataAttribute` flips
+`data-theme` on `<html>`, which is the contract `@helixui/tokens` reads to
+swap between light / dark / high-contrast modes. The same decorator is
+used by every HELiX consumer; consistency matters when Phase C MDX docs
+embed cross-app live previews.
+
+**`@storybook/addon-links`** — Required by the foundations index and
+brand-registry MDX pages, which jump between `Foundations/Color`,
+`Foundations/Typography`, and `Components/*` without leaving the canvas.
+
+**`@storybook/addon-designs`** — Design-driven components ship with a
+canonical Figma frame. Embedding it in autodocs keeps the design source
+adjacent to the implementation; consumers do not have to switch tabs to
+verify a token mapping.
+
+**`storybook-addon-pseudo-states`** — The HELiX library exposes a shared
+`force-states.css` hook for forcing pseudo-state styling in stories. The
+addon adds the toolbar UX on top, so any story (not just the ones that
+import `force-states.css`) gets a one-click `:hover` / `:focus` toggle.
+The two layers stack — the toolbar is non-destructive.
+
+**`@chromatic-com/storybook`** — Visual regression testing. The capture
+hooks ship registered so projects can opt into Chromatic by setting
+`CHROMATIC_PROJECT_TOKEN`; without it, the addon is inert. No commercial
+lock-in — the addon registration is free, and projects that prefer Percy
+or Loki can replace this entry without disturbing the rest of the set.
+
+## Rejected and deferred candidates
+
+| Package                        | Status    | Reason                                                                               |
+| ------------------------------ | --------- | ------------------------------------------------------------------------------------ |
+| `@storybook/addon-essentials`  | Removed   | Storybook 10 broke this into core + standalone addons. Do not install.               |
+| `@storybook/addon-viewport`    | Core      | Bundled in SB10 core. Configure via `parameters.viewport`.                           |
+| `@storybook/addon-actions`     | Core      | Bundled in SB10 core. Configure via `parameters.actions`.                            |
+| `@storybook/addon-measure`     | Core      | Bundled in SB10 core.                                                                |
+| `@storybook/addon-outline`     | Core      | Bundled in SB10 core.                                                                |
+| `@storybook/addon-coverage`    | Redundant | `@storybook/addon-vitest` already provides V8 coverage.                              |
+| `@storybook/addon-jest`        | SB9 only  | Latest is `9.1.12`; peer-deps `storybook@^9`. Replaced by `addon-vitest` for SB10.   |
+| `@storybook/addon-storysource` | SB8 only  | Latest is `8.6.14`; peer-deps `storybook@^8`. Not maintained for SB10.               |
+| `@storybook/addon-mdx-gfm`     | SB8 only  | Latest is `8.6.14`. SB10 MDX renderer handles GFM natively.                          |
+| `@storybook/test-runner`       | Optional  | Playwright-based runner. Overlaps with `addon-vitest`; opt-in for CI only if needed. |
+
+## Configuration
+
+### `.storybook/main.ts`
+
+```ts
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+import type { StorybookConfig } from '@storybook/web-components-vite';
+
+const config: StorybookConfig = {
+  stories: ['../src/**/*.stories.@(ts|tsx)', '../stories/**/*.mdx'],
+
+  addons: [
+    getAbsolutePath('@storybook/addon-a11y'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-vitest'),
+    getAbsolutePath('@storybook/addon-links'),
+    getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath('@storybook/addon-designs'),
+    getAbsolutePath('storybook-addon-pseudo-states'),
+    getAbsolutePath('@chromatic-com/storybook'),
+  ],
+
+  framework: {
+    name: getAbsolutePath('@storybook/web-components-vite'),
+    options: {},
+  },
+
+  core: { disableTelemetry: true },
+};
+
+export default config;
+
+function getAbsolutePath(value: string): string {
+  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
+}
+```
+
+### `.storybook/preview.ts`
+
+```ts
+import '@helixui/tokens/tokens.css';
+import type { Preview } from '@storybook/web-components';
+import { setCustomElementsManifest } from '@storybook/web-components';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import { html } from 'lit';
+import customElements from '@helixui/library/custom-elements.json';
+
+setCustomElementsManifest(customElements);
+
+const preview: Preview = {
+  parameters: {
+    controls: { expanded: true, sort: 'requiredFirst' },
+
+    // axe-core. Default = WCAG 2.1 AA via the `color-contrast` rule. Stories
+    // that are AAA-certified upgrade by toggling the rule on a per-story basis.
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: true }],
+      },
+    },
+
+    // SB10 core viewport addon. Provide your own breakpoint map.
+    viewport: {
+      options: {
+        /* ... */
+      },
+    },
+
+    // SB10 core actions addon. Auto-detect `hx-*` event args.
+    actions: { argTypesRegex: '^hx-.*' },
+
+    // Pseudo-states + designs panels register on empty defaults; per-story
+    // overrides supply the actual frame URL or the forced state.
+    pseudo: {},
+    design: {},
+  },
+
+  initialGlobals: {
+    theme: 'light',
+    brand: '',
+  },
+
+  decorators: [
+    withThemeByDataAttribute({
+      themes: { light: 'light', dark: 'dark', 'high-contrast': 'high-contrast' },
+      defaultTheme: 'light',
+      attributeName: 'data-theme',
+    }),
+    (story, ctx) => {
+      const brand = (ctx.globals.brand as string) ?? '';
+      if (typeof document !== 'undefined') {
+        if (brand) document.documentElement.setAttribute('data-brand', brand);
+        else document.documentElement.removeAttribute('data-brand');
+      }
+      return story();
+    },
+  ],
+};
+
+export default preview;
+```
+
+## Patterns
+
+### AAA opt-in per story
+
+```ts
+export const HighContrastButton: Story = {
+  args: { variant: 'primary' },
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'color-contrast-enhanced', enabled: true },
+        ],
+      },
+    },
+  },
+};
+```
+
+### Figma embed per story
+
+```ts
+export const Default: Story = {
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/<id>/<file>?node-id=<frame>',
+    },
+  },
+};
+```
+
+### Pseudo-state in MDX docs
+
+```ts
+export const Hover: Story = {
+  parameters: { pseudo: { hover: true } },
+};
+
+export const FocusVisible: Story = {
+  parameters: { pseudo: { focusVisible: true } },
+};
+```
+
+## Migration
+
+### From a vanilla `create-helix-app` scaffold
+
+Versions of `create-helix-app` published before `2026-05` shipped only the
+five required addons (`a11y`, `docs`, `vitest`, `themes`, `links`). To bring
+an existing scaffold in line with this preset:
+
+```bash
+pnpm --filter=<your-storybook-app> add -D \
+  "@storybook/addon-designs@^11.1.3" \
+  "storybook-addon-pseudo-states@^10.3.6" \
+  "@chromatic-com/storybook@^5.1.2"
+```
+
+Then add the three entries to the `addons` array in `.storybook/main.ts`.
+No other configuration changes are required — the addons register on empty
+defaults and become visible as soon as a story sets the corresponding
+parameter.
+
+### From Storybook 8 / 9
+
+Drop these packages first; they are not compatible with SB10 and the
+package's latest version still pins to the prior major:
+
+- `@storybook/addon-essentials`
+- `@storybook/addon-viewport`
+- `@storybook/addon-actions`
+- `@storybook/addon-measure`
+- `@storybook/addon-outline`
+- `@storybook/addon-jest`
+- `@storybook/addon-storysource`
+- `@storybook/addon-mdx-gfm`
+
+Then follow the migration steps above.

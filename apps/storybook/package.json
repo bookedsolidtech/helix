@@ -17,17 +17,20 @@
     "@helixui/tokens": "workspace:*"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^5.1.2",
     "@mdx-js/react": "^3.0.0",
     "@storybook/addon-a11y": "^10.3.6",
+    "@storybook/addon-designs": "^11.1.3",
     "@storybook/addon-docs": "^10.3.6",
     "@storybook/addon-links": "^10.3.6",
     "@storybook/addon-themes": "^10.3.6",
     "@storybook/addon-vitest": "^10.3.6",
     "@storybook/web-components-vite": "^10.3.6",
+    "@vitest/ui": "^3.0.0",
     "lit": "^3.3.2",
     "storybook": "^10.3.6",
-    "vitest": "^3.0.0",
-    "@vitest/ui": "^3.0.0",
-    "vite": "^6.2.0"
+    "storybook-addon-pseudo-states": "^10.3.6",
+    "vite": "^6.2.0",
+    "vitest": "^3.0.0"
   }
 }
