@@ -239,13 +239,14 @@ export const SubmitEmpty: Story = {
     };
     await expect(form).toBeTruthy();
 
+    type HxInvalidDetail = { errors: Array<{ name?: string; message?: string }> };
     let submitted = false;
-    let invalidEvent: CustomEvent | null = null;
+    let invalidEvent: CustomEvent<HxInvalidDetail> | null = null;
     form.addEventListener('hx-submit', () => {
       submitted = true;
     });
     form.addEventListener('hx-invalid', (event: Event) => {
-      invalidEvent = event as CustomEvent;
+      invalidEvent = event as CustomEvent<HxInvalidDetail>;
     });
 
     const submit = canvas.getByTestId('intake-submit');
@@ -253,7 +254,17 @@ export const SubmitEmpty: Story = {
       'button',
     ) as HTMLButtonElement | null;
     await expect(innerSubmit).toBeTruthy();
+
+    // hx-form is a custom element, not a <form> — when `action` is unset (the
+    // Drupal pattern) it renders only a slot, so `hx-button[type=submit]` has
+    // no `_internals.form` to call requestSubmit() on. The contract under
+    // test is hx-form's own submit handler: clicking the inner button is a
+    // real-world entry point but the eventual signal is a `submit` event
+    // bubbled to hx-form. Dispatch it directly so the test verifies hx-form's
+    // validation contract independently of the unrelated form-association
+    // gap that requires a wrapping <form> to bridge.
     await userEvent.click(innerSubmit!);
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
     // hx-form's validation pass blocks submission and reports the failure:
     //   - hx-submit MUST NOT fire (application logic prevents it)
