@@ -499,4 +499,86 @@ describe('buildComponentEntry', () => {
     expect(entry.cssProperties.length).toBe(BUTTON_DECL.cssProperties!.length);
     expect(entry.excludedAttributes).toContain('aria-label');
   });
+
+  it('emits neutral helix-metadata defaults when the declaration has no helixMeta', () => {
+    const entry = buildComponentEntry({
+      decl: BUTTON_DECL,
+      module: BUTTON_MODULE,
+      templateDependencies: [],
+    });
+    expect(entry.aaa).toEqual({
+      certified: false,
+      certifiedDate: null,
+      criteria: [],
+      auditUrl: null,
+    });
+    expect(entry.keyboardContract).toBeNull();
+    expect(entry.ariaPattern).toBeNull();
+    expect(entry.themeAware).toBeNull();
+    expect(entry.brandAware).toBeNull();
+    expect(entry.formAssociated).toBeNull();
+    expect(entry.priorityTier).toBeNull();
+  });
+
+  it('mirrors the full helixMeta subset when the declaration carries one', () => {
+    const declWithMeta: CemDeclaration = {
+      ...BUTTON_DECL,
+      aaaCertified: true,
+      aaaCertifiedDate: '2026-05-15',
+      helixMeta: {
+        aaa: {
+          certified: true,
+          certifiedDate: '2026-05-15',
+          criteria: ['1.4.6', '2.1.3'],
+          auditUrl: 'src/components/hx-button/AAA-AUDIT.md',
+        },
+        keyboardContract: {
+          activate: ['Enter', 'Space'],
+          navigate: [],
+          dismiss: [],
+          disabledSuppresses: true,
+        },
+        ariaPattern: 'button',
+        themeAware: true,
+        brandAware: true,
+        formAssociated: true,
+        priorityTier: 'P0',
+      },
+    };
+    const entry = buildComponentEntry({
+      decl: declWithMeta,
+      module: BUTTON_MODULE,
+      templateDependencies: [],
+    });
+    expect(entry.aaa.certified).toBe(true);
+    expect(entry.aaa.certifiedDate).toBe('2026-05-15');
+    expect(entry.aaa.criteria).toEqual(['1.4.6', '2.1.3']);
+    expect(entry.aaa.auditUrl).toBe('src/components/hx-button/AAA-AUDIT.md');
+    expect(entry.keyboardContract).toEqual({
+      activate: ['Enter', 'Space'],
+      navigate: [],
+      dismiss: [],
+      disabledSuppresses: true,
+    });
+    expect(entry.ariaPattern).toBe('button');
+    expect(entry.themeAware).toBe(true);
+    expect(entry.brandAware).toBe(true);
+    expect(entry.formAssociated).toBe(true);
+    expect(entry.priorityTier).toBe('P0');
+  });
+
+  it('falls back to top-level aaaCertified when helixMeta.aaa.certified is missing', () => {
+    const declWithBackCompatOnly: CemDeclaration = {
+      ...BUTTON_DECL,
+      aaaCertified: true,
+      aaaCertifiedDate: '2026-05-15',
+    };
+    const entry = buildComponentEntry({
+      decl: declWithBackCompatOnly,
+      module: BUTTON_MODULE,
+      templateDependencies: [],
+    });
+    expect(entry.aaa.certified).toBe(true);
+    expect(entry.aaa.certifiedDate).toBe('2026-05-15');
+  });
 });
