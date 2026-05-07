@@ -1,0 +1,88 @@
+{/* Color.mdx — Foundations / Color (replaces tokens/Colors.mdx) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, TokenSwatchGrid, SurfaceCard } from '../_components';
+
+<Meta
+  title="Foundations/Color"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Color · primitive ramps"
+  title="11 stops, AA-tuned, every ramp."
+  lede={
+    <>
+      Eight color roles, each with a precision-cool 50&nbsp;→&nbsp;950 ramp. Stops 500–700 are the
+      interactive surfaces; 50–200 are the tints; 800–950 are dark-mode pages and emphasis fills.
+      Click any swatch to copy its <code>var(--hx-color-…)</code> reference.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Brand ramps" meta="--hx-color-{primary,secondary,accent}-{50…950}" />
+  <TokenSwatchGrid ramp="primary" />
+  <TokenSwatchGrid ramp="secondary" />
+  <TokenSwatchGrid ramp="accent" />
+</section>
+
+<section>
+  <SectionHead title="Neutral ramp" meta="--hx-color-neutral-{50…950}" />
+  <TokenSwatchGrid ramp="neutral" />
+</section>
+
+<section>
+  <SectionHead title="Status ramps" meta="--hx-color-{success,warning,error,info}-{50…950}" />
+  <TokenSwatchGrid ramp="success" />
+  <TokenSwatchGrid ramp="warning" />
+  <TokenSwatchGrid ramp="error" />
+  <TokenSwatchGrid ramp="info" />
+</section>
+
+<section>
+  <SectionHead title="Semantic surfaces" meta="--hx-color-surface-{role}" />
+  <div className="hx-docs-surface-grid">
+    <SurfaceCard
+      surfaceToken="--hx-color-surface-default"
+      pairedWith="--hx-color-text-primary"
+      description="Page canvas"
+    />
+    <SurfaceCard
+      surfaceToken="--hx-color-surface-raised"
+      pairedWith="--hx-color-text-primary"
+      description="Cards, panels"
+    />
+    <SurfaceCard
+      surfaceToken="--hx-color-surface-sunken"
+      pairedWith="--hx-color-text-primary"
+      description="Wells, code blocks"
+    />
+    <SurfaceCard
+      surfaceToken="--hx-color-surface-inverse"
+      pairedWith="--hx-color-text-inverse"
+      description="Tooltips, dark nav"
+    />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="How the cascade resolves" meta="primitive → semantic → component" />
+  <pre className="hx-docs-code"><span className="s">{`/* primitive — the raw ramp */`}</span>
+{`--hx-color-primary-600: #0F7078;
+
+`}<span className="s">{`/_ semantic — what consumers override _/`}</span>
+{`--hx-color-action-primary-bg: var(--hx-color-primary-600);
+--hx-color-action-primary-bg-hover: var(--hx-color-primary-700);
+--hx-color-action-primary-bg-active: var(--hx-color-primary-800);
+
+`}<span className="s">{`/_ component — what the host element reads _/`}</span>
+{`hx-button[variant='primary'] {
+background: var(--hx-color-action-primary-bg);
+}`}</pre>
+
+</section>
+
+</div>

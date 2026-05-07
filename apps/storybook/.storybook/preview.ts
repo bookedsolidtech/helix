@@ -150,7 +150,35 @@ const preview: Preview = {
       value: 'surface-default-light',
     },
     theme: 'light',
+    brand: '',
     viewport: { value: undefined, isRotated: false },
+  },
+
+  /**
+   * Brand toolbar entry. Sets `data-brand` on <html>; the brand registry
+   * documented at `Foundations/Brand registry` toggles between the four
+   * reference brands (HELiX default + Meridian + Evergreen + Lumen).
+   *
+   * The data-brand attribute is read by `<hx-theme brand="…">` consumers
+   * and by the brand-mock tile demonstrations in the Brand Registry MDX
+   * page; it is not consumed by the published @helixui/tokens cascade
+   * (brand registries are added by consumers themselves).
+   */
+  globalTypes: {
+    brand: {
+      description: 'Active brand override (data-brand on :root)',
+      toolbar: {
+        title: 'Brand',
+        icon: 'paintbrush',
+        items: [
+          { value: '', title: 'HELiX (default)' },
+          { value: 'meridian', title: 'Meridian (indigo)' },
+          { value: 'evergreen', title: 'Evergreen (teal)' },
+          { value: 'lumen', title: 'Lumen (violet)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
 
   decorators: [
@@ -170,6 +198,18 @@ const preview: Preview = {
       defaultTheme: 'light',
       attributeName: 'data-theme',
     }),
+
+    // Brand switching via data-brand attribute on <html>. Mirrors the
+    // dist v3.2.2 review bundle's brand registry. Empty value clears
+    // the attribute so the HELiX default cascade applies.
+    (story, ctx) => {
+      const brand = (ctx.globals.brand as string) ?? '';
+      if (typeof document !== 'undefined') {
+        if (brand) document.documentElement.setAttribute('data-brand', brand);
+        else document.documentElement.removeAttribute('data-brand');
+      }
+      return story();
+    },
   ],
 };
 

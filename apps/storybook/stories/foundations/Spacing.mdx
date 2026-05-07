@@ -1,0 +1,159 @@
+{/* Spacing.mdx — Foundations / Spacing & density (replaces tokens/Spacing.mdx) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead } from '../_components';
+
+<Meta
+  title="Foundations/Spacing"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+export const SCALE = [
+  { token: '0', px: 0 },
+  { token: '0-5', px: 2 },
+  { token: '1', px: 4 },
+  { token: '1-5', px: 6 },
+  { token: '2', px: 8 },
+  { token: '3', px: 12 },
+  { token: '4', px: 16 },
+  { token: '5', px: 20 },
+  { token: '6', px: 24 },
+  { token: '7', px: 28 },
+  { token: '8', px: 32 },
+  { token: '10', px: 40 },
+  { token: '12', px: 48 },
+  { token: '16', px: 64 },
+  { token: '20', px: 80 },
+  { token: '24', px: 96 },
+];
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Spacing & surface"
+  title="Rhythm. Radius. Elevation."
+  lede={
+    <>
+      One 4&nbsp;px base, halved at the small end, doubled at the large end. Sixteen stops, six
+      radii, five shadows. The same scale powers grid gaps, component padding, and the three density
+      modes — desktop, EHR-dense, and 56-inch ED touchscreens.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="The scale" meta="--hx-space-{0…24}" />
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    {SCALE.map((s) => (
+      <div
+        key={s.token}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '120px 80px 1fr',
+          gap: 16,
+          alignItems: 'center',
+          padding: '12px 0',
+          borderBottom: '1px dashed var(--hx-color-border-subtle)',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 12,
+            color: 'var(--hx-color-text-primary)',
+          }}
+        >
+          space-{s.token}
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 11,
+            color: 'var(--hx-color-text-muted)',
+          }}
+        >
+          {s.px}px
+        </div>
+        <div
+          style={{
+            background: 'var(--hx-color-primary-200)',
+            borderRadius: 4,
+            height: 24,
+            width: `var(--hx-space-${s.token}, ${s.px}px)`,
+            minWidth: s.px === 0 ? 1 : undefined,
+          }}
+        />
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Density modes" meta="same component · three padding scales" />
+  <p className="hx-docs-card-body">
+    A patient list rendered at three densities. Only <code>padding</code> and <code>gap</code>{' '}
+    tokens change — the markup is identical. This is why every component spec lists its density
+    token rather than hard-coding pixels.
+  </p>
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+      marginTop: 16,
+    }}
+  >
+    {[
+      { name: 'Compact', toks: 'space-2 / space-4', pad: 8, gap: 4 },
+      { name: 'Default', toks: 'space-3 / space-5', pad: 12, gap: 8 },
+      { name: 'Touch', toks: 'space-5 / space-6', pad: 20, gap: 16 },
+    ].map((mode) => (
+      <div key={mode.name} className="hx-docs-card">
+        <div className="hx-docs-card-head">
+          <h4 className="hx-docs-card-title">{mode.name}</h4>
+          <span className="hx-docs-card-tag">{mode.toks}</span>
+        </div>
+        <ul
+          style={{
+            listStyle: 'none',
+            margin: 0,
+            padding: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: mode.gap,
+          }}
+        >
+          {['Vega, Annika · 41', 'Tran, Mei · 67', 'Ojo, Femi · 22', 'Schwartz, Eli · 58'].map(
+            (p) => (
+              <li
+                key={p}
+                style={{
+                  padding: `${mode.pad}px 12px`,
+                  background: 'var(--hx-color-surface-default)',
+                  border: '1px solid var(--hx-color-border-subtle)',
+                  borderRadius: 6,
+                  fontSize: 13,
+                  color: 'var(--hx-color-text-primary)',
+                }}
+              >
+                {p}
+              </li>
+            ),
+          )}
+        </ul>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Touch target floor" meta="WCAG 2.5.5 — 44px minimum" />
+  <p className="hx-docs-card-body">
+    Every interactive host (<code>hx-button</code>, <code>hx-checkbox</code>, <code>hx-switch</code>
+    ,<code> hx-tabs</code>, …) honors <code>--hx-touch-target-min</code> (default <code>44px</code>)
+    on small/medium variants. The compact density variants drop to <code>32px</code> with explicit
+    consumer opt-in for desktop-only EHR scenarios.
+  </p>
+</section>
+
+</div>
