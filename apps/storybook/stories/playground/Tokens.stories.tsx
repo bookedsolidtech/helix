@@ -214,11 +214,11 @@ const meta = {
             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--hx-space-4, 16px); align-items: start;"
           >
             <hx-card>
-              <div slot="header" style="font-weight: 600;">Jordan Reyes</div>
+              <div slot="heading" style="font-weight: 600;">Jordan Reyes</div>
               <div style="font-size: 13px; color: var(--hx-color-text-secondary);">
                 MRN-849172 · 36y · Cardiology follow-up
               </div>
-              <hx-button slot="footer" variant="primary" size="small">Open chart</hx-button>
+              <hx-button slot="footer" variant="primary" hx-size="small">Open chart</hx-button>
             </hx-card>
             <hx-alert variant="info" open>
               <strong slot="title">Two records merged</strong>
