@@ -1324,8 +1324,42 @@ export const WithSlots: Story = {
   render: () => html`
     <hx-checkbox value="consent">
       I agree to the <a href="/terms">terms and conditions</a> for patient data access
-      <span slot="help-text">Required for portal access. Review the full policy before agreeing.</span>
+      <span slot="help-text"
+        >Required for portal access. Review the full policy before agreeing.</span
+      >
       <span slot="error">You must accept the terms to continue.</span>
     </hx-checkbox>
   `,
+};
+
+// ─────────────────────────────────────────────────
+// AAA OPT-IN — color-contrast-enhanced (WCAG 2.1 AAA)
+// ─────────────────────────────────────────────────
+
+/**
+ * Opt this story into AAA-level contrast checking. The default preview
+ * registers `color-contrast` (AA, 4.5:1). This per-story override disables
+ * AA and enables `color-contrast-enhanced` (AAA, 7:1). Inspect the
+ * Accessibility panel to confirm label and help-text pass AAA against the
+ * default surface.
+ */
+export const ContrastAAA: Story = {
+  name: 'Contrast — AAA opt-in',
+  render: () => html`
+    <hx-checkbox value="acknowledged" label="I have reviewed the HIPAA privacy notice" checked>
+      <span slot="help-text"
+        >Required to continue. The full notice is available in your patient portal.</span
+      >
+    </hx-checkbox>
+  `,
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'color-contrast-enhanced', enabled: true },
+        ],
+      },
+    },
+  },
 };
