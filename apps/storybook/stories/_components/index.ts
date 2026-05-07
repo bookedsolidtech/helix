@@ -27,4 +27,8 @@ export { StateMatrix } from './StateMatrix';
 export type { StateMatrixProps, MatrixState } from './StateMatrix';
 export { DocsCard } from './DocsCard';
 export type { DocsCardProps } from './DocsCard';
+export { TokenRef } from './TokenRef';
+export type { TokenRefProps } from './TokenRef';
+export { ContrastMatrix } from './ContrastMatrix';
+export type { ContrastMatrixProps } from './ContrastMatrix';
 export { contrastRatio, gradeRatio } from './contrast';
