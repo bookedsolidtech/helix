@@ -1,0 +1,310 @@
+{/* Accessibility / Overview.mdx — WCAG 2.1 AA panorama, lifted from dist patterns/13-a11y */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, StatCard, RatioCard, DocsCard } from '../_components';
+
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-badge';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-icon-button';
+
+<Meta
+  title="Accessibility/Overview"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Accessibility · WCAG 2.1 AA"
+  title="The contrast bar isn't a goal. It's the floor."
+  lede={
+    <>
+      HELiX is engineered for the <strong>May 2026 HHS Section&nbsp;504</strong> deadline. 47
+      contrast pairings, 14 keyboard contracts, 22 ARIA patterns — all verified by the regression
+      suite. Adding a token below the floor fails CI.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Coverage at a glance" meta="3.2.2 release" />
+  <div className="hx-docs-stats">
+    <StatCard num="47" unit="/47" label="Contrast pairings AA+" sub="regression-tested in CI" />
+    <StatCard num="44" unit="px" label="Touch target floor" sub="WCAG 2.5.5 enforced" />
+    <StatCard num="3" label="Theme modes" sub="light · dark · high-contrast" />
+    <StatCard num="0" label="axe-core violations" sub="critical + serious" />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Token contrast matrix" meta="measured on light surface · WCAG 1.4.3 / 1.4.11" />
+  <div className="hx-docs-ratio-grid">
+    <RatioCard pair="text-primary on default" ratio={21.0} grade="AAA" />
+    <RatioCard pair="text-secondary on default" ratio={10.9} grade="AAA" />
+    <RatioCard pair="text-muted on default" ratio={7.76} grade="AA" />
+    <RatioCard pair="text-on-primary / primary-500" ratio={5.2} grade="AA" />
+    <RatioCard pair="on-primary-strong / primary-600" ratio={5.82} grade="AA" />
+    <RatioCard pair="error-text on default" ratio={5.46} grade="AA" />
+    <RatioCard pair="success-text on default" ratio={6.88} grade="AA" />
+    <RatioCard pair="focus-ring · 1.4.11" ratio={5.82} grade="AA-large" />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Focus indicators" meta="2px ring · 2px offset · :focus-visible only" />
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+    <hx-button variant="primary" className="force-focus">
+      Primary · focused
+    </hx-button>
+    <hx-button variant="secondary" className="force-focus">
+      Secondary · focused
+    </hx-button>
+    <hx-button variant="ghost" className="force-focus">
+      Ghost · focused
+    </hx-button>
+    <hx-button variant="danger" className="force-focus">
+      Danger · focused
+    </hx-button>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Never color alone" meta="WCAG 1.4.1 · status conveyed by ≥2 channels" />
+  <p style={{ color: 'var(--hx-color-text-secondary)', maxWidth: '70ch', marginBottom: 24, fontSize: 14, lineHeight: 1.6 }}>
+    Every status signal in HELiX combines color with at least one other channel: an icon, a text
+    label, a shape, or a position. A user with red-green color blindness sees the same information
+    as everyone else.
+  </p>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+    <DocsCard title="Status badges" tag="color + dot + text">
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <hx-badge variant="success">✓ Verified</hx-badge>
+        <hx-badge variant="info">● Pending</hx-badge>
+        <hx-badge variant="warning">▲ Review needed</hx-badge>
+        <hx-badge variant="error">× Rejected</hx-badge>
+      </div>
+    </DocsCard>
+    <DocsCard title="Form validation" tag="color + icon + message">
+      <div style={{ display: 'grid', gap: 6, fontSize: 13, width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--hx-color-success-text)' }}>
+          <span>✓</span>
+          <span>Email format valid</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--hx-color-warning-700)' }}>
+          <span>⚠</span>
+          <span>Password could be stronger</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--hx-color-error-text)' }}>
+          <span>×</span>
+          <span>Member ID not found</span>
+        </div>
+      </div>
+    </DocsCard>
+    <DocsCard title="Charts & data" tag="color + pattern + label">
+      <svg viewBox="0 0 200 80" width="200" height="80" role="img" aria-label="Triage outcomes by category">
+        <defs>
+          <pattern id="p1" width="6" height="6" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="6" x2="6" y2="0" stroke="currentColor" strokeWidth="1.4" />
+          </pattern>
+          <pattern id="p2" width="4" height="4" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="currentColor" />
+          </pattern>
+        </defs>
+        <g style={{ color: 'var(--hx-color-success-600)' }}>
+          <rect x="10" y="20" width="50" height="50" fill="currentColor" opacity="0.85" />
+          <rect x="10" y="20" width="50" height="50" fill="url(#p2)" opacity="0.3" />
+        </g>
+        <g style={{ color: 'var(--hx-color-warning-600)' }}>
+          <rect x="75" y="35" width="50" height="35" fill="currentColor" opacity="0.85" />
+          <rect x="75" y="35" width="50" height="35" fill="url(#p1)" opacity="0.4" />
+        </g>
+        <g style={{ color: 'var(--hx-color-error-600)' }}>
+          <rect x="140" y="50" width="50" height="20" fill="currentColor" opacity="0.85" />
+        </g>
+        <text x="35" y="78" textAnchor="middle" fontSize="8" fill="currentColor">Routine</text>
+        <text x="100" y="78" textAnchor="middle" fontSize="8" fill="currentColor">Urgent</text>
+        <text x="165" y="78" textAnchor="middle" fontSize="8" fill="currentColor">Critical</text>
+      </svg>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Keyboard contracts" meta="14 patterns · ARIA APG aligned" />
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+    <DocsCard title="Within a component" tag="menu, listbox, combobox, tabs">
+      <div style={{ width: '100%', display: 'grid', gap: 6, fontSize: 13 }}>
+        {[
+          ['Tab', 'Move focus to next interactive element'],
+          ['Shift + Tab', 'Move focus backward'],
+          ['↑ ↓', 'Move within a listbox / radio group'],
+          ['← →', 'Move within tabs / segmented controls'],
+          ['Home / End', 'Jump to first / last item'],
+          ['Space', 'Activate / toggle current item'],
+          ['Enter', 'Activate primary action'],
+          ['Esc', 'Dismiss popover / cancel edit'],
+        ].map(([keys, desc]) => (
+          <div key={keys} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 12, padding: '4px 0', borderBottom: '1px dashed var(--hx-color-border-subtle)' }}>
+            <kbd style={{ fontFamily: 'var(--hx-font-family-mono)', fontSize: 11, color: 'var(--hx-color-text-strong)' }}>
+              {keys}
+            </kbd>
+            <span style={{ color: 'var(--hx-color-text-secondary)' }}>{desc}</span>
+          </div>
+        ))}
+      </div>
+    </DocsCard>
+    <DocsCard title="App-level shortcuts" tag="documented + remappable">
+      <div style={{ width: '100%', display: 'grid', gap: 6, fontSize: 13 }}>
+        {[
+          ['/', 'Focus global search'],
+          ['g p', 'Go to patient list'],
+          ['g s', 'Go to schedule'],
+          ['?', 'Open keyboard cheat sheet'],
+          ['⌘ + k', 'Open command palette'],
+          ['⌘ + s', 'Save current chart'],
+        ].map(([keys, desc]) => (
+          <div key={keys} style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: 12, padding: '4px 0', borderBottom: '1px dashed var(--hx-color-border-subtle)' }}>
+            <kbd style={{ fontFamily: 'var(--hx-font-family-mono)', fontSize: 11, color: 'var(--hx-color-text-strong)' }}>
+              {keys}
+            </kbd>
+            <span style={{ color: 'var(--hx-color-text-secondary)' }}>{desc}</span>
+          </div>
+        ))}
+      </div>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Focus management" meta="trap · restore · skip · roving tabindex" />
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+    <DocsCard title="Modal focus trap" tag="aria-modal · focus contained">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        Tab cycles within an open dialog. Esc returns focus to the trigger that opened it. Helix's{' '}
+        <code>hx-dialog</code> handles trap + restore automatically.
+      </p>
+    </DocsCard>
+    <DocsCard title="Roving tabindex" tag="menubar · grid · toolbar">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        One stop for the whole component group; arrow keys move within. Tab leaves the group.
+        Helix's <code>hx-tabs</code>, <code>hx-radio-group</code>, <code>hx-menu</code> all
+        implement this.
+      </p>
+    </DocsCard>
+    <DocsCard title="Restore on close" tag="popover · drawer · menu">
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
+        When a transient surface closes, focus returns to the element that opened it. No "where did
+        I just lose my place" moments.
+      </p>
+    </DocsCard>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Success criteria covered" meta="WCAG 2.1 Level A & AA · selected highlights" />
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
+    {[
+      ['1.1.1', 'Non-text content — alt + aria-label', 'A'],
+      ['1.3.1', 'Info & relationships — semantic landmarks', 'A'],
+      ['1.4.1', 'Use of color — never the only signal', 'A'],
+      ['1.4.3', 'Contrast (minimum) — text ≥ 4.5:1', 'AA'],
+      ['1.4.4', 'Resize text — to 200% w/o loss', 'AA'],
+      ['1.4.10', 'Reflow — 320px width, no horiz scroll', 'AA'],
+      ['1.4.11', 'Non-text contrast — UI ≥ 3:1', 'AA'],
+      ['2.1.1', 'Keyboard — full operability', 'A'],
+      ['2.1.2', 'No keyboard trap', 'A'],
+      ['2.4.3', 'Focus order — logical, follows reading', 'A'],
+      ['2.4.7', 'Focus visible — 2px ring everywhere', 'AA'],
+      ['2.5.5', 'Target size — 44×44px minimum', 'AAA→AA'],
+      ['3.3.1', 'Error identification — text + icon + aria', 'A'],
+      ['3.3.3', 'Error suggestion — what to do', 'AA'],
+      ['3.3.4', 'Error prevention — confirm destructive', 'AA'],
+      ['4.1.2', 'Name, role, value — every component', 'A'],
+      ['4.1.3', 'Status messages — live regions', 'AA'],
+    ].map(([num, name, grade]) => (
+      <div
+        key={num}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '64px 1fr auto',
+          gap: 12,
+          alignItems: 'center',
+          padding: '10px 12px',
+          background: 'var(--hx-color-surface-default)',
+          border: '1px solid var(--hx-color-border-subtle)',
+          borderRadius: 8,
+        }}
+      >
+        <span style={{ fontFamily: 'var(--hx-font-family-mono)', fontSize: 12, color: 'var(--hx-color-text-strong)', fontWeight: 600 }}>
+          {num}
+        </span>
+        <span style={{ fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>{name}</span>
+        <span
+          style={{
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontSize: 10,
+            padding: '2px 6px',
+            borderRadius: 4,
+            background: 'var(--hx-color-success-50)',
+            color: 'var(--hx-color-success-text)',
+            border: '1px solid var(--hx-color-success-200, var(--hx-color-success-500))',
+          }}
+        >
+          {grade}
+        </span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Release quality bar" meta="7 gates · all green or no merge" />
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
+    {[
+      ['axe-core', '0 critical, 0 serious'],
+      ['Contrast', 'All pairings ≥ AA floor'],
+      ['Keyboard', '100% nav, no traps'],
+      ['Screen reader', 'VoiceOver + NVDA'],
+      ['Bundle', '≤ 5KB / component'],
+      ['SSR', 'Lit hydration clean'],
+      ['Visual reg', 'Chromatic 0 diff'],
+    ].map(([name, desc], i) => (
+      <article
+        key={name}
+        style={{
+          background: 'var(--hx-color-surface-raised)',
+          border: '1px solid var(--hx-color-border-default)',
+          borderRadius: 12,
+          padding: 16,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          textAlign: 'center',
+        }}
+      >
+        <span
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: 'var(--hx-color-success-500)',
+            color: '#fff',
+            display: 'grid',
+            placeItems: 'center',
+            margin: '0 auto',
+            fontFamily: 'var(--hx-font-family-mono)',
+            fontWeight: 700,
+            fontSize: 13,
+          }}
+        >
+          {i + 1}
+        </span>
+        <strong style={{ fontSize: 13 }}>{name}</strong>
+        <span style={{ fontSize: 11, color: 'var(--hx-color-text-muted)' }}>{desc}</span>
+      </article>
+    ))}
+  </div>
+</section>
+
+</div>
