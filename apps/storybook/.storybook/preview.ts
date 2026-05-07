@@ -249,15 +249,52 @@ const preview: Preview = {
     },
   },
 
-  initialGlobals: {
-    backgrounds: {
-      // Matches the helixBackgroundsForMode('light') key for surface.default.
-      value: 'surface-default-light',
-    },
-    theme: 'light',
-    brand: '',
-    viewport: { value: undefined, isRotated: false },
-  },
+  /**
+   * Initial globals for theme + brand. Hydrated from the same
+   * `helix:storybook:globals` localStorage key the FOUC-prevention block
+   * in `preview-head.html` reads, so the toolbar UI renders the persisted
+   * choice on first frame instead of flashing the hardcoded defaults
+   * (`light` / no brand) before the post-mount decorator re-syncs.
+   *
+   * The pre-paint script applies `data-theme` / `data-brand` to <html>
+   * before first paint; without this hydration the toolbar dropdown still
+   * displayed "Light" / "Apex (default)" until the first decorator pass,
+   * producing a one-frame UI flicker on every reload.
+   *
+   * Defensive: any localStorage failure (disabled, corrupted JSON,
+   * unexpected shape) silently falls back to the historical defaults so
+   * a broken storage state never prevents Storybook from booting.
+   */
+  initialGlobals: (() => {
+    let persisted: { theme?: unknown; brand?: unknown } | null = null;
+    try {
+      if (typeof window !== 'undefined') {
+        const raw = window.localStorage.getItem('helix:storybook:globals');
+        if (raw) {
+          const parsed: unknown = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            persisted = parsed as { theme?: unknown; brand?: unknown };
+          }
+        }
+      }
+    } catch {
+      /* storage disabled or JSON broken — fall through to defaults */
+    }
+    const theme =
+      typeof persisted?.theme === 'string' && persisted.theme.length > 0
+        ? persisted.theme
+        : 'light';
+    const brand = typeof persisted?.brand === 'string' ? persisted.brand : '';
+    return {
+      backgrounds: {
+        // Matches the helixBackgroundsForMode('light') key for surface.default.
+        value: 'surface-default-light',
+      },
+      theme,
+      brand,
+      viewport: { value: undefined, isRotated: false },
+    };
+  })(),
 
   /**
    * Brand toolbar entry. Sets `data-brand` on <html>; the brand registry
