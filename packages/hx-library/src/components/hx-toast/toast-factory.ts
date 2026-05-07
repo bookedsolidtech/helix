@@ -53,6 +53,20 @@ const _pendingAppends = new WeakMap<HelixToastStack, number>();
 
 /**
  * @internal
+ * Tracks deferred toasts whose `hide()` (or removal) was called by the
+ * consumer during the defer window — i.e. before the queued `setTimeout`
+ * fires `show()`. (codex p2 round-2.) Without this guard, the deferred
+ * `show()` would still flip the toast visible after the consumer asked to
+ * cancel it.
+ *
+ * Population strategy: when we enter the deferred-show path we wrap the
+ * toast's `hide()` so a consumer call adds the element to this set. We also
+ * check `isConnected` inside the timer callback to cover plain DOM removal.
+ */
+const _cancelledDeferred = new WeakSet<HelixToast>();
+
+/**
+ * @internal
  * Per-stack ordered list of `Date.now()`-style timestamps when previously
  * scheduled deferred-hide timers will fire, plus when previously queued
  * appends will become visible. Used by longer-burst calls (codex p1 round-2)
@@ -279,6 +293,22 @@ export function toast(options: ToastOptions): HelixToast {
     // is cleared inside the deferred `setTimeout` below so the natural
     // `:host` display rule reasserts immediately before `show()` fires.
     toastEl.style.display = 'none';
+
+    // (codex p2 round-2) Honor consumer-initiated cancellation during the
+    // defer window. Wrap the toast's `hide()` so calling it before the
+    // queued `setTimeout` fires marks the toast as cancelled. The deferred
+    // show callback below skips `show()` (and cleans up its inline display
+    // style) when this marker is present. Plain DOM removal is covered by
+    // the `isConnected` check in the same callback.
+    const originalHide = toastEl.hide.bind(toastEl);
+    toastEl.hide = function deferredHide(this: HelixToast): void {
+      _cancelledDeferred.add(toastEl);
+      // Restore the host's natural display rule so a cancelled-then-removed
+      // toast does not leave a `display: none` artifact behind if the
+      // consumer keeps it attached for any reason.
+      toastEl.style.removeProperty('display');
+      originalHide();
+    };
   }
 
   // Append the toast to the stack synchronously so the host element is
@@ -313,20 +343,28 @@ export function toast(options: ToastOptions): HelixToast {
         _pendingAppends.delete(targetStack);
       }
       popDeadline(_pendingAppendDeadlines, targetStack, appendFireAt);
-      // Guard: the consumer may have removed the toast before its slot
-      // opened (e.g. test cleanup). Only show if still connected.
-      if (toastEl.isConnected) {
-        // (codex p2) Clear the inline `display: none` applied above so
-        // the natural `:host { display: block }` rule reasserts before
-        // `show()` flips `open=true`. The order here matters — clearing
-        // display BEFORE show() ensures the toast is in layout flow on
-        // the same frame visibility activates, avoiding a one-frame
-        // invisible-but-allocated layout window.
+      // Guard: the consumer may have cancelled the toast before its slot
+      // opened — either by calling `hide()` (tracked via
+      // `_cancelledDeferred`) or by removing it from the DOM
+      // (`!isConnected`). In either case, skip `show()` and clean up the
+      // inline display style we applied during the defer window so the
+      // toast does not leave a `display: none` artifact behind.
+      // (codex p2 round-2.)
+      if (!toastEl.isConnected || _cancelledDeferred.has(toastEl)) {
         toastEl.style.removeProperty('display');
-        wireAutoRemove();
-        toastEl.show();
-        _shownAt.set(toastEl, Date.now());
+        _cancelledDeferred.delete(toastEl);
+        return;
       }
+      // (codex p2) Clear the inline `display: none` applied above so
+      // the natural `:host { display: block }` rule reasserts before
+      // `show()` flips `open=true`. The order here matters — clearing
+      // display BEFORE show() ensures the toast is in layout flow on
+      // the same frame visibility activates, avoiding a one-frame
+      // invisible-but-allocated layout window.
+      toastEl.style.removeProperty('display');
+      wireAutoRemove();
+      toastEl.show();
+      _shownAt.set(toastEl, Date.now());
     }, deferAppendMs);
   } else {
     wireAutoRemove();

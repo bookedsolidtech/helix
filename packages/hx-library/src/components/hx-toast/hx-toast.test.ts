@@ -873,6 +873,51 @@ describe('toast() utility', () => {
     expect(t4PostBox.height).toBeGreaterThan(0);
   });
 
+  it('honors hide() called during the deferred-show window (codex p2 round-2)', async () => {
+    // Regression: the deferred-show path queued a `setTimeout` to flip the
+    // toast visible after the displaced one hid. If a consumer called
+    // `hide()` (or removed the element) during that window, the timer
+    // still fired `show()` and the toast appeared anyway — defying the
+    // explicit cancellation request. Fix tracks a per-toast cancellation
+    // marker and skips `show()` when it is set.
+    const placement = 'top-start';
+    document
+      .querySelectorAll<HelixToastStack>(`hx-toast-stack[placement="${placement}"]`)
+      .forEach((s) => s.remove());
+
+    // Fill to capacity (default stackLimit = 3).
+    const t1 = toast({ message: 'Cancel-1', placement });
+    await t1.updateComplete;
+    const t2 = toast({ message: 'Cancel-2', placement });
+    await t2.updateComplete;
+    const t3 = toast({ message: 'Cancel-3', placement });
+    await t3.updateComplete;
+
+    // Burst 4th toast — t1 still inside MIN_DISPLAY_MS, so this enters
+    // the deferred-show path and is queued behind t1's deferred-hide.
+    const t4 = toast({ message: 'Cancel-4', placement });
+    await t4.updateComplete;
+
+    // Sanity: the queued toast is NOT yet open and is hidden from layout.
+    expect(t4.open).toBe(false);
+    expect(t4.style.display).toBe('none');
+    expect(t4.isConnected).toBe(true);
+
+    // Consumer cancels mid-window.
+    t4.hide();
+
+    // Wait past the defer window. The deferred `setTimeout` will fire
+    // and must NOT call `show()` on the cancelled toast.
+    await new Promise((r) => setTimeout(r, 1700));
+    await t4.updateComplete;
+
+    // Cancellation honored: open stays false; the inline display: none
+    // artifact is cleared so a still-attached toast does not occupy
+    // zero layout permanently.
+    expect(t4.open).toBe(false);
+    expect(t4.style.display).toBe('');
+  });
+
   it('enforces stack limit under a rapid burst within MIN_DISPLAY_MS (group-6 codex round-1)', async () => {
     // (group-6 codex round-1 burst-fix) When more than one toast() call
     // arrives inside the 1500ms minimum-display window after the stack is
