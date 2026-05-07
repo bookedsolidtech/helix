@@ -1,6 +1,21 @@
+<!--
+  Web fonts for the helix design language.
+
+  Inter (variable weights 300–900 incl. 800) is the primary prose face.
+  Weight 800 powers the editorial hero headline (clamp(48px, 6vw, 96px),
+  line-height 0.95, letter-spacing -0.035em) imported from the dist
+  review bundle (`/Users/himerus/Downloads/dist/foundation/04-type.html`).
+
+  JetBrains Mono is the engineering/eyebrow face — token names, code
+  samples, mono-meta annotations, force-state labels. Loaded with the
+  full 100..900 range so docs MDX can drive weight per surface.
+
+  Both are sourced from Google Fonts to keep the preconnect target set
+  to the same origin as the rest of helix's font tooling.
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
   rel="stylesheet"
 />
