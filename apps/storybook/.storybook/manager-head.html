@@ -1,5 +1,63 @@
 <meta name="robots" content="noindex, nofollow" />
 <!--
+  Manager FOUC prevention. The manager chrome (sidebar, toolbar) reads
+  the same data-theme attribute the preview iframe uses. Without this
+  block, the manager paints in light first, then snaps to dark/high-
+  contrast when the manager-theme module loads. We re-use the same
+  resolution chain as the preview: URL globals → localStorage shadow
+  → default light.
+-->
+<script>
+  (function () {
+    try {
+      var html = document.documentElement;
+      var theme = '';
+      var brand = '';
+      try {
+        var url = new URL(window.location.href);
+        var raw = url.searchParams.get('globals') || '';
+        raw.split(';').forEach(function (pair) {
+          var idx = pair.indexOf(':');
+          if (idx === -1) return;
+          var k = pair.slice(0, idx).trim();
+          var v = pair.slice(idx + 1).trim();
+          if (k === 'theme') theme = v;
+          else if (k === 'brand') brand = v;
+        });
+      } catch (_e) {
+        /* fall through */
+      }
+      if (!theme || !brand) {
+        try {
+          var stored = window.localStorage.getItem('helix:storybook:globals');
+          if (stored) {
+            var parsed = JSON.parse(stored);
+            if (!theme && parsed && typeof parsed.theme === 'string') theme = parsed.theme;
+            if (!brand && parsed && typeof parsed.brand === 'string') brand = parsed.brand;
+          }
+        } catch (_e) {
+          /* fall through */
+        }
+      }
+      if (!theme) theme = 'light';
+      html.setAttribute('data-theme', theme);
+      if (brand) html.setAttribute('data-brand', brand);
+      else html.removeAttribute('data-brand');
+    } catch (_e) {
+      /* never throw */
+    }
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  :root[data-theme='dark'],
+  :root[data-theme='high-contrast'] {
+    color-scheme: dark;
+  }
+</style>
+<!--
   Manager chrome shares the preview's font stack so brand title /
   toolbar labels render in the same Inter face as the preview canvas.
   Inter 800 covers the editorial hero weight; JetBrains Mono lets the

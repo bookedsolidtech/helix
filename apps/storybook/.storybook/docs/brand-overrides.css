@@ -1,0 +1,137 @@
+/*
+ * brand-overrides.css — Storybook-only brand registry overrides.
+ *
+ * @helixui/tokens publishes the HELiX-default cascade only. The published
+ * package intentionally does not ship `[data-brand="…"]` overrides; those
+ * are the consumer's job (registered at runtime via HelixBrandRegistry).
+ *
+ * For Storybook docs we mirror the dist v3.2.2 review-bundle reference
+ * brands (Meridian / Evergreen / Lumen) so the toolbar's brand swap is
+ * visibly functional on every page — the toolbar mutates data-brand on
+ * <html>, the rules below recolor `--hx-color-{primary,secondary}-*`,
+ * and every `var(--hx-color-primary-…)` consumer reflows.
+ *
+ * Contract:
+ *   1. Brands ONLY override the primitive primary + secondary ramps.
+ *   2. The 22-token semantic tier (surface.*, text.*, border.*, action.*)
+ *      stays untouched — semantic tokens reference the ramps via cascade,
+ *      so they recompute automatically on brand change.
+ *   3. High-contrast SUPPRESSES brand. The hx-color-primary-* values for
+ *      `[data-theme="high-contrast"]` are AA-tuned and load-bearing for
+ *      the AAA cert; see `dist/foundation/02-brand.html` for the contract.
+ *   4. The HELiX default (no `data-brand` attribute) inherits the
+ *      published @helixui/tokens cascade — we do NOT override `:root`.
+ *
+ * Hex values are mined verbatim from the dist reference registry at
+ * /Users/himerus/Downloads/dist/assets/helix-tokens.css:270-325, with
+ * the `meridian` / `evergreen` / `lumen` toolbar names mapping to the
+ * dist's `mercy-health` / `lakeside-medical` / `summit-childrens`
+ * primary ramps (the BrandRegistry MDX page locks these names).
+ */
+
+@layer hx-docs {
+  /* ── Meridian — authoritative indigo (mercy-health primary ramp) ── */
+  [data-brand='meridian'] {
+    --hx-color-primary-50: #eff4ff;
+    --hx-color-primary-100: #dce8ff;
+    --hx-color-primary-200: #bdd3ff;
+    --hx-color-primary-300: #90b4ff;
+    --hx-color-primary-400: #5b8aff;
+    --hx-color-primary-500: #003da5;
+    --hx-color-primary-600: #002d8a;
+    --hx-color-primary-700: #002070;
+    --hx-color-primary-800: #001559;
+    --hx-color-primary-900: #000d3d;
+    --hx-color-primary-950: #00061f;
+
+    --hx-color-secondary-50: #f0fafb;
+    --hx-color-secondary-100: #dbf2f5;
+    --hx-color-secondary-200: #b3e4ea;
+    --hx-color-secondary-300: #7accd7;
+    --hx-color-secondary-400: #3dafc0;
+    --hx-color-secondary-500: #1d8fa3;
+    --hx-color-secondary-600: #177285;
+    --hx-color-secondary-700: #135c6c;
+    --hx-color-secondary-800: #0f4a57;
+    --hx-color-secondary-900: #0a3741;
+    --hx-color-secondary-950: #061f25;
+  }
+
+  /* ── Evergreen — calm regional teal (lakeside-medical primary ramp) ── */
+  [data-brand='evergreen'] {
+    --hx-color-primary-50: #f0fdfc;
+    --hx-color-primary-100: #ccfbf1;
+    --hx-color-primary-200: #99f6e4;
+    --hx-color-primary-300: #5eead4;
+    --hx-color-primary-400: #2dd4bf;
+    --hx-color-primary-500: #007878;
+    --hx-color-primary-600: #006060;
+    --hx-color-primary-700: #004f4f;
+    --hx-color-primary-800: #003b3b;
+    --hx-color-primary-900: #002b2b;
+    --hx-color-primary-950: #001a1a;
+
+    --hx-color-secondary-50: #f8fafc;
+    --hx-color-secondary-100: #f1f5f9;
+    --hx-color-secondary-200: #e2e8f0;
+    --hx-color-secondary-300: #cbd5e1;
+    --hx-color-secondary-400: #94a3b8;
+    --hx-color-secondary-500: #64748b;
+    --hx-color-secondary-600: #475569;
+    --hx-color-secondary-700: #334155;
+    --hx-color-secondary-800: #1e293b;
+    --hx-color-secondary-900: #0f172a;
+    --hx-color-secondary-950: #020617;
+  }
+
+  /* ── Lumen — warm optimistic violet (summit-childrens primary ramp) ── */
+  [data-brand='lumen'] {
+    --hx-color-primary-50: #faf5ff;
+    --hx-color-primary-100: #f3e8ff;
+    --hx-color-primary-200: #e9d5ff;
+    --hx-color-primary-300: #d8b4fe;
+    --hx-color-primary-400: #c084fc;
+    --hx-color-primary-500: #7c3aed;
+    --hx-color-primary-600: #6d28d9;
+    --hx-color-primary-700: #5b21b6;
+    --hx-color-primary-800: #4c1d95;
+    --hx-color-primary-900: #3b1478;
+    --hx-color-primary-950: #2e1065;
+
+    --hx-color-secondary-50: #fff1f2;
+    --hx-color-secondary-100: #ffe4e6;
+    --hx-color-secondary-200: #fecdd3;
+    --hx-color-secondary-300: #fda4af;
+    --hx-color-secondary-400: #fb7185;
+    --hx-color-secondary-500: #e11d48;
+    --hx-color-secondary-600: #be123c;
+    --hx-color-secondary-700: #9f1239;
+    --hx-color-secondary-800: #881337;
+    --hx-color-secondary-900: #4c0519;
+    --hx-color-secondary-950: #2a0210;
+  }
+
+  /*
+   * High-contrast brand suppression.
+   * AAA-tuned high-contrast tokens are authoritative — brand registries
+   * must not override them. Any data-brand combined with high-contrast
+   * resets the primary/secondary ramps to the @helixui/tokens
+   * high-contrast values (re-stated here so brand selectors can't win
+   * specificity races against the published tokens cascade).
+   */
+  [data-theme='high-contrast'][data-brand='meridian'],
+  [data-theme='high-contrast'][data-brand='evergreen'],
+  [data-theme='high-contrast'][data-brand='lumen'] {
+    --hx-color-primary-50: var(--hx-color-neutral-50);
+    --hx-color-primary-100: var(--hx-color-neutral-100);
+    --hx-color-primary-200: var(--hx-color-neutral-200);
+    --hx-color-primary-300: var(--hx-color-neutral-300);
+    --hx-color-primary-400: var(--hx-color-neutral-400);
+    --hx-color-primary-500: #ffff00;
+    --hx-color-primary-600: #ffff00;
+    --hx-color-primary-700: #ffff00;
+    --hx-color-primary-800: #ffff00;
+    --hx-color-primary-900: #ffff00;
+    --hx-color-primary-950: #ffff00;
+  }
+}

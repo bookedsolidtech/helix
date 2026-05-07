@@ -1,5 +1,6 @@
 import '@helixui/tokens/tokens.css';
 import './docs/helix-docs.css';
+import './docs/brand-overrides.css';
 import './docs/force-states.css';
 import type { Preview } from '@storybook/web-components';
 import { setCustomElementsManifest } from '@storybook/web-components';
@@ -155,6 +156,16 @@ const preview: Preview = {
     actions: {
       argTypesRegex: '^hx-.*',
     },
+    // Pseudo-states addon. The toolbar exposes `:hover`, `:focus`, `:focus-visible`,
+    // `:active`, `:visited`, and `:target` toggles; this default enables the
+    // selector-based fallback for consumers whose components don't use Shadow DOM
+    // attributes for state. Components in @helixui/library already expose
+    // forced-state hooks via `force-states.css`; the addon stacks on top.
+    pseudo: {},
+    // Designs addon. Per-story `parameters.design` accepts `{ type: 'figma',
+    // url: '...' }` (or any embed URL). Setting an empty default here keeps
+    // the panel registered without a global frame.
+    design: {},
   },
 
   initialGlobals: {
@@ -215,11 +226,29 @@ const preview: Preview = {
     // Brand switching via data-brand attribute on <html>. Mirrors the
     // dist v3.2.2 review bundle's brand registry. Empty value clears
     // the attribute so the HELiX default cascade applies.
+    //
+    // The brand override stylesheet (`.storybook/docs/brand-overrides.css`)
+    // defines `[data-brand="meridian|evergreen|lumen"]` rules that swap
+    // the primary/secondary primitive ramps; semantic tokens recompute
+    // automatically because they reference the ramps via cascade.
+    //
+    // We also persist the resolved (theme, brand) tuple to localStorage
+    // under `helix:storybook:globals` so the FOUC-prevention block in
+    // preview-head.html and manager-head.html can apply them BEFORE
+    // first paint on subsequent loads.
     (story, ctx) => {
       const brand = (ctx.globals.brand as string) ?? '';
+      const theme = (ctx.globals.theme as string) ?? 'light';
       if (typeof document !== 'undefined') {
         if (brand) document.documentElement.setAttribute('data-brand', brand);
         else document.documentElement.removeAttribute('data-brand');
+      }
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem('helix:storybook:globals', JSON.stringify({ theme, brand }));
+        } catch {
+          /* storage disabled — the URL globals param remains the source of truth */
+        }
       }
       return story();
     },
