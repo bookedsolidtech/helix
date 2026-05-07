@@ -5,11 +5,19 @@
  * package intentionally does not ship `[data-brand="…"]` overrides; those
  * are the consumer's job (registered at runtime via HelixBrandRegistry).
  *
- * For Storybook docs we mirror the dist v3.2.2 review-bundle reference
- * brands (Meridian / Evergreen / Lumen) so the toolbar's brand swap is
- * visibly functional on every page — the toolbar mutates data-brand on
- * <html>, the rules below recolor `--hx-color-{primary,secondary}-*`,
- * and every `var(--hx-color-primary-…)` consumer reflows.
+ * For Storybook docs we ship six reference brands to demonstrate the
+ * white-label cascade across distinct industries:
+ *
+ *   • Apex (default, no data-brand) — precision-cool teal, healthcare-leaning
+ *   • Meridian — institutional indigo (financial services, federal portals)
+ *   • Lumen — optimistic violet (consumer surfaces, member dashboards)
+ *   • Verdant — moss/forest (sustainability, climate, conservation)
+ *   • Signal — electric cobalt (tech, SaaS, developer platforms)
+ *   • Ember — deep amber/terracotta (energy, industrial, logistics)
+ *
+ * The toolbar mutates data-brand on <html>, the rules below recolor
+ * `--hx-color-{primary,secondary}-*`, and every `var(--hx-color-primary-…)`
+ * consumer reflows automatically through the cascade.
  *
  * Contract:
  *   1. Brands ONLY override the primitive primary + secondary ramps.
@@ -17,20 +25,17 @@
  *      stays untouched — semantic tokens reference the ramps via cascade,
  *      so they recompute automatically on brand change.
  *   3. High-contrast SUPPRESSES brand. The hx-color-primary-* values for
- *      `[data-theme="high-contrast"]` are AA-tuned and load-bearing for
- *      the AAA cert; see `dist/foundation/02-brand.html` for the contract.
- *   4. The HELiX default (no `data-brand` attribute) inherits the
+ *      `[data-theme="high-contrast"]` are AAA-tuned and load-bearing for
+ *      the AAA cert; brand selectors must not win the specificity race.
+ *   4. The HELiX/Apex default (no `data-brand` attribute) inherits the
  *      published @helixui/tokens cascade — we do NOT override `:root`.
- *
- * Hex values are mined verbatim from the dist reference registry at
- * /Users/himerus/Downloads/dist/assets/helix-tokens.css:270-325, with
- * the `meridian` / `evergreen` / `lumen` toolbar names mapping to the
- * dist's `mercy-health` / `lakeside-medical` / `summit-childrens`
- * primary ramps (the BrandRegistry MDX page locks these names).
+ *   5. AAA contract: every brand's primary-700 stop hits ≥7:1 against
+ *      white text (verified at authoring time via WCAG luminance math).
+ *      primary-500 is the AA-tuned mid-stop matching Apex's posture.
  */
 
 @layer hx-docs {
-  /* ── Meridian — authoritative indigo (mercy-health primary ramp) ── */
+  /* ── Meridian — authoritative indigo (financial services / federal) ── */
   [data-brand='meridian'] {
     --hx-color-primary-50: #eff4ff;
     --hx-color-primary-100: #dce8ff;
@@ -57,34 +62,7 @@
     --hx-color-secondary-950: #061f25;
   }
 
-  /* ── Evergreen — calm regional teal (lakeside-medical primary ramp) ── */
-  [data-brand='evergreen'] {
-    --hx-color-primary-50: #f0fdfc;
-    --hx-color-primary-100: #ccfbf1;
-    --hx-color-primary-200: #99f6e4;
-    --hx-color-primary-300: #5eead4;
-    --hx-color-primary-400: #2dd4bf;
-    --hx-color-primary-500: #007878;
-    --hx-color-primary-600: #006060;
-    --hx-color-primary-700: #004f4f;
-    --hx-color-primary-800: #003b3b;
-    --hx-color-primary-900: #002b2b;
-    --hx-color-primary-950: #001a1a;
-
-    --hx-color-secondary-50: #f8fafc;
-    --hx-color-secondary-100: #f1f5f9;
-    --hx-color-secondary-200: #e2e8f0;
-    --hx-color-secondary-300: #cbd5e1;
-    --hx-color-secondary-400: #94a3b8;
-    --hx-color-secondary-500: #64748b;
-    --hx-color-secondary-600: #475569;
-    --hx-color-secondary-700: #334155;
-    --hx-color-secondary-800: #1e293b;
-    --hx-color-secondary-900: #0f172a;
-    --hx-color-secondary-950: #020617;
-  }
-
-  /* ── Lumen — warm optimistic violet (summit-childrens primary ramp) ── */
+  /* ── Lumen — warm optimistic violet (consumer surfaces / portals) ── */
   [data-brand='lumen'] {
     --hx-color-primary-50: #faf5ff;
     --hx-color-primary-100: #f3e8ff;
@@ -111,6 +89,95 @@
     --hx-color-secondary-950: #2a0210;
   }
 
+  /* ── Verdant — moss / forest (sustainability, climate, conservation) ── */
+  /* primary-700 #1f5226 vs white = 9.16:1 (AAA)                          */
+  [data-brand='verdant'] {
+    --hx-color-primary-50: #f1f8f1;
+    --hx-color-primary-100: #dcecdb;
+    --hx-color-primary-200: #bcdcbb;
+    --hx-color-primary-300: #8dc28d;
+    --hx-color-primary-400: #5fa362;
+    --hx-color-primary-500: #3d8242;
+    --hx-color-primary-600: #2d6831;
+    --hx-color-primary-700: #1f5226;
+    --hx-color-primary-800: #173f1d;
+    --hx-color-primary-900: #0f2c14;
+    --hx-color-primary-950: #06170a;
+
+    --hx-color-secondary-50: #fbf7ee;
+    --hx-color-secondary-100: #f3eaca;
+    --hx-color-secondary-200: #e7d195;
+    --hx-color-secondary-300: #d4ae5b;
+    --hx-color-secondary-400: #b88a37;
+    --hx-color-secondary-500: #956d24;
+    --hx-color-secondary-600: #74531b;
+    --hx-color-secondary-700: #5a4015;
+    --hx-color-secondary-800: #3f2c0f;
+    --hx-color-secondary-900: #291c08;
+    --hx-color-secondary-950: #170f04;
+  }
+
+  /* ── Signal — electric cobalt (tech / SaaS / developer platforms) ── */
+  /* primary-700 #0040b0 vs white = 8.90:1 (AAA)                       */
+  /* Distinct from Meridian's institutional indigo — Signal sits on a  */
+  /* brighter, more saturated cobalt hue; pairs with cyan secondary.   */
+  [data-brand='signal'] {
+    --hx-color-primary-50: #eff6ff;
+    --hx-color-primary-100: #dbeafe;
+    --hx-color-primary-200: #bedbff;
+    --hx-color-primary-300: #90c1ff;
+    --hx-color-primary-400: #5b9eff;
+    --hx-color-primary-500: #1e6dff;
+    --hx-color-primary-600: #0a52e0;
+    --hx-color-primary-700: #0040b0;
+    --hx-color-primary-800: #072e7e;
+    --hx-color-primary-900: #0a214f;
+    --hx-color-primary-950: #06122a;
+
+    --hx-color-secondary-50: #edfcff;
+    --hx-color-secondary-100: #d4f6ff;
+    --hx-color-secondary-200: #a8edff;
+    --hx-color-secondary-300: #6fdfff;
+    --hx-color-secondary-400: #2bc7ed;
+    --hx-color-secondary-500: #06a4cb;
+    --hx-color-secondary-600: #0381a3;
+    --hx-color-secondary-700: #066682;
+    --hx-color-secondary-800: #0a4d63;
+    --hx-color-secondary-900: #073645;
+    --hx-color-secondary-950: #031c25;
+  }
+
+  /* ── Ember — deep amber / terracotta (energy / industrial / logistics) ── */
+  /* primary-700 #7d2e02 vs white = 9.28:1 (AAA)                            */
+  /* Warm hues tend to fail AAA at mid-stops; Ember anchors at 700+ to keep */
+  /* the brand legible on text-on-strong primary surfaces. Slate secondary  */
+  /* grounds the warm primary against industrial / utility surfaces.       */
+  [data-brand='ember'] {
+    --hx-color-primary-50: #fff5ec;
+    --hx-color-primary-100: #ffe5cc;
+    --hx-color-primary-200: #ffc699;
+    --hx-color-primary-300: #ff9d5c;
+    --hx-color-primary-400: #f57224;
+    --hx-color-primary-500: #d4540a;
+    --hx-color-primary-600: #a83f04;
+    --hx-color-primary-700: #7d2e02;
+    --hx-color-primary-800: #5b2002;
+    --hx-color-primary-900: #3e1502;
+    --hx-color-primary-950: #220b01;
+
+    --hx-color-secondary-50: #f8fafc;
+    --hx-color-secondary-100: #eef2f6;
+    --hx-color-secondary-200: #d5dde5;
+    --hx-color-secondary-300: #aebcc9;
+    --hx-color-secondary-400: #7c8ea0;
+    --hx-color-secondary-500: #566578;
+    --hx-color-secondary-600: #3e4b5b;
+    --hx-color-secondary-700: #2c3645;
+    --hx-color-secondary-800: #1d2532;
+    --hx-color-secondary-900: #11161e;
+    --hx-color-secondary-950: #080a0e;
+  }
+
   /*
    * High-contrast brand suppression.
    * AAA-tuned high-contrast tokens are authoritative — brand registries
@@ -120,8 +187,10 @@
    * specificity races against the published tokens cascade).
    */
   [data-theme='high-contrast'][data-brand='meridian'],
-  [data-theme='high-contrast'][data-brand='evergreen'],
-  [data-theme='high-contrast'][data-brand='lumen'] {
+  [data-theme='high-contrast'][data-brand='lumen'],
+  [data-theme='high-contrast'][data-brand='verdant'],
+  [data-theme='high-contrast'][data-brand='signal'],
+  [data-theme='high-contrast'][data-brand='ember'] {
     --hx-color-primary-50: var(--hx-color-neutral-50);
     --hx-color-primary-100: var(--hx-color-neutral-100);
     --hx-color-primary-200: var(--hx-color-neutral-200);

@@ -468,49 +468,69 @@
     text-transform: lowercase;
   }
 
-  /* ── Pillar cards (overview) ──────────────────────────────── */
+  /* ── Pillar cards (overview / brand registry) ──────────────── */
 
+  /*
+   * Full-width horizontal rows at desktop. Cards stack vertically on
+   * narrow viewports via the breakpoint below. The previous
+   * `repeat(auto-fit, minmax(280px, 1fr))` rendered as 3-up at typical
+   * desktop widths; full-width rows give each brand card the breathing
+   * room to read editorial-first rather than tile-grid.
+   */
   .hx-docs-pillars {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .hx-docs-pillar {
     background: var(--hx-color-surface-raised, #f8f9fa);
     border: 1px solid var(--hx-color-border-default, #dee2e6);
-    border-radius: 18px;
-    padding: 32px;
+    border-radius: 16px;
+    padding: 28px 32px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
+    transition:
+      border-color var(--hx-duration-fast, 100ms) ease,
+      box-shadow var(--hx-duration-fast, 100ms) ease;
+  }
+
+  .hx-docs-pillar:hover {
+    border-color: var(--hx-color-border-strong, #adb5bd);
+    box-shadow: var(--hx-shadow-sm, 0 1px 2px rgba(13, 24, 37, 0.06));
   }
 
   .hx-docs-pillar-footer {
     margin-top: auto;
-    padding-top: 20px;
+    padding-top: 16px;
     border-top: 1px solid var(--hx-color-border-subtle, #e9ecef);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .hx-docs-pillar-ramp {
     display: grid;
     grid-template-columns: repeat(11, 1fr);
-    height: 36px;
-    border-radius: 8px;
+    height: 32px;
+    border-radius: 6px;
     overflow: hidden;
   }
 
+  /*
+   * Quiet annotation under the swatch ramp — must not compete with
+   * the swatch row visually. 9px / 0.06em sits below the 10px / 0.08em
+   * eyebrow scale used elsewhere, signalling "footnote, not heading".
+   */
   .hx-docs-pillar-ramp-meta {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: var(--hx-color-text-muted, #6c757d);
   }
 
@@ -971,6 +991,7 @@
     .hx-docs-swatch:hover {
       transform: none;
     }
+    .hx-docs-pillar,
     .hx-docs-token-ref,
     .hx-docs-collapsible > summary::after {
       transition: none;

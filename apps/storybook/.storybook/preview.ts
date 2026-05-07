@@ -180,13 +180,18 @@ const preview: Preview = {
 
   /**
    * Brand toolbar entry. Sets `data-brand` on <html>; the brand registry
-   * documented at `Foundations/Brand registry` toggles between the four
-   * reference brands (HELiX default + Meridian + Evergreen + Lumen).
+   * documented at `Foundations/Brand Registry` toggles between the six
+   * reference brands (Apex default + Meridian + Lumen + Verdant + Signal
+   * + Ember).
    *
    * The data-brand attribute is read by `<hx-theme brand="…">` consumers
    * and by the brand-mock tile demonstrations in the Brand Registry MDX
    * page; it is not consumed by the published @helixui/tokens cascade
    * (brand registries are added by consumers themselves).
+   *
+   * Each entry maps 1:1 with a `[data-brand="…"]` block in
+   * `.storybook/docs/brand-overrides.css`; new entries here without a
+   * matching CSS block will toolbar-toggle but not visibly recolor.
    */
   globalTypes: {
     brand: {
@@ -195,10 +200,12 @@ const preview: Preview = {
         title: 'Brand',
         icon: 'paintbrush',
         items: [
-          { value: '', title: 'HELiX (default)' },
+          { value: '', title: 'Apex (default)' },
           { value: 'meridian', title: 'Meridian (indigo)' },
-          { value: 'evergreen', title: 'Evergreen (teal)' },
           { value: 'lumen', title: 'Lumen (violet)' },
+          { value: 'verdant', title: 'Verdant (forest)' },
+          { value: 'signal', title: 'Signal (cobalt)' },
+          { value: 'ember', title: 'Ember (amber)' },
         ],
         dynamicTitle: true,
       },
@@ -223,14 +230,15 @@ const preview: Preview = {
       attributeName: 'data-theme',
     }),
 
-    // Brand switching via data-brand attribute on <html>. Mirrors the
-    // dist v3.2.2 review bundle's brand registry. Empty value clears
-    // the attribute so the HELiX default cascade applies.
+    // Brand switching via data-brand attribute on <html>. Six reference
+    // brands ship with HELiX storybook (Apex default + Meridian, Lumen,
+    // Verdant, Signal, Ember). Empty value clears the attribute so the
+    // Apex / @helixui/tokens default cascade applies.
     //
     // The brand override stylesheet (`.storybook/docs/brand-overrides.css`)
-    // defines `[data-brand="meridian|evergreen|lumen"]` rules that swap
-    // the primary/secondary primitive ramps; semantic tokens recompute
-    // automatically because they reference the ramps via cascade.
+    // defines `[data-brand="meridian|lumen|verdant|signal|ember"]` rules
+    // that swap the primary/secondary primitive ramps; semantic tokens
+    // recompute automatically because they reference the ramps via cascade.
     //
     // We also persist the resolved (theme, brand) tuple to localStorage
     // under `helix:storybook:globals` so the FOUC-prevention block in
