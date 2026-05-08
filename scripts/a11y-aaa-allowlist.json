@@ -2,6 +2,7 @@
   "$schema": "./a11y-aaa-allowlist.schema.json",
   "_comment": "AAA Cert Epic (Workstream B.1) — per-component opt-in for axe wcag2aaa rules. Components listed here run the AAA tag bucket on top of AA in scripts/a11y-audit.js. Initial state is empty: no component runs AAA until it has earned the @aaa-certified JSDoc tag via the B.3 per-component audit. The CEM analyzer plugin (Workstream A.3) will eventually drive this list automatically; for now the list is hand-edited as components earn certification.",
   "components": [
+    "hx-action-bar",
     "hx-alert",
     "hx-button",
     "hx-button-group",
