@@ -92,11 +92,17 @@
  * See `.reports/aaa-conformance-action-list.md` for the full WCAG 2.1
  * AAA mapping HELiX claims, and `Accessibility/Consumer Obligations` in
  * Storybook for the partial-applicability success criteria contracts.
+ *
+ * NOTE: brand rules MUST stay UNLAYERED. `@helixui/tokens/tokens.css`
+ * defines `:root { --hx-color-primary-* }` at the top of the cascade
+ * with no layer; CSS resolves any unlayered declaration above any
+ * named layer regardless of specificity, so wrapping these rules in
+ * `@layer hx-docs { }` silently disables every brand override. Keep
+ * them at top level.
  */
 
-@layer hx-docs {
-  /* ── Meridian — authoritative indigo (financial services / federal) ── */
-  [data-brand='meridian'] {
+/* ── Meridian — authoritative indigo (financial services / federal) ── */
+  :root[data-brand='meridian'] {
     --hx-color-primary-50: #eff4ff;
     --hx-color-primary-100: #dce8ff;
     --hx-color-primary-200: #bdd3ff;
@@ -123,7 +129,7 @@
   }
 
   /* ── Lumen — warm optimistic violet (consumer surfaces / portals) ── */
-  [data-brand='lumen'] {
+  :root[data-brand='lumen'] {
     --hx-color-primary-50: #faf5ff;
     --hx-color-primary-100: #f3e8ff;
     --hx-color-primary-200: #e9d5ff;
@@ -151,7 +157,7 @@
 
   /* ── Verdant — moss / forest (sustainability, climate, conservation) ── */
   /* primary-700 #1f5226 vs white = 9.16:1 (AAA)                          */
-  [data-brand='verdant'] {
+  :root[data-brand='verdant'] {
     --hx-color-primary-50: #f1f8f1;
     --hx-color-primary-100: #dcecdb;
     --hx-color-primary-200: #bcdcbb;
@@ -181,7 +187,7 @@
   /* primary-700 #0040b0 vs white = 8.90:1 (AAA)                       */
   /* Distinct from Meridian's institutional indigo — Signal sits on a  */
   /* brighter, more saturated cobalt hue; pairs with cyan secondary.   */
-  [data-brand='signal'] {
+  :root[data-brand='signal'] {
     --hx-color-primary-50: #eff6ff;
     --hx-color-primary-100: #dbeafe;
     --hx-color-primary-200: #bedbff;
@@ -212,7 +218,7 @@
   /* Warm hues tend to fail AAA at mid-stops; Ember anchors at 700+ to keep */
   /* the brand legible on text-on-strong primary surfaces. Slate secondary  */
   /* grounds the warm primary against industrial / utility surfaces.       */
-  [data-brand='ember'] {
+  :root[data-brand='ember'] {
     --hx-color-primary-50: #fff5ec;
     --hx-color-primary-100: #ffe5cc;
     --hx-color-primary-200: #ffc699;
@@ -246,11 +252,11 @@
    * high-contrast values (re-stated here so brand selectors can't win
    * specificity races against the published tokens cascade).
    */
-  [data-theme='high-contrast'][data-brand='meridian'],
-  [data-theme='high-contrast'][data-brand='lumen'],
-  [data-theme='high-contrast'][data-brand='verdant'],
-  [data-theme='high-contrast'][data-brand='signal'],
-  [data-theme='high-contrast'][data-brand='ember'] {
+  :root[data-theme='high-contrast'][data-brand='meridian'],
+  :root[data-theme='high-contrast'][data-brand='lumen'],
+  :root[data-theme='high-contrast'][data-brand='verdant'],
+  :root[data-theme='high-contrast'][data-brand='signal'],
+  :root[data-theme='high-contrast'][data-brand='ember'] {
     --hx-color-primary-50: var(--hx-color-neutral-50);
     --hx-color-primary-100: var(--hx-color-neutral-100);
     --hx-color-primary-200: var(--hx-color-neutral-200);
@@ -288,4 +294,3 @@
     --hx-color-secondary-900: #ffff00;
     --hx-color-secondary-950: #ffff00;
   }
-}
