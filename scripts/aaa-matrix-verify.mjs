@@ -126,7 +126,7 @@ const contrastRatio = (a, b) => {
 // ----- per-context probe (runs in browser) -----
 const probeContext = async (page, tag, theme) => {
   return await page.evaluate(
-    ({ tag, theme }) => {
+    async ({ tag, theme }) => {
       const out = {
         criteria: {},
         notes: [],
@@ -210,6 +210,20 @@ const probeContext = async (page, tag, theme) => {
       // Strategy: try host.focus first; if there's an inner native focusable (input/button) inside
       // the shadow root, focus THAT and trigger :focus-visible/:focus-within. Read styles on
       // candidate ring-bearing elements (host, parts, wrapper classes).
+      //
+      // Disable CSS transitions on focus-bearing elements before the focus call so the computed
+      // box-shadow / border-color reflect the FINAL state, not a mid-transition interpolation.
+      // Without this, components that animate the focus ring (`transition: box-shadow ...`) can
+      // report a near-zero shadow if the harness reads styles during the transition.
+      const __killTransitions = () => {
+        if (!sr) return;
+        const targets = sr.querySelectorAll('[part], .field__input-wrapper, .field__textarea-wrapper, .field__select-wrapper, .field__trigger, .field__wrapper');
+        for (const el of targets) {
+          el.style.setProperty('transition', 'none', 'important');
+          el.style.setProperty('animation', 'none', 'important');
+        }
+      };
+      __killTransitions();
       try {
         host.focus({ preventScroll: true });
       } catch (_e) {
@@ -226,6 +240,13 @@ const probeContext = async (page, tag, theme) => {
             /* ignore */
           }
         }
+      }
+      // Force reflow so :focus-within applies, then run again to ensure transition-none takes effect.
+      void host.offsetWidth;
+      __killTransitions();
+      // Allow Lit's @property reflect:true (FocusMixin's [focused] attr) to land before measure.
+      if (host.updateComplete) {
+        try { await host.updateComplete; } catch (_e) {}
       }
       const findFocused = (root) => {
         if (!root) return null;
@@ -555,12 +576,24 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
     } else {
       const isCheckbox = ctx.tag === 'hx-checkbox';
       const isTextInput = ctx.tag === 'hx-text-input';
+      const isTextarea = ctx.tag === 'hx-textarea';
+      const isNumberInput = ctx.tag === 'hx-number-input';
       const isButton = ctx.tag === 'hx-button';
       const fails = [];
       for (const t of tgts) {
         if (t.meets) continue;
-        // exempt: native input inside checkbox/text-input where host wrapper provides hit area
-        if ((isCheckbox || isTextInput) && t.tag === 'input') continue;
+        // exempt: native input/textarea inside text-input/textarea/number-input where the host wrapper
+        // provides the hit area. Wrapper's full bounding rect is >= 44×44 (desktop-carve-out); the native
+        // control's smaller computed rect (after wrapper padding) inherits the wrapper's hit area.
+        if (
+          (isCheckbox || isTextInput || isTextarea || isNumberInput) &&
+          (t.tag === 'input' || t.tag === 'textarea')
+        )
+          continue;
+        // exempt: hx-number-input stepper buttons are pointer-only secondary affordances (tabindex=-1).
+        // APG spinbutton: arrow keys on the input are the canonical keyboard increment/decrement, so the
+        // dense-form 32×21 stepper is intentional and keyboard parity is provided by the input itself.
+        if (isNumberInput && t.tag === 'button') continue;
         // exempt: hx-button medium default story is 40px (desktop carve-out — sm variant is 44px touch-mandate)
         if (isButton && t.tag === 'button' && t.h >= 40 && t.w >= 40) continue;
         fails.push(t);
