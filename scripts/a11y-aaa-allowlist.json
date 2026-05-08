@@ -11,6 +11,7 @@
     "hx-number-input",
     "hx-select",
     "hx-text-input",
-    "hx-textarea"
+    "hx-textarea",
+    "hx-time-picker"
   ]
 }
