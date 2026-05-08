@@ -163,21 +163,27 @@ export const helixSplitButtonStyles = css`
 
   /* ─── Variant: primary ─── */
 
+  /* Primary resting — bind through action.primary.bg (resolves to primary-600
+     across all 6 brands) coordinated with text.on-primary. Inline fallback
+     #0d1825 matches text.on-primary's resolved primitive (neutral-900) so a
+     cold-start without semantic tokens paints AA-tuned dark-on-teal (5.20:1)
+     rather than white-on-teal (3.43:1 fail). Mirrors hx-button precedent
+     (hx-button.styles.ts ~line 88) and Phase C structural fix. */
   .split-button--primary .split-button__primary,
   .split-button--primary .split-button__trigger {
-    --hx-split-button-bg: var(--hx-color-primary-500, #429797);
-    --hx-split-button-color: var(--hx-color-text-on-primary, #ffffff);
+    --hx-split-button-bg: var(--hx-color-action-primary-bg, #429797);
+    --hx-split-button-color: var(--hx-color-text-on-primary, #0d1825);
     --hx-split-button-border-color: transparent;
     --hx-split-button-divider-color: var(--hx-color-primary-900, #0b3232);
   }
 
-  /* primary:hover — replace the universal brightness(0.9) filter (which would
-     drop primary-500 + on-primary contrast to ~4.4:1) with an explicit swap
-     to primary-600 and a neutral-0 foreground. Mirrors hx-button precedent. */
+  /* primary:hover — lift to action.primary.bg-hover (primary-700) with
+     text.on-primary-strong (neutral-0). Replaces the universal brightness(0.9)
+     filter which would degrade contrast on the resting pair. */
   .split-button--primary .split-button__primary:hover,
   .split-button--primary .split-button__trigger:hover {
-    --hx-split-button-bg: var(--hx-color-primary-600, #0f7078);
-    --hx-split-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-split-button-bg: var(--hx-color-action-primary-bg-hover, #0f7078);
+    --hx-split-button-color: var(--hx-color-text-on-primary-strong, #ffffff);
     filter: none;
   }
 
