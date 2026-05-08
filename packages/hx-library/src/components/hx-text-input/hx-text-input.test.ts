@@ -724,6 +724,67 @@ describe('hx-text-input', () => {
     });
   });
 
+  // ─── Accessibility (axe-core AAA) — AAA Cert Epic Phase C ───
+
+  /*
+   * AAA cert: hx-text-input has full AAA compliance for all field-level
+   * concerns (label association, focus ring 2px, target size 44px on md/lg,
+   * forced-colors). The 1.4.6 (color-contrast-enhanced) deferral mirrors
+   * hx-button — error-text and helper-text colors live on the same Phase E
+   * lift schedule.
+   */
+  const AAA_RULES_OPT = {
+    rules: { 'color-contrast-enhanced': { enabled: false } },
+    level: 'aaa' as const,
+  };
+
+  describe('Accessibility (axe-core AAA)', () => {
+    it('default labeled input clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+
+    it('error state with aria-invalid + role=alert clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input label="Email" error="Invalid email"></hx-text-input>',
+      );
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+
+    it('all sizes meet AAA target size (sans 1.4.6)', async () => {
+      const sizes = ['sm', 'md', 'lg'] as const;
+      for (const size of sizes) {
+        const el = await fixture<HxTextInput>(
+          `<hx-text-input label="Test" hx-size="${size}"></hx-text-input>`,
+        );
+        const { violations } = await checkA11y(el, AAA_RULES_OPT);
+        expect(violations, `size=${size} AAA violations`).toEqual([]);
+      }
+    });
+
+    it('disabled + required + helpText all clear AAA (sans 1.4.6)', async () => {
+      const disabled = await fixture<HxTextInput>(
+        '<hx-text-input label="Off" disabled></hx-text-input>',
+      );
+      const r1 = await checkA11y(disabled, AAA_RULES_OPT);
+      expect(r1.violations, 'disabled AAA').toEqual([]);
+
+      const required = await fixture<HxTextInput>(
+        '<hx-text-input label="Name" required></hx-text-input>',
+      );
+      const r2 = await checkA11y(required, AAA_RULES_OPT);
+      expect(r2.violations, 'required AAA').toEqual([]);
+
+      const help = await fixture<HxTextInput>(
+        '<hx-text-input label="Phone" help-text="Numbers only"></hx-text-input>',
+      );
+      const r3 = await checkA11y(help, AAA_RULES_OPT);
+      expect(r3.violations, 'helpText AAA').toEqual([]);
+    });
+  });
+
   // ─── Property: requiredMessage ───
 
   describe('Property: requiredMessage', () => {

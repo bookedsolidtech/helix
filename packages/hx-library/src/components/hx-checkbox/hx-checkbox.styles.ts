@@ -98,15 +98,21 @@ export const helixCheckboxStyles = css`
   /* ─── Checked State ─── */
 
   .checkbox--checked .checkbox__box {
-    background-color: var(--hx-checkbox-checked-bg, var(--hx-color-primary-500, #429797));
-    border-color: var(--hx-checkbox-checked-border-color, var(--hx-color-primary-500, #429797));
+    background-color: var(--hx-checkbox-checked-bg, var(--hx-color-action-primary-bg, #0f7078));
+    border-color: var(
+      --hx-checkbox-checked-border-color,
+      var(--hx-color-action-primary-bg, #0f7078)
+    );
   }
 
   /* ─── Indeterminate State ─── */
 
   .checkbox--indeterminate .checkbox__box {
-    background-color: var(--hx-checkbox-checked-bg, var(--hx-color-primary-500, #429797));
-    border-color: var(--hx-checkbox-checked-border-color, var(--hx-color-primary-500, #429797));
+    background-color: var(--hx-checkbox-checked-bg, var(--hx-color-action-primary-bg, #0f7078));
+    border-color: var(
+      --hx-checkbox-checked-border-color,
+      var(--hx-color-action-primary-bg, #0f7078)
+    );
   }
 
   /* ─── Error State ─── */

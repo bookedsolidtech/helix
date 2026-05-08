@@ -57,7 +57,10 @@ export const helixPaginationStyles = css`
 
   .button:hover:not(:disabled) {
     background: var(--hx-pagination-hover-bg, var(--hx-color-surface-sunken, #ebeee9));
-    border-color: var(--hx-pagination-hover-border-color, var(--hx-color-primary-500, #429797));
+    border-color: var(
+      --hx-pagination-hover-border-color,
+      var(--hx-color-action-primary-bg, #0f7078)
+    );
   }
 
   .button:focus-visible {
@@ -67,10 +70,10 @@ export const helixPaginationStyles = css`
   }
 
   .button[aria-current='page'] {
-    background: var(--hx-pagination-active-bg, var(--hx-color-primary-500, #429797));
+    background: var(--hx-pagination-active-bg, var(--hx-color-action-primary-bg, #0f7078));
     border-color: var(
       --hx-pagination-active-border-color,
-      var(--hx-pagination-active-bg, var(--hx-color-primary-500, #429797))
+      var(--hx-pagination-active-bg, var(--hx-color-action-primary-bg, #0f7078))
     );
     color: var(--hx-pagination-active-color, var(--hx-color-text-on-primary, #ffffff));
     font-weight: var(--hx-font-weight-semibold, 600);
