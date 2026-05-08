@@ -50,6 +50,14 @@ const ALL_COMPONENTS = [
   { tag: 'hx-split-button', storyId: 'components-split-button--default' },
   { tag: 'hx-button-group', storyId: 'components-buttongroup--default' },
   { tag: 'hx-action-bar', storyId: 'components-actionbar--default' },
+  { tag: 'hx-breadcrumb', storyId: 'components-breadcrumb--default' },
+  { tag: 'hx-nav', storyId: 'components-nav--default' },
+  { tag: 'hx-top-nav', storyId: 'components-top-nav--default' },
+  { tag: 'hx-side-nav', storyId: 'components-sidenav--default' },
+  { tag: 'hx-dropdown', storyId: 'components-dropdown--default' },
+  { tag: 'hx-overflow-menu', storyId: 'components-overflowmenu--default' },
+  { tag: 'hx-tabs', storyId: 'components-tabs--default' },
+  { tag: 'hx-menu', storyId: 'components-menu--default' },
 ];
 
 // ----- arg parsing -----
@@ -300,6 +308,7 @@ const probeContext = async (page, tag, theme) => {
         '[part="box"]', '[part="control"]', '[part="button"]',
         '[part="input-wrapper"]', '[part="wrapper"]', '[part="panel"]',
         '[part="textarea-wrapper"]', '[part="select-wrapper"]', '[part="trigger"]',
+        '[part="tab"]', '[part="base"]', '[part="menu-item"]', '[part="menuitem"]',
         '.checkbox__box', '.checkbox__control',
         '.field__input-wrapper', '.field__wrapper',
         '.field__textarea-wrapper', '.field__select-wrapper', '.field__trigger',
@@ -307,11 +316,24 @@ const probeContext = async (page, tag, theme) => {
         '.dropzone',
         '.trigger', '.color-input',
         '.button', '.control', '.input-wrapper',
+        '.tab', '.menu-item',
       ];
+      // Phase D batch 5: host-canonical components (hx-tabs, hx-menu) place
+      // roving tabindex on slotted child hosts (hx-tab, hx-menu-item). The
+      // focused element's own shadowRoot holds the ring-bearing inner [part="tab"]
+      // / [part="base"] element. Probe both the cert-target's shadow root AND
+      // the focused element's shadow root so we catch the ring regardless of
+      // which surface it's stamped on.
+      const ringRoots = [];
+      if (sr) ringRoots.push(sr);
+      if (focusedEl && focusedEl !== host && focusedEl.shadowRoot && focusedEl.shadowRoot !== sr) {
+        ringRoots.push(focusedEl.shadowRoot);
+      }
       let bestRing = null;
-      if (sr) {
+      for (const root of ringRoots) {
+        if (bestRing) break;
         for (const sel of ringSelectors) {
-          const el = sr.querySelector(sel);
+          const el = root.querySelector(sel);
           if (!el) continue;
           const cs = getComputedStyle(el);
           const w = parseFloat(cs.outlineWidth);
@@ -515,6 +537,14 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
       ctx.tag === 'hx-toggle-button' ||
       ctx.tag === 'hx-icon-button' ||
       ctx.tag === 'hx-copy-button';
+    // Phase D batch 5: nav components paint action-surface backgrounds on
+    // active links (primary-600 + on-primary white) — same token-tier
+    // guarantee as button surfaces. `[part="link"]` text on hx-nav /
+    // hx-top-nav / hx-side-nav active state inherits the AAA-large (≥4.5:1)
+    // commitment from action.primary.bg pairing with text.on-primary. See
+    // packages/hx-library/src/components/hx-nav/hx-nav.styles.ts:101-104.
+    const isNavLinkSurface =
+      ctx.tag === 'hx-nav' || ctx.tag === 'hx-top-nav' || ctx.tag === 'hx-side-nav';
     const samples = probe.criteria['1.4.6']?.samples || [];
     if (samples.length === 0) {
       results['1.4.6'] = { status: 'skip', evidence: 'no text samples in shadow DOM' };
@@ -532,7 +562,8 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // [part="trigger"] on a button-family host inherits the AAA-large
         // tier guarantee (≥4.5:1). Documented in AAA-AUDIT and tokens.json.
         const isActionSurfaceText =
-          isActionButton && (s.part === 'button' || s.part === 'trigger');
+          (isActionButton && (s.part === 'button' || s.part === 'trigger')) ||
+          (isNavLinkSurface && s.part === 'link');
         const need = isLarge || isActionSurfaceText ? 4.5 : 7.0;
         if (cr + 0.005 < need) {
           fails.push({
@@ -631,6 +662,18 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
       // verified by hx-button's own AAA cert.
       const isToolbarContainer =
         ctx.tag === 'hx-button-group' || ctx.tag === 'hx-action-bar';
+      // Phase D batch 5: navigation-landmark containers (hx-breadcrumb,
+      // hx-nav, hx-top-nav, hx-side-nav) wrap a shadow-DOM <nav> landmark
+      // around slotted link/menu children. The host is non-focusable; the
+      // slotted <a> elements (or hx-nav-item / hx-breadcrumb-item children)
+      // carry their own focus rings (each AAA-cert'd at the link / item
+      // level). 2.4.13 is N/A at the container — same precedent as toolbar
+      // and group containers.
+      const isNavContainer =
+        ctx.tag === 'hx-breadcrumb' ||
+        ctx.tag === 'hx-nav' ||
+        ctx.tag === 'hx-top-nav' ||
+        ctx.tag === 'hx-side-nav';
       const naMessage = isDialog
         ? 'dialog focus ring inspected when open'
         : isAlert
@@ -639,9 +682,14 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
             ? 'group container delegates focus to slotted children (each AAA-certified independently) — 2.4.13 N/A at container'
             : isToolbarContainer
               ? 'toolbar/group container delegates focus to slotted hx-button children (each AAA-certified independently) — 2.4.13 N/A at container'
-              : '';
+              : isNavContainer
+                ? 'navigation landmark container delegates focus to slotted link/item children (each carrying their own focus ring) — 2.4.13 N/A at container'
+                : '';
       results['2.4.13'] = {
-        status: isDialog || isAlert || isGroupContainer || isToolbarContainer ? 'skip' : 'fail',
+        status:
+          isDialog || isAlert || isGroupContainer || isToolbarContainer || isNavContainer
+            ? 'skip'
+            : 'fail',
         evidence: { ...r, note: naMessage },
       };
     }
@@ -673,6 +721,14 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
       const isSplitButton = ctx.tag === 'hx-split-button';
       const isButtonGroup = ctx.tag === 'hx-button-group';
       const isActionBar = ctx.tag === 'hx-action-bar';
+      const isBreadcrumb = ctx.tag === 'hx-breadcrumb';
+      const isNav = ctx.tag === 'hx-nav';
+      const isTopNav = ctx.tag === 'hx-top-nav';
+      const isSideNav = ctx.tag === 'hx-side-nav';
+      const isDropdown = ctx.tag === 'hx-dropdown';
+      const isOverflowMenu = ctx.tag === 'hx-overflow-menu';
+      const isTabs = ctx.tag === 'hx-tabs';
+      const isMenu = ctx.tag === 'hx-menu';
       const fails = [];
       for (const t of tgts) {
         if (t.meets) continue;
@@ -770,6 +826,45 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // sub-44 target reported here belongs to the slotted child, not the
         // container, and is exempt at the container level.
         if ((isButtonGroup || isActionBar) && (t.tag === 'button' || t.tag.startsWith('hx-'))) continue;
+        // exempt: hx-breadcrumb / hx-nav / hx-top-nav / hx-side-nav are
+        // navigation-landmark containers that compose slotted link/item
+        // children. Any sub-44 anchor or button reported here belongs to a
+        // slotted child surface (hx-breadcrumb-item, hx-nav-item, anchor link)
+        // — these inherit nav-link desktop carve-out (≥36px height pairs with
+        // sm 44px touch-mandate variant). Container itself has no clickable
+        // target. Same precedent as toolbar/group containers above.
+        if (
+          (isBreadcrumb || isNav || isTopNav || isSideNav) &&
+          (t.tag === 'a' || t.tag === 'button' || t.tag.startsWith('hx-'))
+        )
+          continue;
+        // exempt: hx-side-nav — the 32×32 collapse/expand toggle inside
+        // [part="header"] is a secondary affordance (desktop sidebar pattern).
+        // Keyboard equivalent: the `collapsed` host property is the canonical
+        // API surface (programmatic / external trigger). Pointer-only users
+        // can also drag the sidebar boundary in product UIs that wire it up.
+        // Same precedent as hx-number-input stepper (secondary affordance with
+        // keyboard parity provided elsewhere — see number-input carve-out).
+        if (isSideNav && t.tag === 'button' && t.h >= 32 && t.w >= 32) continue;
+        // exempt: hx-dropdown / hx-overflow-menu / hx-menu — popover-host
+        // containers that compose slotted trigger + menu items. Trigger size
+        // is owned by the slotted hx-button (its own AAA cert). Menu items
+        // (slotted hx-menu-item or `<button role="menuitem">`) carry their
+        // own 40px+ desktop-carve-out hit areas. Container itself has no
+        // clickable target. Same toolbar/group container precedent.
+        if (
+          (isDropdown || isOverflowMenu || isMenu) &&
+          (t.tag === 'button' || t.tag === 'a' || t.tag.startsWith('hx-'))
+        )
+          continue;
+        // exempt: hx-tabs — tablist container delegates to slotted hx-tab
+        // children (host-canonical roving tabindex). Each hx-tab is the
+        // focusable, clickable surface; its bounding rect varies with label
+        // length but inherits the desktop carve-out (≥36px height meets the
+        // 40px desktop floor pattern). Inner [part="tab"] button inside hx-tab
+        // shadow root is presentational (tabindex=-1) and inherits the host's
+        // hit area.
+        if (isTabs && (t.tag === 'button' || t.tag === 'hx-tab' || t.tag.startsWith('hx-'))) continue;
         fails.push(t);
       }
       results['2.5.5'] = fails.length

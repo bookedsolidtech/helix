@@ -4,6 +4,7 @@
   "components": [
     "hx-action-bar",
     "hx-alert",
+    "hx-breadcrumb",
     "hx-button",
     "hx-button-group",
     "hx-checkbox",
