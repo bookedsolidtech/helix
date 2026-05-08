@@ -476,25 +476,37 @@ function patchAllowlist(currentAllowlist, tagName) {
  *   | `hx-button` | P0 | <wcagA> | <wcagAa> | <wcagAaa> | <notes> |
  */
 function patchVpatRow(vpatText, tagName, criteria, certifiedDate) {
-  const lineRe = new RegExp(`^(\\|\\s*\`${tagName}\`\\s*\\|\\s*P0\\s*\\|)([^\\n]*)$`, 'm');
+  // Match the row by component name only (column 1). The tier column may say
+  // P0, P1, or an old tier label; we preserve whatever it currently is and
+  // only rewrite the conformance + notes cells.
+  const lineRe = new RegExp(`^(\\|\\s*\`${tagName}\`\\s*\\|\\s*[^|]*\\|)([^\\n]*)$`, 'm');
   const match = lineRe.exec(vpatText);
   if (!match) {
     return { text: vpatText, applied: false, reason: 'row not found' };
   }
-  const cells = match[2].split('|').map((c) => c);
-  // Cells: [wcagA, wcagAA, wcagAAA, notes] (4 segments after the leading `|`).
-  if (cells.length < 4) {
+  // `split('|')` on the trailing portion of a markdown row yields a leading
+  // empty segment (from the `|` that opens the wcagA cell) and a trailing
+  // empty segment (from the closing `|` of the row). The real conformance
+  // cells live in indices 1..3 (wcagA, wcagAA, wcagAAA) and the notes cell
+  // is the second-to-last entry.
+  const cells = match[2].split('|');
+  if (cells.length < 5) {
     return { text: vpatText, applied: false, reason: 'row shape unexpected' };
   }
-  const aaCell = ` Supports `;
-  const aaaCell = ` Supports — AAA-cert ${certifiedDate} `;
-  const aCell = ` Supports `;
-  const notesIdx = cells.length - 1;
-  const note = cells[notesIdx];
-  const newCells = [aCell, aaCell, aaaCell, note];
-  // Pad to original cell count if extras exist (the table has a final empty cell).
-  while (newCells.length < cells.length) newCells.push('');
-  const newLine = match[1] + newCells.join('|');
+  const notesIdx = cells.length - 2;
+  const certNote = `AAA-cert ${certifiedDate}`;
+  const existingNote = cells[notesIdx].trim();
+  const mergedNote = existingNote
+    ? existingNote.includes('AAA-cert')
+      ? // Replace any prior AAA-cert stamp so re-runs are idempotent.
+        existingNote.replace(/AAA-cert\s+\d{4}-\d{2}-\d{2}/, certNote)
+      : `${existingNote} — ${certNote}`
+    : certNote;
+  cells[1] = ' Supports ';
+  cells[2] = ' Supports ';
+  cells[3] = ` Supports — AAA-cert ${certifiedDate} `;
+  cells[notesIdx] = ` ${mergedNote} `;
+  const newLine = match[1] + cells.join('|');
   void criteria; // criteria currently surface in AAA-AUDIT.md; the VPAT row
   // links to it via the @aaa-audit relative path.
   return { text: vpatText.replace(lineRe, newLine), applied: true };
@@ -687,6 +699,7 @@ function stageChanges(plan) {
     ALLOWLIST_PATH,
     VPAT_PATH,
     resolve(REPO_ROOT, 'packages/hx-library/figma-inventory.json'),
+    resolve(REPO_ROOT, 'packages/hx-library/custom-elements.json'),
   ];
   spawnSync('git', ['add', '--', ...paths], {
     stdio: 'inherit',
