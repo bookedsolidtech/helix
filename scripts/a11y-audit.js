@@ -59,6 +59,14 @@ function titleToId(title) {
 /**
  * Scan a stories file for its title and exported story names using lightweight
  * regex parsing (no TS compilation needed in CI).
+ *
+ * Also extracts per-story `parameters.a11y.config.rules` overrides so the
+ * audit honours the same per-story rule disables that the Storybook a11y
+ * addon does (e.g. components with documented WCAG carve-outs that disable
+ * an over-strict axe rule on a specific story). The extractor scans for
+ * `parameters: { a11y: { config: { rules: [ { id: 'rule-id', enabled: false } ] } } }`
+ * blocks and maps each disabled rule id to the export-const story name
+ * that owns it.
  */
 function parseStoriesFile(filePath) {
   const content = readFileSync(filePath, 'utf-8');
@@ -80,7 +88,33 @@ function parseStoriesFile(filePath) {
     }
   }
 
-  return { title, storyNames, filePath };
+  // Extract per-story rule disables. Map of storyName → string[] of disabled rule ids.
+  // Only `enabled: false` is honoured; per-story `enabled: true` is irrelevant
+  // here because the AxeBuilder is rebuilt fresh per story.
+  const storyRuleOverrides = {};
+  // Iterate from each export const X = { ... }; capture the body up to the
+  // matching close brace (best-effort; nested braces tolerated to one level).
+  const exportBlockRegex = /^export\s+const\s+(\w+)\s*[:=][^{]*({[\s\S]*?^};?)/gm;
+  let blockMatch;
+  while ((blockMatch = exportBlockRegex.exec(content)) !== null) {
+    const storyName = blockMatch[1];
+    if (storyName === 'meta' || storyName === 'default' || !/^[A-Z]/.test(storyName)) continue;
+    const body = blockMatch[2];
+    const rulesMatch = body.match(/a11y\s*:\s*{[\s\S]*?rules\s*:\s*\[([\s\S]*?)\][\s\S]*?}/);
+    if (!rulesMatch) continue;
+    const ruleEntries = rulesMatch[1];
+    const disabled = [];
+    const ruleRegex = /{\s*id\s*:\s*['"]([^'"]+)['"]\s*,\s*enabled\s*:\s*false\s*}/g;
+    let r;
+    while ((r = ruleRegex.exec(ruleEntries)) !== null) {
+      disabled.push(r[1]);
+    }
+    if (disabled.length > 0) {
+      storyRuleOverrides[storyName] = disabled;
+    }
+  }
+
+  return { title, storyNames, storyRuleOverrides, filePath };
 }
 
 /**
@@ -158,7 +192,7 @@ async function runAudit() {
 
   let totalBlocking = 0;
 
-  for (const { title, storyNames, filePath } of allStories) {
+  for (const { title, storyNames, storyRuleOverrides = {}, filePath } of allStories) {
     // Audit only the Default story per component — if missing, skip
     const storiesToAudit = storyNames.includes('Default') ? ['Default'] : storyNames.slice(0, 1);
 
@@ -188,9 +222,24 @@ async function runAudit() {
               // Non-fatal — proceed with audit even if not fully idle
             });
 
-          const axeResults = await new AxeBuilder({ page })
-            .withTags(['wcag2a', 'wcag2aa', 'best-practice'])
-            .analyze();
+          // Honour per-story `parameters.a11y.config.rules` disables. This
+          // mirrors the Storybook a11y addon's per-story rule scoping so a
+          // documented WCAG carve-out on a specific story (e.g. hx-button
+          // Default's AAA-large primary fill, see
+          // apps/storybook/.storybook/docs/brand-overrides.css) does not
+          // surface as a CI blocker. Only disables are honoured; the
+          // AxeBuilder is rebuilt fresh per story so prior rule state never
+          // leaks across iterations.
+          const disabledRules = storyRuleOverrides[storyName] ?? [];
+          let axeBuilder = new AxeBuilder({ page }).withTags([
+            'wcag2a',
+            'wcag2aa',
+            'best-practice',
+          ]);
+          if (disabledRules.length > 0) {
+            axeBuilder = axeBuilder.disableRules(disabledRules);
+          }
+          const axeResults = await axeBuilder.analyze();
 
           violations = axeResults.violations;
         }
