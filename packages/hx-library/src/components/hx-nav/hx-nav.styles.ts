@@ -101,7 +101,13 @@ export const helixNavStyles = css`
 
   .nav__link--active {
     background-color: var(--hx-nav-link-active-bg, var(--hx-color-primary-600, #0f7078));
-    color: var(--hx-nav-link-active-color, var(--hx-color-neutral-0, #ffffff));
+    /* Use --hx-color-text-on-primary so the active-link text inherits the
+     * action-surface AAA-large pairing (white on primary-600 in default
+     * themes; black on lighter primary-600 in the high-contrast theme).
+     * Hardcoding white here previously failed AAA-large in high-contrast
+     * (ratio 2.54 vs. 4.5 floor). The token is the same one button surfaces
+     * use to satisfy 1.4.6 across the 6-brand × 3-theme matrix. */
+    color: var(--hx-nav-link-active-color, var(--hx-color-text-on-primary, #ffffff));
   }
 
   /* ─── Chevron Icon ─── */
