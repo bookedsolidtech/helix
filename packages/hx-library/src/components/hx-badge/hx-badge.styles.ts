@@ -11,8 +11,8 @@ export const helixBadgeStyles = css`
     justify-content: center;
     gap: var(--hx-space-1, 0.25rem);
     border-radius: var(--hx-badge-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-badge-bg, var(--hx-color-primary-500, #429797));
-    color: var(--hx-badge-color, var(--hx-color-text-on-primary, #0d1825));
+    background-color: var(--hx-badge-bg, var(--hx-color-action-primary-bg, #0f7078));
+    color: var(--hx-badge-color, var(--hx-color-text-on-primary, #ffffff));
     font-family: var(--hx-badge-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-badge-font-weight, var(--hx-font-weight-semibold, 600));
     line-height: var(--hx-line-height-tight, 1.25);
@@ -44,11 +44,11 @@ export const helixBadgeStyles = css`
   /* ─── Style Variants ─── */
 
   .badge--primary {
-    --hx-badge-bg: var(--hx-badge-primary-bg, var(--hx-color-primary-500, #429797));
-    --hx-badge-color: var(--hx-badge-primary-color, var(--hx-color-text-on-primary, #0d1825));
+    --hx-badge-bg: var(--hx-badge-primary-bg, var(--hx-color-action-primary-bg, #0f7078));
+    --hx-badge-color: var(--hx-badge-primary-color, var(--hx-color-text-on-primary, #ffffff));
     --hx-badge-pulse-color-internal: var(
       --hx-badge-pulse-color,
-      var(--hx-badge-primary-bg, var(--hx-color-primary-500, #429797))
+      var(--hx-badge-primary-bg, var(--hx-color-action-primary-bg, #0f7078))
     );
   }
 

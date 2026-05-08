@@ -76,8 +76,8 @@ export const helixRadioStyles = css`
   /* ─── Checked State ─── */
 
   .radio--checked .radio__control {
-    border-color: var(--hx-radio-checked-border-color, var(--hx-color-primary-500, #429797));
-    background-color: var(--hx-radio-checked-bg, var(--hx-color-primary-500, #429797));
+    border-color: var(--hx-radio-checked-border-color, var(--hx-color-action-primary-bg, #0f7078));
+    background-color: var(--hx-radio-checked-bg, var(--hx-color-action-primary-bg, #0f7078));
   }
 
   .radio--checked .radio__dot {

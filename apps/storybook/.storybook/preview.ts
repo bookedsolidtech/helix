@@ -3,12 +3,14 @@ import './docs/helix-docs.css';
 import './docs/brand-overrides.css';
 import './docs/force-states.css';
 import './docs/code-editor.css';
+import './docs/a11y-card.css';
 import type { Preview } from '@storybook/web-components';
 import { setCustomElementsManifest } from '@storybook/web-components';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { html } from 'lit';
 import customElements from '@helixui/library/custom-elements.json';
 import { helixBackgroundsForMode, HELIX_THEME_MODES } from './manager-theme';
+import { HelixDocsPage } from './docs/HelixDocsPage';
 
 // Register the Custom Elements Manifest so autodocs API tables
 // are populated with properties, events, slots, CSS parts, and
@@ -78,6 +80,12 @@ const preview: Preview = {
       },
     },
     docs: {
+      // Custom autodocs template — surfaces the A11yStatusCard (AAA cert
+      // + helixMeta) on every component page automatically. Lives in
+      // `docs/HelixDocsPage.tsx`; reads the meta tag via the addon-docs
+      // `useOf('meta')` hook and the CEM at module evaluation. Per-story
+      // `parameters.docs.page` overrides at the story level still win.
+      page: HelixDocsPage,
       toc: {
         headingSelector: 'h2, h3',
         title: 'Table of Contents',

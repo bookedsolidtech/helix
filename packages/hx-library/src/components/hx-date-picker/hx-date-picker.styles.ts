@@ -301,13 +301,16 @@ export const helixDatePickerStyles = css`
   }
 
   .calendar__day--selected {
-    background-color: var(--hx-date-picker-selected-bg, var(--hx-color-primary-500, #429797));
+    background-color: var(--hx-date-picker-selected-bg, var(--hx-color-action-primary-bg, #0f7078));
     color: var(--hx-date-picker-selected-color, var(--hx-color-text-on-primary, #ffffff));
     font-weight: var(--hx-font-weight-semibold, 600);
   }
 
   .calendar__day--selected:hover {
-    background-color: var(--hx-date-picker-selected-hover-bg, var(--hx-color-primary-600, #0f7078));
+    background-color: var(
+      --hx-date-picker-selected-hover-bg,
+      var(--hx-color-action-primary-bg-hover, #0f6363)
+    );
   }
 
   .calendar__day--today:not(.calendar__day--selected) {
