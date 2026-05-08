@@ -536,27 +536,36 @@ async function runBrowserChecks(componentName, page) {
     }
     await page.waitForFunction(() => document.readyState === 'complete', { timeout: 5_000 }).catch(() => {});
 
-    // Tab into the page so :focus-visible heuristics activate when we then
-    // programmatically focus the target. Without this, browsers may apply
-    // :focus styles but not :focus-visible.
+    // Reset focus to document.body so the Tab walk starts from a known state.
+    // Click on a 1×1 pixel near (0,0) inside the iframe body — programmatic
+    // body.focus() does NOT reset the keyboard-mode flag, but a real click
+    // followed by a Tab keypress does. We then move with real keyboard events
+    // so :focus-visible heuristics activate exactly as they do for a sighted
+    // keyboard user (this is the behaviour Tier-1-Task-1 was added to fix).
     await page.evaluate(() => {
-      // Force focus-visible heuristics by simulating a keyboard input.
-      // This sets the document's last focus mode to keyboard.
-      const evt = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
-      document.dispatchEvent(evt);
+      // Blur any currently focused element and reset to body.
+      if (document.activeElement && document.activeElement !== document.body) {
+        try { document.activeElement.blur(); } catch {}
+      }
+      // Insert a sentinel focusable element at the very top of <body> so the
+      // first Tab press can land on something predictable (some Storybook
+      // iframes have no focusable element ahead of the story content).
+      if (!document.getElementById('__aaa_audit_sentinel__')) {
+        const s = document.createElement('button');
+        s.id = '__aaa_audit_sentinel__';
+        s.textContent = 'aaa-audit-sentinel';
+        s.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+        document.body.insertBefore(s, document.body.firstChild);
+      }
+      const sentinel = document.getElementById('__aaa_audit_sentinel__');
+      sentinel.focus();
     });
-    await page.keyboard.press('Tab').catch(() => {});
 
-    // Locate the host element by tag name. We check the first instance only.
-    const measurements = await page.evaluate(async (tag) => {
+    // Identify the target element first (statically, via shadow DOM walk),
+    // record what we expect to focus, THEN keyboard-Tab toward it.
+    const targetInfo = await page.evaluate((tag) => {
       const host = document.querySelector(tag);
       if (!host) return { error: `no <${tag}> in story` };
-
-      // Identify the primary interactive target. Strategy:
-      //   1. If the host itself is focusable (tabindex), prefer the host.
-      //   2. Otherwise look in the shadowRoot for a focusable descendant.
-      //   3. Filter out visually-hidden / 0px elements — they aren't pointer
-      //      targets per WCAG 2.5.5 (the AT-only native checkbox/input).
       const root = host.shadowRoot || host;
       const allCandidates = [host, ...root.querySelectorAll('button, [role="button"], input, textarea, select, a[href], [tabindex]')];
       const visibleCandidates = allCandidates.filter((el) => {
@@ -566,25 +575,98 @@ async function runBrowserChecks(componentName, page) {
         if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') return false;
         return true;
       });
-      // Prefer host if focusable + visible (custom controls); else first visible candidate.
-      let target = host.tabIndex >= 0 && visibleCandidates.includes(host)
+      const target = host.tabIndex >= 0 && visibleCandidates.includes(host)
         ? host
         : (visibleCandidates.find((el) => el !== host) || visibleCandidates[0] || host);
+      // Tag the target so we can identify it across page.evaluate calls.
+      target.setAttribute('data-aaa-audit-target', '1');
+      return {
+        targetTag: target.tagName.toLowerCase(),
+        targetIsHost: target === host,
+        hostHidden: host.getBoundingClientRect().width < 2 || host.getBoundingClientRect().height < 2,
+      };
+    }, componentName);
 
-      // If the host has 0x0 box (e.g., closed dialog), bail with a Not-Applicable signal.
+    if (targetInfo.error) {
+      return { ...result, error: targetInfo.error };
+    }
+
+    // Real Tab-key walk: press Tab up to MAX_TAB times, after each press
+    // check if the deepest active element across shadow boundaries is our
+    // tagged target. This is what activates :focus-visible — the user-agent
+    // tracks the last focus modality.
+    const MAX_TAB = 80;
+    let tabbed = false;
+    let tabCount = 0;
+    for (let i = 0; i < MAX_TAB; i++) {
+      await page.keyboard.press('Tab');
+      tabCount = i + 1;
+      const reached = await page.evaluate(() => {
+        // Walk shadow boundaries to find the deepest active element.
+        let el = document.activeElement;
+        while (el && el.shadowRoot && el.shadowRoot.activeElement) {
+          el = el.shadowRoot.activeElement;
+        }
+        if (!el) return false;
+        if (el.hasAttribute && el.hasAttribute('data-aaa-audit-target')) return true;
+        // Also accept ancestors that are the tagged target (target may be
+        // the host whose shadowRoot.activeElement is the inner control).
+        let cur = el;
+        while (cur) {
+          if (cur.hasAttribute && cur.hasAttribute('data-aaa-audit-target')) return true;
+          cur = cur.assignedSlot || cur.parentNode || cur.host || null;
+          if (cur && cur.nodeType !== 1) cur = cur.host || null;
+        }
+        return false;
+      });
+      if (reached) { tabbed = true; break; }
+    }
+
+    // Now measure — the target is keyboard-focused (or we fell back to
+    // programmatic focus only if the Tab walk failed to reach it).
+    const measurements = await page.evaluate(async ({ tag, didTab }) => {
+      const target = document.querySelector(`[data-aaa-audit-target="1"]`)
+        || document.querySelector(tag);
+      if (!target) return { error: `no <${tag}> in story` };
+      const host = document.querySelector(tag) || target;
+
+      // If the Tab walk did not reach the target, fall back to programmatic
+      // focus so the rest of the measurements still land — but we'll mark
+      // the focusOutline result as "programmatic-only" for transparency.
+      if (!didTab) {
+        try { target.focus(); } catch {}
+      }
+
+      // Resolve the deepest active element across shadow boundaries. With
+      // `delegatesFocus: true`, Tab onto the host moves real focus to an
+      // inner control; document.activeElement returns the host but the
+      // :focus-visible outline lives on the inner part. Measure styles on
+      // whichever element actually owns the focus pseudo-state.
+      let activeDeep = document.activeElement;
+      while (activeDeep && activeDeep.shadowRoot && activeDeep.shadowRoot.activeElement) {
+        activeDeep = activeDeep.shadowRoot.activeElement;
+      }
+      // The element we measure outline on: prefer the deepest active element
+      // if it is inside our target's subtree (host or shadow descendant);
+      // otherwise fall back to the target itself.
+      let outlineSource = target;
+      if (activeDeep && activeDeep !== target) {
+        // Walk up from activeDeep to confirm it's inside our component subtree.
+        let cur = activeDeep;
+        let inside = false;
+        while (cur) {
+          if (cur === target || cur === host) { inside = true; break; }
+          cur = cur.assignedSlot || cur.parentNode || cur.host || null;
+          if (cur && cur.nodeType !== 1 && cur.host) cur = cur.host;
+        }
+        if (inside) outlineSource = activeDeep;
+      }
+
       const hostRect = host.getBoundingClientRect();
       const hostHidden = hostRect.width < 2 || hostRect.height < 2;
-
       const rect = target.getBoundingClientRect();
 
-      // Focus the target. We read both unfocused and focused outline so a
-      // CSS :focus-visible rule is honoured. Programmatic focus + Tab on
-      // body once before query gives us the same path as a keyboard user.
-      try {
-        target.focus();
-      } catch {}
-
-      const styles = window.getComputedStyle(target);
+      const styles = window.getComputedStyle(outlineSource);
       const outlineWidthPx = parseFloat(styles.outlineWidth || '0');
       const outlineColor = styles.outlineColor;
       const outlineStyle = styles.outlineStyle;
@@ -633,8 +715,18 @@ async function runBrowserChecks(componentName, page) {
         isCovered,
         targetTag: target.tagName.toLowerCase(),
         targetIsHost: target === host,
+        outlineSourceTag: outlineSource.tagName ? outlineSource.tagName.toLowerCase() : null,
+        outlineSourceIsTarget: outlineSource === target,
+        focusedViaKeyboard: didTab,
+        tabPresses: undefined, // populated outside evaluate scope
       };
-    }, componentName);
+    }, { tag: componentName, didTab: tabbed });
+
+    // Annotate measurement with the actual Tab-press count we recorded
+    // before the eval so the evidence string can reference it.
+    if (measurements && !measurements.error) {
+      measurements.tabPresses = tabCount;
+    }
 
     if (measurements.error) {
       result.error = measurements.error;
@@ -668,6 +760,9 @@ async function runBrowserChecks(componentName, page) {
     // 2.4.13 Focus Appearance — outline width >= 2px OR box-shadow focus ring.
     // Many components use box-shadow as the focus indicator (a11y-equivalent
     // when contrast >= 3:1 and >= 2px effective thickness). We accept either.
+    // Measurement was taken AFTER a real Tab-key walk (Tier-1-Task-1) so
+    // :focus-visible heuristics are active in the page exactly as they are
+    // for a sighted keyboard user.
     const hasOutline = measurements.outlineWidthPx >= 2 && measurements.outlineStyle !== 'none';
     // Detect a "thick enough" box-shadow — heuristic: spread-radius or
     // multi-layer shadow with a non-transparent color and a non-zero
@@ -675,28 +770,41 @@ async function runBrowserChecks(componentName, page) {
     const boxShadowSuggestsFocusRing = measurements.hasFocusBoxShadow
       && /\b\d+\s*px/.test(measurements.boxShadow)
       && !/^none$/i.test(measurements.boxShadow);
+    const outlineSourceNote = measurements.outlineSourceIsTarget
+      ? `<${measurements.targetTag}>`
+      : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> via delegatesFocus)`;
+    const focusModeNote = measurements.focusedViaKeyboard
+      ? `keyboard-focused via Tab×${measurements.tabPresses} on ${outlineSourceNote}`
+      : `Tab walk did not reach target after ${measurements.tabPresses} presses; fell back to programmatic focus on ${outlineSourceNote}`;
     let outlineVerdict;
     let outlineEvidence;
     if (hasOutline) {
       outlineVerdict = VERDICT.SUPPORTS;
-      outlineEvidence = `computed outline ${measurements.outlineWidthPx}px ${measurements.outlineStyle} ${measurements.outlineColor}`;
+      outlineEvidence = `computed outline ${measurements.outlineWidthPx}px ${measurements.outlineStyle} ${measurements.outlineColor} (${focusModeNote})`;
     } else if (boxShadowSuggestsFocusRing) {
       outlineVerdict = VERDICT.SUPPORTS;
-      outlineEvidence = `box-shadow focus indicator: ${measurements.boxShadow}. (No outline — must verify >=2px effective thickness + 3:1 contrast manually.)`;
+      outlineEvidence = `box-shadow focus indicator: ${measurements.boxShadow} (${focusModeNote}). Verify >=2px effective thickness + 3:1 contrast manually.`;
     } else if (measurements.outlineWidthPx > 0) {
       outlineVerdict = VERDICT.PARTIALLY;
-      outlineEvidence = `outline ${measurements.outlineWidthPx}px (under 2px threshold)`;
-    } else {
-      // Programmatic focus may not trigger :focus-visible — flag as Partially
-      // until we can simulate a real keyboard tab focus.
+      outlineEvidence = `outline ${measurements.outlineWidthPx}px (under 2px threshold) (${focusModeNote})`;
+    } else if (!measurements.focusedViaKeyboard) {
+      // We never reached the target with real Tab — :focus-visible may be
+      // stripped by user-agent for programmatic focus on some elements.
       outlineVerdict = VERDICT.PARTIALLY;
-      outlineEvidence = `No focus indicator detected via programmatic focus (outline 0px, no box-shadow). Programmatic focus may skip :focus-visible — manual keyboard verification needed.`;
+      outlineEvidence = `No focus indicator detected; ${focusModeNote}. Manual keyboard verification needed (story may have no path to component via Tab).`;
+    } else {
+      // Tab walk DID reach the target, no outline, no box-shadow — this is
+      // a real fail per WCAG 2.4.13.
+      outlineVerdict = VERDICT.DOES_NOT;
+      outlineEvidence = `${focusModeNote}; computed outline 0px and no box-shadow focus indicator. WCAG 2.4.13 requires a visible focus indicator >=2px.`;
     }
     result.focusOutline = {
       widthPx: measurements.outlineWidthPx,
       color: measurements.outlineColor,
       style: measurements.outlineStyle,
       boxShadow: measurements.boxShadow,
+      focusedViaKeyboard: measurements.focusedViaKeyboard,
+      tabPresses: measurements.tabPresses,
       verdict: outlineVerdict,
       evidence: outlineEvidence,
     };
