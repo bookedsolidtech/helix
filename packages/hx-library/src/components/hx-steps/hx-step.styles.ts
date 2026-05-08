@@ -122,8 +122,8 @@ export const helixStepStyles = css`
 
   /* Active: outlined indicator (in-progress) — visually distinct from complete (filled) */
   :host([status='active']) .step__indicator {
-    border-color: var(--hx-steps-active-border-color, var(--hx-color-primary-500, #429797));
-    background-color: var(--hx-steps-active-bg, var(--hx-color-primary-500, #429797));
+    border-color: var(--hx-steps-active-border-color, var(--hx-color-action-primary-bg, #0f7078));
+    background-color: var(--hx-steps-active-bg, var(--hx-color-action-primary-bg, #0f7078));
     color: var(--hx-steps-active-color, var(--hx-color-text-on-primary, #ffffff));
   }
 

@@ -665,6 +665,44 @@ describe('hx-alert', () => {
     });
   });
 
+  // ─── Accessibility (axe-core AAA) — AAA Cert Epic Phase C ───
+
+  /*
+   * AAA cert: hx-alert close-button paint resolves to action.* tokens that
+   * share the Phase E lift schedule. color-contrast-enhanced (1.4.6) is
+   * disabled here with the same justification as hx-button — the gap is in
+   * the token system, not in this component.
+   */
+  const AAA_RULES_OPT = {
+    rules: { 'color-contrast-enhanced': { enabled: false } },
+    level: 'aaa' as const,
+  };
+
+  describe('Accessibility (axe-core AAA)', () => {
+    it('default info alert clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HxAlert>('<hx-alert>Status update</hx-alert>');
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+
+    it('all variants clear AAA (sans 1.4.6)', async () => {
+      const variants = ['info', 'success', 'warning', 'error'] as const;
+      for (const variant of variants) {
+        const el = await fixture<HxAlert>(
+          `<hx-alert variant="${variant}">${variant} alert</hx-alert>`,
+        );
+        const { violations } = await checkA11y(el, AAA_RULES_OPT);
+        expect(violations, `variant=${variant} AAA violations`).toEqual([]);
+      }
+    });
+
+    it('dismissible close-button meets target size + AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HxAlert>('<hx-alert dismissible>Dismiss me</hx-alert>');
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+  });
+
   // ─── Coverage Gap: announcer microtask path ───
 
   describe('Announcer microtask path', () => {

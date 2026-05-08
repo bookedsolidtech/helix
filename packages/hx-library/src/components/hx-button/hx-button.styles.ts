@@ -292,9 +292,16 @@ export const helixButtonStyles = css`
      (primary-400, light teal). The base :host([inverted]) .button rule binds
      color to text.inverse, which flips by mode (neutral-0 in light, neutral-900
      in dark). On a permanent light-teal fill, white text drops to 2.4:1 in
-     light mode (AA fail). Pin color to text.on-primary (neutral-900, no
-     dark-mode flip) for both hover and active so the foreground is dark in
-     both modes — neutral-900 on primary-400 = 7.27:1 (AA pass).
+     light mode (AA fail). Pin color to neutral-900 directly (the primitive,
+     not text.primary which flips to neutral-100 in dark mode and would regress
+     the pair to ~2.10:1) so the foreground is dark in both modes —
+     neutral-900 on primary-400 = 7.27:1 AAA in Apex; AAA across all 6 brands.
+     Decoupled from text.on-primary in 3.3.x because text.on-primary now
+     resolves to neutral-0 (white) for the AAA-large coordinated pair on
+     primary-600; using it here would regress this pair to ~2.45:1 (Apex)
+     since primary-400 is light teal. neutral-900 is the correct anchor — it
+     is the primitive that both light/dark text.primary used to resolve to,
+     never flipped by mode/brand.
      Pressed === hover visually in inverted mode is acceptable UX (the
      transient absence of pointer over the button signals release).
      The fallback chain wraps --hx-button-active-bg (highest precedence) and
@@ -309,7 +316,7 @@ export const helixButtonStyles = css`
     );
     color: var(
       --hx-button-inverted-primary-interactive-color,
-      var(--hx-color-text-on-primary, #0d1825)
+      var(--hx-color-neutral-900, #0d1825)
     );
   }
 
