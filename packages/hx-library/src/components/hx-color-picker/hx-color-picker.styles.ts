@@ -212,7 +212,9 @@ export const helixColorPickerStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-600, #4a5362);
+    /* AAA 1.4.6: 12px label vs neutral-100 must be ≥7:1; neutral-700 = 9.34:1
+       (neutral-600 was 6.63:1, a tight AAA miss). */
+    color: var(--hx-color-neutral-700, #313e4b);
     text-transform: uppercase;
     font-weight: var(--hx-font-weight-semibold, 600);
     letter-spacing: 0.05em;

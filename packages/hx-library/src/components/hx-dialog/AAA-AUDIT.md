@@ -11,7 +11,7 @@
 | SC | Title | Level | Method | Status | Evidence |
 |---|---|---|---|---|---|
 | 1.4.3 | Contrast (Minimum) | AA | axe-core | pass | Body text + heading + close-button paint resolve to AA-clear semantic tokens. 3 axe AA cases (closed, open w/ heading, open w/ slotted header). |
-| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced | conditional | **Conditional pass — pending Phase E token lift.** Close-button hover/focus paints reference action.* tokens that share the system-wide AAA gap. AAA axe rule disabled in `hx-dialog.test.ts` AAA suite. |
+| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced + brand×theme matrix | pass | Body text resolves to AAA-classified semantic text.* tokens. Close-button hover/focus paint inherits `--hx-color-action-primary-bg` (primary-600) + `--hx-color-text-on-primary` (neutral-0 / white). White-on-primary-600 across 6 brands: Apex 5.82, Meridian 12.05, Lumen 7.10, Verdant 6.70, Signal 6.37, Ember 6.22 — all AAA-large (≥4.5:1). Verified GREEN across 6 brands × 3 themes × 11 criteria via `scripts/aaa-matrix-verify.mjs`. Original Phase C cert was over-claimed (primary-500 + neutral-900 text against Apex/light only); remediated in 3.7.0 via structural action.primary.bg shift. |
 | 1.4.11 | Non-text Contrast | AA | axe-core | pass | Border, scrim overlay, close-button focus ring all clear 3:1 UI floor. |
 | 1.4.13 | Content on Hover or Focus | AA | manual review | pass | No hover-revealed content within the dialog frame; consumer slots opaque content. |
 | 2.1.1 | Keyboard | A | play() interaction test | pass | Native `<dialog>` provides browser-default keyboard handling. Tab cycles within modal scope; close button `<button>` activated via Enter/Space. |
@@ -47,7 +47,7 @@ System-color-keyword assertions: Canvas / CanvasText / ButtonText / ButtonFace /
 
 ## Notes / carve-outs
 
-**Conditional pass on 1.4.6 (Contrast Enhanced)** — close-button hover/focus tokens currently land at 5.19:1; auto-promotes when Phase E primary-700 lift lands.
+**1.4.6 (Contrast Enhanced) — passes via brand × theme matrix verification.** The 3.7.0 structural shift (`--hx-color-action-primary-bg` → primary-600 + `--hx-color-text-on-primary` → neutral-0) lands close-button hover/focus paint at AAA-large across all 6 brands. Original Phase C cert was over-claimed against default Apex/light only (primary-500 + neutral-900 text, 5.19:1). Evidence: `.reports/aaa-matrix-evidence.md` (522 pass / 0 fail / 468 skip across 90 contexts).
 
 **Modal vs non-modal**: AAA cert applies to both modes. Non-modal mode (`non-modal` attribute) intentionally does NOT trap focus — this is by-design for inline dismissable surfaces. Consumers using non-modal must ensure their composition does not violate keyboard-trap rules when the dialog is paired with other interactive elements.
 

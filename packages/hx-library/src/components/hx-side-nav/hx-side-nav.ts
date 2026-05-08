@@ -39,6 +39,24 @@ import { helixSideNavStyles } from './hx-side-nav.styles.js';
  * @cssprop [--hx-color-border-on-dark-strong] - Container/header/footer divider border (overlay-white-70 light, overlay-black-50 dark — sized for visibility on the mode-flipped surface-inverse).
  * @cssprop [--hx-color-surface-on-dark-overlay-subtle] - Toggle button hover surface (overlay-white-10 primitive — translucent fill, not a border).
  * @cssprop [--hx-color-border-on-dark-subtle] - DEPRECATED 3.2.2; renamed to --hx-color-surface-on-dark-overlay-subtle (the value paints a translucent fill, not a border). Toggle-hover rule reads both names via deprecated-first fallback so existing overrides keep working until removal in 4.0.0.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-side-nav/AAA-AUDIT.md
+ * @keyboard-contract navigate=Arrow,Home,End; activate=Enter,Space
+ * @aria-pattern navigation
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/navigation.html
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-side-nav
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-side-nav')
 export class HelixSideNav extends HelixElement {

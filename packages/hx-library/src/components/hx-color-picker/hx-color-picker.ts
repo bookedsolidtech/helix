@@ -125,6 +125,24 @@ export interface HxColorPickerDetail {
  * @cssprop [--hx-color-neutral-600] - Color.
  * @cssprop [--hx-font-weight-semibold] - Font weight.
  * @cssprop [--hx-color-neutral-900] - Color.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-color-picker/AAA-AUDIT.md
+ * @keyboard-contract dismiss=Escape; trap-focus=true
+ * @aria-pattern dialog
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated true
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-color-picker
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-color-picker')
 export class HelixColorPicker extends FormMixin(HelixElement) {

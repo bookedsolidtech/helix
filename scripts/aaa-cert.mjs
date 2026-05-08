@@ -145,6 +145,7 @@ function parseArgs(argv) {
     pattern: null,
     stability: 'stable',
     clinical: null,
+    skipMatrix: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const tok = argv[i];
@@ -154,6 +155,7 @@ function parseArgs(argv) {
     else if (tok === '--pattern') args.pattern = argv[++i] ?? null;
     else if (tok === '--stability') args.stability = argv[++i] ?? 'stable';
     else if (tok === '--clinical') args.clinical = argv[++i] ?? null;
+    else if (tok === '--skip-matrix') args.skipMatrix = true;
     else if (tok.startsWith('--')) {
       console.warn(`[aaa-cert] unknown flag: ${tok}`);
     } else {
@@ -692,6 +694,96 @@ function regenerateCem() {
   }
 }
 
+// ── Brand × theme matrix gate ──────────────────────────────────────────────
+//
+// Phase C cert was over-claimed because verification ran against default
+// Apex/light only. The 3.7.0 structural fix landed primary-600 + on-primary
+// tokens that pass AAA-large across the full 6-brand × 3-theme matrix.
+// To prevent regressions, every cert run is gated on a successful matrix
+// verification for the target component. Bypass with --skip-matrix; the
+// bypass is logged so its use is auditable.
+//
+// Exit codes from the harness (scripts/aaa-matrix-verify.mjs):
+//   0 = MATRIX_GREEN
+//   1 = MATRIX_GAPS_FOUND (at least one programmatic FAIL)
+//   2 = HARNESS_USAGE_ERROR (unknown component, etc.)
+const MATRIX_HARNESS_PATH = resolve(REPO_ROOT, 'scripts/aaa-matrix-verify.mjs');
+function matrixEvidencePathFor(tagName) {
+  // Mirrors the harness's component-scoped output convention: the harness
+  // writes `.reports/aaa-matrix-evidence.<tag>.md` when invoked with
+  // --component, so the canonical full-matrix evidence at
+  // `.reports/aaa-matrix-evidence.md` is never clobbered by a cert run.
+  return resolve(REPO_ROOT, `.reports/aaa-matrix-evidence.${tagName}.md`);
+}
+
+function runMatrixGate(tagName, { dryRun = false, skipMatrix = false } = {}) {
+  if (skipMatrix) {
+    const stamp = `[aaa-cert] --skip-matrix used at ${new Date().toISOString()} for ${tagName}`;
+    console.warn(
+      `\n[aaa-cert] WARNING: --skip-matrix flag set; brand × theme verification BYPASSED.`,
+    );
+    console.warn(`           ${stamp}`);
+    console.warn(
+      `           This bypass should only be used when the storybook dev server is unavailable`,
+    );
+    console.warn(
+      `           or when the harness is broken. Re-run without --skip-matrix before merge.`,
+    );
+    return { skipped: true, status: 'bypassed' };
+  }
+
+  if (!exists(MATRIX_HARNESS_PATH)) {
+    die(
+      `matrix harness missing: ${MATRIX_HARNESS_PATH}\n` +
+        `   Cert refused: matrix verification is mandatory. Restore the harness or use --skip-matrix to bypass (audited).`,
+    );
+  }
+
+  const evidencePath = matrixEvidencePathFor(tagName);
+  const label = dryRun ? 'matrix preview' : 'matrix gate';
+  console.log(
+    `\n[aaa-cert] running ${label} for ${tagName} (scripts/aaa-matrix-verify.mjs)…`,
+  );
+  const result = spawnSync('node', [MATRIX_HARNESS_PATH, '--component', tagName], {
+    stdio: 'inherit',
+    cwd: REPO_ROOT,
+  });
+  if (result.error) {
+    die(
+      `failed to spawn matrix harness: ${result.error.message}\n` +
+        `   This is an environment problem (node missing? path resolution?). Cert refused.`,
+    );
+  }
+  if (result.status === 0) {
+    console.log(
+      `[aaa-cert] matrix verification GREEN for ${tagName} — see ${relative(REPO_ROOT, evidencePath)}`,
+    );
+    return { skipped: false, status: 'green' };
+  }
+  if (result.status === 1) {
+    if (dryRun) {
+      console.warn(
+        `\n[aaa-cert] WARNING: matrix preview reported FAILs for ${tagName}.`,
+      );
+      console.warn(
+        `           A live cert run would ABORT here. Inspect ${relative(REPO_ROOT, evidencePath)} and remediate before applying.`,
+      );
+      return { skipped: false, status: 'fail' };
+    }
+    die(
+      `Component "${tagName}" failed brand × theme matrix verification — refusing to stamp @aaa-certified.\n` +
+        `   See evidence: ${relative(REPO_ROOT, evidencePath)}\n` +
+        `   To bypass (audited): re-run with --skip-matrix.`,
+    );
+  }
+  // status 2 (usage error) or unexpected — die() does not return.
+  die(
+    `matrix harness exited with status ${result.status} for ${tagName}.\n` +
+      `   This is a harness or environment problem, not a component verdict.\n` +
+      `   Verify storybook is up at http://localhost:3151 and the component is in the harness's known list.`,
+  );
+}
+
 function stageChanges(plan) {
   const paths = [
     plan.auditAbsPath,
@@ -775,7 +867,9 @@ function printApplyHeader(plan) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args._.length === 0) {
-    die('usage: pnpm exec node scripts/aaa-cert.mjs <component-name> [--dry-run]');
+    die(
+      'usage: pnpm exec node scripts/aaa-cert.mjs <component-name> [--dry-run] [--skip-matrix]',
+    );
   }
   const tagName = args._[0];
 
@@ -783,12 +877,21 @@ function main() {
 
   if (args.dryRun) {
     printDryRun(plan);
+    // Run matrix as a PREVIEW in dry-run so operators see brand × theme
+    // coverage before the live cert run. Failures are reported as warnings
+    // (dry-run never aborts) but a live run with the same state would abort.
+    runMatrixGate(tagName, { dryRun: true, skipMatrix: args.skipMatrix });
     return;
   }
 
   if (!plan.patchApplied) {
     die(`JSDoc patch failed: ${plan.patchReason}. Resolve manually and re-run.`);
   }
+
+  // Brand × theme matrix gate — runs BEFORE applyPlan so a failed matrix
+  // refuses to stamp @aaa-certified. This closes the gap that caused the
+  // Phase C over-cert (default Apex/light only).
+  runMatrixGate(tagName, { dryRun: false, skipMatrix: args.skipMatrix });
 
   printApplyHeader(plan);
   applyPlan(plan);
