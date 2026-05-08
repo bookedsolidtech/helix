@@ -45,8 +45,8 @@ import { A11yStatusCard } from './A11yStatusCard';
 function useResolvedTag(): string | null {
   try {
     const meta = useOf('meta', ['meta']);
-    const candidate =
-      (meta as { preparedMeta?: { component?: unknown } } | undefined)?.preparedMeta?.component;
+    const candidate = (meta as { preparedMeta?: { component?: unknown } } | undefined)?.preparedMeta
+      ?.component;
     if (typeof candidate === 'string' && candidate.startsWith('hx-')) {
       return candidate;
     }

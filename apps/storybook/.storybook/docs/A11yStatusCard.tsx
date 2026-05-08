@@ -168,7 +168,7 @@ export function A11yStatusCard({ tag }: A11yStatusCardProps): React.ReactElement
   const criteria = aaa.criteria ?? [];
   const auditUrl = aaa.auditUrl ? `${REPO_BLOB_BASE}${aaa.auditUrl}` : null;
   const tier = meta.priorityTier ?? null;
-  const tierTooltip = tier ? PRIORITY_TIER_TOOLTIPS[tier] ?? `Priority tier: ${tier}` : null;
+  const tierTooltip = tier ? (PRIORITY_TIER_TOOLTIPS[tier] ?? `Priority tier: ${tier}`) : null;
   const keyboardLine = humanizeKeyboardContract(meta.keyboardContract);
 
   return (
@@ -256,11 +256,7 @@ export function A11yStatusCard({ tag }: A11yStatusCardProps): React.ReactElement
           <CapabilityBadge label="Brand-aware" truthy={meta.brandAware === true} />
           <CapabilityBadge label="Drupal SDC" truthy={meta.drupalSdcEligible === true} />
           {meta.reactWrapperStatus ? (
-            <CapabilityBadge
-              label="React wrapper"
-              truthy
-              valueLabel={meta.reactWrapperStatus}
-            />
+            <CapabilityBadge label="React wrapper" truthy valueLabel={meta.reactWrapperStatus} />
           ) : null}
           {meta.stability ? (
             <CapabilityBadge label="Stability" truthy valueLabel={meta.stability} />
