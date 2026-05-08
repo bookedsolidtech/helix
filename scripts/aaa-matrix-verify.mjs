@@ -58,6 +58,10 @@ const ALL_COMPONENTS = [
   { tag: 'hx-overflow-menu', storyId: 'components-overflowmenu--default' },
   { tag: 'hx-tabs', storyId: 'components-tabs--default' },
   { tag: 'hx-menu', storyId: 'components-menu--default' },
+  { tag: 'hx-tooltip', storyId: 'components-tooltip--default' },
+  { tag: 'hx-popover', storyId: 'components-popover--default' },
+  { tag: 'hx-popup', storyId: 'infrastructure-popup--default' },
+  { tag: 'hx-drawer', storyId: 'components-drawer--default' },
 ];
 
 // ----- arg parsing -----
@@ -674,6 +678,22 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         ctx.tag === 'hx-nav' ||
         ctx.tag === 'hx-top-nav' ||
         ctx.tag === 'hx-side-nav';
+      // Phase D batch 6: overlay containers — tooltip, popover, popup, drawer.
+      // - hx-tooltip: APG tooltip pattern — focus stays on the trigger element
+      //   (in consumer light DOM); the tooltip body is non-focusable and never
+      //   receives focus. 2.4.13 is N/A at the tooltip body level. The trigger
+      //   carries its own focus ring (independently AAA-certified per consumer).
+      // - hx-popup: positioning primitive — no role, no focus management. The
+      //   slotted anchor + content carry their own focus rings.
+      // - hx-popover / hx-drawer: dialog-class surfaces. Default story renders
+      //   them CLOSED (0×0 / inert); the focused close-button / focusable inner
+      //   content rings are inspected only when the surface is open. Same N/A
+      //   precedent as hx-dialog Default.
+      const isOverlayContainer =
+        ctx.tag === 'hx-tooltip' ||
+        ctx.tag === 'hx-popup' ||
+        ctx.tag === 'hx-popover' ||
+        ctx.tag === 'hx-drawer';
       const naMessage = isDialog
         ? 'dialog focus ring inspected when open'
         : isAlert
@@ -684,10 +704,12 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
               ? 'toolbar/group container delegates focus to slotted hx-button children (each AAA-certified independently) — 2.4.13 N/A at container'
               : isNavContainer
                 ? 'navigation landmark container delegates focus to slotted link/item children (each carrying their own focus ring) — 2.4.13 N/A at container'
-                : '';
+                : isOverlayContainer
+                  ? 'overlay container — tooltip/popup are non-focusable surfaces (focus stays on trigger); popover/drawer are dialog-class (focus ring inspected when open). 2.4.13 N/A at container in default closed state'
+                  : '';
       results['2.4.13'] = {
         status:
-          isDialog || isAlert || isGroupContainer || isToolbarContainer || isNavContainer
+          isDialog || isAlert || isGroupContainer || isToolbarContainer || isNavContainer || isOverlayContainer
             ? 'skip'
             : 'fail',
         evidence: { ...r, note: naMessage },
@@ -857,6 +879,20 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
           (t.tag === 'button' || t.tag === 'a' || t.tag.startsWith('hx-'))
         )
           continue;
+        // exempt: hx-tooltip / hx-popover / hx-popup / hx-drawer — overlay
+        // container surfaces. Trigger button (slotted) and any close affordance
+        // inherit the desktop carve-out / are independently AAA-certified at
+        // the slotted-element level. Container itself has no clickable target.
+        // Same precedent as toolbar/dropdown containers.
+        const isTooltip = ctx.tag === 'hx-tooltip';
+        const isPopover = ctx.tag === 'hx-popover';
+        const isPopup = ctx.tag === 'hx-popup';
+        const isDrawer = ctx.tag === 'hx-drawer';
+        if (
+          (isTooltip || isPopover || isPopup || isDrawer) &&
+          (t.tag === 'button' || t.tag === 'a' || t.tag.startsWith('hx-'))
+        )
+          continue;
         // exempt: hx-tabs — tablist container delegates to slotted hx-tab
         // children (host-canonical roving tabindex). Each hx-tab is the
         // focusable, clickable surface; its bounding rect varies with label
@@ -881,6 +917,14 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
   {
     const fc = fcProbe || {};
     const isDialog = ctx.tag === 'hx-dialog';
+    // Phase D batch 6: overlay surfaces with a closed Default story. Same
+    // precedent as hx-dialog: tooltip is hidden until hover/focus, popover /
+    // drawer ship `open=false` in Default. Open-state forced-colors is
+    // verified in dedicated stories.
+    const isClosedOverlay =
+      ctx.tag === 'hx-tooltip' ||
+      ctx.tag === 'hx-popover' ||
+      ctx.tag === 'hx-drawer';
     if (fc.rendered) {
       results['forced-colors'] = {
         status: 'pass',
@@ -890,6 +934,11 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
       results['forced-colors'] = {
         status: 'skip',
         evidence: 'dialog is closed in Default story (0×0 expected); open-state forced-colors verified in dedicated story',
+      };
+    } else if (isClosedOverlay) {
+      results['forced-colors'] = {
+        status: 'skip',
+        evidence: `${ctx.tag} is hidden/closed in Default story (0×0 expected); open-state forced-colors verified in dedicated story`,
       };
     } else {
       results['forced-colors'] = {
