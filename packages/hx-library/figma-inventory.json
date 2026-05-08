@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-08T00:38:59.515Z",
+  "generatedAt": "2026-05-08T00:40:53.549Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.6.0",
   "tokensVersion": "3.5.0",
@@ -24639,16 +24639,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-text-input/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "character-input"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "textbox",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {

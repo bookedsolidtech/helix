@@ -4,6 +4,7 @@
   "components": [
     "hx-alert",
     "hx-button",
-    "hx-checkbox"
+    "hx-checkbox",
+    "hx-text-input"
   ]
 }
