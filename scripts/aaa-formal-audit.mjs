@@ -693,6 +693,39 @@ async function runBrowserChecks(componentName, page) {
         if (inside) outlineSource = activeDeep;
       }
 
+      // If the resolved outlineSource has NO outline, it does not necessarily
+      // mean the component lacks a focus indicator. Many HELiX components
+      // render the focus ring on a sibling inside the shadow root (e.g.
+      // hx-checkbox draws outline on .checkbox__box, NOT on the focused host;
+      // hx-switch draws outline on .switch__track sibling-of-input). Walk
+      // the shadow descendants of the host once and pick the first descendant
+      // currently rendering an outline >=2px or a thick box-shadow — that is
+      // the actual focus indicator the user sees. Only do this when the
+      // primary outlineSource has no own outline (so we never over-report
+      // a passing host).
+      const ownOutlineWidth = parseFloat(window.getComputedStyle(outlineSource).outlineWidth || '0');
+      if (ownOutlineWidth < 2) {
+        const root = host.shadowRoot;
+        if (root) {
+          const candidates = root.querySelectorAll('*');
+          for (const el of candidates) {
+            const cs = window.getComputedStyle(el);
+            const w = parseFloat(cs.outlineWidth || '0');
+            const okOutline = w >= 2 && cs.outlineStyle !== 'none';
+            const okShadow = cs.boxShadow && cs.boxShadow !== 'none' && /\b\d+\s*px/.test(cs.boxShadow);
+            if (okOutline || okShadow) {
+              // Confirm the element is currently visible (focus indicators
+              // on display:none parts do not count).
+              const r = el.getBoundingClientRect();
+              if (r.width >= 2 && r.height >= 2 && cs.visibility !== 'hidden' && cs.display !== 'none') {
+                outlineSource = el;
+                break;
+              }
+            }
+          }
+        }
+      }
+
       const hostRect = host.getBoundingClientRect();
       const hostHidden = hostRect.width < 2 || hostRect.height < 2;
       const rect = target.getBoundingClientRect();
@@ -803,7 +836,7 @@ async function runBrowserChecks(componentName, page) {
       && !/^none$/i.test(measurements.boxShadow);
     const outlineSourceNote = measurements.outlineSourceIsTarget
       ? `<${measurements.targetTag}>`
-      : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> via delegatesFocus)`;
+      : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> — focus ring rendered on inner part)`;
     const focusModeNote = measurements.focusedViaKeyboard
       ? `keyboard-focused via Tab×${measurements.tabPresses} on ${outlineSourceNote}`
       : `Tab walk did not reach target after ${measurements.tabPresses} presses; fell back to programmatic focus on ${outlineSourceNote}`;
