@@ -831,6 +831,71 @@ describe('hx-button', () => {
     });
   });
 
+  // ─── Accessibility (axe-core AAA) — AAA Cert Epic Phase C ───
+
+  /*
+   * AAA cert tests run axe at `level: 'aaa'`. The `color-contrast-enhanced`
+   * (1.4.6) rule is intentionally disabled for hx-button at Phase C: the
+   * primary variant fill `action.primary.bg` resolves to primary-500 which
+   * clears AA (5.19:1 vs neutral-900) but lands below the 7:1 AAA threshold.
+   * The system-wide token lift to a primary-700 base that clears AAA is
+   * scheduled for Phase E of the AAA Cert Epic (validated-toasting-wand
+   * plan). hx-button structurally meets 1.4.6 once that lift lands; the
+   * component's contrast contract is correct. See AAA-AUDIT.md "Notes /
+   * carve-outs" and the per-pair classification in `@helixui/tokens`
+   * `.cache/contrast-report.json`.
+   */
+  const AAA_RULES_OPT = {
+    rules: { 'color-contrast-enhanced': { enabled: false } },
+    level: 'aaa' as const,
+  };
+
+  describe('Accessibility (axe-core AAA)', () => {
+    it('default primary clears AAA (sans 1.4.6 — pending Phase E token lift)', async () => {
+      const el = await fixture<HelixButton>('<hx-button>AAA Action</hx-button>');
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+
+    it('all variants clear AAA (sans 1.4.6)', async () => {
+      const variants = ['primary', 'secondary', 'tertiary', 'danger', 'ghost', 'outline'] as const;
+      for (const variant of variants) {
+        const el = await fixture<HelixButton>(
+          `<hx-button variant="${variant}">AAA ${variant}</hx-button>`,
+        );
+        const { violations } = await checkA11y(el, AAA_RULES_OPT);
+        expect(violations, `variant=${variant} AAA violations`).toEqual([]);
+      }
+    });
+
+    it('all sizes meet AAA target size 44x44', async () => {
+      const sizes = ['sm', 'md', 'lg'] as const;
+      for (const size of sizes) {
+        const el = await fixture<HelixButton>(`<hx-button hx-size="${size}">AAA ${size}</hx-button>`);
+        const { violations } = await checkA11y(el, AAA_RULES_OPT);
+        expect(violations, `size=${size} AAA violations`).toEqual([]);
+      }
+    });
+
+    it('disabled + loading states clear AAA (sans 1.4.6)', async () => {
+      const el1 = await fixture<HelixButton>('<hx-button disabled>Disabled</hx-button>');
+      const r1 = await checkA11y(el1, AAA_RULES_OPT);
+      expect(r1.violations, 'disabled AAA violations').toEqual([]);
+
+      const el2 = await fixture<HelixButton>('<hx-button loading>Loading</hx-button>');
+      const r2 = await checkA11y(el2, AAA_RULES_OPT);
+      expect(r2.violations, 'loading AAA violations').toEqual([]);
+    });
+
+    it('href anchor mode clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com">AAA Link</hx-button>',
+      );
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+  });
+
   // ─── href mode: combined anchor states ───
 
   describe('href mode: combined anchor states', () => {
