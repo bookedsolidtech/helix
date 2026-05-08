@@ -11,7 +11,7 @@
 | SC | Title | Level | Method | Status | Evidence |
 |---|---|---|---|---|---|
 | 1.4.3 | Contrast (Minimum) | AA | axe-core | pass | Default text + label + helper resolve to AA-clear semantic tokens; placeholder uses `--hx-color-text-secondary` (≥4.5:1). 4 axe AA cases at default/error/disabled/required. |
-| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced | conditional | **Conditional pass — pending Phase E token lift.** Error-text and helper-text routes share the same shared-token gap. AAA axe rule disabled; auto-promotes when token-system Phase E lift lands. |
+| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced + brand×theme matrix | pass | Body text resolves to AAA-classified semantic tokens (`--hx-color-text-primary`, `--hx-color-feedback-error-strong`). Any `action.*` references inherit the 3.7.0 structural fix: `--hx-color-action-primary-bg` (primary-600) paired with `--hx-color-text-on-primary` (neutral-0 / white). White-on-primary-600 across 6 brands: Apex 5.82, Meridian 12.05, Lumen 7.10, Verdant 6.70, Signal 6.37, Ember 6.22 — all AAA-large (≥4.5:1). Verified GREEN across 6 brands × 3 themes × 11 criteria via `scripts/aaa-matrix-verify.mjs`. Original Phase C cert referenced primary-500 + neutral-900 text (5.19:1, default Apex/light only) and was over-claimed; remediated in 3.7.0. |
 | 1.4.11 | Non-text Contrast | AA | axe-core | pass | Border (`--hx-color-border-input`), focus ring (color-mixed via `--hx-focus-ring-opacity`), error border (`--hx-color-feedback-error-strong`) all clear 3:1 UI floor. |
 | 1.4.13 | Content on Hover or Focus | AA | manual review | pass | No hover-revealed content; help/error text are static inline. |
 | 2.1.1 | Keyboard | A | play() interaction test | pass | Native `<input>` element; browser-default keyboard handling. Focus delegation via `delegatesFocus` on shadow root. |
@@ -43,6 +43,6 @@ Bespoke `@media (forced-colors: active)` block at `hx-text-input.styles.ts:308+`
 
 ## Notes / carve-outs
 
-**Conditional pass on 1.4.6 (Contrast Enhanced)** — body-text helper/error tokens currently share the system-wide AAA gap; auto-promotes on Phase E lift.
+**1.4.6 (Contrast Enhanced) — passes via brand × theme matrix verification.** The 3.7.0 structural shift (`--hx-color-action-primary-bg` → primary-600 + `--hx-color-text-on-primary` → neutral-0) bounds the worst-case action.* fill at AAA-large across all 6 brands. Body-text routes through AAA-classified feedback.* / text.* tokens. Original Phase C cert was over-claimed (Apex/light only, primary-500 + neutral-900 text). Evidence: `.reports/aaa-matrix-evidence.md` (522 pass / 0 fail / 468 skip across 90 contexts).
 
 **`sm` size and 2.5.5 (Target Size Enhanced):** `sm` size resolves to 32px min-height — meets 2.5.8 Target Size (Minimum, AA, 24×24 inscribed circle) but not 2.5.5 Target Size (Enhanced, AAA, 44×44). Consumers requiring 2.5.5 enhanced must use `md` (default) or `lg`. Documented in component JSDoc and consumer-obligations MDX. md and lg variants both clear 2.5.5; AAA cert is granted for the `md` (default) baseline as the canonical AAA surface.

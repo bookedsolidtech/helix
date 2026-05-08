@@ -11,7 +11,7 @@
 | SC | Title | Level | Method | Status | Evidence |
 |---|---|---|---|---|---|
 | 1.4.3 | Contrast (Minimum) | AA | axe-core | pass | All variants (info/success/warning/error) route through `feedback.*` semantic tokens — clears AA. `hx-alert.test.ts` Accessibility (axe-core) describe verifies 4 variants + dismissible + accent. |
-| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced | conditional | **Conditional pass — pending Phase E token lift.** Close-button hover/focus paint references action.* tokens that share the system-wide AAA gap (5.19:1 vs 7:1). AAA axe rule disabled with documented justification in `hx-alert.test.ts`. Component-level fix is none — token-system promotion handles it. |
+| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced + brand×theme matrix | pass | Variant body text routes through feedback.* AAA-classified tokens. Close-button hover/focus paint inherits `--hx-color-action-primary-bg` (primary-600) with `--hx-color-text-on-primary` (neutral-0 / white) — white-on-primary-600 across 6 brands: Apex 5.82, Meridian 12.05, Lumen 7.10, Verdant 6.70, Signal 6.37, Ember 6.22 (all AAA-large ≥4.5:1). Verified GREEN across 6 brands × 3 themes × 11 criteria via `scripts/aaa-matrix-verify.mjs`. Original Phase C cert referenced action.* tokens at 5.19:1 (primary-500/neutral-900) against Apex/light only — over-claimed; remediated in 3.7.0 via structural `action.primary.bg` shift. |
 | 1.4.11 | Non-text Contrast | AA | axe-core | pass | Variant accent borders/icons clear 3:1 UI floor; close-button focus ring ≥3:1. |
 | 1.4.13 | Content on Hover or Focus | AA | manual review | pass | No hover-revealed content; alert is fully visible on render. |
 | 2.1.1 | Keyboard | A | play() interaction test | pass | Close button is a native `<button>` (browser-default Enter/Space activation). Escape dismisses dismissible alerts (`hx-alert.test.ts` Keyboard describe). |
@@ -45,6 +45,6 @@ System-color-keyword assertions: Canvas / CanvasText / ButtonText / ButtonFace /
 
 ## Notes / carve-outs
 
-**Conditional pass on 1.4.6 (Contrast Enhanced)** — close-button hover/focus tokens currently land at 5.19:1; auto-promotes when Phase E primary-700 lift lands.
+**1.4.6 (Contrast Enhanced) — passes via brand × theme matrix verification.** The 3.7.0 structural shift (`--hx-color-action-primary-bg` → primary-600 + `--hx-color-text-on-primary` → neutral-0) lands close-button hover/focus paint at AAA-large across all 6 brands. Original Phase C cert was over-claimed (primary-500 + neutral-900 text vs Apex/light only). Evidence: `.reports/aaa-matrix-evidence.md` (522 pass / 0 fail / 468 skip across 90 contexts).
 
 The `accent` variant (`accent` attribute) renders an additional left-border accent stripe; contrast against the alert body is governed by the `--hx-color-feedback-*-strong` semantic tokens which are AAA-classified per the `@helixui/tokens` contrast-report.

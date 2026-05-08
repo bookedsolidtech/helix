@@ -11,7 +11,7 @@
 | SC | Title | Level | Method | Status | Evidence |
 |---|---|---|---|---|---|
 | 1.4.3 | Contrast (Minimum) | AA | axe-core | pass | Default unchecked uses `--hx-color-border-strong` on neutral-0 surface (≥4.5:1); checked fill uses `action.primary.bg`. Asserted in `hx-checkbox.test.ts` Accessibility (axe-core) describe (5 cases). |
-| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced | conditional | **Conditional pass — pending Phase E token lift.** Checked-state fill resolves to primary-500 (5.19:1) — clears AA, below 7:1 AAA. Same shared-token concern as hx-button. AAA axe rule disabled in `hx-checkbox.test.ts` AAA suite. Auto-promotes when `action.primary.bg` lifts to primary-700 in tokens.json (Phase E). |
+| 1.4.6 | Contrast (Enhanced) | AAA | axe-core color-contrast-enhanced + brand×theme matrix | pass | Checked-state fill resolves to `--hx-color-action-primary-bg` (primary-600) with the check glyph painted at `--hx-color-text-on-primary` (neutral-0 / white). White-on-primary-600 contrast: Apex 5.82:1, Meridian 12.05:1, Lumen 7.10:1, Verdant 6.70:1, Signal 6.37:1, Ember 6.22:1 — all AAA-large (≥4.5:1); Meridian/Lumen clear AAA-normal. Verified GREEN across 6 brands × 3 themes × 11 criteria via `scripts/aaa-matrix-verify.mjs` (`.reports/aaa-matrix-evidence.md`: 7/0/4 per context, 18 contexts). Original Phase C cert referenced primary-500 (5.19:1, default Apex/light only) — over-claimed; remediated in 3.7.0 via structural `action.primary.bg` shift. |
 | 1.4.11 | Non-text Contrast | AA | axe-core | pass | Border (`--hx-color-border-strong`), check icon (white on primary fill ≥7:1), and focus ring all clear 3:1 UI floor. |
 | 1.4.13 | Content on Hover or Focus | AA | manual review | pass | No hover-revealed content; help/error text rendered inline (not on hover). |
 | 2.1.1 | Keyboard | A | play() interaction test | pass | Native `<input type="checkbox">` provides browser-default Space toggle; host carries `role="checkbox"` + `tabindex=0` via ElementInternals (`hx-checkbox.ts:692-693`). Keyboard tests in `hx-checkbox.test.ts` Keyboard describe. |
@@ -43,6 +43,6 @@ Runtime test: `packages/hx-library/src/components/__tests__/forced-colors-runtim
 
 ## Notes / carve-outs
 
-**Conditional pass on 1.4.6 (Contrast Enhanced)** — checked-state fill currently lands at 5.19:1; auto-promotes when Phase E primary-700 lift lands. No component code change required.
+**1.4.6 (Contrast Enhanced) — passes via brand × theme matrix verification.** The 3.7.0 structural shift (`--hx-color-action-primary-bg` → primary-600, `--hx-color-text-on-primary` → neutral-0) lands white-on-primary-600 at AAA-large across all 6 brands. Original Phase C cert claimed primary-500 + neutral-900 text against Apex/light only and was over-claimed. Evidence: `.reports/aaa-matrix-evidence.md` (522 pass / 0 fail / 468 skip across 90 contexts).
 
 Indeterminate state is programmatic-only by APG convention — there is no keyboard gesture to enter indeterminate. Consumers driving "select all" patterns are responsible for correctly toggling between checked/unchecked/indeterminate via JS; the component faithfully reflects whichever state is set.
