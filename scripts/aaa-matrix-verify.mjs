@@ -2,6 +2,21 @@
 // Up to 5 components × 6 brands × 3 themes = 90 contexts (default scope).
 // Evaluates the 11 component-shippable AAA criteria per Pattern A11y AAA Path.
 //
+// VERDICT AUTHORITY (Tier-1 Task-4, 2026-05-08): the canonical formal audit
+// harness is `scripts/aaa-formal-audit.mjs`, which produces VPAT 2.5
+// verdicts (Supports / Partially Supports / Does Not Support / Not
+// Applicable) backed by measurable evidence and direct WCAG citations. The
+// matrix harness exists to verify that the SAME findings hold across every
+// brand × theme combination — it is a coverage gate, not a verdict authority.
+// Where the two harnesses disagree, defer to the formal audit. Several
+// invented carve-outs that previously whitewashed matrix passes — the
+// "40px desktop md" 2.5.5 carve-out, the "first-party nav-link" container
+// exemption, the side-nav 32x32 toggle exemption, the color-picker swatch
+// height exemption, and the action-surface AAA-large pairing for 16px
+// regular text — were retired in this round because none of them mapped
+// to a normative WCAG 2.2 SC exception. The matrix will now surface MORE
+// failures than the prior pass — that is the point.
+//
 // Output:
 //   .reports/aaa-matrix-evidence.md  (gitignored)
 // Exit:
@@ -519,36 +534,19 @@ const aaaAllowlist = async () => {
 // ----- per-context evaluation -----
 const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) => {
   const results = {};
-  // 1.4.6 — every text sample meets 7:1 (or 4.5:1 for ≥18pt or ≥14pt-bold)
+  // 1.4.6 Contrast (Enhanced) — every text sample meets 7:1, OR 4.5:1 for
+  // text that meets the WCAG 2.1 large-scale-text definition: 18pt (24px)
+  // regular OR 14pt (18.66px) bold.
+  // https://www.w3.org/TR/WCAG22/#contrast-enhanced
+  // https://www.w3.org/TR/WCAG22/#dfn-large-scale
   //
-  // Action-surface carve-out: button-family components paint primary-fill
-  // backgrounds (action.primary.bg = primary-600) coordinated with
-  // text.on-primary (white). The token system explicitly commits to AAA-LARGE
-  // (≥4.5:1) on these surfaces — see tokens.json `text.on-primary` description:
-  // "Pairs with action.primary.bg (primary-600) for AAA-large contrast across
-  // all 6 brands: Apex 5.82:1, Meridian 12.05:1, Lumen 7.10:1, Verdant 6.70:1,
-  // Signal 6.37:1, Ember 6.22:1." Button-label text rendered directly inside
-  // an inner `[part="button"]` (e.g. hx-split-button's primary action) inherits
-  // this surface-level commitment. hx-button itself slot-based and so doesn't
-  // surface text in the probe; hx-split-button hardcodes the label text and
-  // is the canonical case where this carve-out applies. Acceptance threshold
-  // for these `[part="button"]` text nodes is therefore AAA-large (4.5:1)
-  // matching the token-tier guarantee.
+  // RETIRED: "Action-surface AAA-large carve-out" that paired 16px-regular
+  // button labels with the 4.5:1 large-text threshold. WCAG 2.1's normative
+  // large-scale definition is font-size + weight only; a token note in
+  // tokens.json that documents 4.5:1+ contrast does not redefine the SC.
+  // Button-label and nav-link text smaller than 24px regular / 18.66px bold
+  // is held to the 7:1 AAA threshold like any other body text.
   {
-    const isActionButton =
-      ctx.tag === 'hx-button' ||
-      ctx.tag === 'hx-split-button' ||
-      ctx.tag === 'hx-toggle-button' ||
-      ctx.tag === 'hx-icon-button' ||
-      ctx.tag === 'hx-copy-button';
-    // Phase D batch 5: nav components paint action-surface backgrounds on
-    // active links (primary-600 + on-primary white) — same token-tier
-    // guarantee as button surfaces. `[part="link"]` text on hx-nav /
-    // hx-top-nav / hx-side-nav active state inherits the AAA-large (≥4.5:1)
-    // commitment from action.primary.bg pairing with text.on-primary. See
-    // packages/hx-library/src/components/hx-nav/hx-nav.styles.ts:101-104.
-    const isNavLinkSurface =
-      ctx.tag === 'hx-nav' || ctx.tag === 'hx-top-nav' || ctx.tag === 'hx-side-nav';
     const samples = probe.criteria['1.4.6']?.samples || [];
     if (samples.length === 0) {
       results['1.4.6'] = { status: 'skip', evidence: 'no text samples in shadow DOM' };
@@ -562,13 +560,7 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         const isLarge =
           s.fontSize >= 24 ||
           (s.fontSize >= 18.66 && s.fontWeight >= 700);
-        // Action-surface carve-out: text directly inside [part="button"] or
-        // [part="trigger"] on a button-family host inherits the AAA-large
-        // tier guarantee (≥4.5:1). Documented in AAA-AUDIT and tokens.json.
-        const isActionSurfaceText =
-          (isActionButton && (s.part === 'button' || s.part === 'trigger')) ||
-          (isNavLinkSurface && s.part === 'link');
-        const need = isLarge || isActionSurfaceText ? 4.5 : 7.0;
+        const need = isLarge ? 4.5 : 7.0;
         if (cr + 0.005 < need) {
           fails.push({
             tag: s.tag,
@@ -730,23 +722,10 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
       const isTextInput = ctx.tag === 'hx-text-input';
       const isTextarea = ctx.tag === 'hx-textarea';
       const isNumberInput = ctx.tag === 'hx-number-input';
-      const isButton = ctx.tag === 'hx-button';
-      const isSelect = ctx.tag === 'hx-select';
-      const isCombobox = ctx.tag === 'hx-combobox';
-      const isDatePicker = ctx.tag === 'hx-date-picker';
-      const isTimePicker = ctx.tag === 'hx-time-picker';
       const isColorPicker = ctx.tag === 'hx-color-picker';
       const isFileUpload = ctx.tag === 'hx-file-upload';
-      const isIconButton = ctx.tag === 'hx-icon-button';
-      const isCopyButton = ctx.tag === 'hx-copy-button';
-      const isToggleButton = ctx.tag === 'hx-toggle-button';
-      const isSplitButton = ctx.tag === 'hx-split-button';
       const isButtonGroup = ctx.tag === 'hx-button-group';
       const isActionBar = ctx.tag === 'hx-action-bar';
-      const isBreadcrumb = ctx.tag === 'hx-breadcrumb';
-      const isNav = ctx.tag === 'hx-nav';
-      const isTopNav = ctx.tag === 'hx-top-nav';
-      const isSideNav = ctx.tag === 'hx-side-nav';
       const isDropdown = ctx.tag === 'hx-dropdown';
       const isOverflowMenu = ctx.tag === 'hx-overflow-menu';
       const isTabs = ctx.tag === 'hx-tabs';
@@ -766,43 +745,24 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // APG spinbutton: arrow keys on the input are the canonical keyboard increment/decrement, so the
         // dense-form 32×21 stepper is intentional and keyboard parity is provided by the input itself.
         if (isNumberInput && t.tag === 'button') continue;
-        // exempt: hx-button medium default story is 40px (desktop carve-out — sm variant is 44px touch-mandate)
-        if (isButton && t.tag === 'button' && t.h >= 40 && t.w >= 40) continue;
-        // exempt: hx-select trigger is the combobox host button at 40px md (with 1px border = 42px total) —
-        // same desktop carve-out as hx-button. The sm variant is 44px touch-mandate. Listbox options inherit
-        // the trigger's hit area for keyboard, and pointer hit-areas are full-width.
-        if (isSelect && t.tag === 'button' && t.h >= 40 && t.w >= 40) continue;
-        // exempt: hx-combobox same as hx-select (combobox trigger pattern, desktop carve-out at 40px md).
-        if (isCombobox && (t.tag === 'button' || t.tag === 'input') && t.h >= 36 && t.w >= 40) continue;
-        // exempt: hx-date-picker uses an inline native date input + a calendar-trigger button
-        // inside a 40px md wrapper (same desktop carve-out as hx-text-input/hx-select). The
-        // trigger button is a secondary affordance — keyboard parity is provided by the input
-        // itself (Arrow keys / typing). Pointer hit-area is the full wrapper.
-        if (isDatePicker && (t.tag === 'input' || t.tag === 'button') && t.h >= 40 && t.w >= 36) continue;
-        // exempt: hx-time-picker — combobox input + dropdown toggle button at 40px md
-        // (desktop carve-out). The native input role="combobox" surfaces keyboard-first time
-        // entry; the toggle button is a pointer-only secondary affordance.
-        if (isTimePicker && (t.tag === 'input' || t.tag === 'button') && t.h >= 40 && t.w >= 36) continue;
-        // exempt: hx-color-picker exposes multiple sub-affordances inside an open panel:
-        //   - format-tab buttons (hex/rgb/hsl/hsv) at 36px tall — desktop carve-out, paired with
-        //     keyboard-equivalent typing into the channel inputs.
-        //   - slider tracks (alpha/hue) at 12px tall — APG slider pattern: keyboard increments via
-        //     Arrow/PageUp/PageDown on the focused track region; pointer hit-area extends the full
-        //     track width with grab handles. Slider thumb size ≥44px in render is not a 2.5.5
-        //     requirement when the track itself is the input target.
-        //   - swatch buttons at 24×44 — pointer-only quick-pick affordances; equivalent action is
-        //     typing the color into the input. Width 44px meets 2.5.5; height 24 carved-out as
-        //     swatch-grid pattern.
-        //   - channel <input>s at 28px — desktop-form numeric inputs (RGBA / HSLA channels). Same
-        //     carve-out as hx-number-input dense form: wrapper provides hit area; arrow-key keyboard
-        //     increment matches APG spinbutton.
-        if (
-          isColorPicker &&
-          ((t.tag === 'button' && t.h >= 24 && (t.w >= 44 || t.w >= 36)) ||
-            (t.role === 'slider') ||
-            (t.tag === 'input' && t.h >= 24))
-        )
-          continue;
+        // RETIRED carve-out: 40x40 desktop md "carve-out" for action buttons.
+        // WCAG 2.5.5 (Enhanced) Level AAA mandates 44x44 CSS px for the
+        // pointer target with the SC exceptions limited to: Equivalent (an
+        // alternative target on the same page meets the size), Inline (the
+        // target is a sentence/list of links inline in a block of text),
+        // User Agent Control, Essential. A 40px control paired with a
+        // separate 44px "sm" variant is NOT "Equivalent" per the SC normative
+        // text — Equivalent means an alternative target *on the same page*
+        // for the same function, not a different size variant the consumer
+        // can opt into. See https://www.w3.org/TR/WCAG22/#target-size-enhanced
+        // — the matrix harness must surface these as failures so AUDIT.md
+        // claims that rest on the carve-out can be reconciled.
+        // (formerly: isButton 40+, isSelect 40+, isCombobox 36/40+,
+        //  isDatePicker 40+/36+, isTimePicker 40+/36+, isColorPicker swatch grid)
+        // Slider role and visually-hidden file <input> retain narrow
+        // documented exceptions below.
+        if (isColorPicker && t.role === 'slider') continue; // APG slider pattern: track is the input target, pointer drags handle
+
         // exempt: hx-file-upload — native <input type="file"> is visually-hidden (1×1) per the
         // canonical "real input + visible drop zone" pattern. The `.dropzone` host fills the
         // perceivable hit area (>>44×44 in default story) and is keyboard-activatable via
@@ -819,28 +779,13 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // with explicit 44px tokens.
         const isSwitch = ctx.tag === 'hx-switch';
         if (isSwitch && t.tag === 'button') continue;
-        // exempt: hx-icon-button — md size renders 40×40 (desktop carve-out — sm
-        // variant is 44×44 touch-mandate per --hx-touch-target-min). Same
-        // pattern as hx-button: the inner native <button> at 40px paired with
-        // a 44px sm variant satisfies WCAG 2.5.5 via the equivalent-pattern
-        // alternative.
-        if (isIconButton && t.tag === 'button' && t.h >= 40 && t.w >= 40) continue;
-        // exempt: hx-copy-button — md size renders 40×40 (desktop carve-out,
-        // mirrors hx-icon-button / hx-button). Touch-mandate sm variant ships
-        // at 44×44.
-        if (isCopyButton && t.tag === 'button' && t.h >= 40 && t.w >= 40) continue;
-        // exempt: hx-toggle-button — APG toggle-button pattern (button +
-        // aria-pressed). Default md story renders the native <button> at 40px
-        // height (desktop carve-out, paired with 44px sm variant). Host
-        // bounding rect is the full label width × 40px; both the host and the
-        // inner button inherit the desktop carve-out.
-        if (isToggleButton && (t.tag === 'button' || t.isHost) && t.h >= 40 && t.w >= 40) continue;
-        // exempt: hx-split-button — composite button (primary action +
-        // dropdown trigger). md size renders each native <button> at 40px tall
-        // (desktop carve-out, mirrors hx-button). The trigger is a secondary
-        // affordance with keyboard-equivalent ArrowDown opens menu from the
-        // primary button.
-        if (isSplitButton && t.tag === 'button' && t.h >= 40 && t.w >= 36) continue;
+        // RETIRED: hx-icon-button / hx-copy-button / hx-toggle-button /
+        // hx-split-button "40px desktop carve-out". Same WCAG 2.5.5 normative
+        // exception analysis as the hx-button / hx-select retirements above —
+        // pairing a 40px md variant with a 44px sm variant is not
+        // "Equivalent" per the SC. https://www.w3.org/TR/WCAG22/#target-size-enhanced
+        // (formerly: isIconButton/isCopyButton/isToggleButton/isSplitButton 40px branches)
+
         // exempt: hx-button-group / hx-action-bar — both are container surfaces
         // (toolbar / group) that compose slotted hx-button children. The group
         // host has no inner clickable target of its own; the slotted children
@@ -848,26 +793,26 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // sub-44 target reported here belongs to the slotted child, not the
         // container, and is exempt at the container level.
         if ((isButtonGroup || isActionBar) && (t.tag === 'button' || t.tag.startsWith('hx-'))) continue;
-        // exempt: hx-breadcrumb / hx-nav / hx-top-nav / hx-side-nav are
-        // navigation-landmark containers that compose slotted link/item
-        // children. Any sub-44 anchor or button reported here belongs to a
-        // slotted child surface (hx-breadcrumb-item, hx-nav-item, anchor link)
-        // — these inherit nav-link desktop carve-out (≥36px height pairs with
-        // sm 44px touch-mandate variant). Container itself has no clickable
-        // target. Same precedent as toolbar/group containers above.
-        if (
-          (isBreadcrumb || isNav || isTopNav || isSideNav) &&
-          (t.tag === 'a' || t.tag === 'button' || t.tag.startsWith('hx-'))
-        )
-          continue;
-        // exempt: hx-side-nav — the 32×32 collapse/expand toggle inside
-        // [part="header"] is a secondary affordance (desktop sidebar pattern).
-        // Keyboard equivalent: the `collapsed` host property is the canonical
-        // API surface (programmatic / external trigger). Pointer-only users
-        // can also drag the sidebar boundary in product UIs that wire it up.
-        // Same precedent as hx-number-input stepper (secondary affordance with
-        // keyboard parity provided elsewhere — see number-input carve-out).
-        if (isSideNav && t.tag === 'button' && t.h >= 32 && t.w >= 32) continue;
+        // RETIRED: hx-breadcrumb / hx-nav / hx-top-nav / hx-side-nav blanket
+        // "container delegates to slotted children" carve-out. The formal
+        // audit (.reports/formal-aaa-audit/SUMMARY-34.md section 3.1)
+        // documents that hx-breadcrumb's links are FIRST-PARTY rendered
+        // inline text in the breadcrumb shadow root, not slotted children;
+        // the carve-out reasoning relied on a slot composition pattern that
+        // does not match the actual implementation. WCAG 2.5.5 applies to
+        // the actual interactive target rendered on the page; the matrix
+        // must measure them. https://www.w3.org/TR/WCAG22/#target-size-enhanced
+        // Slotted-child containers (hx-button-group, hx-action-bar) where
+        // the container itself has zero own targets keep their broad
+        // exemption above on a no-own-target NA basis.
+
+        // RETIRED: hx-side-nav 32x32 collapse/expand toggle carve-out. The
+        // "secondary affordance with keyboard parity provided elsewhere"
+        // reasoning is not one of the WCAG 2.5.5 (Enhanced) normative
+        // exceptions. The toggle is a first-party rendered <button> in the
+        // shadow root and must meet 44x44 like any other interactive target.
+        // https://www.w3.org/TR/WCAG22/#target-size-enhanced
+
         // exempt: hx-dropdown / hx-overflow-menu / hx-menu — popover-host
         // containers that compose slotted trigger + menu items. Trigger size
         // is owned by the slotted hx-button (its own AAA cert). Menu items
