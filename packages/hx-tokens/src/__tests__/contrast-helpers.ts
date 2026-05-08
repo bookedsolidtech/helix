@@ -290,13 +290,13 @@ export const PAIRS: PairSpec[] = [
   // Consumers needing AAA on buttons must pick a brand stop where the
   // resolved text-on-stop ratio clears 7:1 (typically primary-700+).
   // See ConsumerObligations.mdx for the consumer guidance.
-  {
-    text: '--hx-color-text-on-primary',
-    surface: '--hx-color-primary-500',
-    threshold: 4.5,
-    role: 'body-text',
-    label: 'text.on-primary on primary-500',
-  },
+  //
+  // Note (3.3.0): the `text.on-primary on primary-500` pair was removed —
+  // text.on-primary now resolves to neutral-0 (white) for the AAA-large
+  // coordinated pair on action.primary.bg (primary-600). No component paints
+  // text.on-primary directly on primary-500 anymore; the live pairs are
+  // `text.on-primary on action.primary.bg` (line ~590) and the explicit
+  // `text.on-primary on primary-600` regression pin (line ~440).
   {
     text: '--hx-color-text-on-secondary',
     surface: '--hx-color-secondary-500',
@@ -570,11 +570,18 @@ export const PAIRS: PairSpec[] = [
     modes: ['light'],
   },
   {
-    text: '--hx-color-text-on-primary',
+    // Decoupled in 3.3.0: text.on-primary moved to neutral-0 (white) for the
+    // AAA-large coordinated pair on action.primary.bg (primary-600). Inverted
+    // hover/active deliberately needs DARK text on the light-teal primary-400
+    // fill. text.primary cannot be the anchor — dark.text.primary flips to
+    // neutral-100 (light), regressing this pair to ~2.10:1 in dark mode.
+    // Pin to the neutral-900 primitive directly, which never flips by mode
+    // or brand and pairs with primary-400 at 7.27:1 AAA across all 6 brands.
+    text: '--hx-color-neutral-900',
     surface: '--hx-color-action-primary-bg-inverted-hover',
     threshold: 4.5,
     role: 'body-text',
-    label: 'text.on-primary on action.primary.bg-inverted-hover (inverted hover/active fg)',
+    label: 'neutral-900 on action.primary.bg-inverted-hover (inverted hover/active fg)',
     modes: ['light', 'dark'],
   },
   {
