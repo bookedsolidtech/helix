@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://helixui.dev/schemas/aaa-standards.schema.json",
+  "title": "HELiX AAA Standards Reference",
+  "description": "Authoritative source-of-truth for the WCAG 2.2 AAA Success Criteria + peer standards (forced-colors, APG keyboard contracts) HELiX components are formally certified against. Every URL is verified live against the upstream W3C/MDN endpoint at the date in `verification.verifiedAt`.",
+  "type": "object",
+  "required": ["version", "generatedAt", "verification", "claim", "criteria", "vpat"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "generatedAt": { "type": "string", "format": "date" },
+    "verification": {
+      "type": "object",
+      "required": ["method", "verifiedAt", "verifierAgent"],
+      "properties": {
+        "method": { "type": "string" },
+        "verifiedAt": { "type": "string", "format": "date" },
+        "verifierAgent": { "type": "string" },
+        "summary": { "type": "string" },
+        "unverifiedUrls": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": ["wcagVersion", "wcagLevel", "wcagSource"],
+      "properties": {
+        "wcagVersion": { "type": "string" },
+        "wcagLevel": { "type": "string", "enum": ["AAA"] },
+        "wcagSource": { "type": "string", "format": "uri" },
+        "wcagSourceVerified": { "type": "boolean" },
+        "wcagPublicationDate": { "type": "string", "format": "date" },
+        "wcagFirstRecommendationDate": { "type": "string", "format": "date" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "slug", "name", "level", "type", "url"],
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "level": { "type": "string", "enum": ["AAA", "PEER"] },
+          "type": { "type": "string", "enum": ["wcag-sc", "peer-standard"] },
+          "wcagVersion": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "urlVerified": { "type": "boolean" },
+          "understandingUrl": { "type": "string", "format": "uri" },
+          "understandingUrlVerified": { "type": "boolean" },
+          "specUrl": { "type": "string", "format": "uri" },
+          "specUrlVerified": { "type": "boolean" },
+          "summary": { "type": "string" },
+          "thresholds": { "type": "object" },
+          "actRules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "url", "name"],
+              "properties": {
+                "id": { "type": "string" },
+                "url": { "type": "string", "format": "uri" },
+                "name": { "type": "string" },
+                "verified": { "type": "boolean" }
+              }
+            }
+          },
+          "actRuleNote": { "type": "string" },
+          "evidence": { "type": "string" },
+          "componentApplicability": { "type": "string" },
+          "wcagAddition": { "type": "string" },
+          "wcagNote": { "type": "string" },
+          "isPeerStandard": { "type": "boolean" },
+          "peerStandardNote": { "type": "string" },
+          "patterns": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["url"],
+              "properties": {
+                "url": { "type": "string", "format": "uri" },
+                "verified": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "vpat": {
+      "type": "object",
+      "required": ["language", "verdicts"],
+      "properties": {
+        "language": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "verdicts": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["Supports", "Partially Supports", "Does Not Support", "Not Applicable"] }
+        },
+        "verdictDefinitions": { "type": "object" }
+      }
+    },
+    "axeMapping": { "type": "object" }
+  }
+}
