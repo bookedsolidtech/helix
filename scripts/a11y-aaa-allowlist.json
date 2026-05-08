@@ -5,6 +5,7 @@
     "hx-alert",
     "hx-button",
     "hx-checkbox",
+    "hx-dialog",
     "hx-text-input"
   ]
 }
