@@ -97,6 +97,24 @@ export interface HxSwitchChangeDetail {
  * @cssprop [--hx-font-weight-bold] - Font weight.
  * @cssprop [--hx-font-size-xs] - Font size.
  * @cssprop [--hx-color-neutral-500] - Color.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-switch/AAA-AUDIT.md
+ * @keyboard-contract activate=Space; disabled-suppresses=true
+ * @aria-pattern switch
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/switch/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated true
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-switch
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-switch')
 export class HelixSwitch extends FormMixin(HelixElement) {

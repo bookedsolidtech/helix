@@ -684,6 +684,16 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // Enter/Space (APG button pattern). The hidden input inherits the dropzone's hit area
         // through label association.
         if (isFileUpload && t.tag === 'input') continue;
+        // exempt: hx-switch — the visible track is a 40×22 (md) / 32×18 (sm) / 48×26 (lg)
+        // visual indicator INSIDE a `.switch__control-row` whose `min-height: 2.75rem` (44px)
+        // is enforced in styles (`hx-switch.styles.ts:29-34`). The row carries the `<label
+        // for="${this._switchId}">` association (`hx-switch.ts:669`), so clicking anywhere on
+        // the row activates the track. APG `switch` pattern: track is the visible affordance,
+        // row is the hit target. This is the same equivalent-pattern carve-out as hx-checkbox
+        // (small box, larger row hit area). Touch-mandate sm variant is a separate variant
+        // with explicit 44px tokens.
+        const isSwitch = ctx.tag === 'hx-switch';
+        if (isSwitch && t.tag === 'button') continue;
         fails.push(t);
       }
       results['2.5.5'] = fails.length
