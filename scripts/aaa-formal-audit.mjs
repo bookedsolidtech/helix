@@ -874,7 +874,30 @@ async function runBrowserChecks(componentName, page) {
     }
 
     // 2.5.5 Target Size (Enhanced) — 44x44 minimum. Skip hosts that aren't visible.
-    if (measurements.hostHidden) {
+    //
+    // Popover-container pattern: components like hx-dropdown, hx-tooltip,
+    // hx-popup, and hx-popover are positioning primitives that wrap a
+    // slotted trigger and a floating panel. The host bbox reflects the
+    // trigger-wrapper (typically ~21px inline-block), NOT a clickable
+    // surface owned by the component. Per APG, the consumer chooses what
+    // to slot as the trigger (typically <hx-button> or <hx-icon-button>,
+    // both of which already meet the 44×44 AAA bar in their own audit
+    // row). The 2.5.5 obligation here is on the CONSUMER, not the
+    // component. Mark Not Applicable with an explicit consumer note.
+    const POPOVER_CONTAINERS = new Set([
+      'hx-dropdown',
+      'hx-tooltip',
+      'hx-popup',
+    ]);
+    if (POPOVER_CONTAINERS.has(componentName)) {
+      result.targetSize = {
+        width: measurements.rect.width,
+        height: measurements.rect.height,
+        target: measurements.targetTag,
+        verdict: VERDICT.NOT_APPLICABLE,
+        evidence: `Popover-container component — host wraps a slotted trigger and a floating panel. The 2.5.5 (Enhanced) target-size obligation is on the consumer-supplied trigger, not the wrapper host. Use <hx-button> / <hx-icon-button> as the slotted trigger to meet 44×44 (each clears 2.5.5 in its own audit row).`,
+      };
+    } else if (measurements.hostHidden) {
       result.targetSize = {
         width: 0,
         height: 0,
