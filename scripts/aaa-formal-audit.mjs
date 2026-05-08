@@ -154,6 +154,37 @@ const APG_KEYBOARD_EXPECTATIONS = {
   accordion: [['Enter', ' ', 'Space']],
   link: [['Enter']],
   textbox: [],
+  // Tier-1 Task-5 (2026-05-08) — extended pattern coverage. Five
+  // SUMMARY-34 components carried @aria-pattern values that were not in
+  // the canonical table above and were therefore reported as Partial
+  // ("not in the APG canonical pattern table — verify manually"). The
+  // patterns below are documented in WAI-ARIA 1.2 / W3C APG and have a
+  // verified URL in scripts/aaa-standards.json.
+  //
+  // Spinbutton (W3C APG / WAI-ARIA 1.2 role="spinbutton"):
+  //   https://www.w3.org/TR/wai-aria-1.2/#spinbutton — keyboard contract
+  //   is ArrowUp/ArrowDown to step (PageUp/PageDown for large step,
+  //   Home/End for min/max). Native <input type="number"> already
+  //   provides this contract via the user agent. Required group is the
+  //   minimal step-key set.
+  spinbutton: [['ArrowUp', 'ArrowDown']],
+  // Breadcrumb (W3C APG breadcrumb pattern):
+  //   https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/ — APG
+  //   describes breadcrumb as "a list of links to ancestor pages" with
+  //   no special keyboard interaction beyond Tab through links and
+  //   Enter to activate (link contract, satisfied by native <a href>).
+  breadcrumb: [],
+  // Navigation landmark (ARIA landmark role, NOT a composite widget):
+  //   https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/ — a
+  //   navigation landmark has no keyboard contract of its own; its
+  //   keyboard behaviour is whatever the inner widget defines (links,
+  //   menu, tablist).
+  navigation: [],
+  // Group (generic ARIA role):
+  //   https://www.w3.org/TR/wai-aria-1.2/#group — a structural grouping
+  //   with no required keyboard contract. Items inside the group
+  //   dictate keyboard behaviour.
+  group: [],
 };
 
 // ── Standards reference loader ──────────────────────────────────────────────

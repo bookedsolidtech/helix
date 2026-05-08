@@ -226,7 +226,10 @@
         "table": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/table/", "verified": true },
         "grid": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/grid/", "verified": true },
         "feed": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/feed/", "verified": true },
-        "meter": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/meter/", "verified": true }
+        "meter": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/meter/", "verified": true },
+        "spinbutton": { "url": "https://www.w3.org/TR/wai-aria-1.2/#spinbutton", "verified": true, "note": "Tier-1 Task-5 (2026-05-08): role=spinbutton from WAI-ARIA 1.2; APG documents spinbutton interaction via the related slider/listbox patterns. Native <input type=number> provides the keyboard contract via the user agent." },
+        "navigation": { "url": "https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/", "verified": true, "note": "Tier-1 Task-5 (2026-05-08): navigation landmark from APG landmark-regions practice. Has no required keyboard contract of its own; inner widgets (links, menus) define the contract." },
+        "group": { "url": "https://www.w3.org/TR/wai-aria-1.2/#group", "verified": true, "note": "Tier-1 Task-5 (2026-05-08): role=group from WAI-ARIA 1.2 — a structural grouping role with no required keyboard contract; items inside the group dictate keyboard behaviour." }
       },
       "evidence": "Playwright per-pattern keyboard test matrix; deviations from APG must be documented with rationale.",
       "componentApplicability": "All components claiming an @aria-pattern JSDoc tag"
