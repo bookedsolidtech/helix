@@ -210,7 +210,25 @@ type Story = StoryObj;
 // 1. Default
 // ─────────────────────────────────────────────────
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    a11y: {
+      // aria-required-children and aria-required-parent are false positives
+      // in Shadow DOM: axe cannot traverse the flattened slot tree across
+      // multiple shadow roots (hx-thead → hx-tr → hx-th each render native
+      // elements in their own shadow roots). The component IS accessible —
+      // ARIA roles are correct on each native element AND mirrored via
+      // ElementInternals on each host. Mirrors the documented carve-out
+      // in hx-table.test.ts:237-247.
+      config: {
+        rules: [
+          { id: 'aria-required-children', enabled: false },
+          { id: 'aria-required-parent', enabled: false },
+        ],
+      },
+    },
+  },
+};
 
 // ─────────────────────────────────────────────────
 // 2. Striped
