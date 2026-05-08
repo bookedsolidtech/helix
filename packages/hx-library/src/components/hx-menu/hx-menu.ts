@@ -86,6 +86,24 @@ function findOwningMenuItem(menu: HelixMenu): HelixMenuItem | null {
  * @cssprop [--hx-color-neutral-200] - Color.
  * @cssprop [--hx-border-radius-md] - CSS custom property.
  * @cssprop [--hx-shadow-md] - Box shadow.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-menu/AAA-AUDIT.md
+ * @keyboard-contract navigate=Arrow,Home,End; activate=Enter,Space; dismiss=Escape; disabled-suppresses=true
+ * @aria-pattern menu
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/menubar/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-menu
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-menu')
 export class HelixMenu extends HelixElement {
