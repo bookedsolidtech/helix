@@ -5,6 +5,7 @@
     "hx-alert",
     "hx-button",
     "hx-checkbox",
+    "hx-combobox",
     "hx-dialog",
     "hx-number-input",
     "hx-select",
