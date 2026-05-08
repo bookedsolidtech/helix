@@ -368,9 +368,16 @@ export class HelixBreadcrumb extends HelixElement {
   // ─── Render ───
 
   override render() {
+    // role="list" on a <div> instead of <ol> intentionally: native <ol>
+    // requires its direct children to be <li>, but slotted breadcrumb-items
+    // are projected `hx-breadcrumb-item` host elements, not `<li>`. Using
+    // <ol>/<ul> triggers axe `list` rule (WCAG 1.3.1) — see PR #1688
+    // audit. The role-based contract carries the same list semantics
+    // without enforcing the HTML structure rule. hx-breadcrumb-item
+    // carries role="listitem" so the AT tree stays canonical.
     return html`
       <nav part="nav" aria-label=${this.label}>
-        <ol part="list">
+        <div part="list" role="list">
           <slot @slotchange=${this._handleSlotChange}></slot>
           ${this._showEllipsis
             ? html`
@@ -385,7 +392,7 @@ export class HelixBreadcrumb extends HelixElement {
                 </hx-breadcrumb-item>
               `
             : nothing}
-        </ol>
+        </div>
       </nav>
       <slot
         name="separator"

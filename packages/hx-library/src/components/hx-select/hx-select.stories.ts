@@ -160,6 +160,7 @@ export const Default: Story = {
   render: (args) => html`
     <hx-select
       label=${args.label}
+      aria-label=${args.label}
       placeholder=${args.placeholder}
       hx-size=${args.size}
       ?required=${args.required}

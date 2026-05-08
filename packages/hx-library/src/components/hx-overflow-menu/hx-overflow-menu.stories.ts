@@ -91,7 +91,6 @@ const meta = {
   render: (args) => html`
     <div style="display: flex; justify-content: center; padding: 4rem 2rem;">
       <hx-overflow-menu
-        role="menu"
         placement=${args.placement}
         hx-size=${args.size}
         ?disabled=${args.disabled}
