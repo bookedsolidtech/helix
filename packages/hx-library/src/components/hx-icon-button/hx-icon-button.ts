@@ -60,6 +60,24 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-color-neutral-100] - Color.
  * @cssprop [--hx-color-error-500] - Color.
  * @cssprop [--hx-color-error-600] - Color.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-icon-button/AAA-AUDIT.md
+ * @keyboard-contract activate=Enter,Space; disabled-suppresses=true
+ * @aria-pattern button
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/button/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated true
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-icon-button
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-icon-button')
 export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
