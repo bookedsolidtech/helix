@@ -4,6 +4,7 @@
   "components": [
     "hx-alert",
     "hx-button",
+    "hx-button-group",
     "hx-checkbox",
     "hx-checkbox-group",
     "hx-color-picker",
