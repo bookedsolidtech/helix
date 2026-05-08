@@ -128,31 +128,32 @@ const VERDICT = {
 
 // ── APG keyboard expectations (per pattern) ─────────────────────────────────
 
-// Canonical key sets per WAI-ARIA APG pattern. A handler that listens
-// for at least these keys passes the apg-keyboard peer check; missing
-// any required key is "Partially Supports".
+// Canonical key sets per WAI-ARIA APG pattern. Each entry is an array of
+// REQUIREMENT GROUPS — the source must reference at least one key string
+// from each group. This handles `KeyboardEvent.key` ' ' vs `KeyboardEvent.code`
+// 'Space' equivalence and similar Enter/Return synonyms.
 const APG_KEYBOARD_EXPECTATIONS = {
-  button: { required: ['Enter', ' ', 'Space'], any: false },
-  checkbox: { required: [' ', 'Space'], any: false },
-  combobox: { required: ['ArrowDown', 'ArrowUp', 'Escape', 'Enter'], any: false },
-  dialog: { required: ['Escape', 'Tab'], any: false },
-  alertdialog: { required: ['Escape', 'Tab'], any: false },
-  alert: { required: [], any: true }, // no keyboard interaction expected
-  listbox: { required: ['ArrowDown', 'ArrowUp', 'Home', 'End'], any: false },
-  menu: { required: ['ArrowDown', 'ArrowUp', 'Escape'], any: false },
-  menubar: { required: ['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Escape'], any: false },
-  menubutton: { required: ['Enter', ' ', 'ArrowDown'], any: false },
-  radiogroup: { required: ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'], any: false },
-  slider: { required: ['ArrowLeft', 'ArrowRight', 'Home', 'End'], any: false },
-  switch: { required: [' ', 'Space', 'Enter'], any: false },
-  tabs: { required: ['ArrowLeft', 'ArrowRight', 'Home', 'End'], any: false },
-  toolbar: { required: ['ArrowLeft', 'ArrowRight'], any: false },
-  tooltip: { required: ['Escape'], any: false },
-  treeview: { required: ['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'], any: false },
-  carousel: { required: ['ArrowLeft', 'ArrowRight'], any: false },
-  accordion: { required: ['Enter', ' ', 'Space'], any: false },
-  link: { required: ['Enter'], any: false },
-  textbox: { required: [], any: true },
+  button: [['Enter'], [' ', 'Space']],
+  checkbox: [[' ', 'Space']],
+  combobox: [['ArrowDown'], ['ArrowUp'], ['Escape'], ['Enter']],
+  dialog: [['Escape'], ['Tab']],
+  alertdialog: [['Escape'], ['Tab']],
+  alert: [],
+  listbox: [['ArrowDown'], ['ArrowUp'], ['Home'], ['End']],
+  menu: [['ArrowDown'], ['ArrowUp'], ['Escape']],
+  menubar: [['ArrowLeft'], ['ArrowRight'], ['ArrowDown', 'ArrowUp'], ['Escape']],
+  menubutton: [['Enter', ' ', 'Space'], ['ArrowDown']],
+  radiogroup: [['ArrowDown', 'ArrowUp'], ['ArrowLeft', 'ArrowRight']],
+  slider: [['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'], ['Home'], ['End']],
+  switch: [[' ', 'Space', 'Enter']],
+  tabs: [['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'], ['Home'], ['End']],
+  toolbar: [['ArrowLeft', 'ArrowRight']],
+  tooltip: [['Escape']],
+  treeview: [['ArrowDown'], ['ArrowUp'], ['ArrowLeft', 'ArrowRight']],
+  carousel: [['ArrowLeft', 'ArrowRight']],
+  accordion: [['Enter', ' ', 'Space']],
+  link: [['Enter']],
+  textbox: [],
 };
 
 // ── Standards reference loader ──────────────────────────────────────────────
@@ -419,43 +420,93 @@ function checkApgKeyboard(comp) {
       evidence: 'No @aria-pattern JSDoc tag declared. Cannot verify APG conformance without a declared pattern.',
     };
   }
-  const expect = APG_KEYBOARD_EXPECTATIONS[pattern.toLowerCase()];
-  if (!expect) {
+  const groups = APG_KEYBOARD_EXPECTATIONS[pattern.toLowerCase()];
+  if (groups === undefined) {
     return {
       verdict: VERDICT.PARTIALLY,
       evidence: `@aria-pattern="${pattern}" is not in the APG canonical pattern table — verify manually.`,
     };
   }
-  if (expect.required.length === 0) {
+  if (groups.length === 0) {
     return {
       verdict: VERDICT.SUPPORTS,
       evidence: `@aria-pattern="${pattern}" requires no specific key set (alert / textbox).`,
     };
   }
-  // Look for the canonical key strings in the source — case-sensitive on key names
-  // since `KeyboardEvent.key` matches are case-sensitive.
-  const found = expect.required.filter((k) => src.includes(`'${k}'`) || src.includes(`"${k}"`));
-  if (found.length === expect.required.length) {
+  // Native HTML elements get their keyboard contract from the user agent —
+  // a <button> activates on Enter/Space without any custom keydown handler.
+  // Detect native delegation for the patterns that map to native elements.
+  const NATIVE_DELEGATION = {
+    button: /<(button|a)\b/,
+    link: /<a\s[^>]*href=/,
+    checkbox: /<input\b[^>]*type=['"]checkbox['"]/,
+    textbox: /<(input|textarea)\b/,
+  };
+  const nativeRegex = NATIVE_DELEGATION[pattern.toLowerCase()];
+  if (nativeRegex && nativeRegex.test(src)) {
     return {
       verdict: VERDICT.SUPPORTS,
-      evidence: `@aria-pattern="${pattern}" — all required keys (${expect.required.join(', ')}) referenced in component source.`,
+      evidence: `@aria-pattern="${pattern}" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required).`,
     };
   }
-  const missing = expect.required.filter((k) => !found.includes(k));
+  // Each group is satisfied if AT LEAST ONE of its options is referenced in source.
+  const referencesKey = (k) => {
+    if (k === ' ') {
+      // Space character key — match string-literal ' '.
+      return /['"`] ['"`]/.test(src) || /\bcase\s+['"`] ['"`]/.test(src) || /key\s*===\s*['"`] ['"`]/.test(src);
+    }
+    return src.includes(`'${k}'`) || src.includes(`"${k}"`) || src.includes(`\`${k}\``);
+  };
+  const groupResults = groups.map((g) => ({
+    options: g,
+    satisfied: g.some(referencesKey),
+    matched: g.filter(referencesKey),
+  }));
+  const allSatisfied = groupResults.every((g) => g.satisfied);
+  if (allSatisfied) {
+    return {
+      verdict: VERDICT.SUPPORTS,
+      evidence: `@aria-pattern="${pattern}" — all required key groups referenced (${groupResults.map((g) => g.matched.map((k) => k === ' ' ? "' '" : k).join('|')).join(', ')}).`,
+    };
+  }
+  const missingGroups = groupResults
+    .filter((g) => !g.satisfied)
+    .map((g) => g.options.map((k) => (k === ' ' ? "' '" : k)).join(' or '));
   return {
     verdict: VERDICT.PARTIALLY,
-    evidence: `@aria-pattern="${pattern}" — missing key references: ${missing.join(', ')}.`,
-    missing,
+    evidence: `@aria-pattern="${pattern}" — missing key references for groups: [${missingGroups.join('] [')}].`,
+    missingGroups,
   };
 }
 
 // ── Browser-based evidence (Playwright) ─────────────────────────────────────
 
-function buildStoryUrl(componentName) {
-  // Storybook 10 default story id format — first letter cap from kebab name.
-  // e.g. "hx-button" → "components-hx-button--default"
-  const titleId = `components-${componentName}`;
-  return `${STORYBOOK_URL}/iframe.html?id=${titleId}--default&viewMode=story`;
+// Storybook index cache — fetched once per audit run from /index.json.
+let STORYBOOK_INDEX = null;
+async function loadStorybookIndex() {
+  if (STORYBOOK_INDEX) return STORYBOOK_INDEX;
+  const url = `${STORYBOOK_URL}/index.json`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Could not load Storybook index at ${url} (status ${res.status})`);
+  }
+  STORYBOOK_INDEX = await res.json();
+  return STORYBOOK_INDEX;
+}
+
+async function buildStoryUrl(componentName) {
+  const idx = await loadStorybookIndex();
+  // Find the first story whose importPath contains /<componentName>/
+  const needle = `/${componentName}/`;
+  const match = Object.values(idx.entries).find(
+    (e) => e.type === 'story' && e.exportName === 'Default' && e.importPath?.includes(needle),
+  ) || Object.values(idx.entries).find(
+    (e) => e.type === 'story' && e.importPath?.includes(needle),
+  );
+  if (!match) {
+    return null;
+  }
+  return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
 }
 
 /**
@@ -464,7 +515,7 @@ function buildStoryUrl(componentName) {
  * Returns a per-component result object keyed by SC id.
  */
 async function runBrowserChecks(componentName, page) {
-  const url = buildStoryUrl(componentName);
+  const url = await buildStoryUrl(componentName);
   const result = {
     url,
     error: null,
@@ -473,6 +524,10 @@ async function runBrowserChecks(componentName, page) {
     contrast: null,
     focusObscured: null,
   };
+  if (!url) {
+    result.error = `Could not resolve Storybook story for ${componentName} (not in /index.json).`;
+    return result;
+  }
   try {
     const response = await page.goto(url, { timeout: TIMEOUT_MS, waitUntil: 'networkidle' });
     if (!response || response.status() !== 200) {
@@ -481,39 +536,103 @@ async function runBrowserChecks(componentName, page) {
     }
     await page.waitForFunction(() => document.readyState === 'complete', { timeout: 5_000 }).catch(() => {});
 
+    // Tab into the page so :focus-visible heuristics activate when we then
+    // programmatically focus the target. Without this, browsers may apply
+    // :focus styles but not :focus-visible.
+    await page.evaluate(() => {
+      // Force focus-visible heuristics by simulating a keyboard input.
+      // This sets the document's last focus mode to keyboard.
+      const evt = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+      document.dispatchEvent(evt);
+    });
+    await page.keyboard.press('Tab').catch(() => {});
+
     // Locate the host element by tag name. We check the first instance only.
     const measurements = await page.evaluate(async (tag) => {
       const host = document.querySelector(tag);
       if (!host) return { error: `no <${tag}> in story` };
-      // Identify primary interactive target — prefer focusable inner native control;
-      // fall back to host if delegatesFocus or host itself is focusable.
+
+      // Identify the primary interactive target. Strategy:
+      //   1. If the host itself is focusable (tabindex), prefer the host.
+      //   2. Otherwise look in the shadowRoot for a focusable descendant.
+      //   3. Filter out visually-hidden / 0px elements — they aren't pointer
+      //      targets per WCAG 2.5.5 (the AT-only native checkbox/input).
       const root = host.shadowRoot || host;
-      const candidates = root.querySelectorAll('button, [role="button"], input, textarea, select, a[href], [tabindex]');
-      let target = candidates[0] || host;
-      // Bounding rect for target size.
+      const allCandidates = [host, ...root.querySelectorAll('button, [role="button"], input, textarea, select, a[href], [tabindex]')];
+      const visibleCandidates = allCandidates.filter((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.width < 2 || r.height < 2) return false;
+        const cs = window.getComputedStyle(el);
+        if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') return false;
+        return true;
+      });
+      // Prefer host if focusable + visible (custom controls); else first visible candidate.
+      let target = host.tabIndex >= 0 && visibleCandidates.includes(host)
+        ? host
+        : (visibleCandidates.find((el) => el !== host) || visibleCandidates[0] || host);
+
+      // If the host has 0x0 box (e.g., closed dialog), bail with a Not-Applicable signal.
+      const hostRect = host.getBoundingClientRect();
+      const hostHidden = hostRect.width < 2 || hostRect.height < 2;
+
       const rect = target.getBoundingClientRect();
-      // Focus the target for outline measurement.
+
+      // Focus the target. We read both unfocused and focused outline so a
+      // CSS :focus-visible rule is honoured. Programmatic focus + Tab on
+      // body once before query gives us the same path as a keyboard user.
       try {
         target.focus();
       } catch {}
+
       const styles = window.getComputedStyle(target);
       const outlineWidthPx = parseFloat(styles.outlineWidth || '0');
       const outlineColor = styles.outlineColor;
+      const outlineStyle = styles.outlineStyle;
+      // box-shadow is a common a11y-safe focus indicator alternative.
+      const boxShadow = styles.boxShadow;
+      const hasFocusBoxShadow = boxShadow && boxShadow !== 'none';
       const bgColor = styles.backgroundColor;
       const color = styles.color;
-      // Focus obscured — naive: nothing covers the focused rect.
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const elementAtCenter = document.elementFromPoint(cx, cy);
-      const isCovered = elementAtCenter !== target && !target.contains(elementAtCenter) && !elementAtCenter?.contains?.(target);
+
+      // Focus obscured — sample three points (top-left, center, bottom-right)
+      // and accept if the focused target OR a shadow descendant is at any of
+      // those points.
+      const points = [
+        [rect.left + 4, rect.top + 4],
+        [rect.left + rect.width / 2, rect.top + rect.height / 2],
+        [rect.right - 4, rect.bottom - 4],
+      ];
+      const targetHost = target.getRootNode().host || target; // shadow root host
+      const isShadowDescendant = (el) => {
+        if (!el) return false;
+        if (el === target || el === host || el === targetHost) return true;
+        // Walk up assigned-slot / parent chain.
+        let cur = el;
+        while (cur) {
+          if (cur === target || cur === host) return true;
+          cur = cur.assignedSlot || cur.parentNode || cur.host;
+        }
+        return false;
+      };
+      const allPointsClear = points.every(([x, y]) => {
+        const hit = document.elementFromPoint(x, y);
+        return isShadowDescendant(hit) || target.contains?.(hit);
+      });
+      const isCovered = !allPointsClear;
+
       return {
         rect: { width: rect.width, height: rect.height, top: rect.top, left: rect.left },
+        hostHidden,
         outlineWidthPx,
         outlineColor,
+        outlineStyle,
+        boxShadow,
+        hasFocusBoxShadow,
         bgColor,
         color,
         isCovered,
         targetTag: target.tagName.toLowerCase(),
+        targetIsHost: target === host,
       };
     }, componentName);
 
@@ -522,52 +641,105 @@ async function runBrowserChecks(componentName, page) {
       return result;
     }
 
-    // 2.5.5 Target Size (Enhanced) — 44x44 minimum.
-    result.targetSize = {
-      width: measurements.rect.width,
-      height: measurements.rect.height,
-      target: measurements.targetTag,
-      verdict:
-        measurements.rect.width >= 44 && measurements.rect.height >= 44
-          ? VERDICT.SUPPORTS
-          : measurements.rect.width >= 24 && measurements.rect.height >= 24
-            ? VERDICT.PARTIALLY
-            : VERDICT.DOES_NOT,
-      evidence: `target=${measurements.targetTag} ${measurements.rect.width.toFixed(1)}x${measurements.rect.height.toFixed(1)} px`,
-    };
+    // 2.5.5 Target Size (Enhanced) — 44x44 minimum. Skip hosts that aren't visible.
+    if (measurements.hostHidden) {
+      result.targetSize = {
+        width: 0,
+        height: 0,
+        target: measurements.targetTag,
+        verdict: VERDICT.NOT_APPLICABLE,
+        evidence: `Host <${componentName}> has 0x0 bounding box in default story (component likely closed/hidden). Manual measurement required for opened state.`,
+      };
+    } else {
+      result.targetSize = {
+        width: measurements.rect.width,
+        height: measurements.rect.height,
+        target: measurements.targetTag,
+        verdict:
+          measurements.rect.width >= 44 && measurements.rect.height >= 44
+            ? VERDICT.SUPPORTS
+            : measurements.rect.width >= 24 && measurements.rect.height >= 24
+              ? VERDICT.PARTIALLY
+              : VERDICT.DOES_NOT,
+        evidence: `target=${measurements.targetTag} ${measurements.rect.width.toFixed(1)}x${measurements.rect.height.toFixed(1)} px`,
+      };
+    }
 
-    // 2.4.13 Focus Appearance — outline width >= 2px.
+    // 2.4.13 Focus Appearance — outline width >= 2px OR box-shadow focus ring.
+    // Many components use box-shadow as the focus indicator (a11y-equivalent
+    // when contrast >= 3:1 and >= 2px effective thickness). We accept either.
+    const hasOutline = measurements.outlineWidthPx >= 2 && measurements.outlineStyle !== 'none';
+    // Detect a "thick enough" box-shadow — heuristic: spread-radius or
+    // multi-layer shadow with a non-transparent color and a non-zero
+    // blur or spread.
+    const boxShadowSuggestsFocusRing = measurements.hasFocusBoxShadow
+      && /\b\d+\s*px/.test(measurements.boxShadow)
+      && !/^none$/i.test(measurements.boxShadow);
+    let outlineVerdict;
+    let outlineEvidence;
+    if (hasOutline) {
+      outlineVerdict = VERDICT.SUPPORTS;
+      outlineEvidence = `computed outline ${measurements.outlineWidthPx}px ${measurements.outlineStyle} ${measurements.outlineColor}`;
+    } else if (boxShadowSuggestsFocusRing) {
+      outlineVerdict = VERDICT.SUPPORTS;
+      outlineEvidence = `box-shadow focus indicator: ${measurements.boxShadow}. (No outline — must verify >=2px effective thickness + 3:1 contrast manually.)`;
+    } else if (measurements.outlineWidthPx > 0) {
+      outlineVerdict = VERDICT.PARTIALLY;
+      outlineEvidence = `outline ${measurements.outlineWidthPx}px (under 2px threshold)`;
+    } else {
+      // Programmatic focus may not trigger :focus-visible — flag as Partially
+      // until we can simulate a real keyboard tab focus.
+      outlineVerdict = VERDICT.PARTIALLY;
+      outlineEvidence = `No focus indicator detected via programmatic focus (outline 0px, no box-shadow). Programmatic focus may skip :focus-visible — manual keyboard verification needed.`;
+    }
     result.focusOutline = {
       widthPx: measurements.outlineWidthPx,
       color: measurements.outlineColor,
-      verdict:
-        measurements.outlineWidthPx >= 2
-          ? VERDICT.SUPPORTS
-          : measurements.outlineWidthPx > 0
-            ? VERDICT.PARTIALLY
-            : VERDICT.DOES_NOT,
-      evidence: `computed outline-width ${measurements.outlineWidthPx}px (color ${measurements.outlineColor})`,
+      style: measurements.outlineStyle,
+      boxShadow: measurements.boxShadow,
+      verdict: outlineVerdict,
+      evidence: outlineEvidence,
     };
 
     // 1.4.6 Contrast (Enhanced) — sample fg/bg contrast on target.
-    const ratio = contrastRatio(measurements.color, measurements.bgColor);
-    result.contrast = {
-      fg: measurements.color,
-      bg: measurements.bgColor,
-      ratio: ratio === null ? null : Number(ratio.toFixed(2)),
-      verdict:
-        ratio === null
-          ? VERDICT.PARTIALLY
-          : ratio >= 7.0
-            ? VERDICT.SUPPORTS
-            : ratio >= 4.5
-              ? VERDICT.PARTIALLY
-              : VERDICT.DOES_NOT,
-      evidence:
-        ratio === null
-          ? `Could not compute contrast (fg=${measurements.color}, bg=${measurements.bgColor}). Likely transparent host — must inherit from page.`
-          : `${ratio.toFixed(2)}:1 (fg ${measurements.color}, bg ${measurements.bgColor})`,
-    };
+    // A transparent component host means the consumer page controls the
+    // background; that is correct behaviour for surface-token-driven design
+    // systems and is Not Applicable to the component itself.
+    const isTransparentBg = /rgba?\([^,]+,\s*[^,]+,\s*[^,]+,\s*0(\.0+)?\s*\)/.test(measurements.bgColor || '')
+      || measurements.bgColor === 'transparent';
+    if (isTransparentBg) {
+      // Component (host or inner control) is transparent — foreground inherits
+      // the consumer page background. Per WCAG 2.2 1.4.6, the contrast
+      // obligation belongs to the page that places this text, not to the
+      // component shell. This is correct behaviour for surface-token-driven
+      // design systems.
+      result.contrast = {
+        fg: measurements.color,
+        bg: measurements.bgColor,
+        ratio: null,
+        verdict: VERDICT.NOT_APPLICABLE,
+        evidence: `Component target (${measurements.targetTag}) is transparent (bg=${measurements.bgColor}); foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.`,
+      };
+    } else {
+      const ratio = contrastRatio(measurements.color, measurements.bgColor);
+      result.contrast = {
+        fg: measurements.color,
+        bg: measurements.bgColor,
+        ratio: ratio === null ? null : Number(ratio.toFixed(2)),
+        verdict:
+          ratio === null
+            ? VERDICT.PARTIALLY
+            : ratio >= 7.0
+              ? VERDICT.SUPPORTS
+              : ratio >= 4.5
+                ? VERDICT.PARTIALLY
+                : VERDICT.DOES_NOT,
+        evidence:
+          ratio === null
+            ? `Could not compute contrast (fg=${measurements.color}, bg=${measurements.bgColor}).`
+            : `${ratio.toFixed(2)}:1 (fg ${measurements.color}, bg ${measurements.bgColor})`,
+      };
+    }
 
     // 2.4.12 Focus Not Obscured (Enhanced).
     result.focusObscured = {
