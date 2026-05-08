@@ -6,6 +6,7 @@
     "hx-button",
     "hx-checkbox",
     "hx-combobox",
+    "hx-date-picker",
     "hx-dialog",
     "hx-number-input",
     "hx-select",
