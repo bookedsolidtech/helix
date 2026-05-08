@@ -1076,8 +1076,10 @@ describe('hx-button', () => {
       expect(css).toMatch(/\.button--danger:active\s*\{[^}]*filter:\s*none/);
     });
 
-    it('action.primary.bg-active resolves to primary-700 (#0F6363)', async () => {
-      expect(await resolveSemantic('--hx-color-action-primary-bg-active')).toBe('rgb(15, 99, 99)');
+    it('action.primary.bg-active resolves to primary-800 (#07494A)', async () => {
+      // 3.3.0: action.primary.bg chain shifted (rest=primary-600, hover=primary-700,
+      // active=primary-800) for AAA-large white-on-fill across all 6 brands.
+      expect(await resolveSemantic('--hx-color-action-primary-bg-active')).toBe('rgb(7, 73, 74)');
     });
 
     it('action.danger.bg-active resolves to error-700 (#A21312)', async () => {
@@ -1129,17 +1131,25 @@ describe('hx-button', () => {
     });
 
     // Foreground pin: the inverted hover/active rules also override `color`
-    // to text.on-{role} (neutral-900, no dark-mode flip). Without this pin,
-    // text.inverse stays in effect on the lifted -400 fill — white text on
-    // light-teal/red collapses to ~2.4–2.6:1 in light mode, AA fail. Codex
-    // round-7 follow-up flagged the missing foreground assertions.
-    it('inverted primary hover/active pins color to text.on-primary', async () => {
+    // to a dark anchor (no dark-mode flip). Without this pin, text.inverse
+    // stays in effect on the lifted -400 fill — white text on light-teal/red
+    // collapses to ~2.4–2.6:1 in light mode, AA fail.
+    //
+    // 3.3.0: primary inverted-hover repointed from text.on-primary to the
+    // neutral-900 primitive directly. text.on-primary moved to neutral-0
+    // (white) for the AAA-large coordinated pair on action.primary.bg
+    // (primary-600); using it on primary-400 inverted hover would regress
+    // to ~2.45:1. text.primary cannot be the anchor either since
+    // dark.text.primary flips to neutral-100. neutral-900 is the only
+    // primitive that never flips by mode/brand and pairs with primary-400
+    // at 7.27:1 AAA across all 6 brands.
+    it('inverted primary hover/active pins color to neutral-900', async () => {
       const el = await fixture<HelixButton>(
         '<hx-button variant="primary" inverted>Click</hx-button>',
       );
       const css = cssSource(el);
       expect(css).toMatch(
-        /:host\(\[inverted\]\)\s+\.button--primary:hover[^{]*\{[^}]*color:\s*var\(\s*--hx-button-inverted-primary-interactive-color,\s*var\(\s*--hx-color-text-on-primary/,
+        /:host\(\[inverted\]\)\s+\.button--primary:hover[^{]*\{[^}]*color:\s*var\(\s*--hx-button-inverted-primary-interactive-color,\s*var\(\s*--hx-color-neutral-900/,
       );
     });
 
