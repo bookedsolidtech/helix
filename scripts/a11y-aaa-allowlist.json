@@ -6,6 +6,7 @@
     "hx-button",
     "hx-checkbox",
     "hx-dialog",
+    "hx-number-input",
     "hx-text-input",
     "hx-textarea"
   ]
