@@ -49,14 +49,22 @@ describe('hx-breadcrumb', () => {
       expect(shadowQuery(el, '[part="list"]')).toBeTruthy();
     });
 
-    it('renders a semantic ol element as list container', async () => {
+    it('renders a role="list" container (PR #1688 audit fix — replaced <ol>)', async () => {
+      // The shadow DOM container is a <div role="list"> rather than <ol>.
+      // <ol>/<ul> direct children must be <li>, but slotted hx-breadcrumb-items
+      // are projected custom elements, so axe-core flags the structural rule.
+      // The role-based contract carries the same list semantics without
+      // enforcing the HTML structure rule. hx-breadcrumb-item carries
+      // role="listitem" via ElementInternals.
       const el = await fixture<HelixBreadcrumb>(`
         <hx-breadcrumb>
           <hx-breadcrumb-item>Current</hx-breadcrumb-item>
         </hx-breadcrumb>
       `);
-      const list = shadowQuery(el, 'ol[part="list"]');
-      expect(list).toBeInstanceOf(HTMLOListElement);
+      const list = shadowQuery(el, '[part="list"]');
+      expect(list).toBeTruthy();
+      expect(list?.getAttribute('role')).toBe('list');
+      expect(list?.tagName.toLowerCase()).toBe('div');
     });
   });
 
@@ -770,7 +778,12 @@ describe('hx-breadcrumb', () => {
   // ─── hx-breadcrumb-item: role guard (2) ───
 
   describe('hx-breadcrumb-item: role guard', () => {
-    it('does not set explicit role on items (native ol handles list semantics)', async () => {
+    it('does not pollute light DOM with an explicit role attribute', async () => {
+      // PR #1688 audit fix: items carry role="listitem" via
+      // ElementInternals (host-canonical pattern), NOT via a reflected
+      // attribute. internals.role does not surface in getAttribute('role'),
+      // so the consumer's light-DOM markup stays clean while AT walks the
+      // canonical list semantics through the host's announced surface.
       const el = await fixture<HelixBreadcrumb>(`
         <hx-breadcrumb>
           <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
@@ -784,7 +797,7 @@ describe('hx-breadcrumb', () => {
       });
     });
 
-    it('does not set role when used standalone', async () => {
+    it('does not set role attribute when used standalone (internals-only mirror)', async () => {
       const el = await fixture<HelixBreadcrumbItem>(
         '<hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>',
       );
