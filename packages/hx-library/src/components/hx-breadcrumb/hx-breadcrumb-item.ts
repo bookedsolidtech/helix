@@ -36,12 +36,17 @@ export class HelixBreadcrumbItem extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    // No explicit role needed. The shadow-DOM <ol> inside hx-breadcrumb
-    // provides native list semantics; slotted items are projected into it.
-    // Previously role="listitem" was set here, but it conflicted with the
-    // host's role="list" + shadow-DOM <nav> structure (aria-required-children).
-    // The native <ol> handles the accessibility tree correctly without
-    // explicit ARIA roles on host or items.
+    // hx-breadcrumb's shadow root uses `<div role="list">` (PR #1688
+    // audit fix — see hx-breadcrumb.ts render comment). axe-core pierces
+    // the shadow boundary and treats the breadcrumb-item's inner shadow
+    // content as the direct children of the role="list" container, so
+    // setting role="listitem" via ElementInternals on the host does NOT
+    // satisfy aria-required-children — axe still surfaces
+    // `a[tabindex]` / `span[aria-current]` as disallowed children. The
+    // shadow render places `role="listitem"` on the inner
+    // `<span part="item">` wrapper instead (see render() below), so the
+    // composed-tree walk lands on a valid listitem ancestor for every
+    // leaf node.
   }
 
   /**
@@ -85,8 +90,14 @@ export class HelixBreadcrumbItem extends HelixElement {
     // aria-current="page" is placed on the inner element (not the listitem host)
     // for canonical AT announcement ("current page, Patient Records" vs
     // "current page, list item").
+    //
+    // role="listitem" lives on the inner `<span part="item">` (not the
+    // host) because axe-core pierces the shadow boundary and treats this
+    // wrapper as the direct child of the parent role="list" container. A
+    // host-level internals.role mirror is invisible to axe at this surface
+    // (verified via PR #1688 audit).
     return html`
-      <span part="item">
+      <span part="item" role="listitem">
         ${this.current
           ? html`<span part="text" aria-current="page"><slot></slot></span>`
           : this.href
