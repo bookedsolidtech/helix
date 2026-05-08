@@ -25,6 +25,7 @@
     "hx-text-input",
     "hx-textarea",
     "hx-time-picker",
-    "hx-toggle-button"
+    "hx-toggle-button",
+    "hx-top-nav"
   ]
 }
