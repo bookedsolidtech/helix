@@ -95,6 +95,24 @@ export interface HxCheckboxGroupChangeDetail {
  * @cssprop [--hx-space-3] - Spacing token.
  * @cssprop [--hx-font-size-xs] - Font size.
  * @cssprop [--hx-color-neutral-500] - Color.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-checkbox-group/AAA-AUDIT.md
+ * @keyboard-contract navigate=Tab; disabled-suppresses=true
+ * @aria-pattern group
+ * @aria-pattern-source https://www.w3.org/TR/wai-aria-1.2/#group
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated true
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-checkbox-group
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-checkbox-group')
 export class HelixCheckboxGroup extends FormMixin(HelixElement) {

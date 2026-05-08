@@ -41,6 +41,9 @@ const ALL_COMPONENTS = [
   { tag: 'hx-time-picker', storyId: 'components-time-picker--default' },
   { tag: 'hx-color-picker', storyId: 'components-colorpicker--default' },
   { tag: 'hx-file-upload', storyId: 'components-file-upload--default' },
+  { tag: 'hx-checkbox-group', storyId: 'components-checkbox-group--default' },
+  { tag: 'hx-radio-group', storyId: 'components-radio-group--default' },
+  { tag: 'hx-switch', storyId: 'components-switch--default' },
 ];
 
 // ----- arg parsing -----
@@ -581,13 +584,23 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
       // (alert is role="alert"/region — announcement, not focus target) 2.4.13 is N/A.
       const isDialog = ctx.tag === 'hx-dialog';
       const isAlert = ctx.tag === 'hx-alert';
+      // Group containers (hx-checkbox-group, hx-radio-group) are non-focusable
+      // accessible-container surfaces that delegate focus to slotted children.
+      // The children (hx-checkbox, hx-radio) carry their own focus rings and
+      // are independently AAA-certified. The group host has no inner ring of
+      // its own — 2.4.13 is N/A at the container level. This mirrors the
+      // dialog/alert pattern.
+      const isGroupContainer =
+        ctx.tag === 'hx-checkbox-group' || ctx.tag === 'hx-radio-group';
       const naMessage = isDialog
         ? 'dialog focus ring inspected when open'
         : isAlert
           ? 'alert is non-focusable announcement region — 2.4.13 N/A'
-          : '';
+          : isGroupContainer
+            ? 'group container delegates focus to slotted children (each AAA-certified independently) — 2.4.13 N/A at container'
+            : '';
       results['2.4.13'] = {
-        status: isDialog || isAlert ? 'skip' : 'fail',
+        status: isDialog || isAlert || isGroupContainer ? 'skip' : 'fail',
         evidence: { ...r, note: naMessage },
       };
     }

@@ -5,6 +5,7 @@
     "hx-alert",
     "hx-button",
     "hx-checkbox",
+    "hx-checkbox-group",
     "hx-color-picker",
     "hx-combobox",
     "hx-date-picker",
