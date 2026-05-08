@@ -38,6 +38,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const CEM_PATH = resolve(ROOT, 'packages/hx-library/custom-elements.json');
 const COMPONENTS_DIR = resolve(ROOT, 'packages/hx-library/src/components');
+const PRIORITY_TIERS_PATH = resolve(ROOT, 'packages/hx-library/src/p0-priority-tiers.json');
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -397,6 +398,128 @@ function validateFile(filePath, cemIndex) {
   return errors;
 }
 
+// ── Metadata-completeness gate (Phase B.3) ─────────────────────────────────
+
+/**
+ * Load p0-priority-tiers.json into a tagName → tier map. Returns an empty
+ * map (and emits a warning) if the file cannot be read so that we degrade
+ * gracefully when the tier roster is missing — the API-surface validator
+ * above is the load-bearing check, the metadata gate is additive.
+ */
+function loadTierIndex() {
+  const map = new Map();
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync(PRIORITY_TIERS_PATH, 'utf8'));
+  } catch (err) {
+    console.warn(`  [warn] could not read ${PRIORITY_TIERS_PATH}: ${err.message}`);
+    return map;
+  }
+  for (const tierKey of ['p0', 'p1', 'p2', 'exempt']) {
+    const label = tierKey === 'exempt' ? 'exempt' : tierKey.toUpperCase();
+    const block = raw?.[tierKey]?.components;
+    if (!block) continue;
+    if (Array.isArray(block)) {
+      for (const tag of block) map.set(tag, label);
+      continue;
+    }
+    for (const cat of Object.values(block)) {
+      if (!Array.isArray(cat)) continue;
+      for (const tag of cat) map.set(tag, label);
+    }
+  }
+  return map;
+}
+
+/**
+ * Metadata-completeness checks per validated-toasting-wand Phase B.3:
+ *
+ *   - Every component the roster places in P0/P1/P2/exempt MUST surface
+ *     `helixMeta.priorityTier` in the manifest. (The plugin auto-populates
+ *     this from the same roster, so a miss flags real schema drift —
+ *     either an orphan declaration or a roster entry that doesn't exist
+ *     in the source tree.)
+ *   - Every component the manifest declares as `aaaCertified === true`
+ *     MUST also carry `helixMeta.aaa.criteria` (non-empty) AND
+ *     `helixMeta.aaa.auditUrl`. AAA cert without an audit trail is the
+ *     primary failure mode the cert toolkit (B.2) prevents — the gate
+ *     guards against drift if a tag is added by hand and the audit
+ *     artifact is forgotten.
+ *   - `helixMeta.priorityTier` value, if emitted, MUST match one of
+ *     P0 / P1 / P2 / exempt.
+ *
+ * Returns an array of `{ file, message }` errors. The shape matches the
+ * existing API-surface validator so the main reporter renders both
+ * uniformly.
+ */
+function validateMetadataCompleteness(cem, tierIndex) {
+  const errors = [];
+  const cemTagToDecl = new Map();
+  const validTiers = new Set(['P0', 'P1', 'P2', 'exempt']);
+
+  for (const mod of cem.modules ?? []) {
+    for (const decl of mod.declarations ?? []) {
+      if (decl.kind !== 'class' || !decl.tagName) continue;
+      cemTagToDecl.set(decl.tagName, { decl, modulePath: mod.path ?? '<unknown>' });
+    }
+  }
+
+  // 1. Every roster member must surface helixMeta.priorityTier.
+  for (const [tag, expectedTier] of tierIndex) {
+    const entry = cemTagToDecl.get(tag);
+    if (!entry) {
+      errors.push({
+        file: 'p0-priority-tiers.json',
+        message: `roster declares ${tag} (${expectedTier}) but no class with that tagName exists in the CEM`,
+      });
+      continue;
+    }
+    const meta = entry.decl.helixMeta;
+    if (!meta || typeof meta.priorityTier !== 'string') {
+      errors.push({
+        file: entry.modulePath,
+        message: `${tag}: helixMeta.priorityTier missing (expected ${expectedTier})`,
+      });
+      continue;
+    }
+    if (meta.priorityTier !== expectedTier) {
+      errors.push({
+        file: entry.modulePath,
+        message: `${tag}: helixMeta.priorityTier="${meta.priorityTier}" but roster says ${expectedTier}`,
+      });
+    }
+  }
+
+  // 2. AAA-certified declarations must carry helixMeta.aaa.criteria + auditUrl.
+  // 3. priorityTier values must be valid.
+  for (const [tag, { decl, modulePath }] of cemTagToDecl) {
+    const meta = decl.helixMeta;
+    if (decl.aaaCertified === true) {
+      const aaa = meta?.aaa ?? {};
+      if (!Array.isArray(aaa.criteria) || aaa.criteria.length === 0) {
+        errors.push({
+          file: modulePath,
+          message: `${tag}: aaaCertified=true but helixMeta.aaa.criteria is missing or empty`,
+        });
+      }
+      if (typeof aaa.auditUrl !== 'string' || aaa.auditUrl.length === 0) {
+        errors.push({
+          file: modulePath,
+          message: `${tag}: aaaCertified=true but helixMeta.aaa.auditUrl is missing`,
+        });
+      }
+    }
+    if (meta && typeof meta.priorityTier === 'string' && !validTiers.has(meta.priorityTier)) {
+      errors.push({
+        file: modulePath,
+        message: `${tag}: helixMeta.priorityTier="${meta.priorityTier}" is not one of P0|P1|P2|exempt`,
+      });
+    }
+  }
+
+  return errors;
+}
+
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 function main() {
@@ -429,6 +552,25 @@ function main() {
       }
       totalErrors += errors.length;
     }
+  }
+
+  // ── Metadata-completeness gate (additive; runs after API-surface checks)
+  const tierIndex = loadTierIndex();
+  if (tierIndex.size > 0) {
+    console.log(
+      `  Metadata gate: ${tierIndex.size} roster entries (P0/P1/P2/exempt) ` +
+        `cross-checked against helixMeta…`,
+    );
+    const metadataErrors = validateMetadataCompleteness(cem, tierIndex);
+    if (metadataErrors.length > 0) {
+      for (const err of metadataErrors) {
+        console.error(`\n  [METADATA-FAIL] ${err.file}`);
+        console.error(`                  ${err.message}`);
+      }
+      totalErrors += metadataErrors.length;
+    }
+  } else {
+    console.log(`  Metadata gate: skipped (priority-tier roster unavailable).`);
   }
 
   if (totalErrors > 0) {

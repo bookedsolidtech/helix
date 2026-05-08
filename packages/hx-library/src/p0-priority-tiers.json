@@ -1,0 +1,143 @@
+{
+  "$schema": "./p0-priority-tiers.schema.json",
+  "version": "1.0.0",
+  "generatedAt": "2026-05-07",
+  "rationale": "Canonical priority-tier classification for the AAA Cert Epic (Tier 3). P0 = interactive + healthcare-critical components committed to AAA conformance per WCAG 2.1 + APG-aligned keyboard contracts. P1 = data display + progress + special-case components committed to AA-strict + AAA-informational. P2 = indicators + structural layout (AA-inherited; AAA where the component happens to qualify). Exempt = utility/theming primitives with no contrast obligation.",
+  "p0": {
+    "count": 43,
+    "rationale": "Interactive primitives, healthcare-critical surfaces, form controls. AAA-certified per the 11 component-shippable criteria (1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, APG-aligned keyboard contract). VPAT v1.0 publishes when 30+ of these reach AAA-cert.",
+    "components": {
+      "form-inputs": [
+        "hx-text-input",
+        "hx-textarea",
+        "hx-number-input",
+        "hx-select",
+        "hx-combobox",
+        "hx-date-picker",
+        "hx-time-picker",
+        "hx-color-picker",
+        "hx-file-upload"
+      ],
+      "selection-controls": ["hx-checkbox", "hx-checkbox-group", "hx-radio-group", "hx-switch"],
+      "buttons": [
+        "hx-button",
+        "hx-icon-button",
+        "hx-copy-button",
+        "hx-toggle-button",
+        "hx-split-button",
+        "hx-button-group",
+        "hx-action-bar"
+      ],
+      "navigation": [
+        "hx-tabs",
+        "hx-menu",
+        "hx-nav",
+        "hx-side-nav",
+        "hx-top-nav",
+        "hx-dropdown",
+        "hx-overflow-menu",
+        "hx-breadcrumb"
+      ],
+      "overlays": ["hx-dialog", "hx-drawer", "hx-popover", "hx-tooltip", "hx-popup"],
+      "live-regions": ["hx-alert", "hx-toast", "hx-banner"],
+      "sliders": ["hx-slider", "hx-rating"],
+      "form-assembly": ["hx-form", "hx-field"],
+      "field-helpers": ["hx-field-label", "hx-help-text", "hx-clinical-status"]
+    }
+  },
+  "p1": {
+    "count": 11,
+    "rationale": "Data display, progress indicators, healthcare-specific surfaces. Committed to AA-strict + AAA-informational. Keyboard contracts published; AAA contrast met where structurally possible.",
+    "components": {
+      "data-display": [
+        "hx-table",
+        "hx-data-table",
+        "hx-structured-list",
+        "hx-pagination",
+        "hx-list"
+      ],
+      "progress-meter": ["hx-progress-bar", "hx-progress-ring", "hx-meter"],
+      "healthcare": ["hx-phi-field", "hx-patient-banner"],
+      "navigation-anchor": ["hx-link"]
+    }
+  },
+  "p2": {
+    "count": 23,
+    "rationale": "Indicators, structural/layout primitives, decorative content. AA-inherited from token cascade; AAA where the surface naturally qualifies (e.g., text on default surfaces). No per-component AAA cert obligation; documented in VPAT as Pending audit / Not Evaluated until escalated.",
+    "components": {
+      "indicators": [
+        "hx-badge",
+        "hx-tag",
+        "hx-spinner",
+        "hx-avatar",
+        "hx-image",
+        "hx-icon",
+        "hx-status-indicator"
+      ],
+      "stat-metric": ["hx-stat", "hx-counter"],
+      "structural-layout": [
+        "hx-card",
+        "hx-container",
+        "hx-grid",
+        "hx-stack",
+        "hx-split-panel",
+        "hx-divider",
+        "hx-accordion",
+        "hx-carousel",
+        "hx-steps",
+        "hx-skeleton",
+        "hx-prose",
+        "hx-tree-view"
+      ],
+      "presentational": ["hx-text"],
+      "special": ["hx-code-snippet"]
+    }
+  },
+  "exempt": {
+    "count": 4,
+    "rationale": "Utility / theming primitives. No contrast obligation, no interactive surface, no rendered content of their own. Documented in VPAT as Out of Scope.",
+    "components": ["hx-visually-hidden", "hx-style-scope", "hx-theme", "hx-format-date"]
+  },
+  "totals": {
+    "p0": 43,
+    "p1": 11,
+    "p2": 23,
+    "exempt": 4,
+    "all": 81
+  },
+  "vpat": {
+    "v1ReleaseTrigger": {
+      "metric": "p0AaaCertifiedCount",
+      "threshold": 30,
+      "currentCount": 0,
+      "comment": "VPAT v1.0 auto-promotes when 30+ P0 components carry @aaa-certified JSDoc + AAA-AUDIT.md + axe-AAA pass. Records: scripts/a11y-aaa-allowlist.json (allow-list) + custom-elements.json (aaaCertified field) + per-component AAA-AUDIT.md."
+    }
+  },
+  "consumers": [
+    {
+      "consumer": "apps/storybook/stories/accessibility/Dashboard.mdx",
+      "purpose": "Live cert-count badges + per-tier coverage matrix",
+      "field": "p0.totals + aaaCertified count from custom-elements.json"
+    },
+    {
+      "consumer": "apps/docs/src/content/docs/accessibility/vpat-2.5.mdx",
+      "purpose": "Per-component conformance rows; v0.1 → v1.0 promotion trigger",
+      "field": "all tier rosters; v1ReleaseTrigger.threshold"
+    },
+    {
+      "consumer": "scripts/aaa-cert.mjs",
+      "purpose": "Validates target component is in P0 before applying cert; rejects P1/P2/exempt names",
+      "field": "p0.components.* (flattened)"
+    },
+    {
+      "consumer": "scripts/validate-cem.mjs",
+      "purpose": "Metadata-completeness gate — every P0 must declare aaa-criteria, keyboard-contract, aria-pattern, priority-tier",
+      "field": "p0.components.* (flattened) cross-checked against custom-elements.json helixMeta"
+    },
+    {
+      "consumer": "@helixui/library cem-plugins/helix-metadata.mjs",
+      "purpose": "Auto-populates priorityTier in helixMeta when @priority-tier JSDoc tag is omitted",
+      "field": "all tier rosters reverse-indexed by component name"
+    }
+  ]
+}
