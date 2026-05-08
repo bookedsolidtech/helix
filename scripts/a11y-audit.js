@@ -28,6 +28,36 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const COMPONENTS_DIR = resolve(ROOT, 'packages/hx-library/src/components');
+const AAA_ALLOWLIST_PATH = resolve(__dirname, 'a11y-aaa-allowlist.json');
+
+// ── AAA allow-list (Workstream B.1) ──────────────────────────────────────────
+//
+// Components listed in scripts/a11y-aaa-allowlist.json have earned the
+// `@aaa-certified` JSDoc tag (Workstream A.3) and run the wcag2aaa axe
+// tag bucket on top of the AA baseline. Components NOT in the list
+// continue to run AA-only — zero behavioural change to the default sweep.
+//
+// File is hand-edited per component as the B.3 audit lands; the CEM
+// analyzer plugin (A.3) provides the source-of-truth `aaaCertified`
+// flag, this list mirrors it for the script that runs against built
+// Storybook (no CEM at audit time).
+function loadAaaAllowlist() {
+  try {
+    const raw = readFileSync(AAA_ALLOWLIST_PATH, 'utf-8');
+    const parsed = JSON.parse(raw);
+    const components = Array.isArray(parsed.components) ? parsed.components : [];
+    return new Set(components.map((c) => String(c).trim()).filter(Boolean));
+  } catch (err) {
+    // Missing or malformed file is non-fatal — degrade to AA-only (status quo).
+    console.warn(
+      `[a11y-audit] Could not load AAA allow-list at ${AAA_ALLOWLIST_PATH}: ${err.message}. Falling back to AA-only for all components.`,
+    );
+    return new Set();
+  }
+}
+
+const AA_TAGS = ['wcag2a', 'wcag2aa', 'best-practice'];
+const AAA_TAGS = ['wcag2a', 'wcag2aa', 'wcag2aaa', 'best-practice'];
 
 // ── CLI arg parsing ──────────────────────────────────────────────────────────
 
@@ -177,13 +207,23 @@ async function runAudit() {
   const allStories = discoverStories();
   console.log(`Discovered ${allStories.length} story files\n`);
 
+  const aaaAllowlist = loadAaaAllowlist();
+  if (aaaAllowlist.size > 0) {
+    console.log(
+      `AAA allow-list: ${aaaAllowlist.size} component(s) opted in — ${Array.from(aaaAllowlist).sort().join(', ')}\n`,
+    );
+  } else {
+    console.log(`AAA allow-list: empty — all components run AA-only.\n`);
+  }
+
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const context = await browser.newContext();
 
   const report = {
     runAt: new Date().toISOString(),
     storybookUrl: STORYBOOK_URL,
-    rules: ['wcag2a', 'wcag2aa', 'best-practice'],
+    rules: AA_TAGS,
+    aaaAllowlist: Array.from(aaaAllowlist).sort(),
     totalStories: 0,
     totalViolations: 0,
     blockingViolations: 0,
@@ -203,6 +243,10 @@ async function runAudit() {
 
     for (const storyName of storiesToAudit) {
       const url = buildStoryUrl(title, storyName);
+      const componentName = basename(dirname(filePath));
+      const useAaa = aaaAllowlist.has(componentName);
+      const tagsForRun = useAaa ? AAA_TAGS : AA_TAGS;
+      const level = useAaa ? 'aaa' : 'aa';
       report.totalStories++;
 
       const page = await context.newPage();
@@ -231,11 +275,7 @@ async function runAudit() {
           // AxeBuilder is rebuilt fresh per story so prior rule state never
           // leaks across iterations.
           const disabledRules = storyRuleOverrides[storyName] ?? [];
-          let axeBuilder = new AxeBuilder({ page }).withTags([
-            'wcag2a',
-            'wcag2aa',
-            'best-practice',
-          ]);
+          let axeBuilder = new AxeBuilder({ page }).withTags(tagsForRun);
           if (disabledRules.length > 0) {
             axeBuilder = axeBuilder.disableRules(disabledRules);
           }
@@ -254,7 +294,9 @@ async function runAudit() {
         title,
         storyName,
         url,
-        component: basename(dirname(filePath)),
+        component: componentName,
+        level,
+        tags: tagsForRun,
         violations: violations.map((v) => ({
           id: v.id,
           impact: v.impact,
@@ -284,7 +326,8 @@ async function runAudit() {
             ? 'WARN '
             : 'PASS ';
 
-      const line = `  ${status}  ${title}/${storyName}${error ? ` — ${error}` : blockingViolations.length > 0 ? ` — ${blockingViolations.length} blocking violation(s)` : violations.length > 0 ? ` — ${violations.length} minor violation(s)` : ''}`;
+      const levelTag = useAaa ? ' [AAA]' : '';
+      const line = `  ${status}  ${title}/${storyName}${levelTag}${error ? ` — ${error}` : blockingViolations.length > 0 ? ` — ${blockingViolations.length} blocking violation(s)` : violations.length > 0 ? ` — ${violations.length} minor violation(s)` : ''}`;
       console.log(line);
 
       // GitHub Actions annotations for blocking violations

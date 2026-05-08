@@ -15,6 +15,14 @@ const config: StorybookConfig = {
     getAbsolutePath('@storybook/addon-vitest'),
     getAbsolutePath('@storybook/addon-links'),
     getAbsolutePath('@storybook/addon-themes'),
+    // Figma frame embeds in autodocs (Design panel + <Source> Figma block).
+    getAbsolutePath('@storybook/addon-designs'),
+    // Toolbar for forcing :hover/:focus/:active/:focus-visible across stories.
+    getAbsolutePath('storybook-addon-pseudo-states'),
+    // Chromatic capture hooks. Inert without a CHROMATIC_PROJECT_TOKEN; safe
+    // to register so consumers opting into VRT do not need a Storybook config
+    // change to enable it.
+    getAbsolutePath('@chromatic-com/storybook'),
   ],
 
   framework: {

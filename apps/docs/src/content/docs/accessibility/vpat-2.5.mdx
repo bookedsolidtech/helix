@@ -1,0 +1,451 @@
+---
+title: 'VPAT 2.5 — @helixui/library'
+description: Voluntary Product Accessibility Template (VPAT) 2.5 baseline for the HELiX web component library — WCAG 2.1 AA conformance with AAA-targeted differentiation surface.
+draft: true
+sidebar:
+  order: 1
+  badge:
+    text: 'Draft v0.1'
+    variant: 'caution'
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Draft v0.1 — Aspirational Baseline">
+  This is the **v0.1 baseline VPAT** for `@helixui/library`. Per-component AAA
+  certification populates this document over time as the [AAA Certification
+  Epic](#roadmap-to-v10) executes. Until a component is explicitly audited and
+  marked **Supports**, treat its conformance state as **Pending audit / Not
+  Evaluated**.
+
+**v1.0 publishes when 30+ P0 components reach AAA-cert status.**
+
+</Aside>
+
+This document is the **Voluntary Product Accessibility Template (VPAT) 2.5**
+for [`@helixui/library`](https://www.npmjs.com/package/@helixui/library), the
+HELiX healthcare web component library. The format follows the [ITI VPAT
+2.5 Rev 508](https://www.itic.org/policy/accessibility/vpat) template, the
+same structure adopted by the [U.S. Web Design System (USWDS) for its 44
+core components](https://designsystem.digital.gov/documentation/accessibility/).
+
+HELiX's strategic posture: where USWDS publishes a Level AA conformance
+claim, HELiX targets **Level AAA on its P0 (Tier 1) components** —
+positioning HELiX as the OSS enterprise-supported AAA competitor for global
+healthcare and public-sector teams that need conformance headroom above the
+508 floor.
+
+## Product Information
+
+| Field                     | Value                                                                                                                                                                                                                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Product Name**          | `@helixui/library`                                                                                                                                                                                                                                                |
+| **Product Version**       | 3.4.1                                                                                                                                                                                                                                                             |
+| **Report Date**           | 2026-05-06                                                                                                                                                                                                                                                        |
+| **Report Version**        | v0.1 (Draft baseline)                                                                                                                                                                                                                                             |
+| **Product Description**   | Enterprise healthcare web component library — 80 framework-agnostic custom elements built on Lit 3.x and the W3C Web Components standard. Ships with a three-tier design token system (light, dark, high-contrast) and Drupal CMS integration via Twig templates. |
+| **Contact Information**   | https://github.com/bookedsolidtech/helix/issues                                                                                                                                                                                                                   |
+| **Notes**                 | This VPAT covers the published `@helixui/library` package. The companion `@helixui/tokens` package and `@helixui/react` framework wrappers are evaluated under the same conformance posture and inherit the per-SC outcomes recorded here.                        |
+| **Evaluation Methods**    | Automated testing (axe-core, Vitest browser mode), runtime adopted-stylesheet inspection, design-token contrast regression matrix, manual keyboard / screen-reader review on a per-component basis as the AAA Certification Epic executes.                        |
+| **Evaluator Credentials** | HELiX engineering team — internal review. Third-party audit (planned for v1.0) is **not yet performed**. This VPAT is an internal, voluntary disclosure; it has not been reviewed or signed off by an independent accessibility auditor.                          |
+
+## Applicable Standards / Guidelines
+
+This report covers conformance with the following standards:
+
+| Standard                                                                                              | Included In Report                                           |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Web Content Accessibility Guidelines 2.1](https://www.w3.org/TR/WCAG21/), Level A                    | Yes                                                          |
+| [Web Content Accessibility Guidelines 2.1](https://www.w3.org/TR/WCAG21/), Level AA                   | Yes                                                          |
+| [Web Content Accessibility Guidelines 2.1](https://www.w3.org/TR/WCAG21/), Level AAA                  | Yes (HELiX differentiation surface)                          |
+| [Revised Section 508 standards (2017)](https://www.access-board.gov/ict/), 36 CFR Part 1194           | Yes — Chapters 3, 4, 5, 6 mapped via WCAG 2.0 Level A and AA |
+| [EN 301 549 V3.2.1 (2021-03)](https://www.etsi.org/deliver/etsi_en/301500_301599/301549/03.02.01_60/) | Yes — Chapters 9, 10, 11 mapped via WCAG 2.1 Level A and AA  |
+
+A Level AAA claim is **not** required by Section 508 or EN 301 549. HELiX's
+AAA targeting is voluntary and intended to provide conformance headroom for
+healthcare and public-sector consumers operating under stricter procurement
+posture.
+
+## Terms
+
+The terms used in the conformance columns follow the standard VPAT 2.5
+vocabulary, as adopted by [USWDS in its
+VPAT](https://designsystem.digital.gov/documentation/accessibility/) and the
+broader U.S. federal procurement community:
+
+| Term                   | Definition                                                                                                                                                                                                                         |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Supports**           | The functionality of the product has at least one method that meets the criterion without known defects, or meets with equivalent facilitation.                                                                                    |
+| **Partially Supports** | Some functionality of the product does not meet the criterion. Known defects exist; remediation is in progress.                                                                                                                    |
+| **Does Not Support**   | The majority of product functionality does not meet the criterion.                                                                                                                                                                 |
+| **Not Applicable**     | The criterion is not relevant to the product.                                                                                                                                                                                      |
+| **Not Evaluated**      | The product has not been evaluated against this criterion. **This is the initial state of most criteria in this v0.1 baseline.** Per-component audits convert "Not Evaluated" rows to one of the three conformance verdicts above. |
+
+## Conformance Summary
+
+The library currently asserts **AA conformance for the design-token
+contrast layer** (gated by the [`contrast.test.ts` regression
+matrix](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/src/__tests__/contrast.test.ts))
+and **forced-colors runtime adoption for the five mixin family
+representatives** (gated by
+[`forced-colors-runtime.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/components/__tests__/forced-colors-runtime.test.ts)).
+
+All other Success Criteria are scoped per-component and populate from the
+[Per-Component Coverage Matrix](#per-component-coverage-matrix) as the AAA
+Certification Epic executes.
+
+### WCAG 2.1 Level A (30 Success Criteria)
+
+| Success Criterion                                                                                                                                                 | Conformance Level  | Remarks and Explanations                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [1.1.1 Non-text Content](https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html)                                                                       | Not Evaluated      | Per-component audit pending. Components that ship icons (`hx-icon`, `hx-icon-button`, `hx-avatar`) require explicit `label` / `aria-label` review.       |
+| [1.2.1 Audio-only and Video-only (Prerecorded)](https://www.w3.org/WAI/WCAG21/Understanding/audio-only-and-video-only-prerecorded.html)                           | Not Applicable     | The library ships no audio or video components.                                                                                                          |
+| [1.2.2 Captions (Prerecorded)](https://www.w3.org/WAI/WCAG21/Understanding/captions-prerecorded.html)                                                             | Not Applicable     | The library ships no audio or video components.                                                                                                          |
+| [1.2.3 Audio Description or Media Alternative (Prerecorded)](https://www.w3.org/WAI/WCAG21/Understanding/audio-description-or-media-alternative-prerecorded.html) | Not Applicable     | The library ships no audio or video components.                                                                                                          |
+| [1.3.1 Info and Relationships](https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html)                                                           | Partially Supports | Form composition (`hx-field`, `hx-form`, `hx-field-label`, `hx-help-text`) cross-shadow-boundary association is the dominant per-SC remediation surface. |
+| [1.3.2 Meaningful Sequence](https://www.w3.org/WAI/WCAG21/Understanding/meaningful-sequence.html)                                                                 | Not Evaluated      | Per-component audit pending.                                                                                                                             |
+| [1.3.3 Sensory Characteristics](https://www.w3.org/WAI/WCAG21/Understanding/sensory-characteristics.html)                                                         | Not Evaluated      | Per-component audit pending.                                                                                                                             |
+| [1.4.1 Use of Color](https://www.w3.org/WAI/WCAG21/Understanding/use-of-color.html)                                                                               | Not Evaluated      | Validation styling (`hx-text-input`, `hx-textarea`, `hx-checkbox`, `hx-select`) requires explicit non-color indicator audit.                             |
+| [1.4.2 Audio Control](https://www.w3.org/WAI/WCAG21/Understanding/audio-control.html)                                                                             | Not Applicable     | The library ships no audio components.                                                                                                                   |
+| [2.1.1 Keyboard](https://www.w3.org/WAI/WCAG21/Understanding/keyboard.html)                                                                                       | Partially Supports | Interactive components broadly tested. Outstanding: per-component keyboard-test coverage parity (see AAA Epic Phase 2).                                  |
+| [2.1.2 No Keyboard Trap](https://www.w3.org/WAI/WCAG21/Understanding/no-keyboard-trap.html)                                                                       | Partially Supports | Modal-class components (`hx-dialog`, `hx-drawer`, `hx-popover`) require explicit focus-trap audit per APG.                                               |
+| [2.1.4 Character Key Shortcuts](https://www.w3.org/WAI/WCAG21/Understanding/character-key-shortcuts.html)                                                         | Not Evaluated      | Per-component audit pending.                                                                                                                             |
+| [2.2.1 Timing Adjustable](https://www.w3.org/WAI/WCAG21/Understanding/timing-adjustable.html)                                                                     | Not Evaluated      | `hx-toast` auto-dismiss timing requires audit.                                                                                                           |
+| [2.2.2 Pause, Stop, Hide](https://www.w3.org/WAI/WCAG21/Understanding/pause-stop-hide.html)                                                                       | Not Evaluated      | `hx-carousel`, `hx-spinner`, `hx-progress-ring` motion-control audit pending.                                                                            |
+| [2.3.1 Three Flashes or Below Threshold](https://www.w3.org/WAI/WCAG21/Understanding/three-flashes-or-below-threshold.html)                                       | Supports           | No components flash above the threshold. All animated components honour `prefers-reduced-motion`.                                                        |
+| [2.4.1 Bypass Blocks](https://www.w3.org/WAI/WCAG21/Understanding/bypass-blocks.html)                                                                             | Not Applicable     | Page-level concern; the library provides composition primitives (`hx-side-nav`, `hx-top-nav`) but does not enforce page structure.                       |
+| [2.4.2 Page Titled](https://www.w3.org/WAI/WCAG21/Understanding/page-titled.html)                                                                                 | Not Applicable     | Page-level concern outside library scope.                                                                                                                |
+| [2.4.3 Focus Order](https://www.w3.org/WAI/WCAG21/Understanding/focus-order.html)                                                                                 | Not Evaluated      | Per-component audit pending. Composite components (`hx-tabs`, `hx-radio-group`, `hx-tree-view`) require roving-tabindex audit.                           |
+| [2.4.4 Link Purpose (In Context)](https://www.w3.org/WAI/WCAG21/Understanding/link-purpose-in-context.html)                                                       | Not Evaluated      | `hx-link`, `hx-card[href]` audit pending.                                                                                                                |
+| [2.5.1 Pointer Gestures](https://www.w3.org/WAI/WCAG21/Understanding/pointer-gestures.html)                                                                       | Not Evaluated      | `hx-slider`, `hx-color-picker` audit pending.                                                                                                            |
+| [2.5.2 Pointer Cancellation](https://www.w3.org/WAI/WCAG21/Understanding/pointer-cancellation.html)                                                               | Not Evaluated      | Per-component audit pending.                                                                                                                             |
+| [2.5.3 Label in Name](https://www.w3.org/WAI/WCAG21/Understanding/label-in-name.html)                                                                             | Not Evaluated      | Per-component audit pending.                                                                                                                             |
+| [2.5.4 Motion Actuation](https://www.w3.org/WAI/WCAG21/Understanding/motion-actuation.html)                                                                       | Not Applicable     | No motion-actuated functionality in the library.                                                                                                         |
+| [3.1.1 Language of Page](https://www.w3.org/WAI/WCAG21/Understanding/language-of-page.html)                                                                       | Not Applicable     | Page-level concern outside library scope.                                                                                                                |
+| [3.2.1 On Focus](https://www.w3.org/WAI/WCAG21/Understanding/on-focus.html)                                                                                       | Not Evaluated      | Per-component audit pending.                                                                                                                             |
+| [3.2.2 On Input](https://www.w3.org/WAI/WCAG21/Understanding/on-input.html)                                                                                       | Not Evaluated      | Per-component audit pending.                                                                                                                             |
+| [3.3.1 Error Identification](https://www.w3.org/WAI/WCAG21/Understanding/error-identification.html)                                                               | Partially Supports | Form-error association (`hx-field`, `hx-help-text`, `hx-text-input` validity) is the dominant remediation surface.                                       |
+| [3.3.2 Labels or Instructions](https://www.w3.org/WAI/WCAG21/Understanding/labels-or-instructions.html)                                                           | Partially Supports | Slotted label/help-text patterns are the dominant remediation surface.                                                                                   |
+| [4.1.1 Parsing](https://www.w3.org/WAI/WCAG21/Understanding/parsing.html)                                                                                         | Supports           | All components emit valid HTML; Lit's templating prevents malformed output. (Note: WCAG 2.2 obsoletes 4.1.1.)                                            |
+| [4.1.2 Name, Role, Value](https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html)                                                                       | Partially Supports | Custom-element ARIA contracts are reviewed per-component. The `host-canonical` ARIA pattern (e.g. `hx-select`) is the strategic direction.               |
+
+### WCAG 2.1 Level AA (20 Success Criteria)
+
+| Success Criterion                                                                                                                         | Conformance Level  | Remarks and Explanations                                                                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [1.2.4 Captions (Live)](https://www.w3.org/WAI/WCAG21/Understanding/captions-live.html)                                                   | Not Applicable     | The library ships no live audio or video components.                                                                                                                                                                                                                                                                 |
+| [1.2.5 Audio Description (Prerecorded)](https://www.w3.org/WAI/WCAG21/Understanding/audio-description-prerecorded.html)                   | Not Applicable     | The library ships no audio or video components.                                                                                                                                                                                                                                                                      |
+| [1.3.4 Orientation](https://www.w3.org/WAI/WCAG21/Understanding/orientation.html)                                                         | Supports           | No component restricts orientation.                                                                                                                                                                                                                                                                                  |
+| [1.3.5 Identify Input Purpose](https://www.w3.org/WAI/WCAG21/Understanding/identify-input-purpose.html)                                   | Not Evaluated      | `hx-text-input` `autocomplete` token coverage audit pending.                                                                                                                                                                                                                                                         |
+| [1.4.3 Contrast (Minimum)](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)                                             | **Supports**       | Gated by [`packages/hx-tokens/src/__tests__/contrast.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/src/__tests__/contrast.test.ts) — every semantic `text.* × surface.*` pairing across light, dark, and high-contrast modes asserts ≥4.5:1 (body) / ≥3.0:1 (large/UI) at CI time. |
+| [1.4.4 Resize Text](https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html)                                                         | Not Evaluated      | All component dimensions use relative units (`em`, `rem`); explicit 200% zoom audit pending.                                                                                                                                                                                                                         |
+| [1.4.5 Images of Text](https://www.w3.org/WAI/WCAG21/Understanding/images-of-text.html)                                                   | Supports           | The library renders no images of text.                                                                                                                                                                                                                                                                               |
+| [1.4.10 Reflow](https://www.w3.org/WAI/WCAG21/Understanding/reflow.html)                                                                  | Not Evaluated      | Per-component reflow audit at 320 CSS px pending.                                                                                                                                                                                                                                                                    |
+| [1.4.11 Non-text Contrast](https://www.w3.org/WAI/WCAG21/Understanding/non-text-contrast.html)                                            | Partially Supports | Border / focus-ring tokens audited; `border.on-dark-strong` enforced ≥3:1 in `contrast.test.ts`. Per-component focus-ring contrast audit pending.                                                                                                                                                                    |
+| [1.4.12 Text Spacing](https://www.w3.org/WAI/WCAG21/Understanding/text-spacing.html)                                                      | Not Evaluated      | Per-component audit pending.                                                                                                                                                                                                                                                                                         |
+| [1.4.13 Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html)                            | Not Evaluated      | `hx-tooltip`, `hx-popover` dismissable / hoverable / persistent audit pending.                                                                                                                                                                                                                                       |
+| [2.4.5 Multiple Ways](https://www.w3.org/WAI/WCAG21/Understanding/multiple-ways.html)                                                     | Not Applicable     | Page-level concern outside library scope.                                                                                                                                                                                                                                                                            |
+| [2.4.6 Headings and Labels](https://www.w3.org/WAI/WCAG21/Understanding/headings-and-labels.html)                                         | Not Evaluated      | Slotted heading audit pending.                                                                                                                                                                                                                                                                                       |
+| [2.4.7 Focus Visible](https://www.w3.org/WAI/WCAG21/Understanding/focus-visible.html)                                                     | Partially Supports | `:focus-visible` rings present on all interactive components. Forced-colors fallback gated by [`forced-colors-runtime.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/components/__tests__/forced-colors-runtime.test.ts). Per-component visual review pending.                 |
+| [3.1.2 Language of Parts](https://www.w3.org/WAI/WCAG21/Understanding/language-of-parts.html)                                             | Not Applicable     | Page-level concern outside library scope.                                                                                                                                                                                                                                                                            |
+| [3.2.3 Consistent Navigation](https://www.w3.org/WAI/WCAG21/Understanding/consistent-navigation.html)                                     | Not Applicable     | Page-level concern outside library scope.                                                                                                                                                                                                                                                                            |
+| [3.2.4 Consistent Identification](https://www.w3.org/WAI/WCAG21/Understanding/consistent-identification.html)                             | Supports           | Components preserve consistent ARIA contracts and slot APIs across instantiations.                                                                                                                                                                                                                                   |
+| [3.3.3 Error Suggestion](https://www.w3.org/WAI/WCAG21/Understanding/error-suggestion.html)                                               | Not Evaluated      | `hx-form` validation suggestion-message audit pending.                                                                                                                                                                                                                                                               |
+| [3.3.4 Error Prevention (Legal, Financial, Data)](https://www.w3.org/WAI/WCAG21/Understanding/error-prevention-legal-financial-data.html) | Not Applicable     | Application-level concern outside library scope.                                                                                                                                                                                                                                                                     |
+| [4.1.3 Status Messages](https://www.w3.org/WAI/WCAG21/Understanding/status-messages.html)                                                 | Partially Supports | `hx-toast`, `hx-alert`, `hx-progress-bar` live-region audit in progress. ARIA Group 4 Phase 1 work covers `aria-live` posture for status / alert components.                                                                                                                                                         |
+
+### WCAG 2.1 Level AAA (28 Success Criteria) — Differentiation Surface
+
+<Aside type="tip" title="Strategic Differentiation">
+  Level AAA is **HELiX's strategic differentiator vs USWDS**, which publishes AA only. The criteria
+  below identify where AAA conformance is in scope for the AAA Certification Epic. Criteria marked
+  **Not Applicable** are application-level concerns outside library control.
+</Aside>
+
+| Success Criterion                                                                                                           | Conformance Level      | Remarks and Explanations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [1.2.6 Sign Language (Prerecorded)](https://www.w3.org/WAI/WCAG21/Understanding/sign-language-prerecorded.html)             | Not Applicable         | The library ships no audio or video components.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [1.2.7 Extended Audio Description](https://www.w3.org/WAI/WCAG21/Understanding/extended-audio-description-prerecorded.html) | Not Applicable         | The library ships no audio or video components.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [1.2.8 Media Alternative (Prerecorded)](https://www.w3.org/WAI/WCAG21/Understanding/media-alternative-prerecorded.html)     | Not Applicable         | The library ships no audio or video components.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [1.2.9 Audio-only (Live)](https://www.w3.org/WAI/WCAG21/Understanding/audio-only-live.html)                                 | Not Applicable         | The library ships no audio or video components.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [1.3.6 Identify Purpose](https://www.w3.org/WAI/WCAG21/Understanding/identify-purpose.html)                                 | Not Evaluated          | Symbol / icon / region purpose-mapping audit pending.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| [1.4.6 Contrast (Enhanced)](https://www.w3.org/WAI/WCAG21/Understanding/contrast-enhanced.html)                             | **Partially Supports** | Informational AAA pass/fail (≥7.0 body, ≥4.5 large) is logged on every test run via `console.info` in [`contrast.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/src/__tests__/contrast.test.ts). The persisted machine-readable AAA report lives in `.cache/contrast-report.json` and `CONTRAST-REPORT.md` (run `pnpm --filter=@helixui/tokens run contrast:report`). HELiX commits to the AAA contrast posture on the **default + dark + high-contrast** semantic palette. AAA is **not yet a CI gate**; promotion to gating is the v1.0 milestone. |
+| [1.4.7 Low or No Background Audio](https://www.w3.org/WAI/WCAG21/Understanding/low-or-no-background-audio.html)             | Not Applicable         | The library ships no audio components.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| [1.4.8 Visual Presentation](https://www.w3.org/WAI/WCAG21/Understanding/visual-presentation.html)                           | Not Evaluated          | Block-of-text presentation control audit pending — `hx-prose` is the audit target.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| [1.4.9 Images of Text (No Exception)](https://www.w3.org/WAI/WCAG21/Understanding/images-of-text-no-exception.html)         | Supports               | The library renders no images of text.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| [2.1.3 Keyboard (No Exception)](https://www.w3.org/WAI/WCAG21/Understanding/keyboard-no-exception.html)                     | Not Evaluated          | Per-component keyboard-no-exception audit pending; AAA conformance requires removing all keyboard traps including timed paths.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| [2.2.3 No Timing](https://www.w3.org/WAI/WCAG21/Understanding/no-timing.html)                                               | Not Applicable         | No essential timing in component behaviour. `hx-toast` auto-dismiss is configurable to indefinite.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| [2.2.4 Interruptions](https://www.w3.org/WAI/WCAG21/Understanding/interruptions.html)                                       | Not Evaluated          | `hx-toast`, `hx-alert` interrupt-suppression API audit pending.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [2.2.5 Re-authenticating](https://www.w3.org/WAI/WCAG21/Understanding/re-authenticating.html)                               | Not Applicable         | Application-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| [2.2.6 Timeouts](https://www.w3.org/WAI/WCAG21/Understanding/timeouts.html)                                                 | Not Applicable         | Application-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| [2.3.2 Three Flashes](https://www.w3.org/WAI/WCAG21/Understanding/three-flashes.html)                                       | Supports               | No components flash. All animated components honour `prefers-reduced-motion`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| [2.3.3 Animation from Interactions](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions.html)           | Supports               | All animated components honour `prefers-reduced-motion`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| [2.4.8 Location](https://www.w3.org/WAI/WCAG21/Understanding/location.html)                                                 | Not Applicable         | Page-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| [2.4.9 Link Purpose (Link Only)](https://www.w3.org/WAI/WCAG21/Understanding/link-purpose-link-only.html)                   | Not Evaluated          | `hx-link`, `hx-card[href]` link-only-purpose audit pending.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| [2.4.10 Section Headings](https://www.w3.org/WAI/WCAG21/Understanding/section-headings.html)                                | Not Applicable         | Page-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| [2.5.5 Target Size](https://www.w3.org/WAI/WCAG21/Understanding/target-size.html)                                           | Not Evaluated          | All interactive component target-size audit (≥44×44 CSS px) pending. WCAG 2.2 introduces 2.5.8 at AA (24×24); HELiX targets the AAA 44×44 floor.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| [2.5.6 Concurrent Input Mechanisms](https://www.w3.org/WAI/WCAG21/Understanding/concurrent-input-mechanisms.html)           | Supports               | All components support keyboard, pointer, and touch concurrently; no input mechanism is restricted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| [3.1.3 Unusual Words](https://www.w3.org/WAI/WCAG21/Understanding/unusual-words.html)                                       | Not Applicable         | Content-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| [3.1.4 Abbreviations](https://www.w3.org/WAI/WCAG21/Understanding/abbreviations.html)                                       | Not Applicable         | Content-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| [3.1.5 Reading Level](https://www.w3.org/WAI/WCAG21/Understanding/reading-level.html)                                       | Not Applicable         | Content-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| [3.1.6 Pronunciation](https://www.w3.org/WAI/WCAG21/Understanding/pronunciation.html)                                       | Not Applicable         | Content-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| [3.2.5 Change on Request](https://www.w3.org/WAI/WCAG21/Understanding/change-on-request.html)                               | Not Evaluated          | Per-component automatic-change audit pending (`hx-tabs`, `hx-combobox`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| [3.3.5 Help](https://www.w3.org/WAI/WCAG21/Understanding/help.html)                                                         | Supports               | `hx-help-text` and the `help-text` slot pattern provide context-sensitive help on all form components.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| [3.3.6 Error Prevention (All)](https://www.w3.org/WAI/WCAG21/Understanding/error-prevention-all.html)                       | Not Applicable         | Application-level concern outside library scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+
+## Per-Component Coverage Matrix
+
+The matrix below records the per-component conformance posture across the
+80 published components. Tier assignments follow the [AAA Certification
+Epic](#roadmap-to-v10) plan:
+
+- **P0** — Tier 1 (42 components): form inputs, selection controls, buttons,
+  navigation composites, modals, live regions, sliders, form assembly, field
+  helpers. Highest user-facing risk; first to AAA-cert.
+- **P1** — Tier 2 (10 components): data display, progress / meter,
+  specialised healthcare components.
+- **P2** — Tier 3 (22 components): indicators, stat / metric, structural and
+  layout primitives.
+- **Exempt** — Tier 4 (6 components): utility / theming components with no
+  user-facing surface.
+
+The matrix below is the **authoritative source of truth** for per-component
+conformance. As components complete the AAA-cert flow, their rows are
+updated in place. This v0.1 baseline reflects the state where only the
+five forced-colors mixin family representatives (`hx-button`, `hx-checkbox`,
+`hx-card`, `hx-link`, `hx-side-nav`) carry runtime-verified evidence.
+
+### P0 — Tier 1 (42 components)
+
+| Component           | Tier | AA Status                 | AAA Status    | Forced-Colors Coverage      | Notes                                                                                                                        |
+| ------------------- | ---- | ------------------------- | ------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `hx-button`         | P0   | Supports — runtime tested | Supports      | Supports                    | Forced-colors mixin: `forcedColorsInteractive`. Live-region for loading state pending (P1 audit item). — AAA-cert 2026-05-08 |
+| `hx-icon-button`    | P0   | Pending audit             | Pending audit | Pending verification        | Inherits interactive forced-colors mixin via shared base. Per-component runtime test pending.                                |
+| `hx-toggle-button`  | P0   | Pending audit             | Pending audit | Pending verification        | Pressed-state ARIA contract audit pending.                                                                                   |
+| `hx-split-button`   | P0   | Pending audit             | Pending audit | Pending verification        | Composite (button + dropdown trigger); ARIA grouping audit pending.                                                          |
+| `hx-button-group`   | P0   | Pending audit             | Pending audit | Pending verification        | `role="group"` accessible name audit pending.                                                                                |
+| `hx-text-input`     | P0   | Pending audit             | Supports      | Supports                    | Forced-colors mixin: `forcedColorsField`. Validity-driven `aria-invalid` audit pending. — AAA-cert 2026-05-08                |
+| `hx-textarea`       | P0   | Pending audit             | Pending audit | Pending verification        | Counter `aria-describedby` association audit pending.                                                                        |
+| `hx-number-input`   | P0   | Pending audit             | Pending audit | Pending verification        | Spinner-button accessible name audit pending.                                                                                |
+| `hx-checkbox`       | P0   | Supports — runtime tested | Supports      | Supports                    | Forced-colors mixin: `forcedColorsField`. Keyboard accessibility remediated post-AUDIT-001. — AAA-cert 2026-05-08            |
+| `hx-checkbox-group` | P0   | Pending audit             | Pending audit | Pending verification        | Group-level error / `aria-describedby` audit pending.                                                                        |
+| `hx-radio-group`    | P0   | Pending audit             | Pending audit | Pending verification        | Roving-tabindex + group error audit pending.                                                                                 |
+| `hx-switch`         | P0   | Pending audit             | Pending audit | Pending verification        | APG `Space`-only key audit pending.                                                                                          |
+| `hx-select`         | P0   | Pending audit             | Pending audit | Pending verification        | Host-canonical combobox pattern (ARIA Group 3 in progress); `aria-activedescendant` audit ongoing.                           |
+| `hx-combobox`       | P0   | Pending audit             | Pending audit | Pending verification        | APG combobox pattern audit pending.                                                                                          |
+| `hx-date-picker`    | P0   | Pending audit             | Pending audit | Pending verification        | Calendar grid + dialog ARIA audit pending.                                                                                   |
+| `hx-time-picker`    | P0   | Pending audit             | Pending audit | Pending verification        | Spinbutton ARIA audit pending.                                                                                               |
+| `hx-slider`         | P0   | Pending audit             | Pending audit | Pending verification        | `role="slider"` keyboard contract audit pending.                                                                             |
+| `hx-color-picker`   | P0   | Pending audit             | Pending audit | Pending verification        | Custom widget ARIA audit pending.                                                                                            |
+| `hx-rating`         | P0   | Pending audit             | Pending audit | Pending verification        | Group-of-radios pattern audit pending.                                                                                       |
+| `hx-file-upload`    | P0   | Pending audit             | Pending audit | Pending verification        | Drop-target announce + button-trigger audit pending.                                                                         |
+| `hx-form`           | P0   | Pending audit             | Pending audit | Pending verification        | Light-DOM scoped CSS via AdoptedStylesheetsController; form-association audit pending.                                       |
+| `hx-field`          | P0   | Pending audit             | Pending audit | Pending verification        | Cross-shadow-boundary label / error association — dominant 1.3.1 / 4.1.2 remediation surface.                                |
+| `hx-field-label`    | P0   | Pending audit             | Pending audit | Pending verification        | Slotted `<label>` ID-ref pattern audit pending.                                                                              |
+| `hx-help-text`      | P0   | Pending audit             | Pending audit | Pending verification        | `aria-describedby` ID-ref pattern audit pending.                                                                             |
+| `hx-dialog`         | P0   | Pending audit             | Supports      | Supports                    | Native `<dialog>` + APG modal audit pending; focus-trap verification required. — AAA-cert 2026-05-08                         |
+| `hx-drawer`         | P0   | Pending audit             | Pending audit | Pending verification        | APG dialog pattern audit pending.                                                                                            |
+| `hx-popover`        | P0   | Pending audit             | Pending audit | Pending verification        | APG dialog / disclosure pattern audit pending.                                                                               |
+| `hx-popup`          | P0   | Pending audit             | Pending audit | Pending verification        | Floating-UI placement primitive; ARIA inherits from parent.                                                                  |
+| `hx-tooltip`        | P0   | Pending audit             | Pending audit | Pending verification        | APG tooltip dismissable / hoverable / persistent audit (1.4.13) pending.                                                     |
+| `hx-dropdown`       | P0   | Pending audit             | Pending audit | Pending verification        | APG menu / listbox audit pending.                                                                                            |
+| `hx-menu`           | P0   | Pending audit             | Pending audit | Pending verification        | APG menu pattern audit pending.                                                                                              |
+| `hx-overflow-menu`  | P0   | Pending audit             | Pending audit | Pending verification        | APG menu pattern audit pending.                                                                                              |
+| `hx-side-nav`       | P0   | Supports — runtime tested | Pending audit | Supports — runtime verified | Forced-colors disabled `.nav-item__link` opacity scoping verified at runtime; cascade-order regression net in place.         |
+| `hx-top-nav`        | P0   | Pending audit             | Pending audit | Pending verification        | Landmark + nav-list audit pending.                                                                                           |
+| `hx-nav`            | P0   | Pending audit             | Pending audit | Pending verification        | Per-component audit pending.                                                                                                 |
+| `hx-tabs`           | P0   | Pending audit             | Pending audit | Pending verification        | APG tabs pattern + roving tabindex audit pending.                                                                            |
+| `hx-breadcrumb`     | P0   | Pending audit             | Pending audit | Pending verification        | Native `<ol>` migration audit pending.                                                                                       |
+| `hx-pagination`     | P0   | Pending audit             | Pending audit | Pending verification        | Page-link `aria-current` audit pending.                                                                                      |
+| `hx-toast`          | P0   | Pending audit             | Pending audit | Pending verification        | Live-region + auto-dismiss timing audit pending.                                                                             |
+| `hx-alert`          | P0   | Pending audit             | Supports      | Supports                    | `role="alert"` redundancy + close-button target-size audit pending. — AAA-cert 2026-05-08                                    |
+| `hx-link`           | P0   | Supports — runtime tested | Pending audit | Supports — runtime verified | Forced-colors mixin: `forcedColorsLink`. Visited-state `LinkText` / `VisitedText` keywords verified.                         |
+| `hx-card`           | P0   | Supports — runtime tested | Pending audit | Supports — runtime verified | Forced-colors mixin: `forcedColorsSurface`. Interactive-card `aria-label` audit pending.                                     |
+
+### P1 — Tier 2 (10 components)
+
+| Component            | Tier | AA Status                 | AAA Status    | Forced-Colors Coverage      | Notes                                                                                                            |
+| -------------------- | ---- | ------------------------- | ------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `hx-data-table`      | P1   | Pending audit             | Pending audit | Pending verification        | APG grid pattern audit pending.                                                                                  |
+| `hx-table`           | P1   | Pending audit             | Pending audit | Pending verification        | Native semantic table; header-cell association audit pending.                                                    |
+| `hx-list`            | P1   | Pending audit             | Pending audit | Pending verification        | `role="list"` posture audit pending.                                                                             |
+| `hx-structured-list` | P1   | Pending audit             | Pending audit | Pending verification        | DL / table semantics audit pending.                                                                              |
+| `hx-tree-view`       | P1   | Pending audit             | Pending audit | Pending verification        | APG tree pattern + roving tabindex audit pending.                                                                |
+| `hx-progress-bar`    | P1   | Pending audit             | Pending audit | Pending verification        | `role="progressbar"` ARIA contract audit pending.                                                                |
+| `hx-progress-ring`   | P1   | Pending audit             | Pending audit | Pending verification        | `role="progressbar"` ARIA contract audit pending.                                                                |
+| `hx-meter`           | P1   | Pending audit             | Pending audit | Pending verification        | `role="meter"` ARIA contract audit pending.                                                                      |
+| `hx-link`            | P1   | Supports — runtime tested | Pending audit | Supports — runtime verified | Cross-listed P0/P1 due to its role as both interactive control and navigation primitive. Forced-colors verified. |
+| `hx-patient-banner`  | P1   | Pending audit             | Pending audit | Pending verification        | Healthcare-specialised composite; landmark + status audit pending.                                               |
+| `hx-phi-field`       | P1   | Pending audit             | Pending audit | Pending verification        | Healthcare-specialised PHI redaction; show / hide announce audit pending.                                        |
+
+### P2 — Tier 3 (22 components)
+
+| Component             | Tier | AA Status     | AAA Status    | Forced-Colors Coverage | Notes                                                                                          |
+| --------------------- | ---- | ------------- | ------------- | ---------------------- | ---------------------------------------------------------------------------------------------- |
+| `hx-badge`            | P2   | Pending audit | Pending audit | Pending verification   | Dot variant screen-reader announce audit pending.                                              |
+| `hx-tag`              | P2   | Pending audit | Pending audit | Pending verification   | Removable-tag close-button name audit pending.                                                 |
+| `hx-avatar`           | P2   | Pending audit | Pending audit | Pending verification   | Image / initials accessible name audit pending.                                                |
+| `hx-status-indicator` | P2   | Pending audit | Pending audit | Pending verification   | Color + icon non-color indicator audit pending.                                                |
+| `hx-clinical-status`  | P2   | Pending audit | Pending audit | Pending verification   | Healthcare-specialised; status-text + color audit pending.                                     |
+| `hx-stat`             | P2   | Pending audit | Pending audit | Pending verification   | Forced-colors block carried via mixin; per-component runtime test pending.                     |
+| `hx-counter`          | P2   | Pending audit | Pending audit | Pending verification   | Live-update announce audit pending.                                                            |
+| `hx-spinner`          | P2   | Pending audit | Pending audit | Pending verification   | `role="status"` + label audit pending.                                                         |
+| `hx-skeleton`         | P2   | Pending audit | Pending audit | Pending verification   | `aria-busy` posture audit pending.                                                             |
+| `hx-divider`          | P2   | Pending audit | Pending audit | Pending verification   | `role="separator"` posture audit pending.                                                      |
+| `hx-action-bar`       | P2   | Pending audit | Pending audit | Pending verification   | Toolbar pattern audit pending.                                                                 |
+| `hx-banner`           | P2   | Pending audit | Pending audit | Pending verification   | Landmark + dismissable banner audit pending.                                                   |
+| `hx-carousel`         | P2   | Pending audit | Pending audit | Pending verification   | APG carousel pattern + 2.2.2 pause control audit pending.                                      |
+| `hx-steps`            | P2   | Pending audit | Pending audit | Pending verification   | Stepper pattern + `aria-current` audit pending.                                                |
+| `hx-grid`             | P2   | Pending audit | Pending audit | N/A — layout-only      | Layout primitive; no interactive ARIA surface.                                                 |
+| `hx-stack`            | P2   | Pending audit | Pending audit | N/A — layout-only      | Layout primitive; no interactive ARIA surface.                                                 |
+| `hx-container`        | P2   | Pending audit | Pending audit | N/A — layout-only      | Layout primitive; no interactive ARIA surface.                                                 |
+| `hx-split-panel`      | P2   | Pending audit | Pending audit | Pending verification   | Resize-handle keyboard audit pending.                                                          |
+| `hx-accordion`        | P2   | Pending audit | Pending audit | Pending verification   | APG accordion pattern audit pending.                                                           |
+| `hx-text`             | P2   | Pending audit | Pending audit | N/A — text primitive   | Text primitive; no interactive ARIA surface.                                                   |
+| `hx-prose`            | P2   | Pending audit | Pending audit | Pending verification   | Light-DOM scoped CSS via AdoptedStylesheetsController; 1.4.8 visual-presentation audit target. |
+| `hx-image`            | P2   | Pending audit | Pending audit | Pending verification   | Alt-text / decorative-role audit pending.                                                      |
+
+### Exempt — Tier 4 (6 components)
+
+| Component            | Tier   | AA Status      | AAA Status     | Forced-Colors Coverage | Notes                                                                    |
+| -------------------- | ------ | -------------- | -------------- | ---------------------- | ------------------------------------------------------------------------ |
+| `hx-theme`           | Exempt | Not Applicable | Not Applicable | Not Applicable         | Theming primitive; no rendered surface.                                  |
+| `hx-style-scope`     | Exempt | Not Applicable | Not Applicable | Not Applicable         | CSS scoping primitive; no rendered surface.                              |
+| `hx-icon`            | Exempt | Pending audit  | Pending audit  | Not Applicable         | Renders SVG; `aria-hidden` posture audit pending. Decorative by default. |
+| `hx-format-date`     | Exempt | Not Applicable | Not Applicable | Not Applicable         | Formatter primitive; renders inline text.                                |
+| `hx-visually-hidden` | Exempt | Supports       | Supports       | Not Applicable         | A11y utility primitive — provides visually-hidden text by design.        |
+| `hx-code-snippet`    | Exempt | Pending audit  | Pending audit  | Not Applicable         | `<pre><code>` wrapper; copy-button accessible name audit pending.        |
+| `hx-copy-button`     | Exempt | Pending audit  | Pending audit  | Not Applicable         | Live-region announce on copy audit pending.                              |
+
+## Testing Methodology
+
+HELiX's accessibility evidence is layered across automated, runtime, and
+manual review tiers.
+
+### Automated tests (CI-gated)
+
+- **axe-core** integration via [`packages/hx-library/src/test-utils.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/test-utils.ts)
+  — every component test file runs `checkA11y()` against
+  `wcag2a`, `wcag2aa`, and `best-practice` tags.
+- **Contrast regression matrix** —
+  [`packages/hx-tokens/src/__tests__/contrast.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/src/__tests__/contrast.test.ts)
+  walks every semantic `text.* × surface.*` pair across light, dark, and
+  high-contrast modes; asserts AA thresholds (4.5 body / 3.0 large) and logs
+  AAA pass/fail (7.0 body / 4.5 large) informationally.
+- **Forced-colors runtime adoption** —
+  [`packages/hx-library/src/components/__tests__/forced-colors-runtime.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/components/__tests__/forced-colors-runtime.test.ts)
+  inspects adopted stylesheets at runtime to confirm representatives from
+  each forced-colors mixin family (interactive, field, surface, link,
+  side-nav) emit the correct `@media (forced-colors: active)` block with the
+  required system-color keywords.
+
+### Runtime evidence (Vitest browser mode)
+
+Vitest browser mode (Chromium via Playwright) provides a real DOM with
+shadow-root encapsulation. This is the source of truth for any assertion
+that depends on adopted-stylesheet behaviour, live-region timing, or
+focus management.
+
+### Manual review (per-component)
+
+When a component reaches AAA-cert review, a per-component
+`AAA-AUDIT.md` document is created at
+`packages/hx-library/src/components/<tag>/AAA-AUDIT.md`. The document
+records:
+
+- WCAG SC-by-SC pass/fail with screen-reader transcripts (NVDA + Chrome,
+  VoiceOver + Safari, JAWS + Edge).
+- Keyboard interaction transcript per APG pattern.
+- Forced-colors visual review screenshots (Windows High Contrast white-on-
+  black + black-on-white).
+- Auditor name and date.
+
+### Future work
+
+- **HC-mode visual regression** — Playwright `emulateMedia({ forcedColors: 'active' })`
+  is not exposed by Vitest browser mode (per the comment in `forced-colors-runtime.test.ts`).
+  A separate Playwright VRT job is planned for v1.0 to capture screenshots
+  in active forced-colors mode.
+- **Third-party audit** — Independent VPAT audit by an accredited
+  accessibility auditor (target: pre-v1.0).
+
+## Differentiation vs USWDS
+
+HELiX competes directly with USWDS in the OSS enterprise-supported design
+system space. The table below summarises the differentiation surface from
+an accessibility-and-tokens posture, with citations to public USWDS sources.
+
+| Axis                             | HELiX                                                                                               | USWDS                                                                                                                  |
+| -------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Conformance claim**            | WCAG 2.1 AA (gated) + AAA-targeted on P0 (in progress)                                              | WCAG 2.1 AA only ([USWDS Accessibility](https://designsystem.digital.gov/documentation/accessibility/))                |
+| **Token system**                 | Separate npm package `@helixui/tokens` with light + dark + high-contrast modes                      | Embedded SCSS settings, no native dark mode (USWDS [tokens settings](https://designsystem.digital.gov/design-tokens/)) |
+| **Forced-colors coverage**       | Mixin family covers 100% of in-scope components (interactive / field / surface / link / nav)        | 13 components covered per [USWDS PR #4610](https://github.com/uswds/uswds/pull/4610)                                   |
+| **Framework**                    | Framework-agnostic W3C Custom Elements (Lit 3.x) — works in React, Angular, Vue, Drupal, plain HTML | Sass classes + vanilla JS; React wrapper is community-maintained, not first-party                                      |
+| **Distribution**                 | npm + CDN (per-component entry points, tree-shakeable)                                              | npm + CDN (Sass + compiled CSS bundle)                                                                                 |
+| **License + commercial support** | MIT + commercial support available via Booked Solid Tech                                            | CC0 1.0 Universal (public domain), no SLA, community-maintained                                                        |
+| **Contrast gating**              | CI-gated regression matrix across 3 modes                                                           | Manual contrast review                                                                                                 |
+| **CEM-driven docs**              | Custom Elements Manifest with auto-generated React wrappers + Storybook autodocs                    | Manual SCSS / HTML reference                                                                                           |
+| **Testing posture**              | Vitest browser mode (real DOM, real shadow-root) + axe-core every test                              | Manual test plan; some automated checks                                                                                |
+
+Sources:
+
+- [USWDS Accessibility documentation](https://designsystem.digital.gov/documentation/accessibility/)
+- [USWDS GitHub](https://github.com/uswds/uswds)
+- [USWDS PR #4610 — forced-colors expansion](https://github.com/uswds/uswds/pull/4610)
+- [USWDS Design Tokens reference](https://designsystem.digital.gov/design-tokens/)
+
+## Roadmap to v1.0
+
+This v0.1 baseline scaffold publishes the conformance posture and the
+per-component matrix as a public commitment. The v1.0 milestone publishes
+when 30+ P0 components reach AAA-cert status. The phasing below is the
+**AAA Certification Epic** plan.
+
+### Phase 1 — Foundation (current)
+
+- [x] Forced-colors mixin family (interactive / field / surface / link / nav)
+- [x] Forced-colors runtime adoption tests (5 family representatives)
+- [x] Contrast regression matrix (AA gated, AAA logged) across 3 modes
+- [x] Cross-shadow-boundary `:focus-visible` baseline
+- [x] VPAT 2.5 v0.1 baseline scaffold (this document)
+- [ ] AAA contrast report promoted to CI gate
+
+### Phase 2 — P0 keyboard parity
+
+- [ ] Per-component keyboard test parity (every interactive component)
+- [ ] APG-pattern conformance audit (combobox, menu, tabs, dialog,
+      tree-view, slider)
+- [ ] Cross-shadow-boundary label / `aria-describedby` association
+      remediation (`hx-field` family)
+
+### Phase 3 — P0 AAA-cert wave 1
+
+- [ ] AAA-AUDIT.md for the 10 highest-traffic P0 components (form
+      inputs + buttons + dialog + side-nav)
+- [ ] Third-party accessibility auditor review
+- [ ] HC-mode visual regression (Playwright VRT in active forced-colors)
+
+### Phase 4 — P0 AAA-cert wave 2
+
+- [ ] AAA-AUDIT.md for the remaining ~30 P0 components
+- [ ] Third-party accessibility auditor sign-off on the P0 surface
+
+### Phase 5 — v1.0 publication
+
+- [ ] VPAT v1.0 publication with 30+ P0 components at AAA-cert
+- [ ] Public commitment to AAA conformance for the P0 surface
+- [ ] CI-gated AAA contrast posture (promoted from informational logging)
+- [ ] Section 508 + EN 301 549 conformance attestation
+
+## References
+
+- [WCAG 2.1 — W3C Recommendation](https://www.w3.org/TR/WCAG21/)
+- [WAI-ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/)
+- [Section 508 — 36 CFR Part 1194](https://www.access-board.gov/ict/)
+- [EN 301 549 V3.2.1 (2021-03)](https://www.etsi.org/deliver/etsi_en/301500_301599/301549/03.02.01_60/)
+- [VPAT 2.5 Rev 508 template — ITI](https://www.itic.org/policy/accessibility/vpat)
+- [USWDS Accessibility documentation](https://designsystem.digital.gov/documentation/accessibility/)
+- [HHS Section 504 Digital Accessibility rule](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/)
+- [HELiX AUDIT-REPORT.md](https://github.com/bookedsolidtech/helix/blob/main/AUDIT-REPORT.md)
+- [`@helixui/tokens` contrast regression matrix](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/src/__tests__/contrast.test.ts)
+- [`@helixui/library` forced-colors runtime tests](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/components/__tests__/forced-colors-runtime.test.ts)

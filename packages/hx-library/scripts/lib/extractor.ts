@@ -58,6 +58,48 @@ export interface CemSuperclass {
   module?: string;
 }
 
+/**
+ * Subset of `helixMeta` that the figma-inventory mirror surfaces. Mirrors
+ * the schema emitted by `cem-plugins/helix-metadata.mjs` (Phase B.1) but
+ * only carries the fields figgy / Drupal SDC builders / AI agents need at
+ * a glance — full parity with helixMeta is intentionally NOT a goal.
+ */
+export interface CemHelixMetaAaa {
+  certified?: boolean;
+  certifiedDate?: string;
+  criteria?: string[];
+  auditUrl?: string;
+}
+
+export interface CemHelixMetaKeyboardContract {
+  activate?: string[];
+  navigate?: string[];
+  dismiss?: string[];
+  disabledSuppresses?: boolean;
+  [key: string]: unknown;
+}
+
+export interface CemHelixMeta {
+  aaa?: CemHelixMetaAaa;
+  keyboardContract?: CemHelixMetaKeyboardContract;
+  ariaPattern?: string;
+  ariaPatternSource?: string;
+  forcedColorsSupported?: boolean;
+  screenReaderTested?: string[];
+  stability?: string;
+  since?: string;
+  formAssociated?: boolean;
+  themeAware?: boolean;
+  brandAware?: boolean;
+  composesWith?: string[];
+  drupalSdcEligible?: boolean;
+  reactWrapperStatus?: string;
+  figma?: { componentName?: string; page?: string };
+  priorityTier?: string;
+  phiHandles?: boolean;
+  clinicalContext?: string;
+}
+
 export interface CemDeclaration {
   kind: string;
   tagName?: string;
@@ -70,6 +112,10 @@ export interface CemDeclaration {
   events?: CemEvent[];
   members?: CemMember[];
   superclass?: CemSuperclass;
+  // Phase B.1 (helix-metadata plugin) — back-compat top-level + structured.
+  aaaCertified?: boolean;
+  aaaCertifiedDate?: string;
+  helixMeta?: CemHelixMeta;
 }
 
 export interface CemModule {
@@ -141,6 +187,26 @@ export interface ResolvedCssProperty extends CemCssProperty {
 
 export type Tier = 'atom' | 'molecule' | 'organism';
 
+/**
+ * Inventory-side mirror of the Phase B.1 helix-metadata fields figgy and
+ * downstream consumers care about. A strict subset of the CEM `helixMeta`
+ * schema — kept narrow so the inventory stays a "what figma needs"
+ * artifact rather than a duplicate of the manifest.
+ */
+export interface InventoryAaa {
+  certified: boolean;
+  certifiedDate: string | null;
+  criteria: string[];
+  auditUrl: string | null;
+}
+
+export interface InventoryKeyboardContract {
+  activate: string[];
+  navigate: string[];
+  dismiss: string[];
+  disabledSuppresses: boolean | null;
+}
+
 export interface ComponentEntry {
   tag: string;
   className: string;
@@ -158,6 +224,18 @@ export interface ComponentEntry {
   cssProperties: ResolvedCssProperty[];
   dependsOn: string[];
   excludedAttributes: string[];
+  // ── Phase B helix-metadata mirror ─────────────────────────────────────
+  // Always emitted. Fields fall back to neutral defaults when the source
+  // CEM declaration carries no helixMeta block (e.g. legacy components
+  // before the cert sweep populates them) so the inventory schema stays
+  // stable for figgy.
+  aaa: InventoryAaa;
+  keyboardContract: InventoryKeyboardContract | null;
+  ariaPattern: string | null;
+  themeAware: boolean | null;
+  brandAware: boolean | null;
+  formAssociated: boolean | null;
+  priorityTier: string | null;
 }
 
 export interface ExclusionDetail {
@@ -641,6 +719,52 @@ export interface BuildComponentInput {
   tierOverride?: Tier;
 }
 
+/**
+ * Mirror the relevant subset of `helixMeta` (Phase B.1 plugin output) into
+ * the inventory shape figgy reads. Falls back to neutral defaults when the
+ * declaration carries no helixMeta — keeps the schema stable so consumers
+ * never have to null-check the inventory entry itself.
+ */
+export function mirrorHelixMeta(decl: CemDeclaration): {
+  aaa: InventoryAaa;
+  keyboardContract: InventoryKeyboardContract | null;
+  ariaPattern: string | null;
+  themeAware: boolean | null;
+  brandAware: boolean | null;
+  formAssociated: boolean | null;
+  priorityTier: string | null;
+} {
+  const meta = decl.helixMeta ?? {};
+  const aaaRaw = meta.aaa ?? {};
+  const aaa: InventoryAaa = {
+    certified: aaaRaw.certified === true || decl.aaaCertified === true,
+    certifiedDate: aaaRaw.certifiedDate ?? decl.aaaCertifiedDate ?? null,
+    criteria: Array.isArray(aaaRaw.criteria) ? [...aaaRaw.criteria] : [],
+    auditUrl: typeof aaaRaw.auditUrl === 'string' ? aaaRaw.auditUrl : null,
+  };
+
+  let keyboardContract: InventoryKeyboardContract | null = null;
+  if (meta.keyboardContract) {
+    const kc = meta.keyboardContract;
+    keyboardContract = {
+      activate: Array.isArray(kc.activate) ? [...kc.activate] : [],
+      navigate: Array.isArray(kc.navigate) ? [...kc.navigate] : [],
+      dismiss: Array.isArray(kc.dismiss) ? [...kc.dismiss] : [],
+      disabledSuppresses: typeof kc.disabledSuppresses === 'boolean' ? kc.disabledSuppresses : null,
+    };
+  }
+
+  return {
+    aaa,
+    keyboardContract,
+    ariaPattern: typeof meta.ariaPattern === 'string' ? meta.ariaPattern : null,
+    themeAware: typeof meta.themeAware === 'boolean' ? meta.themeAware : null,
+    brandAware: typeof meta.brandAware === 'boolean' ? meta.brandAware : null,
+    formAssociated: typeof meta.formAssociated === 'boolean' ? meta.formAssociated : null,
+    priorityTier: typeof meta.priorityTier === 'string' ? meta.priorityTier : null,
+  };
+}
+
 export function buildComponentEntry(input: BuildComponentInput): ComponentEntry {
   const { decl, module: mod, templateDependencies, tierOverride } = input;
   if (!decl.tagName) {
@@ -656,6 +780,7 @@ export function buildComponentEntry(input: BuildComponentInput): ComponentEntry 
       figmaBinding: resolveBinding(cp, tag, cssParts),
     }),
   );
+  const helixMirror = mirrorHelixMeta(decl);
   return {
     tag,
     className: decl.name ?? '',
@@ -673,5 +798,6 @@ export function buildComponentEntry(input: BuildComponentInput): ComponentEntry 
     cssProperties,
     dependsOn: templateDependencies.filter((t) => t !== tag),
     excludedAttributes: excludedAttributeNames(decl),
+    ...helixMirror,
   };
 }

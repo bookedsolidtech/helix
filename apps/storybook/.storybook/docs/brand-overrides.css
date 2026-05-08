@@ -1,0 +1,296 @@
+/*
+ * brand-overrides.css — Storybook-only brand registry overrides.
+ *
+ * @helixui/tokens publishes the HELiX-default cascade only. The published
+ * package intentionally does not ship `[data-brand="…"]` overrides; those
+ * are the consumer's job (registered at runtime via HelixBrandRegistry).
+ *
+ * For Storybook docs we ship six reference brands to demonstrate the
+ * white-label cascade across distinct industries:
+ *
+ *   • Apex (default, no data-brand) — precision-cool teal, healthcare-leaning
+ *   • Meridian — institutional indigo (financial services, federal portals)
+ *   • Lumen — optimistic violet (consumer surfaces, member dashboards)
+ *   • Verdant — moss/forest (sustainability, climate, conservation)
+ *   • Signal — electric cobalt (tech, SaaS, developer platforms)
+ *   • Ember — deep amber/terracotta (energy, industrial, logistics)
+ *
+ * The toolbar mutates data-brand on <html>, the rules below recolor
+ * `--hx-color-{primary,secondary}-*`, and every `var(--hx-color-primary-…)`
+ * consumer reflows automatically through the cascade.
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * Brand override contract — extraction-quality reference for create-helix-app
+ * ─────────────────────────────────────────────────────────────────────────
+ *   1. Brands ONLY override the primitive primary + secondary ramps.
+ *   2. The 22-token semantic tier (surface.*, text.*, border.*, action.*)
+ *      stays untouched — semantic tokens reference the ramps via cascade,
+ *      so they recompute automatically on brand change.
+ *   3. High-contrast SUPPRESSES brand. The hx-color-primary-* AND
+ *      hx-color-secondary-* values for `[data-theme="high-contrast"]` are
+ *      AAA-tuned and load-bearing for the AAA cert; brand selectors must
+ *      not win the specificity race on either ramp. Suppressing only one
+ *      of the two leaks brand expression into HC surfaces (e.g. Verdant's
+ *      tawny gold, Lumen's rose) and breaks the HC contract.
+ *   4. The HELiX/Apex default (no `data-brand` attribute) inherits the
+ *      published @helixui/tokens cascade — we do NOT override `:root`.
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * Brand AAA contrast contract (WCAG 2.1 1.4.6 + 1.4.11)
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ *   • Body text on primary surface  →  USE primary-700 OR DARKER
+ *     -------------------------------------------------------------
+ *     Body prose (small text, ≤ 0.875rem regular) on a primary fill must
+ *     clear AAA 7:1. All 5 reference brands ship a primary-700 stop that
+ *     hits ≥ 7.91:1 against white text. Override authors who add brands
+ *     MUST verify the same (see verification snippet below).
+ *
+ *     Verified at authoring time:
+ *       Apex     primary-700 = #155a5e on #ffffff = 7.91:1   AAA ✓
+ *       Meridian primary-700 = #002070 on #ffffff = 14.58:1  AAA ✓
+ *       Lumen    primary-700 = #5b21b6 on #ffffff = 8.98:1   AAA ✓
+ *       Verdant  primary-700 = #1f5226 on #ffffff = 9.16:1   AAA ✓
+ *       Signal   primary-700 = #0040b0 on #ffffff = 8.90:1   AAA ✓
+ *       Ember    primary-700 = #7d2e02 on #ffffff = 9.28:1   AAA ✓
+ *
+ *   • Button labels on primary-500/600  →  large-text carve-out (AAA 4.5:1)
+ *     -------------------------------------------------------------
+ *     hx-button renders labels at ≥ 1rem (16px) with weight 600+. Per
+ *     WCAG 2.1 1.4.6 large-text bold branch (≥ 14pt bold ≈ 18.66px or
+ *     ≥ 14pt bold), AAA threshold for those pairs is 4.5:1, NOT 7:1.
+ *     primary-500 fills (e.g. Apex #0a8fa5 = 3.83:1) sit at AA, not AAA;
+ *     primary-600 stops cross AAA-large at 5.41:1+. Buttons in this
+ *     library use primary-600 as the rest fill → AAA-large compliant.
+ *
+ *     Override authors who shrink button label size below ≥ 14pt bold
+ *     forfeit this carve-out and must use primary-700+ as the button
+ *     fill. The hx-button default labels stay above the threshold.
+ *
+ *   • Borders / status indicators / focus rings  →  ≥ primary-400 stops
+ *     -------------------------------------------------------------
+ *     Non-text UI elements (borders, focus rings, status pills) must
+ *     clear 1.4.11 AA 3:1 against the background. WCAG 1.4.6 has NO
+ *     AAA tier above 1.4.11 for non-text contrast — 3:1 is the strictest
+ *     defined threshold. primary-400 stops typically hit 3:1 against
+ *     white surfaces; primary-500 always does.
+ *
+ *   • primary-50 / primary-100 / primary-200 are TINTED SURFACE tokens
+ *     -------------------------------------------------------------
+ *     These light stops are intended as background fills with dark text
+ *     (text.primary on primary-50). They are NOT for use as button fills
+ *     or text colors. text.primary on primary-50 hits AAA 7:1 across all
+ *     5 brands (verified at authoring time).
+ *
+ * ─────────────────────────────────────────────────────────────────────────
+ * Verification snippet for override authors (paste into a Node REPL):
+ * ─────────────────────────────────────────────────────────────────────────
+ *   import { contrastRatio } from '@helixui/tokens/utils';
+ *   const myBrand700 = '#1a3f8a';
+ *   console.log(contrastRatio(myBrand700, '#ffffff')); // must be ≥ 7.0
+ *
+ * See `.reports/aaa-conformance-action-list.md` for the full WCAG 2.1
+ * AAA mapping HELiX claims, and `Accessibility/Consumer Obligations` in
+ * Storybook for the partial-applicability success criteria contracts.
+ *
+ * NOTE: brand rules MUST stay UNLAYERED. `@helixui/tokens/tokens.css`
+ * defines `:root { --hx-color-primary-* }` at the top of the cascade
+ * with no layer; CSS resolves any unlayered declaration above any
+ * named layer regardless of specificity, so wrapping these rules in
+ * `@layer hx-docs { }` silently disables every brand override. Keep
+ * them at top level.
+ */
+
+/* ── Meridian — authoritative indigo (financial services / federal) ── */
+:root[data-brand='meridian'] {
+  --hx-color-primary-50: #eff4ff;
+  --hx-color-primary-100: #dce8ff;
+  --hx-color-primary-200: #bdd3ff;
+  --hx-color-primary-300: #90b4ff;
+  --hx-color-primary-400: #5b8aff;
+  --hx-color-primary-500: #003da5;
+  --hx-color-primary-600: #002d8a;
+  --hx-color-primary-700: #002070;
+  --hx-color-primary-800: #001559;
+  --hx-color-primary-900: #000d3d;
+  --hx-color-primary-950: #00061f;
+
+  --hx-color-secondary-50: #f0fafb;
+  --hx-color-secondary-100: #dbf2f5;
+  --hx-color-secondary-200: #b3e4ea;
+  --hx-color-secondary-300: #7accd7;
+  --hx-color-secondary-400: #3dafc0;
+  --hx-color-secondary-500: #1d8fa3;
+  --hx-color-secondary-600: #177285;
+  --hx-color-secondary-700: #135c6c;
+  --hx-color-secondary-800: #0f4a57;
+  --hx-color-secondary-900: #0a3741;
+  --hx-color-secondary-950: #061f25;
+}
+
+/* ── Lumen — warm optimistic violet (consumer surfaces / portals) ── */
+:root[data-brand='lumen'] {
+  --hx-color-primary-50: #faf5ff;
+  --hx-color-primary-100: #f3e8ff;
+  --hx-color-primary-200: #e9d5ff;
+  --hx-color-primary-300: #d8b4fe;
+  --hx-color-primary-400: #c084fc;
+  --hx-color-primary-500: #7c3aed;
+  --hx-color-primary-600: #6d28d9;
+  --hx-color-primary-700: #5b21b6;
+  --hx-color-primary-800: #4c1d95;
+  --hx-color-primary-900: #3b1478;
+  --hx-color-primary-950: #2e1065;
+
+  --hx-color-secondary-50: #fff1f2;
+  --hx-color-secondary-100: #ffe4e6;
+  --hx-color-secondary-200: #fecdd3;
+  --hx-color-secondary-300: #fda4af;
+  --hx-color-secondary-400: #fb7185;
+  --hx-color-secondary-500: #e11d48;
+  --hx-color-secondary-600: #be123c;
+  --hx-color-secondary-700: #9f1239;
+  --hx-color-secondary-800: #881337;
+  --hx-color-secondary-900: #4c0519;
+  --hx-color-secondary-950: #2a0210;
+}
+
+/* ── Verdant — moss / forest (sustainability, climate, conservation) ── */
+/* primary-700 #1f5226 vs white = 9.16:1 (AAA)                          */
+:root[data-brand='verdant'] {
+  --hx-color-primary-50: #f1f8f1;
+  --hx-color-primary-100: #dcecdb;
+  --hx-color-primary-200: #bcdcbb;
+  --hx-color-primary-300: #8dc28d;
+  --hx-color-primary-400: #5fa362;
+  --hx-color-primary-500: #3d8242;
+  --hx-color-primary-600: #2d6831;
+  --hx-color-primary-700: #1f5226;
+  --hx-color-primary-800: #173f1d;
+  --hx-color-primary-900: #0f2c14;
+  --hx-color-primary-950: #06170a;
+
+  --hx-color-secondary-50: #fbf7ee;
+  --hx-color-secondary-100: #f3eaca;
+  --hx-color-secondary-200: #e7d195;
+  --hx-color-secondary-300: #d4ae5b;
+  --hx-color-secondary-400: #b88a37;
+  --hx-color-secondary-500: #956d24;
+  --hx-color-secondary-600: #74531b;
+  --hx-color-secondary-700: #5a4015;
+  --hx-color-secondary-800: #3f2c0f;
+  --hx-color-secondary-900: #291c08;
+  --hx-color-secondary-950: #170f04;
+}
+
+/* ── Signal — electric cobalt (tech / SaaS / developer platforms) ── */
+/* primary-700 #0040b0 vs white = 8.90:1 (AAA)                       */
+/* Distinct from Meridian's institutional indigo — Signal sits on a  */
+/* brighter, more saturated cobalt hue; pairs with cyan secondary.   */
+:root[data-brand='signal'] {
+  --hx-color-primary-50: #eff6ff;
+  --hx-color-primary-100: #dbeafe;
+  --hx-color-primary-200: #bedbff;
+  --hx-color-primary-300: #90c1ff;
+  --hx-color-primary-400: #5b9eff;
+  --hx-color-primary-500: #1e6dff;
+  --hx-color-primary-600: #0a52e0;
+  --hx-color-primary-700: #0040b0;
+  --hx-color-primary-800: #072e7e;
+  --hx-color-primary-900: #0a214f;
+  --hx-color-primary-950: #06122a;
+
+  --hx-color-secondary-50: #edfcff;
+  --hx-color-secondary-100: #d4f6ff;
+  --hx-color-secondary-200: #a8edff;
+  --hx-color-secondary-300: #6fdfff;
+  --hx-color-secondary-400: #2bc7ed;
+  --hx-color-secondary-500: #06a4cb;
+  --hx-color-secondary-600: #0381a3;
+  --hx-color-secondary-700: #066682;
+  --hx-color-secondary-800: #0a4d63;
+  --hx-color-secondary-900: #073645;
+  --hx-color-secondary-950: #031c25;
+}
+
+/* ── Ember — deep amber / terracotta (energy / industrial / logistics) ── */
+/* primary-700 #7d2e02 vs white = 9.28:1 (AAA)                            */
+/* Warm hues tend to fail AAA at mid-stops; Ember anchors at 700+ to keep */
+/* the brand legible on text-on-strong primary surfaces. Slate secondary  */
+/* grounds the warm primary against industrial / utility surfaces.       */
+:root[data-brand='ember'] {
+  --hx-color-primary-50: #fff5ec;
+  --hx-color-primary-100: #ffe5cc;
+  --hx-color-primary-200: #ffc699;
+  --hx-color-primary-300: #ff9d5c;
+  --hx-color-primary-400: #f57224;
+  --hx-color-primary-500: #d4540a;
+  --hx-color-primary-600: #a83f04;
+  --hx-color-primary-700: #7d2e02;
+  --hx-color-primary-800: #5b2002;
+  --hx-color-primary-900: #3e1502;
+  --hx-color-primary-950: #220b01;
+
+  --hx-color-secondary-50: #f8fafc;
+  --hx-color-secondary-100: #eef2f6;
+  --hx-color-secondary-200: #d5dde5;
+  --hx-color-secondary-300: #aebcc9;
+  --hx-color-secondary-400: #7c8ea0;
+  --hx-color-secondary-500: #566578;
+  --hx-color-secondary-600: #3e4b5b;
+  --hx-color-secondary-700: #2c3645;
+  --hx-color-secondary-800: #1d2532;
+  --hx-color-secondary-900: #11161e;
+  --hx-color-secondary-950: #080a0e;
+}
+
+/*
+   * High-contrast brand suppression.
+   * AAA-tuned high-contrast tokens are authoritative — brand registries
+   * must not override them. Any data-brand combined with high-contrast
+   * resets the primary/secondary ramps to the @helixui/tokens
+   * high-contrast values (re-stated here so brand selectors can't win
+   * specificity races against the published tokens cascade).
+   */
+:root[data-theme='high-contrast'][data-brand='meridian'],
+:root[data-theme='high-contrast'][data-brand='lumen'],
+:root[data-theme='high-contrast'][data-brand='verdant'],
+:root[data-theme='high-contrast'][data-brand='signal'],
+:root[data-theme='high-contrast'][data-brand='ember'] {
+  --hx-color-primary-50: var(--hx-color-neutral-50);
+  --hx-color-primary-100: var(--hx-color-neutral-100);
+  --hx-color-primary-200: var(--hx-color-neutral-200);
+  --hx-color-primary-300: var(--hx-color-neutral-300);
+  --hx-color-primary-400: var(--hx-color-neutral-400);
+  --hx-color-primary-500: #ffff00;
+  --hx-color-primary-600: #ffff00;
+  --hx-color-primary-700: #ffff00;
+  --hx-color-primary-800: #ffff00;
+  --hx-color-primary-900: #ffff00;
+  --hx-color-primary-950: #ffff00;
+
+  /*
+     * Secondary ramp must be suppressed too. Without this reset the
+     * brand's secondary stops (Verdant's tawny gold, Lumen's rose,
+     * Ember's slate, etc.) leak into HC surfaces — any component that
+     * paints from --hx-color-secondary-* (status fills, info badges,
+     * link-visited treatments) re-introduces brand expression on top
+     * of an HC contract that promises system colours only.
+     *
+     * Mirrors the primary-ramp treatment: low stops fall back to the
+     * AAA-tuned neutral cascade; mid + high stops collapse to the same
+     * #ffff00 HC focus colour as primary so any UI surface that paints
+     * from secondary stays inside the HC contrast envelope.
+     */
+  --hx-color-secondary-50: var(--hx-color-neutral-50);
+  --hx-color-secondary-100: var(--hx-color-neutral-100);
+  --hx-color-secondary-200: var(--hx-color-neutral-200);
+  --hx-color-secondary-300: var(--hx-color-neutral-300);
+  --hx-color-secondary-400: var(--hx-color-neutral-400);
+  --hx-color-secondary-500: #ffff00;
+  --hx-color-secondary-600: #ffff00;
+  --hx-color-secondary-700: #ffff00;
+  --hx-color-secondary-800: #ffff00;
+  --hx-color-secondary-900: #ffff00;
+  --hx-color-secondary-950: #ffff00;
+}

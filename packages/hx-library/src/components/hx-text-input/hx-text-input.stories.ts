@@ -1349,3 +1349,38 @@ type HxTextInput = HTMLElement & {
   pristine: boolean;
   shadowRoot: ShadowRoot;
 };
+
+// ─────────────────────────────────────────────────
+// AAA OPT-IN — color-contrast-enhanced (WCAG 2.1 AAA)
+// ─────────────────────────────────────────────────
+
+/**
+ * Opt this story into AAA-level contrast checking. The default preview
+ * registers `color-contrast` (AA, 4.5:1). This per-story override disables
+ * AA and enables `color-contrast-enhanced` (AAA, 7:1). Inspect the
+ * Accessibility panel to confirm label, value, help-text, and placeholder
+ * all pass AAA against the default surface.
+ */
+export const ContrastAAA: Story = {
+  name: 'Contrast — AAA opt-in',
+  render: () => html`
+    <hx-text-input
+      label="Patient email"
+      name="email"
+      type="email"
+      placeholder="you@example.com"
+      help-text="We'll only use this for appointment reminders."
+      value="jordan@example.com"
+    ></hx-text-input>
+  `,
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'color-contrast-enhanced', enabled: true },
+        ],
+      },
+    },
+  },
+};

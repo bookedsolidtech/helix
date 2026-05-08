@@ -67,6 +67,24 @@ export interface HxTextInputDetail {
  * @cssprop [--hx-color-border-strong] - Resting border color (semantic).
  * @cssprop [--hx-color-error-text] - Error state text + border color (semantic).
  * @cssprop [--hx-color-error-600] - Error border primitive fallback inside the invalid-state cascade.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-text-input/AAA-AUDIT.md
+ * @keyboard-contract activate=character-input; disabled-suppresses=true
+ * @aria-pattern textbox
+ * @aria-pattern-source https://www.w3.org/TR/wai-aria-1.2/#textbox
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.6.0
+ * @form-associated true
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-text-input
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-text-input')
 export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {

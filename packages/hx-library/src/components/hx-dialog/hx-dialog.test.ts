@@ -664,6 +664,50 @@ describe('hx-dialog', () => {
     });
   });
 
+  // ─── Accessibility (axe-core AAA) — AAA Cert Epic Phase C ───
+
+  /*
+   * AAA cert: hx-dialog wraps native <dialog> + close-button. Close-button
+   * paint shares the same Phase E lift schedule. color-contrast-enhanced
+   * (1.4.6) is disabled with documented justification.
+   */
+  const AAA_RULES_OPT = {
+    rules: { 'color-contrast-enhanced': { enabled: false } },
+    level: 'aaa' as const,
+  };
+
+  describe('Accessibility (axe-core AAA)', () => {
+    it('open dialog with heading clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open heading="Confirm">Body content</hx-dialog>',
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+
+    it('open dialog with aria-label + slotted header clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HelixDialog>(
+        `<hx-dialog open aria-label="Critical">
+          <div slot="header"><strong>Critical alert</strong></div>
+          <p>Body</p>
+        </hx-dialog>`,
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+
+    it('non-modal dialog clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HelixDialog>(
+        '<hx-dialog open non-modal heading="Notice">Non-modal body</hx-dialog>',
+      );
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+  });
+
   // ─── i18n / label overrides ───
 
   describe('i18n / label overrides', () => {

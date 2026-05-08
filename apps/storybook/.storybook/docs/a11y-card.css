@@ -1,0 +1,307 @@
+/*
+ * a11y-card.css — styling for the A11yStatusCard surfaced on every
+ * component docs page via the HelixDocsPage autodocs template.
+ *
+ * Imported once via `.storybook/preview.ts`. Pairs with the editorial
+ * docs surface defined in `helix-docs.css` (typography pin, token cascade)
+ * and the dark editor chrome from `code-editor.css`. All colors and
+ * spacing values come from the @helixui/tokens cascade — no hardcoded
+ * values per CLAUDE.md token-cascade contract.
+ *
+ * Cascade strategy: NOT wrapped in @layer (matches helix-docs.css /
+ * code-editor.css convention). addon-docs ships unlayered emotion CSS;
+ * a wrapped layer here would lose specificity battles on intermediate
+ * elements between the Storybook docs container and our card.
+ */
+
+/* ── Card container ────────────────────────────────────────────── */
+
+.hx-a11y-card {
+  margin: 24px 0 32px;
+  padding: 20px 24px;
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  border-radius: 8px;
+  background: var(--hx-color-surface-raised, #ffffff);
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--hx-color-text-primary, #0d1825);
+  display: grid;
+  gap: 14px;
+}
+
+/* AAA-cert state lights up the left rail in success token. The 4px rail
+ * pairs with the 2px focus ring established elsewhere — distinct enough
+ * to read as "compliance signal" without competing with focus state. */
+.hx-a11y-card[data-certified='true'] {
+  border-left-width: 4px;
+  border-left-color: var(--hx-color-success, #1d4d2f);
+}
+
+.hx-a11y-card[data-certified='false'] {
+  border-left-width: 4px;
+  border-left-color: var(--hx-color-border-default, #adb5bd);
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+
+.hx-a11y-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hx-a11y-card-headline {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.hx-a11y-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  background: var(--hx-color-surface-default, #f8f9fa);
+  color: var(--hx-color-text-muted, #6c757d);
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+}
+
+.hx-a11y-card[data-certified='true'] .hx-a11y-card-icon {
+  background: var(--hx-color-success, #1d4d2f);
+  color: var(--hx-color-text-inverse, #ffffff);
+  border-color: var(--hx-color-success, #1d4d2f);
+}
+
+.hx-a11y-card-title-block {
+  min-width: 0;
+}
+
+.hx-a11y-card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--hx-color-text-primary, #0d1825);
+  line-height: 1.2;
+}
+
+.hx-a11y-card[data-certified='true'] .hx-a11y-card-title {
+  color: var(--hx-color-success, #1d4d2f);
+}
+
+.hx-a11y-card-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--hx-color-text-secondary, #4a5562);
+  line-height: 1.4;
+}
+
+.hx-a11y-card-subtitle time {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+}
+
+/* ── Priority tier chip (top-right) ────────────────────────────── */
+
+.hx-a11y-card-tier {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--hx-color-surface-default, #f8f9fa);
+  color: var(--hx-color-text-secondary, #4a5562);
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  cursor: help;
+}
+
+.hx-a11y-card-tier[data-tier='P0'] {
+  background: var(--hx-color-info-subtle, #e7f1ff);
+  color: var(--hx-color-info, #0a4b8f);
+  border-color: var(--hx-color-info, #0a4b8f);
+}
+
+.hx-a11y-card-tier[data-tier='P1'] {
+  background: var(--hx-color-surface-raised, #ffffff);
+  color: var(--hx-color-text-primary, #0d1825);
+}
+
+.hx-a11y-card-tier[data-tier='Exempt'] {
+  background: var(--hx-color-surface-sunken, #e9ecef);
+  color: var(--hx-color-text-muted, #6c757d);
+}
+
+/* ── Rows ──────────────────────────────────────────────────────── */
+
+.hx-a11y-card-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 16px;
+  align-items: baseline;
+  padding-top: 10px;
+  border-top: 1px solid var(--hx-color-border-subtle, #e9ecef);
+}
+
+@media (max-width: 600px) {
+  .hx-a11y-card-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+.hx-a11y-card-row-label {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--hx-color-text-muted, #6c757d);
+  font-weight: 500;
+}
+
+.hx-a11y-card-row-value {
+  font-size: 13px;
+  color: var(--hx-color-text-primary, #0d1825);
+  line-height: 1.5;
+}
+
+.hx-a11y-card-row-value code {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--hx-color-surface-sunken, #e9ecef);
+  color: var(--hx-color-text-link, #0f7078);
+}
+
+/* ── Criteria chips ────────────────────────────────────────────── */
+
+.hx-a11y-card-criteria {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hx-a11y-card-criterion {
+  display: inline-flex;
+}
+
+.hx-a11y-card-criterion code {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--hx-color-success-subtle, #e9f5ee);
+  color: var(--hx-color-success, #1d4d2f);
+  border: 1px solid var(--hx-color-success, #1d4d2f);
+  letter-spacing: 0.02em;
+}
+
+/* ── Capability badges ─────────────────────────────────────────── */
+
+.hx-a11y-card-caps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hx-a11y-card-cap-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--hx-color-surface-default, #f8f9fa);
+  border: 1px solid var(--hx-color-border-default, #dee2e6);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.hx-a11y-card-cap-label {
+  color: var(--hx-color-text-secondary, #4a5562);
+  font-weight: 500;
+}
+
+.hx-a11y-card-cap-value {
+  font-family: var(--hx-font-family-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--hx-color-text-primary, #0d1825);
+  font-weight: 600;
+}
+
+/* ── Footer + audit link ───────────────────────────────────────── */
+
+.hx-a11y-card-footer {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hx-color-border-subtle, #e9ecef);
+}
+
+.hx-a11y-card-audit-link,
+.hx-a11y-card-link {
+  font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--hx-color-text-link, #0f7078);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 120ms ease;
+}
+
+.hx-a11y-card-audit-link:hover,
+.hx-a11y-card-audit-link:focus-visible,
+.hx-a11y-card-link:hover,
+.hx-a11y-card-link:focus-visible {
+  border-bottom-color: var(--hx-color-text-link, #0f7078);
+  outline: none;
+}
+
+.hx-a11y-card-audit-link:focus-visible,
+.hx-a11y-card-link:focus-visible {
+  outline: 2px solid var(--hx-color-focus-ring, #0f7078);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Forced-colors / high-contrast ──────────────────────────────
+ * The card is healthcare compliance signal — it MUST remain legible
+ * under Windows High Contrast / forced-colors media. Token cascade
+ * already maps to system colors when forced-colors: active, but the
+ * cert-success rail and chip colors get system-mapped to neutral, so
+ * we re-anchor with explicit system color references where the green
+ * is the load-bearing signal. */
+@media (forced-colors: active) {
+  .hx-a11y-card[data-certified='true'] {
+    border-left-color: Highlight;
+  }
+  .hx-a11y-card[data-certified='true'] .hx-a11y-card-icon {
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+  .hx-a11y-card[data-certified='true'] .hx-a11y-card-title {
+    color: CanvasText;
+  }
+  .hx-a11y-card-criterion code {
+    background: Canvas;
+    color: CanvasText;
+    border-color: CanvasText;
+  }
+}

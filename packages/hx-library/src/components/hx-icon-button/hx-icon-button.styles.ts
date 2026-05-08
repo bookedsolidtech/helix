@@ -76,16 +76,15 @@ export const helixIconButtonStyles = css`
   /* ─── Style Variants ─── */
 
   .button--primary {
-    --hx-icon-button-bg: var(--hx-color-primary-500, #429797);
+    --hx-icon-button-bg: var(--hx-color-action-primary-bg, #0f7078);
     --hx-icon-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-icon-button-border-color: transparent;
   }
 
-  /* on-primary tokens are tuned for primary-500. primary-600 + on-primary
-     drops icon contrast to 3.07:1 — fails the 4.5:1 floor for meaningful
-     icons. Pin fg at neutral-0 (5.82:1 on primary-600). Mirrors hx-button. */
+  /* Hover deepens to action.primary.bg-hover (primary-700) + neutral-0 = 7.03:1 AA.
+     Mirrors hx-button. */
   .button--primary:hover {
-    --hx-icon-button-bg: var(--hx-color-primary-600, #0f7078);
+    --hx-icon-button-bg: var(--hx-color-action-primary-bg-hover, #0f6363);
     --hx-icon-button-color: var(--hx-color-neutral-0, #ffffff);
   }
 

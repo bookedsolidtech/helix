@@ -1,0 +1,48 @@
+/*
+ * force-states.css — visualize :hover, :active, :focus-visible, :disabled
+ * statically for documentation grids.
+ *
+ * Custom elements (`hx-*`) own their own state styling inside Shadow DOM,
+ * so the .force-* trick only works for properties that propagate through
+ * the host (focus ring via outline on the element itself, opacity for
+ * disabled, attribute reflection for hover/active where the component
+ * exposes it). For deep-encapsulated hover/active, the component's
+ * own styles.ts must opt in by also matching `:host(.force-hover)`,
+ * `:host(.force-active)`. The contract documented below.
+ *
+ * Source: /Users/himerus/Downloads/dist/components/07-buttons.html:67-76.
+ *
+ * Imported once via preview-head.html. Layered under @layer hx-docs so it
+ * cannot accidentally win over real `:hover` / `:active` rules.
+ */
+
+@layer hx-docs {
+  /* Focus ring works on every focusable element — outline is host-level. */
+  .force-focus,
+  .hx-docs *:has(> .force-focus),
+  .hx-docs *.force-focus {
+    outline: var(--hx-focus-ring-width, 2px) solid var(--hx-color-focus-ring, #0f7078) !important;
+    outline-offset: var(--hx-focus-ring-offset, 2px) !important;
+  }
+
+  /* Disabled — opacity + cursor. Component-internal pointer-events stay
+     untouched so demos remain visually inert without breaking event
+     instrumentation. */
+  .force-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /*
+   * Hover / active hooks. Components must opt in by adding
+   *   :host(.force-hover) { … same as :hover { } … }
+   *   :host(.force-active) { … same as :active { } … }
+   * to their own .styles.ts. Until they do, the .force-hover/.force-active
+   * cells render the rest state — which is the documented fallback.
+   *
+   * No global rule is defined here for hover/active because Shadow DOM
+   * encapsulation means we cannot reach into the component's own internal
+   * tree from outside. The opt-in contract keeps this module thin.
+   */
+}

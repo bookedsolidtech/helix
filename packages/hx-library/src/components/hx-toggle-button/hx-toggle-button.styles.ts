@@ -19,7 +19,7 @@ export const helixToggleButtonStyles = css`
     gap: var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-toggle-button-border-color, transparent);
     border-radius: var(--hx-toggle-button-border-radius, var(--hx-border-radius-md, 0.375rem));
-    background-color: var(--hx-toggle-button-bg, var(--hx-color-primary-500, #429797));
+    background-color: var(--hx-toggle-button-bg, var(--hx-color-action-primary-bg, #0f7078));
     color: var(--hx-toggle-button-color, var(--hx-color-text-on-primary, #ffffff));
     font-family: var(--hx-toggle-button-font-family, var(--hx-font-family-sans, sans-serif));
     font-weight: var(--hx-toggle-button-font-weight, var(--hx-font-weight-semibold, 600));
@@ -92,7 +92,7 @@ export const helixToggleButtonStyles = css`
   /* ─── Style Variants ─── */
 
   .button--primary {
-    --hx-toggle-button-bg: var(--hx-color-primary-500, #429797);
+    --hx-toggle-button-bg: var(--hx-color-action-primary-bg, #0f7078);
     --hx-toggle-button-color: var(--hx-color-text-on-primary, #ffffff);
     --hx-toggle-button-border-color: transparent;
   }
@@ -170,12 +170,15 @@ export const helixToggleButtonStyles = css`
    * so the state change is immediately legible.
    */
   .button--secondary.button--pressed {
-    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-primary-500, #429797));
+    --hx-toggle-button-bg: var(
+      --hx-toggle-button-pressed-bg,
+      var(--hx-color-action-primary-bg, #0f7078)
+    );
     --hx-toggle-button-color: var(
       --hx-toggle-button-pressed-color,
       var(--hx-color-text-on-primary, #ffffff)
     );
-    --hx-toggle-button-border-color: var(--hx-color-primary-500, #429797);
+    --hx-toggle-button-border-color: var(--hx-color-action-primary-bg, #0f7078);
   }
 
   /* Tertiary pressed: use primary-100 bg + primary-700 text + border for WCAG 3:1 non-text contrast. */
@@ -186,7 +189,8 @@ export const helixToggleButtonStyles = css`
       var(--hx-color-primary-700, #0f6363)
     );
     --hx-toggle-button-border-color: var(--hx-color-primary-600, #0f7078);
-    box-shadow: inset 0 0 0 1px var(--hx-color-primary-600, #0f7078);
+    box-shadow: inset 0 0 0 var(--hx-toggle-button-pressed-ring-width, 1px)
+      var(--hx-color-primary-600, #0f7078);
   }
 
   /* Ghost pressed: subtle neutral fill, matching hover behavior as a baseline. */
@@ -210,7 +214,8 @@ export const helixToggleButtonStyles = css`
       var(--hx-color-text-primary, #0d1825)
     );
     --hx-toggle-button-border-color: var(--hx-color-text-muted, #4a5362);
-    box-shadow: inset 0 0 0 1px var(--hx-color-neutral-500, #66787b);
+    box-shadow: inset 0 0 0 var(--hx-toggle-button-pressed-ring-width, 1px)
+      var(--hx-color-neutral-500, #66787b);
   }
 
   /* ─── Disabled ─── */
@@ -245,15 +250,17 @@ export const helixToggleButtonStyles = css`
   @media (forced-colors: active) {
     .button {
       forced-color-adjust: none;
-      background-color: ButtonFace;
-      color: ButtonText;
-      border: 2px solid ButtonText;
+      background-color: var(--hx-toggle-button-fc-bg, ButtonFace);
+      color: var(--hx-toggle-button-fc-color, ButtonText);
+      border: var(--hx-toggle-button-fc-border-width, 2px) solid
+        var(--hx-toggle-button-fc-border-color, ButtonText);
     }
 
     :host(:focus-visible) .button,
     .button:focus-visible {
-      outline: 3px solid Highlight;
-      outline-offset: 2px;
+      outline: var(--hx-toggle-button-fc-focus-ring-width, 3px) solid
+        var(--hx-toggle-button-fc-focus-ring-color, Highlight);
+      outline-offset: var(--hx-toggle-button-fc-focus-ring-offset, 2px);
     }
 
     .button--pressed {

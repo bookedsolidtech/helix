@@ -1,0 +1,361 @@
+{/* DataDisplay.mdx — Patterns / Data display (real hx-* components) */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead } from '../_components';
+
+import '@helixui/library/components/hx-badge';
+import '@helixui/library/components/hx-tag';
+import '@helixui/library/components/hx-avatar';
+import '@helixui/library/components/hx-card';
+
+<Meta
+  title="Patterns/Data display"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
+
+<div className="hx-docs">
+
+<EyebrowHeading
+  eyebrow="Patterns · data display"
+  title="Density when you need it. Quiet when you don't."
+  lede={
+    <>
+      Cards, tables, badges, tags, avatars. Status badges pull AA-tuned <code>{`{role}-text`}</code>{' '}
+      tokens that meet 4.5:1 in light and dark — no manual checking required.
+    </>
+  }
+/>
+
+<section>
+  <SectionHead title="Status badges" meta="hx-badge" />
+  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+    <hx-badge variant="primary">In progress</hx-badge>
+    <hx-badge variant="success">Verified</hx-badge>
+    <hx-badge variant="info">2 new</hx-badge>
+    <hx-badge variant="warning">Needs review</hx-badge>
+    <hx-badge variant="error">Critical</hx-badge>
+    <hx-badge variant="neutral">Draft</hx-badge>
+    <hx-badge variant="neutral">Archived</hx-badge>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Tags & chips" meta="hx-tag · removable" />
+  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+    <hx-tag removable>Cardiology</hx-tag>
+    <hx-tag removable>Anthem PPO</hx-tag>
+    <hx-tag removable>Telehealth</hx-tag>
+    <hx-tag removable>Sulfa allergy</hx-tag>
+    <hx-tag removable>Returning</hx-tag>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Avatars" meta="hx-avatar · sizes · color tokens" />
+  <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+    <hx-avatar initials="JR" style={{ '--hx-avatar-bg': 'var(--hx-color-primary-600)' }} />
+    <hx-avatar initials="AP" style={{ '--hx-avatar-bg': 'var(--hx-color-secondary-600)' }} />
+    <hx-avatar initials="MK" style={{ '--hx-avatar-bg': 'var(--hx-color-accent-600)' }} />
+    <hx-avatar initials="DS" style={{ '--hx-avatar-bg': 'var(--hx-color-warning-600)' }} />
+    <hx-avatar initials="RT" style={{ '--hx-avatar-bg': 'var(--hx-color-error-600)' }} />
+    <hx-avatar
+      initials="LG"
+      style={{ '--hx-avatar-bg': 'var(--hx-color-primary-700)', '--hx-avatar-size': '64px' }}
+    />
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Cards" meta="hx-card · header + body + status badge" />
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+      gap: 16,
+    }}
+  >
+    <hx-card>
+      <div
+        slot="header"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
+      >
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <hx-avatar initials="JR" style={{ '--hx-avatar-bg': 'var(--hx-color-primary-600)' }} />
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>
+              Jordan Reyes
+            </div>
+            <div className="hx-docs-card-tag">MRN-849172 · 36y</div>
+          </div>
+        </div>
+        <hx-badge variant="success">Checked in</hx-badge>
+      </div>
+      <div style={{ display: 'grid', gap: 6, fontSize: 13 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Visit type</span>
+          <strong style={{ fontWeight: 500 }}>Cardiology follow-up</strong>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Provider</span>
+          <strong style={{ fontWeight: 500 }}>Dr. Tanaka</strong>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Vitals</span>
+          <strong style={{ fontWeight: 500 }}>128/78 · 72 bpm</strong>
+        </div>
+      </div>
+    </hx-card>
+    <hx-card>
+      <div
+        slot="header"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
+      >
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <hx-avatar initials="AP" style={{ '--hx-avatar-bg': 'var(--hx-color-secondary-600)' }} />
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>
+              Aisha Patel
+            </div>
+            <div className="hx-docs-card-tag">MRN-721883 · 52y</div>
+          </div>
+        </div>
+        <hx-badge variant="warning">Needs review</hx-badge>
+      </div>
+      <div style={{ display: 'grid', gap: 6, fontSize: 13 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Visit type</span>
+          <strong style={{ fontWeight: 500 }}>Lab review</strong>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Provider</span>
+          <strong style={{ fontWeight: 500 }}>Dr. Park</strong>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>A1C</span>
+          <strong style={{ fontWeight: 500 }}>7.4% ↑</strong>
+        </div>
+      </div>
+    </hx-card>
+    <hx-card>
+      <div
+        slot="header"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
+      >
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <hx-avatar initials="MK" style={{ '--hx-avatar-bg': 'var(--hx-color-error-600)' }} />
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>
+              Marcus King
+            </div>
+            <div className="hx-docs-card-tag">MRN-913004 · 71y</div>
+          </div>
+        </div>
+        <hx-badge variant="error">Critical</hx-badge>
+      </div>
+      <div style={{ display: 'grid', gap: 6, fontSize: 13 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Status</span>
+          <strong style={{ fontWeight: 500 }}>Triage — Bay 3</strong>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            borderBottom: '1px dashed var(--hx-color-border-subtle)',
+            paddingBottom: 6,
+          }}
+        >
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Vitals</span>
+          <strong style={{ fontWeight: 500 }}>162/98 · 104 bpm</strong>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 6 }}>
+          <span style={{ color: 'var(--hx-color-text-muted)' }}>Wait</span>
+          <strong style={{ fontWeight: 500 }}>06:42</strong>
+        </div>
+      </div>
+    </hx-card>
+  </div>
+</section>
+
+<section>
+  <SectionHead title="Table" meta="patient roster · status badges in cells" />
+  <div
+    style={{
+      border: '1px solid var(--hx-color-border-default)',
+      borderRadius: 14,
+      overflow: 'hidden',
+      background: 'var(--hx-color-surface-raised)',
+    }}
+  >
+    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+      <thead>
+        <tr>
+          {['Patient', 'Visit type', 'Provider', 'Status', 'Last seen'].map((h) => (
+            <th
+              key={h}
+              style={{
+                textAlign: h === 'Last seen' ? 'right' : 'left',
+                padding: '12px 16px',
+                background: 'var(--hx-color-surface-sunken)',
+                color: 'var(--hx-color-text-muted)',
+                fontFamily: 'var(--hx-font-family-mono)',
+                fontSize: 11,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                fontWeight: 500,
+                borderBottom: '1px solid var(--hx-color-border-subtle)',
+              }}
+            >
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody style={{ fontSize: 13 }}>
+        {[
+          [
+            'Jordan Reyes',
+            'MRN-849172',
+            'Cardiology follow-up',
+            'Dr. Tanaka',
+            'success',
+            'Checked in',
+            '14 days ago',
+          ],
+          [
+            'Aisha Patel',
+            'MRN-721883',
+            'Lab review',
+            'Dr. Park',
+            'warning',
+            'Needs review',
+            '3 days ago',
+          ],
+          ['Marcus King', 'MRN-913004', 'ED triage', 'Dr. Vega', 'error', 'Critical', 'just now'],
+          [
+            'Sara Demir',
+            'MRN-554819',
+            'Telehealth',
+            'Dr. Ortiz',
+            'info',
+            'Scheduled',
+            'tomorrow 10:30',
+          ],
+          [
+            'Elena Volkov',
+            'MRN-660294',
+            'Annual physical',
+            'Dr. Park',
+            'neutral',
+            'Draft',
+            '28 days ago',
+          ],
+        ].map(([name, mrn, type, prov, badgeVariant, badgeText, last]) => (
+          <tr key={mrn}>
+            <td
+              style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--hx-color-border-subtle)',
+              }}
+            >
+              <div style={{ fontWeight: 600, color: 'var(--hx-color-text-primary)' }}>{name}</div>
+              <div
+                style={{
+                  color: 'var(--hx-color-text-muted)',
+                  fontFamily: 'var(--hx-font-family-mono)',
+                  fontSize: 12,
+                }}
+              >
+                {mrn}
+              </div>
+            </td>
+            <td
+              style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--hx-color-border-subtle)',
+              }}
+            >
+              {type}
+            </td>
+            <td
+              style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--hx-color-border-subtle)',
+              }}
+            >
+              {prov}
+            </td>
+            <td
+              style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--hx-color-border-subtle)',
+              }}
+            >
+              <hx-badge variant={badgeVariant}>{badgeText}</hx-badge>
+            </td>
+            <td
+              style={{
+                padding: '12px 16px',
+                borderBottom: '1px solid var(--hx-color-border-subtle)',
+                textAlign: 'right',
+              }}
+            >
+              {last}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>

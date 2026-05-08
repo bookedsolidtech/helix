@@ -25,11 +25,11 @@ export const darkTokenStyles =
       ] as unknown as TemplateStringsArray)
     : css``;
 
-/** Lit CSSResult with high-contrast overrides for :host when data-hx-contrast="high" */
+/** Lit CSSResult with high-contrast overrides for :host when data-hx-contrast="high" or data-theme="high-contrast" */
 export const highContrastTokenStyles =
   highContrastTokenEntries.length > 0
     ? css([
-        `:host([data-hx-contrast="high"]) {\n${highContrastTokenEntries.map((t) => `  ${t.name}: ${t.value};`).join('\n')}\n}\n` +
-          `@media (prefers-contrast: more) {\n  :host(:not([data-hx-contrast="normal"])) {\n${highContrastTokenEntries.map((t) => `    ${t.name}: ${t.value};`).join('\n')}\n  }\n}`,
+        `:host([data-hx-contrast="high"]),\n:host([data-theme="high-contrast"]) {\n${highContrastTokenEntries.map((t) => `  ${t.name}: ${t.value};`).join('\n')}\n}\n` +
+          `@media (prefers-contrast: more) {\n  :host(:not([data-hx-contrast="normal"]):not([data-theme="light"]):not([data-theme="dark"])) {\n${highContrastTokenEntries.map((t) => `    ${t.name}: ${t.value};`).join('\n')}\n  }\n}`,
       ] as unknown as TemplateStringsArray)
     : css``;

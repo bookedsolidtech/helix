@@ -1385,8 +1385,44 @@ export const TertiaryOptionsMenu: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     label: 'Schedule Appointment',
+  },
+};
+
+// ─────────────────────────────────────────────────
+// 15. AAA OPT-IN — color-contrast-enhanced (WCAG 2.1 AAA)
+// ─────────────────────────────────────────────────
+
+/**
+ * Opt this story into AAA-level contrast checking. The default preview
+ * registers `color-contrast` (AA, 4.5:1). This per-story override disables
+ * AA and enables `color-contrast-enhanced` (AAA, 7:1). Inspect the
+ * Accessibility panel to confirm the primary button passes AAA against the
+ * default surface — when it doesn't, the violation surfaces here as a
+ * finding rather than silently in production.
+ *
+ * Canonical pattern. Copy this `parameters.a11y` block into any other
+ * story to certify AAA contrast on a per-story basis.
+ */
+export const ContrastAAA: Story = {
+  name: 'Contrast — AAA opt-in',
+  args: {
+    variant: 'primary',
+    label: 'AAA contrast — Schedule',
+  },
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'color-contrast-enhanced', enabled: true },
+        ],
+      },
+    },
   },
 };

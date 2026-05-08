@@ -24,15 +24,15 @@ export const darkManualCSS: string =
 /** High-contrast override CSS for @media prefers-contrast: more */
 export const highContrastMediaCSS: string =
   highContrastTokenEntries.length > 0
-    ? `@media (prefers-contrast: more) {\n  :root:not([data-hx-contrast="normal"]) {\n${highContrastTokenEntries
+    ? `@media (prefers-contrast: more) {\n  :root:not([data-hx-contrast="normal"]):not([data-theme="light"]):not([data-theme="dark"]) {\n${highContrastTokenEntries
         .map((t) => `    ${t.name}: ${t.value};`)
         .join('\n')}\n  }\n}\n`
     : '';
 
-/** High-contrast override CSS for manual [data-hx-contrast="high"] */
+/** High-contrast override CSS for manual [data-hx-contrast="high"] or [data-theme="high-contrast"] */
 export const highContrastManualCSS: string =
   highContrastTokenEntries.length > 0
-    ? `:root[data-hx-contrast="high"] {\n${highContrastTokenEntries
+    ? `:root[data-hx-contrast="high"],\n:root[data-theme="high-contrast"] {\n${highContrastTokenEntries
         .map((t) => `  ${t.name}: ${t.value};`)
         .join('\n')}\n}\n`
     : '';
