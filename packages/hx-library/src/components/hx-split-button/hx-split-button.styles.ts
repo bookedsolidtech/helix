@@ -163,21 +163,30 @@ export const helixSplitButtonStyles = css`
 
   /* ─── Variant: primary ─── */
 
+  /* Resting fill routes through action.primary.bg (primary-600) coordinated
+     with text.on-primary (neutral-0 / white) for AAA-large contrast across
+     all 6 brands (Apex 5.82:1, etc). Pre-3.3.0 was primary-500 + white at
+     3.43:1 — fails AA. Inline #0d1825 (neutral-900) fallback matches the
+     resolved primitive when the semantic is missing at cold-start, so the
+     uncached paint is dark-on-teal (5.20:1 AA) instead of white-on-teal
+     (3.43:1 fail). Mirrors hx-button precedent (lines 88-95 in
+     hx-button.styles.ts). */
   .split-button--primary .split-button__primary,
   .split-button--primary .split-button__trigger {
-    --hx-split-button-bg: var(--hx-color-primary-500, #429797);
-    --hx-split-button-color: var(--hx-color-text-on-primary, #ffffff);
+    --hx-split-button-bg: var(--hx-color-action-primary-bg, #429797);
+    --hx-split-button-color: var(--hx-color-text-on-primary, #0d1825);
     --hx-split-button-border-color: transparent;
     --hx-split-button-divider-color: var(--hx-color-primary-900, #0b3232);
   }
 
-  /* primary:hover — replace the universal brightness(0.9) filter (which would
-     drop primary-500 + on-primary contrast to ~4.4:1) with an explicit swap
-     to primary-600 and a neutral-0 foreground. Mirrors hx-button precedent. */
+  /* primary:hover — replace the universal brightness(0.9) filter with an
+     explicit swap to action.primary.bg-hover (primary-700) +
+     text.on-primary-strong (neutral-0) so the pair stays AAA-strict
+     7:1 across the 6 brands. Mirrors hx-button precedent. */
   .split-button--primary .split-button__primary:hover,
   .split-button--primary .split-button__trigger:hover {
-    --hx-split-button-bg: var(--hx-color-primary-600, #0f7078);
-    --hx-split-button-color: var(--hx-color-neutral-0, #ffffff);
+    --hx-split-button-bg: var(--hx-color-action-primary-bg-hover, #0f7078);
+    --hx-split-button-color: var(--hx-color-text-on-primary-strong, #ffffff);
     filter: none;
   }
 
