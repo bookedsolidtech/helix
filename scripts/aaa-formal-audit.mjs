@@ -525,9 +525,28 @@ async function loadStorybookIndex() {
   return STORYBOOK_INDEX;
 }
 
+/**
+ * Per-component story export override. Some components (overlay class:
+ * dialog, drawer, popover) render at 0×0 in their `Default` export because
+ * the `open` arg defaults to `false`. The audit cannot measure focus
+ * appearance, target size, or focus-not-obscured on a component whose
+ * surface isn't painted. Map those components to a sibling story export
+ * that drives the component into its open state for measurement.
+ *
+ * NOTE: These overrides only target the formal AAA audit harness and do
+ * not affect the `Default` story rendering in the consumer-facing
+ * Storybook docs.
+ */
+const STORY_OVERRIDES = {
+  'hx-dialog': 'ModalOpen',
+  'hx-drawer': 'AAAAuditOpen',
+  'hx-popover': 'AAAAuditOpen',
+};
+
 async function buildStoryUrl(componentName) {
   const idx = await loadStorybookIndex();
   const entries = Object.values(idx.entries);
+  const overrideExport = STORY_OVERRIDES[componentName] || null;
   // Prefer stories whose importPath file basename matches `<name>.stories.*`.
   // Some directories host sibling component stories (e.g. hx-menu/ contains
   // both hx-menu.stories.ts and hx-menu-item.stories.ts); a substring match
@@ -543,8 +562,19 @@ async function buildStoryUrl(componentName) {
   const dirNeedle = `/${componentName}/`;
   const isStory = (e) => e.type === 'story';
 
+  // Tier 0: explicit STORY_OVERRIDES table (open-state stories for overlay
+  // components). Resolves before the Default export so the audit measures
+  // an open dialog / drawer / popover surface rather than a 0×0 host.
+  let match;
+  if (overrideExport) {
+    match = entries.find(
+      (e) => isStory(e) && e.exportName === overrideExport && importPathMatchesFile(e.importPath),
+    );
+    if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
+  }
+
   // Tier 1: exact file basename + Default export.
-  let match = entries.find(
+  match = entries.find(
     (e) => isStory(e) && e.exportName === 'Default' && importPathMatchesFile(e.importPath),
   );
   if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
@@ -759,7 +789,22 @@ async function runBrowserChecks(componentName, page) {
 
       const hostRect = host.getBoundingClientRect();
       const hostHidden = hostRect.width < 2 || hostRect.height < 2;
-      const rect = target.getBoundingClientRect();
+      let rect = target.getBoundingClientRect();
+
+      // Overlay components (hx-dialog/hx-drawer/hx-popover) commonly use
+      // :host { display: contents; } so the host has a 0×0 bounding box
+      // even when the inner panel is rendered fixed-position elsewhere.
+      // For 2.4.12 (Focus Not Obscured) hit-testing we cannot use a 0×0
+      // rect — every elementFromPoint call would land at (0,0) which is
+      // never a shadow descendant. Fall back to the actual focused element
+      // bounding rect (outlineSource) when the target rect is degenerate
+      // — that's the visible focus surface the user sees.
+      if (rect.width < 2 || rect.height < 2) {
+        const sourceRect = outlineSource.getBoundingClientRect();
+        if (sourceRect.width >= 2 && sourceRect.height >= 2) {
+          rect = sourceRect;
+        }
+      }
 
       const styles = window.getComputedStyle(outlineSource);
       const outlineWidthPx = parseFloat(styles.outlineWidth || '0');
