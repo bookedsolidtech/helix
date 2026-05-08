@@ -402,6 +402,69 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
 
   // ─── Lifecycle ───
 
+  /**
+   * APG group / checkbox roving-tabindex keyboard handler.
+   * Reference: https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/
+   *
+   * - ArrowRight / ArrowDown: focus next checkbox, wrap.
+   * - ArrowLeft  / ArrowUp:   focus prev checkbox, wrap.
+   * - Home: focus first checkbox.
+   * - End:  focus last checkbox.
+   *
+   * Space / Enter activation is handled by the native checkbox itself —
+   * the host does not intercept those keys.
+   * @internal
+   */
+  private _handleHostKeydown = (e: KeyboardEvent): void => {
+    const isVertical = this.orientation !== 'horizontal';
+    const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight';
+    const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft';
+
+    if (e.key === nextKey) {
+      e.preventDefault();
+      this._moveCheckboxFocus('next');
+    } else if (e.key === prevKey) {
+      e.preventDefault();
+      this._moveCheckboxFocus('prev');
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      const items = this._getEnabledCheckboxes();
+      items[0]?.focus();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      const items = this._getEnabledCheckboxes();
+      items[items.length - 1]?.focus();
+    }
+  };
+
+  /** @internal */
+  private _getEnabledCheckboxes(): HTMLElement[] {
+    return this._getCheckboxes().filter((cb) => {
+      const el = cb as HTMLElement & { disabled?: boolean };
+      return !el.disabled && !el.hasAttribute('disabled');
+    }) as HTMLElement[];
+  }
+
+  /** @internal */
+  private _moveCheckboxFocus(direction: 'next' | 'prev'): void {
+    const items = this._getEnabledCheckboxes();
+    if (!items.length) return;
+    const focused = (document.activeElement as HTMLElement) || null;
+    // activeElement may be the host; resolve through shadow active path.
+    let deep: Element | null = focused;
+    while (deep && deep.shadowRoot && deep.shadowRoot.activeElement) {
+      deep = deep.shadowRoot.activeElement;
+    }
+    const currentIndex = items.indexOf(deep as HTMLElement);
+    let nextIndex: number;
+    if (direction === 'next') {
+      nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0;
+    } else {
+      nextIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1;
+    }
+    items[nextIndex]?.focus();
+  }
+
   override connectedCallback(): void {
     super.connectedCallback();
     // Detect IDL element-references API support so render() can branch the
@@ -409,6 +472,10 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
     // (fallback) treatments. Codex round-17 P1.
     this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);
     this.addEventListener('hx-change', this._handleCheckboxChange);
+    // APG-aligned host keyboard contract — fulfils WCAG 2.2 AAA 2.1.3
+    // requirement that a focusable host with a declared role provides a
+    // keyboard interaction contract (formal AAA audit verifies this).
+    this.addEventListener('keydown', this._handleHostKeydown);
     // Seed root-independent semantics from connect.
     this._syncHostAriaSemantics();
     this._ariaMirror = installAriaIdrefMirror(this, () => {
@@ -430,6 +497,7 @@ export class HelixCheckboxGroup extends FormMixin(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('hx-change', this._handleCheckboxChange);
+    this.removeEventListener('keydown', this._handleHostKeydown);
     this._ariaMirror?.disconnect();
     this._ariaMirror = null;
     // Codex round-21 P3: tear down the slot-label text observer so detached
