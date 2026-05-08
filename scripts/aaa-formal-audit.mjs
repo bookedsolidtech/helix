@@ -496,17 +496,48 @@ async function loadStorybookIndex() {
 
 async function buildStoryUrl(componentName) {
   const idx = await loadStorybookIndex();
-  // Find the first story whose importPath contains /<componentName>/
-  const needle = `/${componentName}/`;
-  const match = Object.values(idx.entries).find(
-    (e) => e.type === 'story' && e.exportName === 'Default' && e.importPath?.includes(needle),
-  ) || Object.values(idx.entries).find(
-    (e) => e.type === 'story' && e.importPath?.includes(needle),
+  const entries = Object.values(idx.entries);
+  // Prefer stories whose importPath file basename matches `<name>.stories.*`.
+  // Some directories host sibling component stories (e.g. hx-menu/ contains
+  // both hx-menu.stories.ts and hx-menu-item.stories.ts); a substring match
+  // on the directory would silently pick the wrong story and report "no <tag>
+  // in story" downstream. Anchoring on the file basename eliminates that.
+  const fileNeedles = [
+    `/${componentName}.stories.ts`,
+    `/${componentName}.stories.tsx`,
+    `/${componentName}.stories.js`,
+    `/${componentName}.stories.mjs`,
+  ];
+  const importPathMatchesFile = (path) => path && fileNeedles.some((n) => path.endsWith(n));
+  const dirNeedle = `/${componentName}/`;
+  const isStory = (e) => e.type === 'story';
+
+  // Tier 1: exact file basename + Default export.
+  let match = entries.find(
+    (e) => isStory(e) && e.exportName === 'Default' && importPathMatchesFile(e.importPath),
   );
-  if (!match) {
-    return null;
-  }
-  return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
+  if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
+
+  // Tier 2: exact file basename, any export.
+  match = entries.find(
+    (e) => isStory(e) && importPathMatchesFile(e.importPath),
+  );
+  if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
+
+  // Tier 3: directory match + Default export (legacy fallback — risky for
+  // shared-directory stories but preserves backward compatibility).
+  match = entries.find(
+    (e) => isStory(e) && e.exportName === 'Default' && e.importPath?.includes(dirNeedle),
+  );
+  if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
+
+  // Tier 4: directory match, any export.
+  match = entries.find(
+    (e) => isStory(e) && e.importPath?.includes(dirNeedle),
+  );
+  if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
+
+  return null;
 }
 
 /**
