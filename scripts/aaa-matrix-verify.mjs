@@ -765,7 +765,13 @@ lines.push(`- forced-colors check is geometric (component still renders), not se
 lines.push(`- 2.5.5 exempts native \`<input>\` inside hx-checkbox/hx-text-input where host wrapper provides hit area.`);
 lines.push('');
 
-const outPath = resolve(ROOT, '.reports/aaa-matrix-evidence.md');
+// Single-component runs (cert gate scope) write to a component-scoped file
+// so they never clobber the canonical full-matrix evidence at
+// .reports/aaa-matrix-evidence.md. Full-matrix runs continue to write the
+// canonical path.
+const outPath = onlyComponent
+  ? resolve(ROOT, `.reports/aaa-matrix-evidence.${onlyComponent}.md`)
+  : resolve(ROOT, '.reports/aaa-matrix-evidence.md');
 writeFileSync(outPath, lines.join('\n'), 'utf8');
 const wall = ((Date.now() - start) / 1000).toFixed(1);
 console.log(`\n[harness] wrote ${outPath}`);

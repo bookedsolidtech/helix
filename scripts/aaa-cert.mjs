@@ -708,7 +708,13 @@ function regenerateCem() {
 //   1 = MATRIX_GAPS_FOUND (at least one programmatic FAIL)
 //   2 = HARNESS_USAGE_ERROR (unknown component, etc.)
 const MATRIX_HARNESS_PATH = resolve(REPO_ROOT, 'scripts/aaa-matrix-verify.mjs');
-const MATRIX_EVIDENCE_PATH = resolve(REPO_ROOT, '.reports/aaa-matrix-evidence.md');
+function matrixEvidencePathFor(tagName) {
+  // Mirrors the harness's component-scoped output convention: the harness
+  // writes `.reports/aaa-matrix-evidence.<tag>.md` when invoked with
+  // --component, so the canonical full-matrix evidence at
+  // `.reports/aaa-matrix-evidence.md` is never clobbered by a cert run.
+  return resolve(REPO_ROOT, `.reports/aaa-matrix-evidence.${tagName}.md`);
+}
 
 function runMatrixGate(tagName, { dryRun = false, skipMatrix = false } = {}) {
   if (skipMatrix) {
@@ -733,6 +739,7 @@ function runMatrixGate(tagName, { dryRun = false, skipMatrix = false } = {}) {
     );
   }
 
+  const evidencePath = matrixEvidencePathFor(tagName);
   const label = dryRun ? 'matrix preview' : 'matrix gate';
   console.log(
     `\n[aaa-cert] running ${label} for ${tagName} (scripts/aaa-matrix-verify.mjs)…`,
@@ -741,9 +748,15 @@ function runMatrixGate(tagName, { dryRun = false, skipMatrix = false } = {}) {
     stdio: 'inherit',
     cwd: REPO_ROOT,
   });
+  if (result.error) {
+    die(
+      `failed to spawn matrix harness: ${result.error.message}\n` +
+        `   This is an environment problem (node missing? path resolution?). Cert refused.`,
+    );
+  }
   if (result.status === 0) {
     console.log(
-      `[aaa-cert] matrix verification GREEN for ${tagName} — see ${relative(REPO_ROOT, MATRIX_EVIDENCE_PATH)}`,
+      `[aaa-cert] matrix verification GREEN for ${tagName} — see ${relative(REPO_ROOT, evidencePath)}`,
     );
     return { skipped: false, status: 'green' };
   }
@@ -753,23 +766,22 @@ function runMatrixGate(tagName, { dryRun = false, skipMatrix = false } = {}) {
         `\n[aaa-cert] WARNING: matrix preview reported FAILs for ${tagName}.`,
       );
       console.warn(
-        `           A live cert run would ABORT here. Inspect ${relative(REPO_ROOT, MATRIX_EVIDENCE_PATH)} and remediate before applying.`,
+        `           A live cert run would ABORT here. Inspect ${relative(REPO_ROOT, evidencePath)} and remediate before applying.`,
       );
       return { skipped: false, status: 'fail' };
     }
     die(
       `Component "${tagName}" failed brand × theme matrix verification — refusing to stamp @aaa-certified.\n` +
-        `   See evidence: ${relative(REPO_ROOT, MATRIX_EVIDENCE_PATH)}\n` +
+        `   See evidence: ${relative(REPO_ROOT, evidencePath)}\n` +
         `   To bypass (audited): re-run with --skip-matrix.`,
     );
   }
-  // status 2 (usage error) or unexpected
+  // status 2 (usage error) or unexpected — die() does not return.
   die(
     `matrix harness exited with status ${result.status} for ${tagName}.\n` +
       `   This is a harness or environment problem, not a component verdict.\n` +
       `   Verify storybook is up at http://localhost:3151 and the component is in the harness's known list.`,
   );
-  return { skipped: false, status: 'error' };
 }
 
 function stageChanges(plan) {
