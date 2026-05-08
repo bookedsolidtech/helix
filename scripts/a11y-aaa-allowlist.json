@@ -12,6 +12,7 @@
     "hx-dialog",
     "hx-file-upload",
     "hx-number-input",
+    "hx-radio-group",
     "hx-select",
     "hx-text-input",
     "hx-textarea",
