@@ -19,6 +19,7 @@
     "hx-switch",
     "hx-text-input",
     "hx-textarea",
-    "hx-time-picker"
+    "hx-time-picker",
+    "hx-toggle-button"
   ]
 }
