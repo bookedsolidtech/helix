@@ -610,6 +610,59 @@ describe('hx-checkbox', () => {
     });
   });
 
+  // ─── Accessibility (axe-core AAA) — AAA Cert Epic Phase C ───
+
+  /*
+   * AAA cert: hx-checkbox-specific exclusions:
+   *   - 1.4.6 (color-contrast-enhanced): pending Phase E primary token lift —
+   *     same shared-token gap as hx-button. Re-enables when primary base
+   *     promotes to primary-700 in tokens.json.
+   */
+  const AAA_RULES_OPT = {
+    rules: { 'color-contrast-enhanced': { enabled: false } },
+    level: 'aaa' as const,
+  };
+
+  describe('Accessibility (axe-core AAA)', () => {
+    it('default checkbox clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HelixCheckbox>('<hx-checkbox label="Accept terms"></hx-checkbox>');
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+
+    it('checked + indeterminate + disabled all clear AAA (sans 1.4.6)', async () => {
+      const checked = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Checked" checked></hx-checkbox>',
+      );
+      const r1 = await checkA11y(checked, AAA_RULES_OPT);
+      expect(r1.violations, 'checked AAA').toEqual([]);
+
+      const indet = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Mixed"></hx-checkbox>',
+      );
+      indet.indeterminate = true;
+      await indet.updateComplete;
+      const r2 = await checkA11y(indet, AAA_RULES_OPT);
+      expect(r2.violations, 'indeterminate AAA').toEqual([]);
+
+      const disabled = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Off" disabled></hx-checkbox>',
+      );
+      const r3 = await checkA11y(disabled, AAA_RULES_OPT);
+      expect(r3.violations, 'disabled AAA').toEqual([]);
+    });
+
+    it('error state clears AAA (sans 1.4.6)', async () => {
+      const el = await fixture<HelixCheckbox>(
+        '<hx-checkbox label="Accept" required></hx-checkbox>',
+      );
+      el.reportValidity();
+      await el.updateComplete;
+      const { violations } = await checkA11y(el, AAA_RULES_OPT);
+      expect(violations).toEqual([]);
+    });
+  });
+
   // ─── Property: requiredMessage ───
 
   describe('Property: requiredMessage', () => {
