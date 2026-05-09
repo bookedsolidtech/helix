@@ -220,7 +220,8 @@ const ARIA_PATTERN_HEURISTICS = [
   [/^hx-popup$/, 'dialog'],
   [/^hx-file-upload$/, 'button'],
   [/^hx-form$/, 'form'],
-  [/^hx-(field|field-label|help-text|clinical-status)$/, 'label'],
+  [/^hx-(field|field-label|help-text)$/, 'label'],
+  [/^hx-clinical-status$/, 'alert'],
   [/^hx-action-bar$/, 'toolbar'],
 ];
 

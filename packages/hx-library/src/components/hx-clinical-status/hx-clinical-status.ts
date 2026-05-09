@@ -83,6 +83,25 @@ const nextId = createIdCounter('hx-clinical-status');
  * @cssprop [--hx-space-8] - Spacing token.
  * @cssprop [--hx-touch-target-size] - Minimum touch target size.
  * @cssprop [--hx-transition-fast] - Transition timing.
+ *
+ * @aaa-certified 2026-05-09
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-clinical-status/AAA-AUDIT.md
+ * @keyboard-contract dismiss=Escape
+ * @aria-pattern alert
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/alert/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-clinical-status
+ * @priority-tier P0
+ * @phi-handles true
+ * @clinical-context healthcare-alert-fatigue-prevention
  */
 @customElement('hx-clinical-status')
 export class HelixClinicalStatus extends HelixElement {
