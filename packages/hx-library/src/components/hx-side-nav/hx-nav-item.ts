@@ -1,6 +1,7 @@
 import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixNavItemStyles } from './hx-nav-item.styles.js';
 
@@ -145,11 +146,12 @@ export class HelixNavItem extends HelixElement {
   /** @internal */
   private _renderExpandArrow() {
     return html`<span class="nav-item__arrow" aria-hidden="true">
-      <svg viewBox="0 0 20 20">
-        <path
-          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-        />
-      </svg>
+      <hx-icon
+        class="nav-item__arrow-glyph"
+        library="helix"
+        name="chevron-right"
+        aria-hidden="true"
+      ></hx-icon>
     </span>`;
   }
 
