@@ -112,7 +112,10 @@ const hasFlag = (flag) => args.includes(flag);
 
 const STORYBOOK_URL = getArg('--storybook-url', 'http://localhost:3151');
 const OUTPUT_PATH = getArg('--output', resolve(REPO_ROOT, '.reports/formal-aaa-audit/audit.json'));
-const EVIDENCE_DIR = getArg('--evidence-dir', resolve(REPO_ROOT, '.reports/formal-aaa-audit/evidence'));
+const EVIDENCE_DIR = getArg(
+  '--evidence-dir',
+  resolve(REPO_ROOT, '.reports/formal-aaa-audit/evidence'),
+);
 const SINGLE_COMPONENT = getArg('--component', null);
 const NO_BROWSER = hasFlag('--no-browser');
 const TIMEOUT_MS = 30_000;
@@ -143,7 +146,10 @@ const APG_KEYBOARD_EXPECTATIONS = {
   menu: [['ArrowDown'], ['ArrowUp'], ['Escape']],
   menubar: [['ArrowLeft'], ['ArrowRight'], ['ArrowDown', 'ArrowUp'], ['Escape']],
   menubutton: [['Enter', ' ', 'Space'], ['ArrowDown']],
-  radiogroup: [['ArrowDown', 'ArrowUp'], ['ArrowLeft', 'ArrowRight']],
+  radiogroup: [
+    ['ArrowDown', 'ArrowUp'],
+    ['ArrowLeft', 'ArrowRight'],
+  ],
   slider: [['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'], ['Home'], ['End']],
   switch: [[' ', 'Space', 'Enter']],
   tabs: [['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'], ['Home'], ['End']],
@@ -220,7 +226,15 @@ function loadComponentSources(name) {
   if (!existsSync(dir) || !statSync(dir).isDirectory()) {
     return null;
   }
-  const out = { dir, classFile: null, classSrc: '', styleFile: null, styleSrc: '', storiesFile: null, storiesSrc: '' };
+  const out = {
+    dir,
+    classFile: null,
+    classSrc: '',
+    styleFile: null,
+    styleSrc: '',
+    storiesFile: null,
+    storiesSrc: '',
+  };
   const files = readdirSync(dir);
   for (const f of files) {
     if (f === `${name}.ts`) {
@@ -266,7 +280,8 @@ function checkImagesOfText(comp) {
   if (offenders.length === 0) {
     return {
       verdict: VERDICT.SUPPORTS,
-      evidence: 'No raster <img> tags rendered in component output. Text content is rendered via real text nodes.',
+      evidence:
+        'No raster <img> tags rendered in component output. Text content is rendered via real text nodes.',
       offenders: [],
     };
   }
@@ -284,7 +299,8 @@ function checkImagesOfText(comp) {
  */
 function checkKeyboardNoException(comp) {
   const src = comp.classSrc;
-  const hasKeydown = /\b(addEventListener\(['"]keydown|@keydown\b|onKeyDown|handleKeyDown|_handleKey)/.test(src);
+  const hasKeydown =
+    /\b(addEventListener\(['"]keydown|@keydown\b|onKeyDown|handleKeyDown|_handleKey)/.test(src);
   const hasNativeFocusable = /<(button|a|input|textarea|select)\b/.test(src);
   const declaresHostRole = /role=['"]\w+['"]|host\.role|this\.role\s*=/.test(src);
   const hasTabIndex = /tabindex=['"]?\-?0|tabindex=\${|this\.tabIndex/.test(src);
@@ -294,7 +310,8 @@ function checkKeyboardNoException(comp) {
     if (hasMouseOnly && !hasKeydown) {
       return {
         verdict: VERDICT.PARTIALLY,
-        evidence: 'Mouse handlers detected without a corresponding keydown handler. Verify all interactions are keyboard-reachable.',
+        evidence:
+          'Mouse handlers detected without a corresponding keydown handler. Verify all interactions are keyboard-reachable.',
       };
     }
     return {
@@ -308,7 +325,8 @@ function checkKeyboardNoException(comp) {
   if (!hasTabIndex && !declaresHostRole) {
     return {
       verdict: VERDICT.NOT_APPLICABLE,
-      evidence: 'Component has no interactive elements (no tabindex, no host role, no keydown handlers).',
+      evidence:
+        'Component has no interactive elements (no tabindex, no host role, no keydown handlers).',
     };
   }
   return {
@@ -400,7 +418,8 @@ function checkErrorPrevention(comp) {
   if (hasInternals && hasSetValidity) {
     return {
       verdict: VERDICT.SUPPORTS,
-      evidence: 'Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.',
+      evidence:
+        'Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.',
     };
   }
   return {
@@ -423,9 +442,15 @@ function checkForcedColors(comp) {
     };
   }
   const hasForcedColorsMQ = /@media\s*\(\s*forced-colors\s*:\s*active\s*\)/.test(src);
-  const hasSystemColors = /\b(CanvasText|ButtonText|ButtonFace|Highlight|HighlightText|LinkText|GrayText|Mark|MarkText|VisitedText|SelectedItem|SelectedItemText|Field|FieldText)\b/.test(src);
+  const hasSystemColors =
+    /\b(CanvasText|ButtonText|ButtonFace|Highlight|HighlightText|LinkText|GrayText|Mark|MarkText|VisitedText|SelectedItem|SelectedItemText|Field|FieldText)\b/.test(
+      src,
+    );
   const hasForcedColorAdjust = /\bforced-color-adjust\s*:/.test(src);
-  const hasColorDecl = /\b(color|background|background-color|border|border-color|outline|outline-color|box-shadow)\s*:/.test(src);
+  const hasColorDecl =
+    /\b(color|background|background-color|border|border-color|outline|outline-color|box-shadow)\s*:/.test(
+      src,
+    );
   if (!hasColorDecl) {
     return {
       verdict: VERDICT.NOT_APPLICABLE,
@@ -439,12 +464,15 @@ function checkForcedColors(comp) {
         hasForcedColorsMQ ? '@media (forced-colors: active) guard present' : null,
         hasSystemColors ? 'system colors used (CanvasText / ButtonText / etc.)' : null,
         hasForcedColorAdjust ? 'forced-color-adjust property declared' : null,
-      ].filter(Boolean).join('; '),
+      ]
+        .filter(Boolean)
+        .join('; '),
     };
   }
   return {
     verdict: VERDICT.DOES_NOT,
-    evidence: 'Component declares colors/backgrounds/borders but has NO forced-colors guard, NO system colors, and NO forced-color-adjust.',
+    evidence:
+      'Component declares colors/backgrounds/borders but has NO forced-colors guard, NO system colors, and NO forced-color-adjust.',
   };
 }
 
@@ -458,7 +486,8 @@ function checkApgKeyboard(comp) {
   if (!pattern) {
     return {
       verdict: VERDICT.PARTIALLY,
-      evidence: 'No @aria-pattern JSDoc tag declared. Cannot verify APG conformance without a declared pattern.',
+      evidence:
+        'No @aria-pattern JSDoc tag declared. Cannot verify APG conformance without a declared pattern.',
     };
   }
   const groups = APG_KEYBOARD_EXPECTATIONS[pattern.toLowerCase()];
@@ -494,7 +523,11 @@ function checkApgKeyboard(comp) {
   const referencesKey = (k) => {
     if (k === ' ') {
       // Space character key — match string-literal ' '.
-      return /['"`] ['"`]/.test(src) || /\bcase\s+['"`] ['"`]/.test(src) || /key\s*===\s*['"`] ['"`]/.test(src);
+      return (
+        /['"`] ['"`]/.test(src) ||
+        /\bcase\s+['"`] ['"`]/.test(src) ||
+        /key\s*===\s*['"`] ['"`]/.test(src)
+      );
     }
     return src.includes(`'${k}'`) || src.includes(`"${k}"`) || src.includes(`\`${k}\``);
   };
@@ -507,7 +540,7 @@ function checkApgKeyboard(comp) {
   if (allSatisfied) {
     return {
       verdict: VERDICT.SUPPORTS,
-      evidence: `@aria-pattern="${pattern}" — all required key groups referenced (${groupResults.map((g) => g.matched.map((k) => k === ' ' ? "' '" : k).join('|')).join(', ')}).`,
+      evidence: `@aria-pattern="${pattern}" — all required key groups referenced (${groupResults.map((g) => g.matched.map((k) => (k === ' ' ? "' '" : k)).join('|')).join(', ')}).`,
     };
   }
   const missingGroups = groupResults
@@ -590,9 +623,7 @@ async function buildStoryUrl(componentName) {
   if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
 
   // Tier 2: exact file basename, any export.
-  match = entries.find(
-    (e) => isStory(e) && importPathMatchesFile(e.importPath),
-  );
+  match = entries.find((e) => isStory(e) && importPathMatchesFile(e.importPath));
   if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
 
   // Tier 3: directory match + Default export (legacy fallback — risky for
@@ -603,9 +634,7 @@ async function buildStoryUrl(componentName) {
   if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
 
   // Tier 4: directory match, any export.
-  match = entries.find(
-    (e) => isStory(e) && e.importPath?.includes(dirNeedle),
-  );
+  match = entries.find((e) => isStory(e) && e.importPath?.includes(dirNeedle));
   if (match) return `${STORYBOOK_URL}/iframe.html?id=${match.id}&viewMode=story`;
 
   return null;
@@ -636,7 +665,9 @@ async function runBrowserChecks(componentName, page) {
       result.error = `HTTP ${response?.status() ?? 'no response'}`;
       return result;
     }
-    await page.waitForFunction(() => document.readyState === 'complete', { timeout: 5_000 }).catch(() => {});
+    await page
+      .waitForFunction(() => document.readyState === 'complete', { timeout: 5_000 })
+      .catch(() => {});
 
     // Reset focus to document.body so the Tab walk starts from a known state.
     // Click on a 1×1 pixel near (0,0) inside the iframe body — programmatic
@@ -647,7 +678,9 @@ async function runBrowserChecks(componentName, page) {
     await page.evaluate(() => {
       // Blur any currently focused element and reset to body.
       if (document.activeElement && document.activeElement !== document.body) {
-        try { document.activeElement.blur(); } catch {}
+        try {
+          document.activeElement.blur();
+        } catch {}
       }
       // Insert a sentinel focusable element at the very top of <body> so the
       // first Tab press can land on something predictable (some Storybook
@@ -669,7 +702,12 @@ async function runBrowserChecks(componentName, page) {
       const host = document.querySelector(tag);
       if (!host) return { error: `no <${tag}> in story` };
       const root = host.shadowRoot || host;
-      const allCandidates = [host, ...root.querySelectorAll('button, [role="button"], input, textarea, select, a[href], [tabindex]')];
+      const allCandidates = [
+        host,
+        ...root.querySelectorAll(
+          'button, [role="button"], input, textarea, select, a[href], [tabindex]',
+        ),
+      ];
       const visibleCandidates = allCandidates.filter((el) => {
         const r = el.getBoundingClientRect();
         if (r.width < 2 || r.height < 2) return false;
@@ -677,15 +715,17 @@ async function runBrowserChecks(componentName, page) {
         if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') return false;
         return true;
       });
-      const target = host.tabIndex >= 0 && visibleCandidates.includes(host)
-        ? host
-        : (visibleCandidates.find((el) => el !== host) || visibleCandidates[0] || host);
+      const target =
+        host.tabIndex >= 0 && visibleCandidates.includes(host)
+          ? host
+          : visibleCandidates.find((el) => el !== host) || visibleCandidates[0] || host;
       // Tag the target so we can identify it across page.evaluate calls.
       target.setAttribute('data-aaa-audit-target', '1');
       return {
         targetTag: target.tagName.toLowerCase(),
         targetIsHost: target === host,
-        hostHidden: host.getBoundingClientRect().width < 2 || host.getBoundingClientRect().height < 2,
+        hostHidden:
+          host.getBoundingClientRect().width < 2 || host.getBoundingClientRect().height < 2,
       };
     }, componentName);
 
@@ -721,237 +761,258 @@ async function runBrowserChecks(componentName, page) {
         }
         return false;
       });
-      if (reached) { tabbed = true; break; }
+      if (reached) {
+        tabbed = true;
+        break;
+      }
     }
 
     // Now measure — the target is keyboard-focused (or we fell back to
     // programmatic focus only if the Tab walk failed to reach it).
-    const measurements = await page.evaluate(async ({ tag, didTab }) => {
-      const target = document.querySelector(`[data-aaa-audit-target="1"]`)
-        || document.querySelector(tag);
-      if (!target) return { error: `no <${tag}> in story` };
-      const host = document.querySelector(tag) || target;
+    const measurements = await page.evaluate(
+      async ({ tag, didTab }) => {
+        const target =
+          document.querySelector(`[data-aaa-audit-target="1"]`) || document.querySelector(tag);
+        if (!target) return { error: `no <${tag}> in story` };
+        const host = document.querySelector(tag) || target;
 
-      // If the Tab walk did not reach the target, fall back to programmatic
-      // focus so the rest of the measurements still land — but we'll mark
-      // the focusOutline result as "programmatic-only" for transparency.
-      if (!didTab) {
-        try { target.focus(); } catch {}
-      }
-
-      // Resolve the deepest active element across shadow boundaries. With
-      // `delegatesFocus: true`, Tab onto the host moves real focus to an
-      // inner control; document.activeElement returns the host but the
-      // :focus-visible outline lives on the inner part. Measure styles on
-      // whichever element actually owns the focus pseudo-state.
-      let activeDeep = document.activeElement;
-      while (activeDeep && activeDeep.shadowRoot && activeDeep.shadowRoot.activeElement) {
-        activeDeep = activeDeep.shadowRoot.activeElement;
-      }
-      // The element we measure outline on: prefer the deepest active element
-      // if it is inside our target's subtree (host or shadow descendant);
-      // otherwise fall back to the target itself.
-      let outlineSource = target;
-      if (activeDeep && activeDeep !== target) {
-        // Walk up from activeDeep to confirm it's inside our component subtree.
-        let cur = activeDeep;
-        let inside = false;
-        while (cur) {
-          if (cur === target || cur === host) { inside = true; break; }
-          cur = cur.assignedSlot || cur.parentNode || cur.host || null;
-          if (cur && cur.nodeType !== 1 && cur.host) cur = cur.host;
+        // If the Tab walk did not reach the target, fall back to programmatic
+        // focus so the rest of the measurements still land — but we'll mark
+        // the focusOutline result as "programmatic-only" for transparency.
+        if (!didTab) {
+          try {
+            target.focus();
+          } catch {}
         }
-        if (inside) outlineSource = activeDeep;
-      }
 
-      // If the resolved outlineSource has NO outline, it does not necessarily
-      // mean the component lacks a focus indicator. Many HELiX components
-      // render the focus ring on a sibling inside the shadow root (e.g.
-      // hx-checkbox draws outline on .checkbox__box, NOT on the focused host;
-      // hx-switch draws outline on .switch__track sibling-of-input). Walk
-      // the shadow descendants of the host once and pick the first descendant
-      // currently rendering an outline >=2px or a thick box-shadow — that is
-      // the actual focus indicator the user sees. Only do this when the
-      // primary outlineSource has no own outline (so we never over-report
-      // a passing host).
-      const ownOutlineWidth = parseFloat(window.getComputedStyle(outlineSource).outlineWidth || '0');
-      if (ownOutlineWidth < 2) {
-        // Walk the host's shadow tree AND the shadow trees of any slotted
-        // children. Group components like hx-checkbox-group and hx-radio-group
-        // host only a <slot> in their own shadow root; the focus-ring is
-        // painted on a part inside the slotted child's shadow root (e.g.
-        // <hx-checkbox>::shadow .checkbox__box). Without traversing slot
-        // assignments, the harness records 0px outline on the slot itself
-        // and reports a Does-Not-Support 2.4.13 false-fail.
-        const collectFocusCandidates = (root, sink) => {
-          if (!root) return;
-          const all = root.querySelectorAll('*');
-          for (const el of all) sink.push(el);
-          // For each <slot>, recurse into the shadow trees of assigned elements
-          // and harvest their light DOM children too.
-          const slots = root.querySelectorAll('slot');
+        // Resolve the deepest active element across shadow boundaries. With
+        // `delegatesFocus: true`, Tab onto the host moves real focus to an
+        // inner control; document.activeElement returns the host but the
+        // :focus-visible outline lives on the inner part. Measure styles on
+        // whichever element actually owns the focus pseudo-state.
+        let activeDeep = document.activeElement;
+        while (activeDeep && activeDeep.shadowRoot && activeDeep.shadowRoot.activeElement) {
+          activeDeep = activeDeep.shadowRoot.activeElement;
+        }
+        // The element we measure outline on: prefer the deepest active element
+        // if it is inside our target's subtree (host or shadow descendant);
+        // otherwise fall back to the target itself.
+        let outlineSource = target;
+        if (activeDeep && activeDeep !== target) {
+          // Walk up from activeDeep to confirm it's inside our component subtree.
+          let cur = activeDeep;
+          let inside = false;
+          while (cur) {
+            if (cur === target || cur === host) {
+              inside = true;
+              break;
+            }
+            cur = cur.assignedSlot || cur.parentNode || cur.host || null;
+            if (cur && cur.nodeType !== 1 && cur.host) cur = cur.host;
+          }
+          if (inside) outlineSource = activeDeep;
+        }
+
+        // If the resolved outlineSource has NO outline, it does not necessarily
+        // mean the component lacks a focus indicator. Many HELiX components
+        // render the focus ring on a sibling inside the shadow root (e.g.
+        // hx-checkbox draws outline on .checkbox__box, NOT on the focused host;
+        // hx-switch draws outline on .switch__track sibling-of-input). Walk
+        // the shadow descendants of the host once and pick the first descendant
+        // currently rendering an outline >=2px or a thick box-shadow — that is
+        // the actual focus indicator the user sees. Only do this when the
+        // primary outlineSource has no own outline (so we never over-report
+        // a passing host).
+        const ownOutlineWidth = parseFloat(
+          window.getComputedStyle(outlineSource).outlineWidth || '0',
+        );
+        if (ownOutlineWidth < 2) {
+          // Walk the host's shadow tree AND the shadow trees of any slotted
+          // children. Group components like hx-checkbox-group and hx-radio-group
+          // host only a <slot> in their own shadow root; the focus-ring is
+          // painted on a part inside the slotted child's shadow root (e.g.
+          // <hx-checkbox>::shadow .checkbox__box). Without traversing slot
+          // assignments, the harness records 0px outline on the slot itself
+          // and reports a Does-Not-Support 2.4.13 false-fail.
+          const collectFocusCandidates = (root, sink) => {
+            if (!root) return;
+            const all = root.querySelectorAll('*');
+            for (const el of all) sink.push(el);
+            // For each <slot>, recurse into the shadow trees of assigned elements
+            // and harvest their light DOM children too.
+            const slots = root.querySelectorAll('slot');
+            for (const slot of slots) {
+              // assignedElements with flatten:true follows slot fallback chains
+              // when the slot is empty.
+              let assigned = [];
+              try {
+                assigned = slot.assignedElements({ flatten: true }) || [];
+              } catch {
+                assigned = [];
+              }
+              for (const a of assigned) {
+                sink.push(a);
+                if (a.shadowRoot) collectFocusCandidates(a.shadowRoot, sink);
+                // Also harvest the assigned element's light DOM descendants —
+                // some patterns render focus indicators directly on light DOM
+                // children rather than in shadow.
+                try {
+                  const lightChildren = a.querySelectorAll('*');
+                  for (const c of lightChildren) sink.push(c);
+                } catch {
+                  /* ignore */
+                }
+              }
+            }
+          };
+          const candidates = [];
+          if (host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
+          for (const el of candidates) {
+            const cs = window.getComputedStyle(el);
+            const w = parseFloat(cs.outlineWidth || '0');
+            const okOutline = w >= 2 && cs.outlineStyle !== 'none';
+            const okShadow =
+              cs.boxShadow && cs.boxShadow !== 'none' && /\b\d+\s*px/.test(cs.boxShadow);
+            if (okOutline || okShadow) {
+              // Confirm the element is currently visible (focus indicators
+              // on display:none parts do not count).
+              const r = el.getBoundingClientRect();
+              if (
+                r.width >= 2 &&
+                r.height >= 2 &&
+                cs.visibility !== 'hidden' &&
+                cs.display !== 'none'
+              ) {
+                outlineSource = el;
+                break;
+              }
+            }
+          }
+        }
+
+        const hostRect = host.getBoundingClientRect();
+        const hostHidden = hostRect.width < 2 || hostRect.height < 2;
+        let rect = target.getBoundingClientRect();
+
+        // Overlay components (hx-dialog/hx-drawer/hx-popover) commonly use
+        // :host { display: contents; } so the host has a 0×0 bounding box
+        // even when the inner panel is rendered fixed-position elsewhere.
+        // For 2.4.12 (Focus Not Obscured) hit-testing we cannot use a 0×0
+        // rect — every elementFromPoint call would land at (0,0) which is
+        // never a shadow descendant. Fall back to the actual focused element
+        // bounding rect (outlineSource) when the target rect is degenerate
+        // — that's the visible focus surface the user sees.
+        if (rect.width < 2 || rect.height < 2) {
+          const sourceRect = outlineSource.getBoundingClientRect();
+          if (sourceRect.width >= 2 && sourceRect.height >= 2) {
+            rect = sourceRect;
+          }
+        }
+
+        const styles = window.getComputedStyle(outlineSource);
+        const outlineWidthPx = parseFloat(styles.outlineWidth || '0');
+        const outlineColor = styles.outlineColor;
+        const outlineStyle = styles.outlineStyle;
+        // box-shadow is a common a11y-safe focus indicator alternative.
+        const boxShadow = styles.boxShadow;
+        const hasFocusBoxShadow = boxShadow && boxShadow !== 'none';
+        const bgColor = styles.backgroundColor;
+        const color = styles.color;
+        // WCAG 1.4.6 applies to text and images of text. A focus-paint surface
+        // with no rendered text content (e.g. hx-switch track, color-picker
+        // swatch grid cell, toggle thumb) is a 1.4.11 Non-text Contrast
+        // surface, not a 1.4.6 surface. Detect rendered-text-free elements so
+        // the 1.4.6 verdict can route to Not Applicable instead of measuring
+        // the cascade-inherited foreground color against an empty element's
+        // background.
+        //
+        // A focus-paint element counts as text-bearing if it has:
+        //   1. a non-empty direct child text node, OR
+        //   2. a non-empty innerText (covers slot-flattened light-DOM text), OR
+        //   3. a <slot> with assigned text-bearing nodes/elements.
+        const hasOwnTextContent = (() => {
+          // Direct text-node children.
+          for (const node of outlineSource.childNodes) {
+            if (node.nodeType === 3 /* TEXT_NODE */ && (node.textContent || '').trim().length > 0) {
+              return true;
+            }
+          }
+          // Rendered text via innerText (handles flattened slot content).
+          try {
+            const it = outlineSource.innerText;
+            if (typeof it === 'string' && it.trim().length > 0) return true;
+          } catch {
+            /* ignore */
+          }
+          // Slot-assigned content.
+          const slots = outlineSource.querySelectorAll
+            ? outlineSource.querySelectorAll('slot')
+            : [];
           for (const slot of slots) {
-            // assignedElements with flatten:true follows slot fallback chains
-            // when the slot is empty.
             let assigned = [];
             try {
-              assigned = slot.assignedElements({ flatten: true }) || [];
+              assigned = slot.assignedNodes({ flatten: true }) || [];
             } catch {
               assigned = [];
             }
             for (const a of assigned) {
-              sink.push(a);
-              if (a.shadowRoot) collectFocusCandidates(a.shadowRoot, sink);
-              // Also harvest the assigned element's light DOM descendants —
-              // some patterns render focus indicators directly on light DOM
-              // children rather than in shadow.
-              try {
-                const lightChildren = a.querySelectorAll('*');
-                for (const c of lightChildren) sink.push(c);
-              } catch {
-                /* ignore */
-              }
+              if (a.nodeType === 3 /* TEXT_NODE */ && (a.textContent || '').trim().length > 0)
+                return true;
+              if (a.nodeType === 1 /* ELEMENT_NODE */ && (a.textContent || '').trim().length > 0)
+                return true;
             }
           }
+          return false;
+        })();
+
+        // Focus obscured — sample three points (top-left, center, bottom-right)
+        // and accept if the focused target OR a shadow descendant is at any of
+        // those points.
+        const points = [
+          [rect.left + 4, rect.top + 4],
+          [rect.left + rect.width / 2, rect.top + rect.height / 2],
+          [rect.right - 4, rect.bottom - 4],
+        ];
+        const targetHost = target.getRootNode().host || target; // shadow root host
+        const isShadowDescendant = (el) => {
+          if (!el) return false;
+          if (el === target || el === host || el === targetHost) return true;
+          // Walk up assigned-slot / parent chain.
+          let cur = el;
+          while (cur) {
+            if (cur === target || cur === host) return true;
+            cur = cur.assignedSlot || cur.parentNode || cur.host;
+          }
+          return false;
         };
-        const candidates = [];
-        if (host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
-        for (const el of candidates) {
-          const cs = window.getComputedStyle(el);
-          const w = parseFloat(cs.outlineWidth || '0');
-          const okOutline = w >= 2 && cs.outlineStyle !== 'none';
-          const okShadow = cs.boxShadow && cs.boxShadow !== 'none' && /\b\d+\s*px/.test(cs.boxShadow);
-          if (okOutline || okShadow) {
-            // Confirm the element is currently visible (focus indicators
-            // on display:none parts do not count).
-            const r = el.getBoundingClientRect();
-            if (r.width >= 2 && r.height >= 2 && cs.visibility !== 'hidden' && cs.display !== 'none') {
-              outlineSource = el;
-              break;
-            }
-          }
-        }
-      }
+        const allPointsClear = points.every(([x, y]) => {
+          const hit = document.elementFromPoint(x, y);
+          return isShadowDescendant(hit) || target.contains?.(hit);
+        });
+        const isCovered = !allPointsClear;
 
-      const hostRect = host.getBoundingClientRect();
-      const hostHidden = hostRect.width < 2 || hostRect.height < 2;
-      let rect = target.getBoundingClientRect();
-
-      // Overlay components (hx-dialog/hx-drawer/hx-popover) commonly use
-      // :host { display: contents; } so the host has a 0×0 bounding box
-      // even when the inner panel is rendered fixed-position elsewhere.
-      // For 2.4.12 (Focus Not Obscured) hit-testing we cannot use a 0×0
-      // rect — every elementFromPoint call would land at (0,0) which is
-      // never a shadow descendant. Fall back to the actual focused element
-      // bounding rect (outlineSource) when the target rect is degenerate
-      // — that's the visible focus surface the user sees.
-      if (rect.width < 2 || rect.height < 2) {
-        const sourceRect = outlineSource.getBoundingClientRect();
-        if (sourceRect.width >= 2 && sourceRect.height >= 2) {
-          rect = sourceRect;
-        }
-      }
-
-      const styles = window.getComputedStyle(outlineSource);
-      const outlineWidthPx = parseFloat(styles.outlineWidth || '0');
-      const outlineColor = styles.outlineColor;
-      const outlineStyle = styles.outlineStyle;
-      // box-shadow is a common a11y-safe focus indicator alternative.
-      const boxShadow = styles.boxShadow;
-      const hasFocusBoxShadow = boxShadow && boxShadow !== 'none';
-      const bgColor = styles.backgroundColor;
-      const color = styles.color;
-      // WCAG 1.4.6 applies to text and images of text. A focus-paint surface
-      // with no rendered text content (e.g. hx-switch track, color-picker
-      // swatch grid cell, toggle thumb) is a 1.4.11 Non-text Contrast
-      // surface, not a 1.4.6 surface. Detect rendered-text-free elements so
-      // the 1.4.6 verdict can route to Not Applicable instead of measuring
-      // the cascade-inherited foreground color against an empty element's
-      // background.
-      //
-      // A focus-paint element counts as text-bearing if it has:
-      //   1. a non-empty direct child text node, OR
-      //   2. a non-empty innerText (covers slot-flattened light-DOM text), OR
-      //   3. a <slot> with assigned text-bearing nodes/elements.
-      const hasOwnTextContent = (() => {
-        // Direct text-node children.
-        for (const node of outlineSource.childNodes) {
-          if (node.nodeType === 3 /* TEXT_NODE */ && (node.textContent || '').trim().length > 0) {
-            return true;
-          }
-        }
-        // Rendered text via innerText (handles flattened slot content).
-        try {
-          const it = outlineSource.innerText;
-          if (typeof it === 'string' && it.trim().length > 0) return true;
-        } catch {
-          /* ignore */
-        }
-        // Slot-assigned content.
-        const slots = outlineSource.querySelectorAll
-          ? outlineSource.querySelectorAll('slot')
-          : [];
-        for (const slot of slots) {
-          let assigned = [];
-          try {
-            assigned = slot.assignedNodes({ flatten: true }) || [];
-          } catch {
-            assigned = [];
-          }
-          for (const a of assigned) {
-            if (a.nodeType === 3 /* TEXT_NODE */ && (a.textContent || '').trim().length > 0) return true;
-            if (a.nodeType === 1 /* ELEMENT_NODE */ && (a.textContent || '').trim().length > 0) return true;
-          }
-        }
-        return false;
-      })();
-
-      // Focus obscured — sample three points (top-left, center, bottom-right)
-      // and accept if the focused target OR a shadow descendant is at any of
-      // those points.
-      const points = [
-        [rect.left + 4, rect.top + 4],
-        [rect.left + rect.width / 2, rect.top + rect.height / 2],
-        [rect.right - 4, rect.bottom - 4],
-      ];
-      const targetHost = target.getRootNode().host || target; // shadow root host
-      const isShadowDescendant = (el) => {
-        if (!el) return false;
-        if (el === target || el === host || el === targetHost) return true;
-        // Walk up assigned-slot / parent chain.
-        let cur = el;
-        while (cur) {
-          if (cur === target || cur === host) return true;
-          cur = cur.assignedSlot || cur.parentNode || cur.host;
-        }
-        return false;
-      };
-      const allPointsClear = points.every(([x, y]) => {
-        const hit = document.elementFromPoint(x, y);
-        return isShadowDescendant(hit) || target.contains?.(hit);
-      });
-      const isCovered = !allPointsClear;
-
-      return {
-        rect: { width: rect.width, height: rect.height, top: rect.top, left: rect.left },
-        hostHidden,
-        outlineWidthPx,
-        outlineColor,
-        outlineStyle,
-        boxShadow,
-        hasFocusBoxShadow,
-        bgColor,
-        color,
-        isCovered,
-        targetTag: target.tagName.toLowerCase(),
-        targetIsHost: target === host,
-        outlineSourceTag: outlineSource.tagName ? outlineSource.tagName.toLowerCase() : null,
-        outlineSourceIsTarget: outlineSource === target,
-        outlineSourceHasOwnText: hasOwnTextContent,
-        focusedViaKeyboard: didTab,
-        tabPresses: undefined, // populated outside evaluate scope
-      };
-    }, { tag: componentName, didTab: tabbed });
+        return {
+          rect: { width: rect.width, height: rect.height, top: rect.top, left: rect.left },
+          hostHidden,
+          outlineWidthPx,
+          outlineColor,
+          outlineStyle,
+          boxShadow,
+          hasFocusBoxShadow,
+          bgColor,
+          color,
+          isCovered,
+          targetTag: target.tagName.toLowerCase(),
+          targetIsHost: target === host,
+          outlineSourceTag: outlineSource.tagName ? outlineSource.tagName.toLowerCase() : null,
+          outlineSourceIsTarget: outlineSource === target,
+          outlineSourceHasOwnText: hasOwnTextContent,
+          focusedViaKeyboard: didTab,
+          tabPresses: undefined, // populated outside evaluate scope
+        };
+      },
+      { tag: componentName, didTab: tabbed },
+    );
 
     // Annotate measurement with the actual Tab-press count we recorded
     // before the eval so the evidence string can reference it.
@@ -975,11 +1036,7 @@ async function runBrowserChecks(componentName, page) {
     // both of which already meet the 44×44 AAA bar in their own audit
     // row). The 2.5.5 obligation here is on the CONSUMER, not the
     // component. Mark Not Applicable with an explicit consumer note.
-    const POPOVER_CONTAINERS = new Set([
-      'hx-dropdown',
-      'hx-tooltip',
-      'hx-popup',
-    ]);
+    const POPOVER_CONTAINERS = new Set(['hx-dropdown', 'hx-tooltip', 'hx-popup']);
     if (POPOVER_CONTAINERS.has(componentName)) {
       result.targetSize = {
         width: measurements.rect.width,
@@ -1021,9 +1078,10 @@ async function runBrowserChecks(componentName, page) {
     // Detect a "thick enough" box-shadow — heuristic: spread-radius or
     // multi-layer shadow with a non-transparent color and a non-zero
     // blur or spread.
-    const boxShadowSuggestsFocusRing = measurements.hasFocusBoxShadow
-      && /\b\d+\s*px/.test(measurements.boxShadow)
-      && !/^none$/i.test(measurements.boxShadow);
+    const boxShadowSuggestsFocusRing =
+      measurements.hasFocusBoxShadow &&
+      /\b\d+\s*px/.test(measurements.boxShadow) &&
+      !/^none$/i.test(measurements.boxShadow);
     const outlineSourceNote = measurements.outlineSourceIsTarget
       ? `<${measurements.targetTag}>`
       : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> — focus ring rendered on inner part)`;
@@ -1067,8 +1125,9 @@ async function runBrowserChecks(componentName, page) {
     // A transparent component host means the consumer page controls the
     // background; that is correct behaviour for surface-token-driven design
     // systems and is Not Applicable to the component itself.
-    const isTransparentBg = /rgba?\([^,]+,\s*[^,]+,\s*[^,]+,\s*0(\.0+)?\s*\)/.test(measurements.bgColor || '')
-      || measurements.bgColor === 'transparent';
+    const isTransparentBg =
+      /rgba?\([^,]+,\s*[^,]+,\s*[^,]+,\s*0(\.0+)?\s*\)/.test(measurements.bgColor || '') ||
+      measurements.bgColor === 'transparent';
     // WCAG 1.4.6 applies to text and images of text. A focus-paint surface
     // with no own text content (e.g. hx-switch track, swatch grid cells,
     // toggle thumbs) is a 1.4.11 Non-text Contrast surface — measuring
@@ -1142,7 +1201,9 @@ async function runBrowserChecks(componentName, page) {
 
 function parseRgb(str) {
   if (!str) return null;
-  const m = str.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/);
+  const m = str.match(
+    /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)$/,
+  );
   if (!m) return null;
   const r = Number(m[1]);
   const g = Number(m[2]);
@@ -1210,15 +1271,39 @@ async function auditComponent(name, browser) {
       const browserData = await runBrowserChecks(name, page);
       result.browserChecks = browserData;
       if (browserData.error) {
-        result.verdicts['1.4.6'] = { verdict: VERDICT.PARTIALLY, evidence: `Browser check error: ${browserData.error}` };
-        result.verdicts['2.4.12'] = { verdict: VERDICT.PARTIALLY, evidence: `Browser check error: ${browserData.error}` };
-        result.verdicts['2.4.13'] = { verdict: VERDICT.PARTIALLY, evidence: `Browser check error: ${browserData.error}` };
-        result.verdicts['2.5.5'] = { verdict: VERDICT.PARTIALLY, evidence: `Browser check error: ${browserData.error}` };
+        result.verdicts['1.4.6'] = {
+          verdict: VERDICT.PARTIALLY,
+          evidence: `Browser check error: ${browserData.error}`,
+        };
+        result.verdicts['2.4.12'] = {
+          verdict: VERDICT.PARTIALLY,
+          evidence: `Browser check error: ${browserData.error}`,
+        };
+        result.verdicts['2.4.13'] = {
+          verdict: VERDICT.PARTIALLY,
+          evidence: `Browser check error: ${browserData.error}`,
+        };
+        result.verdicts['2.5.5'] = {
+          verdict: VERDICT.PARTIALLY,
+          evidence: `Browser check error: ${browserData.error}`,
+        };
       } else {
-        result.verdicts['1.4.6'] = browserData.contrast || { verdict: VERDICT.PARTIALLY, evidence: 'No contrast measurement available.' };
-        result.verdicts['2.4.12'] = browserData.focusObscured || { verdict: VERDICT.PARTIALLY, evidence: 'No focus-obscured measurement available.' };
-        result.verdicts['2.4.13'] = browserData.focusOutline || { verdict: VERDICT.PARTIALLY, evidence: 'No focus-outline measurement available.' };
-        result.verdicts['2.5.5'] = browserData.targetSize || { verdict: VERDICT.PARTIALLY, evidence: 'No target-size measurement available.' };
+        result.verdicts['1.4.6'] = browserData.contrast || {
+          verdict: VERDICT.PARTIALLY,
+          evidence: 'No contrast measurement available.',
+        };
+        result.verdicts['2.4.12'] = browserData.focusObscured || {
+          verdict: VERDICT.PARTIALLY,
+          evidence: 'No focus-obscured measurement available.',
+        };
+        result.verdicts['2.4.13'] = browserData.focusOutline || {
+          verdict: VERDICT.PARTIALLY,
+          evidence: 'No focus-outline measurement available.',
+        };
+        result.verdicts['2.5.5'] = browserData.targetSize || {
+          verdict: VERDICT.PARTIALLY,
+          evidence: 'No target-size measurement available.',
+        };
 
         // Phase 4 Tier 3 Task 5 — non-interactive components (alert / status
         // live regions, structural primitives) are intentionally non-focusable.
@@ -1247,10 +1332,22 @@ async function auditComponent(name, browser) {
       await page.close();
     }
   } else {
-    result.verdicts['1.4.6'] = { verdict: VERDICT.PARTIALLY, evidence: 'Browser checks skipped (--no-browser).' };
-    result.verdicts['2.4.12'] = { verdict: VERDICT.PARTIALLY, evidence: 'Browser checks skipped (--no-browser).' };
-    result.verdicts['2.4.13'] = { verdict: VERDICT.PARTIALLY, evidence: 'Browser checks skipped (--no-browser).' };
-    result.verdicts['2.5.5'] = { verdict: VERDICT.PARTIALLY, evidence: 'Browser checks skipped (--no-browser).' };
+    result.verdicts['1.4.6'] = {
+      verdict: VERDICT.PARTIALLY,
+      evidence: 'Browser checks skipped (--no-browser).',
+    };
+    result.verdicts['2.4.12'] = {
+      verdict: VERDICT.PARTIALLY,
+      evidence: 'Browser checks skipped (--no-browser).',
+    };
+    result.verdicts['2.4.13'] = {
+      verdict: VERDICT.PARTIALLY,
+      evidence: 'Browser checks skipped (--no-browser).',
+    };
+    result.verdicts['2.5.5'] = {
+      verdict: VERDICT.PARTIALLY,
+      evidence: 'Browser checks skipped (--no-browser).',
+    };
   }
 
   return result;
@@ -1264,7 +1361,9 @@ function renderMatrix(report) {
   lines.push('# HELiX Formal AAA Audit — Verdict Matrix');
   lines.push('');
   lines.push(`Generated: ${report.runAt}`);
-  lines.push(`Standards: ${report.standards.claim.wcagSource} (${report.standards.claim.wcagVersion} ${report.standards.claim.wcagLevel})`);
+  lines.push(
+    `Standards: ${report.standards.claim.wcagSource} (${report.standards.claim.wcagVersion} ${report.standards.claim.wcagLevel})`,
+  );
   lines.push(`Components: ${report.results.length}`);
   lines.push('');
   lines.push('| Component | ' + cols.join(' | ') + ' |');
@@ -1278,17 +1377,24 @@ function renderMatrix(report) {
       const v = r.verdicts[id];
       if (!v) return '-';
       switch (v.verdict) {
-        case VERDICT.SUPPORTS: return 'S';
-        case VERDICT.PARTIALLY: return 'P';
-        case VERDICT.DOES_NOT: return 'F';
-        case VERDICT.NOT_APPLICABLE: return 'NA';
-        default: return '?';
+        case VERDICT.SUPPORTS:
+          return 'S';
+        case VERDICT.PARTIALLY:
+          return 'P';
+        case VERDICT.DOES_NOT:
+          return 'F';
+        case VERDICT.NOT_APPLICABLE:
+          return 'NA';
+        default:
+          return '?';
       }
     });
     lines.push(`| ${r.component} | ${row.join(' | ')} |`);
   }
   lines.push('');
-  lines.push('Legend: **S** Supports · **P** Partially Supports · **F** Does Not Support · **NA** Not Applicable');
+  lines.push(
+    'Legend: **S** Supports · **P** Partially Supports · **F** Does Not Support · **NA** Not Applicable',
+  );
   lines.push('');
   // Per-component findings detail.
   for (const r of report.results) {
@@ -1314,13 +1420,24 @@ function renderMatrix(report) {
 function aggregateCounts(report) {
   const counts = { S: 0, P: 0, F: 0, NA: 0, ERR: 0 };
   for (const r of report.results) {
-    if (r.error) { counts.ERR++; continue; }
+    if (r.error) {
+      counts.ERR++;
+      continue;
+    }
     for (const v of Object.values(r.verdicts)) {
       switch (v.verdict) {
-        case VERDICT.SUPPORTS: counts.S++; break;
-        case VERDICT.PARTIALLY: counts.P++; break;
-        case VERDICT.DOES_NOT: counts.F++; break;
-        case VERDICT.NOT_APPLICABLE: counts.NA++; break;
+        case VERDICT.SUPPORTS:
+          counts.S++;
+          break;
+        case VERDICT.PARTIALLY:
+          counts.P++;
+          break;
+        case VERDICT.DOES_NOT:
+          counts.F++;
+          break;
+        case VERDICT.NOT_APPLICABLE:
+          counts.NA++;
+          break;
       }
     }
   }
@@ -1339,7 +1456,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`\nHELiX Formal AAA Audit — ${standards.claim.wcagVersion} ${standards.claim.wcagLevel}`);
+  console.log(
+    `\nHELiX Formal AAA Audit — ${standards.claim.wcagVersion} ${standards.claim.wcagLevel}`,
+  );
   console.log(`Standards: ${standards.claim.wcagSource}`);
   console.log(`Components: ${targets.length} (${targets.join(', ')})`);
   if (NO_BROWSER) {
@@ -1378,10 +1497,18 @@ async function main() {
       if (r.verdicts) {
         for (const v of Object.values(r.verdicts)) {
           switch (v.verdict) {
-            case VERDICT.SUPPORTS: counts.S++; break;
-            case VERDICT.PARTIALLY: counts.P++; break;
-            case VERDICT.DOES_NOT: counts.F++; break;
-            case VERDICT.NOT_APPLICABLE: counts.NA++; break;
+            case VERDICT.SUPPORTS:
+              counts.S++;
+              break;
+            case VERDICT.PARTIALLY:
+              counts.P++;
+              break;
+            case VERDICT.DOES_NOT:
+              counts.F++;
+              break;
+            case VERDICT.NOT_APPLICABLE:
+              counts.NA++;
+              break;
           }
         }
       }
@@ -1411,7 +1538,9 @@ async function main() {
   const counts = aggregateCounts(report);
   console.log();
   console.log('─'.repeat(60));
-  console.log(`Verdict aggregate (across ${report.results.length} components × ${standards.criteria.length} criteria):`);
+  console.log(
+    `Verdict aggregate (across ${report.results.length} components × ${standards.criteria.length} criteria):`,
+  );
   console.log(`  Supports          : ${counts.S}`);
   console.log(`  Partially Supports: ${counts.P}`);
   console.log(`  Does Not Support  : ${counts.F}`);

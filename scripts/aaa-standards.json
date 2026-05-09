@@ -204,32 +204,74 @@
       "peerStandardNote": "WAI-ARIA APG is informative (non-normative) — not part of WCAG. We treat APG conformance as a peer standard for keyboard predictability. Pattern URLs verified live against the APG index 2026-05-08.",
       "patterns": {
         "button": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "verified": true },
-        "checkbox": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/", "verified": true },
-        "combobox": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/", "verified": true },
-        "dialog": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/", "verified": true },
-        "alertdialog": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/", "verified": true },
+        "checkbox": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/",
+          "verified": true
+        },
+        "combobox": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
+          "verified": true
+        },
+        "dialog": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+          "verified": true
+        },
+        "alertdialog": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/",
+          "verified": true
+        },
         "alert": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/", "verified": true },
         "listbox": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/", "verified": true },
         "menu": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/", "verified": true },
-        "menubutton": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/", "verified": true },
-        "radiogroup": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/", "verified": true },
+        "menubutton": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/",
+          "verified": true
+        },
+        "radiogroup": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/",
+          "verified": true
+        },
         "slider": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/", "verified": true },
         "switch": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/", "verified": true },
         "tabs": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/", "verified": true },
         "toolbar": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/", "verified": true },
         "tooltip": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/", "verified": true },
-        "treeview": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/", "verified": true },
-        "carousel": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/", "verified": true },
-        "accordion": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/accordion/", "verified": true },
-        "breadcrumb": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/", "verified": true },
+        "treeview": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/",
+          "verified": true
+        },
+        "carousel": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/",
+          "verified": true
+        },
+        "accordion": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/accordion/",
+          "verified": true
+        },
+        "breadcrumb": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/",
+          "verified": true
+        },
         "link": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/link/", "verified": true },
         "table": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/table/", "verified": true },
         "grid": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/grid/", "verified": true },
         "feed": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/feed/", "verified": true },
         "meter": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/meter/", "verified": true },
-        "spinbutton": { "url": "https://www.w3.org/TR/wai-aria-1.2/#spinbutton", "verified": true, "note": "Tier-1 Task-5 (2026-05-08): role=spinbutton from WAI-ARIA 1.2; APG documents spinbutton interaction via the related slider/listbox patterns. Native <input type=number> provides the keyboard contract via the user agent." },
-        "navigation": { "url": "https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/", "verified": true, "note": "Tier-1 Task-5 (2026-05-08): navigation landmark from APG landmark-regions practice. Has no required keyboard contract of its own; inner widgets (links, menus) define the contract." },
-        "group": { "url": "https://www.w3.org/TR/wai-aria-1.2/#group", "verified": true, "note": "Tier-1 Task-5 (2026-05-08): role=group from WAI-ARIA 1.2 — a structural grouping role with no required keyboard contract; items inside the group dictate keyboard behaviour." }
+        "spinbutton": {
+          "url": "https://www.w3.org/TR/wai-aria-1.2/#spinbutton",
+          "verified": true,
+          "note": "Tier-1 Task-5 (2026-05-08): role=spinbutton from WAI-ARIA 1.2; APG documents spinbutton interaction via the related slider/listbox patterns. Native <input type=number> provides the keyboard contract via the user agent."
+        },
+        "navigation": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/",
+          "verified": true,
+          "note": "Tier-1 Task-5 (2026-05-08): navigation landmark from APG landmark-regions practice. Has no required keyboard contract of its own; inner widgets (links, menus) define the contract."
+        },
+        "group": {
+          "url": "https://www.w3.org/TR/wai-aria-1.2/#group",
+          "verified": true,
+          "note": "Tier-1 Task-5 (2026-05-08): role=group from WAI-ARIA 1.2 — a structural grouping role with no required keyboard contract; items inside the group dictate keyboard behaviour."
+        }
       },
       "evidence": "Playwright per-pattern keyboard test matrix; deviations from APG must be documented with rationale.",
       "componentApplicability": "All components claiming an @aria-pattern JSDoc tag"
@@ -238,12 +280,7 @@
   "vpat": {
     "language": "VPAT 2.5 (Section 508 Refresh / WCAG 2.x)",
     "url": "https://www.itic.org/policy/accessibility/vpat",
-    "verdicts": [
-      "Supports",
-      "Partially Supports",
-      "Does Not Support",
-      "Not Applicable"
-    ],
+    "verdicts": ["Supports", "Partially Supports", "Does Not Support", "Not Applicable"],
     "verdictDefinitions": {
       "Supports": "The functionality of the product has at least one method that meets the criterion without known defects or meets with equivalent facilitation.",
       "Partially Supports": "Some functionality of the product does not meet the criterion.",

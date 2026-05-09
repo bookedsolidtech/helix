@@ -217,50 +217,50 @@ five forced-colors mixin family representatives (`hx-button`, `hx-checkbox`,
 
 ### P0 — Tier 1 (42 components)
 
-| Component           | Tier | AA Status                 | AAA Status    | Forced-Colors Coverage      | Notes                                                                                                                        |
-| ------------------- | ---- | ------------------------- | ------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `hx-button`         | P0   | Supports — runtime tested | Supports      | Supports                    | Forced-colors mixin: `forcedColorsInteractive`. Live-region for loading state pending (P1 audit item). — AAA-cert 2026-05-08 |
-| `hx-icon-button`    | P0   | Pending audit             | Supports | Supports | Inherits interactive forced-colors mixin via shared base. Per-component runtime test pending. — AAA-cert 2026-05-08 |
-| `hx-toggle-button`  | P0   | Pending audit             | Supports | Supports | Pressed-state ARIA contract audit pending. — AAA-cert 2026-05-08 |
-| `hx-split-button`   | P0   | Pending audit             | Supports | Supports | Composite (button + dropdown trigger); ARIA grouping audit pending. — AAA-cert 2026-05-08 |
-| `hx-button-group`   | P0   | Pending audit             | Supports | Supports | `role="group"` accessible name audit pending. — AAA-cert 2026-05-08 |
-| `hx-text-input`     | P0   | Pending audit             | Supports      | Supports                    | Forced-colors mixin: `forcedColorsField`. Validity-driven `aria-invalid` audit pending. — AAA-cert 2026-05-08                |
-| `hx-textarea`       | P0   | Pending audit             | Supports | Supports | Counter `aria-describedby` association audit pending. — AAA-cert 2026-05-08 |
-| `hx-number-input`   | P0   | Pending audit             | Supports | Supports | Spinner-button accessible name audit pending. — AAA-cert 2026-05-08 |
-| `hx-checkbox`       | P0   | Supports — runtime tested | Supports      | Supports                    | Forced-colors mixin: `forcedColorsField`. Keyboard accessibility remediated post-AUDIT-001. — AAA-cert 2026-05-08            |
-| `hx-checkbox-group` | P0   | Pending audit             | Supports | Supports | Group-level error / `aria-describedby` audit pending. — AAA-cert 2026-05-08 |
-| `hx-radio-group`    | P0   | Pending audit             | Supports | Supports | Roving-tabindex + group error audit pending. — AAA-cert 2026-05-08 |
-| `hx-switch`         | P0   | Pending audit             | Supports | Supports | APG `Space`-only key audit pending. — AAA-cert 2026-05-08 |
-| `hx-select`         | P0   | Pending audit             | Supports | Supports | Host-canonical combobox pattern (ARIA Group 3 in progress); `aria-activedescendant` audit ongoing. — AAA-cert 2026-05-08 |
-| `hx-combobox`       | P0   | Pending audit             | Supports | Supports | APG combobox pattern audit pending. — AAA-cert 2026-05-08 |
-| `hx-date-picker`    | P0   | Pending audit             | Supports | Supports | Calendar grid + dialog ARIA audit pending. — AAA-cert 2026-05-08 |
-| `hx-time-picker`    | P0   | Pending audit             | Supports | Supports | Spinbutton ARIA audit pending. — AAA-cert 2026-05-08 |
-| `hx-slider`         | P0   | Pending audit             | Pending audit | Pending verification        | `role="slider"` keyboard contract audit pending.                                                                             |
-| `hx-color-picker`   | P0   | Pending audit             | Supports | Supports | Custom widget ARIA audit pending. — AAA-cert 2026-05-08 |
-| `hx-rating`         | P0   | Pending audit             | Pending audit | Pending verification        | Group-of-radios pattern audit pending.                                                                                       |
-| `hx-file-upload`    | P0   | Pending audit             | Supports | Supports | Drop-target announce + button-trigger audit pending. — AAA-cert 2026-05-08 |
-| `hx-form`           | P0   | Pending audit             | Pending audit | Pending verification        | Light-DOM scoped CSS via AdoptedStylesheetsController; form-association audit pending.                                       |
-| `hx-field`          | P0   | Pending audit             | Pending audit | Pending verification        | Cross-shadow-boundary label / error association — dominant 1.3.1 / 4.1.2 remediation surface.                                |
-| `hx-field-label`    | P0   | Pending audit             | Pending audit | Pending verification        | Slotted `<label>` ID-ref pattern audit pending.                                                                              |
-| `hx-help-text`      | P0   | Pending audit             | Pending audit | Pending verification        | `aria-describedby` ID-ref pattern audit pending.                                                                             |
-| `hx-dialog`         | P0   | Pending audit             | Supports      | Supports                    | Native `<dialog>` + APG modal audit pending; focus-trap verification required. — AAA-cert 2026-05-08                         |
-| `hx-drawer`         | P0   | Pending audit             | Supports | Supports | APG dialog pattern audit pending. — AAA-cert 2026-05-08 |
-| `hx-popover`        | P0   | Pending audit             | Supports | Supports | APG dialog / disclosure pattern audit pending. — AAA-cert 2026-05-08 |
-| `hx-popup`          | P0   | Pending audit             | Supports | Supports | Floating-UI placement primitive; ARIA inherits from parent. — AAA-cert 2026-05-08 |
-| `hx-tooltip`        | P0   | Pending audit             | Supports | Supports | APG tooltip dismissable / hoverable / persistent audit (1.4.13) pending. — AAA-cert 2026-05-08 |
-| `hx-dropdown`       | P0   | Pending audit             | Supports | Supports | APG menu / listbox audit pending. — AAA-cert 2026-05-08 |
-| `hx-menu`           | P0   | Pending audit             | Supports | Supports | APG menu pattern audit pending. — AAA-cert 2026-05-08 |
-| `hx-overflow-menu`  | P0   | Pending audit             | Supports | Supports | APG menu pattern audit pending. — AAA-cert 2026-05-08 |
-| `hx-side-nav`       | P0   | Supports — runtime tested | Supports | Supports | Forced-colors disabled `.nav-item__link` opacity scoping verified at runtime; cascade-order regression net in place. — AAA-cert 2026-05-08 |
-| `hx-top-nav`        | P0   | Pending audit             | Supports | Supports | Landmark + nav-list audit pending. — AAA-cert 2026-05-08 |
-| `hx-nav`            | P0   | Pending audit             | Supports | Supports | Per-component audit pending. — AAA-cert 2026-05-08 |
-| `hx-tabs`           | P0   | Pending audit             | Supports | Supports | APG tabs pattern + roving tabindex audit pending. — AAA-cert 2026-05-08 |
-| `hx-breadcrumb`     | P0   | Pending audit             | Supports | Supports | Native `<ol>` migration audit pending. — AAA-cert 2026-05-08 |
-| `hx-pagination`     | P0   | Pending audit             | Pending audit | Pending verification        | Page-link `aria-current` audit pending.                                                                                      |
-| `hx-toast`          | P0   | Pending audit             | Pending audit | Pending verification        | Live-region + auto-dismiss timing audit pending.                                                                             |
-| `hx-alert`          | P0   | Pending audit             | Supports      | Supports                    | `role="alert"` redundancy + close-button target-size audit pending. — AAA-cert 2026-05-08                                    |
-| `hx-link`           | P0   | Supports — runtime tested | Pending audit | Supports — runtime verified | Forced-colors mixin: `forcedColorsLink`. Visited-state `LinkText` / `VisitedText` keywords verified.                         |
-| `hx-card`           | P0   | Supports — runtime tested | Pending audit | Supports — runtime verified | Forced-colors mixin: `forcedColorsSurface`. Interactive-card `aria-label` audit pending.                                     |
+| Component           | Tier | AA Status                 | AAA Status    | Forced-Colors Coverage      | Notes                                                                                                                                      |
+| ------------------- | ---- | ------------------------- | ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `hx-button`         | P0   | Supports — runtime tested | Supports      | Supports                    | Forced-colors mixin: `forcedColorsInteractive`. Live-region for loading state pending (P1 audit item). — AAA-cert 2026-05-08               |
+| `hx-icon-button`    | P0   | Pending audit             | Supports      | Supports                    | Inherits interactive forced-colors mixin via shared base. Per-component runtime test pending. — AAA-cert 2026-05-08                        |
+| `hx-toggle-button`  | P0   | Pending audit             | Supports      | Supports                    | Pressed-state ARIA contract audit pending. — AAA-cert 2026-05-08                                                                           |
+| `hx-split-button`   | P0   | Pending audit             | Supports      | Supports                    | Composite (button + dropdown trigger); ARIA grouping audit pending. — AAA-cert 2026-05-08                                                  |
+| `hx-button-group`   | P0   | Pending audit             | Supports      | Supports                    | `role="group"` accessible name audit pending. — AAA-cert 2026-05-08                                                                        |
+| `hx-text-input`     | P0   | Pending audit             | Supports      | Supports                    | Forced-colors mixin: `forcedColorsField`. Validity-driven `aria-invalid` audit pending. — AAA-cert 2026-05-08                              |
+| `hx-textarea`       | P0   | Pending audit             | Supports      | Supports                    | Counter `aria-describedby` association audit pending. — AAA-cert 2026-05-08                                                                |
+| `hx-number-input`   | P0   | Pending audit             | Supports      | Supports                    | Spinner-button accessible name audit pending. — AAA-cert 2026-05-08                                                                        |
+| `hx-checkbox`       | P0   | Supports — runtime tested | Supports      | Supports                    | Forced-colors mixin: `forcedColorsField`. Keyboard accessibility remediated post-AUDIT-001. — AAA-cert 2026-05-08                          |
+| `hx-checkbox-group` | P0   | Pending audit             | Supports      | Supports                    | Group-level error / `aria-describedby` audit pending. — AAA-cert 2026-05-08                                                                |
+| `hx-radio-group`    | P0   | Pending audit             | Supports      | Supports                    | Roving-tabindex + group error audit pending. — AAA-cert 2026-05-08                                                                         |
+| `hx-switch`         | P0   | Pending audit             | Supports      | Supports                    | APG `Space`-only key audit pending. — AAA-cert 2026-05-08                                                                                  |
+| `hx-select`         | P0   | Pending audit             | Supports      | Supports                    | Host-canonical combobox pattern (ARIA Group 3 in progress); `aria-activedescendant` audit ongoing. — AAA-cert 2026-05-08                   |
+| `hx-combobox`       | P0   | Pending audit             | Supports      | Supports                    | APG combobox pattern audit pending. — AAA-cert 2026-05-08                                                                                  |
+| `hx-date-picker`    | P0   | Pending audit             | Supports      | Supports                    | Calendar grid + dialog ARIA audit pending. — AAA-cert 2026-05-08                                                                           |
+| `hx-time-picker`    | P0   | Pending audit             | Supports      | Supports                    | Spinbutton ARIA audit pending. — AAA-cert 2026-05-08                                                                                       |
+| `hx-slider`         | P0   | Pending audit             | Pending audit | Pending verification        | `role="slider"` keyboard contract audit pending.                                                                                           |
+| `hx-color-picker`   | P0   | Pending audit             | Supports      | Supports                    | Custom widget ARIA audit pending. — AAA-cert 2026-05-08                                                                                    |
+| `hx-rating`         | P0   | Pending audit             | Pending audit | Pending verification        | Group-of-radios pattern audit pending.                                                                                                     |
+| `hx-file-upload`    | P0   | Pending audit             | Supports      | Supports                    | Drop-target announce + button-trigger audit pending. — AAA-cert 2026-05-08                                                                 |
+| `hx-form`           | P0   | Pending audit             | Pending audit | Pending verification        | Light-DOM scoped CSS via AdoptedStylesheetsController; form-association audit pending.                                                     |
+| `hx-field`          | P0   | Pending audit             | Pending audit | Pending verification        | Cross-shadow-boundary label / error association — dominant 1.3.1 / 4.1.2 remediation surface.                                              |
+| `hx-field-label`    | P0   | Pending audit             | Pending audit | Pending verification        | Slotted `<label>` ID-ref pattern audit pending.                                                                                            |
+| `hx-help-text`      | P0   | Pending audit             | Pending audit | Pending verification        | `aria-describedby` ID-ref pattern audit pending.                                                                                           |
+| `hx-dialog`         | P0   | Pending audit             | Supports      | Supports                    | Native `<dialog>` + APG modal audit pending; focus-trap verification required. — AAA-cert 2026-05-08                                       |
+| `hx-drawer`         | P0   | Pending audit             | Supports      | Supports                    | APG dialog pattern audit pending. — AAA-cert 2026-05-08                                                                                    |
+| `hx-popover`        | P0   | Pending audit             | Supports      | Supports                    | APG dialog / disclosure pattern audit pending. — AAA-cert 2026-05-08                                                                       |
+| `hx-popup`          | P0   | Pending audit             | Supports      | Supports                    | Floating-UI placement primitive; ARIA inherits from parent. — AAA-cert 2026-05-08                                                          |
+| `hx-tooltip`        | P0   | Pending audit             | Supports      | Supports                    | APG tooltip dismissable / hoverable / persistent audit (1.4.13) pending. — AAA-cert 2026-05-08                                             |
+| `hx-dropdown`       | P0   | Pending audit             | Supports      | Supports                    | APG menu / listbox audit pending. — AAA-cert 2026-05-08                                                                                    |
+| `hx-menu`           | P0   | Pending audit             | Supports      | Supports                    | APG menu pattern audit pending. — AAA-cert 2026-05-08                                                                                      |
+| `hx-overflow-menu`  | P0   | Pending audit             | Supports      | Supports                    | APG menu pattern audit pending. — AAA-cert 2026-05-08                                                                                      |
+| `hx-side-nav`       | P0   | Supports — runtime tested | Supports      | Supports                    | Forced-colors disabled `.nav-item__link` opacity scoping verified at runtime; cascade-order regression net in place. — AAA-cert 2026-05-08 |
+| `hx-top-nav`        | P0   | Pending audit             | Supports      | Supports                    | Landmark + nav-list audit pending. — AAA-cert 2026-05-08                                                                                   |
+| `hx-nav`            | P0   | Pending audit             | Supports      | Supports                    | Per-component audit pending. — AAA-cert 2026-05-08                                                                                         |
+| `hx-tabs`           | P0   | Pending audit             | Supports      | Supports                    | APG tabs pattern + roving tabindex audit pending. — AAA-cert 2026-05-08                                                                    |
+| `hx-breadcrumb`     | P0   | Pending audit             | Supports      | Supports                    | Native `<ol>` migration audit pending. — AAA-cert 2026-05-08                                                                               |
+| `hx-pagination`     | P0   | Pending audit             | Pending audit | Pending verification        | Page-link `aria-current` audit pending.                                                                                                    |
+| `hx-toast`          | P0   | Pending audit             | Pending audit | Pending verification        | Live-region + auto-dismiss timing audit pending.                                                                                           |
+| `hx-alert`          | P0   | Pending audit             | Supports      | Supports                    | `role="alert"` redundancy + close-button target-size audit pending. — AAA-cert 2026-05-08                                                  |
+| `hx-link`           | P0   | Supports — runtime tested | Pending audit | Supports — runtime verified | Forced-colors mixin: `forcedColorsLink`. Visited-state `LinkText` / `VisitedText` keywords verified.                                       |
+| `hx-card`           | P0   | Supports — runtime tested | Pending audit | Supports — runtime verified | Forced-colors mixin: `forcedColorsSurface`. Interactive-card `aria-label` audit pending.                                                   |
 
 ### P1 — Tier 2 (10 components)
 
@@ -292,7 +292,7 @@ five forced-colors mixin family representatives (`hx-button`, `hx-checkbox`,
 | `hx-spinner`          | P2   | Pending audit | Pending audit | Pending verification   | `role="status"` + label audit pending.                                                         |
 | `hx-skeleton`         | P2   | Pending audit | Pending audit | Pending verification   | `aria-busy` posture audit pending.                                                             |
 | `hx-divider`          | P2   | Pending audit | Pending audit | Pending verification   | `role="separator"` posture audit pending.                                                      |
-| `hx-action-bar`       | P2   | Pending audit | Supports | Supports | Toolbar pattern audit pending. — AAA-cert 2026-05-08 |
+| `hx-action-bar`       | P2   | Pending audit | Supports      | Supports               | Toolbar pattern audit pending. — AAA-cert 2026-05-08                                           |
 | `hx-banner`           | P2   | Pending audit | Pending audit | Pending verification   | Landmark + dismissable banner audit pending.                                                   |
 | `hx-carousel`         | P2   | Pending audit | Pending audit | Pending verification   | APG carousel pattern + 2.2.2 pause control audit pending.                                      |
 | `hx-steps`            | P2   | Pending audit | Pending audit | Pending verification   | Stepper pattern + `aria-current` audit pending.                                                |
@@ -315,7 +315,7 @@ five forced-colors mixin family representatives (`hx-button`, `hx-checkbox`,
 | `hx-format-date`     | Exempt | Not Applicable | Not Applicable | Not Applicable         | Formatter primitive; renders inline text.                                |
 | `hx-visually-hidden` | Exempt | Supports       | Supports       | Not Applicable         | A11y utility primitive — provides visually-hidden text by design.        |
 | `hx-code-snippet`    | Exempt | Pending audit  | Pending audit  | Not Applicable         | `<pre><code>` wrapper; copy-button accessible name audit pending.        |
-| `hx-copy-button`     | Exempt | Pending audit  | Supports | Supports | Live-region announce on copy audit pending. — AAA-cert 2026-05-08 |
+| `hx-copy-button`     | Exempt | Pending audit  | Supports       | Supports               | Live-region announce on copy audit pending. — AAA-cert 2026-05-08        |
 
 ## Testing Methodology
 

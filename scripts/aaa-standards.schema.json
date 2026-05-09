@@ -95,7 +95,10 @@
         "url": { "type": "string", "format": "uri" },
         "verdicts": {
           "type": "array",
-          "items": { "type": "string", "enum": ["Supports", "Partially Supports", "Does Not Support", "Not Applicable"] }
+          "items": {
+            "type": "string",
+            "enum": ["Supports", "Partially Supports", "Does Not Support", "Not Applicable"]
+          }
         },
         "verdictDefinitions": { "type": "object" }
       }
