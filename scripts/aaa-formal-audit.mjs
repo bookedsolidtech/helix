@@ -584,6 +584,10 @@ const STORY_OVERRIDES = {
   'hx-dialog': 'ModalOpen',
   'hx-drawer': 'AAAAuditOpen',
   'hx-popover': 'AAAAuditOpen',
+  // Banner Default has dismissible=false (no focusable surface). Route the
+  // audit at the Dismissible story so 2.4.13 Focus Appearance has a real
+  // close-button to measure.
+  'hx-banner': 'Dismissible',
 };
 
 async function buildStoryUrl(componentName) {
