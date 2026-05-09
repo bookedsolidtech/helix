@@ -13,6 +13,7 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixRatingStyles } from './hx-rating.styles.js';
@@ -398,74 +399,42 @@ export class HelixRating extends FormMixin(HelixElement) {
 
   /** @internal */
   private _renderFullStar() {
-    return html`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        aria-hidden="true"
-        width="1em"
-        height="1em"
-      >
-        <path
-          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-        />
-      </svg>
-    `;
+    return html`<hx-icon
+      class="star-glyph"
+      library="helix"
+      name="star-filled"
+      aria-hidden="true"
+    ></hx-icon>`;
   }
 
   /** @internal */
   private _renderHalfStar() {
     return html`
       <span class="star-half" aria-hidden="true">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          width="1em"
-          height="1em"
-          class="star-half__filled"
-        >
-          <path
-            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-          />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          width="1em"
-          height="1em"
-          class="star-half__empty"
-        >
-          <path
-            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-          />
-        </svg>
+        <hx-icon
+          class="star-glyph star-half__filled"
+          library="helix"
+          name="star-filled"
+          aria-hidden="true"
+        ></hx-icon>
+        <hx-icon
+          class="star-glyph star-half__empty"
+          library="helix"
+          name="star-outline"
+          aria-hidden="true"
+        ></hx-icon>
       </span>
     `;
   }
 
   /** @internal */
   private _renderEmptyStar() {
-    return html`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.5"
-        aria-hidden="true"
-        width="1em"
-        height="1em"
-      >
-        <path
-          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-        />
-      </svg>
-    `;
+    return html`<hx-icon
+      class="star-glyph"
+      library="helix"
+      name="star-outline"
+      aria-hidden="true"
+    ></hx-icon>`;
   }
 
   /** @internal */

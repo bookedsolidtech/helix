@@ -62,6 +62,12 @@ export const helixRatingStyles = css`
     color: var(--hx-rating-hover-color, var(--hx-color-warning-300, #eeb383));
   }
 
+  /* ─── Star Glyph (hx-icon) Sizing ─── */
+
+  .star-glyph {
+    --hx-icon-size: 1em;
+  }
+
   /* ─── Half-Star Layout ─── */
 
   .star-half {
