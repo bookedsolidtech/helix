@@ -335,18 +335,18 @@ describe('hx-step', () => {
       expect(el.hasAttribute('aria-current')).toBe(false);
     });
 
-    it('renders checkmark SVG when complete', async () => {
+    it('renders checkmark hx-icon when complete', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="complete"></hx-step>');
       const indicator = shadowQuery(el, '[part~="indicator"]');
-      const svg = indicator?.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = indicator?.querySelector('hx-icon[library="helix"][name="check"]');
+      expect(glyph).toBeTruthy();
     });
 
-    it('renders X SVG when error', async () => {
+    it('renders X hx-icon when error', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Test" status="error"></hx-step>');
       const indicator = shadowQuery(el, '[part~="indicator"]');
-      const svg = indicator?.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = indicator?.querySelector('hx-icon[library="helix"][name="close"]');
+      expect(glyph).toBeTruthy();
     });
 
     it('renders sr-only "Complete" text when complete', async () => {
@@ -722,12 +722,12 @@ describe('hx-steps — additional edge cases', () => {
   // ─── All step statuses rendering ───
 
   describe('all step statuses', () => {
-    it('complete step renders a checkmark SVG in the indicator', async () => {
+    it('complete step renders a checkmark hx-icon in the indicator', async () => {
       const el = await fixture<HelixSteps>(ALL_STATUSES_HTML);
       await el.updateComplete;
       const completeStep = el.querySelector<HelixStep>('[status="complete"]')!;
       const indicator = completeStep.shadowRoot?.querySelector('[part~="indicator"]');
-      expect(indicator?.querySelector('svg')).toBeTruthy();
+      expect(indicator?.querySelector('hx-icon[library="helix"][name="check"]')).toBeTruthy();
     });
 
     it('active step displays step number in indicator', async () => {
@@ -746,11 +746,11 @@ describe('hx-steps — additional edge cases', () => {
       expect(indicator.textContent?.trim()).toContain('3');
     });
 
-    it('error step renders an X SVG in the indicator', async () => {
+    it('error step renders an X hx-icon in the indicator', async () => {
       const el = await fixture<HelixStep>('<hx-step label="Error" status="error"></hx-step>');
       await el.updateComplete;
       const indicator = shadowQuery(el, '[part~="indicator"]')!;
-      expect(indicator.querySelector('svg')).toBeTruthy();
+      expect(indicator.querySelector('hx-icon[library="helix"][name="close"]')).toBeTruthy();
     });
   });
 
