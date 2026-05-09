@@ -124,44 +124,44 @@ describe('hx-help-text', () => {
       expect(icon).toBeNull();
     });
 
-    it('error variant renders an icon with SVG inside [part="icon"]', async () => {
+    it('error variant renders an hx-icon inside [part="icon"]', async () => {
       const el = await fixture<HxHelpText>('<hx-help-text variant="error">Error</hx-help-text>');
       const icon = shadowQuery(el, '[part="icon"]');
       expect(icon).toBeTruthy();
-      const svg = icon?.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = icon?.querySelector('hx-icon[library="helix"][name="error"]');
+      expect(glyph).toBeTruthy();
     });
 
-    it('warning variant renders an icon with SVG inside [part="icon"]', async () => {
+    it('warning variant renders an hx-icon inside [part="icon"]', async () => {
       const el = await fixture<HxHelpText>(
         '<hx-help-text variant="warning">Warning</hx-help-text>',
       );
       const icon = shadowQuery(el, '[part="icon"]');
       expect(icon).toBeTruthy();
-      const svg = icon?.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = icon?.querySelector('hx-icon[library="helix"][name="warning"]');
+      expect(glyph).toBeTruthy();
     });
 
-    it('success variant renders an icon with SVG inside [part="icon"]', async () => {
+    it('success variant renders an hx-icon inside [part="icon"]', async () => {
       const el = await fixture<HxHelpText>(
         '<hx-help-text variant="success">Success</hx-help-text>',
       );
       const icon = shadowQuery(el, '[part="icon"]');
       expect(icon).toBeTruthy();
-      const svg = icon?.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = icon?.querySelector('hx-icon[library="helix"][name="success"]');
+      expect(glyph).toBeTruthy();
     });
 
-    it('icon SVGs have aria-hidden="true"', async () => {
+    it('icon glyphs have aria-hidden="true"', async () => {
       for (const variant of ['error', 'warning', 'success']) {
         const el = await fixture<HxHelpText>(
           `<hx-help-text variant="${variant}">Text</hx-help-text>`,
         );
         const icon = shadowQuery(el, '[part="icon"]');
-        const svg = icon?.querySelector('svg');
+        const glyph = icon?.querySelector('hx-icon');
         expect(
-          svg?.getAttribute('aria-hidden'),
-          `${variant} icon SVG should have aria-hidden="true"`,
+          glyph?.getAttribute('aria-hidden'),
+          `${variant} hx-icon should have aria-hidden="true"`,
         ).toBe('true');
         el.remove();
       }
@@ -247,7 +247,7 @@ describe('hx-help-text', () => {
       // Verify error state: icon present, role="alert"
       const icon = shadowQuery(el, '[part="icon"]');
       expect(icon).toBeTruthy();
-      expect(icon?.querySelector('svg')).toBeTruthy();
+      expect(icon?.querySelector('hx-icon[library="helix"][name="error"]')).toBeTruthy();
       expect(shadowQuery(el, '[part="base"]')!.getAttribute('role')).toBe('alert');
     });
 

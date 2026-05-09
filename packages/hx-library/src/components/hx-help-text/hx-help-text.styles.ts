@@ -23,6 +23,11 @@ export const helixHelpTextStyles = css`
     align-items: center;
   }
 
+  /* Render the migrated hx-icon glyph at 1em (matches the previous inline SVG sizing). */
+  .help-text__glyph {
+    --hx-icon-size: 1em;
+  }
+
   .help-text__text {
     min-width: 0;
   }
