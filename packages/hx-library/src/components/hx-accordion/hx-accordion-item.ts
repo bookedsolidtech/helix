@@ -1,28 +1,19 @@
-import { html, svg, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixAccordionItemStyles } from './hx-accordion-item.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
-const chevronIcon = svg`
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
-  >
-    <polyline points="6 9 12 15 18 9"></polyline>
-  </svg>
-`;
+const chevronIcon = html`<hx-icon
+  class="accordion-item__chevron"
+  library="helix"
+  name="chevron-down"
+  aria-hidden="true"
+></hx-icon>`;
 
 const _nextAccordionItemId = createIdCounter('hx-accordion-item');
 
