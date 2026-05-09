@@ -1,0 +1,161 @@
+{/* hx-checkbox.mdx — AAA conformance documentation for hx-checkbox */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  AAAConformanceCard,
+  APGPatternCard,
+  ConsumerObligations,
+  InlineAuditPanel,
+  SectionHead,
+} from '../_components';
+import auditRaw from '../../../../packages/hx-library/src/components/hx-checkbox/AAA-AUDIT.md?raw';
+
+<Meta title="Components/Checkbox/Conformance" />
+
+<div className="hx-docs">
+
+# `hx-checkbox` — Conformance documentation
+
+> **WCAG 2.2 Level AAA certified** for all 9 component-shippable Success Criteria including 3.3.6 Error Prevention (All), plus 2 peer standards. The canonical APG `checkbox` pattern: <kbd>Space</kbd> toggles, focus is visible, target ≥44×44px, and the indeterminate state is communicated via `aria-checked="mixed"`.
+
+---
+
+## Hero scenario — informed-consent acknowledgement
+
+The most consequential deployment of `hx-checkbox` in healthcare: an informed-consent acknowledgement before a procedure. Every checkbox here is required, the focus order matches the visual order, and the consent-confirmation button below remains disabled until all required acknowledgements are checked. The pattern lives or dies on AAA target size (2.5.5) — a clinician with motor difficulty must be able to land each checkbox reliably on the first try.
+
+<div
+  style={{
+    maxWidth: '560px',
+    padding: '2rem',
+    background: 'var(--hx-color-surface-raised, #fff)',
+    border: '1px solid var(--hx-color-border-default, #dee2e6)',
+    borderRadius: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+  }}
+>
+  <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Informed consent — outpatient procedure</h3>
+  <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--hx-color-text-secondary, #4d5b6b)' }}>
+    Acknowledge each statement below to proceed with scheduling.
+  </p>
+
+  <div role="group" aria-label="Consent acknowledgements" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+    <hx-checkbox name="consent_procedure" required>
+      I understand the procedure being performed and the clinical rationale.
+    </hx-checkbox>
+    <hx-checkbox name="consent_risks" required>
+      I have been informed of the material risks, benefits, and alternatives.
+    </hx-checkbox>
+    <hx-checkbox name="consent_questions" required>
+      I have had the opportunity to ask questions and they have been answered.
+    </hx-checkbox>
+    <hx-checkbox name="consent_release" required>
+      I authorize release of records to my primary care physician.
+    </hx-checkbox>
+  </div>
+
+  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
+    <hx-button variant="ghost" type="reset">Cancel</hx-button>
+    <hx-button variant="primary" type="submit">Confirm consent</hx-button>
+  </div>
+</div>
+
+This is the bar. Every checkbox above clears AAA target size at 44×44 CSS px, the focus ring is visible against the form surface, the labels are clickable (so the entire row activates the checkbox), and the keyboard contract — <kbd>Space</kbd> to toggle, <kbd>Tab</kbd> to advance — is exactly what the WAI-ARIA APG `checkbox` pattern specifies.
+
+---
+
+<AAAConformanceCard tag="hx-checkbox" />
+
+---
+
+<APGPatternCard
+  tag="hx-checkbox"
+  screenReaderAnnouncement="I understand the procedure being performed and the clinical rationale, checkbox, not checked, required"
+  screenReaderContext="When the first consent checkbox above is focused (unchecked), screen readers announce"
+/>
+
+<ConsumerObligations
+  tag="hx-checkbox"
+  obligations={[
+    <>Provide a visible label — slot content is the canonical pattern. The label is clickable (the entire label region activates the checkbox), which expands the AAA target-size surface beyond the box itself.</>,
+    <>For groups of related checkboxes, wrap them in a <code>role="group"</code> + <code>aria-label</code> container (or use <code>hx-checkbox-group</code>). Group context is essential for screen-reader navigation.</>,
+    <>Use the indeterminate state (<code>indeterminate</code> property) only when it represents a "some-but-not-all" parent state. Do not use it as a third value — that breaks the APG <code>checkbox</code> contract.</>,
+    <>Do not strip the focus ring. Customize via the <code>--hx-focus-ring-*</code> tokens. The focus ring must remain visible at all times for 2.4.13 compliance.</>,
+    <>For required-by-attribute checkboxes, render a visible required indicator (asterisk in label, "required" text, or both) in addition to the <code>required</code> attribute. <code>aria-required</code> alone does not meet WCAG 3.3.2 Labels or Instructions.</>,
+  ]}
+/>
+
+---
+
+## Live state demos
+
+<SectionHead title="Default — unchecked" meta="--default" />
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-checkbox name="demo_unchecked">
+    Send appointment reminders by SMS
+  </hx-checkbox>
+</div>
+
+<SectionHead title="Checked" meta="--checked" />
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-checkbox name="demo_checked" checked>
+    Subscribe to the patient portal newsletter
+  </hx-checkbox>
+</div>
+
+<SectionHead title="Indeterminate (mixed)" meta="aria-checked=mixed" />
+
+The mixed state communicates "some children of this group are checked." Use as a master toggle in tree-style or grouped selection patterns. Activating an indeterminate checkbox clears the indeterminate state and sets it to checked.
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-checkbox
+    name="demo_indeterminate"
+    indeterminate
+    ref={(el) => {
+      if (el) el.indeterminate = true;
+    }}
+  >
+    Apply to all members of this care team
+  </hx-checkbox>
+</div>
+
+<SectionHead title="Required + error" meta="3.3.6 Error Prevention (All)" />
+
+A required checkbox in error state — the consumer attempted submission without acknowledging. Error styling routes through the same contrast tokens as `hx-text-input`'s error state.
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-checkbox
+    name="demo_error"
+    required
+    error-message="You must accept the terms to continue."
+  >
+    I accept the terms of service
+  </hx-checkbox>
+</div>
+
+<SectionHead title="Disabled" meta="--disabled" />
+
+<div style={{ padding: '1rem 0', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+  <hx-checkbox name="demo_disabled_unchecked" disabled>
+    Disabled (unchecked)
+  </hx-checkbox>
+  <hx-checkbox name="demo_disabled_checked" disabled checked>
+    Disabled (checked)
+  </hx-checkbox>
+</div>
+
+---
+
+<InlineAuditPanel tag="hx-checkbox" markdown={auditRaw} />
+
+---
+
+## Variant gallery
+
+The full enumeration of sizes, label slot patterns, indeterminate transitions, error states, and grouping patterns lives in the `Components/Checkbox` story tree.
+
+</div>
