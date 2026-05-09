@@ -125,6 +125,24 @@ type ArrowData = { x?: number; y?: number; centerOffset: number };
  * <hx-popup anchor="#{{ element['#id'] }}" placement="bottom">...</hx-popup>
  * ```
  * @cssprop [--hx-color-neutral-0] - Color.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-popup/AAA-AUDIT.md
+ * @keyboard-contract none — hx-popup is a positioning primitive that owns anchor placement / collision detection / repositioning only. It does not focus-trap, does not handle Escape, does not manage tab order. Any keyboard contract belongs to the consumer-supplied slotted content (which may be a dialog, menu, listbox, tooltip, or non-widget content).
+ * @aria-pattern none
+ * @aria-pattern-source https://www.w3.org/TR/wai-aria-1.2/#aria-haspopup — popup is a structural anchor primitive, not a widget role. The Phase 4 Tier 3 formal AAA re-cert harness treats `none` as a no-key-required pattern (see APG_KEYBOARD_EXPECTATIONS in scripts/aaa-formal-audit.mjs).
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-popup
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-popup')
 export class HelixPopup extends HelixElement {

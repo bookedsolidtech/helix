@@ -98,8 +98,15 @@ export const helixSideNavStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Visual icon area stays 2rem (32px) — preserves the side-nav header
+       silhouette while the wrapping touch target grows to 44×44 to meet
+       WCAG 2.5.5 (Enhanced) AAA. min-width/min-height own the hit area;
+       width/height drive the visual painted area, but the button's
+       intrinsic size always matches the hit-area floor. */
     width: var(--hx-space-8, 2rem);
     height: var(--hx-space-8, 2rem);
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     margin-inline-start: auto;
     flex-shrink: 0;
     padding: 0;

@@ -15,6 +15,19 @@ export const helixDropdownStyles = css`
     display: inline-block;
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — enforce a ≥2px focus ring on the slotted
+   * trigger (typically <hx-button>, <button>, or <hx-icon-button>). The host
+   * is a popover-container; the interactive surface is the slotted trigger.
+   */
+  ::slotted([slot='trigger']:focus-visible),
+  ::slotted(button:focus-visible),
+  ::slotted(a:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-dropdown-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   [part='panel'] {
     position: fixed;
     z-index: var(--hx-dropdown-panel-z-index, 1000);

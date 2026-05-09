@@ -18,7 +18,20 @@ export const helixBreadcrumbItemStyles = css`
   }
 
   [part='link'] {
-    color: var(--hx-breadcrumb-link-color, var(--hx-color-primary-600, #0f7078));
+    /*
+     * AAA 2.5.5 Target Size (Enhanced) — links rendered as inline text
+     * default to ~17px tall, well below the 44×44 AAA bar. Use
+     * inline-flex + min-height + vertical padding to grow the
+     * interactive area to ≥44×44 without enlarging the visible text.
+     * The padding is symmetrical so the visible label stays vertically
+     * centered against adjacent separators.
+     */
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hx-breadcrumb-link-min-height, var(--hx-touch-target-min, 44px));
+    padding-block: var(--hx-breadcrumb-link-padding-y, var(--hx-space-2, 0.5rem));
+    padding-inline: var(--hx-breadcrumb-link-padding-x, var(--hx-space-1, 0.25rem));
+    color: var(--hx-breadcrumb-link-color, var(--hx-color-text-link, #0f6363));
     text-decoration: none;
     cursor: pointer;
     font-family: inherit;
@@ -30,7 +43,7 @@ export const helixBreadcrumbItemStyles = css`
   }
 
   [part='link']:hover {
-    color: var(--hx-breadcrumb-link-hover-color, var(--hx-color-primary-700, #0f6363));
+    color: var(--hx-breadcrumb-link-hover-color, var(--hx-color-text-link-hover, #07494a));
     text-decoration: underline;
   }
 

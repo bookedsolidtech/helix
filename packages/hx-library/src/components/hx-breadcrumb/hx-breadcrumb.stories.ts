@@ -241,7 +241,7 @@ export const ExplicitCurrent: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           Explicit <code>current</code> on middle item (non-last):
         </p>
@@ -253,7 +253,7 @@ export const ExplicitCurrent: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           Server-rendered Drupal pattern — <code>current</code> on last item:
         </p>
@@ -318,7 +318,7 @@ export const KeyboardNavigation: Story = {
   name: 'Keyboard Navigation',
   render: () => html`
     <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: var(--hx-color-neutral-500); margin-bottom: 0.5rem;">
+      <p style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362); margin-bottom: 0.5rem;">
         Tab moves focus through each breadcrumb link. The ellipsis button (shown when max-items
         collapses middle items) is also focusable — press Enter or Space to expand the full path.
       </p>

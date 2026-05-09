@@ -3,6 +3,14 @@ import { css } from 'lit';
 export const helixRadioStyles = css`
   :host {
     display: block;
+    /*
+     * Suppress the browser default ~1px host outline. Without this the formal
+     * AAA audit harness records a sub-2px outline on the focused host and
+     * reports WCAG 2.4.13 Partially Supports — even though the explicit 2px
+     * focus ring is correctly painted on the inner .radio__control element.
+     * Mirrors the hx-checkbox / hx-switch / hx-toggle-button fix.
+     */
+    outline: none;
   }
 
   :host([disabled]) {

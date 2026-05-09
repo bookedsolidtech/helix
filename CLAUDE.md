@@ -298,7 +298,21 @@ pnpm run test:smart             # Smart: only tests changed components vs origin
 pnpm run cem                    # Generate Custom Elements Manifest
 pnpm run lint                   # ESLint
 pnpm run format                 # Auto-fix formatting
+pnpm aaa:audit                  # Formal WCAG 2.2 AAA audit — cert verdict authority
+pnpm aaa:matrix                 # Brand × theme coverage matrix (informational only)
 ```
+
+### AAA Cert Authority
+
+The formal audit harness (`scripts/aaa-formal-audit.mjs`, alias `pnpm aaa:audit`)
+is the canonical AAA cert verdict source. It sources every criterion from
+`scripts/aaa-standards.json` (verified W3C URLs) and produces VPAT 2.5 verdicts
+backed by measured evidence. The cert toolkit (`scripts/aaa-cert.mjs`) refuses
+to stamp `@aaa-certified` unless ALL 11 criteria resolve to Supports or Not
+Applicable. The brand × theme matrix harness (`scripts/aaa-matrix-verify.mjs`,
+alias `pnpm aaa:matrix`) is an informational coverage tool — it surfaces
+brand-swap behavior across themes but is NOT the cert authority. Where the two
+disagree, the formal audit wins.
 
 ### Component Development Workflow
 

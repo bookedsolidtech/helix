@@ -807,7 +807,7 @@ export const EmptyForm: Story = {
   render: () => html`
     <hx-form>
       <form>
-        <p style="color: var(--hx-color-neutral-500, #66787B); font-style: italic;">
+        <p style="color: var(--hx-color-text-muted, #4A5362); font-style: italic;">
           No form fields have been configured for this form.
         </p>
         <div class="form-actions">
@@ -1020,7 +1020,7 @@ export const CSSPartsDemo: Story = {
   render: () => html`
     <div style="font-family: sans-serif;">
       <h4 style="margin-bottom: 1rem; font-weight: 600;">Light DOM CSS Class Hooks</h4>
-      <p style="margin-bottom: 1.5rem; color: #6c757d; font-size: 0.875rem;">
+      <p style="margin-bottom: 1.5rem; color: var(--hx-color-text-muted, #4A5362); font-size: 0.875rem;">
         Since hx-form renders in Light DOM, styling is scoped via class-based selectors prefixed
         with <code>hx-form</code>. These classes serve the same purpose as CSS Parts in Shadow DOM
         components.
@@ -1030,10 +1030,10 @@ export const CSSPartsDemo: Story = {
         <form>
           <div
             class="form-item"
-            style="outline: 2px dashed #2563EB; outline-offset: 4px; position: relative;"
+            style="outline: 2px dashed #1E40AF; outline-offset: 4px; position: relative;"
           >
             <span
-              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #2563EB; font-weight: 700;"
+              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #1E40AF; font-weight: 700;"
             >
               .form-item
             </span>
@@ -1049,10 +1049,10 @@ export const CSSPartsDemo: Story = {
 
           <div
             class="form-item error"
-            style="outline: 2px dashed #dc3545; outline-offset: 4px; position: relative;"
+            style="outline: 2px dashed #A21312; outline-offset: 4px; position: relative;"
           >
             <span
-              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #dc3545; font-weight: 700;"
+              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #A21312; font-weight: 700;"
             >
               .form-item.error
             </span>
@@ -1066,10 +1066,10 @@ export const CSSPartsDemo: Story = {
 
           <div
             class="form-item success"
-            style="outline: 2px dashed #198754; outline-offset: 4px; position: relative;"
+            style="outline: 2px dashed #0B4D23; outline-offset: 4px; position: relative;"
           >
             <span
-              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #198754; font-weight: 700;"
+              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #0B4D23; font-weight: 700;"
             >
               .form-item.success
             </span>
@@ -1080,10 +1080,10 @@ export const CSSPartsDemo: Story = {
 
           <div
             class="form-type-checkbox"
-            style="outline: 2px dashed #6f42c1; outline-offset: 4px; position: relative;"
+            style="outline: 2px dashed #5B21B6; outline-offset: 4px; position: relative;"
           >
             <span
-              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #6f42c1; font-weight: 700;"
+              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #5B21B6; font-weight: 700;"
             >
               .form-type-checkbox
             </span>
@@ -1093,10 +1093,10 @@ export const CSSPartsDemo: Story = {
 
           <div
             class="form-actions"
-            style="outline: 2px dashed #fd7e14; outline-offset: 4px; position: relative;"
+            style="outline: 2px dashed #9A3412; outline-offset: 4px; position: relative;"
           >
             <span
-              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #fd7e14; font-weight: 700;"
+              style="position: absolute; top: -12px; left: 8px; background: white; padding: 0 4px; font-size: 0.625rem; color: #9A3412; font-weight: 700;"
             >
               .form-actions
             </span>
@@ -1974,7 +1974,7 @@ export const KeyboardNavigation: Story = {
   name: 'Keyboard Navigation',
   render: () => html`
     <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+      <p style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362); margin-bottom: 0.75rem;">
         Tab navigates through all form fields and submit/reset buttons in document order. Enter submits the form when a submit button is focused.
       </p>
       <hx-form></hx-form>

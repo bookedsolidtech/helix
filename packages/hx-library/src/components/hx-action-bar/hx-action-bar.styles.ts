@@ -118,6 +118,18 @@ export const helixActionBarStyles = css`
     flex-shrink: 0;
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — enforce a ≥2px focus ring on slotted
+   * natives (e.g. bare <button>, <a>) so consumers who slot non-HELiX
+   * controls inherit the same indicator as the HELiX components do.
+   * Token-driven: --hx-focus-ring-width resolves to 2px (default).
+   */
+  ::slotted(:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-action-bar-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   /* ─── High Contrast Mode (forced-colors) ─── */
 
   @media (forced-colors: active) {

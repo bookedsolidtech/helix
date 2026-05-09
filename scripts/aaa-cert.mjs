@@ -145,6 +145,8 @@ function parseArgs(argv) {
     pattern: null,
     stability: 'stable',
     clinical: null,
+    skipFormal: false,
+    skipMatrix: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const tok = argv[i];
@@ -154,6 +156,8 @@ function parseArgs(argv) {
     else if (tok === '--pattern') args.pattern = argv[++i] ?? null;
     else if (tok === '--stability') args.stability = argv[++i] ?? 'stable';
     else if (tok === '--clinical') args.clinical = argv[++i] ?? null;
+    else if (tok === '--skip-formal') args.skipFormal = true;
+    else if (tok === '--skip-matrix') args.skipMatrix = true;
     else if (tok.startsWith('--')) {
       console.warn(`[aaa-cert] unknown flag: ${tok}`);
     } else {
@@ -216,7 +220,8 @@ const ARIA_PATTERN_HEURISTICS = [
   [/^hx-popup$/, 'dialog'],
   [/^hx-file-upload$/, 'button'],
   [/^hx-form$/, 'form'],
-  [/^hx-(field|field-label|help-text|clinical-status)$/, 'label'],
+  [/^hx-(field|field-label|help-text)$/, 'label'],
+  [/^hx-clinical-status$/, 'alert'],
   [/^hx-action-bar$/, 'toolbar'],
 ];
 
@@ -692,6 +697,207 @@ function regenerateCem() {
   }
 }
 
+// ── Cert gate authorities ──────────────────────────────────────────────────
+//
+// PRIMARY GATE — formal WCAG 2.2 audit (scripts/aaa-formal-audit.mjs).
+//
+//   Phase 6 (2026-05-08): the formal audit is the canonical cert verdict
+//   source. It sources every criterion from scripts/aaa-standards.json
+//   (verified W3C URLs) and produces VPAT 2.5 verdicts backed by measured
+//   evidence — never narrative. ALL 11 criteria must resolve to Supports OR
+//   Not Applicable for the cert stamp to apply. Any Partial or Does Not
+//   Support verdict refuses the stamp.
+//
+//   The audit harness writes .reports/formal-aaa-audit/audit.json with a
+//   `results[]` array; we match by `component` and inspect every entry in
+//   `verdicts`.
+//
+//   Bypass with --skip-formal; the bypass is logged so its use is auditable.
+//
+// SECONDARY (informational) — brand × theme coverage matrix
+//   (scripts/aaa-matrix-verify.mjs).
+//
+//   The matrix harness is no longer the cert authority. It is an
+//   informational coverage tool that reports brand × theme behaviour as a
+//   sanity check; its verdict CANNOT block or unblock the cert. The matrix
+//   run is fired in dry-run mode only (so operators see coverage during
+//   cert iteration); a non-zero exit is surfaced as a warning, never as a
+//   gate failure.
+const FORMAL_AUDIT_PATH = resolve(REPO_ROOT, 'scripts/aaa-formal-audit.mjs');
+const FORMAL_AUDIT_OUTPUT = resolve(REPO_ROOT, '.reports/formal-aaa-audit/audit.json');
+const MATRIX_HARNESS_PATH = resolve(REPO_ROOT, 'scripts/aaa-matrix-verify.mjs');
+
+function matrixEvidencePathFor(tagName) {
+  // Mirrors the harness's component-scoped output convention: the harness
+  // writes `.reports/aaa-matrix-evidence.<tag>.md` when invoked with
+  // --component, so the canonical full-matrix evidence at
+  // `.reports/aaa-matrix-evidence.md` is never clobbered by a cert run.
+  return resolve(REPO_ROOT, `.reports/aaa-matrix-evidence.${tagName}.md`);
+}
+
+const PASSING_VERDICTS = new Set(['Supports', 'Not Applicable']);
+const FAILING_VERDICTS = new Set(['Partially Supports', 'Does Not Support']);
+
+function runFormalAuditGate(tagName, { dryRun = false, skipFormal = false } = {}) {
+  if (skipFormal) {
+    const stamp = `[aaa-cert] --skip-formal used at ${new Date().toISOString()} for ${tagName}`;
+    console.warn(`\n[aaa-cert] WARNING: --skip-formal flag set; formal WCAG 2.2 audit BYPASSED.`);
+    console.warn(`           ${stamp}`);
+    console.warn(
+      `           This bypass should only be used when the storybook dev server is unavailable`,
+    );
+    console.warn(
+      `           or when the audit harness is broken. Re-run without --skip-formal before merge.`,
+    );
+    return { skipped: true, status: 'bypassed' };
+  }
+
+  if (!exists(FORMAL_AUDIT_PATH)) {
+    die(
+      `formal audit harness missing: ${FORMAL_AUDIT_PATH}\n` +
+        `   Cert refused: formal WCAG 2.2 audit verification is mandatory. Restore the harness or use --skip-formal to bypass (audited).`,
+    );
+  }
+
+  const label = dryRun ? 'formal audit preview' : 'formal audit gate';
+  console.log(`\n[aaa-cert] running ${label} for ${tagName} (scripts/aaa-formal-audit.mjs)…`);
+  const result = spawnSync('node', [FORMAL_AUDIT_PATH, '--component', tagName], {
+    stdio: 'inherit',
+    cwd: REPO_ROOT,
+  });
+  if (result.error) {
+    die(
+      `failed to spawn formal audit harness: ${result.error.message}\n` +
+        `   This is an environment problem (node missing? path resolution?). Cert refused.`,
+    );
+  }
+  if (result.status !== 0) {
+    die(
+      `formal audit harness exited with status ${result.status} for ${tagName}.\n` +
+        `   The harness is non-blocking by design (always exits 0 on completion); a non-zero\n` +
+        `   exit signals a harness crash, not a verdict. Verify storybook is up at\n` +
+        `   http://localhost:3151 and the component is on the AAA allowlist.`,
+    );
+  }
+
+  // Parse the audit.json for this component's verdicts. Harness-environment
+  // problems (no audit.json, missing entry, browser fetch error) abort a live
+  // cert run but only warn during dry-run so operators can preview the rest
+  // of the cert flow when storybook is down.
+  const harnessProblem = (msg) => {
+    if (dryRun) {
+      console.warn(`\n[aaa-cert] WARNING: ${msg}`);
+      console.warn(`           A live cert run would ABORT here.`);
+      return { skipped: false, status: 'harness-error' };
+    }
+    die(msg);
+  };
+  if (!exists(FORMAL_AUDIT_OUTPUT)) {
+    return harnessProblem(
+      `formal audit ran but produced no audit.json at ${relative(REPO_ROOT, FORMAL_AUDIT_OUTPUT)}.\n` +
+        `   Cannot determine verdict. Re-run the harness manually and inspect.`,
+    );
+  }
+  const report = readJson(FORMAL_AUDIT_OUTPUT);
+  const entry = (report.results ?? []).find((r) => r.component === tagName);
+  if (!entry) {
+    return harnessProblem(
+      `formal audit produced no entry for ${tagName} in ${relative(REPO_ROOT, FORMAL_AUDIT_OUTPUT)}.\n` +
+        `   The audit may have errored on this component. Re-run with --component ${tagName} and inspect.`,
+    );
+  }
+  if (entry.error) {
+    return harnessProblem(
+      `formal audit reported an error for ${tagName}: ${entry.error}\n` +
+        `   Cert refused until the audit completes cleanly.`,
+    );
+  }
+
+  const verdicts = entry.verdicts ?? {};
+  const failing = [];
+  const passing = [];
+  for (const [sc, v] of Object.entries(verdicts)) {
+    const verdict = v?.verdict;
+    if (PASSING_VERDICTS.has(verdict)) {
+      passing.push({ sc, verdict });
+    } else if (FAILING_VERDICTS.has(verdict)) {
+      failing.push({ sc, verdict, evidence: v.evidence });
+    } else {
+      failing.push({ sc, verdict: verdict ?? 'Unknown', evidence: v?.evidence });
+    }
+  }
+
+  if (failing.length === 0) {
+    console.log(
+      `[aaa-cert] formal audit GREEN for ${tagName} — ${passing.length}/${passing.length} criteria Supports/N.A.`,
+    );
+    return { skipped: false, status: 'green', passing, failing };
+  }
+
+  // Non-passing verdicts present.
+  if (dryRun) {
+    console.warn(
+      `\n[aaa-cert] WARNING: formal audit preview reported non-passing verdicts for ${tagName}:`,
+    );
+    for (const f of failing) {
+      console.warn(`             - ${f.sc} → ${f.verdict}: ${f.evidence ?? ''}`);
+    }
+    console.warn(`           A live cert run would ABORT here. Remediate before applying.`);
+    return { skipped: false, status: 'fail', passing, failing };
+  }
+  const failSummary = failing
+    .map((f) => `   - ${f.sc} → ${f.verdict}${f.evidence ? `: ${f.evidence}` : ''}`)
+    .join('\n');
+  die(
+    `Component "${tagName}" failed formal WCAG 2.2 audit — refusing to stamp @aaa-certified.\n` +
+      `   ${failing.length} of ${Object.keys(verdicts).length} criteria are not Supports/Not Applicable:\n` +
+      `${failSummary}\n` +
+      `   See evidence: ${relative(REPO_ROOT, FORMAL_AUDIT_OUTPUT)}\n` +
+      `   To bypass (audited): re-run with --skip-formal.`,
+  );
+}
+
+function runMatrixCoverage(tagName, { skipMatrix = false } = {}) {
+  // Informational ONLY — never blocks the cert. Reports brand × theme
+  // coverage as a sanity check during cert iteration.
+  if (skipMatrix) {
+    console.log(`\n[aaa-cert] --skip-matrix set; skipping informational matrix coverage run.`);
+    return { skipped: true, status: 'bypassed' };
+  }
+  if (!exists(MATRIX_HARNESS_PATH)) {
+    console.warn(
+      `\n[aaa-cert] note: matrix harness missing at ${relative(REPO_ROOT, MATRIX_HARNESS_PATH)}; coverage check skipped.`,
+    );
+    return { skipped: true, status: 'missing' };
+  }
+  const evidencePath = matrixEvidencePathFor(tagName);
+  console.log(
+    `\n[aaa-cert] running matrix coverage (informational) for ${tagName} (scripts/aaa-matrix-verify.mjs)…`,
+  );
+  const result = spawnSync('node', [MATRIX_HARNESS_PATH, '--component', tagName], {
+    stdio: 'inherit',
+    cwd: REPO_ROOT,
+  });
+  if (result.error) {
+    console.warn(
+      `[aaa-cert] note: matrix coverage harness failed to spawn (${result.error.message}); cert verdict UNAFFECTED.`,
+    );
+    return { skipped: false, status: 'spawn-error' };
+  }
+  if (result.status === 0) {
+    console.log(
+      `[aaa-cert] matrix coverage GREEN for ${tagName} — see ${relative(REPO_ROOT, evidencePath)}`,
+    );
+    return { skipped: false, status: 'green' };
+  }
+  console.warn(
+    `[aaa-cert] note: matrix coverage reported gaps (exit ${result.status}) for ${tagName}.\n` +
+      `           This is INFORMATIONAL ONLY. The cert verdict comes from the formal audit above.\n` +
+      `           Inspect ${relative(REPO_ROOT, evidencePath)} for brand × theme coverage details.`,
+  );
+  return { skipped: false, status: 'gaps' };
+}
+
 function stageChanges(plan) {
   const paths = [
     plan.auditAbsPath,
@@ -775,7 +981,9 @@ function printApplyHeader(plan) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args._.length === 0) {
-    die('usage: pnpm exec node scripts/aaa-cert.mjs <component-name> [--dry-run]');
+    die(
+      'usage: pnpm exec node scripts/aaa-cert.mjs <component-name> [--dry-run] [--skip-formal] [--skip-matrix]',
+    );
   }
   const tagName = args._[0];
 
@@ -783,12 +991,28 @@ function main() {
 
   if (args.dryRun) {
     printDryRun(plan);
+    // PRIMARY (cert authority): formal WCAG 2.2 audit. In dry-run, failures
+    // are reported as warnings (dry-run never aborts) but a live run with
+    // the same state would abort.
+    runFormalAuditGate(tagName, { dryRun: true, skipFormal: args.skipFormal });
+    // SECONDARY (informational): brand × theme coverage matrix. Never gates.
+    runMatrixCoverage(tagName, { skipMatrix: args.skipMatrix });
     return;
   }
 
   if (!plan.patchApplied) {
     die(`JSDoc patch failed: ${plan.patchReason}. Resolve manually and re-run.`);
   }
+
+  // PRIMARY GATE: formal WCAG 2.2 audit (scripts/aaa-formal-audit.mjs).
+  // Sources verdicts from scripts/aaa-standards.json with verified W3C URLs;
+  // backed by measured evidence. ALL 11 criteria must be Supports/Not
+  // Applicable to stamp @aaa-certified.
+  runFormalAuditGate(tagName, { dryRun: false, skipFormal: args.skipFormal });
+
+  // SECONDARY (informational): brand × theme coverage matrix. Never blocks
+  // the cert; surfaces brand-swap behaviour as a sanity check.
+  runMatrixCoverage(tagName, { skipMatrix: args.skipMatrix });
 
   printApplyHeader(plan);
   applyPlan(plan);

@@ -14,6 +14,20 @@ export const helixPopupStyles = css`
     display: inline-block;
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — enforce a ≥2px focus ring on slotted
+   * trigger / anchor controls. hx-popup is a positioning primitive: it
+   * paints no surface itself, but slotted natives (<button>, <a>) must
+   * still meet the AAA ring threshold. Token-driven.
+   */
+  ::slotted([slot='anchor']:focus-visible),
+  ::slotted(button:focus-visible),
+  ::slotted(a:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-popup-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   [part='popup'] {
     position: fixed;
     z-index: var(--hx-popup-z-index, 9000);

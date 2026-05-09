@@ -1076,10 +1076,11 @@ describe('hx-button', () => {
       expect(css).toMatch(/\.button--danger:active\s*\{[^}]*filter:\s*none/);
     });
 
-    it('action.primary.bg-active resolves to primary-800 (#07494A)', async () => {
-      // 3.3.0: action.primary.bg chain shifted (rest=primary-600, hover=primary-700,
-      // active=primary-800) for AAA-large white-on-fill across all 6 brands.
-      expect(await resolveSemantic('--hx-color-action-primary-bg-active')).toBe('rgb(7, 73, 74)');
+    it('action.primary.bg-active resolves to primary-900 (#0B3232)', async () => {
+      // 3.8.0: action.primary.bg chain shifted again (rest=primary-700,
+      // hover=primary-800, active=primary-900) for AAA-strict 7:1 white-on-fill
+      // across all 6 brands. Was 3.3.0 chain (rest=600, hover=700, active=800).
+      expect(await resolveSemantic('--hx-color-action-primary-bg-active')).toBe('rgb(11, 50, 50)');
     });
 
     it('action.danger.bg-active resolves to error-700 (#A21312)', async () => {

@@ -89,6 +89,25 @@ export interface HxRatingHoverDetail {
  * @cssprop [--hx-color-warning-400] - Color.
  * @cssprop [--hx-color-warning-300] - Color.
  * @cssprop [--hx-color-neutral-300] - Color.
+ *
+ * @aaa-certified 2026-05-09
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-rating/AAA-AUDIT.md
+ * @keyboard-contract navigate=Arrow; activate=Space; disabled-suppresses=true
+ * @aria-pattern radiogroup
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/radio/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated true
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-rating
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-rating')
 export class HelixRating extends FormMixin(HelixElement) {

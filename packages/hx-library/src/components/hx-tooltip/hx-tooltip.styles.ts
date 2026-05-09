@@ -17,6 +17,19 @@ export const helixTooltipStyles = css`
     display: inline-block;
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — enforce a ≥2px focus ring on the slotted
+   * trigger. APG forbids the tooltip body from holding focus, so the
+   * trigger is the only AAA-relevant focus surface. Token-driven.
+   */
+  ::slotted([slot='trigger']:focus-visible),
+  ::slotted(button:focus-visible),
+  ::slotted(a:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-tooltip-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   [part='tooltip'] {
     position: fixed;
     z-index: var(--hx-tooltip-z-index, var(--hx-z-index-tooltip, 1600));

@@ -10,6 +10,16 @@ export const helixRadioGroupStyles = css`
     pointer-events: none;
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — host-level focus ring for the group host
+   * when it carries focus via roving tabindex. Token-driven: ≥2px width.
+   */
+  :host(:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-radio-group-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   * {
     box-sizing: border-box;
   }
