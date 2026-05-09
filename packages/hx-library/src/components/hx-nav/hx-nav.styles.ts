@@ -100,13 +100,19 @@ export const helixNavStyles = css`
   }
 
   .nav__link--active {
-    background-color: var(--hx-nav-link-active-bg, var(--hx-color-primary-600, #0f7078));
+    background-color: var(--hx-nav-link-active-bg, var(--hx-color-action-primary-bg, #0f6363));
     /* Use --hx-color-text-on-primary so the active-link text inherits the
-     * action-surface AAA-large pairing (white on primary-600 in default
-     * themes; black on lighter primary-600 in the high-contrast theme).
-     * Hardcoding white here previously failed AAA-large in high-contrast
-     * (ratio 2.54 vs. 4.5 floor). The token is the same one button surfaces
-     * use to satisfy 1.4.6 across the 6-brand × 3-theme matrix. */
+     * action-surface AAA-strict pairing (white on primary-700 in default
+     * themes; black on lighter primary-700 in the high-contrast theme).
+     * Pre-3.4.0 this consumed --hx-color-primary-600 directly which
+     * resolved to Apex #0F7078 + white = 5.82:1 — AAA-large only, AAA
+     * normal fail under WCAG 1.4.6 for body-text-sized link labels. The
+     * Phase 4 Tier 3 chain shift moved action.primary.bg to primary-700
+     * (Apex 7.03:1 with white) and consuming the action semantic here
+     * picks up the AAA-strict pairing across the full 6-brand matrix.
+     * Hardcoding white previously failed AAA-large in high-contrast
+     * (ratio 2.54 vs. 4.5 floor); the on-primary token resolves correctly
+     * in HC mode. */
     color: var(--hx-nav-link-active-color, var(--hx-color-text-on-primary, #ffffff));
   }
 
