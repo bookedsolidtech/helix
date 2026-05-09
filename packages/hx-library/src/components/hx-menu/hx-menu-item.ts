@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixMenuItemStyles } from './hx-menu-item.styles.js';
@@ -503,18 +504,12 @@ export class HelixMenuItem extends HelixElement {
   private _renderCheckedIcon() {
     return html`
       <span part="checked-icon" class="menu-item__checked-icon" aria-hidden="true">
-        <svg
-          width="1em"
-          height="1em"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="3"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
+        <hx-icon
+          class="menu-item__glyph"
+          library="helix"
+          name="check"
+          aria-hidden="true"
+        ></hx-icon>
       </span>
     `;
   }
@@ -523,18 +518,12 @@ export class HelixMenuItem extends HelixElement {
   private _renderSubmenuIcon() {
     return html`
       <span part="submenu-icon" class="menu-item__submenu-icon" aria-hidden="true">
-        <svg
-          width="1em"
-          height="1em"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
+        <hx-icon
+          class="menu-item__glyph"
+          library="helix"
+          name="chevron-right"
+          aria-hidden="true"
+        ></hx-icon>
       </span>
     `;
   }

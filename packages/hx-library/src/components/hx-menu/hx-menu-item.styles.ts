@@ -89,6 +89,11 @@ export const helixMenuItemStyles = css`
     margin-inline-start: auto;
   }
 
+  /* hx-icon glyph sizing for migrated checked / submenu indicators (1em parity). */
+  .menu-item__glyph {
+    --hx-icon-size: 1em;
+  }
+
   .menu-item__spinner {
     width: 1em;
     height: 1em;
