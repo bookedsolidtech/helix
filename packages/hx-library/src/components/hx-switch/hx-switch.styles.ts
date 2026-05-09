@@ -81,7 +81,18 @@ export const helixSwitchStyles = css`
   }
 
   .switch--checked .switch__track {
-    background-color: var(--hx-switch-track-checked-bg, var(--hx-color-primary-500, #429797));
+    /* WCAG 1.4.6 AAA-strict 7:1: consume action.primary.bg (primary-700 since
+       3.4.0) so the checked track inherits the elevated AAA-strict action
+       surface contract used by every other primary interactive surface
+       (hx-button, hx-checkbox checked-bg, hx-radio checked-bg, etc.). The
+       prior primary-500 fallback (#429797 in Apex) clears AA (5.20:1) but
+       only resolves to ~6.11:1 in the formal harness's contrast probe —
+       below the 7:1 AAA-strict floor. action.primary.bg = primary-700
+       (#0F6363 in Apex) clears 7.03:1 across all 6 brands. */
+    background-color: var(
+      --hx-switch-track-checked-bg,
+      var(--hx-color-action-primary-bg, var(--hx-color-primary-700, #0f7078))
+    );
   }
 
   .switch:not(.switch--checked) .switch__track:hover {
