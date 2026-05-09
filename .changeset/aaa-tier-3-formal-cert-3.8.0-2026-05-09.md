@@ -4,19 +4,26 @@
 '@helixui/react': minor
 ---
 
-AAA Tier 3 — Full library formal cert against WCAG 2.2 AAA (3.8.0).
+AAA Tier 3 — full P0 surface measured against WCAG 2.2 AAA via formal audit harness (3.8.0).
 
-**43/43 P0 components AAA-certified** against the full WCAG 2.2 AAA criteria set. Formal audit harness (`scripts/aaa-formal-audit.mjs`) sweeps all 43 components × 11 AAA criteria in a live browser session and produces an empirical verdict matrix. Latest verification run: **473/473 cells (356 Supports + 117 N/A) — zero Partials, zero Fails** (snapshot at `.reports/formal-aaa-audit/PRE-RELEASE-VERIFICATION-3.8.0.md`).
+## Posture (read this first)
 
-Phase D completion (2026-05-09) added the final 9 P0 components:
+This release ships **self-attested AAA conformance posture** for 43 P0 components against WCAG 2.2 AAA, sourced from a formal audit harness with W3C-cited spec URLs and three-way cross-tool agreement (axe-core + WCAG luminance math + CEM helixMeta claims).
 
-- **Live regions** — `hx-toast`, `hx-banner` (alert pattern; severity-driven role=alert / role=status)
-- **Sliders** — `hx-slider` (native `<input type="range">` slider pattern), `hx-rating` (radiogroup pattern; precision=1 radiogroup, precision=0.5 slider)
-- **Form assembly + helpers** — `hx-form` (HTML AAM form landmark), `hx-field`, `hx-field-label`, `hx-help-text`, `hx-clinical-status` (alert pattern with severity tiers + PHI handling)
+**This is NOT a third-party-signed VPAT 2.5 cert.** Such a cert requires engagement with a credentialed accessibility vendor (e.g., Deque, TPGi, Level Access) and is on the roadmap, not in this release. We deliberately use "conformance posture per WCAG 2.2" (not "AAA Certified") in messaging to avoid mis-stating the legal/compliance weight of the claim.
 
-Form assembly primitives are documented as structural / coordinator patterns (HTML AAM landmark + WAI-ARIA 1.2 group / label). Keyboard contract is provided by child form-controls or the user agent. Native `<input type="range">` slider keyboard contract is delegated to the user agent (Arrow keys + Home/End + PageUp/PageDown).
+What this release IS: the most rigorous self-attested AAA evidence stack we know of in any open enterprise web-component library. What it is NOT: a substitute for third-party AAA certification.
 
-**Criteria matrix (11 axes, all components):**
+## What ships
+
+**43 of 43 P0 components measured against 11 AAA criteria** via the formal audit harness:
+
+- Latest verification run: **473/473 cells, 356 Supports + 117 Not Applicable, zero Partials, zero Fails**
+- Snapshot: `.reports/formal-aaa-audit/PRE-RELEASE-VERIFICATION-3.8.0.md` (gitignored evidence)
+- Cert toolkit (`scripts/aaa-cert.mjs`) gates on formal audit verdict, not the informational matrix harness
+- Standards reference: `scripts/aaa-standards.json` (46 W3C URLs WebFetch-verified 2026-05-08)
+
+**Criteria measured per component (11 axes):**
 
 - 1.4.6 Contrast (Enhanced)
 - 1.4.9 Images of Text (No Exception)
@@ -27,20 +34,57 @@ Form assembly primitives are documented as structural / coordinator patterns (HT
 - 2.5.5 Target Size (Enhanced)
 - 3.2.5 Change on Request
 - 3.3.6 Error Prevention (All)
-- forced-colors media query support
-- WAI-ARIA APG keyboard pattern conformance
+- forced-colors media query support (peer standard, not WCAG)
+- WAI-ARIA APG keyboard pattern conformance (peer standard, not WCAG)
 
-**Phase 4–6 component fixes** rolled into the 43-component cert pass: focus-appearance hardening, forced-colors fallback on every interactive element, target-size compliance (44×44 minimum on touch surfaces; user-agent exemption documented for native slider thumbs), APG keyboard patterns audited per component, and verdict-driven evidence captured per component under `.reports/formal-aaa-audit/evidence/`.
+Per-component evidence in `.reports/formal-aaa-audit/evidence/<tag>.json` captures measured contrast ratios, computed outline width/offset, target rect sizes, focus-visible behavior, and APG keyboard contract verification.
 
-**Token shifts** (semantic-tier only — consumer overrides remain stable):
+**43 P0 components** spanning form inputs (9), selection controls (4), buttons (7), navigation (8), overlays (5), live regions (3), sliders (2), form assembly (2), and field helpers (3).
 
-- Focus-ring tokens hardened for AAA focus-appearance contrast (3:1 against adjacent surfaces, in addition to the existing 2px outline + offset).
-- Forced-colors mode bindings expanded across all interactive components — `CanvasText`, `ButtonText`, `Highlight` system colors now consumed correctly via `@media (forced-colors: active)` blocks.
+## Phase 4 component fixes rolled in
 
-**Storybook MDX template** (`apps/storybook/.storybook/blocks/aaa-story-template.mdx`) — applied to 5 anchor components (`hx-button`, `hx-checkbox`, `hx-alert`, `hx-text-input`, `hx-dialog`, `hx-tabs`) as the canonical pattern for healthcare-context AAA story documentation. Each anchor ships a hero scenario (informed-consent, destructive confirmation, patient chart, etc.) with criteria chips, keyboard contract, and screen-reader notes.
+- Token chain shift: `--hx-color-action-primary-bg` resolves to `primary-700` (was `primary-600`) for AAA-strict 7:1 across all 6 brands
+- Touch-target compliance: button family default `md` size 40 → 44px to meet 2.5.5 (Enhanced)
+- Hit-area expansions on form fields, navigation links, side-nav toggle, color picker controls, date/time picker triggers
+- hx-switch checked-track now consumes `action.primary.bg` (was primary-500 directly)
+- Focus-ring contrast hardening across components where the previous semantic ring missed AAA contrast against adjacent surfaces
 
-**Visual changes flagged:** focus rings are slightly thicker on certain components where the previous semantic ring failed AAA contrast against the surface; forced-colors mode now paints distinct interactive states (was inheriting). Consumers who screenshot-test forced-colors output should re-baseline.
+## Documentation
 
-**No breaking API.** All public attributes, slots, events, CSS parts, and CSS custom properties are backwards-compatible. CEM regenerates with `helixMeta` AAA cert metadata on every certified component.
+- 43 `AAA-AUDIT.md` files regenerated against `scripts/AAA-AUDIT.formal.template.md` using VPAT 2.5 verdict language ("Supports" / "Not Applicable") and W3C spec URLs
+- Storybook A11y Dashboard with live cert-count hero (reads CEM directly, refreshes on every cert)
+- 5 anchor components (hx-button, hx-text-input, hx-checkbox, hx-dialog, hx-tabs) ship MDX stories as proper AAA conformance documentation (hero scenario + AAA card + APG walkthrough + consumer obligations + InlineAuditPanel embed)
+- Remaining 38 component MDX rewrites land in subsequent minors
 
-**Audit harness now part of the gate:** `pnpm aaa:matrix` runs the full 43-component sweep against a live Storybook (port 3151). Required pre-release verification step.
+## Cert tooling
+
+- `scripts/aaa-formal-audit.mjs` — formal audit harness, cert authority for `pnpm aaa:cert`
+- `scripts/aaa-standards.json` — WCAG 2.2 reference with 46 verified W3C URLs
+- `scripts/aaa-matrix-verify.mjs` — demoted to informational coverage tool (header banner explicit; not a cert authority)
+- `pnpm aaa:audit` alias — runs the full 43-component formal sweep against live Storybook
+
+## Visual changes consumers should re-baseline
+
+- Button family default density grew 4px (40 → 44 per WCAG 2.5.5 mandate)
+- Hit-area expansions (visual icon/label sizes preserved; only padding/min-height grew)
+- Primary action surfaces darkened from primary-600 to primary-700
+- hx-switch checked-track shifted accordingly
+- Focus rings rendered slightly thicker on a handful of components
+- Forced-colors mode now paints distinct interactive states (was inheriting)
+
+Consumers who screenshot-test forced-colors output OR who pinned layouts to 40px button heights should re-baseline.
+
+## NOT a breaking change
+
+Token NAMES unchanged. Component PROPS, slots, events, CSS parts, CSS custom properties unchanged. CEM schema additive (`helixMeta` field expanded). Public API surface stable.
+
+## Roadmap before VPAT v1.0
+
+This release is the **starting line** for AAA conformance posture, not the finish. Prior to publishing a VPAT 2.5 with legal/compliance weight, we are:
+
+1. **Tier 1 — harness self-validation** (1-2 days): build broken-component fixtures, cross-tool comparison (WAVE / IBM Equal Access / axe DevTools), cross-browser Playwright (Firefox + WebKit + Chromium)
+2. **Tier 2 — manual AT testing + methodology doc** (1 week): NVDA / VoiceOver runs on anchor components with announcement transcripts, published audit methodology
+3. **Helixir a11y extension** — externalize the formal audit harness as a Helixir MCP tool so the same cert lens can audit ANY web-component library (positioning HELiX as the toolmaker, not just a cert holder)
+4. **Third-party AAA audit** — engage Deque / TPGi / Level Access for credentialed VPAT 2.5 sign-off, only after Tier 1+2 close and we are 1000% ready
+
+Until that path completes, public-facing language is "AAA conformance posture / self-attested per WCAG 2.2 with formal audit harness." VPAT v1.0 publication is held.
