@@ -113,10 +113,10 @@ export const helixNumberInputStyles = css`
     color: var(--hx-number-input-color, var(--hx-color-text-strong));
     line-height: var(--hx-line-height-normal);
     width: 100%;
-    /* Size: md (default) */
+    /* Size: md (default) — WCAG 2.5.5 (Enhanced) AAA touch target. */
     padding: var(--hx-space-2) var(--hx-space-3);
     font-size: var(--hx-font-size-md);
-    min-height: var(--hx-size-10);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .field__input::placeholder {

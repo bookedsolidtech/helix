@@ -148,6 +148,10 @@ export const helixSplitButtonStyles = css`
 
   .split-button--md .split-button__trigger {
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
+    /* WCAG 2.5.5 (Enhanced) AAA — chevron trigger must clear 44×44 in
+       BOTH dimensions. Without min-width, the trigger collapses to its
+       icon width (~38 px) and fails the brand-theme matrix audit. */
+    min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
   }
 

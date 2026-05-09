@@ -235,7 +235,10 @@ export const helixTextInputStyles = css`
     font-size: var(--_text-input-font-size);
     color: var(--_text-input-color);
     line-height: var(--hx-line-height-normal, 1.5);
-    min-height: var(--hx-size-10, 2.5rem);
+    /* WCAG 2.5.5 (Enhanced) AAA — primary input surface must meet 44×44.
+       --hx-touch-target-min resolves to 2.75rem (44px); --hx-size-10 alone
+       resolves to 2.5rem (40px) and fails AAA on the inner input. */
+    min-height: var(--hx-touch-target-min, 2.75rem);
     width: 100%;
   }
 

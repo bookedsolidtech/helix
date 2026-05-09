@@ -210,6 +210,11 @@ export const helixColorPickerStyles = css`
   }
   .format-btn {
     flex-shrink: 0;
+    /* WCAG 2.5.5 (Enhanced) AAA — interactive panel controls must clear
+       44×44. Without min-width/min-height the format toggle collapses to
+       its label box (~44×24 in default rendering, sub-44 on the y-axis). */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     background: var(--hx-color-neutral-100, #ebeee9);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
@@ -226,6 +231,8 @@ export const helixColorPickerStyles = css`
   .color-input {
     flex: 1;
     min-width: 0;
+    /* WCAG 2.5.5 (Enhanced) AAA — text input must clear 44×44. */
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-sm, 0.25rem);

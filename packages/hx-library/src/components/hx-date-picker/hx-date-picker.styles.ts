@@ -107,7 +107,8 @@ export const helixDatePickerStyles = css`
     font-size: var(--hx-font-size-md, 1rem);
     color: var(--hx-date-picker-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
-    min-height: var(--hx-size-10, 2.5rem);
+    /* WCAG 2.5.5 (Enhanced) AAA — primary input surface must meet 44×44. */
+    min-height: var(--hx-touch-target-min, 2.75rem);
     width: 100%;
     cursor: default;
   }
@@ -128,6 +129,10 @@ export const helixDatePickerStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
+    /* WCAG 2.5.5 (Enhanced) AAA — calendar trigger must clear 44×44.
+       Without min-width the icon button collapses to ~41 px wide. */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: 0 var(--hx-space-3, 0.75rem);
     border: none;
     border-left: var(--hx-border-width-thin, 1px) solid

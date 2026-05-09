@@ -77,7 +77,8 @@ export const helixTimePickerStyles = css`
     font-size: var(--hx-font-size-md, 1rem);
     color: var(--hx-time-picker-color, var(--hx-color-text-strong, #202b39));
     line-height: var(--hx-line-height-normal, 1.5);
-    min-height: var(--hx-size-10, 2.5rem);
+    /* WCAG 2.5.5 (Enhanced) AAA — primary input surface must meet 44×44. */
+    min-height: var(--hx-touch-target-min, 2.75rem);
     width: 100%;
     cursor: text;
   }
@@ -97,7 +98,11 @@ export const helixTimePickerStyles = css`
     color: var(--hx-time-picker-chevron-color, var(--hx-color-text-muted, #4a5362));
     cursor: pointer;
     height: 100%;
-    min-height: var(--hx-size-10, 2.5rem);
+    /* WCAG 2.5.5 (Enhanced) AAA — toggle button must meet 44×44 in
+       BOTH dimensions; without min-width the icon button collapses to
+       ~41 px wide and fails the matrix audit. */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     flex-shrink: 0;
     border-inline-start: var(--hx-border-width-thin, 1px) solid
       var(--hx-time-picker-border-color, var(--hx-color-border-strong, #66787b));
