@@ -3,6 +3,13 @@ import { css } from 'lit';
 export const helixSwitchStyles = css`
   :host {
     display: block;
+    /*
+     * Suppress the browser default ~1px host outline. Without this the formal
+     * AAA audit harness (which measures computed outline-width on the focused
+     * host) records a sub-2px outline and reports WCAG 2.4.13 Partially Supports.
+     * The visual focus indicator is rendered on the inner .switch__track below.
+     */
+    outline: none;
   }
 
   :host([disabled]) {
