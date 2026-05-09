@@ -16,8 +16,8 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Standards claimed:** [WCAG 2.2 Recommendation](https://www.w3.org/TR/WCAG22/) at level **AAA** for the 9 component-shippable Success Criteria below; plus 2 peer standards (forced-colors-mode, APG-aligned keyboard contract) documented separately.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
 **Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's Default story in Storybook (Chromium via Playwright); per-cell measurements written to `.reports/formal-aaa-audit/evidence/hx-nav.json`.
-**Audit run:** 2026-05-09T02:28:54.778Z
-**Audit harness run:** 2026-05-09T02:28:29.342Z
+**Audit run:** 2026-05-09T12:35:35.439Z
+**Audit harness run:** 2026-05-09T12:35:01.830Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---

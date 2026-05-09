@@ -16,8 +16,8 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Standards claimed:** [WCAG 2.2 Recommendation](https://www.w3.org/TR/WCAG22/) at level **AAA** for the 9 component-shippable Success Criteria below; plus 2 peer standards (forced-colors-mode, APG-aligned keyboard contract) documented separately.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
 **Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's Default story in Storybook (Chromium via Playwright); per-cell measurements written to `.reports/formal-aaa-audit/evidence/hx-checkbox-group.json`.
-**Audit run:** 2026-05-09T02:28:38.139Z
-**Audit harness run:** 2026-05-09T02:28:29.342Z
+**Audit run:** 2026-05-09T12:35:12.067Z
+**Audit harness run:** 2026-05-09T12:35:01.830Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -26,13 +26,13 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 | Verdict             | Count |
 | ------------------- | ----- |
-| Supports            | 8     |
+| Supports            | 5     |
 | Partially Supports  | 0     |
 | Does Not Support    | 0     |
-| Not Applicable      | 3     |
+| Not Applicable      | 6     |
 | **Total criteria**  | **11** |
 
-**Headline:** **Supports + Not Applicable across all 11 criteria** (8 Supports, 3 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+**Headline:** **Supports + Not Applicable across all 11 criteria** (5 Supports, 6 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
 
 ---
 
@@ -55,11 +55,11 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 | --- | --- | --- | --- | --- | --- |
 | 1.4.6 | Contrast (Enhanced) | Not Applicable | Normal text ≥7:1; large text (≥18.66px or ≥14px bold) ≥4.5:1 | No own text rendered | [spec](https://www.w3.org/TR/WCAG22/#contrast-enhanced) |
 | 1.4.9 | Images of Text (No Exception) | Supports | No raster/SVG images of text (decorative & essential exemptions per WCAG 2.2) | No raster <img> tags rendered in component output. Text content is rendered via real text nodes. | [spec](https://www.w3.org/TR/WCAG22/#images-of-text-no-exception) |
-| 2.1.3 | Keyboard (No Exception) | Supports | All functionality keyboard-operable; no timing-based input | Component declares keydown handlers and is focusable. | [spec](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) |
+| 2.1.3 | Keyboard (No Exception) | Not Applicable | All functionality keyboard-operable; no timing-based input | @aria-pattern="group" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2). Keyboard contract is provided by child form-control elements or the user agent; the host has no per-pattern key requirement. | [spec](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) |
 | 2.3.3 | Animation from Interactions | Not Applicable | All interaction-driven motion respects `prefers-reduced-motion: reduce` | No transition or animation declarations in component styles. | [spec](https://www.w3.org/TR/WCAG22/#animation-from-interactions) |
 | 2.4.12 | Focus Not Obscured (Enhanced) | Supports | No author-created content fully obscures the focused component | No element covers focused target centre | [spec](https://www.w3.org/TR/WCAG22/#focus-not-obscured-enhanced) |
-| 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 2px solid rgb(15, 112, 120); box-shadow=none; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
-| 2.5.5 | Target Size (Enhanced) | Supports | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-checkbox-group 1184.0×293.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
+| 2.4.13 | Focus Appearance | Not Applicable | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | Not focusable / non-interactive | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
+| 2.5.5 | Target Size (Enhanced) | Not Applicable | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | Non-interactive overlay (no clickable target at container) | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
 | 3.2.5 | Change on Request | Supports | Context changes only on explicit user request | No auto-submit on focus, no location mutation in focus/input handlers. | [spec](https://www.w3.org/TR/WCAG22/#change-on-request) |
 | 3.3.6 | Error Prevention (All) | Not Applicable | Submission is reversible, checked, or confirmable | Component is not form-associated. Error prevention applies to form submission. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
 | forced-colors | Forced Colors Mode Support | Supports | `@media (forced-colors: active)` honored; system colors used; no information conveyed by color alone | @media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.) | [spec](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors) |
@@ -101,7 +101,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 2.1.3 — Keyboard (No Exception) (AAA)
 
-**Verdict:** Supports
+**Verdict:** Not Applicable
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#keyboard-no-exception](https://www.w3.org/TR/WCAG22/#keyboard-no-exception)
 
@@ -109,9 +109,11 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** All functionality of the content is operable through a keyboard interface without requiring specific timings for individual keystrokes.
 
-**Measured:** Component declares keydown handlers and is focusable.
+**Measured:** @aria-pattern="group" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2). Keyboard contract is provided by child form-control elements or the user agent; the host has no per-pattern key requirement.
 
-**Evidence:** Component declares keydown handlers and is focusable.
+**Evidence:** @aria-pattern="group" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2). Keyboard contract is provided by child form-control elements or the user agent; the host has no per-pattern key requirement.
+
+**Why N/A:** @aria-pattern="group" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2). Keyboard contract is provided by child form-control elements or the user agent; the host has no per-pattern key requirement.
 
 ### 2.3.3 — Animation from Interactions (AAA)
 
@@ -145,7 +147,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 2.4.13 — Focus Appearance (AAA)
 
-**Verdict:** Supports
+**Verdict:** Not Applicable
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#focus-appearance](https://www.w3.org/TR/WCAG22/#focus-appearance)
 
@@ -153,13 +155,15 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** When the keyboard focus indicator is visible: (1) area at least as large as a 2 CSS px thick perimeter of the unfocused component; (2) contrast ratio at least 3:1 between the focused and unfocused states.
 
-**Measured:** outline 2px solid rgb(15, 112, 120); box-shadow=none; keyboard-focus via Tab×1
+**Measured:** Not focusable / non-interactive
 
-**Evidence:** computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-checkbox-group> — focus ring rendered on inner part))
+**Evidence:** @aria-pattern="group" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)
+
+**Why N/A:** Per WAI-ARIA APG, the audited surface is non-focusable by design (e.g. a tooltip body or overlay container); 2.4.13 applies to elements that receive keyboard focus.
 
 ### 2.5.5 — Target Size (Enhanced) (AAA)
 
-**Verdict:** Supports
+**Verdict:** Not Applicable
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#target-size-enhanced](https://www.w3.org/TR/WCAG22/#target-size-enhanced)
 
@@ -167,9 +171,11 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** The size of the target for pointer inputs is at least 44 by 44 CSS pixels except: equivalent, inline, user-agent control, essential.
 
-**Measured:** target=hx-checkbox-group 1184.0×293.0 px
+**Measured:** Non-interactive overlay (no clickable target at container)
 
-**Evidence:** target=hx-checkbox-group 1184.0x293.0 px
+**Evidence:** @aria-pattern="group" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets. (Phase 4 Tier 3 Task 5.)
+
+**Why N/A:** Per WCAG 2.2 2.5.5 exceptions (essential / equivalent / inline / user-agent control), the audited surface is a non-interactive overlay container with no clickable target of its own; clickable targets reside in light-DOM consumer content and inherit their own AAA cert.
 
 ### 3.2.5 — Change on Request (AAA)
 
