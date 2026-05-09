@@ -72,9 +72,8 @@ export const helixPhiFieldStyles = css`
     opacity: var(--hx-opacity-50, 0.5);
   }
 
-  .phi-field__toggle svg {
-    width: 1em;
-    height: 1em;
+  .phi-field__glyph {
+    --hx-icon-size: 1em;
     pointer-events: none;
   }
 
