@@ -185,6 +185,16 @@ const APG_KEYBOARD_EXPECTATIONS = {
   //   with no required keyboard contract. Items inside the group
   //   dictate keyboard behaviour.
   group: [],
+  // Primitive: positioning / structural utilities that surface no widget
+  //   role of their own. hx-popup is the canonical example — it owns
+  //   anchor positioning math but delegates focus, dismissal, and any
+  //   keyboard contract to whatever the consumer slots in (the slotted
+  //   content may be a dialog, menu, listbox, or non-widget content).
+  //   Components that declare `@aria-pattern none` are asserting "I am
+  //   not a widget; my keyboard contract is N/A by design." Phase 4
+  //   Tier 3 Task 4 — preferred to dropping the @aria-pattern tag,
+  //   which the table-lookup branch above scores Partial.
+  none: [],
 };
 
 // ── Standards reference loader ──────────────────────────────────────────────
