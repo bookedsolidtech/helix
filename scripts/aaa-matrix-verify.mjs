@@ -1,35 +1,45 @@
-// AAA matrix verification harness — Phase C cert hardening + AAA-cert gate.
-// Up to 5 components × 6 brands × 3 themes = 90 contexts (default scope).
-// Evaluates the 11 component-shippable AAA criteria per Pattern A11y AAA Path.
-//
-// VERDICT AUTHORITY (Tier-1 Task-4, 2026-05-08): the canonical formal audit
-// harness is `scripts/aaa-formal-audit.mjs`, which produces VPAT 2.5
-// verdicts (Supports / Partially Supports / Does Not Support / Not
-// Applicable) backed by measurable evidence and direct WCAG citations. The
-// matrix harness exists to verify that the SAME findings hold across every
-// brand × theme combination — it is a coverage gate, not a verdict authority.
-// Where the two harnesses disagree, defer to the formal audit. Several
-// invented carve-outs that previously whitewashed matrix passes — the
-// "40px desktop md" 2.5.5 carve-out, the "first-party nav-link" container
-// exemption, the side-nav 32x32 toggle exemption, the color-picker swatch
-// height exemption, and the action-surface AAA-large pairing for 16px
-// regular text — were retired in this round because none of them mapped
-// to a normative WCAG 2.2 SC exception. The matrix will now surface MORE
-// failures than the prior pass — that is the point.
-//
-// Output:
-//   .reports/aaa-matrix-evidence.md  (gitignored)
-// Exit:
-//   0 = MATRIX_GREEN (zero unexpected fails)
-//   1 = MATRIX_GAPS_FOUND (one or more programmatic FAILs)
-//   2 = HARNESS_USAGE_ERROR (bad flag, unknown component, etc.)
-//
-// Usage:
-//   node scripts/aaa-matrix-verify.mjs                 # all known components
-//   node scripts/aaa-matrix-verify.mjs --component hx-button   # single component
-//   node scripts/aaa-matrix-verify.mjs --help
-//
-// Requires storybook on http://localhost:3151. DO NOT start/stop the dev server.
+/**
+ * AAA matrix verification — INFORMATIONAL COVERAGE TOOL
+ *
+ * This harness reports brand × theme × criterion coverage as a sanity check.
+ * It is NOT the cert authority. The cert verdict comes from
+ * scripts/aaa-formal-audit.mjs which sources WCAG 2.2 thresholds from
+ * scripts/aaa-standards.json with verified W3C URLs.
+ *
+ * Use cases:
+ *   - Quick visual coverage matrix during cert iteration
+ *   - Spot-check brand-swap behavior across themes
+ *
+ * NOT for use cases:
+ *   - Cert verdict authority (use aaa-formal-audit.mjs)
+ *   - VPAT 2.5 row generation (use the AAA-AUDIT.md files)
+ *
+ * History: Phase 6 (2026-05-08) demoted this harness from cert gate to
+ * informational coverage. Several invented carve-outs that previously
+ * whitewashed matrix passes — the "40px desktop md" 2.5.5 carve-out, the
+ * "first-party nav-link" container exemption, the side-nav 32x32 toggle
+ * exemption, the color-picker swatch height exemption, and the
+ * action-surface AAA-large pairing for 16px regular text — were retired
+ * because none of them mapped to a normative WCAG 2.2 SC exception. The
+ * matrix surfaces MORE coverage gaps than the prior pass — that is the
+ * point.
+ *
+ * Scope: up to 5 components × 6 brands × 3 themes = 90 contexts (default).
+ * Evaluates the 11 component-shippable AAA criteria per Pattern A11y AAA
+ * Path. Output: .reports/aaa-matrix-evidence.md (gitignored).
+ *
+ * Exit:
+ *   0 = MATRIX_GREEN (zero unexpected fails)
+ *   1 = MATRIX_GAPS_FOUND (one or more programmatic FAILs)
+ *   2 = HARNESS_USAGE_ERROR (bad flag, unknown component, etc.)
+ *
+ * Usage:
+ *   node scripts/aaa-matrix-verify.mjs                 # all known components
+ *   node scripts/aaa-matrix-verify.mjs --component hx-button   # single component
+ *   node scripts/aaa-matrix-verify.mjs --help
+ *
+ * Requires storybook on http://localhost:3151. DO NOT start/stop the dev server.
+ */
 
 import { chromium } from 'playwright';
 import { writeFileSync } from 'node:fs';
@@ -87,7 +97,10 @@ for (let i = 0; i < argv.length; i++) {
   if (a === '--help' || a === '-h') {
     console.log(
       [
-        'AAA matrix verification harness',
+        'AAA matrix verification — INFORMATIONAL COVERAGE TOOL',
+        '',
+        'NOT the cert authority. Cert verdicts come from scripts/aaa-formal-audit.mjs.',
+        'This harness reports brand × theme × criterion coverage as a sanity check.',
         '',
         'Usage:',
         '  node scripts/aaa-matrix-verify.mjs                       # all known components',
@@ -278,7 +291,9 @@ const probeContext = async (page, tag, theme) => {
       // report a near-zero shadow if the harness reads styles during the transition.
       const __killTransitions = () => {
         if (!sr) return;
-        const targets = sr.querySelectorAll('[part], .field__input-wrapper, .field__textarea-wrapper, .field__select-wrapper, .field__trigger, .field__wrapper, .field__combobox, .dropzone, .trigger, .color-input');
+        const targets = sr.querySelectorAll(
+          '[part], .field__input-wrapper, .field__textarea-wrapper, .field__select-wrapper, .field__trigger, .field__wrapper, .field__combobox, .dropzone, .trigger, .color-input',
+        );
         for (const el of targets) {
           el.style.setProperty('transition', 'none', 'important');
           el.style.setProperty('animation', 'none', 'important');
@@ -293,7 +308,9 @@ const probeContext = async (page, tag, theme) => {
       // For components whose visible ring lives on a wrapper around a native input
       // (text-input, checkbox), drive :focus-visible by focusing the native control directly.
       if (sr) {
-        const nativeFocusable = sr.querySelector('input:not([type="hidden"]), button, [tabindex="0"]');
+        const nativeFocusable = sr.querySelector(
+          'input:not([type="hidden"]), button, [tabindex="0"]',
+        );
         if (nativeFocusable && typeof nativeFocusable.focus === 'function') {
           try {
             nativeFocusable.focus({ preventScroll: true });
@@ -307,7 +324,9 @@ const probeContext = async (page, tag, theme) => {
       __killTransitions();
       // Allow Lit's @property reflect:true (FocusMixin's [focused] attr) to land before measure.
       if (host.updateComplete) {
-        try { await host.updateComplete; } catch (_e) {}
+        try {
+          await host.updateComplete;
+        } catch (_e) {}
       }
       const findFocused = (root) => {
         if (!root) return null;
@@ -324,18 +343,35 @@ const probeContext = async (page, tag, theme) => {
       // Look for parts/classes that are likely the styled focus target.
       // Check both outline (≥2px solid) and box-shadow (any visible ring like "0 0 0 2px ...").
       const ringSelectors = [
-        '[part="box"]', '[part="control"]', '[part="button"]',
-        '[part="input-wrapper"]', '[part="wrapper"]', '[part="panel"]',
-        '[part="textarea-wrapper"]', '[part="select-wrapper"]', '[part="trigger"]',
-        '[part="tab"]', '[part="base"]', '[part="menu-item"]', '[part="menuitem"]',
-        '.checkbox__box', '.checkbox__control',
-        '.field__input-wrapper', '.field__wrapper',
-        '.field__textarea-wrapper', '.field__select-wrapper', '.field__trigger',
+        '[part="box"]',
+        '[part="control"]',
+        '[part="button"]',
+        '[part="input-wrapper"]',
+        '[part="wrapper"]',
+        '[part="panel"]',
+        '[part="textarea-wrapper"]',
+        '[part="select-wrapper"]',
+        '[part="trigger"]',
+        '[part="tab"]',
+        '[part="base"]',
+        '[part="menu-item"]',
+        '[part="menuitem"]',
+        '.checkbox__box',
+        '.checkbox__control',
+        '.field__input-wrapper',
+        '.field__wrapper',
+        '.field__textarea-wrapper',
+        '.field__select-wrapper',
+        '.field__trigger',
         '.field__combobox',
         '.dropzone',
-        '.trigger', '.color-input',
-        '.button', '.control', '.input-wrapper',
-        '.tab', '.menu-item',
+        '.trigger',
+        '.color-input',
+        '.button',
+        '.control',
+        '.input-wrapper',
+        '.tab',
+        '.menu-item',
       ];
       // Phase D batch 5: host-canonical components (hx-tabs, hx-menu) place
       // roving tabindex on slotted child hosts (hx-tab, hx-menu-item). The
@@ -531,9 +567,7 @@ const cemKeyboardContract = async () => {
 const aaaAllowlist = async () => {
   try {
     const { readFileSync } = await import('node:fs');
-    const raw = JSON.parse(
-      readFileSync(`${ROOT}/scripts/a11y-aaa-allowlist.json`, 'utf8'),
-    );
+    const raw = JSON.parse(readFileSync(`${ROOT}/scripts/a11y-aaa-allowlist.json`, 'utf8'));
     return new Set(raw.components || []);
   } catch {
     return new Set();
@@ -566,9 +600,7 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         const bg = parseRGB(s.bg);
         if (!fg || !bg) continue;
         const cr = contrastRatio(fg, bg);
-        const isLarge =
-          s.fontSize >= 24 ||
-          (s.fontSize >= 18.66 && s.fontWeight >= 700);
+        const isLarge = s.fontSize >= 24 || (s.fontSize >= 18.66 && s.fontWeight >= 700);
         const need = isLarge ? 4.5 : 7.0;
         if (cr + 0.005 < need) {
           fails.push({
@@ -607,7 +639,8 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
     // tokens: "0s" / "0ms" / "none"
     const isQuiet = (val) =>
       !val || val === '?' || /^0(\.0+)?(s|ms)$/.test(val.trim()) || val === 'none' || val === '0s';
-    const allQuiet = td.split(',').every((t) => isQuiet(t.trim())) &&
+    const allQuiet =
+      td.split(',').every((t) => isQuiet(t.trim())) &&
       ad.split(',').every((a) => isQuiet(a.trim()));
     results['2.3.3'] = allQuiet
       ? { status: 'pass', evidence: `reduced-motion: transition=${td}, animation=${ad}` }
@@ -657,16 +690,14 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
       // are independently AAA-certified. The group host has no inner ring of
       // its own — 2.4.13 is N/A at the container level. This mirrors the
       // dialog/alert pattern.
-      const isGroupContainer =
-        ctx.tag === 'hx-checkbox-group' || ctx.tag === 'hx-radio-group';
+      const isGroupContainer = ctx.tag === 'hx-checkbox-group' || ctx.tag === 'hx-radio-group';
       // hx-button-group + hx-action-bar are toolbar/group container surfaces
       // that delegate focus to slotted hx-button children (each independently
       // AAA-certified). Same N/A pattern as hx-checkbox-group / hx-radio-group:
       // the container host has no inner ring of its own. Roving tabindex on
       // hx-action-bar moves focus to slotted children; their focus rings are
       // verified by hx-button's own AAA cert.
-      const isToolbarContainer =
-        ctx.tag === 'hx-button-group' || ctx.tag === 'hx-action-bar';
+      const isToolbarContainer = ctx.tag === 'hx-button-group' || ctx.tag === 'hx-action-bar';
       // Phase D batch 5: navigation-landmark containers (hx-breadcrumb,
       // hx-nav, hx-top-nav, hx-side-nav) wrap a shadow-DOM <nav> landmark
       // around slotted link/menu children. The host is non-focusable; the
@@ -710,7 +741,12 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
                   : '';
       results['2.4.13'] = {
         status:
-          isDialog || isAlert || isGroupContainer || isToolbarContainer || isNavContainer || isOverlayContainer
+          isDialog ||
+          isAlert ||
+          isGroupContainer ||
+          isToolbarContainer ||
+          isNavContainer ||
+          isOverlayContainer
             ? 'skip'
             : 'fail',
         evidence: { ...r, note: naMessage },
@@ -801,7 +837,8 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // (each independently AAA-certified) carry their own hit areas. Any
         // sub-44 target reported here belongs to the slotted child, not the
         // container, and is exempt at the container level.
-        if ((isButtonGroup || isActionBar) && (t.tag === 'button' || t.tag.startsWith('hx-'))) continue;
+        if ((isButtonGroup || isActionBar) && (t.tag === 'button' || t.tag.startsWith('hx-')))
+          continue;
         // RETIRED: hx-breadcrumb / hx-nav / hx-top-nav / hx-side-nav blanket
         // "container delegates to slotted children" carve-out. The formal
         // audit (.reports/formal-aaa-audit/SUMMARY-34.md section 3.1)
@@ -854,12 +891,16 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         // 40px desktop floor pattern). Inner [part="tab"] button inside hx-tab
         // shadow root is presentational (tabindex=-1) and inherits the host's
         // hit area.
-        if (isTabs && (t.tag === 'button' || t.tag === 'hx-tab' || t.tag.startsWith('hx-'))) continue;
+        if (isTabs && (t.tag === 'button' || t.tag === 'hx-tab' || t.tag.startsWith('hx-')))
+          continue;
         fails.push(t);
       }
       results['2.5.5'] = fails.length
         ? { status: 'fail', evidence: fails }
-        : { status: 'pass', evidence: `${tgts.length} targets, all ≥44px (or 40px desktop-carve-out)` };
+        : {
+            status: 'pass',
+            evidence: `${tgts.length} targets, all ≥44px (or 40px desktop-carve-out)`,
+          };
     }
   }
   // 3.2.5 / 3.3.6 — documented
@@ -876,9 +917,7 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
     // drawer ship `open=false` in Default. Open-state forced-colors is
     // verified in dedicated stories.
     const isClosedOverlay =
-      ctx.tag === 'hx-tooltip' ||
-      ctx.tag === 'hx-popover' ||
-      ctx.tag === 'hx-drawer';
+      ctx.tag === 'hx-tooltip' || ctx.tag === 'hx-popover' || ctx.tag === 'hx-drawer';
     if (fc.rendered) {
       results['forced-colors'] = {
         status: 'pass',
@@ -887,7 +926,8 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
     } else if (isDialog) {
       results['forced-colors'] = {
         status: 'skip',
-        evidence: 'dialog is closed in Default story (0×0 expected); open-state forced-colors verified in dedicated story',
+        evidence:
+          'dialog is closed in Default story (0×0 expected); open-state forced-colors verified in dedicated story',
       };
     } else if (isClosedOverlay) {
       results['forced-colors'] = {
@@ -937,7 +977,8 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
         ? { status: 'pass', evidence: 'helixMeta.keyboardContract present' }
         : {
             status: 'fail',
-            evidence: 'helixMeta.keyboardContract missing or empty in CEM (regression — already on AAA allowlist)',
+            evidence:
+              'helixMeta.keyboardContract missing or empty in CEM (regression — already on AAA allowlist)',
           };
     }
   }
@@ -1086,7 +1127,8 @@ for (const c of COMPONENTS) {
       for (const v of Object.values(row.results)) sums[v.status] = (sums[v.status] || 0) + 1;
       lines.push(`| ${brand} | ${theme} | ${sums.pass} | ${sums.fail} | ${sums.skip} |`);
       for (const [crit, r] of Object.entries(row.results)) {
-        if (r.status === 'fail') failsForComponent.push({ brand, theme, criterion: crit, evidence: r.evidence });
+        if (r.status === 'fail')
+          failsForComponent.push({ brand, theme, criterion: crit, evidence: r.evidence });
       }
     }
   }
@@ -1113,11 +1155,21 @@ for (const c of CRITERIA) {
 lines.push('');
 lines.push(`## Limitations`);
 lines.push('');
-lines.push(`- 1.4.9, 2.1.3, 3.2.5, 3.3.6 are not programmatically checkable — marked \`skip\` with documented evidence.`);
-lines.push(`- 1.4.6 samples up to 8 text-bearing nodes per shadow DOM (snappiness vs. exhaustiveness).`);
-lines.push(`- 2.4.13 marks \`skip\` when host is not focusable and no inner focused element exposes a ring (component-defined focus pattern).`);
-lines.push(`- forced-colors check is geometric (component still renders), not semantic (does it look right).`);
-lines.push(`- 2.5.5 exempts native \`<input>\` inside hx-checkbox/hx-text-input where host wrapper provides hit area.`);
+lines.push(
+  `- 1.4.9, 2.1.3, 3.2.5, 3.3.6 are not programmatically checkable — marked \`skip\` with documented evidence.`,
+);
+lines.push(
+  `- 1.4.6 samples up to 8 text-bearing nodes per shadow DOM (snappiness vs. exhaustiveness).`,
+);
+lines.push(
+  `- 2.4.13 marks \`skip\` when host is not focusable and no inner focused element exposes a ring (component-defined focus pattern).`,
+);
+lines.push(
+  `- forced-colors check is geometric (component still renders), not semantic (does it look right).`,
+);
+lines.push(
+  `- 2.5.5 exempts native \`<input>\` inside hx-checkbox/hx-text-input where host wrapper provides hit area.`,
+);
 lines.push('');
 
 // Single-component runs (cert gate scope) write to a component-scoped file
@@ -1131,7 +1183,9 @@ writeFileSync(outPath, lines.join('\n'), 'utf8');
 const wall = ((Date.now() - start) / 1000).toFixed(1);
 console.log(`\n[harness] wrote ${outPath}`);
 console.log(`[harness] wall-clock: ${wall}s`);
-console.log(`[harness] contexts: ${totalContexts}/${COMPONENTS.length * BRANDS.length * THEMES.length}`);
+console.log(
+  `[harness] contexts: ${totalContexts}/${COMPONENTS.length * BRANDS.length * THEMES.length}`,
+);
 console.log(`[harness] FAIL contexts: ${totalFailContexts}; ERR: ${errors.length}`);
 
 if (totalFailContexts > 0 || errors.length > 0) {
