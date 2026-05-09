@@ -155,6 +155,21 @@ const APG_KEYBOARD_EXPECTATIONS = {
   tabs: [['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'], ['Home'], ['End']],
   toolbar: [['ArrowLeft', 'ArrowRight']],
   tooltip: [['Escape']],
+  // Structural / coordinator patterns — keyboard contract is provided by
+  // child controls; the host itself has no per-pattern key requirements.
+  // These are valid APG-aligned roles documented in WAI-ARIA 1.2 / HTML AAM.
+  //
+  // form (HTML AAM): https://www.w3.org/TR/html-aam-1.0/#html-element-role-mappings
+  //   The native <form> element delegates submit to Enter on a focused
+  //   submit-button or single-input form (HTML form-submission spec). The
+  //   wrapper component has no key obligation of its own.
+  form: [],
+  // label / labelable wrappers (HTML AAM):
+  //   Native <label> + form-control association requires no key handling.
+  label: [],
+  // group (WAI-ARIA 1.2 role="group") — generic container that exposes
+  // a labelled grouping of controls. No keyboard contract on the wrapper.
+  group: [],
   treeview: [['ArrowDown'], ['ArrowUp'], ['ArrowLeft', 'ArrowRight']],
   carousel: [['ArrowLeft', 'ArrowRight']],
   accordion: [['Enter', ' ', 'Space']],
@@ -299,9 +314,21 @@ function checkImagesOfText(comp) {
  */
 function checkKeyboardNoException(comp) {
   const src = comp.classSrc;
+  // Structural / coordinator patterns have no host-level keyboard contract —
+  // keyboard handling is provided by child controls (or by the user agent
+  // for native landmarks like <form>). 2.1.3 evaluates the consumed surface,
+  // not the wrapper. Mark Not Applicable for these patterns.
+  const STRUCTURAL_PATTERNS = new Set(['form', 'label', 'group']);
+  const declaredPattern = (extractJsdocTag(src, 'aria-pattern') || '').toLowerCase();
+  if (STRUCTURAL_PATTERNS.has(declaredPattern)) {
+    return {
+      verdict: VERDICT.NOT_APPLICABLE,
+      evidence: `@aria-pattern="${declaredPattern}" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2). Keyboard contract is provided by child form-control elements or the user agent; the host has no per-pattern key requirement.`,
+    };
+  }
   const hasKeydown =
     /\b(addEventListener\(['"]keydown|@keydown\b|onKeyDown|handleKeyDown|_handleKey)/.test(src);
-  const hasNativeFocusable = /<(button|a|input|textarea|select)\b/.test(src);
+  const hasNativeFocusable = /<(button|a|input|textarea|select|form)\b/.test(src);
   const declaresHostRole = /role=['"]\w+['"]|host\.role|this\.role\s*=/.test(src);
   const hasTabIndex = /tabindex=['"]?\-?0|tabindex=\${|this\.tabIndex/.test(src);
   // Detect ANY mouse-only timing dependency — pointer events without keyboard equivalent.
@@ -1336,7 +1363,17 @@ async function auditComponent(name, browser) {
         // programmatic focus does not trigger :focus-visible) over-reports
         // these. Detect the documented non-interactive patterns via
         // @aria-pattern and downgrade 2.4.13 + 2.5.5 to NotApplicable.
-        const NON_INTERACTIVE_PATTERNS = new Set(['alert', 'status', 'none']);
+        // Structural / coordinator patterns also have no host-level
+        // keyboard focus obligation — keyboard handling lives on child
+        // controls. Treat them as non-interactive for 2.4.13 + 2.5.5.
+        const NON_INTERACTIVE_PATTERNS = new Set([
+          'alert',
+          'status',
+          'none',
+          'form',
+          'label',
+          'group',
+        ]);
         const declaredPattern = (result.jsdoc.ariaPattern || '').toLowerCase();
         if (NON_INTERACTIVE_PATTERNS.has(declaredPattern)) {
           result.verdicts['2.4.13'] = {
