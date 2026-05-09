@@ -45,8 +45,5 @@ export { ConsumerObligations } from './ConsumerObligations';
 export type { ConsumerObligationsProps } from './ConsumerObligations';
 export { InlineAuditPanel } from './InlineAuditPanel';
 export type { InlineAuditPanelProps } from './InlineAuditPanel';
-export {
-  getStandardCriterion,
-  listStandardCriteria,
-} from './aaa-standards-data';
+export { getStandardCriterion, listStandardCriteria } from './aaa-standards-data';
 export type { AAAStandardCriterion } from './aaa-standards-data';

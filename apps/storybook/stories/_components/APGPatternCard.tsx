@@ -144,7 +144,8 @@ export function APGPatternCard({
           <>
             <h4 className="hx-apg-card-section-title">Expected screen-reader announcement</h4>
             <p className="hx-apg-card-sr">
-              {screenReaderContext}: <q className="hx-apg-card-sr-quote">{screenReaderAnnouncement}</q>
+              {screenReaderContext}:{' '}
+              <q className="hx-apg-card-sr-quote">{screenReaderAnnouncement}</q>
             </p>
           </>
         ) : null}

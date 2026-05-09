@@ -38,30 +38,33 @@ The most common deployment of `hx-text-input` in healthcare: a clinical intake f
 >
   <h3 style={{ margin: 0, fontSize: '1.25rem' }}>New patient intake</h3>
 
-  <hx-text-input
-    label="Patient full name"
-    name="patient_name"
-    required
-    placeholder="Last, First MI"
-    helper-text="As it appears on government ID."
-  ></hx-text-input>
+<hx-text-input
+label="Patient full name"
+name="patient_name"
+required
+placeholder="Last, First MI"
+helper-text="As it appears on government ID."
 
-  <hx-text-input
-    label="Medical record number (MRN)"
-    name="mrn"
-    required
-    pattern="[0-9]{8}"
-    inputmode="numeric"
-    helper-text="8-digit MRN issued by the EHR."
-    error-message="MRN must be exactly 8 digits."
-  ></hx-text-input>
+> </hx-text-input>
 
-  <hx-text-input
-    label="Date of birth"
-    name="dob"
-    type="date"
-    required
-  ></hx-text-input>
+<hx-text-input
+label="Medical record number (MRN)"
+name="mrn"
+required
+pattern="[0-9]{8}"
+inputmode="numeric"
+helper-text="8-digit MRN issued by the EHR."
+error-message="MRN must be exactly 8 digits."
+
+> </hx-text-input>
+
+<hx-text-input
+label="Date of birth"
+name="dob"
+type="date"
+required
+
+> </hx-text-input>
 
   <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
     <hx-button variant="ghost" type="reset">Clear</hx-button>
@@ -94,11 +97,29 @@ The headline AAA card above is rendered automatically by the autodocs template f
 <ConsumerObligations
   tag="hx-text-input"
   obligations={[
-    <>Pair every input with a visible <code>&lt;label&gt;</code> (or use the component's <code>label</code> prop). <code>aria-label</code> alone is permitted but reduces robustness — visible labels survive zoom, voice control, and switch-control acceptance.</>,
-    <>Render error text into the <code>error</code> slot or via the <code>error-message</code> prop. The component wires up <code>aria-describedby</code> + <code>aria-invalid</code> automatically; bypassing the slot loses the assistive-tech association.</>,
-    <>Do not strip the focus ring with author CSS. Customize via the <code>--hx-focus-ring-*</code> design tokens — direct <code>outline: none</code> trips 2.4.13 Focus Appearance.</>,
-    <>Render the input on a page that respects WCAG 2.2 page-level criteria (landmarks, page title, language). Component-level conformance does not certify the page.</>,
-    <>For inputs that mediate destructive or financial submission, pair with a confirmation step — 3.3.6 Error Prevention (All) is satisfied when the submission is reversible, checked, or confirmable.</>,
+    <>
+      Pair every input with a visible <code>&lt;label&gt;</code> (or use the component's{' '}
+      <code>label</code> prop). <code>aria-label</code> alone is permitted but reduces robustness —
+      visible labels survive zoom, voice control, and switch-control acceptance.
+    </>,
+    <>
+      Render error text into the <code>error</code> slot or via the <code>error-message</code> prop.
+      The component wires up <code>aria-describedby</code> + <code>aria-invalid</code>{' '}
+      automatically; bypassing the slot loses the assistive-tech association.
+    </>,
+    <>
+      Do not strip the focus ring with author CSS. Customize via the <code>--hx-focus-ring-*</code>{' '}
+      design tokens — direct <code>outline: none</code> trips 2.4.13 Focus Appearance.
+    </>,
+    <>
+      Render the input on a page that respects WCAG 2.2 page-level criteria (landmarks, page title,
+      language). Component-level conformance does not certify the page.
+    </>,
+    <>
+      For inputs that mediate destructive or financial submission, pair with a confirmation step —
+      3.3.6 Error Prevention (All) is satisfied when the submission is reversible, checked, or
+      confirmable.
+    </>,
   ]}
 />
 

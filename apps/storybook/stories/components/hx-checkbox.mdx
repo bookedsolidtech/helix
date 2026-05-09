@@ -41,20 +41,24 @@ The most consequential deployment of `hx-checkbox` in healthcare: an informed-co
     Acknowledge each statement below to proceed with scheduling.
   </p>
 
-  <div role="group" aria-label="Consent acknowledgements" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-    <hx-checkbox name="consent_procedure" required>
-      I understand the procedure being performed and the clinical rationale.
-    </hx-checkbox>
-    <hx-checkbox name="consent_risks" required>
-      I have been informed of the material risks, benefits, and alternatives.
-    </hx-checkbox>
-    <hx-checkbox name="consent_questions" required>
-      I have had the opportunity to ask questions and they have been answered.
-    </hx-checkbox>
-    <hx-checkbox name="consent_release" required>
-      I authorize release of records to my primary care physician.
-    </hx-checkbox>
-  </div>
+<div
+  role="group"
+  aria-label="Consent acknowledgements"
+  style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+>
+  <hx-checkbox name="consent_procedure" required>
+    I understand the procedure being performed and the clinical rationale.
+  </hx-checkbox>
+  <hx-checkbox name="consent_risks" required>
+    I have been informed of the material risks, benefits, and alternatives.
+  </hx-checkbox>
+  <hx-checkbox name="consent_questions" required>
+    I have had the opportunity to ask questions and they have been answered.
+  </hx-checkbox>
+  <hx-checkbox name="consent_release" required>
+    I authorize release of records to my primary care physician.
+  </hx-checkbox>
+</div>
 
   <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
     <hx-button variant="ghost" type="reset">Cancel</hx-button>
@@ -79,11 +83,30 @@ This is the bar. Every checkbox above clears AAA target size at 44×44 CSS px, t
 <ConsumerObligations
   tag="hx-checkbox"
   obligations={[
-    <>Provide a visible label — slot content is the canonical pattern. The label is clickable (the entire label region activates the checkbox), which expands the AAA target-size surface beyond the box itself.</>,
-    <>For groups of related checkboxes, wrap them in a <code>role="group"</code> + <code>aria-label</code> container (or use <code>hx-checkbox-group</code>). Group context is essential for screen-reader navigation.</>,
-    <>Use the indeterminate state (<code>indeterminate</code> property) only when it represents a "some-but-not-all" parent state. Do not use it as a third value — that breaks the APG <code>checkbox</code> contract.</>,
-    <>Do not strip the focus ring. Customize via the <code>--hx-focus-ring-*</code> tokens. The focus ring must remain visible at all times for 2.4.13 compliance.</>,
-    <>For required-by-attribute checkboxes, render a visible required indicator (asterisk in label, "required" text, or both) in addition to the <code>required</code> attribute. <code>aria-required</code> alone does not meet WCAG 3.3.2 Labels or Instructions.</>,
+    <>
+      Provide a visible label — slot content is the canonical pattern. The label is clickable (the
+      entire label region activates the checkbox), which expands the AAA target-size surface beyond
+      the box itself.
+    </>,
+    <>
+      For groups of related checkboxes, wrap them in a <code>role="group"</code> +{' '}
+      <code>aria-label</code> container (or use <code>hx-checkbox-group</code>). Group context is
+      essential for screen-reader navigation.
+    </>,
+    <>
+      Use the indeterminate state (<code>indeterminate</code> property) only when it represents a
+      "some-but-not-all" parent state. Do not use it as a third value — that breaks the APG{' '}
+      <code>checkbox</code> contract.
+    </>,
+    <>
+      Do not strip the focus ring. Customize via the <code>--hx-focus-ring-*</code> tokens. The
+      focus ring must remain visible at all times for 2.4.13 compliance.
+    </>,
+    <>
+      For required-by-attribute checkboxes, render a visible required indicator (asterisk in label,
+      "required" text, or both) in addition to the <code>required</code> attribute.{' '}
+      <code>aria-required</code> alone does not meet WCAG 3.3.2 Labels or Instructions.
+    </>,
   ]}
 />
 
@@ -94,9 +117,7 @@ This is the bar. Every checkbox above clears AAA target size at 44×44 CSS px, t
 <SectionHead title="Default — unchecked" meta="--default" />
 
 <div style={{ padding: '1rem 0' }}>
-  <hx-checkbox name="demo_unchecked">
-    Send appointment reminders by SMS
-  </hx-checkbox>
+  <hx-checkbox name="demo_unchecked">Send appointment reminders by SMS</hx-checkbox>
 </div>
 
 <SectionHead title="Checked" meta="--checked" />
@@ -128,11 +149,7 @@ The mixed state communicates "some children of this group are checked." Use as a
 A required checkbox in error state — the consumer attempted submission without acknowledging. Error styling routes through the same contrast tokens as `hx-text-input`'s error state.
 
 <div style={{ padding: '1rem 0' }}>
-  <hx-checkbox
-    name="demo_error"
-    required
-    error-message="You must accept the terms to continue."
-  >
+  <hx-checkbox name="demo_error" required error-message="You must accept the terms to continue.">
     I accept the terms of service
   </hx-checkbox>
 </div>

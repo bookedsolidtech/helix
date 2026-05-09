@@ -72,6 +72,7 @@ The most common deployment of `hx-tabs` in healthcare: chart-section navigation.
     <hx-tab-panel name="labs">
       <p style={{ margin: 0 }}>A1c 6.8% (2026-04-30) · Fasting glucose 112 (2026-04-30) · LDL 88 (2026-04-30).</p>
     </hx-tab-panel>
+
   </hx-tabs>
 </div>
 
@@ -93,24 +94,43 @@ This is the contract: tab-key roving (one tab stop for the entire tablist, arrow
   <header className="hx-apg-card-header">
     <h3 className="hx-apg-card-title">APG roving-tabindex contract</h3>
     <p className="hx-apg-card-subtitle">
-      The tabs widget is one tab stop in the page tab order, not six. The <kbd className="hx-apg-kbd">Tab</kbd> key enters and exits the tablist; <kbd className="hx-apg-kbd">Arrow</kbd> keys move the focus cursor among the tabs. This is the canonical <a href="https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#kbd_general_within" target="_blank" rel="noopener noreferrer">composite-widget keyboard model</a> from the WAI-ARIA APG.
+      The tabs widget is one tab stop in the page tab order, not six. The{' '}
+      <kbd className="hx-apg-kbd">Tab</kbd> key enters and exits the tablist;{' '}
+      <kbd className="hx-apg-kbd">Arrow</kbd> keys move the focus cursor among the tabs. This is the
+      canonical{' '}
+      <a
+        href="https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#kbd_general_within"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        composite-widget keyboard model
+      </a>{' '}
+      from the WAI-ARIA APG.
     </p>
   </header>
   <div className="hx-apg-card-body">
     <ul className="hx-apg-card-keyboard">
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Manual activation (default)</strong> — arrow keys move focus between tabs <em>without</em> activating the corresponding panel. <kbd className="hx-apg-kbd">Enter</kbd> or <kbd className="hx-apg-kbd">Space</kbd> activates the focused tab. Suitable for tabs whose panel content is heavy or async-loaded.
+          <strong>Manual activation (default)</strong> — arrow keys move focus between tabs{' '}
+          <em>without</em> activating the corresponding panel.{' '}
+          <kbd className="hx-apg-kbd">Enter</kbd> or <kbd className="hx-apg-kbd">Space</kbd>{' '}
+          activates the focused tab. Suitable for tabs whose panel content is heavy or async-loaded.
         </span>
       </li>
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Roving tabindex</strong> — only the active tab has <code>tabindex="0"</code>; the others have <code>tabindex="-1"</code>. The widget is one tab stop in the page tab order regardless of how many tabs it contains.
+          <strong>Roving tabindex</strong> — only the active tab has <code>tabindex="0"</code>; the
+          others have <code>tabindex="-1"</code>. The widget is one tab stop in the page tab order
+          regardless of how many tabs it contains.
         </span>
       </li>
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Wrapping navigation</strong> — pressing <kbd className="hx-apg-kbd">Arrow Right</kbd> on the last tab wraps to the first; <kbd className="hx-apg-kbd">Arrow Left</kbd> on the first wraps to the last. Disabled tabs are skipped.
+          <strong>Wrapping navigation</strong> — pressing{' '}
+          <kbd className="hx-apg-kbd">Arrow Right</kbd> on the last tab wraps to the first;{' '}
+          <kbd className="hx-apg-kbd">Arrow Left</kbd> on the first wraps to the last. Disabled tabs
+          are skipped.
         </span>
       </li>
     </ul>
@@ -120,11 +140,30 @@ This is the contract: tab-key roving (one tab stop for the entire tablist, arrow
 <ConsumerObligations
   tag="hx-tabs"
   obligations={[
-    <>Provide a meaningful name on every <code>hx-tab</code> via slot text. The accessible name is the tab label, and the screen-reader announcement is the only navigation aid for non-sighted users moving through chart sections.</>,
-    <>Match every <code>hx-tab</code>'s <code>panel</code> attribute to an <code>hx-tab-panel</code>'s <code>name</code> attribute. The component wires <code>aria-controls</code> + <code>aria-labelledby</code> automatically, but only if the names match — a typo silently breaks the screen-reader association.</>,
-    <>Do not nest one tablist inside another. The roving-tabindex model assumes a single tablist on a page surface; nested tabs break the composite-widget keyboard contract.</>,
-    <>Use <code>hx-tabs</code> for peer-content navigation (chart sections, settings categories), not for primary site navigation. For site nav, use <code>hx-top-nav</code> or <code>hx-side-nav</code> — those expose the URL-route + visited-state surface tabs do not.</>,
-    <>Keep tab labels short (1–3 words). Long labels truncate, the truncation reduces the AAA target hit area, and the truncated label may not match the screen-reader announcement.</>,
+    <>
+      Provide a meaningful name on every <code>hx-tab</code> via slot text. The accessible name is
+      the tab label, and the screen-reader announcement is the only navigation aid for non-sighted
+      users moving through chart sections.
+    </>,
+    <>
+      Match every <code>hx-tab</code>'s <code>panel</code> attribute to an <code>hx-tab-panel</code>
+      's <code>name</code> attribute. The component wires <code>aria-controls</code> +{' '}
+      <code>aria-labelledby</code> automatically, but only if the names match — a typo silently
+      breaks the screen-reader association.
+    </>,
+    <>
+      Do not nest one tablist inside another. The roving-tabindex model assumes a single tablist on
+      a page surface; nested tabs break the composite-widget keyboard contract.
+    </>,
+    <>
+      Use <code>hx-tabs</code> for peer-content navigation (chart sections, settings categories),
+      not for primary site navigation. For site nav, use <code>hx-top-nav</code> or{' '}
+      <code>hx-side-nav</code> — those expose the URL-route + visited-state surface tabs do not.
+    </>,
+    <>
+      Keep tab labels short (1–3 words). Long labels truncate, the truncation reduces the AAA target
+      hit area, and the truncated label may not match the screen-reader announcement.
+    </>,
   ]}
 />
 
@@ -143,6 +182,7 @@ This is the contract: tab-key roving (one tab stop for the entire tablist, arrow
     <hx-tab-panel name="settings-account"><p style={{ margin: 0 }}>Profile, contact preferences, time zone.</p></hx-tab-panel>
     <hx-tab-panel name="settings-notifications"><p style={{ margin: 0 }}>Email alerts, SMS reminders, push notifications.</p></hx-tab-panel>
     <hx-tab-panel name="settings-security"><p style={{ margin: 0 }}>Password, two-factor authentication, active sessions.</p></hx-tab-panel>
+
   </hx-tabs>
 </div>
 
@@ -159,6 +199,7 @@ A disabled tab cannot receive arrow-key focus and is skipped during the roving c
     <hx-tab-panel name="dx-active"><p style={{ margin: 0 }}>Hypertension, Type 2 diabetes.</p></hx-tab-panel>
     <hx-tab-panel name="dx-resolved"><p style={{ margin: 0 }}>Acute bronchitis (resolved 2025-11-22).</p></hx-tab-panel>
     <hx-tab-panel name="dx-pending"><p style={{ margin: 0 }}>This panel is unreachable; the tab is disabled.</p></hx-tab-panel>
+
   </hx-tabs>
 </div>
 

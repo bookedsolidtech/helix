@@ -47,10 +47,7 @@ export function InlineAuditPanel({
   const path = auditPath ?? `src/components/${tag}/AAA-AUDIT.md`;
   const githubUrl = `https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/${path}`;
   return (
-    <section
-      className="hx-docs hx-inline-audit"
-      aria-label={`Inline AAA audit for ${tag}`}
-    >
+    <section className="hx-docs hx-inline-audit" aria-label={`Inline AAA audit for ${tag}`}>
       <details className="hx-inline-audit-details" open={defaultOpen}>
         <summary className="hx-inline-audit-summary">
           <span className="hx-inline-audit-icon" aria-hidden="true">

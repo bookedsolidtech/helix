@@ -155,13 +155,13 @@ export function AAAConformanceCard({
                   </>
                 ) : null}
                 . {supportsCount} Supports · {naCount} Not Applicable
-                {unknownCount > 0 ? ` · ${unknownCount} Unknown` : null} across{' '}
-                {rows.length} criteria.
+                {unknownCount > 0 ? ` · ${unknownCount} Unknown` : null} across {rows.length}{' '}
+                criteria.
               </>
             ) : (
               <>
-                Not yet certified. Verdicts shown below reflect the standards file only and have
-                not been measured by the audit harness for this component.
+                Not yet certified. Verdicts shown below reflect the standards file only and have not
+                been measured by the audit harness for this component.
               </>
             )}
           </p>

@@ -98,10 +98,24 @@ The green **AAA Certified** card above this section is rendered by the autodocs 
 <ConsumerObligations
   tag="hx-button"
   obligations={[
-    <>Provide an accessible name on every instance — slot text content, <code>aria-label</code>, or the <code>accessible-label</code> attribute. The harness verifies presence on the Default story but cannot enforce it for every consumer instance.</>,
-    <>Render the component on a page that respects WCAG 2.2 page-level criteria (landmarks, page title, language). Component-level conformance does not certify the page.</>,
-    <>Do not strip the focus ring with author CSS on the slotted/wrapping element. Customize via the <code>--hx-focus-ring-*</code> design tokens — direct <code>outline: none</code> trips 2.4.13 Focus Appearance.</>,
-    <>Icon-only buttons require an explicit accessible name via <code>accessible-label</code> or <code>aria-label</code>; the component emits a <code>devWarn</code> when the name is missing.</>,
+    <>
+      Provide an accessible name on every instance — slot text content, <code>aria-label</code>, or
+      the <code>accessible-label</code> attribute. The harness verifies presence on the Default
+      story but cannot enforce it for every consumer instance.
+    </>,
+    <>
+      Render the component on a page that respects WCAG 2.2 page-level criteria (landmarks, page
+      title, language). Component-level conformance does not certify the page.
+    </>,
+    <>
+      Do not strip the focus ring with author CSS on the slotted/wrapping element. Customize via the{' '}
+      <code>--hx-focus-ring-*</code> design tokens — direct <code>outline: none</code> trips 2.4.13
+      Focus Appearance.
+    </>,
+    <>
+      Icon-only buttons require an explicit accessible name via <code>accessible-label</code> or{' '}
+      <code>aria-label</code>; the component emits a <code>devWarn</code> when the name is missing.
+    </>,
   ]}
 />
 

@@ -35,9 +35,7 @@ export function ConsumerObligations({
     <aside
       className="hx-docs hx-consumer-obligations"
       role="note"
-      aria-label={
-        tag ? `Consumer obligations for ${tag}` : 'Consumer obligations'
-      }
+      aria-label={tag ? `Consumer obligations for ${tag}` : 'Consumer obligations'}
     >
       <header className="hx-consumer-obligations-header">
         <span className="hx-consumer-obligations-icon" aria-hidden="true">

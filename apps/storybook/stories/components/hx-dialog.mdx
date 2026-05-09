@@ -38,14 +38,17 @@ The most consequential deployment of `hx-dialog` in healthcare: a confirmation m
     The "Delete patient record" action below opens a confirmation dialog before the destructive operation runs.
   </p>
 
-  <hx-button
-    variant="danger"
-    onClick={(e) => {
-      const dlg = document.querySelector('#consent-delete-dialog');
-      if (dlg && typeof dlg.show === 'function') dlg.show();
-    }}
-  >
+<hx-button
+variant="danger"
+onClick={(e) => {
+const dlg = document.querySelector('#consent-delete-dialog');
+if (dlg && typeof dlg.show === 'function') dlg.show();
+}}
+
+>
+
     Delete patient record
+
   </hx-button>
 
   <hx-dialog id="consent-delete-dialog" label="Confirm patient record deletion">
@@ -89,29 +92,38 @@ The contract: focus trap, return focus, inert backdrop, Escape dismissal, initia
   <header className="hx-apg-card-header">
     <h3 className="hx-apg-card-title">Focus management contract</h3>
     <p className="hx-apg-card-subtitle">
-      Beyond the keyboard contract, <code>hx-dialog</code> implements the four canonical modal focus behaviors:
+      Beyond the keyboard contract, <code>hx-dialog</code> implements the four canonical modal focus
+      behaviors:
     </p>
   </header>
   <div className="hx-apg-card-body">
     <ul className="hx-apg-card-keyboard">
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Initial focus</strong> — when the dialog opens, focus moves into the dialog and lands on the primary action (or the first focusable child if no <code>autofocus</code> is set).
+          <strong>Initial focus</strong> — when the dialog opens, focus moves into the dialog and
+          lands on the primary action (or the first focusable child if no <code>autofocus</code> is
+          set).
         </span>
       </li>
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Focus trap</strong> — <kbd className="hx-apg-kbd">Tab</kbd> and <kbd className="hx-apg-kbd">Shift+Tab</kbd> cycle through focusable descendants of the dialog only; the rest of the page is inert.
+          <strong>Focus trap</strong> — <kbd className="hx-apg-kbd">Tab</kbd> and{' '}
+          <kbd className="hx-apg-kbd">Shift+Tab</kbd> cycle through focusable descendants of the
+          dialog only; the rest of the page is inert.
         </span>
       </li>
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Escape dismiss</strong> — <kbd className="hx-apg-kbd">Escape</kbd> closes the dialog (unless <code>no-light-dismiss</code> is set, in which case explicit user action is required).
+          <strong>Escape dismiss</strong> — <kbd className="hx-apg-kbd">Escape</kbd> closes the
+          dialog (unless <code>no-light-dismiss</code> is set, in which case explicit user action is
+          required).
         </span>
       </li>
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Return focus</strong> — when the dialog closes, focus returns to the element that opened it. This satisfies 3.2.5 Change on Request — the consumer's focus position after closing matches their position before opening.
+          <strong>Return focus</strong> — when the dialog closes, focus returns to the element that
+          opened it. This satisfies 3.2.5 Change on Request — the consumer's focus position after
+          closing matches their position before opening.
         </span>
       </li>
     </ul>
@@ -121,11 +133,29 @@ The contract: focus trap, return focus, inert backdrop, Escape dismissal, initia
 <ConsumerObligations
   tag="hx-dialog"
   obligations={[
-    <>Provide a <code>label</code> attribute (or render a heading into the <code>header</code> slot) — the dialog's accessible name is what screen readers announce on open. Without it, the dialog is announced as "dialog" with no context.</>,
-    <>Do not render multiple modal dialogs simultaneously. The APG pattern is single-modal-at-a-time; stacking modals breaks focus trap and makes the inert layer ambiguous.</>,
-    <>For dialogs that mediate destructive operations, set the initial-focused action to the <strong>safe</strong> path (Cancel, not Delete). The default Enter activation should never trigger a destructive operation.</>,
-    <>Use <code>hx-drawer</code> instead of <code>hx-dialog</code> for non-blocking side-panel patterns. Drawers do NOT trap focus and do NOT inert the underlying page; the two patterns are not interchangeable.</>,
-    <>Provide a visible Close mechanism inside the dialog. <kbd>Escape</kbd> alone is not enough — touch-only and switch-control users may not have an Escape key.</>,
+    <>
+      Provide a <code>label</code> attribute (or render a heading into the <code>header</code> slot)
+      — the dialog's accessible name is what screen readers announce on open. Without it, the dialog
+      is announced as "dialog" with no context.
+    </>,
+    <>
+      Do not render multiple modal dialogs simultaneously. The APG pattern is
+      single-modal-at-a-time; stacking modals breaks focus trap and makes the inert layer ambiguous.
+    </>,
+    <>
+      For dialogs that mediate destructive operations, set the initial-focused action to the{' '}
+      <strong>safe</strong> path (Cancel, not Delete). The default Enter activation should never
+      trigger a destructive operation.
+    </>,
+    <>
+      Use <code>hx-drawer</code> instead of <code>hx-dialog</code> for non-blocking side-panel
+      patterns. Drawers do NOT trap focus and do NOT inert the underlying page; the two patterns are
+      not interchangeable.
+    </>,
+    <>
+      Provide a visible Close mechanism inside the dialog. <kbd>Escape</kbd> alone is not enough —
+      touch-only and switch-control users may not have an Escape key.
+    </>,
   ]}
 />
 
