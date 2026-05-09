@@ -1,0 +1,298 @@
+{
+  "$schema": "./aaa-standards.schema.json",
+  "version": "1.0.0",
+  "generatedAt": "2026-05-08",
+  "verification": {
+    "method": "WebFetch confirmation against live W3C/MDN endpoints",
+    "verifiedAt": "2026-05-08",
+    "verifierAgent": "accessibility-engineer (formal AAA re-cert mission, Phase 1)",
+    "summary": "47 of 48 cited URLs verified live. 1 URL removed (was speculative ACT-rule mapping that 404'd). 0 fabrications.",
+    "unverifiedUrls": []
+  },
+  "claim": {
+    "wcagVersion": "2.2",
+    "wcagLevel": "AAA",
+    "wcagSource": "https://www.w3.org/TR/WCAG22/",
+    "wcagPublicationDate": "2024-12-12",
+    "wcagFirstRecommendationDate": "2023-10-05",
+    "wcagSourceVerified": true,
+    "rationale": "WCAG 2.2 became a W3C Recommendation 2023-10-05 (republished 2024-12-12) and is the current standard. WCAG 2.1 is superseded but still cited where 2.2 carries forward unchanged. We claim WCAG 2.2 AAA conformance for the 9 component-shippable Success Criteria below (criteria 1-9). Items 10 and 11 are PEER standards (forced-colors-mode is industry consensus, APG-aligned keyboard contracts are pattern conformance from WAI-ARIA APG) — they are NOT WCAG SCs and are documented separately. 2.5.5 Target Size (Enhanced) at 44x44 is still AAA in 2.2. WCAG 2.2 also added 2.5.8 Target Size (Minimum) at 24x24 as an AA-level criterion which we explicitly do NOT claim — we hold to the stricter AAA bar."
+  },
+  "criteria": [
+    {
+      "id": "1.4.6",
+      "slug": "contrast-enhanced",
+      "name": "Contrast (Enhanced)",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#contrast-enhanced",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html",
+      "understandingUrlVerified": true,
+      "summary": "Visual presentation of text and images of text has a contrast ratio of at least 7:1, except: large text 4.5:1, incidental text, logotypes.",
+      "thresholds": {
+        "normalText": 7.0,
+        "largeText": 4.5,
+        "largeTextDefinitionPx": 18.66,
+        "largeTextDefinitionPxBold": 14.0
+      },
+      "actRules": [],
+      "actRuleNote": "ACT rule afw4f7 maps to AA 1.4.3 Contrast (Minimum), not 1.4.6 AAA Contrast (Enhanced). No canonical ACT rule for 1.4.6 yet. Evidence is axe-core color-contrast-enhanced rule + manual computed-style audit.",
+      "evidence": "axe-core color-contrast-enhanced rule. Manual: getComputedStyle on text vs background; ratio >= 7:1 (or >= 4.5:1 for large text).",
+      "componentApplicability": "All components rendering text or text-on-background"
+    },
+    {
+      "id": "1.4.9",
+      "slug": "images-of-text-no-exception",
+      "name": "Images of Text (No Exception)",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#images-of-text-no-exception",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text-no-exception.html",
+      "understandingUrlVerified": true,
+      "summary": "Images of text are only used for pure decoration or where a particular presentation of text is essential to the information being conveyed.",
+      "evidence": "Manual: confirm components render text via real text nodes, not raster/SVG images of text. Icons that aren't text are exempt.",
+      "componentApplicability": "All components — verify no rasterized text labels"
+    },
+    {
+      "id": "2.1.3",
+      "slug": "keyboard-no-exception",
+      "name": "Keyboard (No Exception)",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#keyboard-no-exception",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard-no-exception.html",
+      "understandingUrlVerified": true,
+      "summary": "All functionality of the content is operable through a keyboard interface without requiring specific timings for individual keystrokes.",
+      "evidence": "Playwright keyboard-only walkthrough: all interactive states reachable, no mouse-only timing dependencies, no path-based input requirements.",
+      "componentApplicability": "All interactive components"
+    },
+    {
+      "id": "2.3.3",
+      "slug": "animation-from-interactions",
+      "name": "Animation from Interactions",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#animation-from-interactions",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html",
+      "understandingUrlVerified": true,
+      "summary": "Motion animation triggered by interaction can be disabled, unless the animation is essential to the functionality or the information being conveyed.",
+      "evidence": "CSS audit: every transition/animation respects @media (prefers-reduced-motion: reduce). Test with PRM emulation in Playwright.",
+      "componentApplicability": "All components with motion (open/close, hover, focus, loading)"
+    },
+    {
+      "id": "2.4.12",
+      "slug": "focus-not-obscured-enhanced",
+      "name": "Focus Not Obscured (Enhanced)",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#focus-not-obscured-enhanced",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html",
+      "understandingUrlVerified": true,
+      "summary": "When a user interface component receives keyboard focus, no part of the component is hidden by author-created content.",
+      "wcagAddition": "WCAG 2.2 — added 2023-10-05",
+      "evidence": "Playwright: focus each interactive element in scenarios with sticky headers/footers, overlays, fixed siblings; assert no occlusion via getBoundingClientRect + elementFromPoint.",
+      "componentApplicability": "All focusable components, especially overlays/popovers/sticky containers"
+    },
+    {
+      "id": "2.4.13",
+      "slug": "focus-appearance",
+      "name": "Focus Appearance",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#focus-appearance",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html",
+      "understandingUrlVerified": true,
+      "summary": "When the keyboard focus indicator is visible: (1) area at least as large as a 2 CSS px thick perimeter of the unfocused component; (2) contrast ratio at least 3:1 between the focused and unfocused states.",
+      "wcagAddition": "WCAG 2.2 — added 2023-10-05",
+      "thresholds": {
+        "perimeterMinPx": 2,
+        "contrastFocusedToUnfocused": 3.0
+      },
+      "evidence": "Computed-style audit + screenshot diff: outline width >= 2px, outline contrast vs background >= 3:1.",
+      "componentApplicability": "All focusable components"
+    },
+    {
+      "id": "2.5.5",
+      "slug": "target-size-enhanced",
+      "name": "Target Size (Enhanced)",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#target-size-enhanced",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html",
+      "understandingUrlVerified": true,
+      "summary": "The size of the target for pointer inputs is at least 44 by 44 CSS pixels except: equivalent, inline, user-agent control, essential.",
+      "wcagNote": "WCAG 2.2 added 2.5.8 Target Size (Minimum) at 24x24 as an AA-level criterion. We do NOT claim 2.5.8; we claim the stricter AAA 2.5.5 at 44x44.",
+      "thresholds": {
+        "minWidthPx": 44,
+        "minHeightPx": 44
+      },
+      "evidence": "Playwright: getBoundingClientRect() on every interactive target; assert width >= 44 && height >= 44.",
+      "componentApplicability": "All interactive components (buttons, inputs, links, controls)"
+    },
+    {
+      "id": "3.2.5",
+      "slug": "change-on-request",
+      "name": "Change on Request",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#change-on-request",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/change-on-request.html",
+      "understandingUrlVerified": true,
+      "summary": "Changes of context are initiated only by user request or a mechanism is available to turn off such changes.",
+      "evidence": "Behavioral: focus must not auto-submit, opening a select must not navigate, no auto-redirect from input.",
+      "componentApplicability": "All components with side effects on focus/input/change events"
+    },
+    {
+      "id": "3.3.6",
+      "slug": "error-prevention-all",
+      "name": "Error Prevention (All)",
+      "level": "AAA",
+      "wcagVersion": "2.2",
+      "type": "wcag-sc",
+      "url": "https://www.w3.org/TR/WCAG22/#error-prevention-all",
+      "urlVerified": true,
+      "understandingUrl": "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all.html",
+      "understandingUrlVerified": true,
+      "summary": "For Web pages that require the user to submit information, at least one of the following is true: (1) Reversible, (2) Checked, (3) Confirmed.",
+      "evidence": "Form components expose validation hooks; destructive actions ship with confirmation pattern (hx-dialog).",
+      "componentApplicability": "Form components and components mediating destructive actions"
+    },
+    {
+      "id": "forced-colors",
+      "slug": "forced-colors-mode",
+      "name": "Forced Colors Mode Support",
+      "level": "PEER",
+      "type": "peer-standard",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors",
+      "urlVerified": true,
+      "specUrl": "https://www.w3.org/TR/css-color-adjust-1/",
+      "specUrlVerified": true,
+      "summary": "Components must remain usable when the user agent enforces a limited color palette (Windows High Contrast, etc.). Use system colors (CanvasText, ButtonFace, Highlight, etc.) and forced-color-adjust: none only when necessary with explicit color overrides.",
+      "isPeerStandard": true,
+      "peerStandardNote": "This is NOT a WCAG Success Criterion. It is industry consensus driven by CSS Color Adjustment Module Level 1 (currently Candidate Recommendation Snapshot, December 2025) and Microsoft accessibility guidance. Conformance is engineering practice, not WCAG conformance. The forced-color-adjust property and forced-colors media query are widely supported (Baseline since September 2022).",
+      "evidence": "Playwright with forced-colors emulation: borders visible, focus indicators visible, no information conveyed by color alone.",
+      "componentApplicability": "All visually-presented components"
+    },
+    {
+      "id": "apg-keyboard",
+      "slug": "apg-keyboard-contract",
+      "name": "APG-Aligned Keyboard Contract",
+      "level": "PEER",
+      "type": "peer-standard",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/",
+      "urlVerified": true,
+      "specUrl": "https://www.w3.org/WAI/ARIA/apg/",
+      "specUrlVerified": true,
+      "summary": "Component implements the keyboard interaction model defined by the WAI-ARIA Authoring Practices Guide for its declared @aria-pattern (e.g., button uses Enter+Space; tabs use ArrowLeft/ArrowRight+Home+End; combobox uses ArrowDown+Escape+Enter).",
+      "isPeerStandard": true,
+      "peerStandardNote": "WAI-ARIA APG is informative (non-normative) — not part of WCAG. We treat APG conformance as a peer standard for keyboard predictability. Pattern URLs verified live against the APG index 2026-05-08.",
+      "patterns": {
+        "button": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/button/", "verified": true },
+        "checkbox": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/",
+          "verified": true
+        },
+        "combobox": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
+          "verified": true
+        },
+        "dialog": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+          "verified": true
+        },
+        "alertdialog": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/",
+          "verified": true
+        },
+        "alert": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/", "verified": true },
+        "listbox": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/", "verified": true },
+        "menu": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/", "verified": true },
+        "menubutton": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/",
+          "verified": true
+        },
+        "radiogroup": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/",
+          "verified": true
+        },
+        "slider": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/", "verified": true },
+        "switch": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/", "verified": true },
+        "tabs": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/", "verified": true },
+        "toolbar": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/", "verified": true },
+        "tooltip": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/", "verified": true },
+        "treeview": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/treeview/",
+          "verified": true
+        },
+        "carousel": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/carousel/",
+          "verified": true
+        },
+        "accordion": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/accordion/",
+          "verified": true
+        },
+        "breadcrumb": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/",
+          "verified": true
+        },
+        "link": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/link/", "verified": true },
+        "table": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/table/", "verified": true },
+        "grid": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/grid/", "verified": true },
+        "feed": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/feed/", "verified": true },
+        "meter": { "url": "https://www.w3.org/WAI/ARIA/apg/patterns/meter/", "verified": true },
+        "spinbutton": {
+          "url": "https://www.w3.org/TR/wai-aria-1.2/#spinbutton",
+          "verified": true,
+          "note": "Tier-1 Task-5 (2026-05-08): role=spinbutton from WAI-ARIA 1.2; APG documents spinbutton interaction via the related slider/listbox patterns. Native <input type=number> provides the keyboard contract via the user agent."
+        },
+        "navigation": {
+          "url": "https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/",
+          "verified": true,
+          "note": "Tier-1 Task-5 (2026-05-08): navigation landmark from APG landmark-regions practice. Has no required keyboard contract of its own; inner widgets (links, menus) define the contract."
+        },
+        "group": {
+          "url": "https://www.w3.org/TR/wai-aria-1.2/#group",
+          "verified": true,
+          "note": "Tier-1 Task-5 (2026-05-08): role=group from WAI-ARIA 1.2 — a structural grouping role with no required keyboard contract; items inside the group dictate keyboard behaviour."
+        }
+      },
+      "evidence": "Playwright per-pattern keyboard test matrix; deviations from APG must be documented with rationale.",
+      "componentApplicability": "All components claiming an @aria-pattern JSDoc tag"
+    }
+  ],
+  "vpat": {
+    "language": "VPAT 2.5 (Section 508 Refresh / WCAG 2.x)",
+    "url": "https://www.itic.org/policy/accessibility/vpat",
+    "verdicts": ["Supports", "Partially Supports", "Does Not Support", "Not Applicable"],
+    "verdictDefinitions": {
+      "Supports": "The functionality of the product has at least one method that meets the criterion without known defects or meets with equivalent facilitation.",
+      "Partially Supports": "Some functionality of the product does not meet the criterion.",
+      "Does Not Support": "The majority of product functionality does not meet the criterion.",
+      "Not Applicable": "The criterion is not relevant to the product."
+    }
+  },
+  "axeMapping": {
+    "1.4.6": ["color-contrast-enhanced"],
+    "2.4.13": [],
+    "2.5.5": ["target-size"],
+    "forced-colors": [],
+    "_note": "axe-core does not have rules for every AAA SC. 1.4.6 has color-contrast-enhanced. 2.5.5 has target-size (gates AA min, configurable for AAA 44x44). 2.4.13 Focus Appearance has no axe rule yet — must be verified with computed-style assertions."
+  }
+}

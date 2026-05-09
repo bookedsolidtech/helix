@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-08T00:42:38.150Z",
+  "generatedAt": "2026-05-09T12:33:57.700Z",
   "sourceCem": "custom-elements.json",
-  "helixVersion": "3.6.0",
-  "tokensVersion": "3.5.0",
+  "helixVersion": "3.7.0",
+  "tokensVersion": "3.7.0",
   "components": [
     {
       "tag": "hx-accordion",
@@ -549,16 +549,38 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-action-bar/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "toolbar",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -2260,16 +2282,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-banner/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "alert",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -2457,16 +2498,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-breadcrumb/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [
+          "Arrow"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "breadcrumb",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -3216,16 +3276,38 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-button-group/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "toolbar",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -4802,16 +4884,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-checkbox-group/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [
+          "Tab"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "group",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -5262,16 +5363,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-clinical-status/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "alert",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -6194,16 +6314,44 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-color-picker/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [
+          "ArrowLeft",
+          "ArrowRight",
+          "ArrowUp",
+          "ArrowDown",
+          "Home",
+          "End",
+          "PageUp",
+          "PageDown"
+        ],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "slider",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -6894,16 +7042,41 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-combobox/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "combobox",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -7416,16 +7589,36 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-copy-button/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "button",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -8731,16 +8924,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-date-picker/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "dialog",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -9897,16 +10109,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-drawer/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "dialog",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -10130,16 +10361,42 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-dropdown/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "menu",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -10422,16 +10679,28 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-field/AAA-AUDIT.md"
       },
       "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "ariaPattern": "label",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -10638,16 +10907,28 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-field-label/AAA-AUDIT.md"
       },
       "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "ariaPattern": "label",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -11071,16 +11352,36 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-file-upload/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "button",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -11216,16 +11517,33 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-form/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "form",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -11791,16 +12109,28 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-help-text/AAA-AUDIT.md"
       },
       "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "ariaPattern": "label",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -12269,16 +12599,36 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-icon-button/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "button",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -13319,16 +13669,42 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-menu/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "menu",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -14217,16 +14593,40 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-nav/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "navigation",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -14954,16 +15354,38 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-number-input/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "character-input"
+        ],
+        "navigate": [
+          "ArrowUp",
+          "ArrowDown"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "spinbutton",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -15315,16 +15737,42 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-overflow-menu/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "menu",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -16068,16 +16516,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-popover/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "dialog",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -16345,16 +16812,28 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-popup/AAA-AUDIT.md"
       },
       "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "ariaPattern": "none",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -17504,16 +17983,37 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-radio-group/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Space"
+        ],
+        "navigate": [
+          "Arrow"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "radiogroup",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -17753,16 +18253,37 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-rating/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Space"
+        ],
+        "navigate": [
+          "Arrow"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "radiogroup",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -18363,16 +18884,41 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-select/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "combobox",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -18604,16 +19150,40 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-side-nav/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "navigation",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -19412,16 +19982,39 @@
         "aria-valuetext"
       ],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-slider/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End",
+          "PageUp",
+          "PageDown"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "slider",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -20038,16 +20631,36 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-split-button/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "button",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -22474,16 +23087,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-switch/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Space"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "switch",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -23390,16 +24022,40 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-tabs/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "tabs",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -25145,16 +25801,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-textarea/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "character-input"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "textbox",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -25980,16 +26655,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-time-picker/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "dialog",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -26334,16 +27028,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-toast/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "alert",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -26854,16 +27567,36 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-toggle-button/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [],
+        "dismiss": [],
+        "disabledSuppresses": true
+      },
+      "ariaPattern": "button",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": true,
       "priorityTier": "P0"
     },
     {
@@ -27124,16 +27857,35 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-tooltip/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [],
+        "navigate": [],
+        "dismiss": [
+          "Escape"
+        ],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "tooltip",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {
@@ -27425,16 +28177,40 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-08",
+        "criteria": [
+          "1.4.6",
+          "1.4.9",
+          "2.1.3",
+          "2.3.3",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5",
+          "3.2.5",
+          "3.3.6",
+          "forced-colors",
+          "apg-keyboard"
+        ],
+        "auditUrl": "src/components/hx-top-nav/AAA-AUDIT.md"
       },
-      "keyboardContract": null,
-      "ariaPattern": null,
-      "themeAware": null,
-      "brandAware": null,
-      "formAssociated": null,
+      "keyboardContract": {
+        "activate": [
+          "Enter",
+          "Space"
+        ],
+        "navigate": [
+          "Arrow",
+          "Home",
+          "End"
+        ],
+        "dismiss": [],
+        "disabledSuppresses": null
+      },
+      "ariaPattern": "navigation",
+      "themeAware": true,
+      "brandAware": true,
+      "formAssociated": false,
       "priorityTier": "P0"
     },
     {

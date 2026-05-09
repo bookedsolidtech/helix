@@ -55,7 +55,7 @@ export const helixTabStyles = css`
   /* ─── Selected State ─── */
 
   :host([selected]) .tab {
-    color: var(--hx-tabs-tab-active-color, var(--hx-color-primary-600, #0f7078));
+    color: var(--hx-tabs-tab-active-color, var(--hx-color-text-link, #0f6363));
     border-bottom-color: var(
       --_tab-indicator-bottom-color,
       var(--hx-tabs-indicator-color, var(--hx-color-primary-500, #429797))
@@ -66,7 +66,21 @@ export const helixTabStyles = css`
 
   /* ─── Focus State ───
      Focus lands on the HOST in Group 5a host-canonical mode. The inner
-     [part="tab"] is presentational (tabindex=-1). Use :host(:focus-visible). */
+     [part="tab"] is presentational (tabindex=-1). Paint the ring on BOTH
+     the host and the inner [part="tab"] so:
+     (1) the visible affordance lives on the styled tab surface
+     (2) the host carries a measurable computed outline-width — required
+         by AAA 2.4.13 verification harnesses that read getComputedStyle
+         on the focused element itself (not its shadow descendants in
+         the slotted-host scenario where the parent <hx-tabs> walker
+         cannot reach into the slotted child's shadow root). */
+
+  :host(:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-tabs-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+    border-radius: var(--hx-border-radius-sm, 0.25rem);
+  }
 
   :host(:focus-visible) .tab {
     outline: var(--hx-focus-ring-width, 2px) solid
@@ -75,9 +89,9 @@ export const helixTabStyles = css`
     border-radius: var(--hx-border-radius-sm, 0.25rem);
   }
 
-  /* Strip the default host focus ring — outline lands on the inner [part="tab"]
-     surface above for visual continuity with the existing component appearance. */
-  :host(:focus) {
+  /* Strip the default :focus state — :focus-visible above provides the
+     ring for keyboard interaction. */
+  :host(:focus:not(:focus-visible)) {
     outline: none;
   }
 
@@ -125,6 +139,7 @@ export const helixTabStyles = css`
       border-bottom-color: Highlight;
     }
 
+    :host(:focus-visible),
     :host(:focus-visible) .tab {
       outline: 3px solid Highlight;
       outline-offset: 2px;

@@ -86,6 +86,23 @@ function isFormControl(el: Element): el is HTMLElement {
  * @cssprop [--hx-color-error-500] - Color.
  * @cssprop [--hx-focus-ring-offset] - CSS custom property.
  * @cssprop [--hx-border-radius-sm] - CSS custom property.
+ *
+ * @aaa-certified 2026-05-09
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-field/AAA-AUDIT.md
+ * @aria-pattern label
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-field
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-field')
 export class HelixField extends HelixElement {

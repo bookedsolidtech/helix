@@ -1,0 +1,174 @@
+{/* hx-button.mdx — AAA conformance documentation for hx-button */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  AAAConformanceCard,
+  APGPatternCard,
+  ConsumerObligations,
+  InlineAuditPanel,
+  SectionHead,
+} from '../_components';
+import auditRaw from '../../../../packages/hx-library/src/components/hx-button/AAA-AUDIT.md?raw';
+
+<Meta title="Components/Button/Conformance" />
+
+<div className="hx-docs">
+
+# `hx-button` — Conformance documentation
+
+> **WCAG 2.2 Level AAA certified** for the 9 component-shippable Success Criteria, plus 2 peer standards (forced-colors mode, APG keyboard contract). Per-criterion evidence below; full audit inline at the bottom of this page.
+
+---
+
+## Hero scenario — sign-in form
+
+The most common deployment of `hx-button`: a primary submit action in a sign-in form, paired with a secondary "Forgot password" ghost button. Tab through the fields below to see the focus ring (`outline 2px solid` against the form surface — clears 2.4.13 Focus Appearance), and press <kbd>Enter</kbd> in any field to submit (Space + Enter both activate the submit button per APG `button` pattern).
+
+<div
+  style={{
+    maxWidth: '420px',
+    padding: '2rem',
+    background: 'var(--hx-color-surface-raised, #fff)',
+    border: '1px solid var(--hx-color-border-default, #dee2e6)',
+    borderRadius: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+  }}
+>
+  <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Sign in to HELiX Health</h3>
+  <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+    <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Email</span>
+    <input
+      type="email"
+      defaultValue="dr.morgan@example.health"
+      style={{
+        padding: '0.5rem 0.75rem',
+        border: '1px solid var(--hx-color-border-default, #dee2e6)',
+        borderRadius: '6px',
+        fontSize: '0.9375rem',
+      }}
+    />
+  </label>
+  <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+    <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Password</span>
+    <input
+      type="password"
+      defaultValue="••••••••••••"
+      style={{
+        padding: '0.5rem 0.75rem',
+        border: '1px solid var(--hx-color-border-default, #dee2e6)',
+        borderRadius: '6px',
+        fontSize: '0.9375rem',
+      }}
+    />
+  </label>
+  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+    <hx-button variant="primary" type="submit" style={{ flex: '1 1 auto' }}>
+      Sign in
+    </hx-button>
+    <hx-button variant="ghost" type="button">
+      Forgot password
+    </hx-button>
+  </div>
+</div>
+
+This is documentation, not just enumeration. The component appears here in the context a healthcare clinician would actually meet it.
+
+---
+
+## How to read the badges
+
+The green **AAA Certified** card above this section is rendered by the autodocs template from `helixMeta.aaa.*` in `custom-elements.json`. Each criterion chip in that card maps to a row in the conformance evidence table below. The `View full AAA audit →` link in the corner opens the source-of-truth `AAA-AUDIT.md` on GitHub; the same file is embedded inline at the bottom of this page.
+
+`hx-button` is a **P0** primitive — AAA certification is mandatory before release, not aspirational.
+
+---
+
+<AAAConformanceCard tag="hx-button" />
+
+---
+
+<APGPatternCard
+  tag="hx-button"
+  screenReaderAnnouncement="Sign in, button"
+  screenReaderContext="When the primary submit button above is focused, screen readers announce"
+/>
+
+<ConsumerObligations
+  tag="hx-button"
+  obligations={[
+    <>
+      Provide an accessible name on every instance — slot text content, <code>aria-label</code>, or
+      the <code>accessible-label</code> attribute. The harness verifies presence on the Default
+      story but cannot enforce it for every consumer instance.
+    </>,
+    <>
+      Render the component on a page that respects WCAG 2.2 page-level criteria (landmarks, page
+      title, language). Component-level conformance does not certify the page.
+    </>,
+    <>
+      Do not strip the focus ring with author CSS on the slotted/wrapping element. Customize via the{' '}
+      <code>--hx-focus-ring-*</code> design tokens — direct <code>outline: none</code> trips 2.4.13
+      Focus Appearance.
+    </>,
+    <>
+      Icon-only buttons require an explicit accessible name via <code>accessible-label</code> or{' '}
+      <code>aria-label</code>; the component emits a <code>devWarn</code> when the name is missing.
+    </>,
+  ]}
+/>
+
+---
+
+## Live state demos
+
+<SectionHead title="Focus visible" meta="2.4.13 Focus Appearance" />
+
+The focus ring is a 2px solid outline rendered on the inner `<button>` part with a contrast ratio ≥3:1 against both the focused and unfocused background. Tab to the button below to see the indicator.
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-button variant="primary">Tab to focus me</hx-button>
+</div>
+
+<SectionHead title="Disabled state" meta="2.1.3 + APG button.disabledSuppresses" />
+
+A disabled button suppresses both pointer activation AND keyboard activation (`Enter` / `Space`). The `hx-click` event does not fire. Disabled appearance uses reduced opacity, but the contrast ratio is still preserved through the focus path because the underlying `<button>` retains its accessible name.
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-button variant="primary" disabled>
+    Disabled — no activation
+  </hx-button>
+</div>
+
+<SectionHead title="Loading state" meta="3.2.5 Change on Request" />
+
+Loading state shows an inline spinner and prevents double-click submission. The button remains in DOM flow with stable dimensions (no layout shift), and the accessible name is preserved so the announcement remains stable for screen readers during the in-flight state.
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-button variant="primary" loading>
+    Submitting referral…
+  </hx-button>
+</div>
+
+<SectionHead title="Danger variant" meta="1.4.6 Contrast (Enhanced)" />
+
+The danger variant uses `--hx-color-danger-500` against `text.on-danger` (white) — the contrast ratio clears 7:1 (AAA) on every shipping brand (Apex, Meridian, Lumen, Verdant, Signal, Ember). Use sparingly and pair with confirmation flows for destructive operations.
+
+<div style={{ padding: '1rem 0' }}>
+  <hx-button variant="danger">Delete patient record</hx-button>
+</div>
+
+---
+
+<InlineAuditPanel tag="hx-button" markdown={auditRaw} />
+
+---
+
+## Variant gallery
+
+CEM-driven enumeration of every variant × size combination. Use this as a reference once you've understood the conformance evidence and ARIA pattern above; new docs readers should not start here.
+
+The **Storybook canvas** for `Components/Button` (the `--default` story tree on the sidebar) renders every variant, size, prefix/suffix slot, link mode, form integration, and healthcare scenario as individual stories with a11y panel + viewport + theme + brand toolbars.
+
+</div>

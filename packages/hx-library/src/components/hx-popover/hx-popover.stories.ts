@@ -144,6 +144,25 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Open-state story used by the formal AAA audit harness
+ * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The Default story
+ * renders the popover closed and the host uses display:contents, which
+ * yields a 0×0 host bounding box and defeats focus-appearance, target-
+ * size, and focus-not-obscured measurements. This export sets `open` and
+ * paints the popover body so the audit measures the visible surface.
+ */
+export const AAAAuditOpen: Story = {
+  render: () => html`
+    <div style="padding: 6rem; display: flex; justify-content: center; align-items: center;">
+      <hx-popover open>
+        <button slot="anchor">Open Popover</button>
+        <p style="margin: 0;">AAA-audit fixture — open popover surface.</p>
+      </hx-popover>
+    </div>
+  `,
+};
+
 // ─────────────────────────────────────────────────
 // 2. WITH ARROW
 // ─────────────────────────────────────────────────

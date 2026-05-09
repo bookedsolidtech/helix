@@ -88,6 +88,24 @@ export interface HxNumberInputDetail {
  * @cssprop [--hx-space-3] - Spacing token.
  * @cssprop [--hx-space-4] - Spacing token.
  * @cssprop [--hx-transition-fast] - Transition timing.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-number-input/AAA-AUDIT.md
+ * @keyboard-contract activate=character-input; navigate=ArrowUp,ArrowDown; disabled-suppresses=true
+ * @aria-pattern spinbutton
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated true
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-number-input
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-number-input')
 export class HelixNumberInput extends FormMixin(HelixElement) {

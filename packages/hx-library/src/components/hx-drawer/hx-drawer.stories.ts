@@ -140,6 +140,27 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Open-state story used by the formal AAA audit harness
+ * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The default story
+ * renders the drawer closed (open: false), which paints no surface and
+ * yields a 0×0 host bounding box — this defeats target-size, focus-
+ * appearance, and focus-not-obscured measurements. This export drives
+ * the drawer into its open state so the audit can measure the rendered
+ * panel surface and its focus trap.
+ *
+ * Not part of the consumer-facing docs sidebar — kept as a canonical
+ * sibling export so authors can also visually inspect the open state
+ * during cert reruns.
+ */
+export const AAAAuditOpen: Story = {
+  args: {
+    open: true,
+    placement: 'end',
+    size: 'md',
+  },
+};
+
 /** Drawer slides in from the start (left) edge. */
 export const PlacementStart: Story = {
   args: {

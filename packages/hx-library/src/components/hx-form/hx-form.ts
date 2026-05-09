@@ -29,6 +29,25 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  * @cssprop [--hx-form-gap=var(--hx-space-4)] - Gap between form fields.
  * @cssprop [--hx-form-max-width=none] - Maximum width of the form.
  * @cssprop [--hx-form-padding=0] - Internal padding of the form.
+ *
+ * @aaa-certified 2026-05-09
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-form/AAA-AUDIT.md
+ * @keyboard-contract submit=Enter
+ * @aria-pattern form
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/form.html
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-form
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-form')
 export class HelixForm extends HelixElement {

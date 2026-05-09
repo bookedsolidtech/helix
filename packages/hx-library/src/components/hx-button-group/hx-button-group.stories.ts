@@ -169,7 +169,7 @@ export const MixedVariants: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           Primary + Secondary + Ghost
         </p>
@@ -181,7 +181,7 @@ export const MixedVariants: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           All Secondary (recommended for grouped actions)
         </p>
@@ -214,7 +214,7 @@ export const DisabledChildren: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           One disabled button in the group
         </p>
@@ -226,7 +226,7 @@ export const DisabledChildren: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           All disabled buttons
         </p>
@@ -256,7 +256,7 @@ export const AccessibilityLabel: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           Always provide <code>aria-label</code> for screen reader context:
         </p>
@@ -268,7 +268,7 @@ export const AccessibilityLabel: Story = {
       </div>
       <div>
         <p
-          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
+          style="margin: 0 0 0.5rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           Or use the <code>label</code> property (sets via ElementInternals):
         </p>
@@ -296,7 +296,7 @@ export const DrupalUsage: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px;">
       <div>
         <p
-          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);"
+          style="margin: 0 0 0.75rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
         >
           Typical Drupal form action buttons rendered via Twig:
         </p>
@@ -335,7 +335,7 @@ export const PatientRecord: Story = {
         >
           Patient Record — Jane Doe (MRN: 00482917)
         </h3>
-        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-neutral-500, #66787B);">
+        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);">
           Last updated: 2026-03-03 at 09:14 AM by Dr. R. Patel
         </p>
       </div>
@@ -386,7 +386,7 @@ export const AllSizes: Story = {
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
         <span
-          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); min-width: 3rem;"
+          style="font-size: 0.75rem; color: var(--hx-color-text-muted, #4A5362); min-width: 3rem;"
           >sm</span
         >
         <hx-button-group hx-size="sm">
@@ -397,7 +397,7 @@ export const AllSizes: Story = {
       </div>
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
         <span
-          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); min-width: 3rem;"
+          style="font-size: 0.75rem; color: var(--hx-color-text-muted, #4A5362); min-width: 3rem;"
           >md</span
         >
         <hx-button-group hx-size="md">
@@ -408,7 +408,7 @@ export const AllSizes: Story = {
       </div>
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
         <span
-          style="font-size: 0.75rem; color: var(--hx-color-neutral-500, #66787B); min-width: 3rem;"
+          style="font-size: 0.75rem; color: var(--hx-color-text-muted, #4A5362); min-width: 3rem;"
           >lg</span
         >
         <hx-button-group hx-size="lg">

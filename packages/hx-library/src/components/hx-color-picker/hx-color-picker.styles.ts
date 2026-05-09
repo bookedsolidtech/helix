@@ -46,6 +46,10 @@ export const helixColorPickerStyles = css`
     background: var(--hx-color-neutral-0, #ffffff);
     cursor: pointer;
     transition: border-color var(--hx-transition-fast, 150ms ease);
+    /* WCAG 2.5.5 AAA Target Size (Enhanced): 44×44 minimum.
+       Bound to --hx-touch-target-min so the trigger clears the AAA-strict
+       floor at default sizing. */
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
   .trigger:hover:not([disabled]) {
     border-color: var(
@@ -206,13 +210,20 @@ export const helixColorPickerStyles = css`
   }
   .format-btn {
     flex-shrink: 0;
+    /* WCAG 2.5.5 (Enhanced) AAA — interactive panel controls must clear
+       44×44. Without min-width/min-height the format toggle collapses to
+       its label box (~44×24 in default rendering, sub-44 on the y-axis). */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     background: var(--hx-color-neutral-100, #ebeee9);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
     cursor: pointer;
     font-size: var(--hx-font-size-xs, 0.75rem);
-    color: var(--hx-color-neutral-600, #4a5362);
+    /* AAA 1.4.6: 12px label vs neutral-100 must be ≥7:1; neutral-700 = 9.34:1
+       (neutral-600 was 6.63:1, a tight AAA miss). */
+    color: var(--hx-color-neutral-700, #313e4b);
     text-transform: uppercase;
     font-weight: var(--hx-font-weight-semibold, 600);
     letter-spacing: 0.05em;
@@ -220,6 +231,8 @@ export const helixColorPickerStyles = css`
   .color-input {
     flex: 1;
     min-width: 0;
+    /* WCAG 2.5.5 (Enhanced) AAA — text input must clear 44×44. */
+    min-height: var(--hx-touch-target-min, 2.75rem);
     padding: var(--hx-space-1, 0.25rem) var(--hx-space-2, 0.5rem);
     border: var(--hx-border-width-thin, 1px) solid var(--hx-color-neutral-300, #b6bfb9);
     border-radius: var(--hx-border-radius-sm, 0.25rem);
