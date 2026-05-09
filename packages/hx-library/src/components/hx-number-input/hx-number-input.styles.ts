@@ -60,13 +60,13 @@ export const helixNumberInputStyles = css`
   .field__input-wrapper:focus-within {
     border-color: var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color));
     /* Fallback for Safari < 16.2 (no color-mix support) */
-    box-shadow: 0 0 0 var(--hx-focus-ring-width)
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color));
-    box-shadow: 0 0 0 var(--hx-focus-ring-width)
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
         var(--hx-number-input-focus-ring-color, var(--hx-focus-ring-color))
-          calc(var(--hx-focus-ring-opacity) * 100%),
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -80,13 +80,13 @@ export const helixNumberInputStyles = css`
   .field--error .field__input-wrapper:focus-within {
     border-color: var(--hx-number-input-error-color, var(--hx-color-error-500, #e5493e));
     /* Fallback for Safari < 16.2 (no color-mix support) */
-    box-shadow: 0 0 0 var(--hx-focus-ring-width)
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       var(--hx-number-input-error-color, var(--hx-color-error-500, #e5493e));
-    box-shadow: 0 0 0 var(--hx-focus-ring-width)
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
       color-mix(
         in srgb,
         var(--hx-number-input-error-color, var(--hx-color-error-500, #e5493e))
-          calc(var(--hx-focus-ring-opacity) * 100%),
+          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
         transparent
       );
   }
@@ -113,10 +113,10 @@ export const helixNumberInputStyles = css`
     color: var(--hx-number-input-color, var(--hx-color-text-strong));
     line-height: var(--hx-line-height-normal);
     width: 100%;
-    /* Size: md (default) */
+    /* Size: md (default) — WCAG 2.5.5 (Enhanced) AAA touch target. */
     padding: var(--hx-space-2) var(--hx-space-3);
     font-size: var(--hx-font-size-md);
-    min-height: var(--hx-size-10);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .field__input::placeholder {

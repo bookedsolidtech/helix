@@ -135,9 +135,13 @@ describe('hx-theme density attribute', () => {
       await comfortable.updateComplete;
       const comfortableHeight = getCssVar(comfortable, '--hx-input-height-md');
 
-      // Comfortable value must differ from both compact (2rem) and spacious (2.75rem)
+      // 3.8.0: --hx-input-height-md baseline shifted from 2.5rem (40px) to
+      // 2.75rem (44px) to meet WCAG 2.5.5 (Enhanced) Target Size AAA. The
+      // comfortable density inherits the baseline, so it now coincides with
+      // spacious at 2.75rem — that's intentional. The compact override
+      // (2rem / 32px) is the only density that diverges at this token.
       expect(comfortableHeight).not.toBe('2rem');
-      expect(comfortableHeight).not.toBe('2.75rem');
+      expect(comfortableHeight).toBe('2.75rem');
     });
   });
 

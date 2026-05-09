@@ -57,10 +57,13 @@ export const helixCopyButtonStyles = css`
     font-size: var(--hx-font-size-sm);
   }
 
+  /* md — WCAG 2.5.5 AAA Target Size (Enhanced): 44×44 minimum.
+     Bound to --hx-touch-target-min so the default md variant clears the
+     AAA-strict floor without requiring consumers to opt into sm or lg. */
   .button--md {
     padding: var(--hx-space-2);
-    min-width: var(--hx-size-10);
-    height: var(--hx-size-10);
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
     font-size: var(--hx-font-size-md);
   }
 

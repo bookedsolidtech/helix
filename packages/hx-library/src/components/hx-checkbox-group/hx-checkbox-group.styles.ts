@@ -10,6 +10,17 @@ export const helixCheckboxGroupStyles = css`
     cursor: not-allowed;
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — host-level focus ring (group is focusable
+   * via roving tabindex in Tier-2). Token-driven: --hx-focus-ring-width
+   * resolves to ≥2px.
+   */
+  :host(:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-checkbox-group-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   * {
     box-sizing: border-box;
   }

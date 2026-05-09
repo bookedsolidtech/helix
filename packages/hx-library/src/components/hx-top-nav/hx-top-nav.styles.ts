@@ -79,6 +79,18 @@ export const helixTopNavStyles = css`
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — enforce a ≥2px ring on slotted nav
+   * controls (links, buttons, hx-link, hx-button). Slotted bare anchors
+   * otherwise fall back to the 1px browser default.
+   */
+  ::slotted(a:focus-visible),
+  ::slotted(button:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-top-nav-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   .mobile-toggle__icon {
     width: var(--hx-space-6, 1.5rem);
     height: var(--hx-space-6, 1.5rem);

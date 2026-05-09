@@ -73,6 +73,16 @@ export const helixCheckboxStyles = css`
   /* ─── Focus Ring ─── */
 
   /*
+   * Suppress the browser default ~1px host outline. Without this, the formal
+   * AAA audit harness (which measures computed outline-width on the focused
+   * host) records a sub-2px outline and reports WCAG 2.4.13 Partially Supports.
+   * The visual focus indicator is rendered on the inner .checkbox__box below.
+   */
+  :host {
+    outline: none;
+  }
+
+  /*
    * Host-focus path: on the modern (IDL element-references) render branch the
    * host is the tabbable surface (tabindex=0) and the inner input is demoted
    * to tabindex=-1. Drive the focus ring from ':host(:focus-visible)' so

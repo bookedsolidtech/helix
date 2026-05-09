@@ -175,6 +175,9 @@ data/readiness/
 # Codex hardening campaign output (internal planning, never commit)
 .reports/codex/
 
+# Formal AAA re-cert audit output (internal planning, never commit)
+.reports/formal-aaa-audit/
+
 # Claude Code agent worktree directories
 .claude/worktrees/
 

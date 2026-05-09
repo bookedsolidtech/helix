@@ -20,6 +20,19 @@ export const helixPopoverStyles = css`
     display: inline-block;
   }
 
+  /*
+   * AAA 2.4.13 Focus Appearance — enforce a ≥2px focus ring on the slotted
+   * trigger so consumers who slot bare HTML controls inherit the same ring
+   * width as <hx-button>. Token-driven: --hx-focus-ring-width (default 2px).
+   */
+  ::slotted([slot='trigger']:focus-visible),
+  ::slotted(button:focus-visible),
+  ::slotted(a:focus-visible) {
+    outline: var(--hx-focus-ring-width, 2px) solid
+      var(--hx-popover-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    outline-offset: var(--hx-focus-ring-offset, 2px);
+  }
+
   [part='body'] {
     position: fixed;
     z-index: var(--hx-popover-z-index, 9999);

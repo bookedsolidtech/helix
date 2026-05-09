@@ -137,16 +137,22 @@ export const helixSplitButtonStyles = css`
     min-height: var(--hx-size-8, 2rem);
   }
 
-  /* md */
+  /* md — WCAG 2.5.5 AAA Target Size (Enhanced): 44×44 minimum.
+     Bound to --hx-touch-target-min so the default md variant clears the
+     AAA-strict floor without requiring consumers to opt into sm or lg. */
   .split-button--md .split-button__primary {
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     font-size: var(--hx-font-size-md, 1rem);
-    min-height: var(--hx-size-10, 2.5rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .split-button--md .split-button__trigger {
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
-    min-height: var(--hx-size-10, 2.5rem);
+    /* WCAG 2.5.5 (Enhanced) AAA — chevron trigger must clear 44×44 in
+       BOTH dimensions. Without min-width, the trigger collapses to its
+       icon width (~38 px) and fails the brand-theme matrix audit. */
+    min-width: var(--hx-touch-target-min, 2.75rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   /* lg */
@@ -163,14 +169,12 @@ export const helixSplitButtonStyles = css`
 
   /* ─── Variant: primary ─── */
 
-  /* Resting fill routes through action.primary.bg (primary-600) coordinated
-     with text.on-primary (neutral-0 / white) for AAA-large contrast across
-     all 6 brands (Apex 5.82:1, etc). Pre-3.3.0 was primary-500 + white at
-     3.43:1 — fails AA. Inline #0d1825 (neutral-900) fallback matches the
-     resolved primitive when the semantic is missing at cold-start, so the
-     uncached paint is dark-on-teal (5.20:1 AA) instead of white-on-teal
-     (3.43:1 fail). Mirrors hx-button precedent (lines 88-95 in
-     hx-button.styles.ts). */
+  /* Primary resting — bind through action.primary.bg (resolves to primary-600
+     across all 6 brands) coordinated with text.on-primary. Inline fallback
+     #0d1825 matches text.on-primary's resolved primitive (neutral-900) so a
+     cold-start without semantic tokens paints AA-tuned dark-on-teal (5.20:1)
+     rather than white-on-teal (3.43:1 fail). Mirrors hx-button precedent
+     (hx-button.styles.ts ~line 88) and Phase C structural fix. */
   .split-button--primary .split-button__primary,
   .split-button--primary .split-button__trigger {
     --hx-split-button-bg: var(--hx-color-action-primary-bg, #429797);
@@ -179,10 +183,9 @@ export const helixSplitButtonStyles = css`
     --hx-split-button-divider-color: var(--hx-color-primary-900, #0b3232);
   }
 
-  /* primary:hover — replace the universal brightness(0.9) filter with an
-     explicit swap to action.primary.bg-hover (primary-700) +
-     text.on-primary-strong (neutral-0) so the pair stays AAA-strict
-     7:1 across the 6 brands. Mirrors hx-button precedent. */
+  /* primary:hover — lift to action.primary.bg-hover (primary-700) with
+     text.on-primary-strong (neutral-0). Replaces the universal brightness(0.9)
+     filter which would degrade contrast on the resting pair. */
   .split-button--primary .split-button__primary:hover,
   .split-button--primary .split-button__trigger:hover {
     --hx-split-button-bg: var(--hx-color-action-primary-bg-hover, #0f7078);

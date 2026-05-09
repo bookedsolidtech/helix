@@ -99,7 +99,7 @@ const meta = {
         <button role="menuitem">Edit record</button>
         <button role="menuitem">Duplicate</button>
         <button role="menuitem">Archive</button>
-        <button role="menuitem" style="color: #b91c1c;">Delete</button>
+        <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">Delete</button>
       </hx-overflow-menu>
     </div>
   `,
@@ -309,7 +309,7 @@ export const ManyItems: Story = {
         <button role="menuitem">Duplicate</button>
         <button role="menuitem">Archive</button>
         <button role="menuitem">Export</button>
-        <button role="menuitem" style="color: #dc2626;">Delete</button>
+        <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">Delete</button>
       </hx-overflow-menu>
     </div>
   `,
@@ -338,25 +338,25 @@ export const PatientRowActions: Story = {
       <tbody>
         <tr style="border-bottom: 1px solid #e5e7eb;">
           <td style="padding: 0.75rem 1rem; color: #111827;">Jane Doe</td>
-          <td style="padding: 0.75rem 1rem; color: #6b7280;">Cardiology</td>
+          <td style="padding: 0.75rem 1rem; color: var(--hx-color-text-muted, #4A5362);">Cardiology</td>
           <td style="padding: 0.5rem 1rem; text-align: right;">
             <hx-overflow-menu role="menu" hx-size="sm" placement="bottom-end">
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: #dc2626;">Discharge</button>
+              <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">Discharge</button>
             </hx-overflow-menu>
           </td>
         </tr>
         <tr style="border-bottom: 1px solid #e5e7eb;">
           <td style="padding: 0.75rem 1rem; color: #111827;">John Smith</td>
-          <td style="padding: 0.75rem 1rem; color: #6b7280;">Neurology</td>
+          <td style="padding: 0.75rem 1rem; color: var(--hx-color-text-muted, #4A5362);">Neurology</td>
           <td style="padding: 0.5rem 1rem; text-align: right;">
             <hx-overflow-menu role="menu" hx-size="sm" placement="bottom-end">
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: #dc2626;">Discharge</button>
+              <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">Discharge</button>
             </hx-overflow-menu>
           </td>
         </tr>
@@ -424,7 +424,7 @@ export const WithIconItems: Story = {
         </button>
         <button
           role="menuitem"
-          style="display: flex; align-items: center; gap: 0.5rem; color: #dc2626;"
+          style="display: flex; align-items: center; gap: 0.5rem; color: var(--hx-color-error-text, #A21312);"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

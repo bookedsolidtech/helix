@@ -106,6 +106,24 @@ const _nextPopoverId = createIdCounter('hx-popover');
  * @cssprop [--hx-focus-ring-color] - Color.
  * @cssprop [--hx-color-primary-500] - Color.
  * @cssprop [--hx-focus-ring-offset] - CSS custom property.
+ * @aaa-certified 2026-05-08
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-popover/AAA-AUDIT.md
+ * @keyboard-contract dismiss=Escape; trap-focus=true
+ * @aria-pattern dialog
+ * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-popover
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 
 @customElement('hx-popover')

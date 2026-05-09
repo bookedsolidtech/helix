@@ -72,6 +72,16 @@ export const helixNavStyles = css`
     align-items: center;
     gap: var(--hx-space-1, 0.25rem);
     padding: var(--hx-nav-item-padding, var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem));
+    /*
+     * WCAG 2.5.5 (Enhanced) AAA — nav links rendered with default padding
+     * land at ~37 px tall (8 px + 1.5 line-height + 8 px). The link
+     * content is first-party (rendered via consumer-supplied props on
+     * <hx-nav-item>), so the slotted-content carve-out does not apply —
+     * this is a real component obligation. Bind --hx-nav-link-min-height
+     * to --hx-touch-target-min (2.75rem / 44 px) to grow the interactive
+     * area without enlarging the visible label.
+     */
+    min-height: var(--hx-nav-link-min-height, var(--hx-touch-target-min, 2.75rem));
     color: var(--hx-nav-link-color, var(--hx-color-neutral-100, #ebeee9));
     text-decoration: none;
     border-radius: var(--hx-nav-border-radius, var(--hx-border-radius-sm, 0.25rem));
@@ -100,8 +110,20 @@ export const helixNavStyles = css`
   }
 
   .nav__link--active {
-    background-color: var(--hx-nav-link-active-bg, var(--hx-color-primary-600, #0f7078));
-    color: var(--hx-nav-link-active-color, var(--hx-color-neutral-0, #ffffff));
+    background-color: var(--hx-nav-link-active-bg, var(--hx-color-action-primary-bg, #0f6363));
+    /* Use --hx-color-text-on-primary so the active-link text inherits the
+     * action-surface AAA-strict pairing (white on primary-700 in default
+     * themes; black on lighter primary-700 in the high-contrast theme).
+     * Pre-3.4.0 this consumed --hx-color-primary-600 directly which
+     * resolved to Apex #0F7078 + white = 5.82:1 — AAA-large only, AAA
+     * normal fail under WCAG 1.4.6 for body-text-sized link labels. The
+     * Phase 4 Tier 3 chain shift moved action.primary.bg to primary-700
+     * (Apex 7.03:1 with white) and consuming the action semantic here
+     * picks up the AAA-strict pairing across the full 6-brand matrix.
+     * Hardcoding white previously failed AAA-large in high-contrast
+     * (ratio 2.54 vs. 4.5 floor); the on-primary token resolves correctly
+     * in HC mode. */
+    color: var(--hx-nav-link-active-color, var(--hx-color-text-on-primary, #ffffff));
   }
 
   /* ─── Chevron Icon ─── */
