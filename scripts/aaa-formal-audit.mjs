@@ -1117,6 +1117,29 @@ async function auditComponent(name, browser) {
         result.verdicts['2.4.12'] = browserData.focusObscured || { verdict: VERDICT.PARTIALLY, evidence: 'No focus-obscured measurement available.' };
         result.verdicts['2.4.13'] = browserData.focusOutline || { verdict: VERDICT.PARTIALLY, evidence: 'No focus-outline measurement available.' };
         result.verdicts['2.5.5'] = browserData.targetSize || { verdict: VERDICT.PARTIALLY, evidence: 'No target-size measurement available.' };
+
+        // Phase 4 Tier 3 Task 5 — non-interactive components (alert / status
+        // live regions, structural primitives) are intentionally non-focusable.
+        // WCAG 2.4.13 Focus Appearance applies only to focusable user-interface
+        // components; for a host that legitimately cannot receive keyboard
+        // focus, the criterion is Not Applicable rather than Partially
+        // Supports. The harness's default 2.4.13 verdict (Partial because
+        // programmatic focus does not trigger :focus-visible) over-reports
+        // these. Detect the documented non-interactive patterns via
+        // @aria-pattern and downgrade 2.4.13 + 2.5.5 to NotApplicable.
+        const NON_INTERACTIVE_PATTERNS = new Set(['alert', 'status', 'none']);
+        const declaredPattern = (result.jsdoc.ariaPattern || '').toLowerCase();
+        if (NON_INTERACTIVE_PATTERNS.has(declaredPattern)) {
+          result.verdicts['2.4.13'] = {
+            verdict: VERDICT.NOT_APPLICABLE,
+            evidence: `@aria-pattern="${declaredPattern}" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)`,
+          };
+          // Target-size also doesn't apply to non-interactive callout surfaces.
+          result.verdicts['2.5.5'] = {
+            verdict: VERDICT.NOT_APPLICABLE,
+            evidence: `@aria-pattern="${declaredPattern}" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets. (Phase 4 Tier 3 Task 5.)`,
+          };
+        }
       }
     } finally {
       await page.close();
