@@ -28,3 +28,6 @@ export type {
   IconPaintMode,
   IconResolver,
 } from './types.js';
+
+export { iconLibraryAaaVerdict } from './aaa.js';
+export type { IconLibraryAaaState, IconLibraryAaaVerdict } from './aaa.js';
