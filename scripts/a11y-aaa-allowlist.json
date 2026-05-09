@@ -33,6 +33,7 @@
     "hx-text-input",
     "hx-textarea",
     "hx-time-picker",
+    "hx-toast",
     "hx-toggle-button",
     "hx-tooltip",
     "hx-top-nav"
