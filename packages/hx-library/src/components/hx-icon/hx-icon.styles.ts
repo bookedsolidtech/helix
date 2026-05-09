@@ -51,6 +51,12 @@ export const helixIconStyles = css`
     width: 100%;
     height: 100%;
     fill: currentColor;
+    /* stroke-width is consumed by stroke-paint and mixed-paint icon libraries
+       (Lucide, Heroicons-outline, Phosphor). Built-in helix + fa-free
+       libraries declare paintMode: 'fill' and ignore this property; setting
+       it here makes the token universally available without per-library
+       branching in the resolver. */
+    stroke-width: var(--hx-icon-stroke-width, 2);
     display: block;
     overflow: visible;
   }
@@ -71,6 +77,7 @@ export const helixIconStyles = css`
     width: 100%;
     height: 100%;
     fill: currentColor;
+    stroke-width: var(--hx-icon-stroke-width, 2);
     display: block;
   }
 
