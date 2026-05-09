@@ -779,9 +779,20 @@ function runFormalAuditGate(tagName, { dryRun = false, skipFormal = false } = {}
     );
   }
 
-  // Parse the audit.json for this component's verdicts.
+  // Parse the audit.json for this component's verdicts. Harness-environment
+  // problems (no audit.json, missing entry, browser fetch error) abort a live
+  // cert run but only warn during dry-run so operators can preview the rest
+  // of the cert flow when storybook is down.
+  const harnessProblem = (msg) => {
+    if (dryRun) {
+      console.warn(`\n[aaa-cert] WARNING: ${msg}`);
+      console.warn(`           A live cert run would ABORT here.`);
+      return { skipped: false, status: 'harness-error' };
+    }
+    die(msg);
+  };
   if (!exists(FORMAL_AUDIT_OUTPUT)) {
-    die(
+    return harnessProblem(
       `formal audit ran but produced no audit.json at ${relative(REPO_ROOT, FORMAL_AUDIT_OUTPUT)}.\n` +
         `   Cannot determine verdict. Re-run the harness manually and inspect.`,
     );
@@ -789,13 +800,13 @@ function runFormalAuditGate(tagName, { dryRun = false, skipFormal = false } = {}
   const report = readJson(FORMAL_AUDIT_OUTPUT);
   const entry = (report.results ?? []).find((r) => r.component === tagName);
   if (!entry) {
-    die(
+    return harnessProblem(
       `formal audit produced no entry for ${tagName} in ${relative(REPO_ROOT, FORMAL_AUDIT_OUTPUT)}.\n` +
         `   The audit may have errored on this component. Re-run with --component ${tagName} and inspect.`,
     );
   }
   if (entry.error) {
-    die(
+    return harnessProblem(
       `formal audit reported an error for ${tagName}: ${entry.error}\n` +
         `   Cert refused until the audit completes cleanly.`,
     );
