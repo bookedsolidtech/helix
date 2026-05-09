@@ -167,4 +167,9 @@ export const helixOverflowMenuStyles = css`
       border: 2px solid CanvasText;
     }
   }
+
+  /* hx-icon glyph sizing for the migrated trigger icons (1em parity). */
+  .trigger__glyph {
+    --hx-icon-size: 1em;
+  }
 `;

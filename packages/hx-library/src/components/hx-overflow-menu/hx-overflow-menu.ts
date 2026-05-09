@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
@@ -647,38 +648,26 @@ export class HelixOverflowMenu extends HelixElement {
 
   // ─── SVG Icons ───
 
-  /** @internal */
+  /**
+   * @internal Helix's curated set provides the horizontal `ellipsis` glyph.
+   * For the vertical variant we fall back to FA Free's `ellipsis-vertical`
+   * since it isn't part of helix's 32-glyph vocabulary.
+   */
   private _renderIcon() {
     if (this.icon === 'horizontal') {
-      return html`
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="1em"
-          height="1em"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <circle cx="5" cy="12" r="2" />
-          <circle cx="12" cy="12" r="2" />
-          <circle cx="19" cy="12" r="2" />
-        </svg>
-      `;
-    }
-    return html`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="1em"
-        height="1em"
-        viewBox="0 0 24 24"
-        fill="currentColor"
+      return html`<hx-icon
+        class="trigger__glyph"
+        library="helix"
+        name="ellipsis"
         aria-hidden="true"
-      >
-        <circle cx="12" cy="5" r="2" />
-        <circle cx="12" cy="12" r="2" />
-        <circle cx="12" cy="19" r="2" />
-      </svg>
-    `;
+      ></hx-icon>`;
+    }
+    return html`<hx-icon
+      class="trigger__glyph"
+      library="fa-free"
+      name="ellipsis-vertical"
+      aria-hidden="true"
+    ></hx-icon>`;
   }
 
   // ─── Render ───
