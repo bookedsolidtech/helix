@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { devWarn } from '../../utils/dev-warn.js';
 import { HelixElement } from '../../base/index.js';
 import { helixStatStyles } from './hx-stat.styles.js';
@@ -283,41 +284,9 @@ export class HelixStat extends HelixElement {
 
   /** @internal */
   private _renderTrendArrow(trend: 'up' | 'down'): ReturnType<typeof html> {
-    if (trend === 'up') {
-      return html`
-        <svg
-          class="stat__trend-arrow"
-          aria-hidden="true"
-          viewBox="0 0 12 12"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M6 10V2M6 2L2 6M6 2L10 6"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      `;
-    }
+    const name = trend === 'up' ? 'arrow-up' : 'arrow-down';
     return html`
-      <svg
-        class="stat__trend-arrow"
-        aria-hidden="true"
-        viewBox="0 0 12 12"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M6 2V10M6 10L2 6M6 10L10 6"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+      <hx-icon class="stat__trend-arrow" library="helix" name=${name}></hx-icon>
     `;
   }
 
