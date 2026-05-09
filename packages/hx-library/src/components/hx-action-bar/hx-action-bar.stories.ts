@@ -81,7 +81,7 @@ const meta = {
         Edit
       </button>
       <span
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-text-muted, #4A5362);"
         >Patient Record</span
       >
       <button
@@ -175,7 +175,7 @@ export const Filled: Story = {
           Sort
         </button>
         <span
-          style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);"
+          style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-text-muted, #4A5362);"
           >24 results</span
         >
         <button
@@ -277,7 +277,7 @@ export const Sticky: Story = {
         style="padding: 1rem; height: 400px; background: linear-gradient(to bottom, var(--hx-color-neutral-50, #F5F8F3), var(--hx-color-neutral-100, #EBEEE9));"
       >
         <p
-          style="color: var(--hx-color-neutral-500, #66787B); font-size: var(--hx-text-sm, 0.875rem);"
+          style="color: var(--hx-color-text-muted, #4A5362); font-size: var(--hx-text-sm, 0.875rem);"
         >
           Scroll down to see the sticky action bar.
         </p>
@@ -342,7 +342,7 @@ export const KeyboardNavigation: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B); margin-bottom: 0.5rem;"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-text-muted, #4A5362); margin-bottom: 0.5rem;"
       >
         Focus any button, then use Arrow Left/Right to navigate. Home moves to first, End to last.
       </p>
@@ -426,7 +426,7 @@ export const EmptyActionBar: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B); margin-bottom: 0.5rem;"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-text-muted, #4A5362); margin-bottom: 0.5rem;"
       >
         An action bar with no slotted content. The bar renders but shows no items.
       </p>
@@ -459,7 +459,7 @@ export const WithOverflowSlot: Story = {
   render: () => html`
     <div style="padding: 1rem;">
       <p
-        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B); margin-bottom: 0.5rem;"
+        style="font-size: var(--hx-text-sm, 0.875rem); color: var(--hx-color-text-muted, #4A5362); margin-bottom: 0.5rem;"
       >
         The <code>overflow</code> slot renders actions that appear when the bar has constrained
         space. Content in the overflow slot is only visible when assigned.

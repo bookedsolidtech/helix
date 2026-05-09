@@ -55,7 +55,7 @@ export const helixTabStyles = css`
   /* ─── Selected State ─── */
 
   :host([selected]) .tab {
-    color: var(--hx-tabs-tab-active-color, var(--hx-color-primary-600, #0f7078));
+    color: var(--hx-tabs-tab-active-color, var(--hx-color-text-link, #0f6363));
     border-bottom-color: var(
       --_tab-indicator-bottom-color,
       var(--hx-tabs-indicator-color, var(--hx-color-primary-500, #429797))

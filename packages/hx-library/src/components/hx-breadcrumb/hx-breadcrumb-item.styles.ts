@@ -31,7 +31,7 @@ export const helixBreadcrumbItemStyles = css`
     min-height: var(--hx-breadcrumb-link-min-height, var(--hx-touch-target-min, 44px));
     padding-block: var(--hx-breadcrumb-link-padding-y, var(--hx-space-2, 0.5rem));
     padding-inline: var(--hx-breadcrumb-link-padding-x, var(--hx-space-1, 0.25rem));
-    color: var(--hx-breadcrumb-link-color, var(--hx-color-primary-600, #0f7078));
+    color: var(--hx-breadcrumb-link-color, var(--hx-color-text-link, #0f6363));
     text-decoration: none;
     cursor: pointer;
     font-family: inherit;
@@ -43,7 +43,7 @@ export const helixBreadcrumbItemStyles = css`
   }
 
   [part='link']:hover {
-    color: var(--hx-breadcrumb-link-hover-color, var(--hx-color-primary-700, #0f6363));
+    color: var(--hx-breadcrumb-link-hover-color, var(--hx-color-text-link-hover, #07494a));
     text-decoration: underline;
   }
 

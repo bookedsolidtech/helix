@@ -326,7 +326,7 @@ export const ManualActivation: Story = {
   },
   render: (args) => html`
     <div>
-      <p style="margin-bottom: 1rem; font-size: 0.875rem; color: #6c757d;">
+      <p style="margin-bottom: 1rem; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);">
         In manual activation mode, arrow keys move focus without activating tabs. Press Space or
         Enter to activate the focused tab.
       </p>
@@ -463,7 +463,7 @@ export const Healthcare: Story = {
         <h2 style="margin: 0 0 0.25rem; font-size: 1.25rem; font-weight: 600; color: #212529;">
           Jane Doe
         </h2>
-        <p style="margin: 0; font-size: 0.875rem; color: #6c757d;">
+        <p style="margin: 0; font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);">
           MRN: 00123456 &nbsp;|&nbsp; DOB: 04/12/1978 &nbsp;|&nbsp; PCP: Dr. A. Patel
         </p>
       </header>
@@ -562,7 +562,7 @@ export const Healthcare: Story = {
               style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;"
             >
               <strong style="display: block; color: #212529;">Lisinopril 10 mg</strong>
-              <span style="font-size: 0.875rem; color: #6c757d;"
+              <span style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
                 >Once daily — Hypertension management</span
               >
             </li>
@@ -570,7 +570,7 @@ export const Healthcare: Story = {
               style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;"
             >
               <strong style="display: block; color: #212529;">Metformin 500 mg</strong>
-              <span style="font-size: 0.875rem; color: #6c757d;"
+              <span style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
                 >Twice daily with meals — Type 2 Diabetes</span
               >
             </li>
@@ -578,7 +578,7 @@ export const Healthcare: Story = {
               style="padding: 0.75rem; background: #f8f9fa; border-radius: 0.375rem; border-left: 4px solid #2563eb;"
             >
               <strong style="display: block; color: #212529;">Atorvastatin 20 mg</strong>
-              <span style="font-size: 0.875rem; color: #6c757d;"
+              <span style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);"
                 >Once daily at bedtime — Hypercholesterolemia</span
               >
             </li>
@@ -586,7 +586,7 @@ export const Healthcare: Story = {
               style="padding: 0.75rem; background: #fff3cd; border-radius: 0.375rem; border-left: 4px solid #f59e0b;"
             >
               <strong style="display: block; color: #212529;">Penicillin</strong>
-              <span style="font-size: 0.875rem; color: #b45309;"
+              <span style="font-size: 0.875rem; color: #7C2D12;"
                 >ALLERGY — Anaphylaxis. Do not administer.</span
               >
             </li>
@@ -598,27 +598,27 @@ export const Healthcare: Story = {
             <div style="padding: 0.75rem; border: 1px solid #dee2e6; border-radius: 0.375rem;">
               <header style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <strong style="color: #212529;">Follow-Up Visit — Diabetes Management</strong>
-                <time style="font-size: 0.875rem; color: #6c757d;">2026-02-18</time>
+                <time style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);">2026-02-18</time>
               </header>
               <p style="margin: 0; font-size: 0.9rem; color: #343a40; line-height: 1.6;">
                 Patient reports improved adherence to dietary guidelines. HbA1c trending down from
                 7.8% to 7.2%. Continue current Metformin dose. Follow up in 3 months for repeat
                 labs.
               </p>
-              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: #6c757d;">
+              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--hx-color-text-muted, #4A5362);">
                 Dr. A. Patel, MD
               </footer>
             </div>
             <div style="padding: 0.75rem; border: 1px solid #dee2e6; border-radius: 0.375rem;">
               <header style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                 <strong style="color: #212529;">Annual Wellness Exam</strong>
-                <time style="font-size: 0.875rem; color: #6c757d;">2025-11-05</time>
+                <time style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362);">2025-11-05</time>
               </header>
               <p style="margin: 0; font-size: 0.9rem; color: #343a40; line-height: 1.6;">
                 Routine annual exam. All preventive screenings up to date. Mammogram ordered. Flu
                 and COVID boosters administered. No new concerns reported by patient.
               </p>
-              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: #6c757d;">
+              <footer style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--hx-color-text-muted, #4A5362);">
                 Dr. A. Patel, MD
               </footer>
             </div>
@@ -897,7 +897,7 @@ export const KeyboardNavigation: Story = {
   name: 'Keyboard Navigation',
   render: () => html`
     <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+      <p style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4A5362); margin-bottom: 0.75rem;">
         Tab focuses the tab list. Arrow Left/Right navigates between tabs. Enter or Space activates
         the focused tab. Tab moves focus into the active tab panel.
       </p>
