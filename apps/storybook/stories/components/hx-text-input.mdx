@@ -1,0 +1,171 @@
+{/* hx-text-input.mdx — AAA conformance documentation for hx-text-input */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  AAAConformanceCard,
+  APGPatternCard,
+  ConsumerObligations,
+  InlineAuditPanel,
+  SectionHead,
+} from '../_components';
+import auditRaw from '../../../../packages/hx-library/src/components/hx-text-input/AAA-AUDIT.md?raw';
+
+<Meta title="Components/Text Input/Conformance" />
+
+<div className="hx-docs">
+
+# `hx-text-input` — Conformance documentation
+
+> **WCAG 2.2 Level AAA certified** for all 9 component-shippable Success Criteria including 3.3.6 Error Prevention (All), plus 2 peer standards (forced-colors, APG keyboard contract). Form-associated via `ElementInternals` so it participates in `<form>` validity, submission, and reset.
+
+---
+
+## Hero scenario — clinical intake form with validation
+
+The most common deployment of `hx-text-input` in healthcare: a clinical intake form where validation errors must be announced **before** the consumer submits, and where the error description is programmatically associated with the field via `aria-describedby`. The MRN field below has a regex-validation error you can see when the field is left empty or blank — the error text is rendered into the `error` slot, the input is marked `aria-invalid="true"`, and screen readers announce the error message inline with the input's accessible name.
+
+<div
+  style={{
+    maxWidth: '480px',
+    padding: '2rem',
+    background: 'var(--hx-color-surface-raised, #fff)',
+    border: '1px solid var(--hx-color-border-default, #dee2e6)',
+    borderRadius: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.25rem',
+  }}
+>
+  <h3 style={{ margin: 0, fontSize: '1.25rem' }}>New patient intake</h3>
+
+  <hx-text-input
+    label="Patient full name"
+    name="patient_name"
+    required
+    placeholder="Last, First MI"
+    helper-text="As it appears on government ID."
+  ></hx-text-input>
+
+  <hx-text-input
+    label="Medical record number (MRN)"
+    name="mrn"
+    required
+    pattern="[0-9]{8}"
+    inputmode="numeric"
+    helper-text="8-digit MRN issued by the EHR."
+    error-message="MRN must be exactly 8 digits."
+  ></hx-text-input>
+
+  <hx-text-input
+    label="Date of birth"
+    name="dob"
+    type="date"
+    required
+  ></hx-text-input>
+
+  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+    <hx-button variant="ghost" type="reset">Clear</hx-button>
+    <hx-button variant="primary" type="submit">Admit patient</hx-button>
+  </div>
+</div>
+
+The contract: `hx-text-input` is form-associated, so `<form>.checkValidity()` will report this MRN field as invalid until it matches the pattern. The `aria-invalid` state, the `error-message` slot, and the focus ring all coordinate to satisfy 3.3.6 Error Prevention (All) and 2.4.13 Focus Appearance simultaneously.
+
+---
+
+## How to read the badges
+
+The headline AAA card above is rendered automatically by the autodocs template from CEM. The conformance row table below expands each criterion chip into evidence — verdict, threshold, plain-language summary, and spec links — so a healthcare procurement reviewer can verify the cert claim row-by-row without opening the audit file.
+
+`hx-text-input` is a **P0** primitive. AAA cert is mandatory before release.
+
+---
+
+<AAAConformanceCard tag="hx-text-input" />
+
+---
+
+<APGPatternCard
+  tag="hx-text-input"
+  screenReaderAnnouncement="Medical record number, edit text, required, 8-digit MRN issued by the EHR"
+  screenReaderContext="When the MRN field above is focused, screen readers announce"
+/>
+
+<ConsumerObligations
+  tag="hx-text-input"
+  obligations={[
+    <>Pair every input with a visible <code>&lt;label&gt;</code> (or use the component's <code>label</code> prop). <code>aria-label</code> alone is permitted but reduces robustness — visible labels survive zoom, voice control, and switch-control acceptance.</>,
+    <>Render error text into the <code>error</code> slot or via the <code>error-message</code> prop. The component wires up <code>aria-describedby</code> + <code>aria-invalid</code> automatically; bypassing the slot loses the assistive-tech association.</>,
+    <>Do not strip the focus ring with author CSS. Customize via the <code>--hx-focus-ring-*</code> design tokens — direct <code>outline: none</code> trips 2.4.13 Focus Appearance.</>,
+    <>Render the input on a page that respects WCAG 2.2 page-level criteria (landmarks, page title, language). Component-level conformance does not certify the page.</>,
+    <>For inputs that mediate destructive or financial submission, pair with a confirmation step — 3.3.6 Error Prevention (All) is satisfied when the submission is reversible, checked, or confirmable.</>,
+  ]}
+/>
+
+---
+
+## Live state demos
+
+<SectionHead title="Default — empty optional input" meta="--default" />
+
+<div style={{ padding: '1rem 0', maxWidth: '360px' }}>
+  <hx-text-input
+    label="Phone number"
+    name="phone"
+    type="tel"
+    placeholder="(555) 123-4567"
+    helper-text="Used to confirm appointments."
+  ></hx-text-input>
+</div>
+
+<SectionHead title="Required + filled" meta="2.4.13 + 1.4.6" />
+
+A required input with a value. The required-indicator and the filled-state border both clear AAA contrast. Focus ring renders on top of either state.
+
+<div style={{ padding: '1rem 0', maxWidth: '360px' }}>
+  <hx-text-input
+    label="Allergies"
+    name="allergies"
+    required
+    value="Penicillin, sulfa drugs"
+  ></hx-text-input>
+</div>
+
+<SectionHead title="Error state" meta="3.3.6 Error Prevention" />
+
+`aria-invalid="true"` + error slot text. The error message is programmatically associated with the input via `aria-describedby`, so screen readers announce the error in line with the accessible name. The error border uses `--hx-color-danger-500` against the input surface — clears 7:1 AAA contrast.
+
+<div style={{ padding: '1rem 0', maxWidth: '360px' }}>
+  <hx-text-input
+    label="Email address"
+    name="email"
+    type="email"
+    value="dr.morgan@example"
+    error-message="Email must include a top-level domain (e.g. .health, .org)."
+  ></hx-text-input>
+</div>
+
+<SectionHead title="Disabled state" meta="2.1.3 + APG textbox.disabledSuppresses" />
+
+Disabled inputs do not receive focus and reject all character input. The accessible name is preserved so the assistive-tech announcement is stable.
+
+<div style={{ padding: '1rem 0', maxWidth: '360px' }}>
+  <hx-text-input
+    label="Insurance ID (locked from prior visit)"
+    name="insurance_id"
+    value="BCBS-20240118-PT44829"
+    disabled
+  ></hx-text-input>
+</div>
+
+---
+
+<InlineAuditPanel tag="hx-text-input" markdown={auditRaw} />
+
+---
+
+## Variant gallery
+
+The full enumeration of input types (text, email, tel, url, password, search, date, number), prefix/suffix slots, helper-text + error-text combinations, and brand/theme overrides lives in the `Components/Text Input` story tree. Use it once the conformance contract above is understood.
+
+</div>
