@@ -2,7 +2,78 @@ import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect } from 'storybook/test';
+import { registerIconLibrary, getBasePath } from '@helixui/icons';
 import './hx-icon.js';
+
+// Curated 32-glyph helix set names (mirrors @helixui/icons/dist/helix-names.json
+// at the time of authoring). Listed inline so the story renders without an
+// async fetch/import, and so designers can see the canonical set in source.
+const HELIX_GLYPHS = [
+  'arrow-down',
+  'arrow-flat',
+  'arrow-up',
+  'calendar',
+  'check',
+  'chevron-down',
+  'chevron-left',
+  'chevron-right',
+  'chevron-up',
+  'chevrons-left',
+  'chevrons-right',
+  'clock',
+  'close',
+  'copy',
+  'dash',
+  'dot',
+  'ellipsis',
+  'error',
+  'external-link',
+  'eye',
+  'eye-off',
+  'file',
+  'info',
+  'lock',
+  'menu',
+  'plus',
+  'star-filled',
+  'star-outline',
+  'success',
+  'trash',
+  'upload',
+  'warning',
+];
+
+// Representative subset of FA Free Solid (2000-glyph set). Rendering all
+// 2000 in one story would crash the autodocs panel; this sample covers the
+// common UI categories so the gallery is useful without being abusive.
+const FA_FREE_SAMPLE = [
+  'address-book',
+  'bell',
+  'bookmark',
+  'calendar',
+  'chart-line',
+  'circle-check',
+  'circle-exclamation',
+  'circle-info',
+  'circle-question',
+  'circle-xmark',
+  'clipboard',
+  'clock',
+  'cloud',
+  'comment',
+  'envelope',
+  'eye',
+  'file',
+  'filter',
+  'gear',
+  'heart',
+  'house',
+  'magnifying-glass',
+  'pen',
+  'star',
+  'trash',
+  'user',
+];
 
 // ─────────────────────────────────────────────────
 // Meta
@@ -297,6 +368,123 @@ export const DarkMode: Story = {
     src: undefined,
     spriteUrl: undefined,
     label: '',
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 8. LIBRARY: HELIX
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * The curated 32-glyph `helix` icon library, resolved through the
+ * `@helixui/icons` registry. Each tile renders `<hx-icon library="helix"
+ * name="…">` and exposes the glyph id beneath the icon. Use these glyphs
+ * for HELiX-internal patterns where consistency with the design system is
+ * required (form indicators, navigation chevrons, status states). Phase 5
+ * migrates internal components (hx-checkbox checkmark, hx-alert close, etc.)
+ * onto these names so consumers can override the entire HELiX glyph surface
+ * by re-registering `helix` as a custom library.
+ */
+export const LibraryHelix: Story = {
+  name: 'Library: helix',
+  render: () => html`
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem; padding: 1rem;"
+    >
+      ${HELIX_GLYPHS.map(
+        (name) => html`
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--hx-color-border-default, #e5e7eb); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-surface-default, #ffffff);"
+          >
+            <hx-icon library="helix" name=${name} hx-size="lg" label=${name}></hx-icon>
+            <code
+              style="font-size: 0.75rem; color: var(--hx-color-text-secondary, #6b7280); text-align: center; word-break: break-word;"
+              >${name}</code
+            >
+          </div>
+        `,
+      )}
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 9. LIBRARY: FA-FREE
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Representative slice of the bundled `fa-free` library (FA Free Solid,
+ * CC BY 4.0). The full set ships 2000 glyphs at
+ * `@helixui/icons/dist/fa-free-solid.svg`; this story shows a curated 26-glyph
+ * sample covering the most common UI categories. Use the controls panel on the
+ * Default story to render any FA Free Solid name.
+ */
+export const LibraryFaFree: Story = {
+  name: 'Library: fa-free',
+  render: () => html`
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem; padding: 1rem;"
+    >
+      ${FA_FREE_SAMPLE.map(
+        (name) => html`
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--hx-color-border-default, #e5e7eb); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-surface-default, #ffffff);"
+          >
+            <hx-icon library="fa-free" name=${name} hx-size="lg" label=${name}></hx-icon>
+            <code
+              style="font-size: 0.75rem; color: var(--hx-color-text-secondary, #6b7280); text-align: center; word-break: break-word;"
+              >${name}</code
+            >
+          </div>
+        `,
+      )}
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 10. CUSTOM LIBRARY
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Pattern for registering a consumer library at runtime via
+ * `registerIconLibrary()`. The story registers a one-off library named
+ * `story-demo` whose resolver returns a tiny inline SVG via a `data:` URI.
+ * Real consumer libraries typically resolve to a CDN URL or a sprite sheet
+ * served by the host application.
+ */
+export const CustomLibrary: Story = {
+  name: 'Custom library',
+  render: () => {
+    // Register on first render. Idempotent — subsequent registrations
+    // overwrite the previous entry, which is Shoelace-compatible behaviour.
+    registerIconLibrary('story-demo', {
+      resolver: () =>
+        // Minimal inline circle, encoded as a data URI so the story renders
+        // without a network request.
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3C/svg%3E",
+      spriteSheet: false,
+      paintMode: 'fill',
+    });
+    return html`
+      <div style="display: flex; flex-direction: column; gap: 1rem; padding: 1rem;">
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <hx-icon library="story-demo" name="anything" hx-size="xl" label="Demo"></hx-icon>
+          <code style="font-size: 0.875rem;"
+            >&lt;hx-icon library="story-demo" name="anything"&gt;</code
+          >
+        </div>
+        <p style="font-size: 0.875rem; color: #6b7280; max-width: 60ch; margin: 0;">
+          Consumer libraries register through
+          <code>registerIconLibrary(name, options)</code> from
+          <code>@helixui/icons</code>. The resolver maps an icon name to a sprite href or a
+          standalone SVG URL; an optional <code>mutator</code> runs after the component's built-in
+          security sanitization and lets you rewrite attributes (e.g. force <code>fill</code> to
+          <code>currentColor</code>). Current registry base path:
+          <code>${getBasePath()}</code>.
+        </p>
+      </div>
+    `;
   },
 };
 

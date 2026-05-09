@@ -13,6 +13,7 @@
     "test:single": "NODE_OPTIONS='--max-old-space-size=3072' vitest run"
   },
   "dependencies": {
+    "@helixui/icons": "workspace:*",
     "@helixui/library": "workspace:*",
     "@helixui/tokens": "workspace:*"
   },
