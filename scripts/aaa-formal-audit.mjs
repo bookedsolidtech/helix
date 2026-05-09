@@ -776,22 +776,58 @@ async function runBrowserChecks(componentName, page) {
       // a passing host).
       const ownOutlineWidth = parseFloat(window.getComputedStyle(outlineSource).outlineWidth || '0');
       if (ownOutlineWidth < 2) {
-        const root = host.shadowRoot;
-        if (root) {
-          const candidates = root.querySelectorAll('*');
-          for (const el of candidates) {
-            const cs = window.getComputedStyle(el);
-            const w = parseFloat(cs.outlineWidth || '0');
-            const okOutline = w >= 2 && cs.outlineStyle !== 'none';
-            const okShadow = cs.boxShadow && cs.boxShadow !== 'none' && /\b\d+\s*px/.test(cs.boxShadow);
-            if (okOutline || okShadow) {
-              // Confirm the element is currently visible (focus indicators
-              // on display:none parts do not count).
-              const r = el.getBoundingClientRect();
-              if (r.width >= 2 && r.height >= 2 && cs.visibility !== 'hidden' && cs.display !== 'none') {
-                outlineSource = el;
-                break;
+        // Walk the host's shadow tree AND the shadow trees of any slotted
+        // children. Group components like hx-checkbox-group and hx-radio-group
+        // host only a <slot> in their own shadow root; the focus-ring is
+        // painted on a part inside the slotted child's shadow root (e.g.
+        // <hx-checkbox>::shadow .checkbox__box). Without traversing slot
+        // assignments, the harness records 0px outline on the slot itself
+        // and reports a Does-Not-Support 2.4.13 false-fail.
+        const collectFocusCandidates = (root, sink) => {
+          if (!root) return;
+          const all = root.querySelectorAll('*');
+          for (const el of all) sink.push(el);
+          // For each <slot>, recurse into the shadow trees of assigned elements
+          // and harvest their light DOM children too.
+          const slots = root.querySelectorAll('slot');
+          for (const slot of slots) {
+            // assignedElements with flatten:true follows slot fallback chains
+            // when the slot is empty.
+            let assigned = [];
+            try {
+              assigned = slot.assignedElements({ flatten: true }) || [];
+            } catch {
+              assigned = [];
+            }
+            for (const a of assigned) {
+              sink.push(a);
+              if (a.shadowRoot) collectFocusCandidates(a.shadowRoot, sink);
+              // Also harvest the assigned element's light DOM descendants —
+              // some patterns render focus indicators directly on light DOM
+              // children rather than in shadow.
+              try {
+                const lightChildren = a.querySelectorAll('*');
+                for (const c of lightChildren) sink.push(c);
+              } catch {
+                /* ignore */
               }
+            }
+          }
+        };
+        const candidates = [];
+        if (host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
+        for (const el of candidates) {
+          const cs = window.getComputedStyle(el);
+          const w = parseFloat(cs.outlineWidth || '0');
+          const okOutline = w >= 2 && cs.outlineStyle !== 'none';
+          const okShadow = cs.boxShadow && cs.boxShadow !== 'none' && /\b\d+\s*px/.test(cs.boxShadow);
+          if (okOutline || okShadow) {
+            // Confirm the element is currently visible (focus indicators
+            // on display:none parts do not count).
+            const r = el.getBoundingClientRect();
+            if (r.width >= 2 && r.height >= 2 && cs.visibility !== 'hidden' && cs.display !== 'none') {
+              outlineSource = el;
+              break;
             }
           }
         }
@@ -825,6 +861,50 @@ async function runBrowserChecks(componentName, page) {
       const hasFocusBoxShadow = boxShadow && boxShadow !== 'none';
       const bgColor = styles.backgroundColor;
       const color = styles.color;
+      // WCAG 1.4.6 applies to text and images of text. A focus-paint surface
+      // with no rendered text content (e.g. hx-switch track, color-picker
+      // swatch grid cell, toggle thumb) is a 1.4.11 Non-text Contrast
+      // surface, not a 1.4.6 surface. Detect rendered-text-free elements so
+      // the 1.4.6 verdict can route to Not Applicable instead of measuring
+      // the cascade-inherited foreground color against an empty element's
+      // background.
+      //
+      // A focus-paint element counts as text-bearing if it has:
+      //   1. a non-empty direct child text node, OR
+      //   2. a non-empty innerText (covers slot-flattened light-DOM text), OR
+      //   3. a <slot> with assigned text-bearing nodes/elements.
+      const hasOwnTextContent = (() => {
+        // Direct text-node children.
+        for (const node of outlineSource.childNodes) {
+          if (node.nodeType === 3 /* TEXT_NODE */ && (node.textContent || '').trim().length > 0) {
+            return true;
+          }
+        }
+        // Rendered text via innerText (handles flattened slot content).
+        try {
+          const it = outlineSource.innerText;
+          if (typeof it === 'string' && it.trim().length > 0) return true;
+        } catch {
+          /* ignore */
+        }
+        // Slot-assigned content.
+        const slots = outlineSource.querySelectorAll
+          ? outlineSource.querySelectorAll('slot')
+          : [];
+        for (const slot of slots) {
+          let assigned = [];
+          try {
+            assigned = slot.assignedNodes({ flatten: true }) || [];
+          } catch {
+            assigned = [];
+          }
+          for (const a of assigned) {
+            if (a.nodeType === 3 /* TEXT_NODE */ && (a.textContent || '').trim().length > 0) return true;
+            if (a.nodeType === 1 /* ELEMENT_NODE */ && (a.textContent || '').trim().length > 0) return true;
+          }
+        }
+        return false;
+      })();
 
       // Focus obscured — sample three points (top-left, center, bottom-right)
       // and accept if the focused target OR a shadow descendant is at any of
@@ -867,6 +947,7 @@ async function runBrowserChecks(componentName, page) {
         targetIsHost: target === host,
         outlineSourceTag: outlineSource.tagName ? outlineSource.tagName.toLowerCase() : null,
         outlineSourceIsTarget: outlineSource === target,
+        outlineSourceHasOwnText: hasOwnTextContent,
         focusedViaKeyboard: didTab,
         tabPresses: undefined, // populated outside evaluate scope
       };
@@ -988,6 +1069,13 @@ async function runBrowserChecks(componentName, page) {
     // systems and is Not Applicable to the component itself.
     const isTransparentBg = /rgba?\([^,]+,\s*[^,]+,\s*[^,]+,\s*0(\.0+)?\s*\)/.test(measurements.bgColor || '')
       || measurements.bgColor === 'transparent';
+    // WCAG 1.4.6 applies to text and images of text. A focus-paint surface
+    // with no own text content (e.g. hx-switch track, swatch grid cells,
+    // toggle thumbs) is a 1.4.11 Non-text Contrast surface — measuring
+    // cascade-inherited foreground color against an empty element's
+    // background is a category error. Route to Not Applicable when the
+    // outline-source has no rendered text content.
+    const hasNoOwnText = measurements.outlineSourceHasOwnText === false;
     if (isTransparentBg) {
       // Component (host or inner control) is transparent — foreground inherits
       // the consumer page background. Per WCAG 2.2 1.4.6, the contrast
@@ -1000,6 +1088,20 @@ async function runBrowserChecks(componentName, page) {
         ratio: null,
         verdict: VERDICT.NOT_APPLICABLE,
         evidence: `Component target (${measurements.targetTag}) is transparent (bg=${measurements.bgColor}); foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.`,
+      };
+    } else if (hasNoOwnText) {
+      // No text content on the focus-paint surface — this is a 1.4.11
+      // Non-text Contrast scenario, not a 1.4.6 text-contrast scenario.
+      // Cascade-inherited foreground color is meaningless when the element
+      // renders no characters; measuring it would compare body text color
+      // (typically black) against a UI-component fill, producing false
+      // verdicts that flip on every brand swap. Route to Not Applicable.
+      result.contrast = {
+        fg: measurements.color,
+        bg: measurements.bgColor,
+        ratio: null,
+        verdict: VERDICT.NOT_APPLICABLE,
+        evidence: `Focus-paint surface <${measurements.outlineSourceTag}> renders no own text content; WCAG 1.4.6 applies only to text and images of text. UI-component-boundary contrast is governed by 1.4.11 (separate harness probe).`,
       };
     } else {
       const ratio = contrastRatio(measurements.color, measurements.bgColor);
