@@ -46,6 +46,10 @@ export const helixColorPickerStyles = css`
     background: var(--hx-color-neutral-0, #ffffff);
     cursor: pointer;
     transition: border-color var(--hx-transition-fast, 150ms ease);
+    /* WCAG 2.5.5 AAA Target Size (Enhanced): 44×44 minimum.
+       Bound to --hx-touch-target-min so the trigger clears the AAA-strict
+       floor at default sizing. */
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
   .trigger:hover:not([disabled]) {
     border-color: var(

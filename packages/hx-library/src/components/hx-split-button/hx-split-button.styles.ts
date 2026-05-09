@@ -137,16 +137,18 @@ export const helixSplitButtonStyles = css`
     min-height: var(--hx-size-8, 2rem);
   }
 
-  /* md */
+  /* md — WCAG 2.5.5 AAA Target Size (Enhanced): 44×44 minimum.
+     Bound to --hx-touch-target-min so the default md variant clears the
+     AAA-strict floor without requiring consumers to opt into sm or lg. */
   .split-button--md .split-button__primary {
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-4, 1rem);
     font-size: var(--hx-font-size-md, 1rem);
-    min-height: var(--hx-size-10, 2.5rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   .split-button--md .split-button__trigger {
     padding: var(--hx-space-2, 0.5rem) var(--hx-space-3, 0.75rem);
-    min-height: var(--hx-size-10, 2.5rem);
+    min-height: var(--hx-touch-target-min, 2.75rem);
   }
 
   /* lg */
