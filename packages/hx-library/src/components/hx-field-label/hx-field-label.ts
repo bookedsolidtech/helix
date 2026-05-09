@@ -56,6 +56,23 @@ import { forcedColorsSurface } from '../../styles/forced-colors.js';
  * @cssprop [--hx-font-size-xs] - Font size.
  * @cssprop [--hx-font-weight-normal] - Font weight.
  * @cssprop [--hx-color-neutral-500] - Color.
+ *
+ * @aaa-certified 2026-05-09
+ * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
+ * @aaa-audit src/components/hx-field-label/AAA-AUDIT.md
+ * @aria-pattern label
+ * @forced-colors-supported true
+ * @stability stable
+ * @since 3.7.0
+ * @form-associated false
+ * @theme-aware true
+ * @brand-aware true
+ * @drupal-sdc-eligible true
+ * @react-wrapper-status complete
+ * @figma-component-name hx-field-label
+ * @priority-tier P0
+ * @phi-handles false
+ * @clinical-context none
  */
 @customElement('hx-field-label')
 export class HelixFieldLabel extends HelixElement {
