@@ -1,6 +1,6 @@
 # WCAG Contrast Report — `@helixui/tokens`
 
-_Generated 2026-05-08T03:09:02.677Z from `@helixui/tokens@3.5.0`._
+_Generated 2026-05-09T00:18:58.032Z from `@helixui/tokens@3.7.0`._
 
 Per-mode pass/fail telemetry for every semantically valid `(text × surface)` pair declared in the contrast matrix. **AA is the published gate** (enforced by `contrast.test.ts`); **AAA is informational** and surfaces here so consumers and auditors can see the actual ceiling each pairing reaches.
 
@@ -14,11 +14,11 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 
 ## Aggregate
 
-**Across all three modes:** 106 of 160 pair-instances AAA-pass · 54 AA-only · 0 sub-AA
+**Across all three modes:** 108 of 160 pair-instances AAA-pass · 52 AA-only · 0 sub-AA
 
 ## Light Mode
 
-**Summary:** 30 of 58 pairs AAA-pass · 28 AA-only · 0 sub-AA
+**Summary:** 31 of 58 pairs AAA-pass · 27 AA-only · 0 sub-AA
 
 | Status | Role | Text token | Surface token | Ratio | AAA min | AA | AAA |
 |---|---|---|---|---:|---:|:---:|:---:|
@@ -51,15 +51,15 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `neutral-0` | `error-700` | 7.96:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `neutral-0` | `info-600` | 4.92:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `neutral-0` | `info-700` | 7.26:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-on-primary-strong` | `action-primary-bg-hover` | 7.03:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-on-primary-strong` | `action-primary-bg-active` | 10.19:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-on-primary-strong` | `action-primary-bg-hover` | 10.19:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-on-primary-strong` | `action-primary-bg-active` | 13.85:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-on-error-strong` | `action-danger-bg-hover` | 5.46:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `text-on-error-strong` | `action-danger-bg-active` | 7.96:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | ui | `action-primary-bg-inverted-hover` | `surface-inverse` | 7.27:1 | 3.0:1 | ✅ | ✅ |
 | ✅ | ui | `action-danger-bg-inverted-hover` | `surface-inverse` | 6.58:1 | 3.0:1 | ✅ | ✅ |
 | ✅ | body | `neutral-900` | `action-primary-bg-inverted-hover` | 7.27:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-on-error` | `action-danger-bg-inverted-hover` | 6.58:1 | 7.0:1 | ✅ | ⚠️ |
-| ⚠️ | body | `text-on-primary` | `action-primary-bg` | 5.82:1 | 7.0:1 | ✅ | ⚠️ |
+| ✅ | body | `text-on-primary` | `action-primary-bg` | 7.03:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-on-error` | `action-danger-bg` | 4.56:1 | 7.0:1 | ✅ | ⚠️ |
 | ⚠️ | body | `action-secondary-fg` | `surface-default` | 5.82:1 | 7.0:1 | ✅ | ⚠️ |
 | ⚠️ | body | `action-secondary-fg` | `action-secondary-bg-hover` | 5.35:1 | 7.0:1 | ✅ | ⚠️ |
@@ -83,7 +83,7 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 
 ## Dark Mode
 
-**Summary:** 32 of 57 pairs AAA-pass · 25 AA-only · 0 sub-AA
+**Summary:** 33 of 57 pairs AAA-pass · 24 AA-only · 0 sub-AA
 
 | Status | Role | Text token | Surface token | Ratio | AAA min | AA | AAA |
 |---|---|---|---|---:|---:|:---:|:---:|
@@ -116,13 +116,13 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `neutral-0` | `error-700` | 7.96:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `neutral-0` | `info-600` | 4.92:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `neutral-0` | `info-700` | 7.26:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-on-primary-strong` | `action-primary-bg-hover` | 7.03:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-on-primary-strong` | `action-primary-bg-active` | 10.19:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-on-primary-strong` | `action-primary-bg-hover` | 10.19:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-on-primary-strong` | `action-primary-bg-active` | 13.85:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-on-error-strong` | `action-danger-bg-hover` | 5.46:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `text-on-error-strong` | `action-danger-bg-active` | 7.96:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `neutral-900` | `action-primary-bg-inverted-hover` | 7.27:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-on-error` | `action-danger-bg-inverted-hover` | 6.58:1 | 7.0:1 | ✅ | ⚠️ |
-| ⚠️ | body | `text-on-primary` | `action-primary-bg` | 5.82:1 | 7.0:1 | ✅ | ⚠️ |
+| ✅ | body | `text-on-primary` | `action-primary-bg` | 7.03:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-on-error` | `action-danger-bg` | 4.56:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `action-secondary-fg` | `surface-default` | 7.27:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `action-secondary-fg` | `action-secondary-bg-hover` | 5.63:1 | 7.0:1 | ✅ | ⚠️ |
@@ -174,11 +174,11 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `text-on-warning` | `warning-600` | 14.56:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-on-error` | `error-600` | 11.06:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-on-info` | `info-600` | 12.60:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-on-primary-strong` | `action-primary-bg-hover` | 11.65:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-on-primary-strong` | `action-primary-bg-hover` | 8.26:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-on-primary-strong` | `action-primary-bg-active` | 11.65:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-on-error-strong` | `action-danger-bg-hover` | 11.06:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-on-error-strong` | `action-danger-bg-active` | 7.59:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-on-primary` | `action-primary-bg` | 8.26:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-on-primary` | `action-primary-bg` | 11.65:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-on-error` | `action-danger-bg` | 7.59:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `action-secondary-fg` | `surface-default` | 8.26:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `action-ghost-fg` | `surface-default` | 8.26:1 | 7.0:1 | ✅ | ✅ |
