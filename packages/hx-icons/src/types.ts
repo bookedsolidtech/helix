@@ -3,8 +3,6 @@
  *
  * Wire-compatible with Shoelace's `registerIconLibrary()` API so that
  * downstream consumers can swap implementations without code changes.
- *
- * Phase 1: type definitions only. Runtime implementation lands in Phase 2.
  */
 
 /**
@@ -12,9 +10,9 @@
  * to obtain the icon's SVG markup.
  *
  * @param name - The icon name passed to `<hx-icon name="...">`.
- * @returns A URL string, or a Promise resolving to one.
+ * @returns A URL string.
  */
-export type IconResolver = (name: string) => string | Promise<string>;
+export type IconResolver = (name: string) => string;
 
 /**
  * Mutates a resolved SVG element before it is rendered into the DOM.
@@ -51,8 +49,6 @@ export interface IconLibraryOptions {
    * When true, the resolver returns URLs of the form
    * `<sprite-url>#<icon-id>` and the consumer should render
    * `<svg><use href="..."/></svg>` rather than inlining markup.
-   *
-   * Phase 2+ feature — included here so the type surface is stable.
    */
   spriteSheet?: boolean;
 }
@@ -60,6 +56,8 @@ export interface IconLibraryOptions {
 /**
  * The registered representation of an icon library. Internal state shape
  * returned by `getIconLibrary()`.
+ *
+ * `spriteSheet` is normalized to a boolean at registration time.
  */
 export interface IconLibrary {
   /** The library identifier passed to `registerIconLibrary()`. */
@@ -69,5 +67,5 @@ export interface IconLibrary {
   /** The optional mutator function provided at registration. */
   mutator?: IconMutator;
   /** Whether the library uses a sprite sheet at the resolved URL. */
-  spriteSheet?: boolean;
+  spriteSheet: boolean;
 }
