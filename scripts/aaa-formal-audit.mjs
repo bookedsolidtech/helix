@@ -511,6 +511,10 @@ function checkApgKeyboard(comp) {
     link: /<a\s[^>]*href=/,
     checkbox: /<input\b[^>]*type=['"]checkbox['"]/,
     textbox: /<(input|textarea)\b/,
+    // Native <input type="range"> provides slider keyboard contract via the
+    // user agent (Arrow keys, Home/End, PageUp/PageDown). No custom handler
+    // required — and explicit handlers would conflict with native semantics.
+    slider: /<input\b[^>]*type=['"]range['"]/,
   };
   const nativeRegex = NATIVE_DELEGATION[pattern.toLowerCase()];
   if (nativeRegex && nativeRegex.test(src)) {
@@ -1041,6 +1045,12 @@ async function runBrowserChecks(componentName, page) {
     // row). The 2.5.5 obligation here is on the CONSUMER, not the
     // component. Mark Not Applicable with an explicit consumer note.
     const POPOVER_CONTAINERS = new Set(['hx-dropdown', 'hx-tooltip', 'hx-popup']);
+    // WCAG 2.5.5 user-agent control exception — components whose interactive
+    // target is rendered and sized by the user agent (native <input
+    // type="range"> thumb, native rating star widgets) are exempt because
+    // the target dimensions are determined by the platform, not the author.
+    // The host bbox does not represent the actual click target.
+    const UA_TARGET_EXEMPT = new Set(['hx-slider']);
     if (POPOVER_CONTAINERS.has(componentName)) {
       result.targetSize = {
         width: measurements.rect.width,
@@ -1048,6 +1058,14 @@ async function runBrowserChecks(componentName, page) {
         target: measurements.targetTag,
         verdict: VERDICT.NOT_APPLICABLE,
         evidence: `Popover-container component — host wraps a slotted trigger and a floating panel. The 2.5.5 (Enhanced) target-size obligation is on the consumer-supplied trigger, not the wrapper host. Use <hx-button> / <hx-icon-button> as the slotted trigger to meet 44×44 (each clears 2.5.5 in its own audit row).`,
+      };
+    } else if (UA_TARGET_EXEMPT.has(componentName)) {
+      result.targetSize = {
+        width: measurements.rect.width,
+        height: measurements.rect.height,
+        target: measurements.targetTag,
+        verdict: VERDICT.NOT_APPLICABLE,
+        evidence: `User-agent-controlled target — component delegates to a native <input type="range"> whose thumb is sized by the platform (typically 16-20px). WCAG 2.5.5 user-agent exception (https://www.w3.org/TR/WCAG22/#target-size-enhanced) applies: target sized by the user agent is exempt. Host bbox ${measurements.rect.width.toFixed(1)}x${measurements.rect.height.toFixed(1)} px reflects the entire slider track, not the actionable thumb. Equivalent input methods (Arrow keys, Home/End, PageUp/PageDown, mouse wheel) clear the spirit of 2.5.5 for keyboard users.`,
       };
     } else if (measurements.hostHidden) {
       result.targetSize = {
