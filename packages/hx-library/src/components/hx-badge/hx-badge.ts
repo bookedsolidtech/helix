@@ -2,6 +2,7 @@ import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixBadgeStyles } from './hx-badge.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
@@ -263,12 +264,12 @@ export class HelixBadge extends HelixElement {
               aria-label=${this.removeLabel}
               @click=${this._handleRemove}
             >
-              <svg viewBox="0 0 12 12" aria-hidden="true" width="10" height="10">
-                <path
-                  d="M2.22 2.22a.75.75 0 011.06 0L6 4.94l2.72-2.72a.75.75 0 011.06 1.06L7.06 6l2.72 2.72a.75.75 0 01-1.06 1.06L6 7.06 3.28 9.78a.75.75 0 01-1.06-1.06L4.94 6 2.22 3.28a.75.75 0 010-1.06z"
-                  fill="currentColor"
-                />
-              </svg>
+              <hx-icon
+                class="badge__remove-glyph"
+                library="helix"
+                name="close"
+                aria-hidden="true"
+              ></hx-icon>
             </button>`
           : nothing}
       </span>
