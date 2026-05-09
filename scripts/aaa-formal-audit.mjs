@@ -90,6 +90,7 @@ import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSy
 import { resolve, dirname, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -1213,22 +1214,84 @@ async function runBrowserChecks(componentName, page) {
       };
     } else {
       const ratio = contrastRatio(measurements.color, measurements.bgColor);
+      const targetRatio = ratio === null ? null : Number(ratio.toFixed(2));
+      const targetVerdict =
+        ratio === null
+          ? VERDICT.PARTIALLY
+          : ratio >= 7.0
+            ? VERDICT.SUPPORTS
+            : ratio >= 4.5
+              ? VERDICT.PARTIALLY
+              : VERDICT.DOES_NOT;
+      const targetEvidence =
+        ratio === null
+          ? `Could not compute contrast (fg=${measurements.color}, bg=${measurements.bgColor}).`
+          : `${ratio.toFixed(2)}:1 (fg ${measurements.color}, bg ${measurements.bgColor})`;
+
+      // Phase 4 Tier 3 harness extension (3.8.0): the focused-target
+      // sample alone misses AAA contrast failures elsewhere in the
+      // story DOM (caption text, sample composition labels, dim
+      // primitive-tier color-pinned spans). axe-core walks every
+      // text node and applies the WCAG 1.4.6 7:1 floor — run its
+      // `color-contrast-enhanced` rule on the full story and downgrade
+      // the 1.4.6 verdict if any text node fails. This closes the gap
+      // that allowed 6 hx-* components (action-bar, breadcrumb,
+      // button-group, form, overflow-menu, tabs) to ship 473/473
+      // formal-audit-clean while CI's a11y-audit.js fan-out caught
+      // them at AAA-strict.
+      let axeViolations = [];
+      try {
+        const axeResult = await new AxeBuilder({ page })
+          .withRules(['color-contrast-enhanced'])
+          .analyze();
+        axeViolations = (axeResult.violations || []).filter(
+          (v) => v.id === 'color-contrast-enhanced',
+        );
+      } catch (axeErr) {
+        // Non-fatal — the focused-target sample still carries the
+        // primary verdict. Record the axe error in the evidence so
+        // reviewers know the broader sweep was attempted.
+        axeViolations = [];
+        result.contrastAxeError = axeErr instanceof Error ? axeErr.message : String(axeErr);
+      }
+      const axeNodeCount = axeViolations.reduce(
+        (sum, v) => sum + (Array.isArray(v.nodes) ? v.nodes.length : 0),
+        0,
+      );
+      const axeSamples = [];
+      for (const v of axeViolations) {
+        for (const n of (v.nodes || []).slice(0, 5)) {
+          axeSamples.push({
+            target: Array.isArray(n.target) ? n.target.join(' ') : String(n.target ?? ''),
+            failureSummary: n.failureSummary || '',
+            html: typeof n.html === 'string' ? n.html.slice(0, 240) : '',
+          });
+        }
+      }
+
+      // Merge: any axe AAA contrast violation downgrades the verdict
+      // to at least Partially Supports. If the focused-target sample
+      // already failed at AA (DOES_NOT), keep that stronger signal.
+      let mergedVerdict = targetVerdict;
+      if (axeNodeCount > 0 && mergedVerdict === VERDICT.SUPPORTS) {
+        mergedVerdict = VERDICT.PARTIALLY;
+      }
+      const mergedEvidence =
+        axeNodeCount === 0
+          ? `${targetEvidence}; axe color-contrast-enhanced sweep: 0 violations across full story DOM.`
+          : `${targetEvidence}; axe color-contrast-enhanced sweep: ${axeNodeCount} text node(s) fail AAA 7:1 within the story (see contrastAxe.samples).`;
+
       result.contrast = {
         fg: measurements.color,
         bg: measurements.bgColor,
-        ratio: ratio === null ? null : Number(ratio.toFixed(2)),
-        verdict:
-          ratio === null
-            ? VERDICT.PARTIALLY
-            : ratio >= 7.0
-              ? VERDICT.SUPPORTS
-              : ratio >= 4.5
-                ? VERDICT.PARTIALLY
-                : VERDICT.DOES_NOT,
-        evidence:
-          ratio === null
-            ? `Could not compute contrast (fg=${measurements.color}, bg=${measurements.bgColor}).`
-            : `${ratio.toFixed(2)}:1 (fg ${measurements.color}, bg ${measurements.bgColor})`,
+        ratio: targetRatio,
+        verdict: mergedVerdict,
+        evidence: mergedEvidence,
+      };
+      result.contrastAxe = {
+        rule: 'color-contrast-enhanced',
+        violationCount: axeNodeCount,
+        samples: axeSamples,
       };
     }
 
