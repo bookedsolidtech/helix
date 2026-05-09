@@ -150,6 +150,18 @@ function renderPerCriterionTable(verdicts) {
       `| ${id} | ${title} | ${verdict} | ${threshold} | ${measured.replace(/\|/g, '\\|')} | [spec](${refUrl}) |`,
     );
   }
+  // Phase 4 (hx-icon): supplemental WCAG 1.4.11 row when the harness
+  // emitted an icon-specific non-text-contrast measurement. This is NOT one
+  // of the 11 cert-claimed criteria; it is recorded alongside the matrix
+  // because hx-icon's contrast obligation is carried by 1.4.11 rather than
+  // 1.4.6 (the component renders no text content).
+  const iconContrast = verdicts['non-text-contrast-icon'];
+  if (iconContrast) {
+    const measured = (iconContrast.evidence ?? '—').replace(/\|/g, '\\|');
+    rows.push(
+      `| 1.4.11 | Non-text Contrast (icon) | ${iconContrast.verdict} | Rendered glyph color vs. document background ≥3:1 | ${measured} | [spec](https://www.w3.org/TR/WCAG22/#non-text-contrast) |`,
+    );
+  }
   return rows.join('\n');
 }
 
@@ -203,6 +215,34 @@ function renderDetailedEvidence(component, verdicts) {
       lines.push('');
       lines.push(`**Underlying CSS spec:** [${c.specUrl}](${c.specUrl})`);
     }
+    blocks.push(lines.join('\n'));
+  }
+  // Phase 4 (hx-icon): supplemental block for the icon-specific
+  // non-text-contrast measurement, when present.
+  const iconContrast = verdicts['non-text-contrast-icon'];
+  if (iconContrast) {
+    const lines = [];
+    lines.push('### 1.4.11 — Non-text Contrast (AA) — supplemental icon measurement');
+    lines.push('');
+    lines.push(`**Verdict:** ${iconContrast.verdict}`);
+    lines.push('');
+    lines.push(
+      '**Spec:** [https://www.w3.org/TR/WCAG22/#non-text-contrast](https://www.w3.org/TR/WCAG22/#non-text-contrast)',
+    );
+    lines.push('');
+    lines.push(
+      '**Understanding:** [https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html](https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html)',
+    );
+    lines.push('');
+    lines.push(
+      '**Summary (from W3C):** The visual presentation of UI components and graphical objects has a contrast ratio of at least 3:1 against adjacent color(s).',
+    );
+    lines.push('');
+    lines.push(`**Evidence:** ${iconContrast.evidence ?? '—'}`);
+    lines.push('');
+    lines.push(
+      '**Cert note:** WCAG 1.4.11 is an AA criterion (not part of the 11-criterion AAA cert claim). It is recorded here because `<hx-icon>` is a non-text-contrast surface — text-contrast (1.4.6) does not apply to a presentational glyph. The supplemental measurement is what backs the per-library AAA verdict published in `packages/hx-icons/AAA-VERDICT.md`.',
+    );
     blocks.push(lines.join('\n'));
   }
   return blocks.join('\n\n');

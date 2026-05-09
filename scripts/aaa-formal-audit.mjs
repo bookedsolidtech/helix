@@ -327,6 +327,17 @@ function checkKeyboardNoException(comp) {
       evidence: `@aria-pattern="${declaredPattern}" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2). Keyboard contract is provided by child form-control elements or the user agent; the host has no per-pattern key requirement.`,
     };
   }
+  // Phase 4 (hx-icon AAA cert): `@aria-pattern none` declares a
+  // presentational primitive with no widget role of its own. WCAG 2.1.3
+  // applies to interactive functionality; a presentational primitive has
+  // none. Mark Not Applicable rather than failing on a false-positive
+  // role="img" match in render output.
+  if (declaredPattern === 'none') {
+    return {
+      verdict: VERDICT.NOT_APPLICABLE,
+      evidence: `@aria-pattern="none" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality.`,
+    };
+  }
   const hasKeydown =
     /\b(addEventListener\(['"]keydown|@keydown\b|onKeyDown|handleKeyDown|_handleKey)/.test(src);
   const hasNativeFocusable = /<(button|a|input|textarea|select|form)\b/.test(src);
@@ -1343,6 +1354,108 @@ function contrastRatio(fgStr, bgStr) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
+// ── hx-icon specific: non-text contrast (WCAG 1.4.11) ──────────────────────
+
+/**
+ * Phase 4 (hx-icon AAA cert) — `<hx-icon>` is presentational and renders no
+ * text content of its own, so WCAG 1.4.6 Contrast (Enhanced) is Not
+ * Applicable. The cert-relevant contrast obligation for an icon is
+ * 1.4.11 Non-text Contrast (≥3:1 between the rendered glyph color and the
+ * document background) — measured on the *icon* rather than text.
+ *
+ * This check renders representative `<hx-icon>` samples on the audit page
+ * (the existing Default story already renders an `<hx-icon name="check">`),
+ * reads the computed `color` of the rendered SVG (currentColor flowed from
+ * the host text cascade), reads the document background, and computes the
+ * WCAG 1.4.11 ratio. The verdict is `'Supports'` when every sampled glyph
+ * clears 3:1, else `'Does Not Support'` with the offending sample listed.
+ */
+async function checkNonTextContrastIcon(componentName, page) {
+  if (componentName !== 'hx-icon') {
+    return null;
+  }
+  try {
+    const samples = await page.evaluate(() => {
+      const out = [];
+      const icons = Array.from(document.querySelectorAll('hx-icon'));
+      for (const icon of icons) {
+        // Compute against the inner rendered SVG / span (the visual ink) so we
+        // measure the glyph color, not the host inline-flex container.
+        const svgPart = icon.shadowRoot
+          ? icon.shadowRoot.querySelector('[part="svg"]')
+          : null;
+        const target = svgPart || icon;
+        const cs = window.getComputedStyle(target);
+        // Walk up to find the nearest non-transparent background.
+        let bgEl = target;
+        let bg = window.getComputedStyle(bgEl).backgroundColor;
+        const isTransparent = (c) =>
+          !c ||
+          c === 'transparent' ||
+          /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\s*\)/.test(c);
+        while (isTransparent(bg) && bgEl.parentElement) {
+          bgEl = bgEl.parentElement;
+          bg = window.getComputedStyle(bgEl).backgroundColor;
+        }
+        if (isTransparent(bg)) {
+          // Default to white if the entire chain is transparent — Storybook
+          // body has a default light background; this fallback is documented.
+          bg = 'rgb(255, 255, 255)';
+        }
+        out.push({
+          name: icon.getAttribute('name') || '',
+          library: icon.getAttribute('library') || 'fa-free',
+          fg: cs.color,
+          bg,
+        });
+      }
+      return out;
+    });
+
+    if (!samples || samples.length === 0) {
+      return {
+        verdict: VERDICT.NOT_APPLICABLE,
+        evidence: 'No <hx-icon> instances rendered in the story; nothing to measure.',
+      };
+    }
+
+    const measurements = samples
+      .map((s) => {
+        const ratio = contrastRatio(s.fg, s.bg);
+        return { ...s, ratio };
+      })
+      .filter((m) => m.ratio !== null);
+
+    if (measurements.length === 0) {
+      return {
+        verdict: VERDICT.PARTIALLY,
+        evidence: 'Could not parse foreground/background colors for any rendered hx-icon sample.',
+      };
+    }
+
+    const failing = measurements.filter((m) => (m.ratio ?? 0) < 3.0);
+    const minRatio = Math.min(...measurements.map((m) => m.ratio));
+    if (failing.length === 0) {
+      return {
+        verdict: VERDICT.SUPPORTS,
+        evidence: `WCAG 1.4.11 Non-text Contrast: ${measurements.length} hx-icon sample(s) measured; min ratio ${minRatio.toFixed(2)}:1 (≥3:1 required).`,
+        samples: measurements,
+      };
+    }
+    return {
+      verdict: VERDICT.DOES_NOT,
+      evidence: `WCAG 1.4.11 Non-text Contrast: ${failing.length} of ${measurements.length} hx-icon sample(s) below 3:1. Lowest ratio ${minRatio.toFixed(2)}:1.`,
+      offenders: failing,
+      samples: measurements,
+    };
+  } catch (err) {
+    return {
+      verdict: VERDICT.PARTIALLY,
+      evidence: `Non-text contrast measurement error: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+}
+
 // ── Per-component audit ─────────────────────────────────────────────────────
 
 async function auditComponent(name, browser) {
@@ -1382,6 +1495,14 @@ async function auditComponent(name, browser) {
     try {
       const browserData = await runBrowserChecks(name, page);
       result.browserChecks = browserData;
+
+      // Phase 4 (hx-icon) — additional non-text-contrast measurement on the
+      // rendered icon glyph(s). The page is already loaded by runBrowserChecks
+      // at this point so the samples are present. Only runs for hx-icon.
+      const iconContrast = await checkNonTextContrastIcon(name, page);
+      if (iconContrast) {
+        result.verdicts['non-text-contrast-icon'] = iconContrast;
+      }
       if (browserData.error) {
         result.verdicts['1.4.6'] = {
           verdict: VERDICT.PARTIALLY,
