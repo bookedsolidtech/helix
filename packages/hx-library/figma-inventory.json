@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-08T21:27:34.173Z",
+  "generatedAt": "2026-05-09T01:50:36.113Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.7.0",
   "tokensVersion": "3.7.0",
@@ -6295,13 +6295,22 @@
       },
       "keyboardContract": {
         "activate": [],
-        "navigate": [],
+        "navigate": [
+          "ArrowLeft",
+          "ArrowRight",
+          "ArrowUp",
+          "ArrowDown",
+          "Home",
+          "End",
+          "PageUp",
+          "PageDown"
+        ],
         "dismiss": [
           "Escape"
         ],
-        "disabledSuppresses": null
+        "disabledSuppresses": true
       },
-      "ariaPattern": "dialog",
+      "ariaPattern": "slider",
       "themeAware": true,
       "brandAware": true,
       "formAssociated": true,
@@ -16729,15 +16738,8 @@
         ],
         "auditUrl": "src/components/hx-popup/AAA-AUDIT.md"
       },
-      "keyboardContract": {
-        "activate": [],
-        "navigate": [],
-        "dismiss": [
-          "Escape"
-        ],
-        "disabledSuppresses": null
-      },
-      "ariaPattern": "dialog",
+      "keyboardContract": null,
+      "ariaPattern": "none",
       "themeAware": true,
       "brandAware": true,
       "formAssociated": false,

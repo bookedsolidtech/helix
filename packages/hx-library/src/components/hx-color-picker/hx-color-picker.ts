@@ -128,7 +128,7 @@ export interface HxColorPickerDetail {
  * @aaa-certified 2026-05-08
  * @aaa-criteria 1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, apg-keyboard
  * @aaa-audit src/components/hx-color-picker/AAA-AUDIT.md
- * @keyboard-contract ArrowLeft|Right|Up|Down adjust hue / saturation / value on the gradient grid and slider thumbs; Home / End jump to the slider extremes; Escape closes the panel and restores focus to the trigger.
+ * @keyboard-contract navigate=ArrowLeft,ArrowRight,ArrowUp,ArrowDown,Home,End,PageUp,PageDown; dismiss=Escape; disabled-suppresses=true
  * @aria-pattern slider
  * @aria-pattern-source https://www.w3.org/WAI/ARIA/apg/patterns/slider/
  * @forced-colors-supported true

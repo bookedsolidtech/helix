@@ -505,9 +505,18 @@ const cemKeyboardContract = async () => {
       const d = decls.find((x) => x.tagName === c.tag);
       const meta = d?.helixMeta || d?._helixMeta || null;
       const kb = meta?.keyboardContract || meta?.keyboard || null;
+      const ariaPattern = meta?.ariaPattern || null;
       out[c.tag] = {
         hasContract: !!kb && (Array.isArray(kb) ? kb.length > 0 : Object.keys(kb).length > 0),
         contract: kb,
+        // ariaPattern === 'none' explicitly asserts the component is not a
+        // widget and has no keyboard contract by design (positioning
+        // primitives like hx-popup, structural anchors). The canonical formal
+        // audit (scripts/aaa-formal-audit.mjs) treats this case as Supports
+        // (APG_KEYBOARD_EXPECTATIONS.none = []). The matrix harness must
+        // align with the canonical authority — missing contract is correct
+        // when ariaPattern === 'none'.
+        ariaPattern,
       };
     }
     return out;
@@ -900,11 +909,24 @@ const evaluateCriteria = (probe, fcProbe, rmProbe, kbContract, allowlist, ctx) =
   // apg-keyboard as `skip` with note — the cert run itself is what enables
   // this criterion. After cert (component on the allowlist) the contract
   // MUST be present; missing → fail (regression).
+  //
+  // Pattern-none escape: components declaring `@aria-pattern none` (positioning
+  // primitives, structural anchors) explicitly assert "I am not a widget; my
+  // keyboard contract is N/A by design." The canonical formal audit treats
+  // this case as Supports (APG_KEYBOARD_EXPECTATIONS.none = []); the matrix
+  // harness aligns with the canonical authority and skips the contract
+  // requirement when ariaPattern === 'none'.
   {
     const k = kbContract?.[ctx.tag];
     const isCertified = allowlist?.has?.(ctx.tag) ?? false;
     if (!k) {
       results['apg-keyboard'] = { status: 'skip', evidence: 'CEM not loaded or tag missing' };
+    } else if (k.ariaPattern === 'none') {
+      results['apg-keyboard'] = {
+        status: 'skip',
+        evidence:
+          '@aria-pattern="none" — component is not a widget; no keyboard contract by design. Aligns with formal-audit APG_KEYBOARD_EXPECTATIONS.none = [].',
+      };
     } else if (!isCertified && !k.hasContract) {
       results['apg-keyboard'] = {
         status: 'skip',
