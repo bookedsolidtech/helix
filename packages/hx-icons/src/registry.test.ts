@@ -41,6 +41,37 @@ describe('registry — registerIconLibrary', () => {
     expect(lib?.resolver).toBe(resolver);
     expect(lib?.mutator).toBeUndefined();
     expect(lib?.spriteSheet).toBe(false);
+    expect(lib?.paintMode).toBe('fill');
+  });
+
+  it('defaults paintMode to "fill" when omitted', () => {
+    const resolver: IconResolver = (name) => `/icons/${name}.svg`;
+    registerIconLibrary('lib-a', { resolver });
+    expect(getIconLibrary('lib-a')?.paintMode).toBe('fill');
+  });
+
+  it('defaults paintMode to "fill" when undefined', () => {
+    const resolver: IconResolver = (name) => `/icons/${name}.svg`;
+    registerIconLibrary('lib-a', { resolver, paintMode: undefined });
+    expect(getIconLibrary('lib-a')?.paintMode).toBe('fill');
+  });
+
+  it('honors paintMode="stroke"', () => {
+    const resolver: IconResolver = (name) => `/icons/${name}.svg`;
+    registerIconLibrary('lib-a', { resolver, paintMode: 'stroke' });
+    expect(getIconLibrary('lib-a')?.paintMode).toBe('stroke');
+  });
+
+  it('honors paintMode="mixed"', () => {
+    const resolver: IconResolver = (name) => `/icons/${name}.svg`;
+    registerIconLibrary('lib-a', { resolver, paintMode: 'mixed' });
+    expect(getIconLibrary('lib-a')?.paintMode).toBe('mixed');
+  });
+
+  it('honors paintMode="fill" explicitly', () => {
+    const resolver: IconResolver = (name) => `/icons/${name}.svg`;
+    registerIconLibrary('lib-a', { resolver, paintMode: 'fill' });
+    expect(getIconLibrary('lib-a')?.paintMode).toBe('fill');
   });
 
   it('stores the supplied mutator', () => {
@@ -162,7 +193,12 @@ describe('registry — getIconLibrary', () => {
   it('returns the registered library shape', () => {
     const resolver: IconResolver = (name) => `/icons/${name}.svg`;
     const mutator: IconMutator = () => undefined;
-    registerIconLibrary('lib-a', { resolver, mutator, spriteSheet: true });
+    registerIconLibrary('lib-a', {
+      resolver,
+      mutator,
+      spriteSheet: true,
+      paintMode: 'stroke',
+    });
 
     const lib = getIconLibrary('lib-a');
     expect(lib).toEqual({
@@ -170,6 +206,7 @@ describe('registry — getIconLibrary', () => {
       resolver,
       mutator,
       spriteSheet: true,
+      paintMode: 'stroke',
     });
   });
 

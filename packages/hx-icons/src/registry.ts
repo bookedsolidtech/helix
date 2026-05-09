@@ -14,7 +14,13 @@
 
 import type { IconLibrary, IconLibraryOptions } from './types.js';
 
-export type { IconLibrary, IconLibraryOptions, IconMutator, IconResolver } from './types.js';
+export type {
+  IconLibrary,
+  IconLibraryOptions,
+  IconMutator,
+  IconPaintMode,
+  IconResolver,
+} from './types.js';
 
 /**
  * Default base path. Points at the package's own published `dist/`
@@ -57,6 +63,7 @@ export function registerIconLibrary(name: string, options: IconLibraryOptions): 
     name,
     resolver: options.resolver,
     spriteSheet: options.spriteSheet ?? false,
+    paintMode: options.paintMode ?? 'fill',
   };
   if (options.mutator !== undefined) {
     entry.mutator = options.mutator;

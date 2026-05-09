@@ -28,6 +28,26 @@ export type IconResolver = (name: string) => string;
 export type IconMutator = (svg: SVGElement) => void;
 
 /**
+ * The paint strategy a library's glyphs use.
+ *
+ * - `'fill'` — solid silhouettes painted with `fill="currentColor"` and no
+ *   strokes. Color and contrast are governed by the host element's
+ *   `color` cascade alone.
+ * - `'stroke'` — outline glyphs whose visible ink is a stroke (e.g. Lucide,
+ *   Phosphor Thin). Stroke width is consumer-driven via the
+ *   `--hx-icon-stroke-width` token (wired in Phase 4) and contributes to
+ *   AAA non-text contrast measurement.
+ * - `'mixed'` — libraries that combine fill and stroke per-glyph (e.g.
+ *   Phosphor Duotone). Phase 4's AAA harness dispatches a hybrid measure
+ *   that accounts for both surfaces.
+ *
+ * Libraries declare their paint strategy at registration time. The
+ * `<hx-icon>` AAA contrast harness in Phase 4 dispatches per `paintMode`,
+ * which is why this is a first-class registry field rather than a heuristic.
+ */
+export type IconPaintMode = 'fill' | 'stroke' | 'mixed';
+
+/**
  * Options accepted by `registerIconLibrary()`.
  *
  * Mirrors Shoelace's contract: a `resolver` is mandatory; `mutator`
@@ -51,6 +71,14 @@ export interface IconLibraryOptions {
    * `<svg><use href="..."/></svg>` rather than inlining markup.
    */
   spriteSheet?: boolean;
+
+  /**
+   * The paint strategy the library's glyphs use. Defaults to `'fill'`
+   * when omitted at registration time.
+   *
+   * See {@link IconPaintMode}.
+   */
+  paintMode?: IconPaintMode;
 }
 
 /**
@@ -68,4 +96,9 @@ export interface IconLibrary {
   mutator?: IconMutator;
   /** Whether the library uses a sprite sheet at the resolved URL. */
   spriteSheet: boolean;
+  /**
+   * The paint strategy this library declares. Always populated after
+   * registration (defaults to `'fill'` when the option is omitted).
+   */
+  paintMode: IconPaintMode;
 }

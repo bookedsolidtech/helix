@@ -18,5 +18,6 @@ export type {
   IconLibrary,
   IconLibraryOptions,
   IconMutator,
+  IconPaintMode,
   IconResolver,
 } from './types.js';
