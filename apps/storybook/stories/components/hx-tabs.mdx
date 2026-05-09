@@ -1,0 +1,175 @@
+{/* hx-tabs.mdx — AAA conformance documentation for hx-tabs */}
+
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+  AAAConformanceCard,
+  APGPatternCard,
+  ConsumerObligations,
+  InlineAuditPanel,
+  SectionHead,
+} from '../_components';
+import auditRaw from '../../../../packages/hx-library/src/components/hx-tabs/AAA-AUDIT.md?raw';
+
+<Meta title="Components/Tabs/Conformance" />
+
+<div className="hx-docs">
+
+# `hx-tabs` — Conformance documentation
+
+> **WCAG 2.2 Level AAA certified** for all 9 component-shippable Success Criteria, plus 2 peer standards. Implements the WAI-ARIA APG `tabs` pattern (manual activation variant) — <kbd>Arrow</kbd> keys move the visual focus between tabs without immediately activating, <kbd>Enter</kbd> or <kbd>Space</kbd> activates, and <kbd>Home</kbd> / <kbd>End</kbd> jump to the first / last tab. Each panel is associated with its tab via `aria-controls` + `aria-labelledby`.
+
+---
+
+## Hero scenario — patient chart navigation
+
+The most common deployment of `hx-tabs` in healthcare: chart-section navigation. Six panels, each with a meaningful clinical name, a focused tab indicator, and content rendered inside each panel. Tab into the tablist and use <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> to move between tabs (manual activation — the panel does NOT change until you press <kbd>Enter</kbd>); use <kbd>Home</kbd> / <kbd>End</kbd> to jump to the first or last tab.
+
+<div
+  style={{
+    maxWidth: '720px',
+    padding: '1.5rem',
+    background: 'var(--hx-color-surface-raised, #fff)',
+    border: '1px solid var(--hx-color-border-default, #dee2e6)',
+    borderRadius: '12px',
+  }}
+>
+  <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.125rem' }}>James Wilson · MRN 00012345 · DOB 1958-03-22</h3>
+  <p style={{ margin: '0 0 1rem 0', fontSize: '0.875rem', color: 'var(--hx-color-text-secondary, #4d5b6b)' }}>
+    Patient chart — last visit 2026-04-30
+  </p>
+
+  <hx-tabs>
+    <hx-tab slot="tab" panel="overview">Overview</hx-tab>
+    <hx-tab slot="tab" panel="vitals">Vitals</hx-tab>
+    <hx-tab slot="tab" panel="medications">Medications</hx-tab>
+    <hx-tab slot="tab" panel="orders">Orders</hx-tab>
+    <hx-tab slot="tab" panel="notes">Notes</hx-tab>
+    <hx-tab slot="tab" panel="labs">Labs</hx-tab>
+
+    <hx-tab-panel name="overview">
+      <p style={{ margin: 0 }}>Active problems: <strong>Hypertension</strong>, <strong>Type 2 diabetes</strong>. Goal A1c &lt; 7.0%. Last A1c 6.8 (2026-04-30).</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="vitals">
+      <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.25rem 1rem' }}>
+        <dt style={{ fontWeight: 600 }}>BP</dt><dd style={{ margin: 0 }}>128 / 78</dd>
+        <dt style={{ fontWeight: 600 }}>HR</dt><dd style={{ margin: 0 }}>72 bpm</dd>
+        <dt style={{ fontWeight: 600 }}>Weight</dt><dd style={{ margin: 0 }}>184 lb</dd>
+      </dl>
+    </hx-tab-panel>
+    <hx-tab-panel name="medications">
+      <ul style={{ margin: 0, paddingLeft: '1.25rem' }}>
+        <li>Metformin 1000mg PO BID</li>
+        <li>Lisinopril 10mg PO QD</li>
+        <li>Atorvastatin 20mg PO QHS</li>
+      </ul>
+    </hx-tab-panel>
+    <hx-tab-panel name="orders">
+      <p style={{ margin: 0 }}>No open orders.</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="notes">
+      <p style={{ margin: 0 }}>3 progress notes (last 30 days). Most recent: <em>Follow-up — A1c improved, continue current regimen</em> (Dr. Morgan, 2026-04-30).</p>
+    </hx-tab-panel>
+    <hx-tab-panel name="labs">
+      <p style={{ margin: 0 }}>A1c 6.8% (2026-04-30) · Fasting glucose 112 (2026-04-30) · LDL 88 (2026-04-30).</p>
+    </hx-tab-panel>
+  </hx-tabs>
+</div>
+
+This is the contract: tab-key roving (one tab stop for the entire tablist, arrow keys move the inner cursor), manual activation (consumer chooses when the panel switches), and `aria-selected` + `aria-controls` wired through the Shadow DOM so screen readers announce the panel relationship correctly.
+
+---
+
+<AAAConformanceCard tag="hx-tabs" />
+
+---
+
+<APGPatternCard
+  tag="hx-tabs"
+  screenReaderAnnouncement="Vitals, tab, 2 of 6"
+  screenReaderContext="When the second tab in the chart navigation above is focused, screen readers announce"
+/>
+
+<aside className="hx-docs hx-apg-card" style={{ marginTop: '-16px' }}>
+  <header className="hx-apg-card-header">
+    <h3 className="hx-apg-card-title">APG roving-tabindex contract</h3>
+    <p className="hx-apg-card-subtitle">
+      The tabs widget is one tab stop in the page tab order, not six. The <kbd className="hx-apg-kbd">Tab</kbd> key enters and exits the tablist; <kbd className="hx-apg-kbd">Arrow</kbd> keys move the focus cursor among the tabs. This is the canonical <a href="https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#kbd_general_within" target="_blank" rel="noopener noreferrer">composite-widget keyboard model</a> from the WAI-ARIA APG.
+    </p>
+  </header>
+  <div className="hx-apg-card-body">
+    <ul className="hx-apg-card-keyboard">
+      <li>
+        <span className="hx-apg-kbd-desc">
+          <strong>Manual activation (default)</strong> — arrow keys move focus between tabs <em>without</em> activating the corresponding panel. <kbd className="hx-apg-kbd">Enter</kbd> or <kbd className="hx-apg-kbd">Space</kbd> activates the focused tab. Suitable for tabs whose panel content is heavy or async-loaded.
+        </span>
+      </li>
+      <li>
+        <span className="hx-apg-kbd-desc">
+          <strong>Roving tabindex</strong> — only the active tab has <code>tabindex="0"</code>; the others have <code>tabindex="-1"</code>. The widget is one tab stop in the page tab order regardless of how many tabs it contains.
+        </span>
+      </li>
+      <li>
+        <span className="hx-apg-kbd-desc">
+          <strong>Wrapping navigation</strong> — pressing <kbd className="hx-apg-kbd">Arrow Right</kbd> on the last tab wraps to the first; <kbd className="hx-apg-kbd">Arrow Left</kbd> on the first wraps to the last. Disabled tabs are skipped.
+        </span>
+      </li>
+    </ul>
+  </div>
+</aside>
+
+<ConsumerObligations
+  tag="hx-tabs"
+  obligations={[
+    <>Provide a meaningful name on every <code>hx-tab</code> via slot text. The accessible name is the tab label, and the screen-reader announcement is the only navigation aid for non-sighted users moving through chart sections.</>,
+    <>Match every <code>hx-tab</code>'s <code>panel</code> attribute to an <code>hx-tab-panel</code>'s <code>name</code> attribute. The component wires <code>aria-controls</code> + <code>aria-labelledby</code> automatically, but only if the names match — a typo silently breaks the screen-reader association.</>,
+    <>Do not nest one tablist inside another. The roving-tabindex model assumes a single tablist on a page surface; nested tabs break the composite-widget keyboard contract.</>,
+    <>Use <code>hx-tabs</code> for peer-content navigation (chart sections, settings categories), not for primary site navigation. For site nav, use <code>hx-top-nav</code> or <code>hx-side-nav</code> — those expose the URL-route + visited-state surface tabs do not.</>,
+    <>Keep tab labels short (1–3 words). Long labels truncate, the truncation reduces the AAA target hit area, and the truncated label may not match the screen-reader announcement.</>,
+  ]}
+/>
+
+---
+
+## Live state demos
+
+<SectionHead title="Default — three peer panels" meta="--default" />
+
+<div style={{ padding: '1rem 0', maxWidth: '560px' }}>
+  <hx-tabs>
+    <hx-tab slot="tab" panel="settings-account">Account</hx-tab>
+    <hx-tab slot="tab" panel="settings-notifications">Notifications</hx-tab>
+    <hx-tab slot="tab" panel="settings-security">Security</hx-tab>
+
+    <hx-tab-panel name="settings-account"><p style={{ margin: 0 }}>Profile, contact preferences, time zone.</p></hx-tab-panel>
+    <hx-tab-panel name="settings-notifications"><p style={{ margin: 0 }}>Email alerts, SMS reminders, push notifications.</p></hx-tab-panel>
+    <hx-tab-panel name="settings-security"><p style={{ margin: 0 }}>Password, two-factor authentication, active sessions.</p></hx-tab-panel>
+  </hx-tabs>
+</div>
+
+<SectionHead title="With disabled tab" meta="2.1.3 + APG tabs.disabledSuppresses" />
+
+A disabled tab cannot receive arrow-key focus and is skipped during the roving cursor walk.
+
+<div style={{ padding: '1rem 0', maxWidth: '560px' }}>
+  <hx-tabs>
+    <hx-tab slot="tab" panel="dx-active">Active diagnoses</hx-tab>
+    <hx-tab slot="tab" panel="dx-resolved">Resolved diagnoses</hx-tab>
+    <hx-tab slot="tab" panel="dx-pending" disabled>Pending review (locked)</hx-tab>
+
+    <hx-tab-panel name="dx-active"><p style={{ margin: 0 }}>Hypertension, Type 2 diabetes.</p></hx-tab-panel>
+    <hx-tab-panel name="dx-resolved"><p style={{ margin: 0 }}>Acute bronchitis (resolved 2025-11-22).</p></hx-tab-panel>
+    <hx-tab-panel name="dx-pending"><p style={{ margin: 0 }}>This panel is unreachable; the tab is disabled.</p></hx-tab-panel>
+  </hx-tabs>
+</div>
+
+---
+
+<InlineAuditPanel tag="hx-tabs" markdown={auditRaw} />
+
+---
+
+## Variant gallery
+
+The full enumeration of orientation variants (horizontal, vertical), size modifiers, scrollable tablists, and integration with `hx-card` and `hx-form` lives in the `Components/Tabs` story tree.
+
+</div>
