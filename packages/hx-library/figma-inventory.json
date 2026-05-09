@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-09T16:43:50.793Z",
+  "generatedAt": "2026-05-09T23:27:58.549Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.8.0",
   "tokensVersion": "3.8.0",
@@ -277,7 +277,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -1063,7 +1065,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -1105,7 +1109,7 @@
       "figmaComponentName": "hx-avatar",
       "figmaPagePlacement": "4a",
       "description": "A user avatar component that displays an image, initials, or a fallback icon. Supports a badge slot for status indicator overlays.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "size",
@@ -1331,7 +1335,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -1354,7 +1360,7 @@
       "figmaComponentName": "hx-badge",
       "figmaPagePlacement": "4a",
       "description": "A small status indicator for notifications, counts, and labels.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -1812,7 +1818,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -2279,7 +2287,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -4043,7 +4053,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -4124,7 +4136,7 @@
       "figmaComponentName": "hx-checkbox",
       "figmaPagePlacement": "4a",
       "description": "A checkbox component with label, validation, and form association.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "checked",
@@ -4593,7 +4605,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -5360,7 +5374,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -7039,7 +7055,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -11951,7 +11969,7 @@
       "figmaComponentName": "hx-help-text",
       "figmaPagePlacement": "4a",
       "description": "Standardized help/hint text displayed below form fields. Used by hx-field as a consistent sub-component for guidance and validation messages.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -12106,7 +12124,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -12140,7 +12160,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-icon",
       "figmaPagePlacement": "4a",
-      "description": "An icon component that supports inline SVG fetching and SVG sprite sheet references. Decorative icons are automatically hidden from assistive technology. When a label is provided the icon is…",
+      "description": "An icon component that resolves through the `@helixui/icons` registry, with sprite-sheet and inline-fetch escape hatches for legacy / consumer patterns. Decorative icons are automatically hidden…",
       "tier": "atom",
       "variantAxes": [
         {
@@ -12164,6 +12184,12 @@
           "cemAttribute": "name",
           "type": "text",
           "defaultValue": ""
+        },
+        {
+          "figmaPropertyName": "library",
+          "cemAttribute": "library",
+          "type": "text",
+          "defaultValue": "fa-free"
         },
         {
           "figmaPropertyName": "src",
@@ -12224,6 +12250,18 @@
           }
         },
         {
+          "description": "Default stroke width consumed by stroke-paint and mixed-paint icon libraries (Lucide, Heroicons-outline, Phosphor). Built-in helix + fa-free libraries are fill-only and ignore this token.",
+          "name": "--hx-icon-stroke-width",
+          "default": "2",
+          "figmaBinding": {
+            "target": null,
+            "layerSelector": "root",
+            "semanticToken": null,
+            "fallbackPrimitive": null,
+            "literalFallback": "2"
+          }
+        },
+        {
           "description": "Size token.",
           "name": "--hx-size-4",
           "figmaBinding": null
@@ -12252,17 +12290,19 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-09",
+        "criteria": [
+          "1.4.11"
+        ],
+        "auditUrl": "src/components/hx-icon/AAA-AUDIT.md"
       },
       "keyboardContract": null,
-      "ariaPattern": null,
+      "ariaPattern": "none",
       "themeAware": null,
       "brandAware": null,
       "formAssociated": null,
-      "priorityTier": "P2"
+      "priorityTier": "P0"
     },
     {
       "tag": "hx-icon-button",
@@ -12852,7 +12892,7 @@
       "figmaComponentName": "hx-link",
       "figmaPagePlacement": "4a",
       "description": "A semantic hyperlink component with accessibility-first design. Renders a native `<a>` element for enabled state and a `<span>` for disabled state with full keyboard and screen reader support.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -13160,7 +13200,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -13763,7 +13805,7 @@
       "figmaComponentName": "hx-menu-item",
       "figmaPagePlacement": "4a",
       "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "disabled",
@@ -13924,7 +13966,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -14590,7 +14634,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -14637,7 +14683,7 @@
       "figmaComponentName": "hx-nav-item",
       "figmaPagePlacement": "4a",
       "description": "A navigation item for use inside hx-side-nav. Supports icons, badges, sub-navigation, and active/disabled states.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "active",
@@ -14831,7 +14877,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -14854,7 +14902,7 @@
       "figmaComponentName": "hx-number-input",
       "figmaPagePlacement": "4a",
       "description": "A numeric input component with stepper controls, label, validation, and full form association. Designed for healthcare data-entry contexts where precise numeric values (dosage, age, measurements)…",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "required",
@@ -15351,7 +15399,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -15734,7 +15784,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -18024,7 +18076,7 @@
       "figmaComponentName": "hx-rating",
       "figmaPagePlacement": "4a",
       "description": "A star rating input component for user feedback and display. Supports whole and half-star ratings, keyboard navigation, hover preview, and native form participation via ElementInternals.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "readonly",
@@ -18250,7 +18302,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -19147,7 +19201,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -21508,7 +21564,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -21768,7 +21826,7 @@
       "figmaComponentName": "hx-step",
       "figmaPagePlacement": "4a",
       "description": "An individual step, designed to be used inside an `<hx-steps>` container. Represents a single step in a multi-step wizard or progress indicator.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "status",
@@ -21977,7 +22035,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -27025,7 +27085,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -28174,7 +28236,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
@@ -28287,7 +28351,7 @@
       "figmaComponentName": "hx-tree-item",
       "figmaPagePlacement": "4a",
       "description": "A tree item used within an hx-tree-view component. Supports expand/collapse, selection, keyboard navigation, and icon/children slots.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "expanded",
@@ -28464,7 +28528,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
