@@ -151,12 +151,9 @@ export const IconTrigger: Story = {
   render: () => html`
     <div style="padding: 4rem; display: flex; justify-content: center; align-items: flex-start;">
       <hx-dropdown placement="bottom-end">
-        <hx-icon-button
-          slot="trigger"
-          label="More actions"
-          name="ellipsis"
-          library="helix"
-        ></hx-icon-button>
+        <hx-icon-button slot="trigger" label="More actions">
+          <hx-icon library="helix" name="ellipsis"></hx-icon>
+        </hx-icon-button>
         <hx-menu>
           <hx-menu-item value="view">View details</hx-menu-item>
           <hx-menu-item value="export">Export</hx-menu-item>
