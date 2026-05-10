@@ -277,6 +277,25 @@ function naRationale(component, id, v) {
 /**
  * Render the consumer obligations list. Sourced from JSDoc + harness signals + standards.
  */
+/**
+ * Tooling notes — surfaces any harness-side gaps that affect this component's
+ * automated verification. Currently covers the axe-core ElementInternals gap
+ * for FACE (form-associated custom elements). Resolution path is axe-core 5.x
+ * — at which point the FACE branch can be removed.
+ */
+function toolingNotes(component) {
+  const lines = [];
+  if (component.jsdoc.formAssociated) {
+    lines.push(
+      '- **axe-core ElementInternals gap.** This component is form-associated (`static formAssociated = true`) and exposes its ARIA role / accessible name via [`ElementInternals`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals). axe-core 4.11.x cannot read those semantics, so axe runs against this component will emit false-positive violations on `aria-allowed-attr`, `aria-required-children`, `aria-required-parent`, and `button-name`. The verdicts above are sourced from the formal Playwright audit (which reads the live accessibility tree directly) and from manual NVDA / JAWS / VoiceOver verification — both of which observe the ElementInternals semantics correctly. See [accessibility/axe-element-internals-gap](https://docs.helixui.com/accessibility/axe-element-internals-gap/) for the full discussion. Tracked in axe-core via [PR #5080](https://github.com/dequelabs/axe-core/pull/5080) and [issue #4259](https://github.com/dequelabs/axe-core/issues/4259); resolution path is axe-core 5.x.',
+    );
+  }
+  if (lines.length === 0) {
+    lines.push('_No harness-side gaps recorded for this component._');
+  }
+  return lines.join('\n');
+}
+
 function consumerObligations(component) {
   const lines = [];
   const pat = component.jsdoc.ariaPattern;
@@ -385,6 +404,7 @@ function renderComponent(componentResult) {
     perCriterionTable: renderPerCriterionTable(verdicts),
     detailedEvidenceBlocks: renderDetailedEvidence(componentResult, verdicts),
     consumerObligations: consumerObligations(componentResult),
+    toolingNotes: toolingNotes(componentResult),
   };
 
   let out = template;

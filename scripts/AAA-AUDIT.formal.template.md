@@ -69,6 +69,12 @@ For the AAA verdicts above to hold in real-world deployment, the consumer MUST:
 
 ---
 
+## Tooling notes
+
+{{toolingNotes}}
+
+---
+
 ## Test artefacts
 
 - **Source class:** [`{{sourceClassPath}}`](../../../../{{sourceClassPath}})
