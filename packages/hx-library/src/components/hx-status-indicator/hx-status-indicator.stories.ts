@@ -69,13 +69,18 @@ const meta = {
     showLabel: false,
   },
   render: (args) => html`
-    <hx-status-indicator
-      status=${args.status}
-      size=${args.size}
-      ?pulse=${args.pulse}
-      ?show-label=${args.showLabel}
-      label=${args.label ?? ''}
-    ></hx-status-indicator>
+    <div
+      style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; font: 1rem system-ui, sans-serif; min-width: 16rem;"
+    >
+      <hx-status-indicator
+        status=${args.status}
+        size=${args.size}
+        ?pulse=${args.pulse}
+        ?show-label=${args.showLabel}
+        label=${args.label ?? ''}
+      ></hx-status-indicator>
+      <span style="font-weight: 500;">Status: ${args.status}</span>
+    </div>
   `,
 } satisfies Meta;
 
