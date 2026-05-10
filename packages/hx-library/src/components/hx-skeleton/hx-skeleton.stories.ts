@@ -136,13 +136,11 @@ export const ButtonVariant: Story = {
 export const ParagraphVariant: Story = {
   name: 'Variant: Paragraph',
   render: () => html`
-    <div style="width: 300px;">
-      <hx-skeleton variant="paragraph" width="100%">
-        <hx-skeleton variant="text" width="100%"></hx-skeleton>
-        <hx-skeleton variant="text" width="90%"></hx-skeleton>
-        <hx-skeleton variant="text" width="80%"></hx-skeleton>
-        <hx-skeleton variant="text" width="60%"></hx-skeleton>
-      </hx-skeleton>
+    <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 300px;">
+      <hx-skeleton variant="text" width="100%"></hx-skeleton>
+      <hx-skeleton variant="text" width="90%"></hx-skeleton>
+      <hx-skeleton variant="text" width="80%"></hx-skeleton>
+      <hx-skeleton variant="text" width="60%"></hx-skeleton>
     </div>
   `,
 };

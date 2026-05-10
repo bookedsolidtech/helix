@@ -223,6 +223,16 @@ export const Caption: Story = {
 
 export const Code: Story = {
   args: { variant: 'code', content: 'ICD-10: J45.901' },
+  decorators: [
+    (story) => html`
+      <div
+        style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 18rem; font: 0.875rem system-ui, sans-serif;"
+      >
+        <span style="color: #4b5563;">Diagnosis code:</span>
+        ${story()}
+      </div>
+    `,
+  ],
   play: async ({ canvasElement }) => {
     const host = canvasElement.querySelector('hx-text')!;
     const base = host.shadowRoot!.querySelector('[part="base"]')!;

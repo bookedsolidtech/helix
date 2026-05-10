@@ -162,6 +162,13 @@ export const IconTrigger: Story = {
       </hx-dropdown>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const dropdown = canvasElement.querySelector('hx-dropdown');
+    if (!dropdown) return;
+    const trigger = dropdown.querySelector('[slot="trigger"]') as HTMLElement | null;
+    if (!trigger) return;
+    await userEvent.click(trigger);
+  },
 };
 
 // ─────────────────────────────────────────────────

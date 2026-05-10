@@ -254,5 +254,17 @@ export const RemovableInteractive: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
+  render: (args) => html`
+    <div style="display: inline-flex; gap: 0.5rem; flex-wrap: wrap; max-width: 32rem;">
+      <hx-tag variant=${args.variant ?? 'default'} hx-size=${args.size ?? 'md'}>Default</hx-tag>
+      <hx-tag variant="primary" hx-size=${args.size ?? 'md'}>Primary</hx-tag>
+      <hx-tag variant="success" hx-size=${args.size ?? 'md'}>Success</hx-tag>
+      <hx-tag variant="warning" hx-size=${args.size ?? 'md'}>Warning</hx-tag>
+      <hx-tag variant="danger" hx-size=${args.size ?? 'md'}>Danger</hx-tag>
+    </div>
+  `,
 };

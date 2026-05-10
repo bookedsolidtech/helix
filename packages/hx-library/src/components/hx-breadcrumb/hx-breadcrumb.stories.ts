@@ -215,9 +215,13 @@ export const SingleItem: Story = {
     label: 'Breadcrumb',
   },
   render: (args) => html`
-    <hx-breadcrumb separator=${args.separator} label=${args.label}>
-      <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
-    </hx-breadcrumb>
+    <div
+      style="display: inline-block; padding: 1rem 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 18rem;"
+    >
+      <hx-breadcrumb separator=${args.separator} label=${args.label}>
+        <hx-breadcrumb-item>Patient Records</hx-breadcrumb-item>
+      </hx-breadcrumb>
+    </div>
   `,
 };
 

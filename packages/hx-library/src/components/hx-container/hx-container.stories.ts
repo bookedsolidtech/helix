@@ -628,19 +628,19 @@ export const WithAlerts: Story = {
   render: () => html`
     <hx-container width="lg" padding="md" style="--hx-container-bg: #ffffff;">
       <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-        <hx-alert variant="info">
+        <hx-alert variant="info" open>
           Your annual wellness visit is due. Schedule your appointment today to stay current on
           preventive screenings.
         </hx-alert>
-        <hx-alert variant="success">
+        <hx-alert variant="success" open>
           Lab results from your visit on February 10 are now available. All values are within the
           normal reference range.
         </hx-alert>
-        <hx-alert variant="warning">
+        <hx-alert variant="warning" open>
           Your prescription for Lisinopril 10mg requires renewal before March 1. Contact your
           provider or use the portal refill feature.
         </hx-alert>
-        <hx-alert variant="error">
+        <hx-alert variant="error" open>
           An allergy to Penicillin is recorded in your chart. Confirm or update this information at
           your next visit.
         </hx-alert>
@@ -1225,7 +1225,7 @@ export const HospitalPortalLayout: Story = {
       <!-- Alert Banner -->
       <hx-container width="full" padding="none" style="--hx-container-bg: #fff3e0;">
         <hx-container width="lg" padding="sm">
-          <hx-alert variant="warning">
+          <hx-alert variant="warning" open>
             Flu season advisory: Walk-in vaccination clinics available Monday through Friday, 8:00
             AM to 4:00 PM at all outpatient locations.
           </hx-alert>
@@ -1339,7 +1339,7 @@ export const DashboardLayout: Story = {
 
       <!-- Dashboard Alerts -->
       <hx-container width="xl" padding="sm" style="--hx-container-bg: #fff8e1;">
-        <hx-alert variant="info">
+        <hx-alert variant="info" open>
           Bed capacity at 87%. Six discharges expected by 14:00. ED wait time averaging 22 minutes.
         </hx-alert>
       </hx-container>
