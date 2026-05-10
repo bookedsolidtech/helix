@@ -1381,18 +1381,14 @@ async function checkNonTextContrastIcon(componentName, page) {
       for (const icon of icons) {
         // Compute against the inner rendered SVG / span (the visual ink) so we
         // measure the glyph color, not the host inline-flex container.
-        const svgPart = icon.shadowRoot
-          ? icon.shadowRoot.querySelector('[part="svg"]')
-          : null;
+        const svgPart = icon.shadowRoot ? icon.shadowRoot.querySelector('[part="svg"]') : null;
         const target = svgPart || icon;
         const cs = window.getComputedStyle(target);
         // Walk up to find the nearest non-transparent background.
         let bgEl = target;
         let bg = window.getComputedStyle(bgEl).backgroundColor;
         const isTransparent = (c) =>
-          !c ||
-          c === 'transparent' ||
-          /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\s*\)/.test(c);
+          !c || c === 'transparent' || /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\s*\)/.test(c);
         while (isTransparent(bg) && bgEl.parentElement) {
           bgEl = bgEl.parentElement;
           bg = window.getComputedStyle(bgEl).backgroundColor;

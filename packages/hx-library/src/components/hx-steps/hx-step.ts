@@ -200,12 +200,7 @@ export class HelixStep extends HelixElement {
   /** @internal */
   private _renderCheckmark() {
     return html`
-      <hx-icon
-        class="step__status-glyph"
-        library="helix"
-        name="check"
-        aria-hidden="true"
-      ></hx-icon>
+      <hx-icon class="step__status-glyph" library="helix" name="check" aria-hidden="true"></hx-icon>
       <span class="sr-only">Complete</span>
     `;
   }
@@ -213,12 +208,7 @@ export class HelixStep extends HelixElement {
   /** @internal */
   private _renderXMark() {
     return html`
-      <hx-icon
-        class="step__status-glyph"
-        library="helix"
-        name="close"
-        aria-hidden="true"
-      ></hx-icon>
+      <hx-icon class="step__status-glyph" library="helix" name="close" aria-hidden="true"></hx-icon>
       <span class="sr-only">Error</span>
     `;
   }

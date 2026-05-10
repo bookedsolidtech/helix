@@ -504,12 +504,7 @@ export class HelixMenuItem extends HelixElement {
   private _renderCheckedIcon() {
     return html`
       <span part="checked-icon" class="menu-item__checked-icon" aria-hidden="true">
-        <hx-icon
-          class="menu-item__glyph"
-          library="helix"
-          name="check"
-          aria-hidden="true"
-        ></hx-icon>
+        <hx-icon class="menu-item__glyph" library="helix" name="check" aria-hidden="true"></hx-icon>
       </span>
     `;
   }

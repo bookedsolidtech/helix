@@ -285,9 +285,7 @@ export class HelixStat extends HelixElement {
   /** @internal */
   private _renderTrendArrow(trend: 'up' | 'down'): ReturnType<typeof html> {
     const name = trend === 'up' ? 'arrow-up' : 'arrow-down';
-    return html`
-      <hx-icon class="stat__trend-arrow" library="helix" name=${name}></hx-icon>
-    `;
+    return html` <hx-icon class="stat__trend-arrow" library="helix" name=${name}></hx-icon> `;
   }
 
   // ─── Render ───

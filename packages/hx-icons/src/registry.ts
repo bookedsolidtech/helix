@@ -49,9 +49,7 @@ let basePath: string = DEFAULT_BASE_PATH;
  */
 export function registerIconLibrary(name: string, options: IconLibraryOptions): void {
   if (typeof name !== 'string' || name.trim() === '') {
-    throw new TypeError(
-      '@helixui/icons: registerIconLibrary requires a non-empty string `name`.',
-    );
+    throw new TypeError('@helixui/icons: registerIconLibrary requires a non-empty string `name`.');
   }
   if (!options || typeof options.resolver !== 'function') {
     throw new TypeError(

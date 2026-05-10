@@ -32,10 +32,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(here, '..');
 const distDir = resolve(packageRoot, 'dist');
 const helixSrcDir = resolve(packageRoot, 'src/libraries/helix-glyphs');
-const faSrcDir = resolve(
-  packageRoot,
-  'node_modules/@fortawesome/fontawesome-free/svgs/solid',
-);
+const faSrcDir = resolve(packageRoot, 'node_modules/@fortawesome/fontawesome-free/svgs/solid');
 
 interface Symbol {
   /** Final id used in the sprite (matches consumer-facing name). */

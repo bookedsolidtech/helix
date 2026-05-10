@@ -40,10 +40,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(here, '..');
 const distDir = resolve(packageRoot, 'dist');
 const helixSrcDir = resolve(packageRoot, 'src/libraries/helix-glyphs');
-const faSrcDir = resolve(
-  packageRoot,
-  'node_modules/@fortawesome/fontawesome-free/svgs/solid',
-);
+const faSrcDir = resolve(packageRoot, 'node_modules/@fortawesome/fontawesome-free/svgs/solid');
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -169,15 +166,11 @@ function emitGroup(label: string, srcDir: string, outDir: string): number {
 
   const indexJs =
     `/** Re-exports every icon in the ${label} library. Generated; do not edit. */\n` +
-    glyphs
-      .map((g) => `export { ${toIdentifier(g.id)} } from './${g.id}.js';`)
-      .join('\n') +
+    glyphs.map((g) => `export { ${toIdentifier(g.id)} } from './${g.id}.js';`).join('\n') +
     '\n';
   const indexDts =
     `/** Re-exports every icon in the ${label} library. Generated; do not edit. */\n` +
-    glyphs
-      .map((g) => `export { ${toIdentifier(g.id)} } from './${g.id}.js';`)
-      .join('\n') +
+    glyphs.map((g) => `export { ${toIdentifier(g.id)} } from './${g.id}.js';`).join('\n') +
     '\n';
   writeFileSync(join(outDir, 'index.js'), indexJs, 'utf8');
   writeFileSync(join(outDir, 'index.d.ts'), indexDts, 'utf8');
@@ -188,15 +181,7 @@ function emitGroup(label: string, srcDir: string, outDir: string): number {
 
 mkdirSync(distDir, { recursive: true });
 
-const helixCount = emitGroup(
-  'helix',
-  helixSrcDir,
-  resolve(distDir, 'tree-shake/helix'),
-);
-const faCount = emitGroup(
-  'fa-free/solid',
-  faSrcDir,
-  resolve(distDir, 'tree-shake/fa-free/solid'),
-);
+const helixCount = emitGroup('helix', helixSrcDir, resolve(distDir, 'tree-shake/helix'));
+const faCount = emitGroup('fa-free/solid', faSrcDir, resolve(distDir, 'tree-shake/fa-free/solid'));
 
 console.log(`[tree-shake] done. helix=${helixCount}, fa-free/solid=${faCount}`);

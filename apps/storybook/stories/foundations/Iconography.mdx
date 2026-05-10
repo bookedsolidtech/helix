@@ -1,7 +1,14 @@
 {/* Iconography.mdx — Foundations / Iconography */}
 
 import { Meta } from '@storybook/addon-docs/blocks';
-import { EyebrowHeading, SectionHead, DocsCard, StatCard, CodeBlock, CodeTabs } from '../_components';
+import {
+  EyebrowHeading,
+  SectionHead,
+  DocsCard,
+  StatCard,
+  CodeBlock,
+  CodeTabs,
+} from '../_components';
 import '@helixui/library/components/hx-icon';
 
 <Meta
@@ -10,20 +17,67 @@ import '@helixui/library/components/hx-icon';
 />
 
 export const HELIX_GLYPHS = [
-  'arrow-down', 'arrow-flat', 'arrow-up', 'calendar', 'check',
-  'chevron-down', 'chevron-left', 'chevron-right', 'chevron-up',
-  'chevrons-left', 'chevrons-right', 'clock', 'close', 'copy', 'dash',
-  'dot', 'ellipsis', 'error', 'external-link', 'eye', 'eye-off',
-  'file', 'info', 'lock', 'menu', 'plus', 'star-filled', 'star-outline',
-  'success', 'trash', 'upload', 'warning',
+  'arrow-down',
+  'arrow-flat',
+  'arrow-up',
+  'calendar',
+  'check',
+  'chevron-down',
+  'chevron-left',
+  'chevron-right',
+  'chevron-up',
+  'chevrons-left',
+  'chevrons-right',
+  'clock',
+  'close',
+  'copy',
+  'dash',
+  'dot',
+  'ellipsis',
+  'error',
+  'external-link',
+  'eye',
+  'eye-off',
+  'file',
+  'info',
+  'lock',
+  'menu',
+  'plus',
+  'star-filled',
+  'star-outline',
+  'success',
+  'trash',
+  'upload',
+  'warning',
 ];
 
 export const FA_FREE_SAMPLE = [
-  'address-book', 'bell', 'bookmark', 'calendar', 'chart-line',
-  'circle-check', 'circle-exclamation', 'circle-info', 'circle-question',
-  'circle-xmark', 'clipboard', 'clock', 'cloud', 'comment', 'envelope',
-  'eye', 'file', 'filter', 'gear', 'heart', 'house', 'magnifying-glass',
-  'pen', 'star', 'trash', 'user',
+  'address-book',
+  'bell',
+  'bookmark',
+  'calendar',
+  'chart-line',
+  'circle-check',
+  'circle-exclamation',
+  'circle-info',
+  'circle-question',
+  'circle-xmark',
+  'clipboard',
+  'clock',
+  'cloud',
+  'comment',
+  'envelope',
+  'eye',
+  'file',
+  'filter',
+  'gear',
+  'heart',
+  'house',
+  'magnifying-glass',
+  'pen',
+  'star',
+  'trash',
+  'user',
 ];
 
 export const SIZES = [
@@ -43,11 +97,11 @@ export const SIZES = [
     <>
       <code>hx-icon</code> resolves names through registered libraries — the same pattern Shoelace
       established and that the WC ecosystem has converged on. <strong>FA Free</strong> is the
-      out-of-the-box default. <strong>helix</strong> is the curated internal glyph set powering every
-      checkmark, chevron, and status indicator across the library. <strong>Bring your own</strong>{' '}
-      — Font Awesome Pro, Phosphor, Heroicons, Material Symbols, Iconify, or a brand-internal set —
-      via a one-call registration. Powered by <code>@helixui/icons</code>, a peer dependency
-      required like <code>@helixui/tokens</code>.
+      out-of-the-box default. <strong>helix</strong> is the curated internal glyph set powering
+      every checkmark, chevron, and status indicator across the library.{' '}
+      <strong>Bring your own</strong> — Font Awesome Pro, Phosphor, Heroicons, Material Symbols,
+      Iconify, or a brand-internal set — via a one-call registration. Powered by{' '}
+      <code>@helixui/icons</code>, a peer dependency required like <code>@helixui/tokens</code>.
     </>
   }
 />
@@ -90,18 +144,8 @@ export const SIZES = [
       sublabel="32 curated internal glyphs"
       tone="success"
     />
-    <StatCard
-      label="Bring-your-own"
-      value="∞"
-      sublabel="register any resolver"
-      tone="neutral"
-    />
-    <StatCard
-      label="Conformance"
-      value="AAA"
-      sublabel="non-text contrast 1.4.11"
-      tone="success"
-    />
+    <StatCard label="Bring-your-own" value="∞" sublabel="register any resolver" tone="neutral" />
+    <StatCard label="Conformance" value="AAA" sublabel="non-text contrast 1.4.11" tone="success" />
   </div>
 </section>
 
@@ -113,24 +157,28 @@ export const SIZES = [
 <hx-icon name="heart" hx-size="md"></hx-icon>
 
 <!-- Explicit FA Free -->
+
 <hx-icon library="fa-free" name="user-doctor" hx-size="md"></hx-icon>
 
 <!-- helix system glyph -->
+
 <hx-icon library="helix" name="check" hx-size="sm"></hx-icon>
 
 <!-- Brand-registered library -->
+
 <hx-icon library="acme-medical" name="vitals" hx-size="lg"></hx-icon>`}
-  />
+/>
+
 </section>
 
 <section>
   <SectionHead title="Live: helix library" meta="32 curated glyphs · paint-mode fill · MIT" />
   <p style={{ marginBottom: 16, maxWidth: '70ch' }}>
-    The internal glyph vocabulary every HELiX component renders through. Hand-drawn at 24×24,
-    filled silhouettes (no strokes), <code>currentColor</code> only. AAA-validated for WCAG 1.4.11
-    non-text contrast at 16px+ render sizes. Phase 5 of the icons epic migrates internal components
-    (hx-checkbox, hx-alert, hx-toast, etc.) to consume these names — re-register{' '}
-    <code>helix</code> with your own resolver to override the entire system glyph surface.
+    The internal glyph vocabulary every HELiX component renders through. Hand-drawn at 24×24, filled
+    silhouettes (no strokes), <code>currentColor</code> only. AAA-validated for WCAG 1.4.11 non-text
+    contrast at 16px+ render sizes. Phase 5 of the icons epic migrates internal components
+    (hx-checkbox, hx-alert, hx-toast, etc.) to consume these names — re-register <code>helix</code>{' '}
+    with your own resolver to override the entire system glyph surface.
   </p>
   <div
     style={{
@@ -250,8 +298,8 @@ export const SIZES = [
 import { registerIconLibrary } from '@helixui/icons';
 
 registerIconLibrary('fa-pro', {
-  resolver: (name) => \`/assets/fa-pro/svgs/solid/\${name}.svg\`,
-  paintMode: 'fill',
+resolver: (name) => \`/assets/fa-pro/svgs/solid/\${name}.svg\`,
+paintMode: 'fill',
 });
 
 // Use:
@@ -264,9 +312,9 @@ registerIconLibrary('fa-pro', {
 import { registerIconLibrary } from '@helixui/icons';
 
 registerIconLibrary('iconify', {
-  resolver: (name) => \`https://api.iconify.design/\${name}.svg\`,
-  mutator: (svg) => svg.setAttribute('fill', 'currentColor'),
-  paintMode: 'mixed',
+resolver: (name) => \`https://api.iconify.design/\${name}.svg\`,
+mutator: (svg) => svg.setAttribute('fill', 'currentColor'),
+paintMode: 'mixed',
 });
 
 // Use:
@@ -279,9 +327,9 @@ registerIconLibrary('iconify', {
 import { registerIconLibrary } from '@helixui/icons';
 
 registerIconLibrary('phosphor', {
-  resolver: (name) =>
-    \`https://unpkg.com/@phosphor-icons/core/assets/regular/\${name}.svg\`,
-  paintMode: 'stroke',
+resolver: (name) =>
+\`https://unpkg.com/@phosphor-icons/core/assets/regular/\${name}.svg\`,
+paintMode: 'stroke',
 });
 
 // Use:
@@ -294,16 +342,17 @@ registerIconLibrary('phosphor', {
 import { registerIconLibrary } from '@helixui/icons';
 
 registerIconLibrary('acme-medical', {
-  resolver: (name) => \`/assets/acme-medical-sprite.svg#\${name}\`,
-  spriteSheet: true,
-  paintMode: 'fill',
+resolver: (name) => \`/assets/acme-medical-sprite.svg#\${name}\`,
+spriteSheet: true,
+paintMode: 'fill',
 });
 
 // Use:
 // <hx-icon library="acme-medical" name="vitals"></hx-icon>`,
-      },
-    ]}
-  />
+},
+]}
+/>
+
 </section>
 
 <section>
@@ -421,33 +470,27 @@ registerIconLibrary('acme-medical', {
     <DocsCard
       title="Decorative by default"
       tag="aria-hidden"
-      demo={
-        <code style={{ fontSize: 13 }}>{'<hx-icon name="check"></hx-icon>'}</code>
-      }
+      demo={<code style={{ fontSize: 13 }}>{'<hx-icon name="check"></hx-icon>'}</code>}
     >
       With no <code>label</code>, <code>aria-hidden="true"</code> is applied and the SVG is hidden
-      from assistive technology. This is the right default — the surrounding text is the
-      accessible name.
+      from assistive technology. This is the right default — the surrounding text is the accessible
+      name.
     </DocsCard>
     <DocsCard
       title="Labeled when standalone"
       tag="role=img + aria-label"
       demo={
-        <code style={{ fontSize: 13 }}>
-          {'<hx-icon name="error" label="Critical"></hx-icon>'}
-        </code>
+        <code style={{ fontSize: 13 }}>{'<hx-icon name="error" label="Critical"></hx-icon>'}</code>
       }
     >
-      A non-empty <code>label</code> opts into <code>role="img"</code> +{' '}
-      <code>aria-label</code> + <code>{'<title>'}</code>. Use only when the icon carries meaning
-      that no adjacent text conveys.
+      A non-empty <code>label</code> opts into <code>role="img"</code> + <code>aria-label</code> +{' '}
+      <code>{'<title>'}</code>. Use only when the icon carries meaning that no adjacent text
+      conveys.
     </DocsCard>
     <DocsCard
       title="Forced-colors safe"
       tag="System Colors via currentColor"
-      demo={
-        <code style={{ fontSize: 13 }}>{'fill: currentColor; stroke: currentColor;'}</code>
-      }
+      demo={<code style={{ fontSize: 13 }}>{'fill: currentColor; stroke: currentColor;'}</code>}
     >
       Every glyph in the <code>helix</code> library uses <code>currentColor</code> exclusively. FA
       Free Solid is normalized to <code>currentColor</code> at sprite-build time. High-contrast and
@@ -456,13 +499,11 @@ registerIconLibrary('acme-medical', {
     <DocsCard
       title="Non-text contrast 1.4.11"
       tag="≥3:1 against background"
-      demo={
-        <code style={{ fontSize: 13 }}>{'iconLibraryAaaVerdict("helix")'}</code>
-      }
+      demo={<code style={{ fontSize: 13 }}>{'iconLibraryAaaVerdict("helix")'}</code>}
     >
       Both built-in libraries are validated against WCAG 2.2 1.4.11 at minimum render size. Custom
-      libraries inherit the same harness — call{' '}
-      <code>iconLibraryAaaVerdict(name)</code> to verify before claiming AAA on icon glyphs.
+      libraries inherit the same harness — call <code>iconLibraryAaaVerdict(name)</code> to verify
+      before claiming AAA on icon glyphs.
     </DocsCard>
   </div>
 </section>
@@ -492,9 +533,7 @@ registerIconLibrary('acme-medical', {
     <DocsCard
       title="Inline fetch + sanitize"
       tag="src=URL"
-      demo={
-        <code style={{ fontSize: 13 }}>{'<hx-icon src="/icons/foo.svg"></hx-icon>'}</code>
-      }
+      demo={<code style={{ fontSize: 13 }}>{'<hx-icon src="/icons/foo.svg"></hx-icon>'}</code>}
     >
       Fetch + DOMParser sanitize + inject. Strips <code>{'<script>'}</code>,{' '}
       <code>{'<foreignObject>'}</code>, SMIL animations, <code>on*</code> handlers,{' '}
@@ -542,8 +581,8 @@ registerIconLibrary('acme-medical', {
       <p className="hx-docs-card-body">
         Mixing fill and stroke styles in the same composition reads as inconsistency. The built-in{' '}
         <code>helix</code> + <code>fa-free</code> libraries are both fill-only and mix cleanly.
-        Stroke-style libraries (Lucide, Phosphor regular) declare{' '}
-        <code>paintMode: 'stroke'</code> at registration so the harness can validate them.
+        Stroke-style libraries (Lucide, Phosphor regular) declare <code>paintMode: 'stroke'</code>{' '}
+        at registration so the harness can validate them.
       </p>
     </div>
     <div className="hx-docs-card" style={{ borderColor: 'var(--hx-color-error-500)' }}>
