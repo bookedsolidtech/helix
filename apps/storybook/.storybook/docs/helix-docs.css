@@ -77,10 +77,19 @@
 .hx-docs p a,
 .hx-docs li a,
 .hx-docs td a,
-.hx-docs-lede a,
+.hx-docs-lede a {
+  color: var(--hx-color-text-link, #0F6363);
+}
+
+/*
+ * DocsCard body links sit on surface.raised (#F5F8F3) where text.link
+ * (primary-700 #0F6363) lands at 6.57:1 — sub-7:1. Bump to text.link-hover
+ * (primary-800 #07494A = 9.51:1 on raised) for the resting card-body link
+ * so AAA-strict holds on the tinted card surface.
+ */
 .hx-docs-card-body a,
 .hx-docs-card-body p a {
-  color: var(--hx-color-text-link, #0F6363);
+  color: var(--hx-color-text-link-hover, #07494A);
 }
 
 .hx-docs a:hover,

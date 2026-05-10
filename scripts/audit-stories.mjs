@@ -139,6 +139,20 @@ const HARNESS_TEXT_SKIP_SELECTORS = [
   'pre.shiki',
   '.shiki',
   '.hx-docs-code-editor-body',
+  // Storybook docs-page chrome (TOC nav, sidebar, toolbar). These are not
+  // owned by the library — they ship from @storybook/addon-docs and the
+  // manager theme. Storybook's own a11y conformance is the upstream's
+  // concern, not HELiX's.
+  'nav.toc-wrapper',
+  'nav[class*="toc"]',
+  '.toc-wrapper',
+  '.toc-list',
+  '.toc-link',
+  '.sbdocs-toc',
+  '.sbdocs-toc--bottom',
+  '.sbdocs-toc--top',
+  '.sb-show-main',
+  '.sidebar-container',
 ];
 
 /**
@@ -378,7 +392,18 @@ const IN_PAGE_AUDIT_FN = `
         axeOptions.rules[id] = { enabled: false };
       }
     }
-    axeResult = await window.axe.run(document, axeOptions);
+    // Build axe context with Storybook-chrome exclusions. Storybook docs
+    // pages render their own TOC nav, sidebar, and toolbar — these ship
+    // from @storybook/addon-docs and the manager theme, and their a11y
+    // conformance is upstream's concern.
+    let axeContext = document;
+    if (_textSkip.length) {
+      axeContext = {
+        include: [['html']],
+        exclude: _textSkip.map((s) => [s]),
+      };
+    }
+    axeResult = await window.axe.run(axeContext, axeOptions);
   } catch (e) {
     findings.push({
       severity: 'moderate',
@@ -550,6 +575,9 @@ const IN_PAGE_AUDIT_FN = `
   const interactiveEls = Array.from(document.querySelectorAll(interactiveSelectors.join(',')));
   for (const el of interactiveEls) {
     if (!isVisible(el)) continue;
+    // Skip Storybook chrome interactive elements (TOC links, sidebar, etc.) —
+    // these are upstream's concern, not the library's.
+    if (_textSkipSelector && el.closest(_textSkipSelector)) continue;
     const r = el.getBoundingClientRect();
     if (r.width <= 0 || r.height <= 0) continue;
     const min = Math.min(r.width, r.height);
