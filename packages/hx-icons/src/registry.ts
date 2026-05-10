@@ -23,25 +23,31 @@ export type {
 } from './types.js';
 
 /**
- * Default base path is the empty string — meaning library resolvers
- * produce a relative URL like `helix.svg#check`. Consumers MUST call
- * `setBasePath(path)` at app bootstrap to point the resolvers at where
- * they serve the sprites (e.g. `/icons` for a static-mounted bundle,
- * `/themes/foo/icons` for a Drupal theme, `https://cdn.example.com/...`
- * for a CDN-hosted copy).
+ * Default base path. Points at the package's published `dist/` on
+ * jsDelivr so unconfigured consumers get working sprite resolution
+ * "out of the box" once `@helixui/icons` is published to npm. Pinned
+ * to a SPECIFIC version so future icon releases don't silently change
+ * what existing consumers fetch.
  *
- * We deliberately do NOT default to a CDN URL: healthcare consumers
- * typically run behind firewalls or strict CSPs that disallow third-
- * party network fetches, and a hard-coded jsDelivr URL would silently
- * 404 in those environments. Empty default forces the consumer to make
- * an explicit, auditable decision about where icons come from.
+ * **Healthcare consumers behind firewalls or strict CSPs MUST override
+ * with `setBasePath()` at app bootstrap.** The console warning below
+ * surfaces the first resolution attempt against this default so
+ * consumers get a single, clear signal that they need to self-host or
+ * override. The warning fires ONCE per page lifetime to avoid log
+ * spam.
  *
- * Storybook calls `setBasePath('/icons')` in `apps/storybook/.storybook/preview.ts`
- * so the sprites resolve through the bundled staticDirs entry. Other
- * consumer apps (`apps/docs`, `apps/admin`, downstream Drupal/React
- * builds) must do the same in their own bootstrap.
+ * Recommended override patterns:
+ *   - Storybook (already wired): `setBasePath('/icons')` + staticDirs
+ *   - Next.js: copy `node_modules/@helixui/icons/dist/*.svg` to
+ *     `public/icons/`, then `setBasePath('/icons')` in a client init
+ *   - Astro: same pattern via `public/icons/` static directory
+ *   - Drupal: serve from `themes/<custom>/icons/`, then
+ *     `setBasePath('/themes/<custom>/icons')` in a Drupal behavior
+ *   - Air-gapped enterprise: serve from a same-origin static asset
+ *     server and `setBasePath('https://internal.example.com/...')`
  */
-const DEFAULT_BASE_PATH = '';
+const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist';
+let _hasWarnedDefaultBasePath = false;
 
 /** Module-level singleton map of registered libraries. */
 const libraries = new Map<string, IconLibrary>();
@@ -115,7 +121,29 @@ export function setBasePath(path: string): void {
 
 /**
  * Read the current global base path. See {@link setBasePath}.
+ *
+ * On first call, if the consumer hasn't overridden the default jsDelivr
+ * CDN URL, emit a one-shot console warning so air-gapped / firewalled
+ * environments get a clear signal that they need to self-host. Silent
+ * 404s on a missing CDN URL are otherwise hard to diagnose. The warning
+ * is suppressed in production builds (NODE_ENV='production' or where
+ * `process` is undefined like browsers without a process shim).
  */
 export function getBasePath(): string {
+  if (
+    !_hasWarnedDefaultBasePath &&
+    basePath === DEFAULT_BASE_PATH &&
+    typeof console !== 'undefined' &&
+    typeof console.warn === 'function'
+  ) {
+    _hasWarnedDefaultBasePath = true;
+    console.warn(
+      '[@helixui/icons] resolving sprites from the default CDN URL ' +
+        `"${DEFAULT_BASE_PATH}". For air-gapped, firewalled, or strict-CSP ` +
+        'deployments, call `setBasePath("/your/icons/path")` at app bootstrap. ' +
+        'See https://github.com/bookedsolidtech/helix/blob/main/packages/hx-icons/README.md ' +
+        'for the recommended self-hosting pattern.',
+    );
+  }
   return basePath;
 }
