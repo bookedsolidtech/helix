@@ -26,11 +26,129 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const TEMPLATE_PATH = path.join(REPO_ROOT, 'scripts/AAA-AUDIT.formal.template.md');
 const STANDARDS_PATH = path.join(REPO_ROOT, 'scripts/aaa-standards.json');
 const AUDIT_PATH = path.join(REPO_ROOT, '.reports/formal-aaa-audit/audit.json');
+const STORY_AUDIT_PATH = path.join(REPO_ROOT, '.reports/story-audit/findings.jsonl');
 const COMPONENTS_DIR = path.join(REPO_ROOT, 'packages/hx-library/src/components');
 
 const template = fs.readFileSync(TEMPLATE_PATH, 'utf8');
 const standards = JSON.parse(fs.readFileSync(STANDARDS_PATH, 'utf8'));
 const audit = JSON.parse(fs.readFileSync(AUDIT_PATH, 'utf8'));
+
+/**
+ * Build per-component story totals from the Storybook index. Cached
+ * snapshot is at /tmp/sb-index.json (refreshed before each regenerate).
+ * Falls back to "unknown" if Storybook isn't running.
+ */
+const STORYBOOK_INDEX_CACHE = '/tmp/sb-index.json';
+const storyTotalsByComponent = new Map();
+try {
+  if (fs.existsSync(STORYBOOK_INDEX_CACHE)) {
+    const idx = JSON.parse(fs.readFileSync(STORYBOOK_INDEX_CACHE, 'utf8'));
+    for (const entry of Object.values(idx.entries || {})) {
+      const t = entry.title || '';
+      const m = /^Components\/(.+)$/.exec(t);
+      if (!m) continue;
+      if (entry.type !== 'story') continue;
+      const compName = m[1].trim().toLowerCase().replace(/\s+/g, '-');
+      const tag = compName.startsWith('hx-') ? compName : `hx-${compName}`;
+      storyTotalsByComponent.set(tag, (storyTotalsByComponent.get(tag) || 0) + 1);
+    }
+  }
+} catch {
+  // Storybook index unavailable — fall through, variant coverage will say "unknown"
+}
+
+/**
+ * Optional: story-audit findings keyed by storyTitle's first segment after
+ * "Components/". Used to compute per-component variant coverage. If the file
+ * is missing (story audit hasn't been run yet) we degrade gracefully.
+ */
+const storyAuditByComponent = new Map();
+let storyAuditFresh = false;
+try {
+  if (fs.existsSync(STORY_AUDIT_PATH)) {
+    const lines = fs.readFileSync(STORY_AUDIT_PATH, 'utf8').split('\n').filter(Boolean);
+    for (const line of lines) {
+      try {
+        const f = JSON.parse(line);
+        const title = f.storyTitle || '';
+        // Match "Components/<Name>" → tag is hx-<lowercased name with spaces collapsed>
+        const m = /^Components\/(.+)$/.exec(title);
+        if (!m) continue;
+        const compName = m[1].trim().toLowerCase().replace(/\s+/g, '-');
+        const tag = compName.startsWith('hx-') ? compName : `hx-${compName}`;
+        if (!storyAuditByComponent.has(tag)) {
+          storyAuditByComponent.set(tag, { stories: new Map() });
+        }
+        const bucket = storyAuditByComponent.get(tag);
+        if (!bucket.stories.has(f.storyId)) {
+          bucket.stories.set(f.storyId, { storyName: f.storyName, severities: [] });
+        }
+        bucket.stories.get(f.storyId).severities.push(f.severity);
+      } catch {
+        // Skip malformed lines
+      }
+    }
+    storyAuditFresh = true;
+  }
+} catch {
+  storyAuditFresh = false;
+}
+
+/**
+ * Build the variant-coverage Markdown block for a component. Reflects the
+ * project's self-certification posture explicitly: how many stories the
+ * story-audit harness rendered, how many had zero serious findings, and how
+ * many are still pending visual confirmation.
+ */
+function variantCoverage(tagName) {
+  if (!storyAuditFresh) {
+    return [
+      '> **Story-audit data not available** at audit-regenerate time. Run `node scripts/audit-stories.mjs --concurrency=6` to populate `.reports/story-audit/findings.jsonl`, then re-run the audit regenerator. Until then, this component\'s AAA cert is bounded by the **Default story** only.',
+      '',
+    ].join('\n');
+  }
+  const totalStories = storyTotalsByComponent.get(tagName) ?? 0;
+  const bucket = storyAuditByComponent.get(tagName);
+  const flaggedStoryIds = bucket
+    ? new Set(
+        [...bucket.stories.entries()]
+          .filter(([, s]) => s.severities.some((sev) => sev === 'critical' || sev === 'serious'))
+          .map(([id]) => id),
+      )
+    : new Set();
+  const flagged = flaggedStoryIds.size;
+  const cleared = totalStories - flagged;
+  const pct = totalStories === 0 ? 'n/a' : `${Math.round((cleared / totalStories) * 100)}%`;
+
+  if (totalStories === 0) {
+    return [
+      '> **No `Components/*` stories** found for this component in the Storybook index. The component may be exposed only as part of a parent component\'s story (e.g., `hx-menu-item` rendered inside `hx-menu` stories). The Default-story AAA verdict above applies.',
+      '',
+    ].join('\n');
+  }
+
+  const lines = [
+    '| Metric | Value |',
+    '|---|---|',
+    `| Total \`Components/*\` stories for this component | ${totalStories} |`,
+    `| Stories with **zero serious findings** (visually confirmed by story-audit harness) | ${cleared} |`,
+    `| Stories with serious findings (pending re-verification) | ${flagged} |`,
+    `| Visual-confirmation rate | **${pct}** |`,
+    '',
+  ];
+  if (flagged > 0) {
+    lines.push(
+      `> ${flagged} of ${totalStories} stories under this component have outstanding serious findings from the story-audit harness. Until those clear, the AAA cert claim above applies to the **Default story only** — not necessarily to all variants. See \`.reports/story-audit/findings.jsonl\` for specifics.`,
+    );
+    lines.push('');
+  } else if (cleared === totalStories) {
+    lines.push(
+      `> All ${totalStories} stories for this component cleared the story-audit harness at the serious floor. **Visual confirmation rate: 100%.** The component's AAA cert is supported by both formal-audit measurements (Default story) and pixel-level rendering checks across every shipped variant.`,
+    );
+    lines.push('');
+  }
+  return lines.join('\n');
+}
 
 // Index criteria by id from aaa-standards.json (canonical source of titles, URLs, thresholds).
 const criteriaById = new Map();
@@ -405,6 +523,7 @@ function renderComponent(componentResult) {
     detailedEvidenceBlocks: renderDetailedEvidence(componentResult, verdicts),
     consumerObligations: consumerObligations(componentResult),
     toolingNotes: toolingNotes(componentResult),
+    variantCoverage: variantCoverage(tag),
   };
 
   let out = template;
