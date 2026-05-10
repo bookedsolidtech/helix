@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-09T23:27:58.549Z",
+  "generatedAt": "2026-05-10T17:52:22.087Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.8.0",
   "tokensVersion": "3.8.0",
@@ -12189,7 +12189,7 @@
           "figmaPropertyName": "library",
           "cemAttribute": "library",
           "type": "text",
-          "defaultValue": "fa-free"
+          "defaultValue": ""
         },
         {
           "figmaPropertyName": "src",

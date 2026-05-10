@@ -18,10 +18,12 @@ will build the full href as `${spriteUrl}#${name}`. If `name` already
 starts with `#` it is used as-is (inline sprite reference without a base
 URL). */
   name?: string;
-  /** Identifier of the icon library to resolve `name` through. Defaults to
-`'fa-free'` — the FA Free Solid set bundled with `@helixui/icons`. Set to
-`'helix'` for the curated 32-glyph helix set, or to any consumer-registered
-library identifier.
+  /** Identifier of the icon library to resolve `name` through. Default is
+the empty string — meaning bare `<hx-icon name="foo">` continues to
+render a document-local sprite fragment (`<use href="#foo">`) per the
+pre-3.9.0 contract. Set explicitly to `'fa-free'` for the FA Free Solid
+set bundled with `@helixui/icons`, `'helix'` for the curated 32-glyph
+helix set, or to any consumer-registered library identifier.
 
 Library resolution applies only when `src` is empty AND `sprite-url` is
 not set; the inline-fetch and explicit-sprite paths are kept as escape

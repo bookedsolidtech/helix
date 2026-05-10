@@ -221,27 +221,15 @@ export class HelixIcon extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback();
     if (typeof globalThis.addEventListener === 'function') {
-      globalThis.addEventListener(
-        'helixicon-library-registered',
-        this._onLibraryRegistered,
-      );
-      globalThis.addEventListener(
-        'helixicon-base-path-changed',
-        this._onBasePathChanged,
-      );
+      globalThis.addEventListener('helixicon-library-registered', this._onLibraryRegistered);
+      globalThis.addEventListener('helixicon-base-path-changed', this._onBasePathChanged);
     }
   }
 
   override disconnectedCallback(): void {
     if (typeof globalThis.removeEventListener === 'function') {
-      globalThis.removeEventListener(
-        'helixicon-library-registered',
-        this._onLibraryRegistered,
-      );
-      globalThis.removeEventListener(
-        'helixicon-base-path-changed',
-        this._onBasePathChanged,
-      );
+      globalThis.removeEventListener('helixicon-library-registered', this._onLibraryRegistered);
+      globalThis.removeEventListener('helixicon-base-path-changed', this._onBasePathChanged);
     }
     super.disconnectedCallback();
   }
@@ -546,11 +534,7 @@ export class HelixIcon extends HelixElement {
     // may have changed and a newer fetch may have superseded this one.
     // Re-check the fetch identity before mutating — otherwise library A's
     // mutator could apply to library B's already-rendered SVG.
-    if (
-      this._fetchedLibraryKey === key &&
-      resolved.library.mutator &&
-      this._inlineSvg
-    ) {
+    if (this._fetchedLibraryKey === key && resolved.library.mutator && this._inlineSvg) {
       this._inlineSvg = this._applyLibraryMutator(this._inlineSvg, resolved.library);
     }
   }
