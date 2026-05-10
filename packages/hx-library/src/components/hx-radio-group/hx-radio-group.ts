@@ -1101,13 +1101,12 @@ export class HelixRadioGroup extends FormMixin(HelixElement) {
     // and broke external IDREFs (shadow ids cannot resolve across the
     // boundary). The host carries the radiogroup role via ElementInternals
     // on both paths.
+    // axe rule `aria-allowed-attr` forbids aria-orientation on
+    // role="presentation" — the host carries `ariaOrientation` via
+    // ElementInternals (see _syncHostAriaSemantics), so the inner
+    // fieldset must not duplicate it.
     return html`
-      <fieldset
-        part="fieldset"
-        class=${classMap(fieldsetClasses)}
-        role="presentation"
-        aria-orientation=${this.orientation === 'horizontal' ? 'horizontal' : nothing}
-      >
+      <fieldset part="fieldset" class=${classMap(fieldsetClasses)} role="presentation">
         ${this.label
           ? html`
               <legend part="legend" class="fieldset__legend" id=${legendId}>

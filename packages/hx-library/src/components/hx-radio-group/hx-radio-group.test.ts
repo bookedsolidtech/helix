@@ -1199,10 +1199,12 @@ describe('hx-radio-group', () => {
       await el.updateComplete;
       const internals = (el as RadioGroupTestHarness)._internals;
       expect(internals.ariaOrientation).toBe('horizontal');
-      // Inner fieldset also exposes the attribute so AT walking the shadow
-      // tree sees a consistent orientation.
+      // The inner fieldset is `role="presentation"`; per axe
+      // `aria-allowed-attr`, aria-orientation cannot live on a
+      // presentational element. Orientation is carried by host internals
+      // only — the inner fieldset must NOT duplicate the attribute.
       const fieldset = shadowQuery<HTMLElement>(el, 'fieldset')!;
-      expect(fieldset.getAttribute('aria-orientation')).toBe('horizontal');
+      expect(fieldset.hasAttribute('aria-orientation')).toBe(false);
     });
 
     it('host ariaInvalid is driven by validity, not visible error content', async () => {
