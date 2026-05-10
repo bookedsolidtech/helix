@@ -76,9 +76,12 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
       modes); the Default story is also rendered in forced-colors mode for visual smoke.
     </li>
     <li>
-      <strong>Error prevention (3.3.6)</strong> — on form-associated components only; verifies the
-      component declares <code>static formAssociated</code> and exposes the
-      <code>ElementInternals</code> validity hooks the consumer needs to wire confirmation steps.
+      <strong>Error prevention (3.3.6)</strong> — applies to form-associated{' '}
+      <strong>input</strong> components. Submission triggers (aria-pattern=button) are NA — 3.3.6
+      is a form-flow contract the consumer app fulfills, not a leaf-component contract. Input
+      components must expose <code>ElementInternals</code> + <code>setValidity()</code> so the
+      consumer&apos;s form gets native form-validity participation; without setValidity, the
+      verdict is Partially Supports.
     </li>
     <li>
       <strong>The remaining 5 criteria</strong> — 1.4.9, 2.3.3, 2.4.12, 2.5.5, 3.2.5 — apply per

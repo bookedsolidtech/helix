@@ -391,6 +391,93 @@ describe('hx-slider', () => {
     });
   });
 
+  // ─── Constraint Validation (WCAG 3.3.6) ───
+
+  describe('Constraint validation', () => {
+    it('default value passes validity (form.checkValidity true)', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-slider name="vol" min="0" max="100" value="50"></hx-slider>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-slider') as HelixSlider;
+      await el.updateComplete;
+      expect(el.validity.valid).toBe(true);
+      expect(form.checkValidity()).toBe(true);
+    });
+
+    it('valueMissing flag is set when required + value is null', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider required></hx-slider>');
+      // Force value to null to simulate "no selection". The numeric default (0) cannot
+      // express "missing" — consumers wiring custom workflows may set value to null to
+      // express absence and expect setValidity to surface it. Direct _updateValidity()
+      // call avoids the clamp pipeline (which coerces null → 0).
+      (el as unknown as { value: number | null }).value = null;
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.valueMissing).toBe(true);
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('rangeUnderflow flag is set when value < min', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="50"></hx-slider>');
+      // The slider's updated() clamps value into [min, max], so after a normal Lit
+      // cycle the validity will always be valid. To verify the underflow code path,
+      // we force value below min and call _updateValidity directly (bypassing clamp).
+      (el as unknown as { value: number }).value = -5;
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.rangeUnderflow).toBe(true);
+    });
+
+    it('rangeOverflow flag is set when value > max', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="50"></hx-slider>');
+      // Same approach as rangeUnderflow — bypass clamp by calling _updateValidity directly.
+      (el as unknown as { value: number }).value = 150;
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.rangeOverflow).toBe(true);
+    });
+
+    it('stepMismatch flag is set when value not aligned to step', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="100" step="10" value="50"></hx-slider>',
+      );
+      // Set a value that does not align to step (50 + 5 = 55 with step 10 → mismatch)
+      (el as unknown as { value: number }).value = 55;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(true);
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('aligned step value passes validity', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="100" step="10" value="50"></hx-slider>',
+      );
+      (el as unknown as { value: number }).value = 60;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(false);
+      expect(el.validity.valid).toBe(true);
+    });
+
+    it('floating-point step alignment tolerates small jitter', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="1" step="0.1" value="0.3"></hx-slider>',
+      );
+      // 0.1 + 0.2 = 0.30000000000000004 — should still be considered aligned within tolerance
+      (el as unknown as { value: number }).value = 0.1 + 0.2;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(false);
+    });
+
+    it('formResetCallback clears validity', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="100" step="10" value="50"></hx-slider>',
+      );
+      (el as unknown as { value: number }).value = 55;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(true);
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.validity.valid).toBe(true);
+    });
+  });
+
   // ─── CSS Parts (7) ───
 
   describe('CSS Parts', () => {

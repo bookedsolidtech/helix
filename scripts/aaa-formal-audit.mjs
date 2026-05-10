@@ -862,6 +862,16 @@ async function runBrowserChecks(componentName, page) {
       }
     }
 
+    // Give the browser time to fully render the focus ring before measuring.
+    // Several HELiX components use CSS transitions on the focus-ring box-shadow
+    // (opacity 0 → 1, spread 0 → 2px) for visual polish — the shadow takes
+    // ~150ms to reach its full computed value. Measuring earlier captures the
+    // transition midpoint (e.g. spread=0.65px, opacity=0.0008) which my
+    // hardened isVisibleFocusShadow predicate correctly rejects as below the
+    // 2px threshold. 250ms is a safe upper bound for any reasonable focus
+    // transition while remaining acceptable in audit runtime.
+    await page.waitForTimeout(250);
+
     // Now measure — the target is keyboard-focused (or we fell back to
     // programmatic focus only if the Tab walk failed to reach it).
     const measurements = await page.evaluate(

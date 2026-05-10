@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-10T19:46:50.814Z",
-  "sourceAuditRunAt": "2026-05-10T19:45:42.774Z",
+  "generatedAt": "2026-05-10T20:28:11.924Z",
+  "sourceAuditRunAt": "2026-05-10T20:26:54.143Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -503,7 +503,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-combobox> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-combobox> — focus ring rendered on inner part))."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -595,7 +595,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-date-picker> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-date-picker> — focus ring rendered on inner part))."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -850,8 +850,8 @@
         "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
       },
       "3.3.6": {
-        "verdict": "Partially Supports",
-        "evidence": "Component is a form-associated input but lacks setValidity()."
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
       },
       "forced-colors": {
         "verdict": "Supports",
@@ -1197,7 +1197,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-number-input> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-number-input> — focus ring rendered on inner part))."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1473,7 +1473,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-select> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-select> — focus ring rendered on inner part))."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1544,8 +1544,8 @@
         "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
       },
       "3.3.6": {
-        "verdict": "Partially Supports",
-        "evidence": "Component is a form-associated input but lacks setValidity()."
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
       },
       "forced-colors": {
         "verdict": "Supports",
@@ -1565,7 +1565,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-slider> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus indicator: rgb(15, 112, 120) 0px 0px 0px 2px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-slider> — focus ring rendered on inner part))."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1841,7 +1841,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-time-picker> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-time-picker> — focus ring rendered on inner part))."
       },
       "2.5.5": {
         "verdict": "Supports",

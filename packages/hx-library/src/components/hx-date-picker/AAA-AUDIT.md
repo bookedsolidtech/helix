@@ -17,8 +17,8 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
 **Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
 **Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/hx-date-picker.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
-**Audit run:** 2026-05-10T19:46:01.416Z
-**Audit harness run:** 2026-05-10T19:45:42.774Z
+**Audit run:** 2026-05-10T20:15:15.568Z
+**Audit harness run:** 2026-05-10T20:14:57.269Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -27,13 +27,13 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 | Verdict             | Count |
 | ------------------- | ----- |
-| Supports            | 10     |
+| Supports            | 9     |
 | Partially Supports  | 0     |
-| Does Not Support    | 0     |
+| Does Not Support    | 1     |
 | Not Applicable      | 1     |
 | **Total criteria**  | **11** |
 
-**Headline:** **Supports + Not Applicable across all 11 criteria** (10 Supports, 1 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+**Headline:** 9 Supports / 0 Partially Supports / 1 Does Not Support / 1 Not Applicable across 11 criteria. See per-criterion findings below.
 
 > **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
 
@@ -79,7 +79,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 | 2.1.3 | Keyboard (No Exception) | Supports | All functionality keyboard-operable; no timing-based input | Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction. | [spec](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) |
 | 2.3.3 | Animation from Interactions | Supports | All interaction-driven motion respects `prefers-reduced-motion: reduce` | Component has 3 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard. | [spec](https://www.w3.org/TR/WCAG22/#animation-from-interactions) |
 | 2.4.12 | Focus Not Obscured (Enhanced) | Supports | No author-created content fully obscures the focused component | No element covers focused target centre | [spec](https://www.w3.org/TR/WCAG22/#focus-not-obscured-enhanced) |
-| 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 0px none rgb(0, 0, 0); box-shadow=oklab(0 0 0 / 0) 0px 0px 0px 0px; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
+| 2.4.13 | Focus Appearance | Does Not Support | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 0px none rgb(32, 43, 57); box-shadow=none; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
 | 2.5.5 | Target Size (Enhanced) | Supports | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-date-picker 1184.0×71.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
 | 3.2.5 | Change on Request | Supports | Context changes only on explicit user request | No auto-submit on focus, no location mutation in focus/input handlers. | [spec](https://www.w3.org/TR/WCAG22/#change-on-request) |
 | 3.3.6 | Error Prevention (All) | Supports | Submission is reversible, checked, or confirmable | Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
@@ -102,7 +102,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Measured:** No own text rendered
 
-**Evidence:** Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text. UI-component-boundary contrast is governed by 1.4.11 (separate harness probe).
+**Evidence:** Component target (hx-date-picker) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.
 
 **Why N/A:** Per `aaa-standards.json` `componentApplicability`, 1.4.6 applies to text and images of text. The harness probe found no own text on the audited surface (UI-component-boundary contrast is governed by 1.4.11, which is not part of this AAA claim).
 
@@ -164,7 +164,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 2.4.13 — Focus Appearance (AAA)
 
-**Verdict:** Supports
+**Verdict:** Does Not Support
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#focus-appearance](https://www.w3.org/TR/WCAG22/#focus-appearance)
 
@@ -172,9 +172,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** When the keyboard focus indicator is visible: (1) area at least as large as a 2 CSS px thick perimeter of the unfocused component; (2) contrast ratio at least 3:1 between the focused and unfocused states.
 
-**Measured:** outline 0px none rgb(0, 0, 0); box-shadow=oklab(0 0 0 / 0) 0px 0px 0px 0px; keyboard-focus via Tab×1
+**Measured:** outline 0px none rgb(32, 43, 57); box-shadow=none; keyboard-focus via Tab×1
 
-**Evidence:** box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-date-picker> — focus ring rendered on inner part)). Verify >=2px effective thickness + 3:1 contrast manually.
+**Evidence:** keyboard-focused via Tab×1 on <input> (shadow descendant of <hx-date-picker> — focus ring rendered on inner part); computed outline 0px and no box-shadow focus indicator. WCAG 2.4.13 requires a visible focus indicator >=2px.
 
 ### 2.5.5 — Target Size (Enhanced) (AAA)
 

@@ -174,6 +174,14 @@ export class HelixSlider extends FormMixin(HelixElement) {
   disabled = false;
 
   /**
+   * Whether the slider must have a value for form submission.
+   * Drives `validity.valueMissing` when no value is set.
+   * @attr required
+   */
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  /**
    * The visible label text for the slider.
    * @attr label
    */
@@ -355,12 +363,81 @@ export class HelixSlider extends FormMixin(HelixElement) {
 
   // ─── Form Integration ───
 
+  /**
+   * Constraint validation: surfaces native `validity` flags through
+   * `ElementInternals.setValidity()` so the slider participates in
+   * `form.checkValidity()` / `form.reportValidity()`.
+   *
+   * Flags applied (in priority order):
+   *   - `valueMissing` when `required` is set and `value` is null/undefined.
+   *   - `rangeUnderflow` when `value < min`.
+   *   - `rangeOverflow` when `value > max`.
+   *   - `stepMismatch` when `step` is finite/positive and `value` is not
+   *     aligned to `min + n*step` within `step / 1000` floating-point
+   *     tolerance.
+   *
+   * The validity anchor is the native range input so browser
+   * `reportValidity()` focuses the correct element. If the input has not
+   * yet rendered (firstUpdated has not run), the anchor is omitted.
+   *
+   * Called automatically by `FormMixin.updated()` after every Lit cycle.
+   * @internal
+   */
+  override _updateValidity(): void {
+    const anchor = this._input;
+    const v = this.value;
+
+    if (this.required && (v === null || v === undefined)) {
+      this._internals.setValidity(
+        { valueMissing: true },
+        'Please select a value.',
+        anchor ?? undefined,
+      );
+      return;
+    }
+
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      if (v < this.min) {
+        this._internals.setValidity(
+          { rangeUnderflow: true },
+          `Value must be at least ${this.min}.`,
+          anchor ?? undefined,
+        );
+        return;
+      }
+      if (v > this.max) {
+        this._internals.setValidity(
+          { rangeOverflow: true },
+          `Value must be at most ${this.max}.`,
+          anchor ?? undefined,
+        );
+        return;
+      }
+      if (Number.isFinite(this.step) && this.step > 0) {
+        const offset = v - this.min;
+        const nearest = Math.round(offset / this.step) * this.step;
+        const tolerance = this.step / 1000;
+        if (Math.abs(offset - nearest) > tolerance) {
+          this._internals.setValidity(
+            { stepMismatch: true },
+            `Value must be a multiple of ${this.step} starting from ${this.min}.`,
+            anchor ?? undefined,
+          );
+          return;
+        }
+      }
+    }
+
+    this._internals.setValidity({});
+  }
+
   /** @internal */
   protected override _onFormReset(): void {
     const resetTo = this._clamp(this._defaultValue ?? this.min);
     this.value = resetTo;
     this._internals.setFormValue(String(resetTo));
     this._resetInteractionState();
+    this._updateValidity();
   }
 
   /** @internal */

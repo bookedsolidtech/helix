@@ -179,6 +179,14 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
   disabled = false;
 
   /**
+   * Whether the field must have at least one file selected for form submission.
+   * Drives `validity.valueMissing` when the file list is empty.
+   * @attr required
+   */
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  /**
    * Error message displayed below the dropzone. Also puts the dropzone in an error visual state.
    * @attr error
    */
@@ -299,6 +307,7 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
     this._files = [];
     this._internals.setFormValue(null);
     this._resetInteractionState();
+    this._updateValidity();
   }
 
   /** @internal */
@@ -339,6 +348,73 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
       formData.append(this.name, entry.file, entry.file.name);
     }
     this._internals.setFormValue(formData);
+  }
+
+  /**
+   * Constraint validation: surfaces native `validity` flags through
+   * `ElementInternals.setValidity()` so the upload field participates in
+   * `form.checkValidity()` / `form.reportValidity()`.
+   *
+   * Flags applied (in priority order):
+   *   - `valueMissing` when `required` is set and no files are selected.
+   *   - `customError` when any file exceeds `maxSize`. The platform's
+   *     `ValidityState` has no perfect "file too big" flag, so `customError`
+   *     is the correct surface per the HTML spec.
+   *   - `customError` when `files.length > maxFiles`.
+   *   - `customError` when `accept` is set and any file's MIME or extension
+   *     does not match the accept pattern.
+   *
+   * The validity anchor is the visible upload trigger (the dropzone button)
+   * inside shadow DOM so `reportValidity()` focuses the correct element. If
+   * the dropzone has not yet rendered, the anchor is omitted.
+   *
+   * Called automatically by `FormMixin.updated()` after every Lit cycle.
+   * @internal
+   */
+  override _updateValidity(): void {
+    const dropzone = this.shadowRoot?.querySelector<HTMLElement>('[part="dropzone"]') ?? undefined;
+
+    if (this.required && this._files.length === 0) {
+      this._internals.setValidity({ valueMissing: true }, 'Please select a file.', dropzone);
+      return;
+    }
+
+    if (this.maxSize > 0) {
+      for (const entry of this._files) {
+        if (entry.file.size > this.maxSize) {
+          this._internals.setValidity(
+            { customError: true },
+            `File "${entry.file.name}" exceeds maximum size of ${this._formatSize(this.maxSize)}.`,
+            dropzone,
+          );
+          return;
+        }
+      }
+    }
+
+    if (this.maxFiles > 0 && this._files.length > this.maxFiles) {
+      this._internals.setValidity(
+        { customError: true },
+        `Maximum of ${this.maxFiles} file${this.maxFiles === 1 ? '' : 's'} allowed.`,
+        dropzone,
+      );
+      return;
+    }
+
+    if (this.accept && this._files.length > 0) {
+      for (const entry of this._files) {
+        if (!this._isAccepted(entry.file)) {
+          this._internals.setValidity(
+            { customError: true },
+            `File "${entry.file.name}" has an unsupported file type. Accepted types: ${this.accept}.`,
+            dropzone,
+          );
+          return;
+        }
+      }
+    }
+
+    this._internals.setValidity({});
   }
 
   // ─── Validation ───

@@ -17,8 +17,8 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
 **Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
 **Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/hx-combobox.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
-**Audit run:** 2026-05-10T19:45:58.155Z
-**Audit harness run:** 2026-05-10T19:45:42.774Z
+**Audit run:** 2026-05-10T20:15:12.512Z
+**Audit harness run:** 2026-05-10T20:14:57.269Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -27,13 +27,13 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 | Verdict             | Count |
 | ------------------- | ----- |
-| Supports            | 10     |
+| Supports            | 11     |
 | Partially Supports  | 0     |
 | Does Not Support    | 0     |
-| Not Applicable      | 1     |
+| Not Applicable      | 0     |
 | **Total criteria**  | **11** |
 
-**Headline:** **Supports + Not Applicable across all 11 criteria** (10 Supports, 1 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+**Headline:** **Supports + Not Applicable across all 11 criteria** (11 Supports, 0 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
 
 > **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
 
@@ -74,12 +74,12 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 | SC | Title | Verdict | Threshold | Measured | Reference |
 | --- | --- | --- | --- | --- | --- |
-| 1.4.6 | Contrast (Enhanced) | Not Applicable | Normal text ≥7:1; large text (≥18.66px or ≥14px bold) ≥4.5:1 | No own text rendered | [spec](https://www.w3.org/TR/WCAG22/#contrast-enhanced) |
+| 1.4.6 | Contrast (Enhanced) | Supports | Normal text ≥7:1; large text (≥18.66px or ≥14px bold) ≥4.5:1 | 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255)) | [spec](https://www.w3.org/TR/WCAG22/#contrast-enhanced) |
 | 1.4.9 | Images of Text (No Exception) | Supports | No raster/SVG images of text (decorative & essential exemptions per WCAG 2.2) | No raster <img> tags rendered in component output. Text content is rendered via real text nodes. | [spec](https://www.w3.org/TR/WCAG22/#images-of-text-no-exception) |
 | 2.1.3 | Keyboard (No Exception) | Supports | All functionality keyboard-operable; no timing-based input | Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction. | [spec](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) |
 | 2.3.3 | Animation from Interactions | Supports | All interaction-driven motion respects `prefers-reduced-motion: reduce` | Component has 4 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard. | [spec](https://www.w3.org/TR/WCAG22/#animation-from-interactions) |
 | 2.4.12 | Focus Not Obscured (Enhanced) | Supports | No author-created content fully obscures the focused component | No element covers focused target centre | [spec](https://www.w3.org/TR/WCAG22/#focus-not-obscured-enhanced) |
-| 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 0px none rgb(0, 0, 0); box-shadow=oklab(0 0 0 / 0) 0px 0px 0px 0px; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
+| 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 0px none rgb(0, 0, 0); box-shadow=color(srgb 0.0509804 0.0941176 0.145098 / 0.12) 0px 4px 16px 0px; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
 | 2.5.5 | Target Size (Enhanced) | Supports | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-combobox 1184.0×71.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
 | 3.2.5 | Change on Request | Supports | Context changes only on explicit user request | No auto-submit on focus, no location mutation in focus/input handlers. | [spec](https://www.w3.org/TR/WCAG22/#change-on-request) |
 | 3.3.6 | Error Prevention (All) | Supports | Submission is reversible, checked, or confirmable | Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
@@ -92,7 +92,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 1.4.6 — Contrast (Enhanced) (AAA)
 
-**Verdict:** Not Applicable
+**Verdict:** Supports
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#contrast-enhanced](https://www.w3.org/TR/WCAG22/#contrast-enhanced)
 
@@ -100,11 +100,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** Visual presentation of text and images of text has a contrast ratio of at least 7:1, except: large text 4.5:1, incidental text, logotypes.
 
-**Measured:** No own text rendered
+**Measured:** 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255))
 
-**Evidence:** Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text. UI-component-boundary contrast is governed by 1.4.11 (separate harness probe).
-
-**Why N/A:** Per `aaa-standards.json` `componentApplicability`, 1.4.6 applies to text and images of text. The harness probe found no own text on the audited surface (UI-component-boundary contrast is governed by 1.4.11, which is not part of this AAA claim).
+**Evidence:** 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM.
 
 ### 1.4.9 — Images of Text (No Exception) (AAA)
 
@@ -172,9 +170,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** When the keyboard focus indicator is visible: (1) area at least as large as a 2 CSS px thick perimeter of the unfocused component; (2) contrast ratio at least 3:1 between the focused and unfocused states.
 
-**Measured:** outline 0px none rgb(0, 0, 0); box-shadow=oklab(0 0 0 / 0) 0px 0px 0px 0px; keyboard-focus via Tab×1
+**Measured:** outline 0px none rgb(0, 0, 0); box-shadow=color(srgb 0.0509804 0.0941176 0.145098 / 0.12) 0px 4px 16px 0px; keyboard-focus via Tab×1
 
-**Evidence:** box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-combobox> — focus ring rendered on inner part)). Verify >=2px effective thickness + 3:1 contrast manually.
+**Evidence:** box-shadow focus indicator: color(srgb 0.0509804 0.0941176 0.145098 / 0.12) 0px 4px 16px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-combobox> — focus ring rendered on inner part)). Verify >=2px effective thickness + 3:1 contrast manually.
 
 ### 2.5.5 — Target Size (Enhanced) (AAA)
 

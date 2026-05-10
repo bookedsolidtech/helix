@@ -17,8 +17,8 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
 **Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
 **Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/hx-slider.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
-**Audit run:** 2026-05-10T19:46:34.054Z
-**Audit harness run:** 2026-05-10T19:45:42.774Z
+**Audit run:** 2026-05-10T20:15:47.579Z
+**Audit harness run:** 2026-05-10T20:14:57.269Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -28,12 +28,12 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 | Verdict             | Count |
 | ------------------- | ----- |
 | Supports            | 8     |
-| Partially Supports  | 1     |
-| Does Not Support    | 0     |
+| Partially Supports  | 0     |
+| Does Not Support    | 1     |
 | Not Applicable      | 2     |
 | **Total criteria**  | **11** |
 
-**Headline:** 8 Supports / 1 Partially Supports / 0 Does Not Support / 2 Not Applicable across 11 criteria. See per-criterion findings below.
+**Headline:** 8 Supports / 0 Partially Supports / 1 Does Not Support / 2 Not Applicable across 11 criteria. See per-criterion findings below.
 
 > **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
 
@@ -79,10 +79,10 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 | 2.1.3 | Keyboard (No Exception) | Supports | All functionality keyboard-operable; no timing-based input | Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction. | [spec](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) |
 | 2.3.3 | Animation from Interactions | Supports | All interaction-driven motion respects `prefers-reduced-motion: reduce` | Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard. | [spec](https://www.w3.org/TR/WCAG22/#animation-from-interactions) |
 | 2.4.12 | Focus Not Obscured (Enhanced) | Supports | No author-created content fully obscures the focused component | No element covers focused target centre | [spec](https://www.w3.org/TR/WCAG22/#focus-not-obscured-enhanced) |
-| 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 0px none rgb(0, 0, 0); box-shadow=rgba(0, 0, 0, 0.05) 0px 1px 2px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
+| 2.4.13 | Focus Appearance | Does Not Support | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 0px none rgb(16, 16, 16); box-shadow=none; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
 | 2.5.5 | Target Size (Enhanced) | Not Applicable | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-slider 448.0×35.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
 | 3.2.5 | Change on Request | Supports | Context changes only on explicit user request | No auto-submit on focus, no location mutation in focus/input handlers. | [spec](https://www.w3.org/TR/WCAG22/#change-on-request) |
-| 3.3.6 | Error Prevention (All) | Partially Supports | Submission is reversible, checked, or confirmable | Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
+| 3.3.6 | Error Prevention (All) | Supports | Submission is reversible, checked, or confirmable | Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
 | forced-colors | Forced Colors Mode Support | Supports | `@media (forced-colors: active)` honored; system colors used; no information conveyed by color alone | @media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.) | [spec](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors) |
 | apg-keyboard | APG-Aligned Keyboard Contract | Supports | Keyboard interaction matches WAI-ARIA APG pattern for declared `@aria-pattern` | @aria-pattern="slider" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required). | [spec](https://www.w3.org/WAI/ARIA/apg/patterns/) |
 
@@ -102,7 +102,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Measured:** No own text rendered
 
-**Evidence:** Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text. UI-component-boundary contrast is governed by 1.4.11 (separate harness probe).
+**Evidence:** Component target (hx-slider) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.
 
 **Why N/A:** Per `aaa-standards.json` `componentApplicability`, 1.4.6 applies to text and images of text. The harness probe found no own text on the audited surface (UI-component-boundary contrast is governed by 1.4.11, which is not part of this AAA claim).
 
@@ -164,7 +164,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 2.4.13 — Focus Appearance (AAA)
 
-**Verdict:** Supports
+**Verdict:** Does Not Support
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#focus-appearance](https://www.w3.org/TR/WCAG22/#focus-appearance)
 
@@ -172,9 +172,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** When the keyboard focus indicator is visible: (1) area at least as large as a 2 CSS px thick perimeter of the unfocused component; (2) contrast ratio at least 3:1 between the focused and unfocused states.
 
-**Measured:** outline 0px none rgb(0, 0, 0); box-shadow=rgba(0, 0, 0, 0.05) 0px 1px 2px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px; keyboard-focus via Tab×1
+**Measured:** outline 0px none rgb(16, 16, 16); box-shadow=none; keyboard-focus via Tab×1
 
-**Evidence:** box-shadow focus indicator: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-slider> — focus ring rendered on inner part)). Verify >=2px effective thickness + 3:1 contrast manually.
+**Evidence:** keyboard-focused via Tab×1 on <input> (shadow descendant of <hx-slider> — focus ring rendered on inner part); computed outline 0px and no box-shadow focus indicator. WCAG 2.4.13 requires a visible focus indicator >=2px.
 
 ### 2.5.5 — Target Size (Enhanced) (AAA)
 
@@ -208,7 +208,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 3.3.6 — Error Prevention (All) (AAA)
 
-**Verdict:** Partially Supports
+**Verdict:** Supports
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#error-prevention-all](https://www.w3.org/TR/WCAG22/#error-prevention-all)
 
@@ -216,9 +216,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** For Web pages that require the user to submit information, at least one of the following is true: (1) Reversible, (2) Checked, (3) Confirmed.
 
-**Measured:** Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.
+**Measured:** Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.
 
-**Evidence:** Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.
+**Evidence:** Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.
 
 ### forced-colors — Forced Colors Mode Support (PEER)
 

@@ -17,8 +17,8 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
 **Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
 **Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/hx-file-upload.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
-**Audit run:** 2026-05-10T19:46:10.955Z
-**Audit harness run:** 2026-05-10T19:45:42.774Z
+**Audit run:** 2026-05-10T20:15:24.563Z
+**Audit harness run:** 2026-05-10T20:14:57.269Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -27,13 +27,13 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 | Verdict             | Count |
 | ------------------- | ----- |
-| Supports            | 10     |
-| Partially Supports  | 1     |
+| Supports            | 11     |
+| Partially Supports  | 0     |
 | Does Not Support    | 0     |
 | Not Applicable      | 0     |
 | **Total criteria**  | **11** |
 
-**Headline:** 10 Supports / 1 Partially Supports / 0 Does Not Support / 0 Not Applicable across 11 criteria. See per-criterion findings below.
+**Headline:** **Supports + Not Applicable across all 11 criteria** (11 Supports, 0 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
 
 > **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
 
@@ -82,7 +82,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 | 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 2px solid rgb(15, 112, 120); box-shadow=none; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
 | 2.5.5 | Target Size (Enhanced) | Supports | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-file-upload 1184.0×128.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
 | 3.2.5 | Change on Request | Supports | Context changes only on explicit user request | No auto-submit on focus, no location mutation in focus/input handlers. | [spec](https://www.w3.org/TR/WCAG22/#change-on-request) |
-| 3.3.6 | Error Prevention (All) | Partially Supports | Submission is reversible, checked, or confirmable | Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
+| 3.3.6 | Error Prevention (All) | Supports | Submission is reversible, checked, or confirmable | Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
 | forced-colors | Forced Colors Mode Support | Supports | `@media (forced-colors: active)` honored; system colors used; no information conveyed by color alone | @media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared | [spec](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors) |
 | apg-keyboard | APG-Aligned Keyboard Contract | Supports | Keyboard interaction matches WAI-ARIA APG pattern for declared `@aria-pattern` | @aria-pattern="button" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required). | [spec](https://www.w3.org/WAI/ARIA/apg/patterns/) |
 
@@ -204,7 +204,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 3.3.6 — Error Prevention (All) (AAA)
 
-**Verdict:** Partially Supports
+**Verdict:** Supports
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#error-prevention-all](https://www.w3.org/TR/WCAG22/#error-prevention-all)
 
@@ -212,9 +212,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** For Web pages that require the user to submit information, at least one of the following is true: (1) Reversible, (2) Checked, (3) Confirmed.
 
-**Measured:** Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.
+**Measured:** Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.
 
-**Evidence:** Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.
+**Evidence:** Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.
 
 ### forced-colors — Forced Colors Mode Support (PEER)
 
