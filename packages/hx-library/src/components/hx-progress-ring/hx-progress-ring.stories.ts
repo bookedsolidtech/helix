@@ -97,6 +97,16 @@ const meta = {
       ${!args.indeterminate && args.value !== null ? html`<span>${args.value}%</span>` : ''}
     </hx-progress-ring>
   `,
+  decorators: [
+    (story) => html`
+      <div
+        style="display: inline-flex; align-items: center; gap: 1rem; padding: 1.5rem 2rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 16rem; font: 0.875rem system-ui, sans-serif;"
+      >
+        ${story()}
+        <span style="color: #4b5563;">Sync progress</span>
+      </div>
+    `,
+  ],
 } satisfies Meta;
 
 export default meta;

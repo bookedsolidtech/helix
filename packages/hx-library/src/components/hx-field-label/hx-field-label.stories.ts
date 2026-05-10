@@ -53,6 +53,20 @@ const meta = {
       Email Address
     </hx-field-label>
   `,
+  decorators: [
+    (story) => html`
+      <div
+        style="display: inline-flex; flex-direction: column; gap: 0.5rem; padding: 1.5rem 2rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 18rem; font: 0.875rem system-ui, sans-serif;"
+      >
+        ${story()}
+        <input
+          type="text"
+          placeholder="example@hospital.org"
+          style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"
+        />
+      </div>
+    `,
+  ],
 } satisfies Meta;
 
 export default meta;
