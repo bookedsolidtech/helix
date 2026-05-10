@@ -470,12 +470,13 @@ export const CustomLibrary: Story = {
   render: () => {
     // Register on first render. Idempotent — subsequent registrations
     // overwrite the previous entry, which is Shoelace-compatible behaviour.
+    // Demo of registering a custom library that aliases a name into the
+    // bundled helix sprite. Re-uses the locally-served helix sprite so the
+    // story renders without a network round-trip and without relying on
+    // hx-icon's data:-URI sanitizer (which blocks data: URIs by design).
     registerIconLibrary('story-demo', {
-      resolver: () =>
-        // Minimal inline circle, encoded as a data URI so the story renders
-        // without a network request.
-        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3C/svg%3E",
-      spriteSheet: false,
+      resolver: () => `${getBasePath()}/helix.svg#dot`,
+      spriteSheet: true,
       paintMode: 'fill',
     });
     return html`
