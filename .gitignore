@@ -178,6 +178,9 @@ data/readiness/
 # Formal AAA re-cert audit output (internal planning, never commit)
 .reports/formal-aaa-audit/
 
+# Story-audit harness output (per-run findings, screenshots — never commit)
+.reports/story-audit/
+
 # Claude Code agent worktree directories
 .claude/worktrees/
 
