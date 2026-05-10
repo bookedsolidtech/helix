@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixLink } from './hx-link.js';
 import './index.js';
@@ -231,7 +230,10 @@ describe('hx-link', () => {
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
       anchor.focus();
-      await userEvent.keyboard('{Enter}');
+      anchor.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, composed: true }),
+      );
+      anchor.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
