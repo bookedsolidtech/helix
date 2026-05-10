@@ -1,0 +1,2036 @@
+{
+  "generatedAt": "2026-05-10T19:46:50.814Z",
+  "sourceAuditRunAt": "2026-05-10T19:45:42.774Z",
+  "standards": "WCAG 2.2 AAA",
+  "standardsSource": "https://www.w3.org/TR/WCAG22/",
+  "components": {
+    "hx-action-bar": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"toolbar\" — all required key groups referenced (ArrowLeft|ArrowRight)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-action-bar> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-action-bar 1184.0x47.0 px"
+      }
+    },
+    "hx-alert": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-alert) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-banner": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-banner) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-breadcrumb": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Not Applicable",
+        "evidence": "Component styles set no color/background/border/shadow declarations."
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"breadcrumb\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-breadcrumb) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <a> (shadow descendant of <hx-breadcrumb> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-breadcrumb 1184.0x60.0 px"
+      }
+    },
+    "hx-button": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Form-associated submission trigger (aria-pattern=button) with no user-entered data value."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "7.03:1 (fg rgb(255, 255, 255), bg rgb(15, 99, 99)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-button> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-button 226.8x44.0 px"
+      }
+    },
+    "hx-button-group": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component declares keydown handlers and is focusable."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Not Applicable",
+        "evidence": "Component styles set no color/background/border/shadow declarations."
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"toolbar\" — all required key groups referenced (ArrowLeft|ArrowRight)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-button-group) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-button-group> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-button-group 283.3x44.0 px"
+      }
+    },
+    "hx-checkbox": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"checkbox\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-checkbox> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-checkbox 1184.0x44.0 px"
+      }
+    },
+    "hx-checkbox-group": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"group\" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2)."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"group\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"group\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"group\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-clinical-status": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-clinical-status) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-color-picker": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"slider\" — all required key groups referenced (ArrowLeft|ArrowRight|ArrowUp|ArrowDown, Home, End)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-color-picker> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-color-picker 102.8x48.0 px"
+      }
+    },
+    "hx-combobox": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 4 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"combobox\" — all required key groups referenced (ArrowDown, ArrowUp, Escape, Enter)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-combobox> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-combobox 1184.0x71.0 px"
+      }
+    },
+    "hx-copy-button": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-copy-button) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-copy-button> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-copy-button 44.0x44.0 px"
+      }
+    },
+    "hx-date-picker": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-date-picker> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-date-picker 1184.0x71.0 px"
+      }
+    },
+    "hx-dialog": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "17.88:1 (fg rgb(13, 24, 37), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.1) 0px 8px 10px -6px (Tab walk did not reach target after 80 presses; fell back to programmatic focus on <div> (shadow descendant of <hx-dialog> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "Host <hx-dialog> has 0x0 bounding box in default story (component likely closed/hidden)."
+      }
+    },
+    "hx-drawer": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-drawer) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×2 on <button> (shadow descendant of <hx-drawer> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "Host <hx-drawer> has 0x0 bounding box in default story (component likely closed/hidden)."
+      }
+    },
+    "hx-dropdown": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"menu\" — all required key groups referenced (ArrowDown, ArrowUp, Escape)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-dropdown) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-dropdown> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "Popover-container component — host wraps a slotted trigger and a floating panel."
+      }
+    },
+    "hx-field": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2)."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"label\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <input> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-field-label": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2)."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"label\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-field-label) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-file-upload": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Partially Supports",
+        "evidence": "Component is a form-associated input but lacks setValidity()."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "10.20:1 (fg rgb(49, 62, 75), bg rgb(245, 248, 243)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-file-upload> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-file-upload 1184.0x128.0 px"
+      }
+    },
+    "hx-form": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"form\" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2)."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Not Applicable",
+        "evidence": "Component styles set no color/background/border/shadow declarations."
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"form\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-form) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"form\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"form\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-help-text": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2)."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"label\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-help-text) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-icon": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"none\" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"none\" requires no specific key set (alert / textbox)."
+      },
+      "non-text-contrast-icon": {
+        "verdict": "Supports",
+        "evidence": "WCAG 1.4.11 Non-text Contrast: 1 hx-icon sample(s) measured; min ratio 21.00:1 (≥3:1 required)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-icon) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"none\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"none\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-icon-button": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Form-associated submission trigger (aria-pattern=button) with no user-entered data value."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-icon-button) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-icon-button> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-icon-button 44.0x44.0 px"
+      }
+    },
+    "hx-menu": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component declares keydown handlers and is focusable."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"menu\" — all required key groups referenced (ArrowDown, ArrowUp, Escape)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-menu> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-menu 1184.0x142.0 px"
+      }
+    },
+    "hx-nav": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"navigation\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "7.03:1 (fg rgb(255, 255, 255), bg rgb(15, 99, 99)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <a> (shadow descendant of <hx-nav> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-nav 1184.0x60.0 px"
+      }
+    },
+    "hx-number-input": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"spinbutton\" — all required key groups referenced (ArrowUp|ArrowDown)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-number-input> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-number-input 1184.0x71.0 px"
+      }
+    },
+    "hx-overflow-menu": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"menu\" — all required key groups referenced (ArrowDown, ArrowUp, Escape)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <button> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-overflow-menu> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-overflow-menu 44.0x44.0 px"
+      }
+    },
+    "hx-popover": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "17.88:1 (fg rgb(13, 24, 37), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px (Tab walk did not reach target after 80 presses; fell back to programmatic focus on <div> (shadow descendant of <hx-popover> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "Host <hx-popover> has 0x0 bounding box in default story (component likely closed/hidden)."
+      }
+    },
+    "hx-popup": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"none\" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"none\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"none\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"none\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-radio-group": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component declares keydown handlers and is focusable."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"radiogroup\" — all required key groups referenced (ArrowDown|ArrowUp, ArrowLeft|ArrowRight)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-radio-group> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-radio-group 1184.0x263.0 px"
+      }
+    },
+    "hx-rating": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component declares keydown handlers and is focusable."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"radiogroup\" — all required key groups referenced (ArrowDown|ArrowUp, ArrowLeft|ArrowRight)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-rating) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-rating> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-rating 236.0x44.0 px"
+      }
+    },
+    "hx-select": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"combobox\" — all required key groups referenced (ArrowDown, ArrowUp, Escape, Enter)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "14.32:1 (fg rgb(32, 43, 57), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-select> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-select 1184.0x69.0 px"
+      }
+    },
+    "hx-side-nav": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"navigation\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-side-nav) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-side-nav> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-side-nav 256.0x500.0 px"
+      }
+    },
+    "hx-slider": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Partially Supports",
+        "evidence": "Component is a form-associated input but lacks setValidity()."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"slider\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-slider> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "User-agent-controlled target — component delegates to a native <input type=\"range\"> whose thumb is sized by the platform (typically 16-20px)."
+      }
+    },
+    "hx-split-button": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 3 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "7.03:1 (fg rgb(255, 255, 255), bg rgb(15, 99, 99)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-split-button> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-split-button 173.7x44.0 px"
+      }
+    },
+    "hx-switch": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"switch\" — all required key groups referenced (' '|Enter)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <button> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-switch> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-switch 1184.0x44.0 px"
+      }
+    },
+    "hx-tabs": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component declares keydown handlers and is focusable."
+      },
+      "2.3.3": {
+        "verdict": "Not Applicable",
+        "evidence": "No transition or animation declarations in component styles."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"tabs\" — all required key groups referenced (ArrowLeft|ArrowRight|ArrowUp|ArrowDown, Home, End)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-tabs) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <hx-tab> (shadow descendant of <hx-tabs> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-tabs 1184.0x133.0 px"
+      }
+    },
+    "hx-text-input": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"textbox\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-text-input> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-text-input 1184.0x71.0 px"
+      }
+    },
+    "hx-textarea": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"textbox\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-textarea> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-textarea 1184.0x139.0 px"
+      }
+    },
+    "hx-time-picker": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 2 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "box-shadow focus indicator: oklab(0 0 0 / 0) 0px 0px 0px 0px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-time-picker> — focus ring rendered on inner part))."
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-time-picker 1184.0x71.0 px"
+      }
+    },
+    "hx-toast": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-toast) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets."
+      }
+    },
+    "hx-toggle-button": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Supports",
+        "evidence": "Form-associated submission trigger that also exposes ElementInternals + setValidity for any stateful value (e.g."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "7.03:1 (fg rgb(255, 255, 255), bg rgb(15, 99, 99)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-toggle-button> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-toggle-button 158.4x44.0 px"
+      }
+    },
+    "hx-tooltip": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"tooltip\" — all required key groups referenced (Escape)."
+      },
+      "1.4.6": {
+        "verdict": "Supports",
+        "evidence": "18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-tooltip> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Not Applicable",
+        "evidence": "Popover-container component — host wraps a slotted trigger and a floating panel."
+      }
+    },
+    "hx-top-nav": {
+      "1.4.9": {
+        "verdict": "Supports",
+        "evidence": "No raster <img> tags rendered in component output."
+      },
+      "2.1.3": {
+        "verdict": "Supports",
+        "evidence": "Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction."
+      },
+      "2.3.3": {
+        "verdict": "Supports",
+        "evidence": "Component has 0 transition + 1 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard."
+      },
+      "3.2.5": {
+        "verdict": "Supports",
+        "evidence": "No auto-submit on focus, no location mutation in focus/input handlers."
+      },
+      "3.3.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component is not form-associated."
+      },
+      "forced-colors": {
+        "verdict": "Supports",
+        "evidence": "@media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.)"
+      },
+      "apg-keyboard": {
+        "verdict": "Supports",
+        "evidence": "@aria-pattern=\"navigation\" requires no specific key set (alert / textbox)."
+      },
+      "1.4.6": {
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-top-nav) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+      },
+      "2.4.12": {
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
+      },
+      "2.4.13": {
+        "verdict": "Supports",
+        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <a> (shadow descendant of <hx-top-nav> — focus ring rendered on inner part))"
+      },
+      "2.5.5": {
+        "verdict": "Supports",
+        "evidence": "target=hx-top-nav 1184.0x65.0 px"
+      }
+    }
+  }
+}

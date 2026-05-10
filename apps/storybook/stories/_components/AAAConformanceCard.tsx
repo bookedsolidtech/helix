@@ -1,23 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * AAAConformanceCard — per-criterion conformance evidence rendered inline
  * on a component's docs page.
  *
- * Pulls live from `@helixui/library/custom-elements.json` (the component's
- * `helixMeta.aaa.criteria` list) and joins each id against
- * `scripts/aaa-standards.json` (plain-language summary, threshold, spec
- * URL). One row per standards criterion; verdict = Supports when listed
- * on the cert payload, Not Applicable when standards-applicability rules
- * out the component (currently only 3.3.6 + form-associated heuristic).
+ * SOURCE OF TRUTH: `@helixui/library/aaa-verdicts.json` — the slim snapshot
+ * generated from the formal audit harness (`scripts/aaa-formal-audit.mjs`
+ * → `scripts/generate-aaa-verdicts.mjs`). One row per standards criterion;
+ * the verdict + evidence comes directly from that snapshot so the docs
+ * surface cannot disagree with the formal audit output, the matrix.md, or
+ * the per-component AAA-AUDIT.md.
  *
- * This is a docs-surface companion to the `A11yStatusCard` already mounted
- * on every autodocs page — the status card shows the headline cert badge
- * + criterion chips; this card expands each chip into a row with the
- * "why it passes" prose.
+ * Earlier revisions of this card resolved Not-Applicable verdicts from a
+ * hand-maintained heuristic against `helixMeta.formAssociated`. That
+ * approach produced verdicts that disagreed with the formal harness as
+ * soon as a component's form-association classification changed in the
+ * audit (e.g. hx-button moved from N/A 3.3.6 to Partially Supports once
+ * the audit learned to detect non-Element-Internals form participation).
+ * The heuristic has been removed. Every verdict on this surface is now
+ * audit-data-driven.
+ *
+ * Visual chrome (badge styling, evidence prose, citation link) is
+ * unchanged — this card remains the procurement-facing companion to the
+ * `A11yStatusCard` chip row and the inline AAA-AUDIT.md panel.
  */
 import * as React from 'react';
 import customElements from '@helixui/library/custom-elements.json';
-import { getStandardCriterion, listStandardCriteria } from './aaa-standards-data';
+import verdictsSnapshot from '@helixui/library/aaa-verdicts.json';
+import { listStandardCriteria } from './aaa-standards-data';
 
 interface CemDeclaration {
   tagName?: string;
@@ -35,12 +43,53 @@ interface CemDeclaration {
   };
 }
 
+interface CemRoot {
+  modules?: Array<{ declarations?: CemDeclaration[] }>;
+}
+
+type Verdict =
+  | 'Supports'
+  | 'Partially Supports'
+  | 'Does Not Support'
+  | 'Not Applicable'
+  | 'Audit Pending';
+
+interface VerdictEntry {
+  verdict: string;
+  evidence: string;
+}
+
+interface ComponentVerdicts {
+  [criterionId: string]: VerdictEntry;
+}
+
+interface VerdictSnapshot {
+  generatedAt?: string;
+  sourceAuditRunAt?: string | null;
+  standards?: string;
+  standardsSource?: string | null;
+  components?: Record<string, ComponentVerdicts | { __error?: string }>;
+}
+
+interface Row {
+  id: string;
+  name: string;
+  level: string;
+  type: 'wcag-sc' | 'peer';
+  verdict: Verdict;
+  summary: string;
+  evidence: string;
+  url: string;
+  understandingUrl?: string;
+  applicability?: string;
+}
+
 const REPO_BLOB_BASE = 'https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/';
 
 const declCache = new Map<string, CemDeclaration | null>();
 function findDeclaration(tag: string): CemDeclaration | null {
   if (declCache.has(tag)) return declCache.get(tag) ?? null;
-  const cem = customElements as { modules?: Array<{ declarations?: CemDeclaration[] }> };
+  const cem = customElements as CemRoot;
   for (const mod of cem.modules ?? []) {
     for (const decl of mod.declarations ?? []) {
       if (decl?.tagName === tag) {
@@ -53,42 +102,31 @@ function findDeclaration(tag: string): CemDeclaration | null {
   return null;
 }
 
-type Verdict = 'Supports' | 'Not Applicable' | 'Unknown';
-
-interface Row {
-  id: string;
-  name: string;
-  level: string;
-  type: 'wcag-sc' | 'peer';
-  verdict: Verdict;
-  summary: string;
-  url: string;
-  understandingUrl?: string;
-  applicability?: string;
-  notApplicableReason?: string;
-}
+const VERDICTS = verdictsSnapshot as VerdictSnapshot;
+const KNOWN_VERDICTS = new Set<Verdict>([
+  'Supports',
+  'Partially Supports',
+  'Does Not Support',
+  'Not Applicable',
+]);
 
 /**
- * Heuristic Not-Applicable resolver. Mirrors the standards file's
- * `componentApplicability` strings but enforced as code so the docs
- * verdict matches the formal-audit harness output without re-running it.
- *
- * Currently only 3.3.6 (Error Prevention All) is N/A on a per-component
- * basis — the audit harness writes "Not Applicable" when the component
- * is not form-associated. Every other criterion applies universally.
+ * Normalise an arbitrary verdict string from the snapshot. Unknown values
+ * fall back to "Audit Pending" so the docs surface never invents a
+ * "Supports" verdict for an unaudited path.
  */
-function resolveNotApplicable(
-  criterionId: string,
-  decl: CemDeclaration,
-): { reason: string } | null {
-  if (criterionId === '3.3.6') {
-    if (decl.helixMeta?.formAssociated !== true) {
-      return {
-        reason: 'Component is not form-associated; error prevention applies to form submission.',
-      };
-    }
+function normaliseVerdict(raw: string | undefined): Verdict {
+  if (typeof raw === 'string' && KNOWN_VERDICTS.has(raw as Verdict)) {
+    return raw as Verdict;
   }
-  return null;
+  return 'Audit Pending';
+}
+
+function getComponentVerdicts(tag: string): ComponentVerdicts | null {
+  const entry = VERDICTS.components?.[tag];
+  if (!entry) return null;
+  if ('__error' in entry) return null;
+  return entry as ComponentVerdicts;
 }
 
 export interface AAAConformanceCardProps {
@@ -106,18 +144,18 @@ export function AAAConformanceCard({
   if (!decl) return null;
 
   const certified = decl.aaaCertified === true || decl.helixMeta?.aaa?.certified === true;
-  const claimedCriteria = new Set(decl.helixMeta?.aaa?.criteria ?? []);
   const auditUrl = decl.helixMeta?.aaa?.auditUrl
     ? `${REPO_BLOB_BASE}${decl.helixMeta.aaa.auditUrl}`
     : null;
   const certDate = decl.aaaCertifiedDate ?? decl.helixMeta?.aaa?.certifiedDate ?? null;
 
+  const componentVerdicts = getComponentVerdicts(tag);
+  const auditPending = componentVerdicts === null;
+
   const allCriteria = listStandardCriteria();
   const rows: Row[] = allCriteria.map((sc) => {
-    const naResult = resolveNotApplicable(sc.id, decl);
-    let verdict: Verdict = 'Unknown';
-    if (naResult) verdict = 'Not Applicable';
-    else if (claimedCriteria.has(sc.id)) verdict = 'Supports';
+    const entry = componentVerdicts?.[sc.id];
+    const verdict: Verdict = auditPending ? 'Audit Pending' : normaliseVerdict(entry?.verdict);
     return {
       id: sc.id,
       name: sc.name,
@@ -125,16 +163,18 @@ export function AAAConformanceCard({
       type: sc.type,
       verdict,
       summary: sc.summary,
+      evidence: entry?.evidence ?? '',
       url: sc.url,
       understandingUrl: sc.understandingUrl,
       applicability: sc.componentApplicability,
-      notApplicableReason: naResult?.reason,
     };
   });
 
   const supportsCount = rows.filter((r) => r.verdict === 'Supports').length;
+  const partialCount = rows.filter((r) => r.verdict === 'Partially Supports').length;
+  const failCount = rows.filter((r) => r.verdict === 'Does Not Support').length;
   const naCount = rows.filter((r) => r.verdict === 'Not Applicable').length;
-  const unknownCount = rows.filter((r) => r.verdict === 'Unknown').length;
+  const pendingCount = rows.filter((r) => r.verdict === 'Audit Pending').length;
 
   return (
     <section
@@ -145,7 +185,12 @@ export function AAAConformanceCard({
         <div>
           <h3 className="hx-aaa-conformance-title">{heading}</h3>
           <p className="hx-aaa-conformance-subtitle">
-            {certified ? (
+            {auditPending ? (
+              <>
+                <strong>Audit pending.</strong> This component has not been measured by the formal
+                AAA audit harness yet. Run <code>pnpm aaa:audit</code> to populate verdicts.
+              </>
+            ) : certified ? (
               <>
                 <strong>Certified WCAG 2.2 Level AAA</strong>
                 {certDate ? (
@@ -154,14 +199,20 @@ export function AAAConformanceCard({
                     on <time dateTime={certDate}>{certDate}</time>
                   </>
                 ) : null}
-                . {supportsCount} Supports · {naCount} Not Applicable
-                {unknownCount > 0 ? ` · ${unknownCount} Unknown` : null} across {rows.length}{' '}
-                criteria.
+                . {supportsCount} Supports
+                {partialCount > 0 ? ` · ${partialCount} Partially Supports` : null}
+                {failCount > 0 ? ` · ${failCount} Does Not Support` : null} · {naCount} Not
+                Applicable
+                {pendingCount > 0 ? ` · ${pendingCount} Audit Pending` : null} across {rows.length}{' '}
+                criteria. Verdicts are sourced live from the formal audit snapshot.
               </>
             ) : (
               <>
-                Not yet certified. Verdicts shown below reflect the standards file only and have not
-                been measured by the audit harness for this component.
+                Not yet certified. Verdicts below are sourced from the formal audit snapshot —{' '}
+                {supportsCount} Supports
+                {partialCount > 0 ? `, ${partialCount} Partially Supports` : null}
+                {failCount > 0 ? `, ${failCount} Does Not Support` : null}, {naCount} Not Applicable
+                {pendingCount > 0 ? `, ${pendingCount} Audit Pending` : null}.
               </>
             )}
           </p>
@@ -199,14 +250,28 @@ export function AAAConformanceCard({
                 data-verdict={row.verdict.toLowerCase().replace(/\s+/g, '-')}
               >
                 {row.verdict === 'Supports' ? '✓ Supports' : null}
+                {row.verdict === 'Partially Supports' ? '⚠ Partially Supports' : null}
+                {row.verdict === 'Does Not Support' ? '✕ Does Not Support' : null}
                 {row.verdict === 'Not Applicable' ? '— Not Applicable' : null}
-                {row.verdict === 'Unknown' ? '? Unknown' : null}
+                {row.verdict === 'Audit Pending' ? '… Audit Pending' : null}
               </span>
             </div>
             <p className="hx-aaa-conformance-row-summary">{row.summary}</p>
-            {row.verdict === 'Not Applicable' && row.notApplicableReason ? (
-              <p className="hx-aaa-conformance-row-na">
-                <strong>Why N/A:</strong> {row.notApplicableReason}
+            {row.evidence ? (
+              <p
+                className="hx-aaa-conformance-row-evidence"
+                data-verdict={row.verdict.toLowerCase().replace(/\s+/g, '-')}
+              >
+                <strong>
+                  {row.verdict === 'Not Applicable'
+                    ? 'Why N/A:'
+                    : row.verdict === 'Partially Supports'
+                      ? 'Partial — why:'
+                      : row.verdict === 'Does Not Support'
+                        ? 'Failure — why:'
+                        : 'Evidence:'}
+                </strong>{' '}
+                {row.evidence}
               </p>
             ) : null}
             <div className="hx-aaa-conformance-row-links">

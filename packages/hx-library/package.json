@@ -21,6 +21,7 @@
       "import": "./dist/components/*/index.js"
     },
     "./custom-elements.json": "./custom-elements.json",
+    "./aaa-verdicts.json": "./aaa-verdicts.json",
     "./fouc.css": "./fouc.css",
     "./dist/css/helix-all.css": "./dist/css/helix-all.css",
     "./dist/css/helix-tokens.css": "./dist/css/helix-tokens.css",
@@ -53,6 +54,7 @@
     "dist/utilities/**",
     "dist/utils/**",
     "custom-elements.json",
+    "aaa-verdicts.json",
     "figma-inventory.json",
     "fouc.css"
   ],

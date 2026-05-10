@@ -48,8 +48,8 @@ import { forcedColorsSurface } from '../../styles/forced-colors.js';
  * @cssprop [--hx-size-8] - Size token.
  * @cssprop [--hx-size-10] - Size token.
  *
- * @aaa-certified 2026-05-09
- * @aaa-criteria 1.4.11
+ * @aaa-certified 2026-05-10
+ * @aaa-criteria 1.4.9,3.2.5,forced-colors,apg-keyboard,non-text-contrast-icon
  * @aaa-audit src/components/hx-icon/AAA-AUDIT.md
  * @aria-pattern none
  * @forced-colors-supported true

@@ -87,6 +87,7 @@
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { resolve, dirname, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
@@ -243,6 +244,7 @@ function loadComponentSources(name) {
     return null;
   }
   const out = {
+    tagName: name,
     dir,
     classFile: null,
     classSrc: '',
@@ -440,12 +442,40 @@ function checkChangeOnRequest(comp) {
 }
 
 /**
- * 3.3.6 Error Prevention (All) — applies only to form-associated components.
- * Form-associated components must expose ElementInternals validation hooks.
+ * 3.3.6 Error Prevention (All) — applies to form-associated INPUT components.
+ *
+ * Form-associated components split into two roles:
+ *
+ *   1. **Submission triggers** (aria-pattern=button) — `<hx-button>`,
+ *      `<hx-icon-button>`, `<hx-split-button>`, `<hx-toggle-button>`.
+ *      These participate in form submission but carry no user-entered
+ *      DATA value the leaf could validate. WCAG 3.3.6 is a form-flow
+ *      contract (review/confirm/reverse before commit) — fulfilled by
+ *      the consumer app, not by a submission trigger leaf. Verdict: NA.
+ *
+ *      Exception: if a submission-trigger exposes ElementInternals +
+ *      setValidity (e.g. a toggle-button surfacing its pressed state
+ *      as form value with native validity wiring), keep the original
+ *      Supports verdict.
+ *
+ *   2. **Input components** (aria-pattern in slider/textbox/combobox/
+ *      listbox/spinbutton/radiogroup/checkbox/switch/searchbox or known
+ *      data-bearing patterns like file-upload) — these collect user
+ *      input that may need validation. To help consumer apps fulfill
+ *      3.3.6, they SHOULD expose ElementInternals + setValidity so the
+ *      consumer's form gets native validity participation. Without it,
+ *      this is Partially Supports — consumers can still validate via
+ *      standard form events, but the native hook is missing.
+ *
+ * The aria-pattern jsdoc tag is the cleanest role signal — it's what
+ * we already use to declare APG conformance per component.
  */
+const SUBMISSION_TRIGGER_PATTERNS = new Set(['button']);
+const DATA_BEARING_TAG_HINTS = /upload/i;
+
 function checkErrorPrevention(comp) {
   const src = comp.classSrc;
-  const isFormAssociated = /static\s+formAssociated\s*=\s*true/.test(src);
+  const isFormAssociated = /static\s+(override\s+)?formAssociated\s*=\s*true/.test(src);
   if (!isFormAssociated) {
     return {
       verdict: VERDICT.NOT_APPLICABLE,
@@ -454,6 +484,24 @@ function checkErrorPrevention(comp) {
   }
   const hasInternals = /attachInternals\(\)|this\._internals|this\.internals/.test(src);
   const hasSetValidity = /setValidity\(/.test(src);
+  const ariaPattern = extractJsdocTag(src, 'aria-pattern');
+  const isDataBearingByTag = DATA_BEARING_TAG_HINTS.test(comp.tagName);
+  const isSubmissionTrigger =
+    ariaPattern && SUBMISSION_TRIGGER_PATTERNS.has(ariaPattern.trim()) && !isDataBearingByTag;
+  if (isSubmissionTrigger) {
+    if (hasInternals && hasSetValidity) {
+      return {
+        verdict: VERDICT.SUPPORTS,
+        evidence:
+          'Form-associated submission trigger that also exposes ElementInternals + setValidity for any stateful value (e.g. toggle pressed state).',
+      };
+    }
+    return {
+      verdict: VERDICT.NOT_APPLICABLE,
+      evidence:
+        'Form-associated submission trigger (aria-pattern=button) with no user-entered data value. WCAG 3.3.6 applies to the form submission flow as a whole; consumer apps fulfill review/confirm/reverse for the form, not for the trigger.',
+    };
+  }
   if (hasInternals && hasSetValidity) {
     return {
       verdict: VERDICT.SUPPORTS,
@@ -463,7 +511,7 @@ function checkErrorPrevention(comp) {
   }
   return {
     verdict: VERDICT.PARTIALLY,
-    evidence: `Component is form-associated but lacks ${!hasInternals ? 'ElementInternals' : ''}${!hasInternals && !hasSetValidity ? ' and ' : ''}${!hasSetValidity ? 'setValidity()' : ''}.`,
+    evidence: `Component is a form-associated input but lacks ${!hasInternals ? 'ElementInternals' : ''}${!hasInternals && !hasSetValidity ? ' and ' : ''}${!hasSetValidity ? 'setValidity()' : ''}. Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.`,
   };
 }
 
@@ -1470,7 +1518,7 @@ async function auditComponent(name, browser) {
     jsdoc: {
       ariaPattern: extractJsdocTag(comp.classSrc, 'aria-pattern'),
       keyboardContract: extractJsdocTag(comp.classSrc, 'keyboard-contract'),
-      formAssociated: /static\s+formAssociated\s*=\s*true/.test(comp.classSrc),
+      formAssociated: /static\s+(override\s+)?formAssociated\s*=\s*true/.test(comp.classSrc),
       forcedColorsSupported: extractJsdocTagBoolean(comp.classSrc, 'forced-colors-supported'),
     },
     verdicts: {},
@@ -1790,6 +1838,24 @@ async function main() {
   console.log(`Verdict matrix: ${relative(REPO_ROOT, matrixPath)}`);
   console.log(`Evidence dir  : ${relative(REPO_ROOT, EVIDENCE_DIR)}/`);
   console.log();
+
+  // Regenerate the slim verdicts snapshot consumed by the Storybook docs
+  // surface (AAAConformanceCard). This keeps the docs page verdicts in
+  // lockstep with the formal harness — no heuristic, no drift. The snapshot
+  // is committed to packages/hx-library/aaa-verdicts.json.
+  const generatorPath = resolve(REPO_ROOT, 'scripts/generate-aaa-verdicts.mjs');
+  if (existsSync(generatorPath)) {
+    console.log('Regenerating docs verdict snapshot...');
+    const gen = spawnSync(process.execPath, [generatorPath, '--audit', OUTPUT_PATH], {
+      stdio: 'inherit',
+    });
+    if (gen.status !== 0) {
+      console.error(
+        '[aaa-formal-audit] generate-aaa-verdicts.mjs failed; verdict snapshot may be stale.',
+      );
+      // Do NOT fail the audit run — the audit succeeded; surface the warning.
+    }
+  }
 
   // Always exit 0 — Phase 4 fixes the F/P findings; this harness reports.
   process.exit(0);

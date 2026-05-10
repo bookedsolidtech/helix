@@ -10,15 +10,15 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Source:** `packages/hx-library/src/components/hx-slider/hx-slider.ts`
 **ARIA pattern:** [`slider`](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) (WAI-ARIA APG)
 **Keyboard contract:** `navigate=Arrow,Home,End,PageUp,PageDown; disabled-suppresses=true`
-**Form-associated:** No
+**Form-associated:** Yes
 **Forced-colors supported:** Yes
 
 **Standards claimed:** [WCAG 2.2 Recommendation](https://www.w3.org/TR/WCAG22/) at level **AAA** for the 9 component-shippable Success Criteria below; plus 2 peer standards (forced-colors-mode, APG-aligned keyboard contract) documented separately.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
 **Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
 **Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/hx-slider.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
-**Audit run:** 2026-05-10T11:51:07.739Z
-**Audit harness run:** 2026-05-10T11:50:18.615Z
+**Audit run:** 2026-05-10T19:46:34.054Z
+**Audit harness run:** 2026-05-10T19:45:42.774Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -28,12 +28,12 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 | Verdict             | Count |
 | ------------------- | ----- |
 | Supports            | 8     |
-| Partially Supports  | 0     |
+| Partially Supports  | 1     |
 | Does Not Support    | 0     |
-| Not Applicable      | 3     |
+| Not Applicable      | 2     |
 | **Total criteria**  | **11** |
 
-**Headline:** **Supports + Not Applicable across all 11 criteria** (8 Supports, 3 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+**Headline:** 8 Supports / 1 Partially Supports / 0 Does Not Support / 2 Not Applicable across 11 criteria. See per-criterion findings below.
 
 > **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
 
@@ -80,9 +80,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 | 2.3.3 | Animation from Interactions | Supports | All interaction-driven motion respects `prefers-reduced-motion: reduce` | Component has 2 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard. | [spec](https://www.w3.org/TR/WCAG22/#animation-from-interactions) |
 | 2.4.12 | Focus Not Obscured (Enhanced) | Supports | No author-created content fully obscures the focused component | No element covers focused target centre | [spec](https://www.w3.org/TR/WCAG22/#focus-not-obscured-enhanced) |
 | 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 0px none rgb(0, 0, 0); box-shadow=rgba(0, 0, 0, 0.05) 0px 1px 2px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
-| 2.5.5 | Target Size (Enhanced) | Not Applicable | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-slider 1184.0×35.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
+| 2.5.5 | Target Size (Enhanced) | Not Applicable | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-slider 448.0×35.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
 | 3.2.5 | Change on Request | Supports | Context changes only on explicit user request | No auto-submit on focus, no location mutation in focus/input handlers. | [spec](https://www.w3.org/TR/WCAG22/#change-on-request) |
-| 3.3.6 | Error Prevention (All) | Not Applicable | Submission is reversible, checked, or confirmable | Component is not form-associated. Error prevention applies to form submission. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
+| 3.3.6 | Error Prevention (All) | Partially Supports | Submission is reversible, checked, or confirmable | Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
 | forced-colors | Forced Colors Mode Support | Supports | `@media (forced-colors: active)` honored; system colors used; no information conveyed by color alone | @media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.) | [spec](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors) |
 | apg-keyboard | APG-Aligned Keyboard Contract | Supports | Keyboard interaction matches WAI-ARIA APG pattern for declared `@aria-pattern` | @aria-pattern="slider" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required). | [spec](https://www.w3.org/WAI/ARIA/apg/patterns/) |
 
@@ -186,9 +186,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** The size of the target for pointer inputs is at least 44 by 44 CSS pixels except: equivalent, inline, user-agent control, essential.
 
-**Measured:** target=hx-slider 1184.0×35.0 px
+**Measured:** target=hx-slider 448.0×35.0 px
 
-**Evidence:** User-agent-controlled target — component delegates to a native <input type="range"> whose thumb is sized by the platform (typically 16-20px). WCAG 2.5.5 user-agent exception (https://www.w3.org/TR/WCAG22/#target-size-enhanced) applies: target sized by the user agent is exempt. Host bbox 1184.0x35.0 px reflects the entire slider track, not the actionable thumb. Equivalent input methods (Arrow keys, Home/End, PageUp/PageDown, mouse wheel) clear the spirit of 2.5.5 for keyboard users.
+**Evidence:** User-agent-controlled target — component delegates to a native <input type="range"> whose thumb is sized by the platform (typically 16-20px). WCAG 2.5.5 user-agent exception (https://www.w3.org/TR/WCAG22/#target-size-enhanced) applies: target sized by the user agent is exempt. Host bbox 448.0x35.0 px reflects the entire slider track, not the actionable thumb. Equivalent input methods (Arrow keys, Home/End, PageUp/PageDown, mouse wheel) clear the spirit of 2.5.5 for keyboard users.
 
 **Why N/A:** Per WCAG 2.2 2.5.5 exceptions (essential / equivalent / inline / user-agent control), the audited surface is a non-interactive overlay container with no clickable target of its own; clickable targets reside in light-DOM consumer content and inherit their own AAA cert.
 
@@ -208,7 +208,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 3.3.6 — Error Prevention (All) (AAA)
 
-**Verdict:** Not Applicable
+**Verdict:** Partially Supports
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#error-prevention-all](https://www.w3.org/TR/WCAG22/#error-prevention-all)
 
@@ -216,11 +216,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** For Web pages that require the user to submit information, at least one of the following is true: (1) Reversible, (2) Checked, (3) Confirmed.
 
-**Measured:** Component is not form-associated. Error prevention applies to form submission.
+**Measured:** Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.
 
-**Evidence:** Component is not form-associated. Error prevention applies to form submission.
-
-**Why N/A:** Per `aaa-standards.json` `componentApplicability`, 3.3.6 applies to form components and components mediating destructive actions. The component is not form-associated and exposes no destructive action surface.
+**Evidence:** Component is a form-associated input but lacks setValidity(). Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.
 
 ### forced-colors — Forced Colors Mode Support (PEER)
 
@@ -259,12 +257,13 @@ For the AAA verdicts above to hold in real-world deployment, the consumer MUST:
 - Provide an accessible name (slot content, `aria-label`, or `accessible-label` prop) for every instance — the harness verifies a present accessible name on the Default story but cannot enforce it for every consumer instance.
 - Render the component on a page that respects WCAG 2.2 page-level criteria (landmarks, page titles, language) — component-level conformance does not certify the page.
 - Do not strip the focus ring via author CSS on the slotted/wrapping element. Adjust via the `--hx-focus-ring-*` design tokens if customization is required.
+- For form usage, expose validation messages via the component's `error` / `validity` API and ensure the submit flow honours WCAG 3.3.6 (reversible / checked / confirmed).
 
 ---
 
 ## Tooling notes
 
-_No harness-side gaps recorded for this component._
+- **axe-core ElementInternals gap.** This component is form-associated (`static formAssociated = true`) and exposes its ARIA role / accessible name via [`ElementInternals`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals). axe-core 4.11.x cannot read those semantics, so axe runs against this component will emit false-positive violations on `aria-allowed-attr`, `aria-required-children`, `aria-required-parent`, and `button-name`. The verdicts above are sourced from the formal Playwright audit (which reads the live accessibility tree directly) and from manual NVDA / JAWS / VoiceOver verification — both of which observe the ElementInternals semantics correctly. See [accessibility/axe-element-internals-gap](https://docs.helixui.com/accessibility/axe-element-internals-gap/) for the full discussion. Tracked in axe-core via [PR #5080](https://github.com/dequelabs/axe-core/pull/5080) and [issue #4259](https://github.com/dequelabs/axe-core/issues/4259); resolution path is axe-core 5.x.
 
 ---
 

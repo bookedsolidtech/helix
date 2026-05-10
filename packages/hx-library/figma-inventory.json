@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-10T17:52:22.087Z",
+  "generatedAt": "2026-05-10T19:51:06.935Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.8.0",
   "tokensVersion": "3.8.0",
@@ -12291,9 +12291,13 @@
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
-        "certifiedDate": "2026-05-09",
+        "certifiedDate": "2026-05-10",
         "criteria": [
-          "1.4.11"
+          "1.4.9",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "non-text-contrast-icon"
         ],
         "auditUrl": "src/components/hx-icon/AAA-AUDIT.md"
       },

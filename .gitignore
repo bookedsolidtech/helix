@@ -184,6 +184,10 @@ data/readiness/
 # AAA matrix harness evidence (per-component brand × theme output, regenerated)
 .reports/aaa-matrix-evidence*.md
 
+# Ad-hoc evaluation reports (internal planning, never commit)
+.reports/*-EVALUATION.md
+.reports/*-evaluation.md
+
 # Codex CLI runtime cache (never commit)
 .codex/
 
