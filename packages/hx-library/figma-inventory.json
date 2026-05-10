@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-10T20:13:04.487Z",
+  "generatedAt": "2026-05-10T20:57:41.560Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.8.0",
   "tokensVersion": "3.8.0",
@@ -11335,6 +11335,7 @@
           "2.1.3",
           "2.3.3",
           "3.2.5",
+          "3.3.6",
           "forced-colors",
           "apg-keyboard",
           "1.4.6",
@@ -19986,6 +19987,7 @@
           "2.1.3",
           "2.3.3",
           "3.2.5",
+          "3.3.6",
           "forced-colors",
           "apg-keyboard",
           "2.4.12",
