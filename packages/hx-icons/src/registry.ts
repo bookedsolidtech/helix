@@ -87,6 +87,36 @@ export function registerIconLibrary(name: string, options: IconLibraryOptions): 
     entry.mutator = options.mutator;
   }
   libraries.set(name, entry);
+
+  // Fire a global event so already-rendered <hx-icon> instances (or any
+  // other consumer) can re-resolve. Without this, a consumer registering
+  // a custom library AFTER icons have rendered would see those icons
+  // stuck on whatever they resolved to at first paint (often a warning
+  // + nothing for unknown libraries). The event fires on `globalThis`
+  // (works in browsers, jsdom test envs, and node REPL); listeners that
+  // care subscribe via `addEventListener('helixicon-library-registered', …)`.
+  if (typeof globalThis !== 'undefined' && typeof CustomEvent !== 'undefined') {
+    try {
+      const evt = new CustomEvent('helixicon-library-registered', {
+        detail: { name },
+        bubbles: false,
+        composed: false,
+      });
+      // EventTarget exists on globalThis in browsers and jsdom; gate on
+      // dispatchEvent existing rather than instanceof so node-without-jsdom
+      // execution paths (build-time scripts importing this module for
+      // typecheck) don't blow up.
+      const target = globalThis as unknown as EventTarget & {
+        dispatchEvent?: (ev: Event) => boolean;
+      };
+      if (typeof target.dispatchEvent === 'function') {
+        target.dispatchEvent(evt);
+      }
+    } catch {
+      // Best-effort; never throw from registerIconLibrary on environments
+      // that don't support CustomEvent dispatch.
+    }
+  }
 }
 
 /**
