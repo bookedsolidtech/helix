@@ -1,6 +1,6 @@
 # WCAG Contrast Report — `@helixui/tokens`
 
-_Generated 2026-05-09T20:54:10.058Z from `@helixui/tokens@3.8.0`._
+_Generated 2026-05-10T11:23:44.405Z from `@helixui/tokens@3.8.0`._
 
 Per-mode pass/fail telemetry for every semantically valid `(text × surface)` pair declared in the contrast matrix. **AA is the published gate** (enforced by `contrast.test.ts`); **AAA is informational** and surfaces here so consumers and auditors can see the actual ceiling each pairing reaches.
 
@@ -14,11 +14,11 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 
 ## Aggregate
 
-**Across all three modes:** 113 of 160 pair-instances AAA-pass · 47 AA-only · 0 sub-AA
+**Across all three modes:** 114 of 160 pair-instances AAA-pass · 46 AA-only · 0 sub-AA
 
 ## Light Mode
 
-**Summary:** 36 of 58 pairs AAA-pass · 22 AA-only · 0 sub-AA
+**Summary:** 37 of 58 pairs AAA-pass · 21 AA-only · 0 sub-AA
 
 | Status | Role | Text token | Surface token | Ratio | AAA min | AA | AAA |
 |---|---|---|---|---:|---:|:---:|:---:|
@@ -29,8 +29,8 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `text-strong` | `surface-raised` | 13.37:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-secondary` | `surface-default` | 10.93:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-secondary` | `surface-raised` | 10.20:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-muted` | `surface-default` | 7.76:1 | 7.0:1 | ✅ | ✅ |
-| ✅ | body | `text-muted` | `surface-raised` | 7.25:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-muted` | `surface-default` | 10.93:1 | 7.0:1 | ✅ | ✅ |
+| ✅ | body | `text-muted` | `surface-raised` | 10.20:1 | 7.0:1 | ✅ | ✅ |
 | ⚠️ | body | `text-placeholder` | `surface-default` | 4.63:1 | 7.0:1 | ✅ | ⚠️ |
 | ⚠️ | body | `text-placeholder` | `surface-raised` | 4.32:1 | 7.0:1 | ✅ | ⚠️ |
 | ✅ | body | `text-inverse` | `surface-inverse` | 17.88:1 | 7.0:1 | ✅ | ✅ |
@@ -76,7 +76,7 @@ Legend: ✅ AAA pass · ⚠️ AA pass (sub-AAA) · ❌ sub-AA (gate failure). T
 | ✅ | body | `text-link-visited` | `surface-default` | 7.07:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `text-link-active` | `surface-default` | 13.85:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | body | `error-text` | `surface-default` | 7.96:1 | 7.0:1 | ✅ | ✅ |
-| ⚠️ | body | `success-text` | `surface-default` | 6.88:1 | 7.0:1 | ✅ | ⚠️ |
+| ✅ | body | `success-text` | `surface-default` | 10.00:1 | 7.0:1 | ✅ | ✅ |
 | ✅ | ui | `focus-ring` | `surface-default` | 5.82:1 | 3.0:1 | ✅ | ✅ |
 | ✅ | ui | `action-primary-bg-inverted-rest` | `surface-inverse` | 5.20:1 | 3.0:1 | ✅ | ✅ |
 | ✅ | ui | `border-strong` | `surface-default` | 4.63:1 | 3.0:1 | ✅ | ✅ |
