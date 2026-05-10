@@ -145,6 +145,7 @@ const meta = {
   },
   args: {
     name: 'check',
+    library: 'helix',
     src: undefined,
     spriteUrl: undefined,
     size: 'md',
@@ -153,6 +154,7 @@ const meta = {
   render: (args) => html`
     <hx-icon
       name=${args.name}
+      library=${args.library}
       src=${ifDefined(args.src)}
       sprite-url=${ifDefined(args.spriteUrl)}
       hx-size=${args.size}
@@ -275,7 +277,7 @@ export const Decorative: Story = {
   },
   render: (args) => html`
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <hx-icon name=${args.name} hx-size=${args.size} label=""></hx-icon>
+      <hx-icon library="helix" name=${args.name} hx-size=${args.size} label=""></hx-icon>
       <span>Decorative icon — hidden from screen readers</span>
     </div>
   `,
@@ -305,23 +307,23 @@ export const Sizes: Story = {
   render: () => html`
     <div style="display: flex; align-items: flex-end; gap: 2rem; flex-wrap: wrap;">
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon hx-size="xs" name="check" label="Check icon, extra small"></hx-icon>
+        <hx-icon library="helix" hx-size="xs" name="check" label="Check icon, extra small"></hx-icon>
         <span style="font-size: 0.75rem; color: #6b7280;">xs</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon hx-size="sm" name="check" label="Check icon, small"></hx-icon>
+        <hx-icon library="helix" hx-size="sm" name="check" label="Check icon, small"></hx-icon>
         <span style="font-size: 0.75rem; color: #6b7280;">sm</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon hx-size="md" name="check" label="Check icon, medium"></hx-icon>
+        <hx-icon library="helix" hx-size="md" name="check" label="Check icon, medium"></hx-icon>
         <span style="font-size: 0.75rem; color: #6b7280;">md</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon hx-size="lg" name="check" label="Check icon, large"></hx-icon>
+        <hx-icon library="helix" hx-size="lg" name="check" label="Check icon, large"></hx-icon>
         <span style="font-size: 0.75rem; color: #6b7280;">lg</span>
       </div>
       <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-        <hx-icon hx-size="xl" name="check" label="Check icon, extra large"></hx-icon>
+        <hx-icon library="helix" hx-size="xl" name="check" label="Check icon, extra large"></hx-icon>
         <span style="font-size: 0.75rem; color: #6b7280;">xl</span>
       </div>
     </div>

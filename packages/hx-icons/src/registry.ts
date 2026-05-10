@@ -23,11 +23,25 @@ export type {
 } from './types.js';
 
 /**
- * Default base path. Points at the package's own published `dist/`
- * directory on jsDelivr — the location the bundled sprite sheets land
- * at in Phase 3.
+ * Default base path is the empty string — meaning library resolvers
+ * produce a relative URL like `helix.svg#check`. Consumers MUST call
+ * `setBasePath(path)` at app bootstrap to point the resolvers at where
+ * they serve the sprites (e.g. `/icons` for a static-mounted bundle,
+ * `/themes/foo/icons` for a Drupal theme, `https://cdn.example.com/...`
+ * for a CDN-hosted copy).
+ *
+ * We deliberately do NOT default to a CDN URL: healthcare consumers
+ * typically run behind firewalls or strict CSPs that disallow third-
+ * party network fetches, and a hard-coded jsDelivr URL would silently
+ * 404 in those environments. Empty default forces the consumer to make
+ * an explicit, auditable decision about where icons come from.
+ *
+ * Storybook calls `setBasePath('/icons')` in `apps/storybook/.storybook/preview.ts`
+ * so the sprites resolve through the bundled staticDirs entry. Other
+ * consumer apps (`apps/docs`, `apps/admin`, downstream Drupal/React
+ * builds) must do the same in their own bootstrap.
  */
-const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist';
+const DEFAULT_BASE_PATH = '';
 
 /** Module-level singleton map of registered libraries. */
 const libraries = new Map<string, IconLibrary>();
