@@ -64,6 +64,43 @@
   font-family: var(--hx-font-family-sans, 'Inter', system-ui, sans-serif);
 }
 
+/*
+ * Anchor color override. Storybook's manager theme paints anchors with its
+ * brand secondary (#006DEB) which lands at 4.79:1 on white and 4.47:1 on
+ * surface.raised — both fail the WCAG 1.4.6 strict 7:1 floor. Re-bind to the
+ * HELiX text.link semantic (primary-700 = 7.03:1 on white, AAA-strict across
+ * all 6 brands) so docs prose links match the same AAA tunings the formal
+ * audit gates components on. This is a Storybook-chrome override, not a
+ * library token change.
+ */
+.hx-docs a:not([class]),
+.hx-docs p a,
+.hx-docs li a,
+.hx-docs td a,
+.hx-docs-lede a,
+.hx-docs-card-body a,
+.hx-docs-card-body p a {
+  color: var(--hx-color-text-link, #0F6363);
+}
+
+.hx-docs a:hover,
+.hx-docs p a:hover,
+.hx-docs li a:hover,
+.hx-docs-card-body a:hover {
+  color: var(--hx-color-text-link-hover, #07494A);
+}
+
+.hx-docs a:visited:not([class]),
+.hx-docs p a:visited,
+.hx-docs li a:visited {
+  color: var(--hx-color-text-link-visited, #0B626A);
+}
+
+.hx-docs a:active,
+.hx-docs p a:active {
+  color: var(--hx-color-text-link-active, #0B3232);
+}
+
 .hx-docs pre,
 .hx-docs code,
 .hx-docs kbd,
