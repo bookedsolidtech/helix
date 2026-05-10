@@ -146,7 +146,30 @@ export function getIconLibrary(name: string): IconLibrary | undefined {
  * from page root).
  */
 export function setBasePath(path: string): void {
-  basePath = path.replace(/\/+$/, '');
+  const next = path.replace(/\/+$/, '');
+  if (next === basePath) return;
+  basePath = next;
+  // Notify mounted icons so already-rendered sprite-mode entries re-resolve
+  // against the new base path. Without this, calling setBasePath() after
+  // initial render leaves existing <hx-icon> elements stuck on the previous
+  // href. Same dispatch shape as the registration event.
+  if (typeof globalThis !== 'undefined' && typeof CustomEvent !== 'undefined') {
+    try {
+      const evt = new CustomEvent('helixicon-base-path-changed', {
+        detail: { basePath: next },
+        bubbles: false,
+        composed: false,
+      });
+      const target = globalThis as unknown as EventTarget & {
+        dispatchEvent?: (ev: Event) => boolean;
+      };
+      if (typeof target.dispatchEvent === 'function') {
+        target.dispatchEvent(evt);
+      }
+    } catch {
+      // Best-effort; never throw from setBasePath on environments without CustomEvent.
+    }
+  }
 }
 
 /**
