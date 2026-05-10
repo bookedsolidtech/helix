@@ -101,6 +101,21 @@ const AXE_ELEMENT_INTERNALS_GAP_RULES = [
   'button-name',
 ];
 
+// Page-level axe rules that do not apply to component-library Storybook
+// iframes. Each Storybook story renders a single component (or a small
+// composition), not a full HTML document — so requiring exactly one
+// <main> landmark and one <h1> heading is a structural mismatch with
+// Storybook's render model. These rules belong to the consumer app, not
+// to the library. Disabled globally; consumers running their own pages
+// must satisfy these rules in their own a11y harness.
+const AXE_STORYBOOK_PAGE_LEVEL_RULES = [
+  'landmark-one-main',
+  'page-has-heading-one',
+  'region', // every region must have a label — not applicable inside a story canvas
+  'bypass', // skip-links / keyboard bypass — page-level concern
+  'document-title', // every document must have a title — Storybook iframes do
+];
+
 // Storybook story-title → tag name mapping for FACE components. Match is
 // case-insensitive on the story-title segment that follows "Components/".
 const FACE_COMPONENT_TAGS = new Set([
@@ -685,7 +700,10 @@ async function auditOne(browserContext, entry, axeSource) {
     // FACE components hit the documented axe-core ElementInternals gap; Shiki
     // code blocks hit the documented DOM-walked-bg false positive.
     const faceTag = deriveFaceTag(entry.title);
-    const axeDisableRules = faceTag ? AXE_ELEMENT_INTERNALS_GAP_RULES : [];
+    const axeDisableRules = [
+      ...AXE_STORYBOOK_PAGE_LEVEL_RULES,
+      ...(faceTag ? AXE_ELEMENT_INTERNALS_GAP_RULES : []),
+    ];
     const textSkipSelectors = HARNESS_TEXT_SKIP_SELECTORS;
     const auditOpts = {
       axeTags,
