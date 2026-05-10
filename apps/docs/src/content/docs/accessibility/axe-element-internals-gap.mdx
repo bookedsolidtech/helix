@@ -23,12 +23,11 @@ This page is the canonical reference for that gap, the components it affects,
 the project mitigation, and the resolution path.
 
 <Aside type="caution" title="Why axe alone is not the cert authority">
-  HELiX uses axe-core for fast iteration and Storybook addon feedback, but it
-  is **not** the cert authority. The formal AAA audit
-  (`scripts/aaa-formal-audit.mjs`) is — and it sources verdicts from
-  Playwright keyboard / role / name probes that read the live accessibility
-  tree directly, which **does** observe ElementInternals semantics correctly.
-  When axe-core and the formal audit disagree, the formal audit wins.
+  HELiX uses axe-core for fast iteration and Storybook addon feedback, but it is **not** the cert
+  authority. The formal AAA audit (`scripts/aaa-formal-audit.mjs`) is — and it sources verdicts from
+  Playwright keyboard / role / name probes that read the live accessibility tree directly, which
+  **does** observe ElementInternals semantics correctly. When axe-core and the formal audit
+  disagree, the formal audit wins.
 </Aside>
 
 ## The technical gap

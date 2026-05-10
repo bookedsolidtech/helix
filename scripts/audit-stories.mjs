@@ -188,11 +188,7 @@ function deriveFaceTag(title) {
   const slug = segs[1].toLowerCase().trim();
   // Story titles use display names like "Button", "Text Input", etc. Map to
   // tag names by hyphenating + prefixing with hx-.
-  const candidates = [
-    slug,
-    'hx-' + slug,
-    'hx-' + slug.replace(/\s+/g, '-'),
-  ];
+  const candidates = [slug, 'hx-' + slug, 'hx-' + slug.replace(/\s+/g, '-')];
   for (const c of candidates) {
     if (FACE_COMPONENT_TAGS.has(c)) return c;
   }

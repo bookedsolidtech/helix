@@ -78,7 +78,7 @@
 .hx-docs li a,
 .hx-docs td a,
 .hx-docs-lede a {
-  color: var(--hx-color-text-link, #0F6363);
+  color: var(--hx-color-text-link, #0f6363);
 }
 
 /*
@@ -89,25 +89,25 @@
  */
 .hx-docs-card-body a,
 .hx-docs-card-body p a {
-  color: var(--hx-color-text-link-hover, #07494A);
+  color: var(--hx-color-text-link-hover, #07494a);
 }
 
 .hx-docs a:hover,
 .hx-docs p a:hover,
 .hx-docs li a:hover,
 .hx-docs-card-body a:hover {
-  color: var(--hx-color-text-link-hover, #07494A);
+  color: var(--hx-color-text-link-hover, #07494a);
 }
 
 .hx-docs a:visited:not([class]),
 .hx-docs p a:visited,
 .hx-docs li a:visited {
-  color: var(--hx-color-text-link-visited, #0B626A);
+  color: var(--hx-color-text-link-visited, #0b626a);
 }
 
 .hx-docs a:active,
 .hx-docs p a:active {
-  color: var(--hx-color-text-link-active, #0B3232);
+  color: var(--hx-color-text-link-active, #0b3232);
 }
 
 .hx-docs pre,

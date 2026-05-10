@@ -14,16 +14,26 @@ import type { HxIconProps } from './types.js';
 export type { HxIconProps };
 
 /**
- * An icon component that supports inline SVG fetching and SVG sprite sheet references.
-Decorative icons are automatically hidden from assistive technology.
-When a label is provided the icon is announced as an image with that label.
+ * An icon component that resolves through the `@helixui/icons` registry,
+with sprite-sheet and inline-fetch escape hatches for legacy / consumer
+patterns. Decorative icons are automatically hidden from assistive
+technology. When a label is provided the icon is announced as an image
+with that label.
 
-**Render modes:**
-- **Sprite mode** (recommended for Drupal/SSR): Set `name` and optionally `sprite-url`.
-  Renders an `<svg><use href="...#name">` — works server-side without JavaScript.
-- **Inline mode**: Set `src` to a URL of a standalone SVG file. The component fetches,
-  sanitizes, and embeds the SVG markup. Requires JavaScript; not server-side renderable.
-  For Drupal/Twig templates use sprite mode to avoid content shift before hydration.
+**Render modes (in resolution order):**
+1. **Inline fetch (`src`)** — Set `src` to a URL of a standalone SVG file.
+   The component fetches, sanitizes, and embeds the SVG markup. Requires
+   JavaScript; not server-side renderable. Library attribute is ignored.
+2. **Explicit sprite (`sprite-url` + `name`)** — Pin the sprite URL on the
+   element instead of resolving through the registry. Library attribute is
+   ignored.
+3. **Registry (`library` + `name`)** (recommended) — Resolves through the
+   `@helixui/icons` registry. Defaults to `library="fa-free"` (the FA Free
+   Solid set bundled with `@helixui/icons`). Set `library="helix"` for the
+   curated 32-glyph helix set. Consumer libraries register via
+   `registerIconLibrary()` and become resolvable here without modifying the
+   component.
+4. **No name / no src** — Renders nothing.
  *
  * @example
  * ```tsx

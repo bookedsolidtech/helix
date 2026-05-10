@@ -165,10 +165,7 @@ function isNoise(finding) {
   if (finding.category === 'axe') {
     const html = finding.details?.html || '';
     const ruleId = finding.details?.ruleId || '';
-    if (
-      ruleId === 'button-name' &&
-      /^<button[^>]*>\s*<\/button>\s*$/.test(html.trim())
-    ) {
+    if (ruleId === 'button-name' && /^<button[^>]*>\s*<\/button>\s*$/.test(html.trim())) {
       return true; // empty button → Storybook chrome
     }
   }
@@ -221,8 +218,7 @@ const fixHints = {
     'Interactive element renders smaller than 24×24px (AA) or 44×44px (AAA Enhanced). For broken-sample: rewrite the story to use `<hx-button>` / `<hx-icon-button>` which already meet target-size. For broken-component: check component min-block-size / min-inline-size.',
   'blank-canvas':
     'Story renders mostly empty pixels. Either the component is in a closed/hidden default state (open it in `args` or `play`) or the migration broke its render.',
-  axe:
-    'Address per axe-core rule guidance. Common fixes: ensure form labels (label rule), ensure buttons have accessible names (button-name), avoid duplicate IDs, run with `--theme=dark` to catch theme-specific contrast.',
+  axe: 'Address per axe-core rule guidance. Common fixes: ensure form labels (label rule), ensure buttons have accessible names (button-name), avoid duplicate IDs, run with `--theme=dark` to catch theme-specific contrast.',
 };
 
 const md = [];
@@ -265,7 +261,9 @@ md.push('');
 
 md.push('## Components ranked by signal strength');
 md.push('');
-md.push('Weight = sum of (4 × critical + 3 × serious + 2 × moderate + 1 × minor) across the component\'s stories. Highest weight = highest fix priority.');
+md.push(
+  "Weight = sum of (4 × critical + 3 × serious + 2 × moderate + 1 × minor) across the component's stories. Highest weight = highest fix priority.",
+);
 md.push('');
 md.push('| Rank | Component | Findings | Critical | Serious | Moderate | Minor | Weight |');
 md.push('|---|---|---|---|---|---|---|---|');
@@ -276,7 +274,9 @@ for (let i = 0; i < sortedComponents.length; i++) {
   const m = findings.filter((f) => f.severity === 'moderate').length;
   const n = findings.filter((f) => f.severity === 'minor').length;
   const weight = c * 4 + s * 3 + m * 2 + n;
-  md.push(`| ${i + 1} | \`${comp}\` | ${findings.length} | ${c} | ${s} | ${m} | ${n} | ${weight} |`);
+  md.push(
+    `| ${i + 1} | \`${comp}\` | ${findings.length} | ${c} | ${s} | ${m} | ${n} | ${weight} |`,
+  );
 }
 md.push('');
 
@@ -301,7 +301,8 @@ for (const [comp, findings] of sortedComponents) {
       if (seen.has(key)) continue;
       seen.add(key);
       md.push(`- [${f.category}] \`${f.storyName || f.storyId}\` — ${f.summary}`);
-      if (f.details?.text) md.push(`    text: \`${f.details.text}\` · contrast=${f.details.contrast ?? '?'}`);
+      if (f.details?.text)
+        md.push(`    text: \`${f.details.text}\` · contrast=${f.details.contrast ?? '?'}`);
       if (f.details?.element) md.push(`    element: \`${f.details.element}\``);
       if (f.details?.size) md.push(`    size: ${f.details.size}`);
       if (f.rootCause && f.rootCause !== 'unknown') md.push(`    root-cause: **${f.rootCause}**`);
@@ -323,6 +324,8 @@ if (!existsSync(dirname(OUT))) mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, md.join('\n'), 'utf8');
 
 console.log(`[triage] wrote ${OUT}`);
-console.log(`[triage] raw=${all.length} actionable=${filtered.length} (dropped ${dropped} noise/floor)`);
+console.log(
+  `[triage] raw=${all.length} actionable=${filtered.length} (dropped ${dropped} noise/floor)`,
+);
 console.log(`[triage] components=${sortedComponents.length}`);
 console.log(`[triage] severity:`, buckets);

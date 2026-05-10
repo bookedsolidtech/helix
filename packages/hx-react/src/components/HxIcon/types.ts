@@ -18,6 +18,15 @@ will build the full href as `${spriteUrl}#${name}`. If `name` already
 starts with `#` it is used as-is (inline sprite reference without a base
 URL). */
   name?: string;
+  /** Identifier of the icon library to resolve `name` through. Defaults to
+`'fa-free'` — the FA Free Solid set bundled with `@helixui/icons`. Set to
+`'helix'` for the curated 32-glyph helix set, or to any consumer-registered
+library identifier.
+
+Library resolution applies only when `src` is empty AND `sprite-url` is
+not set; the inline-fetch and explicit-sprite paths are kept as escape
+hatches and ignore the library attribute. */
+  library?: string;
   /** URL of a standalone SVG file to fetch and render inline. Takes precedence
 over sprite mode when both `src` and `spriteUrl`/`name` are set.
 
@@ -32,7 +41,8 @@ the `<use>` href: `${spriteUrl}#${name}`. */
 Set via the `hx-size` HTML attribute (e.g. `hx-size="lg"`) or via the
 `size` JavaScript property (e.g. `el.size = 'lg'`). Both are equivalent —
 the `attribute: 'hx-size'` mapping is used to avoid colliding with the
-native `<input>` `size` attribute in Drupal attribute-passthrough scenarios.
+native HTMLInputElement `size` attribute in Drupal attribute-passthrough
+scenarios.
 The CEM exposes both the JS property name (`size`) and the HTML attribute
 name (`hx-size`). */
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
