@@ -817,7 +817,12 @@ async function auditOne(browserContext, entry, axeSource) {
     }
 
     // E. blank-canvas detector — story view only. Reuses the first-pass shot.
-    if (result.viewMode === 'story' && firstShot) {
+    // Skip stories whose name explicitly indicates an expected-empty state
+    // (e.g. "Hidden", "Dismissed", "Dismiss Interaction" post-interaction).
+    const expectedEmpty = /^(hidden|dismissed|dismiss\b|empty|toggled\s*off|closed|after\s*hide|post-)/i.test(
+      entry.name || '',
+    );
+    if (result.viewMode === 'story' && firstShot && !expectedEmpty) {
       try {
         const blank = await analyzeBlankCanvas(firstShot, firstShotImg);
         if (blank.flag) {
@@ -830,8 +835,17 @@ async function auditOne(browserContext, entry, axeSource) {
           // story-audit (severity floor=serious) does not gate on it. The
           // signal is preserved for the VRT / coverage track that runs at
           // moderate floor.
+          // Tiered severity:
+          //   < 0.05% non-bg pixels → SERIOUS (truly empty — component
+          //     failed to mount, missing icon in interactive control, or
+          //     story renders nothing visible). 0.05% threshold avoids
+          //     false-flagging legitimately small primitives like badge,
+          //     avatar, single-line breadcrumb that paint at 0.1–0.4%.
+          //   0.05% – 2%            → MODERATE (small primitive on the
+          //     default Storybook viewport; canonical layout)
+          const sev = blank.nonBgRatio < 0.0005 ? 'serious' : 'moderate';
           findings.push({
-            severity: 'moderate',
+            severity: sev,
             category: 'blank-canvas',
             rootCause: 'unknown',
             summary: `Blank canvas — only ${(blank.nonBgRatio * 100).toFixed(1)}% non-background pixels`,
