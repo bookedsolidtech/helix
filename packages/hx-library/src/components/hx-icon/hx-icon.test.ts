@@ -70,12 +70,15 @@ describe('hx-icon', () => {
       expect(use).toBeTruthy();
     });
 
-    it('<use> href resolves through default fa-free library when only name="check" is set', async () => {
+    it('<use> href is document-local "#check" when library is empty (pre-3.9.0 back-compat)', async () => {
       const el = await fixture<HelixIcon>('<hx-icon name="check"></hx-icon>');
       await el.updateComplete;
       const use = shadowQuery(el, 'use');
-      // Default library is fa-free; registry returns <basePath>/fa-free-solid.svg#check.
-      expect(use?.getAttribute('href')).toMatch(/\/fa-free-solid\.svg#check$/);
+      // Empty default `library` preserves the pre-3.9.0 bare-name contract:
+      // `<hx-icon name="check">` renders `<use href="#check">` for consumers
+      // that ship their own document-local sprite. Consumers opt into the
+      // registered libraries by setting `library="fa-free"` explicitly.
+      expect(use?.getAttribute('href')).toBe('#check');
     });
 
     it('<use> href is "/icons/sprite.svg#check" when spriteUrl and name are set', async () => {
@@ -112,14 +115,15 @@ describe('hx-icon', () => {
     it('renders an empty icon (invisible) when name does not match any sprite symbol', async () => {
       const el = await fixture<HelixIcon>('<hx-icon name="nonexistent-icon"></hx-icon>');
       await el.updateComplete;
-      // The default library still resolves the href; the icon is invisible
-      // because no symbol with that id exists in the sprite. This is the
-      // known silent failure mode; the test documents and asserts this
-      // behaviour.
+      // With the empty-default `library`, the bare-name path renders a
+      // document-local sprite reference. The icon is invisible because no
+      // <symbol id="nonexistent-icon"> exists in any sprite the consumer
+      // has loaded. This is the known silent failure mode for bare-name
+      // usage; the test documents and asserts the contract.
       const svg = shadowQuery(el, 'svg[part="svg"]');
       expect(svg).toBeTruthy();
       const use = shadowQuery(el, 'use');
-      expect(use?.getAttribute('href')).toMatch(/\/fa-free-solid\.svg#nonexistent-icon$/);
+      expect(use?.getAttribute('href')).toBe('#nonexistent-icon');
     });
   });
 
@@ -696,10 +700,23 @@ describe('hx-icon', () => {
   // ─── Registry Resolution (library attribute) ───
 
   describe('Library Registry Resolution', () => {
-    it('library attribute defaults to "fa-free" and resolves to its sprite href', async () => {
+    it('library attribute defaults to the empty string (back-compat for bare-name document-local sprite)', async () => {
+      // 3.9.0 ships an empty default for `library` to preserve the pre-3.9.0
+      // contract where `<hx-icon name="foo">` rendered a document-local sprite
+      // fragment (`<use href="#foo">`) without going through the registry.
+      // Consumers opt INTO registry resolution by setting `library="fa-free"`
+      // (or any registered library name) explicitly.
       const el = await fixture<HelixIcon>('<hx-icon name="circle"></hx-icon>');
       await el.updateComplete;
-      expect(el.library).toBe('fa-free');
+      expect(el.library).toBe('');
+      const use = shadowQuery(el, 'use');
+      // Document-local sprite reference, no library/basePath prefix.
+      expect(use?.getAttribute('href')).toBe('#circle');
+    });
+
+    it('library="fa-free" explicitly resolves to the fa-free sprite href', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="fa-free" name="circle"></hx-icon>');
+      await el.updateComplete;
       const use = shadowQuery(el, 'use');
       expect(use?.getAttribute('href')).toMatch(/\/fa-free-solid\.svg#circle$/);
     });
