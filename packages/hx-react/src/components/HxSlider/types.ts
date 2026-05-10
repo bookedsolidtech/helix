@@ -24,9 +24,6 @@ export interface HxSliderProps {
   step?: number;
   /** Whether the slider is disabled. */
   disabled?: boolean;
-  /** Whether the slider must have a value for form submission.
-Drives `validity.valueMissing` when no value is set. */
-  required?: boolean;
   /** The visible label text for the slider. */
   label?: string;
   /** Help text displayed below the slider for guidance. */

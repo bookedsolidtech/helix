@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-10T20:57:41.560Z",
+  "generatedAt": "2026-05-10T22:41:17.186Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.8.0",
   "tokensVersion": "3.8.0",
@@ -19402,17 +19402,6 @@
           "figmaAxisName": "disabled",
           "cemAttribute": "disabled",
           "cemFieldName": "disabled",
-          "type": "boolean",
-          "values": [
-            "false",
-            "true"
-          ],
-          "default": "false"
-        },
-        {
-          "figmaAxisName": "required",
-          "cemAttribute": "required",
-          "cemFieldName": "required",
           "type": "boolean",
           "values": [
             "false",

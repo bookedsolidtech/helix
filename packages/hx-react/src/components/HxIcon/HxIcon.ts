@@ -28,12 +28,15 @@ with that label.
    element instead of resolving through the registry. Library attribute is
    ignored.
 3. **Registry (`library` + `name`)** (recommended) — Resolves through the
-   `@helixui/icons` registry. Defaults to `library="fa-free"` (the FA Free
-   Solid set bundled with `@helixui/icons`). Set `library="helix"` for the
-   curated 32-glyph helix set. Consumer libraries register via
-   `registerIconLibrary()` and become resolvable here without modifying the
-   component.
-4. **No name / no src** — Renders nothing.
+   `@helixui/icons` registry. Set `library="fa-free"` for the FA Free Solid
+   set bundled with `@helixui/icons`, or `library="helix"` for the curated
+   32-glyph helix set. Consumer libraries register via `registerIconLibrary()`
+   and become resolvable here without modifying the component.
+4. **Bare name (`name` only, no `library`)** — `library` defaults to the
+   empty string. The component emits `<use href="#name">` against a
+   document-local sprite — pre-3.9.0 back-compat behavior. Consumers
+   opt INTO registry resolution by setting `library` explicitly.
+5. **No name / no src** — Renders nothing.
  *
  * @example
  * ```tsx

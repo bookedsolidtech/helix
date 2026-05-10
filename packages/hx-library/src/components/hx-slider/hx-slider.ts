@@ -174,14 +174,6 @@ export class HelixSlider extends FormMixin(HelixElement) {
   disabled = false;
 
   /**
-   * Whether the slider must have a value for form submission.
-   * Drives `validity.valueMissing` when no value is set.
-   * @attr required
-   */
-  @property({ type: Boolean, reflect: true })
-  required = false;
-
-  /**
    * The visible label text for the slider.
    * @attr label
    */
@@ -369,12 +361,19 @@ export class HelixSlider extends FormMixin(HelixElement) {
    * `form.checkValidity()` / `form.reportValidity()`.
    *
    * Flags applied (in priority order):
-   *   - `valueMissing` when `required` is set and `value` is null/undefined.
    *   - `rangeUnderflow` when `value < min`.
    *   - `rangeOverflow` when `value > max`.
    *   - `stepMismatch` when `step` is finite/positive and `value` is not
    *     aligned to `min + n*step` within `step / 1000` floating-point
    *     tolerance.
+   *
+   * Note: a `required` flag is intentionally NOT exposed on the slider
+   * public API. The `value` property defaults to `0` (a numerically valid
+   * value), so a `required` slider cannot meaningfully report
+   * `valueMissing` without an additional "user-touched" interaction
+   * tracker — exposing the flag would advertise validation behavior the
+   * leaf component cannot deliver. Consumers needing required-on-touch
+   * semantics should wire that at the form level rather than the leaf.
    *
    * The validity anchor is the native range input so browser
    * `reportValidity()` focuses the correct element. If the input has not
@@ -386,15 +385,6 @@ export class HelixSlider extends FormMixin(HelixElement) {
   override _updateValidity(): void {
     const anchor = this._input;
     const v = this.value;
-
-    if (this.required && (v === null || v === undefined)) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        'Please select a value.',
-        anchor ?? undefined,
-      );
-      return;
-    }
 
     if (typeof v === 'number' && Number.isFinite(v)) {
       if (v < this.min) {

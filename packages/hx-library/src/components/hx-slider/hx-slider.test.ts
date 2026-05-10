@@ -404,16 +404,19 @@ describe('hx-slider', () => {
       expect(form.checkValidity()).toBe(true);
     });
 
-    it('valueMissing flag is set when required + value is null', async () => {
-      const el = await fixture<HelixSlider>('<hx-slider required></hx-slider>');
-      // Force value to null to simulate "no selection". The numeric default (0) cannot
-      // express "missing" — consumers wiring custom workflows may set value to null to
-      // express absence and expect setValidity to surface it. Direct _updateValidity()
-      // call avoids the clamp pipeline (which coerces null → 0).
-      (el as unknown as { value: number | null }).value = null;
-      (el as unknown as { _updateValidity: () => void })._updateValidity();
-      expect(el.validity.valueMissing).toBe(true);
-      expect(el.checkValidity()).toBe(false);
+    it('does NOT expose a `required` property — value defaults to 0 (numerically valid)', async () => {
+      // The slider does not implement `required` semantics. `value` defaults
+      // to 0 which is a numerically valid number, so a required-but-untouched
+      // slider would always submit `0` without any way for the leaf to know
+      // it was untouched. Exposing `required` would advertise validation
+      // behavior the component cannot deliver. Consumers needing
+      // required-on-touch semantics wire that at the form level. See
+      // hx-slider.ts._updateValidity for the design rationale.
+      const el = await fixture<HelixSlider>('<hx-slider></hx-slider>');
+      expect((el as unknown as { required?: boolean }).required).toBeUndefined();
+      expect(el.hasAttribute('required')).toBe(false);
+      // The validity object is valid even when value === 0 (the default).
+      expect(el.validity.valid).toBe(true);
     });
 
     it('rangeUnderflow flag is set when value < min', async () => {
