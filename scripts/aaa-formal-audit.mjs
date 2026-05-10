@@ -960,14 +960,37 @@ async function runBrowserChecks(componentName, page) {
               }
             }
           };
+          // A box-shadow value is "visible as a focus indicator" only when:
+          //   - it isn't 'none', AND
+          //   - at least one of (offset-x, offset-y, blur, spread) is >=2px, AND
+          //   - the color isn't fully transparent (alpha 0 / oklab .../0 / rgba(...,0))
+          // The previous heuristic accepted ANY `\d+px` substring, which matched
+          // computed defaults like "oklab(0 0 0 / 0) 0px 0px 0px 0px" — the
+          // browser's default placeholder for "no shadow" on elements that have
+          // a focus-visible rule defined elsewhere in the cascade but not
+          // currently matching. Reject those.
+          const isVisibleFocusShadow = (raw) => {
+            if (!raw || raw === 'none') return false;
+            // Reject fully-transparent color tokens.
+            if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
+            if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+            if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+            if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
+            if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+            // Require at least one non-zero pixel dimension.
+            const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
+              parseFloat(m[1]),
+            );
+            if (pxValues.length === 0) return false;
+            return pxValues.some((v) => Math.abs(v) >= 2);
+          };
           const candidates = [];
           if (host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
           for (const el of candidates) {
             const cs = window.getComputedStyle(el);
             const w = parseFloat(cs.outlineWidth || '0');
             const okOutline = w >= 2 && cs.outlineStyle !== 'none';
-            const okShadow =
-              cs.boxShadow && cs.boxShadow !== 'none' && /\b\d+\s*px/.test(cs.boxShadow);
+            const okShadow = isVisibleFocusShadow(cs.boxShadow);
             if (okOutline || okShadow) {
               // Confirm the element is currently visible (focus indicators
               // on display:none parts do not count).
@@ -1186,11 +1209,24 @@ async function runBrowserChecks(componentName, page) {
     const hasOutline = measurements.outlineWidthPx >= 2 && measurements.outlineStyle !== 'none';
     // Detect a "thick enough" box-shadow — heuristic: spread-radius or
     // multi-layer shadow with a non-transparent color and a non-zero
-    // blur or spread.
-    const boxShadowSuggestsFocusRing =
-      measurements.hasFocusBoxShadow &&
-      /\b\d+\s*px/.test(measurements.boxShadow) &&
-      !/^none$/i.test(measurements.boxShadow);
+    // blur or spread. The previous heuristic accepted ANY `\d+px` substring,
+    // which matched the computed-style default "oklab(0 0 0 / 0) 0px 0px 0px 0px"
+    // (browser placeholder for "no shadow"). Reject those by requiring at
+    // least one non-zero pixel dimension AND a non-transparent color.
+    const isVisibleShadow = (raw) => {
+      if (!raw || raw === 'none' || /^none$/i.test(raw)) return false;
+      if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
+      if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+      if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+      if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
+      if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+      const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
+        parseFloat(m[1]),
+      );
+      if (pxValues.length === 0) return false;
+      return pxValues.some((v) => Math.abs(v) >= 2);
+    };
+    const boxShadowSuggestsFocusRing = isVisibleShadow(measurements.boxShadow);
     const outlineSourceNote = measurements.outlineSourceIsTarget
       ? `<${measurements.targetTag}>`
       : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> — focus ring rendered on inner part)`;

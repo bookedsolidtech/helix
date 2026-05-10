@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-10T19:51:06.935Z",
+  "generatedAt": "2026-05-10T20:13:04.487Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.8.0",
   "tokensVersion": "3.8.0",
@@ -554,17 +554,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-action-bar/AAA-AUDIT.md"
       },
@@ -1073,17 +1071,13 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-alert/AAA-AUDIT.md"
       },
@@ -2295,17 +2289,13 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-banner/AAA-AUDIT.md"
       },
@@ -2511,17 +2501,13 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-breadcrumb/AAA-AUDIT.md"
       },
@@ -3172,17 +3158,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-button/AAA-AUDIT.md"
       },
@@ -3289,17 +3274,13 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-button-group/AAA-AUDIT.md"
       },
@@ -4613,17 +4594,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-checkbox/AAA-AUDIT.md"
       },
@@ -4901,17 +4881,12 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-checkbox-group/AAA-AUDIT.md"
       },
@@ -5382,17 +5357,13 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-clinical-status/AAA-AUDIT.md"
       },
@@ -6333,17 +6304,17 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-color-picker/AAA-AUDIT.md"
       },
@@ -7063,17 +7034,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-combobox/AAA-AUDIT.md"
       },
@@ -7610,17 +7580,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-copy-button/AAA-AUDIT.md"
       },
@@ -8945,17 +8913,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-date-picker/AAA-AUDIT.md"
       },
@@ -9427,17 +9394,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-dialog/AAA-AUDIT.md"
       },
@@ -10130,17 +10095,14 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-drawer/AAA-AUDIT.md"
       },
@@ -10382,17 +10344,14 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-dropdown/AAA-AUDIT.md"
       },
@@ -10700,17 +10659,11 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-field/AAA-AUDIT.md"
       },
@@ -10928,17 +10881,11 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-field-label/AAA-AUDIT.md"
       },
@@ -10974,6 +10921,17 @@
           "figmaAxisName": "disabled",
           "cemAttribute": "disabled",
           "cemFieldName": "disabled",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "figmaAxisName": "required",
+          "cemAttribute": "required",
+          "cemFieldName": "required",
           "type": "boolean",
           "values": [
             "false",
@@ -11373,17 +11331,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-file-upload/AAA-AUDIT.md"
       },
@@ -11538,17 +11495,10 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-form/AAA-AUDIT.md"
       },
@@ -12132,17 +12082,11 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-help-text/AAA-AUDIT.md"
       },
@@ -12297,7 +12241,8 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
-          "non-text-contrast-icon"
+          "non-text-contrast-icon",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-icon/AAA-AUDIT.md"
       },
@@ -12646,17 +12591,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-icon-button/AAA-AUDIT.md"
       },
@@ -13718,17 +13661,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-menu/AAA-AUDIT.md"
       },
@@ -14646,17 +14587,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-nav/AAA-AUDIT.md"
       },
@@ -15411,17 +15351,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-number-input/AAA-AUDIT.md"
       },
@@ -15796,17 +15735,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-overflow-menu/AAA-AUDIT.md"
       },
@@ -16575,17 +16512,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-popover/AAA-AUDIT.md"
       },
@@ -16871,17 +16806,13 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-popup/AAA-AUDIT.md"
       },
@@ -18042,17 +17973,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-radio-group/AAA-AUDIT.md"
       },
@@ -18314,17 +18243,16 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-rating/AAA-AUDIT.md"
       },
@@ -18945,17 +18873,17 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-select/AAA-AUDIT.md"
       },
@@ -19213,17 +19141,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-side-nav/AAA-AUDIT.md"
       },
@@ -19475,6 +19401,17 @@
           "figmaAxisName": "disabled",
           "cemAttribute": "disabled",
           "cemFieldName": "disabled",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "figmaAxisName": "required",
+          "cemAttribute": "required",
+          "cemFieldName": "required",
           "type": "boolean",
           "values": [
             "false",
@@ -20045,17 +19982,14 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-slider/AAA-AUDIT.md"
       },
@@ -20694,17 +20628,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-split-button/AAA-AUDIT.md"
       },
@@ -23154,17 +23087,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-switch/AAA-AUDIT.md"
       },
@@ -24089,17 +24021,14 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-tabs/AAA-AUDIT.md"
       },
@@ -25381,17 +25310,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-text-input/AAA-AUDIT.md"
       },
@@ -25868,17 +25796,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-textarea/AAA-AUDIT.md"
       },
@@ -26722,17 +26649,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-time-picker/AAA-AUDIT.md"
       },
@@ -27097,17 +27023,13 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-toast/AAA-AUDIT.md"
       },
@@ -27636,17 +27558,17 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-toggle-button/AAA-AUDIT.md"
       },
@@ -27926,17 +27848,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-tooltip/AAA-AUDIT.md"
       },
@@ -28248,17 +28168,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-top-nav/AAA-AUDIT.md"
       },
