@@ -819,9 +819,10 @@ async function auditOne(browserContext, entry, axeSource) {
     // E. blank-canvas detector — story view only. Reuses the first-pass shot.
     // Skip stories whose name explicitly indicates an expected-empty state
     // (e.g. "Hidden", "Dismissed", "Dismiss Interaction" post-interaction).
-    const expectedEmpty = /^(hidden|dismissed|dismiss\b|empty|toggled\s*off|closed|after\s*hide|post-)/i.test(
-      entry.name || '',
-    );
+    const expectedEmpty =
+      /^(hidden|dismissed|dismiss\b|empty|toggled\s*off|closed|after\s*hide|post-)/i.test(
+        entry.name || '',
+      );
     if (result.viewMode === 'story' && firstShot && !expectedEmpty) {
       try {
         const blank = await analyzeBlankCanvas(firstShot, firstShotImg);

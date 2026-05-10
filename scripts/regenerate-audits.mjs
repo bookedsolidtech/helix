@@ -103,7 +103,7 @@ try {
 function variantCoverage(tagName) {
   if (!storyAuditFresh) {
     return [
-      '> **Story-audit data not available** at audit-regenerate time. Run `node scripts/audit-stories.mjs --concurrency=6` to populate `.reports/story-audit/findings.jsonl`, then re-run the audit regenerator. Until then, this component\'s AAA cert is bounded by the **Default story** only.',
+      "> **Story-audit data not available** at audit-regenerate time. Run `node scripts/audit-stories.mjs --concurrency=6` to populate `.reports/story-audit/findings.jsonl`, then re-run the audit regenerator. Until then, this component's AAA cert is bounded by the **Default story** only.",
       '',
     ].join('\n');
   }
@@ -122,7 +122,7 @@ function variantCoverage(tagName) {
 
   if (totalStories === 0) {
     return [
-      '> **No `Components/*` stories** found for this component in the Storybook index. The component may be exposed only as part of a parent component\'s story (e.g., `hx-menu-item` rendered inside `hx-menu` stories). The Default-story AAA verdict above applies.',
+      "> **No `Components/*` stories** found for this component in the Storybook index. The component may be exposed only as part of a parent component's story (e.g., `hx-menu-item` rendered inside `hx-menu` stories). The Default-story AAA verdict above applies.",
       '',
     ].join('\n');
   }
