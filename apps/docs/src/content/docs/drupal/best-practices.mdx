@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-import { Aside } from "@astrojs/starlight/components";
+import { Aside } from '@astrojs/starlight/components';
 
 Comprehensive guidance for integrating HELiX web components into Drupal 10/11 themes and modules. This guide covers CDN loading, Twig patterns, Drupal behaviors, Form API integration, and performance optimization for enterprise healthcare applications.
 
@@ -57,9 +57,8 @@ libraries:
 ```
 
 <Aside type="tip" title="Best Practice">
-  Use CDN loading for production to benefit from browser caching and HTTP/2
-  multiplexing. Pin to a specific version (e.g., `@1.0.0`) to prevent breaking
-  changes from auto-updating.
+  Use CDN loading for production to benefit from browser caching and HTTP/2 multiplexing. Pin to a
+  specific version (e.g., `@1.0.0`) to prevent breaking changes from auto-updating.
 </Aside>
 
 ### Local Installation (For Development or Private Hosting)
@@ -184,8 +183,8 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
 ```
 
 <Aside type="note" title="Reference">
-  See **ADR-DRUPAL-001** in the HELiX documentation for detailed guidance on
-  choosing between property-driven and slot-driven patterns.
+  See **ADR-DRUPAL-001** in the HELiX documentation for detailed guidance on choosing between
+  property-driven and slot-driven patterns.
 </Aside>
 
 ## Drupal Behaviors Pattern
@@ -201,7 +200,7 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
  */
 
 (function (Drupal, once) {
-  "use strict";
+  'use strict';
 
   /**
    * Initialize HELiX components.
@@ -209,26 +208,26 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
   Drupal.behaviors.helixComponents = {
     attach: function (context, settings) {
       // Use once() to prevent double-initialization
-      once("helix-init", "hx-card", context).forEach((card) => {
+      once('helix-init', 'hx-card', context).forEach((card) => {
         // Set up event listeners
-        card.addEventListener("hx-card-click", (e) => {
-          console.log("Card clicked:", e.detail);
+        card.addEventListener('hx-card-click', (e) => {
+          console.log('Card clicked:', e.detail);
         });
       });
 
       // Initialize other components
-      once("helix-select", "hx-select", context).forEach((select) => {
-        select.addEventListener("hx-change", (e) => {
-          console.log("Select changed:", e.detail);
+      once('helix-select', 'hx-select', context).forEach((select) => {
+        select.addEventListener('hx-change', (e) => {
+          console.log('Select changed:', e.detail);
         });
       });
     },
 
     detach: function (context, settings, trigger) {
       // Clean up on unload
-      if (trigger === "unload") {
-        context.querySelectorAll("hx-card").forEach((card) => {
-          card.removeEventListener("hx-card-click", () => {});
+      if (trigger === 'unload') {
+        context.querySelectorAll('hx-card').forEach((card) => {
+          card.removeEventListener('hx-card-click', () => {});
         });
       }
     },
@@ -245,24 +244,24 @@ Handle multiple components in a single behavior file:
   Drupal.behaviors.helixAll = {
     attach: function (context) {
       // Cards
-      once("hx-card", "hx-card[hx-href]", context).forEach((card) => {
-        card.addEventListener("hx-card-click", handleCardClick);
+      once('hx-card', 'hx-card[hx-href]', context).forEach((card) => {
+        card.addEventListener('hx-card-click', handleCardClick);
       });
 
       // Selects
-      once("hx-select", "hx-select", context).forEach((select) => {
-        select.addEventListener("hx-change", handleSelectChange);
+      once('hx-select', 'hx-select', context).forEach((select) => {
+        select.addEventListener('hx-change', handleSelectChange);
       });
 
       // Forms
-      once("hx-form", "hx-form", context).forEach((form) => {
-        form.addEventListener("hx-submit", handleFormSubmit);
-        form.addEventListener("hx-invalid", handleFormInvalid);
+      once('hx-form', 'hx-form', context).forEach((form) => {
+        form.addEventListener('hx-submit', handleFormSubmit);
+        form.addEventListener('hx-invalid', handleFormInvalid);
       });
 
       // Buttons
-      once("hx-button", "hx-button[data-ajax]", context).forEach((button) => {
-        button.addEventListener("click", handleAjaxButton);
+      once('hx-button', 'hx-button[data-ajax]', context).forEach((button) => {
+        button.addEventListener('click', handleAjaxButton);
       });
     },
   };
@@ -275,12 +274,12 @@ Handle multiple components in a single behavior file:
   function handleSelectChange(e) {
     const { value } = e.detail;
     const select = e.target;
-    const name = select.getAttribute("name");
+    const name = select.getAttribute('name');
 
     console.log(`${name} changed to: ${value}`);
 
     // Trigger dependent field updates
-    if (name === "department") {
+    if (name === 'department') {
       updateSpecialtyOptions(value);
     }
   }
@@ -289,8 +288,8 @@ Handle multiple components in a single behavior file:
     e.preventDefault();
     const { formData, values } = e.detail;
 
-    fetch(e.target.getAttribute("action"), {
-      method: "POST",
+    fetch(e.target.getAttribute('action'), {
+      method: 'POST',
       body: formData,
     })
       .then((response) => response.json())
@@ -303,8 +302,8 @@ Handle multiple components in a single behavior file:
 
   function handleFormInvalid(e) {
     const { field, message } = e.detail;
-    field.setAttribute("error", message);
-    field.scrollIntoView({ behavior: "smooth", block: "center" });
+    field.setAttribute('error', message);
+    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function handleAjaxButton(e) {
@@ -317,17 +316,15 @@ Handle multiple components in a single behavior file:
   }
 
   function updateSpecialtyOptions(departmentId) {
-    const specialtySelect = document.querySelector(
-      'hx-select[name="specialty"]',
-    );
+    const specialtySelect = document.querySelector('hx-select[name="specialty"]');
     if (!specialtySelect) return;
 
     fetch(`/api/specialties/${departmentId}`)
       .then((response) => response.json())
       .then((data) => {
-        specialtySelect.innerHTML = "";
+        specialtySelect.innerHTML = '';
         data.forEach((specialty) => {
-          const option = document.createElement("option");
+          const option = document.createElement('option');
           option.value = specialty.id;
           option.textContent = specialty.name;
           specialtySelect.appendChild(option);
@@ -338,8 +335,8 @@ Handle multiple components in a single behavior file:
 ```
 
 <Aside type="note" title="Reference">
-  See **ADR-DRUPAL-002** for event handling best practices, including custom
-  event naming conventions and cleanup patterns.
+  See **ADR-DRUPAL-002** for event handling best practices, including custom event naming
+  conventions and cleanup patterns.
 </Aside>
 
 ## Form API Integration
@@ -423,18 +420,18 @@ Load components only when they enter the viewport:
 (function (Drupal, once) {
   Drupal.behaviors.helixLazy = {
     attach: function (context) {
-      if ("IntersectionObserver" in window) {
+      if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               const element = entry.target;
-              element.classList.add("loaded");
+              element.classList.add('loaded');
               observer.unobserve(element);
             }
           });
         });
 
-        once("lazy-load", "[data-lazy]", context).forEach((el) => {
+        once('lazy-load', '[data-lazy]', context).forEach((el) => {
           observer.observe(el);
         });
       }
@@ -470,8 +467,8 @@ $build['facility_cards'] = [
 ```
 
 <Aside type="note" title="Reference">
-  See **ADR-DRUPAL-003** for comprehensive performance optimization strategies,
-  including HTTP/2 server push, asset aggregation, and lazy loading patterns.
+  See **ADR-DRUPAL-003** for comprehensive performance optimization strategies, including HTTP/2
+  server push, asset aggregation, and lazy loading patterns.
 </Aside>
 
 ## Accessibility in Drupal Context
@@ -485,12 +482,12 @@ function handleFormInvalid(e) {
   const { field, message } = e.detail;
 
   // Set error on field
-  field.setAttribute("error", message);
+  field.setAttribute('error', message);
 
   // Create live region announcement
-  const announcement = document.createElement("div");
-  announcement.setAttribute("role", "alert");
-  announcement.setAttribute("aria-live", "assertive");
+  const announcement = document.createElement('div');
+  announcement.setAttribute('role', 'alert');
+  announcement.setAttribute('aria-live', 'assertive');
   announcement.textContent = `Error: ${message}`;
   document.body.appendChild(announcement);
 
@@ -504,14 +501,14 @@ function handleFormInvalid(e) {
 Move focus to the first invalid field on form submission:
 
 ```javascript
-form.addEventListener("hx-invalid", (e) => {
+form.addEventListener('hx-invalid', (e) => {
   const { field } = e.detail;
 
   // Find the first invalid field
-  const firstInvalid = form.querySelector("[error]");
+  const firstInvalid = form.querySelector('[error]');
   if (firstInvalid) {
     firstInvalid.focus();
-    firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 });
 ```
@@ -521,11 +518,11 @@ form.addEventListener("hx-invalid", (e) => {
 Ensure all interactive components are keyboard-accessible:
 
 ```javascript
-once("keyboard-init", "hx-card[hx-href]", context).forEach((card) => {
+once('keyboard-init', 'hx-card[hx-href]', context).forEach((card) => {
   // Cards with hx-href are already keyboard-accessible
   // But ensure Enter key triggers navigation
-  card.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       card.click();
     }
@@ -534,9 +531,8 @@ once("keyboard-init", "hx-card[hx-href]", context).forEach((card) => {
 ```
 
 <Aside type="note" title="Reference">
-  See **ADR-DRUPAL-004** for accessibility best practices, including ARIA
-  patterns, focus management, and screen reader compatibility in Drupal
-  workflows.
+  See **ADR-DRUPAL-004** for accessibility best practices, including ARIA patterns, focus
+  management, and screen reader compatibility in Drupal workflows.
 </Aside>
 
 ## Common Integration Patterns
@@ -663,9 +659,9 @@ Four architectural decision records document Drupal integration patterns:
    - Keyboard navigation patterns
 
 <Aside type="tip" title="Next Steps">
-  Review individual component documentation (hx-card, hx-select, hx-form) for
-  specific Drupal integration examples. See the visual ADRs in the HELiX
-  documentation site for detailed architectural guidance.
+  Review individual component documentation (hx-card, hx-select, hx-form) for specific Drupal
+  integration examples. See the visual ADRs in the HELiX documentation site for detailed
+  architectural guidance.
 </Aside>
 
 ## Support and Contribution

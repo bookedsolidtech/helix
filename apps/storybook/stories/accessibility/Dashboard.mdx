@@ -1,18 +1,12 @@
 {/* Accessibility / Dashboard.mdx — AAA cert dashboard for the helix component surface */}
 
-import { Meta } from "@storybook/addon-docs/blocks";
-import {
-  EyebrowHeading,
-  SectionHead,
-  StatCard,
-  RatioCard,
-  DocsCard,
-} from "../_components";
+import { Meta } from '@storybook/addon-docs/blocks';
+import { EyebrowHeading, SectionHead, StatCard, RatioCard, DocsCard } from '../_components';
 
-import "@helixui/library/components/hx-button";
-import "@helixui/library/components/hx-badge";
-import "@helixui/library/components/hx-text-input";
-import "@helixui/library/components/hx-icon-button";
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-badge';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-icon-button';
 
 <Meta
   title="Accessibility/Dashboard"
@@ -26,75 +20,55 @@ import "@helixui/library/components/hx-icon-button";
   title="WCAG 2.2 AAA is the target. AA is the floor we never touch."
   lede={
     <>
-      HELiX is an OSS enterprise component library positioned alongside USWDS —
-      and where{" "}
+      HELiX is an OSS enterprise component library positioned alongside USWDS — and where{' '}
       <a href="https://designsystem.digital.gov/documentation/accessibility/">
         USWDS works to Level AA
       </a>
       {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
-      , HELiX targets <strong>Level AAA on its P0 surface</strong>. 163 contrast
-      pairings graded across light, dark, and high-contrast; APG-aligned
-      keyboard contracts on every interactive primitive;{" "}
-      <strong>zero sub-AA tokens</strong>. Adding a token below the floor fails
-      CI.
+      , HELiX targets <strong>Level AAA on its P0 surface</strong>. 163 contrast pairings graded
+      across light, dark, and high-contrast; APG-aligned keyboard contracts on every interactive
+      primitive; <strong>zero sub-AA tokens</strong>. Adding a token below the floor fails CI.
     </>
   }
 />
 
 <aside
   style={{
-    margin: "24px 0",
-    padding: "16px 20px",
-    borderLeft: "4px solid var(--hx-color-warning-500)",
-    background: "var(--hx-color-surface-subtle)",
-    borderRadius: "var(--hx-radius-md)",
-    maxWidth: "70ch",
+    margin: '24px 0',
+    padding: '16px 20px',
+    borderLeft: '4px solid var(--hx-color-warning-500)',
+    background: 'var(--hx-color-surface-subtle)',
+    borderRadius: 'var(--hx-radius-md)',
+    maxWidth: '70ch',
   }}
 >
-  <strong style={{ display: "block", marginBottom: 8 }}>
+  <strong style={{ display: 'block', marginBottom: 8 }}>
     Scope of this cert · read this first
   </strong>
-  <p style={{ margin: "0 0 8px 0", fontSize: 14, lineHeight: 1.6 }}>
-    The verdicts on this dashboard and on every component page are{" "}
-    <strong>self-certified by the project maintainers</strong>, not third-party
-    VPAT-attested. The formal AAA harness (<code>pnpm aaa:audit</code>) measures
-    each P0 component against <strong>11 success criteria</strong> on the
-    component&apos;s <strong>Default story only</strong>. Variant coverage
-    (every story state for every component) is asserted by a separate
-    visual-rendering harness (<code>scripts/audit-stories.mjs</code>); axe-core
-    in browser-mode smoke-tests the same surface.
+  <p style={{ margin: '0 0 8px 0', fontSize: 14, lineHeight: 1.6 }}>
+    The verdicts on this dashboard and on every component page are{' '}
+    <strong>self-certified by the project maintainers</strong>, not third-party VPAT-attested. The
+    formal AAA harness (<code>pnpm aaa:audit</code>) measures each P0 component against{' '}
+    <strong>11 success criteria</strong> on the component&apos;s <strong>Default story only</strong>
+    . Variant coverage (every story state for every component) is asserted by a separate
+    visual-rendering harness (<code>scripts/audit-stories.mjs</code>); axe-core in browser-mode
+    smoke-tests the same surface.
   </p>
   <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>
-    Per-component evidence lives under{" "}
+    Per-component evidence lives under{' '}
     <a href="https://github.com/bookedsolidtech/helix/tree/main/.reports/formal-aaa-audit/evidence">
       <code>.reports/formal-aaa-audit/evidence/</code>
     </a>
-    . Full self-cert scope and known limits:{" "}
-    <a href="https://helixui.dev/accessibility/self-cert-scope/">
-      Self-Certification Scope
-    </a>
-    .
+    . Full self-cert scope and known limits:{' '}
+    <a href="https://helixui.dev/accessibility/self-cert-scope/">Self-Certification Scope</a>.
   </p>
 </aside>
 
 <section>
-  <SectionHead
-    title="Coverage at a glance"
-    meta="tokens 3.3.1 · regression-tested in CI"
-  />
+  <SectionHead title="Coverage at a glance" meta="tokens 3.3.1 · regression-tested in CI" />
   <div className="hx-docs-stats">
-    <StatCard
-      num="163"
-      unit="/163"
-      label="Contrast pairings AA+"
-      sub="across 3 modes · 0 sub-AA"
-    />
-    <StatCard
-      num="100"
-      unit="%"
-      label="P0 components AAA-targeted"
-      sub="VPAT 2.5 scaffolded"
-    />
+    <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
+    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 scaffolded" />
     <StatCard num="3" label="Theme modes" sub="light · dark · high-contrast" />
     <StatCard num="0" label="axe-core violations" sub="critical + serious" />
   </div>
@@ -168,44 +142,39 @@ import "@helixui/library/components/hx-icon-button";
     style={{
       marginTop: 12,
       fontSize: 12,
-      color: "var(--hx-color-text-muted)",
-      fontFamily: "var(--hx-font-family-mono)",
+      color: 'var(--hx-color-text-muted)',
+      fontFamily: 'var(--hx-font-family-mono)',
     }}
   >
-    Full per-mode + per-pair table:{" "}
-    <a href="/?path=/docs/accessibility-contrast-deep-dive--docs">
-      Contrast Deep-Dive
-    </a>
+    Full per-mode + per-pair table:{' '}
+    <a href="/?path=/docs/accessibility-contrast-deep-dive--docs">Contrast Deep-Dive</a>
   </p>
 </section>
 
 <section>
-  <SectionHead
-    title="Never color alone"
-    meta="WCAG 1.4.1 · status conveyed by ≥2 channels"
-  />
+  <SectionHead title="Never color alone" meta="WCAG 1.4.1 · status conveyed by ≥2 channels" />
   <p
     style={{
-      color: "var(--hx-color-text-secondary)",
-      maxWidth: "70ch",
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
       marginBottom: 24,
       fontSize: 14,
       lineHeight: 1.6,
     }}
   >
-    Every status signal in HELiX combines color with at least one other channel:
-    an icon, a text label, a shape, or a position. A user with red-green color
-    blindness sees the same information as everyone else.
+    Every status signal in HELiX combines color with at least one other channel: an icon, a text
+    label, a shape, or a position. A user with red-green color blindness sees the same information
+    as everyone else.
   </p>
   <div
     style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
       gap: 16,
     }}
   >
     <DocsCard title="Status badges" tag="color + dot + text">
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <hx-badge variant="success">✓ Verified</hx-badge>
         <hx-badge variant="info">● Pending</hx-badge>
         <hx-badge variant="warning">▲ Review needed</hx-badge>
@@ -213,13 +182,13 @@ import "@helixui/library/components/hx-icon-button";
       </div>
     </DocsCard>
     <DocsCard title="Form validation" tag="color + icon + message">
-      <div style={{ display: "grid", gap: 6, fontSize: 13, width: "100%" }}>
+      <div style={{ display: 'grid', gap: 6, fontSize: 13, width: '100%' }}>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 8,
-            color: "var(--hx-color-success-text)",
+            color: 'var(--hx-color-success-text)',
           }}
         >
           <span>✓</span>
@@ -227,10 +196,10 @@ import "@helixui/library/components/hx-icon-button";
         </div>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 8,
-            color: "var(--hx-color-warning-700)",
+            color: 'var(--hx-color-warning-700)',
           }}
         >
           <span>⚠</span>
@@ -238,10 +207,10 @@ import "@helixui/library/components/hx-icon-button";
         </div>
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
+            display: 'flex',
+            alignItems: 'center',
             gap: 8,
-            color: "var(--hx-color-error-text)",
+            color: 'var(--hx-color-error-text)',
           }}
         >
           <span>×</span>
@@ -259,90 +228,30 @@ import "@helixui/library/components/hx-icon-button";
       >
         <defs>
           <pattern id="p1" width="6" height="6" patternUnits="userSpaceOnUse">
-            <line
-              x1="0"
-              y1="6"
-              x2="6"
-              y2="0"
-              stroke="currentColor"
-              strokeWidth="1.4"
-            />
+            <line x1="0" y1="6" x2="6" y2="0" stroke="currentColor" strokeWidth="1.4" />
           </pattern>
           <pattern id="p2" width="4" height="4" patternUnits="userSpaceOnUse">
             <circle cx="2" cy="2" r="1" fill="currentColor" />
           </pattern>
         </defs>
-        <g style={{ color: "var(--hx-color-success-600)" }}>
-          <rect
-            x="10"
-            y="20"
-            width="50"
-            height="50"
-            fill="currentColor"
-            opacity="0.85"
-          />
-          <rect
-            x="10"
-            y="20"
-            width="50"
-            height="50"
-            fill="url(#p2)"
-            opacity="0.3"
-          />
+        <g style={{ color: 'var(--hx-color-success-600)' }}>
+          <rect x="10" y="20" width="50" height="50" fill="currentColor" opacity="0.85" />
+          <rect x="10" y="20" width="50" height="50" fill="url(#p2)" opacity="0.3" />
         </g>
-        <g style={{ color: "var(--hx-color-warning-600)" }}>
-          <rect
-            x="75"
-            y="35"
-            width="50"
-            height="35"
-            fill="currentColor"
-            opacity="0.85"
-          />
-          <rect
-            x="75"
-            y="35"
-            width="50"
-            height="35"
-            fill="url(#p1)"
-            opacity="0.4"
-          />
+        <g style={{ color: 'var(--hx-color-warning-600)' }}>
+          <rect x="75" y="35" width="50" height="35" fill="currentColor" opacity="0.85" />
+          <rect x="75" y="35" width="50" height="35" fill="url(#p1)" opacity="0.4" />
         </g>
-        <g style={{ color: "var(--hx-color-error-600)" }}>
-          <rect
-            x="140"
-            y="50"
-            width="50"
-            height="20"
-            fill="currentColor"
-            opacity="0.85"
-          />
+        <g style={{ color: 'var(--hx-color-error-600)' }}>
+          <rect x="140" y="50" width="50" height="20" fill="currentColor" opacity="0.85" />
         </g>
-        <text
-          x="35"
-          y="78"
-          textAnchor="middle"
-          fontSize="8"
-          fill="currentColor"
-        >
+        <text x="35" y="78" textAnchor="middle" fontSize="8" fill="currentColor">
           Routine
         </text>
-        <text
-          x="100"
-          y="78"
-          textAnchor="middle"
-          fontSize="8"
-          fill="currentColor"
-        >
+        <text x="100" y="78" textAnchor="middle" fontSize="8" fill="currentColor">
           Urgent
         </text>
-        <text
-          x="165"
-          y="78"
-          textAnchor="middle"
-          fontSize="8"
-          fill="currentColor"
-        >
+        <text x="165" y="78" textAnchor="middle" fontSize="8" fill="currentColor">
           Critical
         </text>
       </svg>
@@ -354,81 +263,77 @@ import "@helixui/library/components/hx-icon-button";
   <SectionHead title="Keyboard contracts" meta="ARIA APG aligned" />
   <div
     style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
       gap: 16,
     }}
   >
     <DocsCard title="Within a component" tag="menu, listbox, combobox, tabs">
-      <div style={{ width: "100%", display: "grid", gap: 6, fontSize: 13 }}>
+      <div style={{ width: '100%', display: 'grid', gap: 6, fontSize: 13 }}>
         {[
-          ["Tab", "Move focus to next interactive element"],
-          ["Shift + Tab", "Move focus backward"],
-          ["↑ ↓", "Move within a listbox / radio group"],
-          ["← →", "Move within tabs / segmented controls"],
-          ["Home / End", "Jump to first / last item"],
-          ["Space", "Activate / toggle current item"],
-          ["Enter", "Activate primary action"],
-          ["Esc", "Dismiss popover / cancel edit"],
+          ['Tab', 'Move focus to next interactive element'],
+          ['Shift + Tab', 'Move focus backward'],
+          ['↑ ↓', 'Move within a listbox / radio group'],
+          ['← →', 'Move within tabs / segmented controls'],
+          ['Home / End', 'Jump to first / last item'],
+          ['Space', 'Activate / toggle current item'],
+          ['Enter', 'Activate primary action'],
+          ['Esc', 'Dismiss popover / cancel edit'],
         ].map(([keys, desc]) => (
           <div
             key={keys}
             style={{
-              display: "grid",
-              gridTemplateColumns: "120px 1fr",
+              display: 'grid',
+              gridTemplateColumns: '120px 1fr',
               gap: 12,
-              padding: "4px 0",
-              borderBottom: "1px dashed var(--hx-color-border-subtle)",
+              padding: '4px 0',
+              borderBottom: '1px dashed var(--hx-color-border-subtle)',
             }}
           >
             <kbd
               style={{
-                fontFamily: "var(--hx-font-family-mono)",
+                fontFamily: 'var(--hx-font-family-mono)',
                 fontSize: 11,
-                color: "var(--hx-color-text-strong)",
+                color: 'var(--hx-color-text-strong)',
               }}
             >
               {keys}
             </kbd>
-            <span style={{ color: "var(--hx-color-text-secondary)" }}>
-              {desc}
-            </span>
+            <span style={{ color: 'var(--hx-color-text-secondary)' }}>{desc}</span>
           </div>
         ))}
       </div>
     </DocsCard>
     <DocsCard title="App-level shortcuts" tag="documented + remappable">
-      <div style={{ width: "100%", display: "grid", gap: 6, fontSize: 13 }}>
+      <div style={{ width: '100%', display: 'grid', gap: 6, fontSize: 13 }}>
         {[
-          ["/", "Focus global search"],
-          ["g p", "Go to patient list"],
-          ["g s", "Go to schedule"],
-          ["?", "Open keyboard cheat sheet"],
-          ["⌘ + k", "Open command palette"],
-          ["⌘ + s", "Save current chart"],
+          ['/', 'Focus global search'],
+          ['g p', 'Go to patient list'],
+          ['g s', 'Go to schedule'],
+          ['?', 'Open keyboard cheat sheet'],
+          ['⌘ + k', 'Open command palette'],
+          ['⌘ + s', 'Save current chart'],
         ].map(([keys, desc]) => (
           <div
             key={keys}
             style={{
-              display: "grid",
-              gridTemplateColumns: "120px 1fr",
+              display: 'grid',
+              gridTemplateColumns: '120px 1fr',
               gap: 12,
-              padding: "4px 0",
-              borderBottom: "1px dashed var(--hx-color-border-subtle)",
+              padding: '4px 0',
+              borderBottom: '1px dashed var(--hx-color-border-subtle)',
             }}
           >
             <kbd
               style={{
-                fontFamily: "var(--hx-font-family-mono)",
+                fontFamily: 'var(--hx-font-family-mono)',
                 fontSize: 11,
-                color: "var(--hx-color-text-strong)",
+                color: 'var(--hx-color-text-strong)',
               }}
             >
               {keys}
             </kbd>
-            <span style={{ color: "var(--hx-color-text-secondary)" }}>
-              {desc}
-            </span>
+            <span style={{ color: 'var(--hx-color-text-secondary)' }}>{desc}</span>
           </div>
         ))}
       </div>
@@ -438,26 +343,21 @@ import "@helixui/library/components/hx-icon-button";
     style={{
       marginTop: 12,
       fontSize: 12,
-      color: "var(--hx-color-text-muted)",
-      fontFamily: "var(--hx-font-family-mono)",
+      color: 'var(--hx-color-text-muted)',
+      fontFamily: 'var(--hx-font-family-mono)',
     }}
   >
-    Full keyboard contracts per pattern:{" "}
-    <a href="/?path=/docs/accessibility-keyboard-contracts--docs">
-      Keyboard Contracts
-    </a>
+    Full keyboard contracts per pattern:{' '}
+    <a href="/?path=/docs/accessibility-keyboard-contracts--docs">Keyboard Contracts</a>
   </p>
 </section>
 
 <section>
-  <SectionHead
-    title="Focus management"
-    meta="trap · restore · skip · roving tabindex"
-  />
+  <SectionHead title="Focus management" meta="trap · restore · skip · roving tabindex" />
   <div
     style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
       gap: 16,
     }}
   >
@@ -466,12 +366,11 @@ import "@helixui/library/components/hx-icon-button";
         style={{
           margin: 0,
           fontSize: 13,
-          color: "var(--hx-color-text-secondary)",
+          color: 'var(--hx-color-text-secondary)',
         }}
       >
-        Tab cycles within an open dialog. Esc returns focus to the trigger that
-        opened it. HELiX's <code>hx-dialog</code> handles trap + restore
-        automatically.
+        Tab cycles within an open dialog. Esc returns focus to the trigger that opened it. HELiX's{' '}
+        <code>hx-dialog</code> handles trap + restore automatically.
       </p>
     </DocsCard>
     <DocsCard title="Roving tabindex" tag="menubar · grid · toolbar">
@@ -479,12 +378,12 @@ import "@helixui/library/components/hx-icon-button";
         style={{
           margin: 0,
           fontSize: 13,
-          color: "var(--hx-color-text-secondary)",
+          color: 'var(--hx-color-text-secondary)',
         }}
       >
-        One stop for the whole component group; arrow keys move within. Tab
-        leaves the group. HELiX's <code>hx-tabs</code>,{" "}
-        <code>hx-radio-group</code>, <code>hx-menu</code> all implement this.
+        One stop for the whole component group; arrow keys move within. Tab leaves the group.
+        HELiX's <code>hx-tabs</code>, <code>hx-radio-group</code>, <code>hx-menu</code> all
+        implement this.
       </p>
     </DocsCard>
     <DocsCard title="Restore on close" tag="popover · drawer · menu">
@@ -492,11 +391,11 @@ import "@helixui/library/components/hx-icon-button";
         style={{
           margin: 0,
           fontSize: 13,
-          color: "var(--hx-color-text-secondary)",
+          color: 'var(--hx-color-text-secondary)',
         }}
       >
-        When a transient surface closes, focus returns to the element that
-        opened it. No "where did I just lose my place" moments.
+        When a transient surface closes, focus returns to the element that opened it. No "where did
+        I just lose my place" moments.
       </p>
     </DocsCard>
   </div>
@@ -509,32 +408,31 @@ import "@helixui/library/components/hx-icon-button";
   />
   <p
     style={{
-      color: "var(--hx-color-text-secondary)",
-      maxWidth: "70ch",
+      color: 'var(--hx-color-text-secondary)',
+      maxWidth: '70ch',
       marginBottom: 16,
       fontSize: 14,
       lineHeight: 1.6,
     }}
   >
-    The dashboard above is the headline. The supporting evidence — every WCAG
-    success criterion HELiX commits to, the test that proves each one, and the
-    seven-gate release quality bar that blocks any merge below the floor — lives
-    on its own page so reviewers can audit it end-to-end.
+    The dashboard above is the headline. The supporting evidence — every WCAG success criterion
+    HELiX commits to, the test that proves each one, and the seven-gate release quality bar that
+    blocks any merge below the floor — lives on its own page so reviewers can audit it end-to-end.
   </p>
   <p style={{ margin: 0 }}>
-    →{" "}
+    →{' '}
     <a
       href="/?path=/docs/accessibility-success-criteria--docs"
-      style={{ fontWeight: 600, color: "var(--hx-color-text-link)" }}
+      style={{ fontWeight: 600, color: 'var(--hx-color-text-link)' }}
     >
       Success Criteria + Release Quality bar
     </a>
   </p>
-  <p style={{ margin: "8px 0 0 0" }}>
-    →{" "}
+  <p style={{ margin: '8px 0 0 0' }}>
+    →{' '}
     <a
       href="https://helixui.dev/accessibility/consumer-obligations/"
-      style={{ fontWeight: 600, color: "var(--hx-color-text-link)" }}
+      style={{ fontWeight: 600, color: 'var(--hx-color-text-link)' }}
     >
       Consumer Obligations — partial-AAA SC contracts
     </a>
