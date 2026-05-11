@@ -1,9 +1,18 @@
 {/* Overview.mdx — HELiX Storybook landing page (component-library index) */}
 
-import { Meta } from '@storybook/addon-docs/blocks';
-import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_components';
+import { Meta } from "@storybook/addon-docs/blocks";
+import {
+  EyebrowHeading,
+  SectionHead,
+  StatCard,
+  DocsCard,
+  CodeBlock,
+} from "./_components";
 
-<Meta title="Overview" parameters={{ controls: { disable: true }, actions: { disable: true } }} />
+<Meta
+  title="Overview"
+  parameters={{ controls: { disable: true }, actions: { disable: true } }}
+/>
 
 <div className="hx-docs">
 
@@ -12,55 +21,78 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
   title="44 P0 components, live in your browser."
   lede={
     <>
-      Use the sidebar to inspect each component&apos;s API, behavior, and AAA cert evidence —
-      properties, attributes, slots, CSS parts, CSS custom properties, events, and per-component
-      audit verdicts. Storybook is where HELiX <em>proves</em>; the marketing site is where it
-      positions, and the docs site is where it onboards.{' '}
-      <a href="https://helix.bookedsolid.tech">Visit the docs site</a> for getting started,
-      framework integration, Drupal, and the self-certification scope.
+      Use the sidebar to inspect each component&apos;s API, behavior, and AAA
+      cert evidence — properties, attributes, slots, CSS parts, CSS custom
+      properties, events, and per-component audit verdicts. Storybook is where
+      HELiX <em>proves</em>; the marketing site is where it positions, and the
+      docs site is where it onboards.{" "}
+      <a href="https://helix.bookedsolid.tech">Visit the docs site</a> for
+      getting started, framework integration, Drupal, and the self-certification
+      scope.
     </>
   }
 />
 
 <section>
-  <SectionHead title="The AAA cert posture" meta="WCAG 2.2 · self-certified · formal harness" />
+  <SectionHead
+    title="The AAA cert posture"
+    meta="WCAG 2.2 · self-certified · formal harness"
+  />
   <div className="hx-docs-stats">
-    <StatCard num="376" label="Supports verdicts" sub="44 components × applicable criteria" />
+    <StatCard
+      num="376"
+      label="Supports verdicts"
+      sub="44 components × applicable criteria"
+    />
     <StatCard num="0" label="Partial verdicts" sub="every claim is whole" />
     <StatCard num="0" label="Fail verdicts" sub="zero unresolved gaps on P0" />
-    <StatCard num="109" label="Not Applicable" sub="criterion does not apply per class" />
+    <StatCard
+      num="109"
+      label="Not Applicable"
+      sub="criterion does not apply per class"
+    />
   </div>
-  <p className="hx-docs-card-body" style={{ marginTop: 16, maxWidth: '70ch' }}>
-    Measured by the formal AAA harness (<code>pnpm aaa:audit</code>) against each P0 component&apos;s
-    Default story and recorded with evidence per (component × criterion) in{' '}
-    <code>.reports/formal-aaa-audit/audit.json</code>. This cert is self-certified by the project
-    maintainers; it is not third-party attested. For the explicit scope and honest limits, see{' '}
+  <p className="hx-docs-card-body" style={{ marginTop: 16, maxWidth: "70ch" }}>
+    Measured by the formal AAA harness (<code>pnpm aaa:audit</code>) against
+    each P0 component&apos;s Default story and recorded with evidence per
+    (component × criterion) in <code>.reports/formal-aaa-audit/audit.json</code>
+    . This cert is self-certified by the project maintainers; it is not
+    third-party attested. For the explicit scope and honest limits, see{" "}
     <a href="https://helix.bookedsolid.tech/accessibility/self-cert-scope/">
       Self-Certification Scope
-    </a>{' '}
+    </a>{" "}
     on the docs site.
   </p>
 </section>
 
 <section>
-  <SectionHead title="Where to go on the docs site" meta="onboarding · integration · cert" />
+  <SectionHead
+    title="Where to go on the docs site"
+    meta="onboarding · integration · cert"
+  />
   <div className="hx-docs-pillars">
     <article className="hx-docs-pillar">
       <span className="hx-docs-pillar-tag">Getting started</span>
       <h3>Install + first component.</h3>
       <p>
-        <a href="https://helix.bookedsolid.tech/getting-started/installation/">Installation</a> for
-        npm + peer-dep setup, then{' '}
-        <a href="https://helix.bookedsolid.tech/getting-started/quick-start/">Quick start</a> for
-        your first <code>hx-button</code>.
+        <a href="https://helix.bookedsolid.tech/getting-started/installation/">
+          Installation
+        </a>{" "}
+        for npm + peer-dep setup, then{" "}
+        <a href="https://helix.bookedsolid.tech/getting-started/quick-start/">
+          Quick start
+        </a>{" "}
+        for your first <code>hx-button</code>.
       </p>
     </article>
     <article className="hx-docs-pillar">
       <span className="hx-docs-pillar-tag">Framework integration</span>
       <h3>React, Next, Vue, Angular, Svelte.</h3>
       <p>
-        <a href="https://helix.bookedsolid.tech/framework-integration/">Framework integration</a>{' '}
-        covers wrappers and plain-HTML usage. The Drupal-specific path lives at{' '}
+        <a href="https://helix.bookedsolid.tech/framework-integration/">
+          Framework integration
+        </a>{" "}
+        covers wrappers and plain-HTML usage. The Drupal-specific path lives at{" "}
         <a href="https://helix.bookedsolid.tech/drupal/">Drupal integration</a>.
       </p>
     </article>
@@ -70,11 +102,11 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
       <p>
         <a href="https://helix.bookedsolid.tech/accessibility/self-cert-scope/">
           Self-certification scope
-        </a>{' '}
-        for what the AAA cert covers and the limits;{' '}
+        </a>{" "}
+        for what the AAA cert covers and the limits;{" "}
         <a href="https://helix.bookedsolid.tech/accessibility/consumer-obligations/">
           consumer obligations
-        </a>{' '}
+        </a>{" "}
         for the partial-AAA SCs the consuming app owns.
       </p>
     </article>
@@ -88,22 +120,23 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
       <span className="hx-docs-pillar-tag">Accessibility</span>
       <h3>The cert ledgers.</h3>
       <p>
-        <strong>Accessibility / Dashboard</strong> for the cert roll-up,{' '}
-        <strong>Success Criteria</strong> for the WCAG 2.2 ledger,{' '}
-        <strong>Keyboard Contracts</strong> for APG-aligned interaction patterns,{' '}
-        <strong>Focus Management</strong> for the ring + trap + restore contract,{' '}
-        <strong>Forced Colors</strong> for the Windows HC contract,{' '}
-        <strong>Contrast Deep-Dive</strong> for the per-mode ledger.
+        <strong>Accessibility / Dashboard</strong> for the cert roll-up,{" "}
+        <strong>Success Criteria</strong> for the WCAG 2.2 ledger,{" "}
+        <strong>Keyboard Contracts</strong> for APG-aligned interaction
+        patterns, <strong>Focus Management</strong> for the ring + trap +
+        restore contract, <strong>Forced Colors</strong> for the Windows HC
+        contract, <strong>Contrast Deep-Dive</strong> for the per-mode ledger.
       </p>
     </article>
     <article className="hx-docs-pillar">
       <span className="hx-docs-pillar-tag">Foundations</span>
       <h3>Tokens, type, spacing, brands, icons.</h3>
       <p>
-        <strong>Foundations / Color</strong> for the 8 ramps × 11 stops, then{' '}
-        <strong>Brand Registry</strong> for the white-label contract, then{' '}
-        <strong>Typography</strong>, <strong>Spacing</strong>, <strong>Iconography</strong> (
-        <code>@helixui/icons@1.0.0</code> registry), <strong>Layout</strong>.
+        <strong>Foundations / Color</strong> for the 8 ramps × 11 stops, then{" "}
+        <strong>Brand Registry</strong> for the white-label contract, then{" "}
+        <strong>Typography</strong>, <strong>Spacing</strong>,{" "}
+        <strong>Iconography</strong> (<code>@helixui/icons@1.0.0</code>{" "}
+        registry), <strong>Layout</strong>.
       </p>
     </article>
     <article className="hx-docs-pillar">
@@ -112,9 +145,9 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
         Real <code>{`hx-*`}</code> elements.
       </h3>
       <p>
-        Each component ships with autodocs sourced from CEM — properties, attributes, slots, CSS
-        parts, CSS custom properties, events. Use the variant controls to see force-state matrices
-        update live.
+        Each component ships with autodocs sourced from CEM — properties,
+        attributes, slots, CSS parts, CSS custom properties, events. Use the
+        variant controls to see force-state matrices update live.
       </p>
     </article>
   </div>
@@ -139,7 +172,7 @@ https://helix.bookedsolid.tech
 # VPAT 2.5 — the conformance artefact
 
 https://helix.bookedsolid.tech/accessibility/vpat-2.5`}
-  />
+/>
 
 </section>
 
