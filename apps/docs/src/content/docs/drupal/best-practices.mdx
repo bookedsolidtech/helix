@@ -1034,8 +1034,8 @@ gzip_types application/javascript text/javascript;
 
 **HELiX targets:**
 
-- Single component: <5KB (minified + gzipped)
-- Full bundle: <50KB (minified + gzipped)
+- Single component: `<5KB` (minified + gzipped)
+- Full bundle: `<50KB` (minified + gzipped)
 - Typical component: 2-3KB (minified + gzipped)
 
 ---
@@ -1744,7 +1744,7 @@ Instrument component performance in production.
 
 - [ ] Component meets accessibility requirements (WCAG 2.1 AA)
 - [ ] Progressive enhancement strategy defined
-- [ ] Bundle size analyzed (<5KB per component)
+- [ ] Bundle size analyzed (`<5KB` per component)
 - [ ] Browser compatibility verified (evergreens + IE11 if required)
 - [ ] Security implications reviewed (CSP, XSS, HIPAA)
 - [ ] Performance impact measured (Lighthouse)
@@ -1772,7 +1772,7 @@ Instrument component performance in production.
 - [ ] Performance validated
   - [ ] Lighthouse score >90
   - [ ] Bundle size within limits
-  - [ ] No layout shifts (CLS <0.1)
+  - [ ] No layout shifts (CLS `<0.1`)
 - [ ] Documentation updated
   - [ ] README.md updated
   - [ ] CHANGELOG.md entry added
@@ -1815,8 +1815,8 @@ Instrument component performance in production.
 **Performance:**
 
 - [ ] Library attachment conditional (not global if not needed)
-- [ ] Bundle size within limits (<5KB component, <50KB total)
-- [ ] No layout shifts (CLS <0.1)
+- [ ] Bundle size within limits (`<5KB` component, `<50KB` total)
+- [ ] No layout shifts (CLS `<0.1`)
 - [ ] Lighthouse score >90
 
 **Security:**
@@ -1885,14 +1885,14 @@ Instrument component performance in production.
 
 ### Performance Budgets
 
-| Metric                  | Target | Warning  | Critical |
-| ----------------------- | ------ | -------- | -------- |
-| Component bundle size   | <5KB   | 5-7KB    | >7KB     |
-| Total bundle size       | <50KB  | 50-75KB  | >75KB    |
-| Time to Interactive     | <2s    | 2-3s     | >3s      |
-| Lighthouse score        | >90    | 80-90    | <80      |
-| Cumulative Layout Shift | <0.1   | 0.1-0.25 | >0.25    |
-| First Contentful Paint  | <1s    | 1-2s     | >2s      |
+| Metric                  | Target  | Warning  | Critical |
+| ----------------------- | ------- | -------- | -------- |
+| Component bundle size   | `<5KB`  | 5-7KB    | >7KB     |
+| Total bundle size       | `<50KB` | 50-75KB  | >75KB    |
+| Time to Interactive     | `<2s`   | 2-3s     | >3s      |
+| Lighthouse score        | >90     | 80-90    | `<80`    |
+| Cumulative Layout Shift | `<0.1`  | 0.1-0.25 | >0.25    |
+| First Contentful Paint  | `<1s`   | 1-2s     | >2s      |
 
 ### Security Headers
 

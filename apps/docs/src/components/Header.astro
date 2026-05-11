@@ -2,20 +2,34 @@
 import config from 'virtual:starlight/user-config';
 import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
 import Search from 'virtual:starlight/components/Search';
-import SiteTitle from 'virtual:starlight/components/SiteTitle';
 import SocialIcons from 'virtual:starlight/components/SocialIcons';
 import ThemeSelect from 'virtual:starlight/components/ThemeSelect';
-import DnaHelixIcon from './DnaHelixIcon.astro';
 
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
 const shouldRenderSearch =
   config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
 ---
 
 <div class="header sl-flex">
-  <div class="title-wrapper sl-flex">
-    <DnaHelixIcon class="nav-helix-icon" />
-    <SiteTitle />
-  </div>
+  <a href={siteTitleHref} class="title-link" aria-label={siteTitle}>
+    <span class="hx-logo-wrap" aria-hidden="true">
+      <img
+        src="/logos/hx-square.png"
+        alt=""
+        class="hx-logo hx-logo--dark"
+        width="44"
+        height="44"
+      />
+      <img
+        src="/logos/hx-square-light.png"
+        alt=""
+        class="hx-logo hx-logo--light"
+        width="44"
+        height="44"
+      />
+    </span>
+    <span class="hx-wordmark">HELiX</span>
+  </a>
 
   <div class="sl-flex right-group print:hidden">
     {shouldRenderSearch && <Search />}
@@ -30,9 +44,6 @@ const shouldRenderSearch =
 </div>
 
 <style>
-  /* ==========================================
-     HEADER LAYOUT
-     ========================================== */
   .header {
     display: flex !important;
     align-items: center;
@@ -40,34 +51,97 @@ const shouldRenderSearch =
     height: 100%;
   }
 
-  /* ==========================================
-     GLASSMORPHISM NAV BAR
-     ========================================== */
-  :global(header.header) {
-    background: rgba(7, 17, 26, 0.82) !important;
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid rgba(0, 212, 200, 0.12) !important;
-    box-shadow: 0 1px 24px rgba(0, 212, 200, 0.06);
+  /* Flatten Starlight surfaces so header, sidebar, and main content share
+     one continuous background — no inner bands, no seams, no borders. */
+  :global(:root) {
+    --sl-color-bg-nav: var(--sl-color-bg) !important;
+    --sl-color-bg-sidebar: var(--sl-color-bg) !important;
   }
 
-  .title-wrapper {
-    overflow: clip;
-    padding: 0.25rem;
-    margin: -0.25rem;
-    min-width: 0;
-    flex-shrink: 0;
+  :global(header.header) {
+    background: var(--sl-color-bg) !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  :global(.sidebar-pane) {
+    background-color: var(--sl-color-bg) !important;
+    border-inline-end: none !important;
+  }
+
+  .title-link {
+    display: flex;
     align-items: center;
     gap: 0.625rem;
-  }
-
-  .nav-helix-icon {
+    text-decoration: none !important;
+    color: inherit;
+    min-height: 44px;
     flex-shrink: 0;
   }
 
-  /* Hide on very small screens where space is at a premium */
+  .hx-logo-wrap {
+    position: relative;
+    display: inline-block;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+  }
+
+  .hx-logo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .hx-logo--light {
+    display: none;
+  }
+
+  :global([data-theme='light']) .hx-logo--dark {
+    display: none;
+  }
+
+  :global([data-theme='light']) .hx-logo--light {
+    display: block;
+  }
+
+  .hx-wordmark {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    background: linear-gradient(
+      135deg,
+      #06b6d4 0%,
+      #8b5cf6 25%,
+      #ec4899 50%,
+      #f97316 75%,
+      #06b6d4 100%
+    );
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: hx-shimmer 8s ease-in-out infinite;
+  }
+
+  @keyframes hx-shimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
   @media (max-width: 23rem) {
-    .nav-helix-icon {
+    .hx-logo-wrap {
       display: none;
     }
   }
@@ -93,5 +167,11 @@ const shouldRenderSearch =
     content: '';
     height: 2rem;
     border-inline-end: 1px solid var(--sl-color-gray-5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hx-wordmark {
+      animation: none;
+    }
   }
 </style>
