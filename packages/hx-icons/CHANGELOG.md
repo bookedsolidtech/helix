@@ -1,8 +1,12 @@
 # @helixui/icons
 
-## 2.0.0
+## 2.0.0 [UNPUBLISHED]
 
-### Major Changes
+Mistakenly published as MAJOR — package.json was at 1.0.0 (initial-publish placeholder) and a `major` changeset bumped it to 2.0.0. Should have been the initial 1.0.0 publish. The 2.0.0 version was unpublished from npm; 1.0.0 below is the corrected initial publish (same code).
+
+## 1.0.0
+
+### Initial Release
 
 - 723eec6: initial release of @helixui/icons — registry-pattern icon system for hx-icon.
   - public api wire-compatible with shoelace's `registerIconLibrary` / `unregisterIconLibrary` / `getIconLibrary` / `setBasePath` / `getBasePath`

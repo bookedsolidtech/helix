@@ -1,6 +1,10 @@
 # @helixui/tokens
 
-## 4.0.0
+## 4.0.0 [DEPRECATED]
+
+Mistakenly published as MAJOR via the [library, tokens, react] linked-package group cascade. The 4.0.0 release contains only a text-muted + success-text contrast tweak — same code as 3.9.0. The 4.0.0 version is deprecated on npm; consumers should use 3.9.0.
+
+## 3.9.0
 
 ### Minor Changes
 
