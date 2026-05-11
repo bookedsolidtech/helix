@@ -10,6 +10,13 @@ import { PipelineFlow, ComponentPipelineRow } from '@/components/dashboard/Pipel
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 import { getBreadcrumbItems } from '@/lib/breadcrumb-utils';
 
+// Opt out of static export: this page processes the full component library
+// (90+ components) through cem-parser + jsdoc-analyzer + health-scorer +
+// drift-detector at render time, which exceeds the Next.js static-export
+// 60-second deadline on GitHub-hosted runners. Same pattern is already in
+// use on apps/admin/src/app/tests/page.tsx and components/[tag]/page.tsx.
+export const dynamic = 'force-dynamic';
+
 export default function PipelinePage() {
   const stats = getManifestStats();
   const components = getAllComponents();

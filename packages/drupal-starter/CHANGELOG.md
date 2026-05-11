@@ -1,5 +1,15 @@
 # @helixui/drupal-starter
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [7b42779]
+- Updated dependencies [2068ed3]
+- Updated dependencies [723eec6]
+- Updated dependencies [1ea6a14]
+  - @helixui/library@4.0.0
+
 ## 3.0.1
 
 ### Patch Changes
