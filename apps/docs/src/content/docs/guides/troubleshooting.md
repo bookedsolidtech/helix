@@ -421,7 +421,7 @@ button, input, textarea, select, table {
 }
 ```
 
-For complete Drupal integration guidance, see [Drupal Integration Overview](/drupal-integration/overview).
+For complete Drupal integration guidance, see [Drupal Integration](/drupal/).
 
 ---
 

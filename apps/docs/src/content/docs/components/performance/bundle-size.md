@@ -1,8 +1,6 @@
 ---
 title: Bundle Size Fundamentals
 description: Master bundle size optimization for wc-2026—tree-shaking, code splitting, lazy loading, minification, compression, and CI enforcement of performance budgets.
-prerequisites:
-  - components/fundamentals/overview
 sidebar:
   order: 1
 ---

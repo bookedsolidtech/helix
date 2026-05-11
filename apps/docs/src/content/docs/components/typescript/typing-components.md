@@ -1186,6 +1186,6 @@ Consumers import this and get full type safety.
 
 **Next Steps:**
 
-- Read [Template Syntax](/components/fundamentals/template-syntax) for Lit's `html` tagged template
-- Explore [Reactive Properties](/components/fundamentals/reactive-properties) for property lifecycle
-- Review [Lifecycle Methods](/components/fundamentals/lifecycle) for component lifecycle
+- Read [Template Syntax](https://lit.dev/docs/templates/overview/) for Lit's `html` tagged template
+- Explore [Reactive Properties](https://lit.dev/docs/components/properties/) for property lifecycle
+- Review [Lifecycle Methods](https://lit.dev/docs/components/lifecycle/) for component lifecycle

@@ -644,4 +644,4 @@ Before tagging a release that includes CDN bundles:
 
 - [Versioning and Changelogs](./versioning/) — Semantic versioning, Changesets, and communicating breaking changes
 - [Lazy Loading Web Components](../performance/lazy-loading/) — Defer component loading with IntersectionObserver and Drupal behaviors
-- [Drupal Integration Overview](/drupal-integration/overview/) — Full guide to consuming HELiX in Drupal
+- [Drupal Integration](/drupal/) — Full guide to consuming HELiX in Drupal

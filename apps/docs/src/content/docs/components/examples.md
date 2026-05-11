@@ -82,5 +82,5 @@ The following examples show common composition patterns for HELIX components. Fo
 ## Next Steps
 
 - [Building Components](/components/building/) - Create your own components
-- [Drupal Integration](/drupal-integration/overview/) - Use components in Drupal
+- [Drupal Integration](/drupal/) - Use components in Drupal
 - [Design Tokens](/design-tokens/overview/) - Customize the visual design
