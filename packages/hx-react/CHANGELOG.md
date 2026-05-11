@@ -1,5 +1,19 @@
 # @helixui/react
 
+## 4.0.0 [UNPUBLISHED]
+
+Mistakenly published as MAJOR via the [library, tokens, react] linked-package group cascade. The 4.0.0 release was unpublished from npm; `latest` dist-tag is on 3.8.0 with 3.9.0 the corrected republish below. Same code — regenerated wrappers only.
+
+## 3.9.0
+
+### Patch Changes
+
+- Updated dependencies [7b42779]
+- Updated dependencies [2068ed3]
+- Updated dependencies [723eec6]
+- Updated dependencies [1ea6a14]
+  - @helixui/library@4.0.0
+
 ## 3.8.0
 
 ### Minor Changes

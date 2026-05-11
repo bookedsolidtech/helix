@@ -64,13 +64,6 @@ export default defineConfig({
       customCss: ['./src/styles/custom.css'],
       head: [
         {
-          tag: 'meta',
-          attrs: {
-            name: 'robots',
-            content: 'noindex, nofollow',
-          },
-        },
-        {
           tag: 'link',
           attrs: {
             rel: 'preconnect',
@@ -213,159 +206,12 @@ export default defineConfig({
         },
         {
           label: 'Component Library',
-          collapsed: true,
-          badge: { text: '92', variant: 'success' },
           items: [
-            { label: 'Overview', slug: 'component-library/overview' },
-            {
-              label: 'Actions',
-              collapsed: true,
-              items: [
-                { label: 'hx-button', slug: 'component-library/hx-button' },
-                { label: 'hx-button-group', slug: 'component-library/hx-button-group' },
-                { label: 'hx-copy-button', slug: 'component-library/hx-copy-button' },
-                { label: 'hx-icon-button', slug: 'component-library/actions/hx-icon-button' },
-                { label: 'hx-link', slug: 'component-library/hx-link' },
-                { label: 'hx-split-button', slug: 'component-library/hx-split-button' },
-                { label: 'hx-toggle-button', slug: 'component-library/hx-toggle-button' },
-              ],
-            },
-            {
-              label: 'Navigation',
-              collapsed: true,
-              items: [
-                { label: 'hx-accordion', slug: 'component-library/hx-accordion' },
-                { label: 'hx-accordion-item', slug: 'component-library/hx-accordion-item' },
-                { label: 'hx-breadcrumb', slug: 'component-library/hx-breadcrumb' },
-                { label: 'hx-breadcrumb-item', slug: 'component-library/hx-breadcrumb-item' },
-                { label: 'hx-nav', slug: 'component-library/hx-nav' },
-                { label: 'hx-nav-item', slug: 'component-library/hx-nav-item' },
-                { label: 'hx-pagination', slug: 'component-library/hx-pagination' },
-                { label: 'hx-side-nav', slug: 'component-library/hx-side-nav' },
-                { label: 'hx-step', slug: 'component-library/hx-step' },
-                { label: 'hx-steps', slug: 'component-library/hx-steps' },
-                { label: 'hx-tab', slug: 'component-library/hx-tab' },
-                { label: 'hx-tab-panel', slug: 'component-library/hx-tab-panel' },
-                { label: 'hx-tabs', slug: 'component-library/hx-tabs' },
-                { label: 'hx-action-bar', slug: 'component-library/hx-action-bar' },
-                { label: 'hx-top-nav', slug: 'component-library/hx-top-nav' },
-              ],
-            },
-            {
-              label: 'Form Controls',
-              collapsed: true,
-              items: [
-                { label: 'hx-checkbox', slug: 'component-library/hx-checkbox' },
-                { label: 'hx-checkbox-group', slug: 'component-library/hx-checkbox-group' },
-                { label: 'hx-color-picker', slug: 'component-library/hx-color-picker' },
-                { label: 'hx-combobox', slug: 'component-library/hx-combobox' },
-                { label: 'hx-date-picker', slug: 'component-library/hx-date-picker' },
-                { label: 'hx-field', slug: 'component-library/hx-field' },
-                { label: 'hx-field-label', slug: 'component-library/hx-field-label' },
-                { label: 'hx-file-upload', slug: 'component-library/hx-file-upload' },
-                { label: 'hx-form', slug: 'component-library/hx-form' },
-                { label: 'hx-help-text', slug: 'component-library/hx-help-text' },
-                { label: 'hx-number-input', slug: 'component-library/hx-number-input' },
-                { label: 'hx-radio', slug: 'component-library/hx-radio' },
-                { label: 'hx-radio-group', slug: 'component-library/hx-radio-group' },
-                { label: 'hx-select', slug: 'component-library/hx-select' },
-                { label: 'hx-slider', slug: 'component-library/hx-slider' },
-                { label: 'hx-switch', slug: 'component-library/hx-switch' },
-                { label: 'hx-text-input', slug: 'component-library/hx-text-input' },
-                { label: 'hx-textarea', slug: 'component-library/hx-textarea' },
-                { label: 'hx-time-picker', slug: 'component-library/hx-time-picker' },
-              ],
-            },
-            {
-              label: 'Data Display',
-              collapsed: true,
-              items: [
-                { label: 'hx-carousel', slug: 'component-library/hx-carousel' },
-                { label: 'hx-carousel-item', slug: 'component-library/hx-carousel-item' },
-                { label: 'hx-code-snippet', slug: 'component-library/hx-code-snippet' },
-                { label: 'hx-counter', slug: 'component-library/data-display/hx-counter' },
-                { label: 'hx-data-table', slug: 'component-library/hx-data-table' },
-                { label: 'hx-list', slug: 'component-library/hx-list' },
-                { label: 'hx-list-item', slug: 'component-library/hx-list-item' },
-                { label: 'hx-rating', slug: 'component-library/hx-rating' },
-                { label: 'hx-stat', slug: 'component-library/data-display/hx-stat' },
-                { label: 'hx-structured-list', slug: 'component-library/hx-structured-list' },
-                {
-                  label: 'hx-structured-list-row',
-                  slug: 'component-library/hx-structured-list-row',
-                },
-                { label: 'hx-table', slug: 'component-library/data-display/hx-table' },
-                { label: 'hx-tag', slug: 'component-library/hx-tag' },
-                { label: 'hx-tree-item', slug: 'component-library/hx-tree-item' },
-                { label: 'hx-tree-view', slug: 'component-library/hx-tree-view' },
-              ],
-            },
-            {
-              label: 'Feedback & Status',
-              collapsed: true,
-              items: [
-                { label: 'hx-alert', slug: 'component-library/hx-alert' },
-                { label: 'hx-badge', slug: 'component-library/hx-badge' },
-                { label: 'hx-banner', slug: 'component-library/feedback-status/hx-banner' },
-                { label: 'hx-meter', slug: 'component-library/hx-meter' },
-                { label: 'hx-progress-bar', slug: 'component-library/hx-progress-bar' },
-                { label: 'hx-progress-ring', slug: 'component-library/hx-progress-ring' },
-                { label: 'hx-skeleton', slug: 'component-library/hx-skeleton' },
-                { label: 'hx-spinner', slug: 'component-library/hx-spinner' },
-                { label: 'hx-status-indicator', slug: 'component-library/hx-status-indicator' },
-                { label: 'hx-toast', slug: 'component-library/hx-toast' },
-                { label: 'hx-toast-stack', slug: 'component-library/hx-toast-stack' },
-              ],
-            },
-            {
-              label: 'Content & Media',
-              collapsed: true,
-              items: [
-                { label: 'hx-avatar', slug: 'component-library/hx-avatar' },
-                { label: 'hx-card', slug: 'component-library/hx-card' },
-                { label: 'hx-container', slug: 'component-library/hx-container' },
-                { label: 'hx-divider', slug: 'component-library/hx-divider' },
-                { label: 'hx-icon', slug: 'component-library/hx-icon' },
-                { label: 'hx-image', slug: 'component-library/hx-image' },
-                { label: 'hx-prose', slug: 'component-library/hx-prose' },
-                { label: 'hx-text', slug: 'component-library/hx-text' },
-              ],
-            },
-            {
-              label: 'Overlays & Menus',
-              collapsed: true,
-              items: [
-                { label: 'hx-dialog', slug: 'component-library/hx-dialog' },
-                { label: 'hx-drawer', slug: 'component-library/hx-drawer' },
-                { label: 'hx-dropdown', slug: 'component-library/hx-dropdown' },
-                { label: 'hx-menu', slug: 'component-library/hx-menu' },
-                { label: 'hx-menu-divider', slug: 'component-library/hx-menu-divider' },
-                { label: 'hx-menu-item', slug: 'component-library/hx-menu-item' },
-                { label: 'hx-overflow-menu', slug: 'component-library/hx-overflow-menu' },
-                { label: 'hx-popover', slug: 'component-library/hx-popover' },
-                { label: 'hx-popup', slug: 'component-library/hx-popup' },
-                { label: 'hx-tooltip', slug: 'component-library/hx-tooltip' },
-              ],
-            },
-            {
-              label: 'Layout',
-              collapsed: true,
-              items: [
-                { label: 'hx-grid', slug: 'component-library/hx-grid' },
-                { label: 'hx-grid-item', slug: 'component-library/hx-grid-item' },
-                { label: 'hx-split-panel', slug: 'component-library/hx-split-panel' },
-                { label: 'hx-stack', slug: 'component-library/hx-stack' },
-              ],
-            },
-            {
-              label: 'Utility',
-              collapsed: true,
-              items: [
-                { label: 'hx-format-date', slug: 'component-library/hx-format-date' },
-                { label: 'hx-theme', slug: 'component-library/hx-theme' },
-                { label: 'hx-visually-hidden', slug: 'component-library/hx-visually-hidden' },
-              ],
-            },
+            // Per-component MDX duplicates were removed (2026-05-11) — they
+            // duplicated the CEM-driven autodocs in Storybook. Storybook is
+            // the canonical per-component reference; the overview here hosts
+            // the live demo entry point.
+            { label: 'Overview (live demo)', slug: 'component-library/overview' },
           ],
         },
         {
@@ -380,33 +226,9 @@ export default defineConfig({
                 { label: 'Building', slug: 'components/building' },
                 { label: 'Component API', slug: 'components/api' },
                 { label: 'Examples', slug: 'components/examples' },
-                {
-                  label: 'Fundamentals',
-                  collapsed: true,
-                  items: [
-                    {
-                      label: 'Your First Component',
-                      slug: 'components/fundamentals/first-component',
-                    },
-                    {
-                      label: 'Reactive Properties',
-                      slug: 'components/fundamentals/reactive-properties',
-                    },
-                    {
-                      label: 'Properties vs Attributes',
-                      slug: 'components/fundamentals/properties-vs-attributes',
-                    },
-                    { label: 'The Update Cycle', slug: 'components/fundamentals/update-cycle' },
-                    { label: 'Lifecycle', slug: 'components/fundamentals/lifecycle' },
-                    { label: 'Template Syntax', slug: 'components/fundamentals/template-syntax' },
-                    { label: 'Decorators', slug: 'components/fundamentals/decorators' },
-                    { label: 'Built-in Directives', slug: 'components/fundamentals/directives' },
-                    {
-                      label: 'Custom Directives',
-                      slug: 'components/fundamentals/custom-directives',
-                    },
-                  ],
-                },
+                // Lit fundamentals tutorial tree was removed (2026-05-11) —
+                // out-of-scope for HELiX docs. Upstream Lit documentation:
+                // https://lit.dev/docs/components/overview/
                 {
                   label: 'Shadow DOM',
                   collapsed: true,
@@ -575,78 +397,9 @@ export default defineConfig({
                 { label: 'Customization', slug: 'design-tokens/customization' },
               ],
             },
-            {
-              label: 'Drupal Integration',
-              collapsed: true,
-              items: [
-                { label: 'Overview', slug: 'drupal-integration/overview' },
-                { label: 'Best Practices', slug: 'drupal-integration/best-practices' },
-                { label: 'Library System', slug: 'drupal-integration/library-system' },
-                {
-                  label: 'SDC Composition',
-                  slug: 'drupal-integration/sdc',
-                  badge: { text: 'New', variant: 'tip' },
-                },
-                {
-                  label: 'Installation',
-                  collapsed: true,
-                  items: [
-                    { label: 'Overview', slug: 'drupal-integration/installation/overview' },
-                    { label: 'Via npm', slug: 'drupal-integration/installation/npm' },
-                    { label: 'Via CDN', slug: 'drupal-integration/installation/cdn' },
-                    { label: 'Drupal Module', slug: 'drupal-integration/installation/module' },
-                  ],
-                },
-                {
-                  label: 'Twig Templates',
-                  collapsed: true,
-                  items: [
-                    { label: 'Fundamentals', slug: 'drupal-integration/twig/fundamentals' },
-                    { label: 'Properties', slug: 'drupal-integration/twig/properties' },
-                    { label: 'Slots', slug: 'drupal-integration/twig/slots' },
-                    { label: 'Attributes', slug: 'drupal-integration/twig/attributes' },
-                    { label: 'Debugging', slug: 'drupal-integration/twig/debugging' },
-                  ],
-                },
-                {
-                  label: 'Drupal Behaviors',
-                  collapsed: true,
-                  items: [
-                    { label: 'Fundamentals', slug: 'drupal-integration/behaviors/fundamentals' },
-                    { label: 'Patterns', slug: 'drupal-integration/behaviors/patterns' },
-                    { label: 'Once API', slug: 'drupal-integration/behaviors/once-api' },
-                    {
-                      label: 'With Web Components',
-                      slug: 'drupal-integration/behaviors/web-components',
-                    },
-                  ],
-                },
-                {
-                  label: 'Forms',
-                  collapsed: true,
-                  items: [
-                    { label: 'Form API', slug: 'drupal-integration/forms/form-api' },
-                    { label: 'Element Plugin', slug: 'drupal-integration/forms/element-plugin' },
-                  ],
-                },
-                {
-                  label: 'Performance',
-                  collapsed: true,
-                  items: [
-                    { label: 'Overview', slug: 'drupal-integration/performance/overview' },
-                    { label: 'Lazy Loading', slug: 'drupal-integration/performance/lazy-loading' },
-                    {
-                      label: 'Per-Component Loading',
-                      slug: 'drupal-integration/per-component-loading',
-                    },
-                  ],
-                },
-                {
-                  label: 'Troubleshooting',
-                  slug: 'drupal-integration/troubleshooting/common-issues',
-                },
-              ],
-            },
+            // drupal-integration/ sidebar tree removed (2026-05-11) —
+            // substantive Drupal docs live in `drupal/` which has its own
+            // top-level sidebar group. drupal-integration/ was mostly stubs.
             {
               label: 'Theming',
               slug: 'guides/theming',

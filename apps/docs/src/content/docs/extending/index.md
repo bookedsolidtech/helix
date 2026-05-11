@@ -17,7 +17,7 @@ This tutorial walks through building a `PatientCard` component that extends `Hel
 
 Before extending a HELiX component you should be comfortable with:
 
-- [Reactive Properties](/components/fundamentals/reactive-properties) — `@property` and `@state` decorators
+- [Reactive Properties](https://lit.dev/docs/components/properties/) on lit.dev — `@property` and `@state` decorators
 - [Shadow DOM Slots](/components/shadow-dom/slots) — slot-based composition
 - [Custom Events](/components/events/custom-events) — `dispatchEvent` and event detail typing
 - [Design Tokens](/components/styling/tokens) — `--hx-*` CSS custom properties
