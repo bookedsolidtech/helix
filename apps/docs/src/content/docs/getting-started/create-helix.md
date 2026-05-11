@@ -221,6 +221,6 @@ cd my-helix-theme
 ## Next Steps
 
 - [Installation](/getting-started/installation/) — Manual installation and monorepo setup
-- [Component Library](/component-library/overview/) — Browse all components
+- [Storybook](https://storybook.helix.bookedsolid.tech/) — Browse all components
 - [Design Tokens](/design-tokens/overview/) — Customize the token system
-- [Drupal Integration](/drupal-integration/overview/) — In-depth Drupal guide
+- [Drupal Integration](/drupal/installation/getting-started/) — In-depth Drupal guide

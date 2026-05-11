@@ -65,4 +65,4 @@ The pipeline:
 
 ## Component Catalog
 
-For the complete component list and API documentation, see the [Component Library](/component-library/overview/).
+For the complete component list and API documentation, see [Storybook](https://storybook.helix.bookedsolid.tech/).

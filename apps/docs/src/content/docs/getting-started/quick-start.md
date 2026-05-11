@@ -69,11 +69,11 @@ The documentation site will be available at `http://localhost:3150`, Storybook a
 
 ## Explore the Component Library
 
-The [Component Library](/component-library/overview/) documents all components with API references, usage examples, and Storybook previews.
+[Storybook](https://storybook.helix.bookedsolid.tech/) documents all components with API references, usage examples, and live previews.
 
 ## Next Steps
 
 - [Installation](/getting-started/installation/) - npm, CDN, and monorepo setup details
 - [Project Structure](/getting-started/project-structure/) - Understand the codebase
-- [Component Library](/component-library/overview/) - Browse all components
+- [Storybook](https://storybook.helix.bookedsolid.tech/) - Browse all components
 - [Design Tokens](/design-tokens/overview/) - Learn the token system

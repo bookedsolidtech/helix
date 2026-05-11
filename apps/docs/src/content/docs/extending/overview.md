@@ -124,7 +124,7 @@ hx-text-input:focus-within::part(input) {
 }
 ```
 
-Every component's available parts are listed in the [Component Library](/component-library/overview/) and in the Custom Elements Manifest.
+Every component's available parts are listed in [Storybook](https://storybook.helix.bookedsolid.tech/) and in the Custom Elements Manifest.
 
 ### Vector 3: Slot Composition (Content Projection)
 
@@ -312,7 +312,7 @@ The following are implementation details. They may change in any release without
 
 ### Reading the CEM
 
-The generated manifest lives at `packages/hx-library/custom-elements.json`. You can also browse it per-component in the [Component Library](/component-library/overview/):
+The generated manifest lives at `packages/hx-library/custom-elements.json`. You can also browse component APIs per-component in [Storybook](https://storybook.helix.bookedsolid.tech/):
 
 ```bash
 # View all CSS parts for hx-button

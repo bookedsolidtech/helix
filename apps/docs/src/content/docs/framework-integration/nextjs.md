@@ -566,5 +566,5 @@ const MyForm = dynamic(
 
 - [React Integration](/framework-integration/react) — general React 18+ patterns
 - [Design Tokens](/design-tokens/overview) — theming HELiX in your Next.js app
-- [Component Library](/component-library/overview) — browse available components
+- [Storybook](https://storybook.helix.bookedsolid.tech/) — browse available components
 - [Accessibility Guide](/components/accessibility/aria) — WCAG 2.1 AA in Next.js
