@@ -41,10 +41,28 @@ In content implemented using markup languages, the purpose of UI components, ico
 Populate `autocomplete` on every form control whose purpose matches Section 7's input-purpose tokens. A signup form should look like:
 
 ```html
-<hx-text-input name="given-name" autocomplete="given-name" label="First name"></hx-text-input>
-<hx-text-input name="family-name" autocomplete="family-name" label="Last name"></hx-text-input>
-<hx-text-input name="email" type="email" autocomplete="email" label="Email"></hx-text-input>
-<hx-text-input name="tel" type="tel" autocomplete="tel-national" label="Phone"></hx-text-input>
+<hx-text-input
+  name="given-name"
+  autocomplete="given-name"
+  label="First name"
+></hx-text-input>
+<hx-text-input
+  name="family-name"
+  autocomplete="family-name"
+  label="Last name"
+></hx-text-input>
+<hx-text-input
+  name="email"
+  type="email"
+  autocomplete="email"
+  label="Email"
+></hx-text-input>
+<hx-text-input
+  name="tel"
+  type="tel"
+  autocomplete="tel-national"
+  label="Phone"
+></hx-text-input>
 ```
 
 ## 1.4.8 Visual Presentation
@@ -217,9 +235,10 @@ Wrap every abbreviation in `<abbr>` on first occurrence per page or per section.
 ```html
 <hx-prose>
   <p>
-    Patient presents with elevated <abbr title="Blood Pressure">BP</abbr>
-    (148/96) and tachycardic <abbr title="Heart Rate">HR</abbr> at 112 bpm.
-    Order <abbr title="Electrocardiogram">ECG</abbr> stat.
+    Patient presents with elevated
+    <abbr title="Blood Pressure">BP</abbr> (148/96) and tachycardic
+    <abbr title="Heart Rate">HR</abbr> at 112 bpm. Order
+    <abbr title="Electrocardiogram">ECG</abbr> stat.
   </p>
 </hx-prose>
 
@@ -228,8 +247,8 @@ Wrap every abbreviation in `<abbr>` on first occurrence per page or per section.
 <hx-tooltip>
   <abbr slot="anchor" title="Glasgow Coma Scale">GCS</abbr>
   <p>
-    A 15-point scale used to assess level of consciousness. 15 = fully alert,
-    3 = deep coma. Scored on eye, verbal, and motor responses.
+    A 15-point scale used to assess level of consciousness. 15 = fully alert, 3
+    = deep coma. Scored on eye, verbal, and motor responses.
   </p>
 </hx-tooltip>
 ```
@@ -259,8 +278,8 @@ Populate `help-text` with substantive content — what the field is for, the for
   required
 >
   <span slot="help-text">
-    Format: 9 digits, no dashes (e.g. 123456789). Used only to verify
-    insurance eligibility — not stored on this device.
+    Format: 9 digits, no dashes (e.g. 123456789). Used only to verify insurance
+    eligibility — not stored on this device.
   </span>
 </hx-text-input>
 
@@ -270,8 +289,8 @@ Populate `help-text` with substantive content — what the field is for, the for
   <hx-popover slot="help-text">
     <button slot="anchor" type="button" aria-label="What is this?">?</button>
     <p>
-      An advance directive is a legal document specifying your healthcare
-      wishes if you cannot communicate them yourself. See the
+      An advance directive is a legal document specifying your healthcare wishes
+      if you cannot communicate them yourself. See the
       <a href="/help/advance-directives">advance-directive help page</a>
       for details.
     </p>
