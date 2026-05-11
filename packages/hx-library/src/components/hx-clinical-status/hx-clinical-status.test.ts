@@ -212,13 +212,13 @@ describe('hx-clinical-status', () => {
   // ─── Property: icon (2) ───
 
   describe('Property: icon', () => {
-    it('renders default SVG icon when icon prop is empty', async () => {
+    it('renders default hx-icon glyph when icon prop is empty', async () => {
       const el = await fixture<HxClinicalStatus>(
         '<hx-clinical-status message="Test"></hx-clinical-status>',
       );
       const iconContainer = shadowQuery(el, '[part="icon"]');
-      const svg = iconContainer?.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = iconContainer?.querySelector('hx-icon[library="helix"]');
+      expect(glyph).toBeTruthy();
     });
 
     it('renders custom icon span when icon prop is set', async () => {
@@ -447,15 +447,15 @@ describe('hx-clinical-status', () => {
   // ─── Default Icons (1) ───
 
   describe('Default icons', () => {
-    it('renders a default SVG icon per severity', async () => {
+    it('renders a default hx-icon glyph per severity', async () => {
       const severities = ['info', 'warning', 'critical', 'emergent'] as const;
       for (const severity of severities) {
         const el = await fixture<HxClinicalStatus>(
           `<hx-clinical-status severity="${severity}" message="Test"></hx-clinical-status>`,
         );
         const iconContainer = shadowQuery(el, '[part="icon"]');
-        const svg = iconContainer?.querySelector('svg');
-        expect(svg, `severity="${severity}" should render an SVG icon`).toBeTruthy();
+        const glyph = iconContainer?.querySelector('hx-icon[library="helix"]');
+        expect(glyph, `severity="${severity}" should render an hx-icon glyph`).toBeTruthy();
         el.remove();
       }
     });

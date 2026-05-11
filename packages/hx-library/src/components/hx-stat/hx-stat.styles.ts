@@ -96,8 +96,7 @@ export const helixStatStyles = css`
   }
 
   .stat__trend-arrow {
-    width: 0.75em;
-    height: 0.75em;
+    --hx-icon-size: 0.75em;
     flex-shrink: 0;
   }
 

@@ -355,12 +355,79 @@ export class HelixSlider extends FormMixin(HelixElement) {
 
   // ─── Form Integration ───
 
+  /**
+   * Constraint validation: surfaces native `validity` flags through
+   * `ElementInternals.setValidity()` so the slider participates in
+   * `form.checkValidity()` / `form.reportValidity()`.
+   *
+   * Flags applied (in priority order):
+   *   - `rangeUnderflow` when `value < min`.
+   *   - `rangeOverflow` when `value > max`.
+   *   - `stepMismatch` when `step` is finite/positive and `value` is not
+   *     aligned to `min + n*step` within `step / 1000` floating-point
+   *     tolerance.
+   *
+   * Note: a `required` flag is intentionally NOT exposed on the slider
+   * public API. The `value` property defaults to `0` (a numerically valid
+   * value), so a `required` slider cannot meaningfully report
+   * `valueMissing` without an additional "user-touched" interaction
+   * tracker — exposing the flag would advertise validation behavior the
+   * leaf component cannot deliver. Consumers needing required-on-touch
+   * semantics should wire that at the form level rather than the leaf.
+   *
+   * The validity anchor is the native range input so browser
+   * `reportValidity()` focuses the correct element. If the input has not
+   * yet rendered (firstUpdated has not run), the anchor is omitted.
+   *
+   * Called automatically by `FormMixin.updated()` after every Lit cycle.
+   * @internal
+   */
+  override _updateValidity(): void {
+    const anchor = this._input;
+    const v = this.value;
+
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      if (v < this.min) {
+        this._internals.setValidity(
+          { rangeUnderflow: true },
+          `Value must be at least ${this.min}.`,
+          anchor ?? undefined,
+        );
+        return;
+      }
+      if (v > this.max) {
+        this._internals.setValidity(
+          { rangeOverflow: true },
+          `Value must be at most ${this.max}.`,
+          anchor ?? undefined,
+        );
+        return;
+      }
+      if (Number.isFinite(this.step) && this.step > 0) {
+        const offset = v - this.min;
+        const nearest = Math.round(offset / this.step) * this.step;
+        const tolerance = this.step / 1000;
+        if (Math.abs(offset - nearest) > tolerance) {
+          this._internals.setValidity(
+            { stepMismatch: true },
+            `Value must be a multiple of ${this.step} starting from ${this.min}.`,
+            anchor ?? undefined,
+          );
+          return;
+        }
+      }
+    }
+
+    this._internals.setValidity({});
+  }
+
   /** @internal */
   protected override _onFormReset(): void {
     const resetTo = this._clamp(this._defaultValue ?? this.min);
     this.value = resetTo;
     this._internals.setFormValue(String(resetTo));
     this._resetInteractionState();
+    this._updateValidity();
   }
 
   /** @internal */

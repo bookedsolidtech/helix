@@ -68,6 +68,10 @@ export const helixAccordionItemStyles = css`
     transition: transform var(--hx-transition-normal, 250ms ease);
   }
 
+  .icon .accordion-item__chevron {
+    --hx-icon-size: 100%;
+  }
+
   .item--expanded .icon {
     transform: rotate(180deg);
   }

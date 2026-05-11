@@ -123,6 +123,11 @@ export const helixSplitButtonStyles = css`
     transform: rotate(180deg);
   }
 
+  /* hx-icon glyph sizing for the migrated chevron (12x8 → 12px). */
+  .split-button__chevron-glyph {
+    --hx-icon-size: 12px;
+  }
+
   /* ─── Size Variants ─── */
 
   /* sm */

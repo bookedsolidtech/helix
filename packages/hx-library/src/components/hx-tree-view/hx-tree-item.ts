@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTreeItemStyles } from './hx-tree-item.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
@@ -606,9 +607,12 @@ export class HelixTreeItem extends HelixElement {
         aria-label="${this.expanded ? 'Collapse' : 'Expand'}"
         @click=${this._handleExpandClick}
       >
-        <svg viewBox="0 0 16 16" aria-hidden="true">
-          <polyline points="6 4 10 8 6 12" />
-        </svg>
+        <hx-icon
+          class="expand-glyph"
+          library="helix"
+          name="chevron-right"
+          aria-hidden="true"
+        ></hx-icon>
       </button>
     `;
   }

@@ -51,6 +51,7 @@
     "a11y-audit": "node scripts/a11y-audit.js",
     "aaa:audit": "node scripts/aaa-formal-audit.mjs",
     "aaa:matrix": "node scripts/aaa-matrix-verify.mjs",
+    "aaa:verdicts": "node scripts/generate-aaa-verdicts.mjs",
     "bundle-size": "node scripts/bundle-size-report.js",
     "bundle-size:ci": "node scripts/bundle-size-report.js --ci",
     "check:bundle": "node scripts/check-bundle-size.mjs",
@@ -102,7 +103,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
-    "@bookedsolid/rea": "^0.28.0",
+    "@bookedsolid/rea": "^0.28.1",
     "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^20.4.3",
     "@commitlint/config-conventional": "^20.4.3",

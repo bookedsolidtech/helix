@@ -73,9 +73,12 @@ export const helixCarouselStyles = css`
     cursor: not-allowed;
   }
 
-  .nav-btn svg {
-    width: 1.25em;
-    height: 1.25em;
+  .nav-btn .carousel__nav-glyph {
+    --hx-icon-size: 1.25em;
+  }
+
+  .play-pause-btn .carousel__autoplay-glyph {
+    --hx-icon-size: 1em;
   }
 
   /* ─── Play/Pause ─── */

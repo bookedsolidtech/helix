@@ -6,6 +6,7 @@ import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
+import '../hx-icon/hx-icon.js';
 import { helixComboboxStyles } from './hx-combobox.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -1926,21 +1927,12 @@ export class HelixCombobox extends FormMixin(HelixElement) {
                         this._removeValue(val);
                       }}
                     >
-                      <svg
-                        width="8"
-                        height="8"
-                        viewBox="0 0 8 8"
-                        fill="none"
+                      <hx-icon
+                        class="field__chip-remove-glyph"
+                        library="helix"
+                        name="close"
                         aria-hidden="true"
-                        focusable="false"
-                      >
-                        <path
-                          d="M1 1L7 7M7 1L1 7"
-                          stroke="currentColor"
-                          stroke-width="1.5"
-                          stroke-linecap="round"
-                        />
-                      </svg>
+                      ></hx-icon>
                     </button>
                   </span>
                 `;
@@ -2001,21 +1993,12 @@ export class HelixCombobox extends FormMixin(HelixElement) {
                   tabindex="0"
                   @click=${this._handleClear}
                 >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 12 12"
-                    fill="none"
+                  <hx-icon
+                    class="field__clear-button-glyph"
+                    library="helix"
+                    name="close"
                     aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path
-                      d="M1 1L11 11M11 1L1 11"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                    />
-                  </svg>
+                  ></hx-icon>
                 </button>
               `
             : nothing}

@@ -87,6 +87,7 @@
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, mkdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { resolve, dirname, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
@@ -243,6 +244,7 @@ function loadComponentSources(name) {
     return null;
   }
   const out = {
+    tagName: name,
     dir,
     classFile: null,
     classSrc: '',
@@ -325,6 +327,17 @@ function checkKeyboardNoException(comp) {
     return {
       verdict: VERDICT.NOT_APPLICABLE,
       evidence: `@aria-pattern="${declaredPattern}" is a structural / coordinator pattern (HTML AAM / WAI-ARIA 1.2). Keyboard contract is provided by child form-control elements or the user agent; the host has no per-pattern key requirement.`,
+    };
+  }
+  // Phase 4 (hx-icon AAA cert): `@aria-pattern none` declares a
+  // presentational primitive with no widget role of its own. WCAG 2.1.3
+  // applies to interactive functionality; a presentational primitive has
+  // none. Mark Not Applicable rather than failing on a false-positive
+  // role="img" match in render output.
+  if (declaredPattern === 'none') {
+    return {
+      verdict: VERDICT.NOT_APPLICABLE,
+      evidence: `@aria-pattern="none" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality.`,
     };
   }
   const hasKeydown =
@@ -429,12 +442,40 @@ function checkChangeOnRequest(comp) {
 }
 
 /**
- * 3.3.6 Error Prevention (All) — applies only to form-associated components.
- * Form-associated components must expose ElementInternals validation hooks.
+ * 3.3.6 Error Prevention (All) — applies to form-associated INPUT components.
+ *
+ * Form-associated components split into two roles:
+ *
+ *   1. **Submission triggers** (aria-pattern=button) — `<hx-button>`,
+ *      `<hx-icon-button>`, `<hx-split-button>`, `<hx-toggle-button>`.
+ *      These participate in form submission but carry no user-entered
+ *      DATA value the leaf could validate. WCAG 3.3.6 is a form-flow
+ *      contract (review/confirm/reverse before commit) — fulfilled by
+ *      the consumer app, not by a submission trigger leaf. Verdict: NA.
+ *
+ *      Exception: if a submission-trigger exposes ElementInternals +
+ *      setValidity (e.g. a toggle-button surfacing its pressed state
+ *      as form value with native validity wiring), keep the original
+ *      Supports verdict.
+ *
+ *   2. **Input components** (aria-pattern in slider/textbox/combobox/
+ *      listbox/spinbutton/radiogroup/checkbox/switch/searchbox or known
+ *      data-bearing patterns like file-upload) — these collect user
+ *      input that may need validation. To help consumer apps fulfill
+ *      3.3.6, they SHOULD expose ElementInternals + setValidity so the
+ *      consumer's form gets native validity participation. Without it,
+ *      this is Partially Supports — consumers can still validate via
+ *      standard form events, but the native hook is missing.
+ *
+ * The aria-pattern jsdoc tag is the cleanest role signal — it's what
+ * we already use to declare APG conformance per component.
  */
+const SUBMISSION_TRIGGER_PATTERNS = new Set(['button']);
+const DATA_BEARING_TAG_HINTS = /upload/i;
+
 function checkErrorPrevention(comp) {
   const src = comp.classSrc;
-  const isFormAssociated = /static\s+formAssociated\s*=\s*true/.test(src);
+  const isFormAssociated = /static\s+(override\s+)?formAssociated\s*=\s*true/.test(src);
   if (!isFormAssociated) {
     return {
       verdict: VERDICT.NOT_APPLICABLE,
@@ -443,6 +484,24 @@ function checkErrorPrevention(comp) {
   }
   const hasInternals = /attachInternals\(\)|this\._internals|this\.internals/.test(src);
   const hasSetValidity = /setValidity\(/.test(src);
+  const ariaPattern = extractJsdocTag(src, 'aria-pattern');
+  const isDataBearingByTag = DATA_BEARING_TAG_HINTS.test(comp.tagName);
+  const isSubmissionTrigger =
+    ariaPattern && SUBMISSION_TRIGGER_PATTERNS.has(ariaPattern.trim()) && !isDataBearingByTag;
+  if (isSubmissionTrigger) {
+    if (hasInternals && hasSetValidity) {
+      return {
+        verdict: VERDICT.SUPPORTS,
+        evidence:
+          'Form-associated submission trigger that also exposes ElementInternals + setValidity for any stateful value (e.g. toggle pressed state).',
+      };
+    }
+    return {
+      verdict: VERDICT.NOT_APPLICABLE,
+      evidence:
+        'Form-associated submission trigger (aria-pattern=button) with no user-entered data value. WCAG 3.3.6 applies to the form submission flow as a whole; consumer apps fulfill review/confirm/reverse for the form, not for the trigger.',
+    };
+  }
   if (hasInternals && hasSetValidity) {
     return {
       verdict: VERDICT.SUPPORTS,
@@ -452,7 +511,7 @@ function checkErrorPrevention(comp) {
   }
   return {
     verdict: VERDICT.PARTIALLY,
-    evidence: `Component is form-associated but lacks ${!hasInternals ? 'ElementInternals' : ''}${!hasInternals && !hasSetValidity ? ' and ' : ''}${!hasSetValidity ? 'setValidity()' : ''}.`,
+    evidence: `Component is a form-associated input but lacks ${!hasInternals ? 'ElementInternals' : ''}${!hasInternals && !hasSetValidity ? ' and ' : ''}${!hasSetValidity ? 'setValidity()' : ''}. Consumers can still validate via standard form events, but the leaf does not surface the ElementInternals hook needed for native form-validity integration.`,
   };
 }
 
@@ -803,6 +862,16 @@ async function runBrowserChecks(componentName, page) {
       }
     }
 
+    // Give the browser time to fully render the focus ring before measuring.
+    // Several HELiX components use CSS transitions on the focus-ring box-shadow
+    // (opacity 0 → 1, spread 0 → 2px) for visual polish — the shadow takes
+    // ~150ms to reach its full computed value. Measuring earlier captures the
+    // transition midpoint (e.g. spread=0.65px, opacity=0.0008) which my
+    // hardened isVisibleFocusShadow predicate correctly rejects as below the
+    // 2px threshold. 250ms is a safe upper bound for any reasonable focus
+    // transition while remaining acceptable in audit runtime.
+    await page.waitForTimeout(250);
+
     // Now measure — the target is keyboard-focused (or we fell back to
     // programmatic focus only if the Tab walk failed to reach it).
     const measurements = await page.evaluate(
@@ -901,14 +970,37 @@ async function runBrowserChecks(componentName, page) {
               }
             }
           };
+          // A box-shadow value is "visible as a focus indicator" only when:
+          //   - it isn't 'none', AND
+          //   - at least one of (offset-x, offset-y, blur, spread) is >=2px, AND
+          //   - the color isn't fully transparent (alpha 0 / oklab .../0 / rgba(...,0))
+          // The previous heuristic accepted ANY `\d+px` substring, which matched
+          // computed defaults like "oklab(0 0 0 / 0) 0px 0px 0px 0px" — the
+          // browser's default placeholder for "no shadow" on elements that have
+          // a focus-visible rule defined elsewhere in the cascade but not
+          // currently matching. Reject those.
+          const isVisibleFocusShadow = (raw) => {
+            if (!raw || raw === 'none') return false;
+            // Reject fully-transparent color tokens.
+            if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
+            if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+            if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+            if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
+            if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+            // Require at least one non-zero pixel dimension.
+            const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
+              parseFloat(m[1]),
+            );
+            if (pxValues.length === 0) return false;
+            return pxValues.some((v) => Math.abs(v) >= 2);
+          };
           const candidates = [];
           if (host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
           for (const el of candidates) {
             const cs = window.getComputedStyle(el);
             const w = parseFloat(cs.outlineWidth || '0');
             const okOutline = w >= 2 && cs.outlineStyle !== 'none';
-            const okShadow =
-              cs.boxShadow && cs.boxShadow !== 'none' && /\b\d+\s*px/.test(cs.boxShadow);
+            const okShadow = isVisibleFocusShadow(cs.boxShadow);
             if (okOutline || okShadow) {
               // Confirm the element is currently visible (focus indicators
               // on display:none parts do not count).
@@ -1127,11 +1219,24 @@ async function runBrowserChecks(componentName, page) {
     const hasOutline = measurements.outlineWidthPx >= 2 && measurements.outlineStyle !== 'none';
     // Detect a "thick enough" box-shadow — heuristic: spread-radius or
     // multi-layer shadow with a non-transparent color and a non-zero
-    // blur or spread.
-    const boxShadowSuggestsFocusRing =
-      measurements.hasFocusBoxShadow &&
-      /\b\d+\s*px/.test(measurements.boxShadow) &&
-      !/^none$/i.test(measurements.boxShadow);
+    // blur or spread. The previous heuristic accepted ANY `\d+px` substring,
+    // which matched the computed-style default "oklab(0 0 0 / 0) 0px 0px 0px 0px"
+    // (browser placeholder for "no shadow"). Reject those by requiring at
+    // least one non-zero pixel dimension AND a non-transparent color.
+    const isVisibleShadow = (raw) => {
+      if (!raw || raw === 'none' || /^none$/i.test(raw)) return false;
+      if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
+      if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+      if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+      if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
+      if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+      const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
+        parseFloat(m[1]),
+      );
+      if (pxValues.length === 0) return false;
+      return pxValues.some((v) => Math.abs(v) >= 2);
+    };
+    const boxShadowSuggestsFocusRing = isVisibleShadow(measurements.boxShadow);
     const outlineSourceNote = measurements.outlineSourceIsTarget
       ? `<${measurements.targetTag}>`
       : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> — focus ring rendered on inner part)`;
@@ -1343,6 +1448,104 @@ function contrastRatio(fgStr, bgStr) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
+// ── hx-icon specific: non-text contrast (WCAG 1.4.11) ──────────────────────
+
+/**
+ * Phase 4 (hx-icon AAA cert) — `<hx-icon>` is presentational and renders no
+ * text content of its own, so WCAG 1.4.6 Contrast (Enhanced) is Not
+ * Applicable. The cert-relevant contrast obligation for an icon is
+ * 1.4.11 Non-text Contrast (≥3:1 between the rendered glyph color and the
+ * document background) — measured on the *icon* rather than text.
+ *
+ * This check renders representative `<hx-icon>` samples on the audit page
+ * (the existing Default story already renders an `<hx-icon name="check">`),
+ * reads the computed `color` of the rendered SVG (currentColor flowed from
+ * the host text cascade), reads the document background, and computes the
+ * WCAG 1.4.11 ratio. The verdict is `'Supports'` when every sampled glyph
+ * clears 3:1, else `'Does Not Support'` with the offending sample listed.
+ */
+async function checkNonTextContrastIcon(componentName, page) {
+  if (componentName !== 'hx-icon') {
+    return null;
+  }
+  try {
+    const samples = await page.evaluate(() => {
+      const out = [];
+      const icons = Array.from(document.querySelectorAll('hx-icon'));
+      for (const icon of icons) {
+        // Compute against the inner rendered SVG / span (the visual ink) so we
+        // measure the glyph color, not the host inline-flex container.
+        const svgPart = icon.shadowRoot ? icon.shadowRoot.querySelector('[part="svg"]') : null;
+        const target = svgPart || icon;
+        const cs = window.getComputedStyle(target);
+        // Walk up to find the nearest non-transparent background.
+        let bgEl = target;
+        let bg = window.getComputedStyle(bgEl).backgroundColor;
+        const isTransparent = (c) =>
+          !c || c === 'transparent' || /rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\s*\)/.test(c);
+        while (isTransparent(bg) && bgEl.parentElement) {
+          bgEl = bgEl.parentElement;
+          bg = window.getComputedStyle(bgEl).backgroundColor;
+        }
+        if (isTransparent(bg)) {
+          // Default to white if the entire chain is transparent — Storybook
+          // body has a default light background; this fallback is documented.
+          bg = 'rgb(255, 255, 255)';
+        }
+        out.push({
+          name: icon.getAttribute('name') || '',
+          library: icon.getAttribute('library') || 'fa-free',
+          fg: cs.color,
+          bg,
+        });
+      }
+      return out;
+    });
+
+    if (!samples || samples.length === 0) {
+      return {
+        verdict: VERDICT.NOT_APPLICABLE,
+        evidence: 'No <hx-icon> instances rendered in the story; nothing to measure.',
+      };
+    }
+
+    const measurements = samples
+      .map((s) => {
+        const ratio = contrastRatio(s.fg, s.bg);
+        return { ...s, ratio };
+      })
+      .filter((m) => m.ratio !== null);
+
+    if (measurements.length === 0) {
+      return {
+        verdict: VERDICT.PARTIALLY,
+        evidence: 'Could not parse foreground/background colors for any rendered hx-icon sample.',
+      };
+    }
+
+    const failing = measurements.filter((m) => (m.ratio ?? 0) < 3.0);
+    const minRatio = Math.min(...measurements.map((m) => m.ratio));
+    if (failing.length === 0) {
+      return {
+        verdict: VERDICT.SUPPORTS,
+        evidence: `WCAG 1.4.11 Non-text Contrast: ${measurements.length} hx-icon sample(s) measured; min ratio ${minRatio.toFixed(2)}:1 (≥3:1 required).`,
+        samples: measurements,
+      };
+    }
+    return {
+      verdict: VERDICT.DOES_NOT,
+      evidence: `WCAG 1.4.11 Non-text Contrast: ${failing.length} of ${measurements.length} hx-icon sample(s) below 3:1. Lowest ratio ${minRatio.toFixed(2)}:1.`,
+      offenders: failing,
+      samples: measurements,
+    };
+  } catch (err) {
+    return {
+      verdict: VERDICT.PARTIALLY,
+      evidence: `Non-text contrast measurement error: ${err instanceof Error ? err.message : String(err)}`,
+    };
+  }
+}
+
 // ── Per-component audit ─────────────────────────────────────────────────────
 
 async function auditComponent(name, browser) {
@@ -1361,7 +1564,7 @@ async function auditComponent(name, browser) {
     jsdoc: {
       ariaPattern: extractJsdocTag(comp.classSrc, 'aria-pattern'),
       keyboardContract: extractJsdocTag(comp.classSrc, 'keyboard-contract'),
-      formAssociated: /static\s+formAssociated\s*=\s*true/.test(comp.classSrc),
+      formAssociated: /static\s+(override\s+)?formAssociated\s*=\s*true/.test(comp.classSrc),
       forcedColorsSupported: extractJsdocTagBoolean(comp.classSrc, 'forced-colors-supported'),
     },
     verdicts: {},
@@ -1382,6 +1585,14 @@ async function auditComponent(name, browser) {
     try {
       const browserData = await runBrowserChecks(name, page);
       result.browserChecks = browserData;
+
+      // Phase 4 (hx-icon) — additional non-text-contrast measurement on the
+      // rendered icon glyph(s). The page is already loaded by runBrowserChecks
+      // at this point so the samples are present. Only runs for hx-icon.
+      const iconContrast = await checkNonTextContrastIcon(name, page);
+      if (iconContrast) {
+        result.verdicts['non-text-contrast-icon'] = iconContrast;
+      }
       if (browserData.error) {
         result.verdicts['1.4.6'] = {
           verdict: VERDICT.PARTIALLY,
@@ -1673,6 +1884,24 @@ async function main() {
   console.log(`Verdict matrix: ${relative(REPO_ROOT, matrixPath)}`);
   console.log(`Evidence dir  : ${relative(REPO_ROOT, EVIDENCE_DIR)}/`);
   console.log();
+
+  // Regenerate the slim verdicts snapshot consumed by the Storybook docs
+  // surface (AAAConformanceCard). This keeps the docs page verdicts in
+  // lockstep with the formal harness — no heuristic, no drift. The snapshot
+  // is committed to packages/hx-library/aaa-verdicts.json.
+  const generatorPath = resolve(REPO_ROOT, 'scripts/generate-aaa-verdicts.mjs');
+  if (existsSync(generatorPath)) {
+    console.log('Regenerating docs verdict snapshot...');
+    const gen = spawnSync(process.execPath, [generatorPath, '--audit', OUTPUT_PATH], {
+      stdio: 'inherit',
+    });
+    if (gen.status !== 0) {
+      console.error(
+        '[aaa-formal-audit] generate-aaa-verdicts.mjs failed; verdict snapshot may be stale.',
+      );
+      // Do NOT fail the audit run — the audit succeeded; surface the warning.
+    }
+  }
 
   // Always exit 0 — Phase 4 fixes the F/P findings; this harness reports.
   process.exit(0);

@@ -260,6 +260,16 @@ const meta = {
     size: 'md',
     disabled: false,
   },
+  decorators: [
+    (story) => html`
+      <div
+        style="display: inline-flex; align-items: center; gap: 1rem; padding: 1.5rem 2rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 14rem;"
+      >
+        ${story()}
+        <span style="font: 0.875rem system-ui, sans-serif; color: #4b5563;">Icon button</span>
+      </div>
+    `,
+  ],
   render: (args) => html`
     <hx-icon-button
       label=${args.label}

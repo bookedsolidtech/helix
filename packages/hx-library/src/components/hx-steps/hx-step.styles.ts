@@ -74,9 +74,8 @@ export const helixStepStyles = css`
     z-index: 1;
   }
 
-  .step__indicator svg {
-    width: var(--hx-steps-indicator-icon-size, 1rem);
-    height: var(--hx-steps-indicator-icon-size, 1rem);
+  .step__indicator .step__status-glyph {
+    --hx-icon-size: var(--hx-steps-indicator-icon-size, 1rem);
   }
 
   /* ─── Connector ─── */

@@ -129,12 +129,19 @@ export const helixNavStyles = css`
   /* ─── Chevron Icon ─── */
 
   .nav__chevron {
+    --hx-icon-size: 16px;
     transition: transform var(--hx-transition-normal, 200ms) ease;
     flex-shrink: 0;
   }
 
   .nav__link--expanded .nav__chevron {
     transform: rotate(180deg);
+  }
+
+  /* ─── Hamburger Icon (mobile menu trigger) ─── */
+
+  .nav__hamburger-glyph {
+    --hx-icon-size: 24px;
   }
 
   /* ─── Submenu ─── */

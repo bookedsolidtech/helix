@@ -4,6 +4,26 @@ import { expect, within, userEvent, fn } from 'storybook/test';
 import './hx-overflow-menu.js';
 
 // ─────────────────────────────────────────────────
+// Shared helper — open the overflow trigger so the panel paints in
+// the static screenshot. Story-audit harness captures the canvas
+// after the play function runs; without this, every collapsed
+// trigger registers as blank-canvas (single ~30px icon button on a
+// 1280×720 canvas falls below the 0.05% non-bg pixel threshold).
+// ─────────────────────────────────────────────────
+async function openOverflowMenu(canvasElement: HTMLElement): Promise<void> {
+  const el = canvasElement.querySelector('hx-overflow-menu');
+  if (!el) return;
+  const triggerBtn = el.shadowRoot?.querySelector('[part~="button"]') as HTMLElement | null;
+  if (!triggerBtn) return;
+  const showFired = new Promise<boolean>((resolve) => {
+    el.addEventListener('hx-show', () => resolve(true), { once: true });
+    window.setTimeout(() => resolve(false), 2000);
+  });
+  await userEvent.click(triggerBtn);
+  await showFired;
+}
+
+// ─────────────────────────────────────────────────
 // Meta Configuration
 // ─────────────────────────────────────────────────
 
@@ -165,6 +185,9 @@ export const HorizontalIcon: Story = {
       </hx-overflow-menu>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -189,6 +212,9 @@ export const VerticalIcon: Story = {
       </hx-overflow-menu>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -197,14 +223,23 @@ export const VerticalIcon: Story = {
 
 export const Small: Story = {
   args: { size: 'sm' },
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 export const Medium: Story = {
   args: { size: 'md' },
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 export const Large: Story = {
   args: { size: 'lg' },
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -212,6 +247,7 @@ export const Large: Story = {
 // ─────────────────────────────────────────────────
 
 export const Disabled: Story = {
+  name: 'Closed: Disabled Trigger',
   args: { disabled: true },
   play: async ({ canvasElement }) => {
     const el = canvasElement.querySelector('hx-overflow-menu');
@@ -274,6 +310,10 @@ export const SelectEvent: Story = {
     await userEvent.click(editItem!);
     await expect(selectSpy).toHaveBeenCalledTimes(1);
 
+    // Re-open the menu so the static story screenshot paints meaningful pixels
+    // (auditor captures after play; selecting an item closes the panel).
+    await openOverflowMenu(canvasElement);
+
     const callArg = selectSpy.mock.calls[0]?.[0] as CustomEvent | undefined;
     await expect(callArg?.detail?.value).toBe('edit');
 
@@ -294,6 +334,9 @@ export const FewItems: Story = {
       </hx-overflow-menu>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -313,6 +356,9 @@ export const ManyItems: Story = {
       </hx-overflow-menu>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -338,25 +384,33 @@ export const PatientRowActions: Story = {
       <tbody>
         <tr style="border-bottom: 1px solid #e5e7eb;">
           <td style="padding: 0.75rem 1rem; color: #111827;">Jane Doe</td>
-          <td style="padding: 0.75rem 1rem; color: var(--hx-color-text-muted, #4A5362);">Cardiology</td>
+          <td style="padding: 0.75rem 1rem; color: var(--hx-color-text-muted, #4A5362);">
+            Cardiology
+          </td>
           <td style="padding: 0.5rem 1rem; text-align: right;">
             <hx-overflow-menu role="menu" hx-size="sm" placement="bottom-end">
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">Discharge</button>
+              <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">
+                Discharge
+              </button>
             </hx-overflow-menu>
           </td>
         </tr>
         <tr style="border-bottom: 1px solid #e5e7eb;">
           <td style="padding: 0.75rem 1rem; color: #111827;">John Smith</td>
-          <td style="padding: 0.75rem 1rem; color: var(--hx-color-text-muted, #4A5362);">Neurology</td>
+          <td style="padding: 0.75rem 1rem; color: var(--hx-color-text-muted, #4A5362);">
+            Neurology
+          </td>
           <td style="padding: 0.5rem 1rem; text-align: right;">
             <hx-overflow-menu role="menu" hx-size="sm" placement="bottom-end">
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">Discharge</button>
+              <button role="menuitem" style="color: var(--hx-color-error-text, #A21312);">
+                Discharge
+              </button>
             </hx-overflow-menu>
           </td>
         </tr>
@@ -446,6 +500,9 @@ export const WithIconItems: Story = {
       </hx-overflow-menu>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -500,5 +557,8 @@ export const DarkMode: Story = {
   args: {
     icon: 'vertical',
     placement: 'bottom-end',
+  },
+  play: async ({ canvasElement }) => {
+    await openOverflowMenu(canvasElement);
   },
 };

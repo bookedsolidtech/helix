@@ -18,25 +18,41 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
         WCAG&nbsp;2.1&nbsp;Level&nbsp;AA
       </a>
       {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
-      ; HELiX targets <strong>WCAG&nbsp;2.1&nbsp;Level&nbsp;AAA on its P0 surface</strong> — and we
-      ship the contrast ledger, the keyboard contracts, and the VPAT to prove it.
+      ; HELiX targets <strong>WCAG&nbsp;2.2&nbsp;Level&nbsp;AAA on its P0 surface</strong> — as
+      measured by the formal AAA harness against each P0 component&apos;s Default story — and we
+      ship the contrast ledger, the keyboard contracts, and per-component evidence to prove it.{' '}
+      <strong>
+        This cert is self-certified by the project maintainers; it is not third-party attested.
+      </strong>{' '}
+      <a href="/?path=/docs/accessibility-self-certification-scope--docs">
+        Read the self-cert scope first
+      </a>
+      .
     </>
   }
 />
 
 <section>
-  <SectionHead title="The AAA cert posture" meta="WCAG 2.1 · differentiation surface" />
+  <SectionHead title="The AAA cert posture" meta="WCAG 2.2 · self-certified · default story" />
   <div className="hx-docs-stats">
     <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
-    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 scaffolded" />
+    <StatCard
+      num="44"
+      unit="/44"
+      label="P0 components self-certed"
+      sub="2 honest Partials on 3.3.6"
+    />
     <StatCard num="100" unit="%" label="forced-colors coverage" sub="every interactive primitive" />
-    <StatCard num="0" label="axe-core violations" sub="critical + serious" />
+    <StatCard num="0" label="axe-core Supports violations" sub="default story · critical+serious" />
   </div>
   <p className="hx-docs-card-body" style={{ marginTop: 16, maxWidth: '70ch' }}>
-    The full ledger lives in <strong>Accessibility / Dashboard</strong>. The supplemental pages
-    cover forced-colors emulation, the APG-aligned keyboard contracts, focus-management patterns,
-    and the per-mode contrast deep-dive — every claim above is verifiable against the regression
-    suite.
+    The full ledger lives in <strong>Accessibility / Dashboard</strong>. The verdicts above are
+    measured against each component&apos;s <strong>Default story</strong> by the formal AAA harness
+    (<code>pnpm aaa:audit</code>) and recorded with evidence per (component × criterion) in{' '}
+    <code>.reports/formal-aaa-audit/audit.json</code>. Variant coverage is asserted by a separate
+    story-audit harness. For the explicit scope and honest limits of this self-cert, see{' '}
+    <a href="/?path=/docs/accessibility-self-certification-scope--docs">Self-Certification Scope</a>
+    .
   </p>
 </section>
 
@@ -63,8 +79,10 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
       <p>
         Healthcare providers, claims systems, and patient-facing portals operate above the federal
         floor — both because patients use assistive tech at a higher rate and because regulators
-        expect <em>headroom</em>. HELiX targets <strong>Level AAA on its P0 surface</strong>
-        and publishes the per-component VPAT so consumers can stake their own claim.
+        expect <em>headroom</em>. HELiX targets{' '}
+        <strong>WCAG 2.2 Level AAA on its P0 surface</strong>
+        and publishes per-component evidence (matrix + audit JSON + per-component AUDIT.md) so
+        consumers can stake their own claim against a reproducible self-cert.
       </p>
     </article>
     <article className="hx-docs-pillar">

@@ -96,10 +96,8 @@ export const helixAlertStyles = css`
     color: var(--hx-alert-icon-color, var(--hx-color-info-500, #0c8beb));
   }
 
-  .alert__icon svg {
-    width: var(--hx-space-5, 1.25rem);
-    height: var(--hx-space-5, 1.25rem);
-    fill: currentColor;
+  .alert__icon .alert__glyph {
+    --hx-icon-size: var(--hx-space-5, 1.25rem);
   }
 
   /* ─── Title ─── */
@@ -186,10 +184,8 @@ export const helixAlertStyles = css`
     opacity: 1;
   }
 
-  .alert__close-button svg {
-    width: var(--hx-space-4, 1rem);
-    height: var(--hx-space-4, 1rem);
-    fill: currentColor;
+  .alert__close-button .alert__glyph {
+    --hx-icon-size: var(--hx-space-4, 1rem);
   }
 
   @media (prefers-reduced-motion: reduce) {

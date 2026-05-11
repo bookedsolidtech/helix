@@ -309,20 +309,20 @@ describe('hx-top-nav', () => {
   // ─── Hamburger icon switching (2) ───
 
   describe('Hamburger icon switching', () => {
-    it('SVG element inside toggle button is present when closed', async () => {
+    it('hx-icon menu glyph is present inside toggle button when closed', async () => {
       const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
-      const svg = btn.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = btn.querySelector('hx-icon[library="helix"][name="menu"]');
+      expect(glyph).toBeTruthy();
     });
 
-    it('SVG element inside toggle button is present when open', async () => {
+    it('hx-icon close glyph is present inside toggle button when open', async () => {
       const el = await fixture<HelixTopNav>('<hx-top-nav></hx-top-nav>');
       const btn = shadowQuery<HTMLButtonElement>(el, '[part="mobile-toggle"]')!;
       btn.click();
       await el.updateComplete;
-      const svg = btn.querySelector('svg');
-      expect(svg).toBeTruthy();
+      const glyph = btn.querySelector('hx-icon[library="helix"][name="close"]');
+      expect(glyph).toBeTruthy();
     });
   });
 
