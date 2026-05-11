@@ -152,15 +152,13 @@ export const helixSideNavStyles = css`
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
-  .side-nav__toggle svg {
-    width: var(--hx-space-5, 1.25rem);
-    height: var(--hx-space-5, 1.25rem);
-    fill: currentColor;
+  .side-nav__toggle .side-nav__toggle-glyph {
+    --hx-icon-size: var(--hx-space-5, 1.25rem);
     flex-shrink: 0;
     transition: transform var(--hx-transition-normal, 300ms) ease;
   }
 
-  :host([collapsed]) .side-nav__toggle svg {
+  :host([collapsed]) .side-nav__toggle .side-nav__toggle-glyph {
     transform: rotate(180deg);
   }
 

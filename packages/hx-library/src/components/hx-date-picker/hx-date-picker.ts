@@ -5,6 +5,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import '../hx-icon/hx-icon.js';
 import { helixDatePickerStyles } from './hx-date-picker.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -1778,24 +1779,12 @@ export class HelixDatePicker extends FormMixin(HelixElement) {
             ?disabled=${this.disabled}
             @click=${this._toggleCalendar}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+            <hx-icon
+              class="field__trigger-glyph"
+              library="helix"
+              name="calendar"
               aria-hidden="true"
-              focusable="false"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
+            ></hx-icon>
           </button>
         </div>
 

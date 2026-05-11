@@ -310,4 +310,9 @@ export const helixDrawerStyles = css`
       border: 1px solid ButtonText;
     }
   }
+
+  /* hx-icon glyph sizing for the migrated close-button SVG. */
+  .drawer-close-button-glyph {
+    --hx-icon-size: 16px;
+  }
 `;

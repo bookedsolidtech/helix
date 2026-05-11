@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixAlertStyles } from './hx-alert.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
@@ -354,63 +355,24 @@ export class HelixAlert extends HelixElement {
   // ─── Default Icons ───
 
   /** @internal */
-  private _renderInfoIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        d="M10 2a8 8 0 100 16 8 8 0 000-16zm.75 4.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM9.25 9a.75.75 0 011.5 0v4a.75.75 0 01-1.5 0V9z"
-      />
-    </svg>`;
-  }
-
-  /** @internal */
-  private _renderSuccessIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.03 6.28a.75.75 0 00-1.06-1.06L9 10.19 7.78 8.97a.75.75 0 00-1.06 1.06l1.75 1.75a.75.75 0 001.06 0l3.5-3.5z"
-      />
-    </svg>`;
-  }
-
-  /** @internal */
-  private _renderWarningIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        d="M8.49 2.92a1.75 1.75 0 013.02 0l6.25 10.83A1.75 1.75 0 0116.25 16H3.75a1.75 1.75 0 01-1.51-2.25L8.49 2.92zM10 7a.75.75 0 01.75.75v3a.75.75 0 01-1.5 0v-3A.75.75 0 0110 7zm0 7.5a.75.75 0 100-1.5.75.75 0 000 1.5z"
-      />
-    </svg>`;
-  }
-
-  /** @internal */
-  private _renderErrorIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        d="M10 2a8 8 0 100 16 8 8 0 000-16zm-1.72 5.22a.75.75 0 011.06 0L10 7.94l.66-.72a.75.75 0 111.06 1.06L11.06 9l.66.72a.75.75 0 11-1.06 1.06L10 10.06l-.66.72a.75.75 0 01-1.06-1.06L8.94 9l-.66-.72a.75.75 0 010-1.06z"
-      />
-    </svg>`;
-  }
-
-  /** @internal */
   private _renderDefaultIcon() {
-    switch (this.variant) {
-      case 'success':
-        return this._renderSuccessIcon();
-      case 'warning':
-        return this._renderWarningIcon();
-      case 'error':
-        return this._renderErrorIcon();
-      case 'info':
-      default:
-        return this._renderInfoIcon();
-    }
+    const name = this.variant === 'info' ? 'info' : this.variant;
+    return html`<hx-icon
+      class="alert__glyph"
+      library="helix"
+      name=${name}
+      aria-hidden="true"
+    ></hx-icon>`;
   }
 
   /** @internal */
   private _renderCloseIcon() {
-    return html`<svg viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
-      />
-    </svg>`;
+    return html`<hx-icon
+      class="alert__glyph"
+      library="helix"
+      name="close"
+      aria-hidden="true"
+    ></hx-icon>`;
   }
 
   // ─── Event Handling ───

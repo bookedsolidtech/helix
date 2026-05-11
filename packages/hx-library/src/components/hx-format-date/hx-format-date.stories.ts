@@ -156,6 +156,15 @@ const meta = {
     hourFormat: 'auto',
     numeric: 'auto',
   },
+  decorators: [
+    (story) => html`
+      <div
+        style="display: inline-block; padding: 1rem 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; font: 1.125rem system-ui, sans-serif; color: #111827; min-width: 16rem;"
+      >
+        ${story()}
+      </div>
+    `,
+  ],
   render: (args) => html`
     <hx-format-date
       date=${ifDefined(args.date)}

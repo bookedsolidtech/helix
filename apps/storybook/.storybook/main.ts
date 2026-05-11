@@ -30,6 +30,17 @@ const config: StorybookConfig = {
     options: {},
   },
 
+  // Serve @helixui/icons sprite sheets locally so <hx-icon library="...">
+  // can resolve glyphs in Storybook dev. The from-path is the workspace
+  // package's dist/, so any rebuild of @helixui/icons (sprite regeneration)
+  // is picked up on Storybook reload.
+  staticDirs: [
+    {
+      from: '../../../packages/hx-icons/dist',
+      to: '/icons',
+    },
+  ],
+
   core: {
     disableTelemetry: true,
   },

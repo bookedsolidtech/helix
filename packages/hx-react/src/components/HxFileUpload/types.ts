@@ -27,6 +27,9 @@ Mirrors the native `<input type="file" accept>` attribute. */
   label?: string;
   /** Whether the component is disabled. */
   disabled?: boolean;
+  /** Whether the field must have at least one file selected for form submission.
+Drives `validity.valueMissing` when the file list is empty. */
+  required?: boolean;
   /** Error message displayed below the dropzone. Also puts the dropzone in an error visual state. */
   error?: string;
   /** Instructional text shown in the dropzone when no custom slot content is provided.

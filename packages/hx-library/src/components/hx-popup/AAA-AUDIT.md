@@ -15,9 +15,10 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 **Standards claimed:** [WCAG 2.2 Recommendation](https://www.w3.org/TR/WCAG22/) at level **AAA** for the 9 component-shippable Success Criteria below; plus 2 peer standards (forced-colors-mode, APG-aligned keyboard contract) documented separately.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
-**Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's Default story in Storybook (Chromium via Playwright); per-cell measurements written to `.reports/formal-aaa-audit/evidence/hx-popup.json`.
-**Audit run:** 2026-05-09T12:35:41.184Z
-**Audit harness run:** 2026-05-09T12:35:01.830Z
+**Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
+**Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/hx-popup.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
+**Audit run:** 2026-05-10T20:15:39.855Z
+**Audit harness run:** 2026-05-10T20:14:57.269Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -26,13 +27,26 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 | Verdict             | Count |
 | ------------------- | ----- |
-| Supports            | 8     |
+| Supports            | 7     |
 | Partially Supports  | 0     |
 | Does Not Support    | 0     |
-| Not Applicable      | 3     |
+| Not Applicable      | 4     |
 | **Total criteria**  | **11** |
 
-**Headline:** **Supports + Not Applicable across all 11 criteria** (8 Supports, 3 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+**Headline:** **Supports + Not Applicable across all 11 criteria** (7 Supports, 4 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+
+> **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
+
+---
+
+## Variant coverage
+
+The formal AAA harness audits the **Default story only**. Visual coverage of every other story / variant of this component is tracked by the story-audit harness (`scripts/audit-stories.mjs`), which runs across all 1,635 Storybook entries in the library and flags any story that fails to render visible content, has below-AAA contrast, has below-WCAG target sizes, or trips axe-core AAA rules.
+
+> **No `Components/*` stories** found for this component in the Storybook index. The component may be exposed only as part of a parent component's story (e.g., `hx-menu-item` rendered inside `hx-menu` stories). The Default-story AAA verdict above applies.
+
+
+A "Visual confirmation" verdict here means the story-audit harness has rendered the story in headless Chromium, sampled real pixels, and recorded zero serious findings. Stories without visual confirmation MAY still meet AAA in practice — but until the story-audit harness clears them, the component's AAA cert claim is bounded by what the Default story exercises.
 
 ---
 
@@ -55,7 +69,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 | --- | --- | --- | --- | --- | --- |
 | 1.4.6 | Contrast (Enhanced) | Supports | Normal text ≥7:1; large text (≥18.66px or ≥14px bold) ≥4.5:1 | 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239)) | [spec](https://www.w3.org/TR/WCAG22/#contrast-enhanced) |
 | 1.4.9 | Images of Text (No Exception) | Supports | No raster/SVG images of text (decorative & essential exemptions per WCAG 2.2) | No raster <img> tags rendered in component output. Text content is rendered via real text nodes. | [spec](https://www.w3.org/TR/WCAG22/#images-of-text-no-exception) |
-| 2.1.3 | Keyboard (No Exception) | Supports | All functionality keyboard-operable; no timing-based input | Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction. | [spec](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) |
+| 2.1.3 | Keyboard (No Exception) | Not Applicable | All functionality keyboard-operable; no timing-based input | @aria-pattern="none" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality. | [spec](https://www.w3.org/TR/WCAG22/#keyboard-no-exception) |
 | 2.3.3 | Animation from Interactions | Supports | All interaction-driven motion respects `prefers-reduced-motion: reduce` | Component has 1 transition + 0 animation declaration(s) and at least one @media (prefers-reduced-motion: reduce) guard. | [spec](https://www.w3.org/TR/WCAG22/#animation-from-interactions) |
 | 2.4.12 | Focus Not Obscured (Enhanced) | Supports | No author-created content fully obscures the focused component | No element covers focused target centre | [spec](https://www.w3.org/TR/WCAG22/#focus-not-obscured-enhanced) |
 | 2.4.13 | Focus Appearance | Not Applicable | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | Not focusable / non-interactive | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
@@ -81,7 +95,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Measured:** 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))
 
-**Evidence:** 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))
+**Evidence:** 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239)); axe color-contrast-enhanced sweep: 0 violations across full story DOM.
 
 ### 1.4.9 — Images of Text (No Exception) (AAA)
 
@@ -99,7 +113,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 2.1.3 — Keyboard (No Exception) (AAA)
 
-**Verdict:** Supports
+**Verdict:** Not Applicable
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#keyboard-no-exception](https://www.w3.org/TR/WCAG22/#keyboard-no-exception)
 
@@ -107,9 +121,11 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** All functionality of the content is operable through a keyboard interface without requiring specific timings for individual keystrokes.
 
-**Measured:** Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction.
+**Measured:** @aria-pattern="none" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality.
 
-**Evidence:** Component uses a native focusable element (<button>, <a>, <input>, <textarea>, <select>) for primary interaction.
+**Evidence:** @aria-pattern="none" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality.
+
+**Why N/A:** @aria-pattern="none" declares a presentational primitive with no widget role; WCAG 2.1.3 Keyboard applies only to interactive functionality.
 
 ### 2.3.3 — Animation from Interactions (AAA)
 
@@ -238,6 +254,12 @@ For the AAA verdicts above to hold in real-world deployment, the consumer MUST:
 - Provide an accessible name (slot content, `aria-label`, or `accessible-label` prop) for every instance — the harness verifies a present accessible name on the Default story but cannot enforce it for every consumer instance.
 - Render the component on a page that respects WCAG 2.2 page-level criteria (landmarks, page titles, language) — component-level conformance does not certify the page.
 - Do not strip the focus ring via author CSS on the slotted/wrapping element. Adjust via the `--hx-focus-ring-*` design tokens if customization is required.
+
+---
+
+## Tooling notes
+
+_No harness-side gaps recorded for this component._
 
 ---
 

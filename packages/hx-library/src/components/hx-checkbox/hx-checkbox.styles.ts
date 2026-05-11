@@ -155,17 +155,12 @@ export const helixCheckboxStyles = css`
     border-color: var(--hx-checkbox-error-color, var(--hx-color-error-500, #e5493e));
   }
 
-  /* ─── Checkmark Icon ─── */
+  /* ─── Checkmark Icon (hx-icon library="helix") ─── */
 
   .checkbox__icon {
     display: none;
-    width: calc(var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) * 0.65);
-    height: calc(var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) * 0.65);
-    fill: none;
-    stroke: var(--hx-checkbox-checkmark-color, var(--hx-color-text-on-primary, #ffffff));
-    stroke-width: 2.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    --hx-icon-size: calc(var(--hx-checkbox-size, var(--hx-size-5, 1.25rem)) * 0.65);
+    --hx-icon-color: var(--hx-checkbox-checkmark-color, var(--hx-color-text-on-primary, #ffffff));
   }
 
   .checkbox--checked .checkbox__icon--check {
@@ -272,7 +267,7 @@ export const helixCheckboxStyles = css`
     }
 
     .checkbox__icon {
-      stroke: HighlightText;
+      --hx-icon-color: HighlightText;
     }
 
     .checkbox--error .checkbox__box {

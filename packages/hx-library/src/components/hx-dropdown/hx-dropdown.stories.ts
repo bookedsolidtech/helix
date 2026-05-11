@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import './hx-dropdown.js';
+import '../hx-menu/hx-menu.js';
+import '../hx-menu/hx-menu-item.js';
+import '../hx-menu/hx-menu-divider.js';
+import '../hx-button/hx-button.js';
+import '../hx-icon-button/hx-icon-button.js';
 
 // ─── Meta ────────────────────────────────────────────────────────────────────
 
@@ -74,33 +79,17 @@ const meta = {
         ?disabled=${args.disabled}
         distance=${args.distance}
       >
-        <button slot="trigger" type="button">Open Menu</button>
-        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="edit"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
+        <hx-button slot="trigger" variant="secondary">Open Menu</hx-button>
+        <hx-menu>
+          <hx-menu-item value="edit">Edit</hx-menu-item>
+          <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
+          <hx-menu-divider></hx-menu-divider>
+          <hx-menu-item
+            value="delete"
+            style="color: var(--hx-color-text-error, var(--hx-color-error-700, #b91c1c));"
+            >Delete</hx-menu-item
           >
-            Edit
-          </li>
-          <li
-            data-value="duplicate"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Duplicate
-          </li>
-          <li
-            data-value="delete"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-          >
-            Delete
-          </li>
-        </ul>
+        </hx-menu>
       </hx-dropdown>
     </div>
   `,
@@ -123,50 +112,50 @@ export const Default: Story = {
   render: () => html`
     <div style="padding: 4rem; display: flex; justify-content: center; align-items: flex-start;">
       <hx-dropdown>
-        <button slot="trigger" type="button">Open Menu</button>
-        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="edit"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
+        <hx-button slot="trigger" variant="secondary">Open Menu</hx-button>
+        <hx-menu>
+          <hx-menu-item value="edit">Edit</hx-menu-item>
+          <hx-menu-item value="duplicate">Duplicate</hx-menu-item>
+          <hx-menu-divider></hx-menu-divider>
+          <hx-menu-item
+            value="delete"
+            style="color: var(--hx-color-text-error, var(--hx-color-error-700, #b91c1c));"
+            >Delete</hx-menu-item
           >
-            Edit
-          </li>
-          <li
-            data-value="duplicate"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Duplicate
-          </li>
-          <li
-            data-value="delete"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-          >
-            Delete
-          </li>
-        </ul>
+        </hx-menu>
       </hx-dropdown>
     </div>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const dropdown = canvasElement.querySelector('hx-dropdown');
     await expect(dropdown).toBeTruthy();
     await expect(dropdown?.shadowRoot?.querySelector('[part="panel"]')).toBeTruthy();
-    // P1-03: role="menu" is on the slotted <ul> in the light DOM, not in the shadow DOM.
-    await expect(dropdown?.querySelector('[role="menu"]')).toBeTruthy();
+    await expect(dropdown?.querySelector('hx-menu')).toBeTruthy();
 
-    // Trigger opens dropdown
-    const trigger = canvas.getByRole('button');
+    // Query the slotted hx-button directly. testing-library's getByRole walks
+    // the accessibility tree but hx-button is a custom element whose internal
+    // <button> role is exposed via ElementInternals; the helper doesn't
+    // resolve slotted-into-custom-element trees reliably across Chromium
+    // accessibility-tree timings. Direct DOM query is the stable pattern,
+    // BUT we still verify the trigger upgraded to a real button (host
+    // querySelector alone would pass even if hx-button failed to register)
+    // by asserting the internal <button> exists with the correct accessible
+    // name. Same pattern as Icon Trigger below.
+    const trigger = dropdown?.querySelector('hx-button[slot="trigger"]') as
+      | (HTMLElement & { updateComplete?: Promise<unknown> })
+      | null;
+    await expect(trigger).toBeTruthy();
+    if (!trigger) return;
+    if (trigger.updateComplete) await trigger.updateComplete;
+    const innerButton = trigger.shadowRoot?.querySelector('button');
+    await expect(innerButton).toBeTruthy();
+    // The visible label is light-DOM slotted content on hx-button, so read
+    // it from the host's textContent — the inner shadow <button> contains
+    // a <slot> placeholder, not the flattened text.
+    await expect(trigger.textContent?.trim()).toMatch(/open menu/i);
     await userEvent.click(trigger);
     await expect(dropdown?.open).toBe(true);
 
-    // Click again closes
     await userEvent.click(trigger);
     await expect(dropdown?.open).toBe(false);
   },
@@ -181,43 +170,24 @@ export const IconTrigger: Story = {
   render: () => html`
     <div style="padding: 4rem; display: flex; justify-content: center; align-items: flex-start;">
       <hx-dropdown placement="bottom-end">
-        <button
-          slot="trigger"
-          type="button"
-          aria-label="More actions"
-          style="width: 2rem; height: 2rem; border-radius: 50%; border: 1px solid #d1d5db; cursor: pointer; font-size: 1.25rem; display: inline-flex; align-items: center; justify-content: center;"
-        >
-          ⋯
-        </button>
-        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="view"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            View details
-          </li>
-          <li
-            data-value="export"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Export
-          </li>
-          <li
-            data-value="archive"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Archive
-          </li>
-        </ul>
+        <hx-icon-button slot="trigger" label="More actions">
+          <hx-icon library="helix" name="ellipsis"></hx-icon>
+        </hx-icon-button>
+        <hx-menu>
+          <hx-menu-item value="view">View details</hx-menu-item>
+          <hx-menu-item value="export">Export</hx-menu-item>
+          <hx-menu-item value="archive">Archive</hx-menu-item>
+        </hx-menu>
       </hx-dropdown>
     </div>
   `,
+  play: async ({ canvasElement }) => {
+    const dropdown = canvasElement.querySelector('hx-dropdown');
+    if (!dropdown) return;
+    const trigger = dropdown.querySelector('[slot="trigger"]') as HTMLElement | null;
+    if (!trigger) return;
+    await userEvent.click(trigger);
+  },
 };
 
 // ─────────────────────────────────────────────────
@@ -229,49 +199,21 @@ export const CustomTrigger: Story = {
   render: () => html`
     <div style="padding: 4rem; display: flex; justify-content: center; align-items: flex-start;">
       <hx-dropdown placement="bottom-start">
-        <a
-          slot="trigger"
-          href="#"
-          role="button"
-          style="display: inline-flex; align-items: center; gap: 0.25rem; text-decoration: none; color: #4338ca; font-weight: 500;"
-          @click=${(e: Event) => e.preventDefault()}
-        >
-          Patient Actions ▾
-        </a>
-        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 180px;">
-          <li
-            data-value="schedule"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
+        <hx-button slot="trigger" variant="tertiary">
+          Patient Actions
+          <hx-icon slot="suffix" library="helix" name="chevron-down" hx-size="sm"></hx-icon>
+        </hx-button>
+        <hx-menu style="min-width: 180px;">
+          <hx-menu-item value="schedule">Schedule Appointment</hx-menu-item>
+          <hx-menu-item value="notes">Add Clinical Note</hx-menu-item>
+          <hx-menu-item value="referral">Create Referral</hx-menu-item>
+          <hx-menu-divider></hx-menu-divider>
+          <hx-menu-item
+            value="discharge"
+            style="color: var(--hx-color-text-error, var(--hx-color-error-700, #b91c1c));"
+            >Discharge Patient</hx-menu-item
           >
-            Schedule Appointment
-          </li>
-          <li
-            data-value="notes"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Add Clinical Note
-          </li>
-          <li
-            data-value="referral"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Create Referral
-          </li>
-          <li
-            data-value="discharge"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-          >
-            Discharge Patient
-          </li>
-        </ul>
+        </hx-menu>
       </hx-dropdown>
     </div>
   `,
@@ -286,17 +228,10 @@ export const Disabled: Story = {
   render: () => html`
     <div style="padding: 4rem; display: flex; justify-content: center; align-items: flex-start;">
       <hx-dropdown disabled>
-        <button slot="trigger" type="button" disabled>Disabled Menu</button>
-        <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
-          <li
-            data-value="action"
-            role="menuitem"
-            tabindex="-1"
-            style="padding: 0.5rem 1rem; cursor: pointer;"
-          >
-            Action
-          </li>
-        </ul>
+        <hx-button slot="trigger" variant="secondary" disabled>Disabled Menu</hx-button>
+        <hx-menu>
+          <hx-menu-item value="action">Action</hx-menu-item>
+        </hx-menu>
       </hx-dropdown>
     </div>
   `,
@@ -320,15 +255,11 @@ export const Placements: Story = {
       ${(['bottom-start', 'bottom', 'bottom-end', 'top-start', 'top', 'top-end'] as const).map(
         (p) => html`
           <hx-dropdown placement=${p}>
-            <button slot="trigger" type="button">${p}</button>
-            <ul role="menu" style="margin: 0; padding: 0.25rem 0; list-style: none;">
-              <li role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">
-                Option A
-              </li>
-              <li role="menuitem" tabindex="-1" style="padding: 0.5rem 1rem; cursor: pointer;">
-                Option B
-              </li>
-            </ul>
+            <hx-button slot="trigger" variant="secondary">${p}</hx-button>
+            <hx-menu>
+              <hx-menu-item value="a">Option A</hx-menu-item>
+              <hx-menu-item value="b">Option B</hx-menu-item>
+            </hx-menu>
           </hx-dropdown>
         `,
       )}
@@ -345,68 +276,31 @@ export const HealthcareUseCases: Story = {
   render: () => html`
     <div style="padding: 4rem; max-width: 600px; margin: 0 auto;">
       <div
-        style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;"
+        style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border: 1px solid var(--hx-color-border-default, #e5e7eb); border-radius: 0.5rem;"
       >
         <div>
           <strong>John Smith</strong>
-          <span style="color: #6b7280; font-size: 0.875rem;">
+          <span style="color: var(--hx-color-text-muted, #4a5568); font-size: 0.875rem;">
             — DOB: 1968-04-12 | MRN: 00123456</span
           >
         </div>
         <hx-dropdown placement="bottom-end">
-          <button
-            slot="trigger"
-            type="button"
-            style="padding: 0.375rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer;"
-          >
-            Actions ▾
-          </button>
-          <ul
-            role="menu"
-            style="margin: 0; padding: 0.25rem 0; list-style: none; min-width: 200px;"
-          >
-            <li
-              data-value="schedule"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
+          <hx-button slot="trigger" variant="secondary" size="sm">
+            Actions
+            <hx-icon slot="suffix" library="helix" name="chevron-down" hx-size="sm"></hx-icon>
+          </hx-button>
+          <hx-menu style="min-width: 200px;">
+            <hx-menu-item value="schedule">Schedule Appointment</hx-menu-item>
+            <hx-menu-item value="notes">Add Clinical Note</hx-menu-item>
+            <hx-menu-item value="labs">Order Labs</hx-menu-item>
+            <hx-menu-item value="referral">Create Referral</hx-menu-item>
+            <hx-menu-divider></hx-menu-divider>
+            <hx-menu-item
+              value="discharge"
+              style="color: var(--hx-color-text-error, var(--hx-color-error-700, #b91c1c));"
+              >Discharge Patient</hx-menu-item
             >
-              Schedule Appointment
-            </li>
-            <li
-              data-value="notes"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
-            >
-              Add Clinical Note
-            </li>
-            <li
-              data-value="labs"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
-            >
-              Order Labs
-            </li>
-            <li
-              data-value="referral"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer;"
-            >
-              Create Referral
-            </li>
-            <hr style="margin: 0.25rem 0; border: none; border-top: 1px solid #e5e7eb;" />
-            <li
-              data-value="discharge"
-              role="menuitem"
-              tabindex="-1"
-              style="padding: 0.5rem 1rem; cursor: pointer; color: #dc2626;"
-            >
-              Discharge Patient
-            </li>
-          </ul>
+          </hx-menu>
         </hx-dropdown>
       </div>
     </div>
@@ -428,11 +322,18 @@ export const KeyboardNavigation: Story = {
   name: 'Keyboard Navigation',
   render: () => html`
     <div style="padding: 1rem;">
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.75rem;">
+      <p style="font-size: 0.875rem; color: var(--hx-color-text-muted, #4a5568); margin-bottom: 0.75rem;">
         Tab focuses the trigger button. Enter or Space opens the menu. Arrow Down/Up navigates menu
         items. Enter selects. Escape closes.
       </p>
-      <hx-dropdown></hx-dropdown>
+      <hx-dropdown>
+        <hx-button slot="trigger" variant="secondary">Keyboard Demo</hx-button>
+        <hx-menu>
+          <hx-menu-item value="a">First option</hx-menu-item>
+          <hx-menu-item value="b">Second option</hx-menu-item>
+          <hx-menu-item value="c">Third option</hx-menu-item>
+        </hx-menu>
+      </hx-dropdown>
     </div>
   `,
   play: async ({ canvasElement }) => {

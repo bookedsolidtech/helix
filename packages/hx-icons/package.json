@@ -1,0 +1,88 @@
+{
+  "name": "@helixui/icons",
+  "version": "1.0.0",
+  "description": "Icon registry and curated icon libraries for the HELiX enterprise healthcare web component library",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "import": "./dist/registry.js",
+      "default": "./dist/registry.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "default": "./dist/types.js"
+    },
+    "./helix": {
+      "types": "./dist/libraries/helix.d.ts",
+      "import": "./dist/libraries/helix.js",
+      "default": "./dist/libraries/helix.js"
+    },
+    "./fa-free": {
+      "types": "./dist/libraries/fa-free.d.ts",
+      "import": "./dist/libraries/fa-free.js",
+      "default": "./dist/libraries/fa-free.js"
+    },
+    "./tree-shake/helix": "./dist/tree-shake/helix/index.js",
+    "./tree-shake/fa-free/solid": "./dist/tree-shake/fa-free/solid/index.js",
+    "./tree-shake/fa-free/solid/*": "./dist/tree-shake/fa-free/solid/*.js",
+    "./tree-shake/helix/*": "./dist/tree-shake/helix/*.js",
+    "./dist/helix.svg": "./dist/helix.svg",
+    "./dist/fa-free-solid.svg": "./dist/fa-free-solid.svg"
+  },
+  "files": [
+    "dist",
+    "NOTICE.md"
+  ],
+  "scripts": {
+    "build": "pnpm run build:sprites && pnpm run build:tree-shake && tsc",
+    "build:sprites": "tsx scripts/generate-sprite.ts",
+    "build:tree-shake": "tsx scripts/generate-tree-shake.ts",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage.enabled --coverage.include=\"src/registry.ts\"",
+    "prepublishOnly": "pnpm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bookedsolidtech/helix.git",
+    "directory": "packages/hx-icons"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://helix.bookedsolid.tech",
+  "bugs": "https://github.com/bookedsolidtech/helix/issues",
+  "keywords": [
+    "web-components",
+    "lit",
+    "healthcare",
+    "design-system",
+    "icons",
+    "icon-library",
+    "svg",
+    "font-awesome",
+    "accessibility",
+    "enterprise",
+    "typescript"
+  ],
+  "devDependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "linkedom": "^0.18.12",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

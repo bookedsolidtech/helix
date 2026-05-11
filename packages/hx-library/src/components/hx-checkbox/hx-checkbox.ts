@@ -4,6 +4,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
@@ -954,21 +955,19 @@ export class HelixCheckbox extends mixinDelegatesAria(FormMixin(HelixElement)) {
           />
 
           <span part="checkbox" class="checkbox__box">
-            <svg
+            <hx-icon
               part="checkmark"
               class="checkbox__icon checkbox__icon--check"
-              viewBox="0 0 16 16"
+              library="helix"
+              name="check"
               aria-hidden="true"
-            >
-              <polyline points="3.5 8 6.5 11 12.5 5"></polyline>
-            </svg>
-            <svg
+            ></hx-icon>
+            <hx-icon
               class="checkbox__icon checkbox__icon--indeterminate"
-              viewBox="0 0 16 16"
+              library="helix"
+              name="dash"
               aria-hidden="true"
-            >
-              <line x1="4" y1="8" x2="12" y2="8"></line>
-            </svg>
+            ></hx-icon>
           </span>
 
           <span part="label" class="checkbox__label" id=${this._labelId}>

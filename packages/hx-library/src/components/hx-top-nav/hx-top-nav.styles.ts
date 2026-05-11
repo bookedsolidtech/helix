@@ -92,8 +92,7 @@ export const helixTopNavStyles = css`
   }
 
   .mobile-toggle__icon {
-    width: var(--hx-space-6, 1.5rem);
-    height: var(--hx-space-6, 1.5rem);
+    --hx-icon-size: var(--hx-space-6, 1.5rem);
   }
 
   /* ─── Collapsible panel (mobile) ─── */

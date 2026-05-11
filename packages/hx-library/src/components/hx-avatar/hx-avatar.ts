@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixAvatarStyles } from './hx-avatar.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
@@ -231,20 +232,19 @@ export class HelixAvatar extends HelixElement {
 
   // ─── Fallback Icon ───
 
-  /** @internal */
+  /** @internal The "user silhouette" fallback isn't part of the helix curated 32-glyph
+   * vocabulary, so it falls back to the FA Free Solid `user` glyph. The
+   * `part="fallback-icon"` is preserved so external `::part(fallback-icon)`
+   * styling continues to target the same surface. */
   private _renderFallbackIcon() {
     return html`
-      <svg
+      <hx-icon
         part="fallback-icon"
         class="avatar__fallback-icon"
-        viewBox="0 0 24 24"
+        library="fa-free"
+        name="user"
         aria-hidden="true"
-        fill="currentColor"
-      >
-        <path
-          d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"
-        />
-      </svg>
+      ></hx-icon>
     `;
   }
 

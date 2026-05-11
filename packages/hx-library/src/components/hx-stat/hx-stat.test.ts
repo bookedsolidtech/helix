@@ -132,12 +132,11 @@ describe('hx-stat', () => {
       expect(trendPart?.getAttribute('aria-label')).toBe('Trend: up');
     });
 
-    it('renders SVG arrow inside trend indicator', async () => {
+    it('renders hx-icon arrow inside trend indicator', async () => {
       const el = await fixture<HelixStat>('<hx-stat value="42" trend="down"></hx-stat>');
       const trendPart = shadowQuery(el, '[part~="trend"]');
-      const svg = trendPart?.querySelector('svg');
-      expect(svg).toBeTruthy();
-      expect(svg?.getAttribute('aria-hidden')).toBe('true');
+      const icon = trendPart?.querySelector('hx-icon[library="helix"][name="arrow-down"]');
+      expect(icon).toBeTruthy();
     });
 
     it('removes trend indicator when changed to neutral', async () => {

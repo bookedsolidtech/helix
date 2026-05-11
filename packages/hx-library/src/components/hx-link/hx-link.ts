@@ -1,8 +1,9 @@
-import { html, nothing, svg } from 'lit';
+import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { helixLinkStyles } from './hx-link.styles.js';
@@ -163,19 +164,13 @@ export class HelixLink extends mixinDelegatesAria(HelixElement) {
     if (this.target !== '_blank') return nothing;
 
     return html`
-      <svg
+      <hx-icon
         class="link__external-icon"
         part="external-icon"
+        library="helix"
+        name="external-link"
         aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        ${svg`<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />`}
-      </svg>
+      ></hx-icon>
       <span class="sr-only">${this.externalLabel}</span>
     `;
   }

@@ -5,6 +5,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
@@ -595,26 +596,22 @@ export class HelixNumberInput extends FormMixin(HelixElement) {
 
   /** @internal */
   private _renderIncrementIcon() {
-    return html`<svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 12 12"
+    return html`<hx-icon
+      class="field__stepper-glyph"
+      library="helix"
+      name="plus"
       aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-    </svg>`;
+    ></hx-icon>`;
   }
 
   /** @internal */
   private _renderDecrementIcon() {
-    return html`<svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 12 12"
+    return html`<hx-icon
+      class="field__stepper-glyph"
+      library="helix"
+      name="dash"
       aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-    </svg>`;
+    ></hx-icon>`;
   }
 
   // ─── Render ───

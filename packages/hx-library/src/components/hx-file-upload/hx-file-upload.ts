@@ -5,6 +5,7 @@ import { HelixElement, createIdCounter } from '../../base/index.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
+import '../hx-icon/hx-icon.js';
 import { mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
@@ -178,6 +179,14 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
   disabled = false;
 
   /**
+   * Whether the field must have at least one file selected for form submission.
+   * Drives `validity.valueMissing` when the file list is empty.
+   * @attr required
+   */
+  @property({ type: Boolean, reflect: true })
+  required = false;
+
+  /**
    * Error message displayed below the dropzone. Also puts the dropzone in an error visual state.
    * @attr error
    */
@@ -298,6 +307,7 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
     this._files = [];
     this._internals.setFormValue(null);
     this._resetInteractionState();
+    this._updateValidity();
   }
 
   /** @internal */
@@ -338,6 +348,73 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
       formData.append(this.name, entry.file, entry.file.name);
     }
     this._internals.setFormValue(formData);
+  }
+
+  /**
+   * Constraint validation: surfaces native `validity` flags through
+   * `ElementInternals.setValidity()` so the upload field participates in
+   * `form.checkValidity()` / `form.reportValidity()`.
+   *
+   * Flags applied (in priority order):
+   *   - `valueMissing` when `required` is set and no files are selected.
+   *   - `customError` when any file exceeds `maxSize`. The platform's
+   *     `ValidityState` has no perfect "file too big" flag, so `customError`
+   *     is the correct surface per the HTML spec.
+   *   - `customError` when `files.length > maxFiles`.
+   *   - `customError` when `accept` is set and any file's MIME or extension
+   *     does not match the accept pattern.
+   *
+   * The validity anchor is the visible upload trigger (the dropzone button)
+   * inside shadow DOM so `reportValidity()` focuses the correct element. If
+   * the dropzone has not yet rendered, the anchor is omitted.
+   *
+   * Called automatically by `FormMixin.updated()` after every Lit cycle.
+   * @internal
+   */
+  override _updateValidity(): void {
+    const dropzone = this.shadowRoot?.querySelector<HTMLElement>('[part="dropzone"]') ?? undefined;
+
+    if (this.required && this._files.length === 0) {
+      this._internals.setValidity({ valueMissing: true }, 'Please select a file.', dropzone);
+      return;
+    }
+
+    if (this.maxSize > 0) {
+      for (const entry of this._files) {
+        if (entry.file.size > this.maxSize) {
+          this._internals.setValidity(
+            { customError: true },
+            `File "${entry.file.name}" exceeds maximum size of ${this._formatSize(this.maxSize)}.`,
+            dropzone,
+          );
+          return;
+        }
+      }
+    }
+
+    if (this.maxFiles > 0 && this._files.length > this.maxFiles) {
+      this._internals.setValidity(
+        { customError: true },
+        `Maximum of ${this.maxFiles} file${this.maxFiles === 1 ? '' : 's'} allowed.`,
+        dropzone,
+      );
+      return;
+    }
+
+    if (this.accept && this._files.length > 0) {
+      for (const entry of this._files) {
+        if (!this._isAccepted(entry.file)) {
+          this._internals.setValidity(
+            { customError: true },
+            `File "${entry.file.name}" has an unsupported file type. Accepted types: ${this.accept}.`,
+            dropzone,
+          );
+          return;
+        }
+      }
+    }
+
+    this._internals.setValidity({});
   }
 
   // ─── Validation ───
@@ -639,22 +716,12 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
                   aria-label=${`Remove ${entry.file.name}`}
                   @click=${() => this._handleRemove(index)}
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                  <hx-icon
+                    class="file-item__remove-glyph"
+                    library="helix"
+                    name="close"
                     aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path
-                      d="M1 1L13 13M13 1L1 13"
-                      stroke="currentColor"
-                      stroke-width="1.75"
-                      stroke-linecap="round"
-                    />
-                  </svg>
+                  ></hx-icon>
                 </button>
               </div>
               <div

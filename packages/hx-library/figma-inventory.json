@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-09T16:43:50.793Z",
+  "generatedAt": "2026-05-10T22:41:17.186Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.8.0",
   "tokensVersion": "3.8.0",
@@ -277,7 +277,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -552,17 +554,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-action-bar/AAA-AUDIT.md"
       },
@@ -1063,23 +1063,21 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-alert/AAA-AUDIT.md"
       },
@@ -1105,7 +1103,7 @@
       "figmaComponentName": "hx-avatar",
       "figmaPagePlacement": "4a",
       "description": "A user avatar component that displays an image, initials, or a fallback icon. Supports a badge slot for status indicator overlays.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "size",
@@ -1331,7 +1329,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -1354,7 +1354,7 @@
       "figmaComponentName": "hx-badge",
       "figmaPagePlacement": "4a",
       "description": "A small status indicator for notifications, counts, and labels.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -1812,7 +1812,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -2279,23 +2281,21 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-banner/AAA-AUDIT.md"
       },
@@ -2501,17 +2501,13 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-breadcrumb/AAA-AUDIT.md"
       },
@@ -3162,17 +3158,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-button/AAA-AUDIT.md"
       },
@@ -3279,17 +3274,13 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-button-group/AAA-AUDIT.md"
       },
@@ -4043,7 +4034,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -4124,7 +4117,7 @@
       "figmaComponentName": "hx-checkbox",
       "figmaPagePlacement": "4a",
       "description": "A checkbox component with label, validation, and form association.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "checked",
@@ -4593,23 +4586,24 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-checkbox/AAA-AUDIT.md"
       },
@@ -4887,17 +4881,12 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-checkbox-group/AAA-AUDIT.md"
       },
@@ -5360,23 +5349,21 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-clinical-status/AAA-AUDIT.md"
       },
@@ -6317,17 +6304,17 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-color-picker/AAA-AUDIT.md"
       },
@@ -7039,23 +7026,24 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-combobox/AAA-AUDIT.md"
       },
@@ -7592,17 +7580,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-copy-button/AAA-AUDIT.md"
       },
@@ -8927,17 +8913,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-date-picker/AAA-AUDIT.md"
       },
@@ -9409,17 +9394,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-dialog/AAA-AUDIT.md"
       },
@@ -10112,17 +10095,14 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-drawer/AAA-AUDIT.md"
       },
@@ -10364,17 +10344,14 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-dropdown/AAA-AUDIT.md"
       },
@@ -10682,17 +10659,11 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-field/AAA-AUDIT.md"
       },
@@ -10910,17 +10881,11 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-field-label/AAA-AUDIT.md"
       },
@@ -10956,6 +10921,17 @@
           "figmaAxisName": "disabled",
           "cemAttribute": "disabled",
           "cemFieldName": "disabled",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
+        },
+        {
+          "figmaAxisName": "required",
+          "cemAttribute": "required",
+          "cemFieldName": "required",
           "type": "boolean",
           "values": [
             "false",
@@ -11355,17 +11331,17 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-file-upload/AAA-AUDIT.md"
       },
@@ -11520,17 +11496,10 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-form/AAA-AUDIT.md"
       },
@@ -11951,7 +11920,7 @@
       "figmaComponentName": "hx-help-text",
       "figmaPagePlacement": "4a",
       "description": "Standardized help/hint text displayed below form fields. Used by hx-field as a consistent sub-component for guidance and validation messages.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -12106,23 +12075,19 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-help-text/AAA-AUDIT.md"
       },
@@ -12140,7 +12105,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-icon",
       "figmaPagePlacement": "4a",
-      "description": "An icon component that supports inline SVG fetching and SVG sprite sheet references. Decorative icons are automatically hidden from assistive technology. When a label is provided the icon is…",
+      "description": "An icon component that resolves through the `@helixui/icons` registry, with sprite-sheet and inline-fetch escape hatches for legacy / consumer patterns. Decorative icons are automatically hidden…",
       "tier": "atom",
       "variantAxes": [
         {
@@ -12162,6 +12127,12 @@
         {
           "figmaPropertyName": "name",
           "cemAttribute": "name",
+          "type": "text",
+          "defaultValue": ""
+        },
+        {
+          "figmaPropertyName": "library",
+          "cemAttribute": "library",
           "type": "text",
           "defaultValue": ""
         },
@@ -12224,6 +12195,18 @@
           }
         },
         {
+          "description": "Default stroke width consumed by stroke-paint and mixed-paint icon libraries (Lucide, Heroicons-outline, Phosphor). Built-in helix + fa-free libraries are fill-only and ignore this token.",
+          "name": "--hx-icon-stroke-width",
+          "default": "2",
+          "figmaBinding": {
+            "target": null,
+            "layerSelector": "root",
+            "semanticToken": null,
+            "fallbackPrimitive": null,
+            "literalFallback": "2"
+          }
+        },
+        {
           "description": "Size token.",
           "name": "--hx-size-4",
           "figmaBinding": null
@@ -12252,17 +12235,24 @@
       "dependsOn": [],
       "excludedAttributes": [],
       "aaa": {
-        "certified": false,
-        "certifiedDate": null,
-        "criteria": [],
-        "auditUrl": null
+        "certified": true,
+        "certifiedDate": "2026-05-10",
+        "criteria": [
+          "1.4.9",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "non-text-contrast-icon",
+          "2.4.12"
+        ],
+        "auditUrl": "src/components/hx-icon/AAA-AUDIT.md"
       },
       "keyboardContract": null,
-      "ariaPattern": null,
+      "ariaPattern": "none",
       "themeAware": null,
       "brandAware": null,
       "formAssociated": null,
-      "priorityTier": "P2"
+      "priorityTier": "P0"
     },
     {
       "tag": "hx-icon-button",
@@ -12602,17 +12592,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-icon-button/AAA-AUDIT.md"
       },
@@ -12852,7 +12840,7 @@
       "figmaComponentName": "hx-link",
       "figmaPagePlacement": "4a",
       "description": "A semantic hyperlink component with accessibility-first design. Renders a native `<a>` element for enabled state and a `<span>` for disabled state with full keyboard and screen reader support.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -13160,7 +13148,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -13672,17 +13662,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-menu/AAA-AUDIT.md"
       },
@@ -13763,7 +13751,7 @@
       "figmaComponentName": "hx-menu-item",
       "figmaPagePlacement": "4a",
       "description": "A single interactive item for use inside `hx-menu`. Supports normal, checkbox, and radio types, loading state, prefix/suffix slots, and submenu nesting.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "disabled",
@@ -13924,7 +13912,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -14590,23 +14580,24 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-nav/AAA-AUDIT.md"
       },
@@ -14637,7 +14628,7 @@
       "figmaComponentName": "hx-nav-item",
       "figmaPagePlacement": "4a",
       "description": "A navigation item for use inside hx-side-nav. Supports icons, badges, sub-navigation, and active/disabled states.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "active",
@@ -14831,7 +14822,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -14854,7 +14847,7 @@
       "figmaComponentName": "hx-number-input",
       "figmaPagePlacement": "4a",
       "description": "A numeric input component with stepper controls, label, validation, and full form association. Designed for healthcare data-entry contexts where precise numeric values (dosage, age, measurements)…",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "required",
@@ -15351,23 +15344,24 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-number-input/AAA-AUDIT.md"
       },
@@ -15734,23 +15728,23 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-overflow-menu/AAA-AUDIT.md"
       },
@@ -16519,17 +16513,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-popover/AAA-AUDIT.md"
       },
@@ -16815,17 +16807,13 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
-          "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-popup/AAA-AUDIT.md"
       },
@@ -17986,17 +17974,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-radio-group/AAA-AUDIT.md"
       },
@@ -18024,7 +18010,7 @@
       "figmaComponentName": "hx-rating",
       "figmaPagePlacement": "4a",
       "description": "A star rating input component for user feedback and display. Supports whole and half-star ratings, keyboard navigation, hover preview, and native form participation via ElementInternals.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "readonly",
@@ -18250,23 +18236,24 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-rating/AAA-AUDIT.md"
       },
@@ -18887,17 +18874,17 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-select/AAA-AUDIT.md"
       },
@@ -19147,23 +19134,23 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-side-nav/AAA-AUDIT.md"
       },
@@ -19985,17 +19972,15 @@
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-slider/AAA-AUDIT.md"
       },
@@ -20634,17 +20619,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-split-button/AAA-AUDIT.md"
       },
@@ -21508,7 +21492,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -21768,7 +21754,7 @@
       "figmaComponentName": "hx-step",
       "figmaPagePlacement": "4a",
       "description": "An individual step, designed to be used inside an `<hx-steps>` container. Represents a single step in a multi-step wizard or progress indicator.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "status",
@@ -21977,7 +21963,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -23090,17 +23078,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-switch/AAA-AUDIT.md"
       },
@@ -24025,17 +24012,14 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
-          "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-tabs/AAA-AUDIT.md"
       },
@@ -25317,17 +25301,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-text-input/AAA-AUDIT.md"
       },
@@ -25804,17 +25787,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-textarea/AAA-AUDIT.md"
       },
@@ -26658,17 +26640,16 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-time-picker/AAA-AUDIT.md"
       },
@@ -27025,23 +27006,21 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-09",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "2.4.12"
         ],
         "auditUrl": "src/components/hx-toast/AAA-AUDIT.md"
       },
@@ -27570,17 +27549,17 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
           "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-toggle-button/AAA-AUDIT.md"
       },
@@ -27860,17 +27839,15 @@
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
-          "2.4.12",
-          "2.4.13",
-          "2.5.5",
           "3.2.5",
-          "3.3.6",
           "forced-colors",
-          "apg-keyboard"
+          "apg-keyboard",
+          "1.4.6",
+          "2.4.12",
+          "2.4.13"
         ],
         "auditUrl": "src/components/hx-tooltip/AAA-AUDIT.md"
       },
@@ -28174,23 +28151,23 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": true,
         "certifiedDate": "2026-05-08",
         "criteria": [
-          "1.4.6",
           "1.4.9",
           "2.1.3",
           "2.3.3",
+          "3.2.5",
+          "forced-colors",
+          "apg-keyboard",
           "2.4.12",
           "2.4.13",
-          "2.5.5",
-          "3.2.5",
-          "3.3.6",
-          "forced-colors",
-          "apg-keyboard"
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-top-nav/AAA-AUDIT.md"
       },
@@ -28287,7 +28264,7 @@
       "figmaComponentName": "hx-tree-item",
       "figmaPagePlacement": "4a",
       "description": "A tree item used within an hx-tree-view component. Supports expand/collapse, selection, keyboard navigation, and icon/children slots.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "expanded",
@@ -28464,7 +28441,9 @@
           }
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
