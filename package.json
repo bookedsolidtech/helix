@@ -6,8 +6,8 @@
   "description": "Enterprise Healthcare Web Component Library - Monorepo",
   "scripts": {
     "kill-ports": "bash scripts/kill-ports.sh",
-    "restart": "pnpm run kill-ports && turbo dev",
-    "dev": "turbo dev",
+    "restart": "pnpm run kill-ports && turbo dev --concurrency=15 --filter=!@helixui/react-starter",
+    "dev": "turbo dev --concurrency=15 --filter=!@helixui/react-starter",
     "dev:docs": "turbo dev --filter=docs",
     "dev:storybook": "turbo dev --filter=@helixui/storybook",
     "dev:library": "turbo dev --filter=@helixui/library",
