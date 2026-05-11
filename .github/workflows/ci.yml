@@ -1080,10 +1080,13 @@ jobs:
     # Per-file runner (apps/storybook/scripts/test-shards.mjs) spawns a
     # fresh Chromium per story file — each file finishes in ~4–5s, full
     # 84-file suite in ~6–7 minutes. Plus install + build + Playwright
-    # download on a cold runner lands total CI wall time around 10–12
-    # minutes worst case. 15 minutes leaves headroom for slower
-    # GitHub-hosted runners without reintroducing the 45m band-aid.
-    timeout-minutes: 15
+    # download on a cold runner. Empirically (2026-05) GitHub-hosted
+    # runners hit cancellation at 15m+: prior 15-minute ceiling killed
+    # the job at 76/88 with every test passing up to the cancel point.
+    # 25 minutes leaves real headroom for slow runners + cold caches
+    # without reintroducing the previous 45m band-aid. Revisit if the
+    # suite grows past 100 story files.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
