@@ -431,4 +431,9 @@ export const helixDatePickerStyles = css`
       border-color: LinkText;
     }
   }
+
+  /* hx-icon glyph sizing for the migrated calendar trigger SVG. */
+  .field__trigger-glyph {
+    --hx-icon-size: 16px;
+  }
 `;

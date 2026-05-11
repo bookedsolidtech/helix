@@ -205,10 +205,9 @@ export const helixNumberInputStyles = css`
     cursor: not-allowed;
   }
 
-  .field__stepper-btn svg {
+  .field__stepper-glyph {
     pointer-events: none;
-    width: var(--hx-number-input-icon-size, var(--hx-space-3, 0.75rem));
-    height: var(--hx-number-input-icon-size, var(--hx-space-3, 0.75rem));
+    --hx-icon-size: var(--hx-number-input-icon-size, var(--hx-space-3, 0.75rem));
   }
 
   /* Size sm adjustments for stepper */

@@ -121,6 +121,16 @@ const meta = {
       </svg>
     </hx-copy-button>
   `,
+  decorators: [
+    (story) => html`
+      <div
+        style="display: inline-flex; align-items: center; gap: 1rem; padding: 1.5rem 2rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 18rem; font: 0.875rem system-ui, sans-serif;"
+      >
+        <code style="color: #1f2937;">patient-id-7421</code>
+        ${story()}
+      </div>
+    `,
+  ],
 } satisfies Meta;
 
 export default meta;

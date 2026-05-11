@@ -46,3 +46,11 @@ docs/releases/*-manifest.json
 packages/hx-library/src/styles/form/form.scoped.css
 packages/hx-library/src/styles/prose/prose.scoped.css
 data/readiness/
+
+# CEM-generated React wrappers — emitted by scripts/generate-react-wrappers.ts
+# on every prebuild. Hand-edits and formatter passes get overwritten by the
+# next build, so prettier checks oscillate forever against the generator.
+# Ignore the entire generated subtree; the generator is the source of truth.
+# See CLAUDE.md "packages/hx-react/ wrappers are CEM-generated".
+packages/hx-react/src/components/
+packages/hx-react/src/index.ts

@@ -33,6 +33,11 @@ export const helixDropdownStyles = css`
     z-index: var(--hx-dropdown-panel-z-index, 1000);
     min-width: var(--hx-dropdown-panel-min-width, 160px);
     background: var(--hx-dropdown-panel-bg, var(--hx-color-surface-default, #ffffff));
+    /* Anchor slotted text color to the design-system primary text token so
+       slotted <li>'s and other native consumer markup don't inherit a
+       foreign color cascade (e.g. brand toolbar setting body { color: #fff }
+       and rendering Edit/Duplicate as white-on-white). */
+    color: var(--hx-dropdown-panel-color, var(--hx-color-text-primary, #1a1a1a));
     border: 1px solid var(--hx-dropdown-panel-border-color, var(--hx-color-border-default, #d6dbd5));
     border-radius: var(--hx-dropdown-panel-border-radius, var(--hx-border-radius-md, 0.375rem));
     box-shadow: var(

@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixSplitButtonStyles } from './hx-split-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
@@ -691,21 +692,12 @@ export class HelixSplitButton extends HelixElement {
           @keydown=${this._handleTriggerKeydown}
         >
           <span class=${classMap(chevronClasses)} aria-hidden="true">
-            <svg
-              width="12"
-              height="8"
-              viewBox="0 0 12 8"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1 1.5L6 6.5L11 1.5"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <hx-icon
+              class="split-button__chevron-glyph"
+              library="helix"
+              name="chevron-down"
+              aria-hidden="true"
+            ></hx-icon>
           </span>
         </button>
 

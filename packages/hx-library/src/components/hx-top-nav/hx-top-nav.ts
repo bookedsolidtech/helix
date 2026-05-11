@@ -1,7 +1,8 @@
-import { html, svg } from 'lit';
+import { html } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixTopNavStyles } from './hx-top-nav.styles.js';
@@ -183,27 +184,12 @@ export class HelixTopNav extends HelixElement {
   /** @internal */
   private _renderHamburgerIcon() {
     return html`
-      <svg
+      <hx-icon
         class="mobile-toggle__icon"
+        library="helix"
+        name=${this._mobileOpen ? 'close' : 'menu'}
         aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        ${this._mobileOpen
-          ? svg`
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            `
-          : svg`
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            `}
-      </svg>
+      ></hx-icon>
     `;
   }
 

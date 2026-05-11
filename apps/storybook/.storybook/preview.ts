@@ -9,8 +9,16 @@ import { setCustomElementsManifest } from '@storybook/web-components';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { html } from 'lit';
 import customElements from '@helixui/library/custom-elements.json';
+import { setBasePath } from '@helixui/icons';
 import { helixBackgroundsForMode, HELIX_THEME_MODES } from './manager-theme';
 import { HelixDocsPage } from './docs/HelixDocsPage';
+
+// Point @helixui/icons at the locally served sprite assets so <hx-icon>
+// resolves real glyphs in Storybook dev. The default basePath targets the
+// jsDelivr CDN URL the package will live at after publish, which 404s in
+// dev. The `/icons` prefix is mapped to `packages/hx-icons/dist/` via the
+// staticDirs entry in .storybook/main.ts.
+setBasePath('/icons');
 
 // Register the Custom Elements Manifest so autodocs API tables
 // are populated with properties, events, slots, CSS parts, and

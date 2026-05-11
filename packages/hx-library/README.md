@@ -169,6 +169,47 @@ Full component docs, API reference, and Storybook playground:
 
 ---
 
+## Accessibility — self-certification limits
+
+HELiX claims **WCAG 2.2 Level AAA** on its P0 component surface. That claim is **self-certified
+by the project maintainers** via an open-source formal harness whose source, methodology, and
+per-component evidence is all in this repository. It is **not** a third-party VPAT 2.5 attestation
+signed by an accredited accessibility firm (Deque, TPGi, Level Access, etc.).
+
+What that means in practice:
+
+- **Cert authority.** `scripts/aaa-formal-audit.mjs` is the canonical AAA cert source. It
+  sources every success criterion from `scripts/aaa-standards.json` (with verified W3C URLs) and
+  produces VPAT 2.5 verdicts (Supports / Partially Supports / Does Not Support / Not Applicable)
+  backed by measured evidence per (component × criterion).
+- **Scope.** The harness measures each P0 component against its **Default story** in Storybook
+  across **11 criteria** — 9 WCAG 2.2 AAA success criteria (1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12,
+  2.4.13, 2.5.5, 3.2.5, 3.3.6) plus 2 peer standards (forced-colors mode, APG-aligned keyboard
+  contract). Variant coverage (every story state for every component) is asserted by a separate
+  visual-rendering harness (`scripts/audit-stories.mjs`).
+- **Evidence trail.** Per-component verdicts and the measurements behind them are recorded in
+  `packages/hx-library/src/components/<name>/AAA-AUDIT.md`, the verdict matrix in
+  `.reports/formal-aaa-audit/audit.matrix.md`, and the full machine-readable JSON in
+  `.reports/formal-aaa-audit/audit.json`. The slim verdicts snapshot consumed by the docs site
+  ships in this package as `aaa-verdicts.json`.
+- **Honest limits.** Where the harness surfaces a real gap, the verdict is published as
+  Partially Supports (or Does Not Support) with the evidence prose explaining what's missing.
+  The 3.9.0 release surfaces 2 honest Partial verdicts on WCAG 3.3.6 Error Prevention (All) for
+  `hx-slider` and `hx-file-upload` — both are form-associated inputs that should expose
+  ElementInternals + setValidity but do not yet. These are queued for 3.9.1.
+- **axe-core gap.** axe-core PR #5080 (unmerged) means ElementInternals-attached ARIA on
+  form-associated components is not visible to axe's rule engine. The harness uses DOM-level
+  fallback assertions where this matters. See `apps/docs/src/content/docs/accessibility/axe-element-internals-gap.mdx`
+  for the documented policy.
+- **When you need a VPAT attestation.** Self-cert is appropriate for an OSS component library;
+  it is not appropriate when an enterprise procurement process requires a VPAT signed by an
+  external auditor. The harness output and per-component evidence here is the starting evidence
+  package — every measurement is reproducible from the repo, every citation links to the W3C
+  source, every component's evidence trail is versioned. A third-party auditor reading this would
+  have substantial completed work before opening a browser.
+
+---
+
 ## License
 
 MIT

@@ -383,7 +383,18 @@
 .hx-aaa-conformance-row[data-verdict='supports'] {
   border-left-color: var(--hx-color-success-500, #2da44e);
 }
+.hx-aaa-conformance-row[data-verdict='partially-supports'] {
+  border-left-color: var(--hx-color-warning-500, #d97706);
+}
+.hx-aaa-conformance-row[data-verdict='does-not-support'] {
+  border-left-color: var(--hx-color-danger-500, #dc2626);
+  background: var(--hx-color-danger-50, #fef2f2);
+}
 .hx-aaa-conformance-row[data-verdict='not-applicable'] {
+  border-left-color: var(--hx-color-neutral-400, #94a3b8);
+  background: var(--hx-color-surface-sunken, #f8f9fa);
+}
+.hx-aaa-conformance-row[data-verdict='audit-pending'] {
   border-left-color: var(--hx-color-neutral-400, #94a3b8);
   background: var(--hx-color-surface-sunken, #f8f9fa);
 }
@@ -433,9 +444,22 @@
   background: var(--hx-color-success-50, #ecfdf5);
   color: var(--hx-color-success-700, #15803d);
 }
+.hx-aaa-conformance-row-verdict[data-verdict='partially-supports'] {
+  background: var(--hx-color-warning-50, #fffbeb);
+  color: var(--hx-color-warning-700, #b45309);
+}
+.hx-aaa-conformance-row-verdict[data-verdict='does-not-support'] {
+  background: var(--hx-color-danger-50, #fef2f2);
+  color: var(--hx-color-danger-700, #b91c1c);
+}
 .hx-aaa-conformance-row-verdict[data-verdict='not-applicable'] {
   background: var(--hx-color-neutral-100, #f1f5f9);
   color: var(--hx-color-neutral-700, #334155);
+}
+.hx-aaa-conformance-row-verdict[data-verdict='audit-pending'] {
+  background: var(--hx-color-neutral-100, #f1f5f9);
+  color: var(--hx-color-neutral-700, #334155);
+  font-style: italic;
 }
 .hx-aaa-conformance-row-verdict[data-verdict='unknown'] {
   background: var(--hx-color-warning-50, #fffbeb);
@@ -448,11 +472,20 @@
   color: var(--hx-color-text-secondary, #4d5b6b);
 }
 
-.hx-aaa-conformance-row-na {
+.hx-aaa-conformance-row-na,
+.hx-aaa-conformance-row-evidence {
   margin: 0 0 8px;
   font-size: 13px;
   color: var(--hx-color-text-secondary, #4d5b6b);
+}
+.hx-aaa-conformance-row-evidence[data-verdict='not-applicable'] {
   font-style: italic;
+}
+.hx-aaa-conformance-row-evidence[data-verdict='does-not-support'] {
+  color: var(--hx-color-danger-700, #b91c1c);
+}
+.hx-aaa-conformance-row-evidence[data-verdict='partially-supports'] {
+  color: var(--hx-color-warning-700, #b45309);
 }
 
 .hx-aaa-conformance-row-links {

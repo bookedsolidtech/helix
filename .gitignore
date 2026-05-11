@@ -178,6 +178,25 @@ data/readiness/
 # Formal AAA re-cert audit output (internal planning, never commit)
 .reports/formal-aaa-audit/
 
+# Story-audit harness output (per-run findings, screenshots — never commit)
+.reports/story-audit/
+
+# AAA matrix harness evidence (per-component brand × theme output, regenerated)
+.reports/aaa-matrix-evidence*.md
+
+# Ad-hoc evaluation reports (internal planning, never commit)
+.reports/*-EVALUATION.md
+.reports/*-evaluation.md
+
+# Codex CLI runtime cache (never commit)
+.codex/
+
+# Agent runtime cache (never commit)
+.agents/
+
+# rea-managed AGENTS.md scaffold (regenerable via `npx @bookedsolid/rea init`)
+AGENTS.md
+
 # Claude Code agent worktree directories
 .claude/worktrees/
 
@@ -190,6 +209,7 @@ data/readiness/
 .rea/serve.state.json
 .rea/fingerprints.json
 .rea/last-review.json
+.rea/last-review.cache.json
 .rea/*.tmp
 .rea/*.tmp.*
 .rea/install-manifest.json.bak

@@ -3,57 +3,34 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixHelpTextStyles } from './hx-help-text.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
 
-/** Icon SVG for error variant (circle with exclamation mark). */
-const errorIcon = html`<svg viewBox="0 0 16 16" aria-hidden="true" width="1em" height="1em">
-  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none" />
-  <line
-    x1="8"
-    y1="4.5"
-    x2="8"
-    y2="8.5"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-  />
-  <circle cx="8" cy="11" r="0.75" fill="currentColor" />
-</svg>`;
+/** Icon for error variant. */
+const errorIcon = html`<hx-icon
+  class="help-text__glyph"
+  library="helix"
+  name="error"
+  aria-hidden="true"
+></hx-icon>`;
 
-/** Icon SVG for warning variant (triangle with exclamation mark). */
-const warningIcon = html`<svg viewBox="0 0 16 16" aria-hidden="true" width="1em" height="1em">
-  <path
-    d="M7.134 2.5a1 1 0 011.732 0l5.196 9a1 1 0 01-.866 1.5H2.804a1 1 0 01-.866-1.5l5.196-9z"
-    stroke="currentColor"
-    stroke-width="1.25"
-    fill="none"
-  />
-  <line
-    x1="8"
-    y1="6"
-    x2="8"
-    y2="9"
-    stroke="currentColor"
-    stroke-width="1.25"
-    stroke-linecap="round"
-  />
-  <circle cx="8" cy="11" r="0.625" fill="currentColor" />
-</svg>`;
+/** Icon for warning variant. */
+const warningIcon = html`<hx-icon
+  class="help-text__glyph"
+  library="helix"
+  name="warning"
+  aria-hidden="true"
+></hx-icon>`;
 
-/** Icon SVG for success variant (circle with checkmark). */
-const successIcon = html`<svg viewBox="0 0 16 16" aria-hidden="true" width="1em" height="1em">
-  <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none" />
-  <path
-    d="M5.25 8.25l1.75 1.75 3.75-3.75"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    fill="none"
-  />
-</svg>`;
+/** Icon for success variant. */
+const successIcon = html`<hx-icon
+  class="help-text__glyph"
+  library="helix"
+  name="success"
+  aria-hidden="true"
+></hx-icon>`;
 
 /** Map of variant to icon template. Default has no icon. */
 const variantIcons = {

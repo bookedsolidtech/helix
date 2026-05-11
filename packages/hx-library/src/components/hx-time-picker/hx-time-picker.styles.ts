@@ -247,4 +247,9 @@ export const helixTimePickerStyles = css`
       color: LinkText;
     }
   }
+
+  /* hx-icon glyph sizing for the migrated clock toggle icon. */
+  .field__toggle-glyph {
+    --hx-icon-size: 16px;
+  }
 `;

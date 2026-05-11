@@ -1,6 +1,7 @@
 import { html, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixStepStyles } from './hx-step.styles.js';
@@ -199,17 +200,7 @@ export class HelixStep extends HelixElement {
   /** @internal */
   private _renderCheckmark() {
     return html`
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M20 6L9 17l-5-5" />
-      </svg>
+      <hx-icon class="step__status-glyph" library="helix" name="check" aria-hidden="true"></hx-icon>
       <span class="sr-only">Complete</span>
     `;
   }
@@ -217,16 +208,7 @@ export class HelixStep extends HelixElement {
   /** @internal */
   private _renderXMark() {
     return html`
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-      >
-        <path d="M18 6L6 18M6 6l12 12" />
-      </svg>
+      <hx-icon class="step__status-glyph" library="helix" name="close" aria-hidden="true"></hx-icon>
       <span class="sr-only">Error</span>
     `;
   }

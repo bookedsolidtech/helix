@@ -526,7 +526,10 @@ export const PatientEducation: Story = {
 };
 
 export const DarkMode: Story = {
-  decorators: [(story) => html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`],
+  decorators: [
+    (story) =>
+      html`<hx-theme mode="dark" style="display: block; padding: 1rem;">${story()}</hx-theme>`,
+  ],
   args: {
     label: 'Demo carousel',
     loop: false,
@@ -537,6 +540,30 @@ export const DarkMode: Story = {
     orientation: 'horizontal',
     mouseDragging: false,
   },
+  render: (args) => html`
+    <hx-carousel
+      label=${args.label}
+      ?loop=${args.loop}
+      ?autoplay=${args.autoplay}
+      autoplay-interval=${args.autoplayInterval}
+      slides-per-page=${args.slidesPerPage}
+      slides-per-move=${args.slidesPerMove}
+      orientation=${args.orientation}
+      ?mouse-dragging=${args.mouseDragging}
+      style="max-width: 600px;"
+    >
+      <hx-carousel-item>
+        <div style="padding: 2rem; text-align: center; background: #1f2937; color: #f9fafb;">
+          Slide 1: Dark Mode Demo
+        </div>
+      </hx-carousel-item>
+      <hx-carousel-item>
+        <div style="padding: 2rem; text-align: center; background: #111827; color: #f9fafb;">
+          Slide 2: Themed Content
+        </div>
+      </hx-carousel-item>
+    </hx-carousel>
+  `,
 };
 
 export const WithSlots: Story = {

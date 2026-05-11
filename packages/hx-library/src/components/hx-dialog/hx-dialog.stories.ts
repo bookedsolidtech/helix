@@ -93,6 +93,7 @@ type Story = StoryObj<typeof meta>;
  * for an unactivated dialog component.
  */
 export const Default: Story = {
+  name: 'Closed (default state)',
   args: {
     open: false,
     modal: false,

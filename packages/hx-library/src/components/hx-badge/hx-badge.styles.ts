@@ -241,4 +241,9 @@ export const helixBadgeStyles = css`
       border-width: 2px;
     }
   }
+
+  /* hx-icon glyph sizing for the migrated remove-button SVG. */
+  .badge__remove-glyph {
+    --hx-icon-size: 10px;
+  }
 `;

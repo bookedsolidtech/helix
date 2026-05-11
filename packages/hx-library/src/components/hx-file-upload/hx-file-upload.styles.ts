@@ -181,6 +181,10 @@ export const helixFileUploadStyles = css`
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
+  .file-item__remove-glyph {
+    --hx-icon-size: 14px;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .file-item__remove {
       transition: none;

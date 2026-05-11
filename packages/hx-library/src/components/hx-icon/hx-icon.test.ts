@@ -1,5 +1,11 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { page } from '@vitest/browser/context';
+import {
+  registerIconLibrary,
+  unregisterIconLibrary,
+  setBasePath,
+  getBasePath,
+} from '@helixui/icons';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixIcon } from './hx-icon.js';
 import './index.js';
@@ -64,10 +70,14 @@ describe('hx-icon', () => {
       expect(use).toBeTruthy();
     });
 
-    it('<use> href is "#check" when only name="check" is set (no spriteUrl)', async () => {
+    it('<use> href is document-local "#check" when library is empty (pre-3.9.0 back-compat)', async () => {
       const el = await fixture<HelixIcon>('<hx-icon name="check"></hx-icon>');
       await el.updateComplete;
       const use = shadowQuery(el, 'use');
+      // Empty default `library` preserves the pre-3.9.0 bare-name contract:
+      // `<hx-icon name="check">` renders `<use href="#check">` for consumers
+      // that ship their own document-local sprite. Consumers opt into the
+      // registered libraries by setting `library="fa-free"` explicitly.
       expect(use?.getAttribute('href')).toBe('#check');
     });
 
@@ -105,9 +115,11 @@ describe('hx-icon', () => {
     it('renders an empty icon (invisible) when name does not match any sprite symbol', async () => {
       const el = await fixture<HelixIcon>('<hx-icon name="nonexistent-icon"></hx-icon>');
       await el.updateComplete;
-      // The component renders a <use href="#nonexistent-icon"> — the icon is
-      // invisible but the SVG part is still present. This is the known silent
-      // failure mode; the test documents and asserts this behavior.
+      // With the empty-default `library`, the bare-name path renders a
+      // document-local sprite reference. The icon is invisible because no
+      // <symbol id="nonexistent-icon"> exists in any sprite the consumer
+      // has loaded. This is the known silent failure mode for bare-name
+      // usage; the test documents and asserts the contract.
       const svg = shadowQuery(el, 'svg[part="svg"]');
       expect(svg).toBeTruthy();
       const use = shadowQuery(el, 'use');
@@ -681,6 +693,202 @@ describe('hx-icon', () => {
         expect(mockFetch).toHaveBeenCalledTimes(1);
       } finally {
         globalThis.fetch = originalFetch;
+      }
+    });
+  });
+
+  // ─── Registry Resolution (library attribute) ───
+
+  describe('Library Registry Resolution', () => {
+    it('library attribute defaults to the empty string (back-compat for bare-name document-local sprite)', async () => {
+      // 3.9.0 ships an empty default for `library` to preserve the pre-3.9.0
+      // contract where `<hx-icon name="foo">` rendered a document-local sprite
+      // fragment (`<use href="#foo">`) without going through the registry.
+      // Consumers opt INTO registry resolution by setting `library="fa-free"`
+      // (or any registered library name) explicitly.
+      const el = await fixture<HelixIcon>('<hx-icon name="circle"></hx-icon>');
+      await el.updateComplete;
+      expect(el.library).toBe('');
+      const use = shadowQuery(el, 'use');
+      // Document-local sprite reference, no library/basePath prefix.
+      expect(use?.getAttribute('href')).toBe('#circle');
+    });
+
+    it('library="fa-free" explicitly resolves to the fa-free sprite href', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="fa-free" name="circle"></hx-icon>');
+      await el.updateComplete;
+      const use = shadowQuery(el, 'use');
+      expect(use?.getAttribute('href')).toMatch(/\/fa-free-solid\.svg#circle$/);
+    });
+
+    it('library="helix" resolves to the helix sprite href', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="helix" name="check"></hx-icon>');
+      await el.updateComplete;
+      const use = shadowQuery(el, 'use');
+      expect(use?.getAttribute('href')).toMatch(/\/helix\.svg#check$/);
+    });
+
+    it('library attribute reflects to host', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="helix" name="check"></hx-icon>');
+      await el.updateComplete;
+      expect(el.getAttribute('library')).toBe('helix');
+    });
+
+    it('changing library re-renders with the new href', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="helix" name="check"></hx-icon>');
+      await el.updateComplete;
+      let use = shadowQuery(el, 'use');
+      expect(use?.getAttribute('href')).toMatch(/\/helix\.svg#check$/);
+
+      el.library = 'fa-free';
+      await el.updateComplete;
+      use = shadowQuery(el, 'use');
+      expect(use?.getAttribute('href')).toMatch(/\/fa-free-solid\.svg#check$/);
+    });
+
+    it('setBasePath reflects in the next render href', async () => {
+      const original = getBasePath();
+      try {
+        setBasePath('/custom/cdn/path');
+        const el = await fixture<HelixIcon>('<hx-icon library="helix" name="check"></hx-icon>');
+        await el.updateComplete;
+        const use = shadowQuery(el, 'use');
+        expect(use?.getAttribute('href')).toBe('/custom/cdn/path/helix.svg#check');
+      } finally {
+        setBasePath(original);
+      }
+    });
+
+    it('unknown library logs a warning and renders nothing', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = await fixture<HelixIcon>(
+          '<hx-icon library="does-not-exist-xyz" name="abc"></hx-icon>',
+        );
+        await el.updateComplete;
+        const svgPart = shadowQuery(el, '[part="svg"]');
+        expect(svgPart).toBeNull();
+        expect(warnSpy).toHaveBeenCalled();
+        const msg = warnSpy.mock.calls
+          .map((c) => c.map(String).join(' '))
+          .find((m) => m.includes('does-not-exist-xyz'));
+        expect(msg).toBeTruthy();
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('explicit sprite-url + name still wins over library resolution', async () => {
+      const el = await fixture<HelixIcon>(
+        '<hx-icon library="helix" name="check" sprite-url="/local/sprite.svg"></hx-icon>',
+      );
+      await el.updateComplete;
+      const use = shadowQuery(el, 'use');
+      expect(use?.getAttribute('href')).toBe('/local/sprite.svg#check');
+    });
+
+    it('explicit src wins over library resolution', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0"/></svg>',
+        } as Response);
+
+        const el = await fixture<HelixIcon>(
+          '<hx-icon library="helix" name="check" src="/explicit.svg"></hx-icon>',
+        );
+        await waitForInlineSvg(el);
+
+        // Inline wrapper is a <span part="svg">, not <svg part="svg">.
+        const wrapper = shadowQuery(el, '[part="svg"]');
+        expect(wrapper?.tagName.toLowerCase()).toBe('span');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('mutator runs AFTER sanitization on a fetch-mode library', async () => {
+      const originalFetch = globalThis.fetch;
+      const mutator = vi.fn((svg: SVGElement) => {
+        // Mark the SVG so we can verify mutation persisted to the rendered DOM.
+        svg.setAttribute('data-mutated', 'yes');
+      });
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          // The script must be stripped by sanitization BEFORE the mutator
+          // sees the SVG. If the mutator runs first, it would observe the
+          // <script>; this test passes only when sanitization gates it.
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><script>1</script><path d="M0 0"/></svg>',
+        } as Response);
+
+        registerIconLibrary('test-mutator-lib', {
+          resolver: () => '/test-mutator.svg',
+          spriteSheet: false,
+          mutator,
+        });
+        try {
+          const el = await fixture<HelixIcon>(
+            '<hx-icon library="test-mutator-lib" name="any"></hx-icon>',
+          );
+          await waitForInlineSvg(el);
+
+          expect(mutator).toHaveBeenCalledTimes(1);
+          // The mutator received an already-sanitized root (no <script> child).
+          const passedSvg = mutator.mock.calls[0]?.[0];
+          expect(passedSvg).toBeTruthy();
+          expect(passedSvg!.querySelector('script')).toBeNull();
+
+          // The mutation persisted to the rendered DOM.
+          const wrapper = shadowQuery(el, '[part="svg"]');
+          const innerSvg = wrapper?.querySelector('svg');
+          expect(innerSvg?.getAttribute('data-mutated')).toBe('yes');
+          // And the script is still gone after re-serialization.
+          expect(el.shadowRoot?.innerHTML).not.toContain('<script');
+        } finally {
+          unregisterIconLibrary('test-mutator-lib');
+        }
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('mutator that throws does not break render — un-mutated SVG still appears', async () => {
+      const originalFetch = globalThis.fetch;
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0"/></svg>',
+        } as Response);
+
+        registerIconLibrary('test-throwing-mutator-lib', {
+          resolver: () => '/test-throwing.svg',
+          spriteSheet: false,
+          mutator: () => {
+            throw new Error('boom');
+          },
+        });
+        try {
+          const el = await fixture<HelixIcon>(
+            '<hx-icon library="test-throwing-mutator-lib" name="any"></hx-icon>',
+          );
+          await waitForInlineSvg(el);
+
+          const wrapper = shadowQuery(el, '[part="svg"]');
+          const innerSvg = wrapper?.querySelector('svg');
+          expect(innerSvg).toBeTruthy();
+          expect(warnSpy).toHaveBeenCalled();
+        } finally {
+          unregisterIconLibrary('test-throwing-mutator-lib');
+        }
+      } finally {
+        globalThis.fetch = originalFetch;
+        warnSpy.mockRestore();
       }
     });
   });

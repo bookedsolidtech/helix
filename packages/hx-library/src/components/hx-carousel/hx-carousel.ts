@@ -2,87 +2,57 @@ import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixCarouselStyles } from './hx-carousel.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import type { HelixCarouselItem } from './hx-carousel-item.js';
 
-// ─── Module-level SVG icon constants ───
+// ─── Module-level icon templates (helix glyphs; play/pause from FA Free) ───
 
-const _svgChevronLeft = html`<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
+const _svgChevronLeft = html`<hx-icon
+  class="carousel__nav-glyph"
+  library="helix"
+  name="chevron-left"
   aria-hidden="true"
->
-  <polyline points="15 18 9 12 15 6"></polyline>
-</svg>`;
+></hx-icon>`;
 
-const _svgChevronUp = html`<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
+const _svgChevronUp = html`<hx-icon
+  class="carousel__nav-glyph"
+  library="helix"
+  name="chevron-up"
   aria-hidden="true"
->
-  <polyline points="18 15 12 9 6 15"></polyline>
-</svg>`;
+></hx-icon>`;
 
-const _svgChevronRight = html`<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
+const _svgChevronRight = html`<hx-icon
+  class="carousel__nav-glyph"
+  library="helix"
+  name="chevron-right"
   aria-hidden="true"
->
-  <polyline points="9 18 15 12 9 6"></polyline>
-</svg>`;
+></hx-icon>`;
 
-const _svgChevronDown = html`<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
+const _svgChevronDown = html`<hx-icon
+  class="carousel__nav-glyph"
+  library="helix"
+  name="chevron-down"
   aria-hidden="true"
->
-  <polyline points="6 9 12 15 18 9"></polyline>
-</svg>`;
+></hx-icon>`;
 
-const _svgPlay = html`<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="currentColor"
+// Play / pause aren't part of the curated 32-glyph helix vocabulary, so the
+// carousel's autoplay toggle falls back to FA Free Solid.
+const _svgPlay = html`<hx-icon
+  class="carousel__autoplay-glyph"
+  library="fa-free"
+  name="play"
   aria-hidden="true"
-  width="1em"
-  height="1em"
->
-  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-</svg>`;
+></hx-icon>`;
 
-const _svgPause = html`<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  fill="currentColor"
+const _svgPause = html`<hx-icon
+  class="carousel__autoplay-glyph"
+  library="fa-free"
+  name="pause"
   aria-hidden="true"
-  width="1em"
-  height="1em"
->
-  <rect x="6" y="4" width="4" height="16"></rect>
-  <rect x="14" y="4" width="4" height="16"></rect>
-</svg>`;
+></hx-icon>`;
 
 /**
  * A scrollable carousel/slider for images or content slides.

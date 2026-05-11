@@ -90,8 +90,7 @@ const meta = {
     },
     returnFocusTo: {
       control: 'text',
-      description:
-        'CSS selector for the element to return focus to after the alert is dismissed.',
+      description: 'CSS selector for the element to return focus to after the alert is dismissed.',
       table: {
         category: 'Accessibility',
         defaultValue: { summary: 'null' },
@@ -147,10 +146,20 @@ export const Default: Story = {
     // Role is applied to the host element, not the shadow DOM internal div
     await expect(alert?.getAttribute('role')).toBe('status');
 
-    // Verify icon is rendered
+    // Verify icon is rendered. Post-3.9.0 hx-alert delegates icon rendering to
+    // <hx-icon library="helix" name=…>, so the SVG lives inside hx-icon's
+    // shadow root rather than directly in alert's [part="icon"] slot. Walk
+    // the shadow boundary to confirm the icon hydrated.
     const iconPart = alert?.shadowRoot?.querySelector('[part="icon"]');
     await expect(iconPart).toBeTruthy();
-    const svg = iconPart?.querySelector('svg');
+    const hxIcon = iconPart?.querySelector('hx-icon') as
+      | (HTMLElement & { updateComplete?: Promise<unknown> })
+      | null;
+    await expect(hxIcon).toBeTruthy();
+    // Lit child has its own async update cycle. Wait for hx-icon to finish
+    // stamping its shadow SVG before asserting on it (race-flake guard).
+    if (hxIcon?.updateComplete) await hxIcon.updateComplete;
+    const svg = hxIcon?.shadowRoot?.querySelector('svg');
     await expect(svg).toBeTruthy();
 
     // Verify message slot is populated
@@ -292,7 +301,7 @@ export const Hidden: Story = {
 export const WithCustomIcon: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="info">
+      <hx-alert variant="info" open>
         <svg
           slot="icon"
           viewBox="0 0 20 20"
@@ -321,7 +330,7 @@ export const WithCustomIcon: Story = {
 export const WithActions: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         This patient has a pending lab result that may affect the current treatment plan. Review
         results before continuing.
         <button
@@ -369,18 +378,24 @@ export const WithActions: Story = {
 /** Applies a left border accent stripe instead of a full border. Common healthcare/enterprise dashboard pattern. */
 export const WithAccent: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
-      <hx-alert variant="info" accent>
-        <strong>Info:</strong> Your session will expire in 15 minutes. Save all open patient records.
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;"
+    >
+      <hx-alert variant="info" accent open>
+        <strong>Info:</strong> Your session will expire in 15 minutes. Save all open patient
+        records.
       </hx-alert>
-      <hx-alert variant="success" accent>
-        <strong>Success:</strong> Patient discharge summary has been finalized and sent to the referring physician.
+      <hx-alert variant="success" accent open>
+        <strong>Success:</strong> Patient discharge summary has been finalized and sent to the
+        referring physician.
       </hx-alert>
-      <hx-alert variant="warning" accent>
-        <strong>Warning:</strong> This patient has a documented allergy to Penicillin. Review before prescribing beta-lactam antibiotics.
+      <hx-alert variant="warning" accent open>
+        <strong>Warning:</strong> This patient has a documented allergy to Penicillin. Review before
+        prescribing beta-lactam antibiotics.
       </hx-alert>
-      <hx-alert variant="error" accent>
-        <strong>Error:</strong> Unable to retrieve patient records from the Health Information Exchange. Please try again or contact IT support.
+      <hx-alert variant="error" accent open>
+        <strong>Error:</strong> Unable to retrieve patient records from the Health Information
+        Exchange. Please try again or contact IT support.
       </hx-alert>
     </div>
   `,
@@ -396,12 +411,15 @@ export const WithAccent: Story = {
 /** Uses the title slot to add a headline above the alert message. */
 export const WithTitle: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
-      <hx-alert variant="warning">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;"
+    >
+      <hx-alert variant="warning" open>
         <span slot="title">Allergy Warning</span>
-        Patient has a documented allergy to Penicillin. Review before prescribing beta-lactam antibiotics.
+        Patient has a documented allergy to Penicillin. Review before prescribing beta-lactam
+        antibiotics.
       </hx-alert>
-      <hx-alert variant="error" dismissible>
+      <hx-alert variant="error" dismissible open>
         <span slot="title">Lab Order Failed</span>
         Unable to submit lab order. The laboratory information system is currently unavailable.
       </hx-alert>
@@ -422,7 +440,9 @@ export const WithTitle: Story = {
 /** Demonstrates returnFocusTo: focus returns to the trigger button after the alert is dismissed. */
 export const ReturnFocusBehavior: Story = {
   render: () => html`
-    <div style="max-width: 600px; display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem);">
+    <div
+      style="max-width: 600px; display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem);"
+    >
       <button
         id="focus-target"
         style="
@@ -437,7 +457,7 @@ export const ReturnFocusBehavior: Story = {
       >
         Show Alert
       </button>
-      <hx-alert variant="info" dismissible return-focus-to="#focus-target">
+      <hx-alert variant="info" dismissible return-focus-to="#focus-target" open>
         Dismiss this alert and focus will return to the button above.
       </hx-alert>
     </div>
@@ -465,20 +485,22 @@ export const ReturnFocusBehavior: Story = {
 /** All four alert variants displayed together for visual comparison. */
 export const AllVariants: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
-      <hx-alert variant="info">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;"
+    >
+      <hx-alert variant="info" open>
         <strong>Information:</strong> Your session will expire in 15 minutes. Save all open patient
         records.
       </hx-alert>
-      <hx-alert variant="success">
+      <hx-alert variant="success" open>
         <strong>Success:</strong> Patient discharge summary has been finalized and sent to the
         referring physician.
       </hx-alert>
-      <hx-alert variant="warning">
+      <hx-alert variant="warning" open>
         <strong>Warning:</strong> This patient has a documented allergy to Penicillin. Review before
         prescribing beta-lactam antibiotics.
       </hx-alert>
-      <hx-alert variant="error">
+      <hx-alert variant="error" open>
         <strong>Error:</strong> Unable to retrieve patient records from the Health Information
         Exchange. Please try again or contact IT support.
       </hx-alert>
@@ -498,7 +520,9 @@ export const AllVariants: Story = {
 /** All state combinations: dismissible, non-dismissible, with actions, with custom icon. */
 export const AllStates: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;"
+    >
       <hx-alert variant="info" open>
         <strong>Default:</strong> Non-dismissible, no actions, default icon.
       </hx-alert>
@@ -566,20 +590,22 @@ export const AllStates: Story = {
 /** Multiple stacked alerts simulating a healthcare drug interaction warning panel. */
 export const StackedAlerts: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: var(--hx-space-2, 0.5rem); max-width: 600px;">
-      <hx-alert variant="error" dismissible>
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-2, 0.5rem); max-width: 600px;"
+    >
+      <hx-alert variant="error" dismissible open>
         <strong>Drug-Drug Interaction (Severity: Major):</strong> Warfarin + Aspirin. Increased risk
         of bleeding. Consider alternative antiplatelet therapy.
       </hx-alert>
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         <strong>Drug-Allergy Interaction:</strong> Patient has documented sensitivity to
         Sulfonamides. Prescribed Sulfamethoxazole requires physician override.
       </hx-alert>
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         <strong>Duplicate Therapy:</strong> Lisinopril 10mg is already active. New order for
         Enalapril 5mg may be a duplicate ACE inhibitor.
       </hx-alert>
-      <hx-alert variant="info">
+      <hx-alert variant="info" open>
         <strong>Formulary Notice:</strong> Atorvastatin 40mg is the preferred formulary statin.
         Generic substitution will be applied automatically.
       </hx-alert>
@@ -602,7 +628,7 @@ export const StackedAlerts: Story = {
 export const InAContainer: Story = {
   render: () => html`
     <hx-container width="content" padding="md">
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         <strong>System Maintenance:</strong> The radiology PACS system will be unavailable for
         scheduled maintenance on Saturday, February 21st from 02:00-06:00 EST. Please plan imaging
         workflows accordingly.
@@ -641,7 +667,7 @@ export const InAContainer: Story = {
 export const LongContent: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         <strong>Clinical Decision Support Alert:</strong> Based on the patient's current medication
         list (Metformin 1000mg BID, Glipizide 10mg daily, Insulin Glargine 30 units at bedtime,
         Lisinopril 20mg daily, Amlodipine 5mg daily, Atorvastatin 40mg daily, Aspirin 81mg daily,
@@ -776,16 +802,22 @@ export const RapidToggle: Story = {
  */
 export const CSSCustomProperties: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem); max-width: 600px;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem); max-width: 600px;"
+    >
       <div>
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           Default (no overrides)
         </p>
-        <hx-alert variant="info"> Standard alert using default design token values. </hx-alert>
+        <hx-alert variant="info" open> Standard alert using default design token values. </hx-alert>
       </div>
 
       <div>
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           Custom: --hx-alert-bg, --hx-alert-color, --hx-alert-border-color
         </p>
         <hx-alert
@@ -795,13 +827,16 @@ export const CSSCustomProperties: Story = {
             --hx-alert-color: #78350f;
             --hx-alert-border-color: #f59e0b;
           "
+          open
         >
           Background, text, and border colors overridden with amber tones.
         </hx-alert>
       </div>
 
       <div>
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           Custom: --hx-alert-border-radius, --hx-alert-border-width
         </p>
         <hx-alert
@@ -810,13 +845,16 @@ export const CSSCustomProperties: Story = {
             --hx-alert-border-radius: 1rem;
             --hx-alert-border-width: 3px;
           "
+          open
         >
           Larger border radius and thicker border for emphasis.
         </hx-alert>
       </div>
 
       <div>
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           Custom: --hx-alert-padding, --hx-alert-gap
         </p>
         <hx-alert
@@ -825,31 +863,38 @@ export const CSSCustomProperties: Story = {
             --hx-alert-padding: 1.5rem;
             --hx-alert-gap: 1.5rem;
           "
+          open
         >
           Increased padding and gap for a more spacious layout.
         </hx-alert>
       </div>
 
       <div>
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           Custom: --hx-alert-icon-color
         </p>
-        <hx-alert variant="info" style="--hx-alert-icon-color: #7c3aed;">
+        <hx-alert variant="info" style="--hx-alert-icon-color: #7c3aed;" open>
           Icon color overridden to purple independent of the variant.
         </hx-alert>
       </div>
 
       <div>
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           Custom: --hx-alert-font-family
         </p>
-        <hx-alert variant="info" style="--hx-alert-font-family: 'Georgia', serif;">
+        <hx-alert variant="info" style="--hx-alert-font-family: 'Georgia', serif;" open>
           Font family overridden to a serif typeface for demonstration.
         </hx-alert>
       </div>
 
       <div>
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           All properties combined
         </p>
         <hx-alert
@@ -866,13 +911,16 @@ export const CSSCustomProperties: Story = {
             --hx-alert-icon-color: #818cf8;
             --hx-alert-font-family: system-ui, sans-serif;
           "
+          open
         >
           Fully customized alert with all 9 CSS custom properties overridden. This demonstrates the
           complete theming API surface.
         </hx-alert>
       </div>
 
-      <details style="font-size: var(--hx-font-size-xs, 0.8125rem); margin-top: var(--hx-space-2, 0.5rem);">
+      <details
+        style="font-size: var(--hx-font-size-xs, 0.8125rem); margin-top: var(--hx-space-2, 0.5rem);"
+      >
         <summary style="cursor: pointer; font-weight: 600;">View CSS code</summary>
         <pre
           style="
@@ -961,10 +1009,12 @@ export const CSSParts: Story = {
 
     <div class="parts-demo" style="max-width: 600px;">
       <div style="margin-bottom: var(--hx-space-6, 1.5rem);">
-        <p style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);">
+        <p
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-weight: 600; font-size: var(--hx-font-size-sm, 0.875rem);"
+        >
           All parts styled externally via ::part()
         </p>
-        <hx-alert variant="info" dismissible>
+        <hx-alert variant="info" dismissible open>
           <span slot="title">Patient Safety Notice</span>
           This alert has all 6 CSS parts styled externally:
           <code>::part(alert)</code>, <code>::part(title)</code>, <code>::part(icon)</code>,
@@ -1072,6 +1122,7 @@ hx-alert::part(actions) {
 
 /** Verifies that clicking the close button hides the alert and fires the `hx-close` event. */
 export const CloseBehavior: Story = {
+  name: 'Dismiss via Click',
   render: () => html`
     <div style="max-width: 600px;">
       <hx-alert variant="info" dismissible open>
@@ -1120,6 +1171,7 @@ export const CloseBehavior: Story = {
 
 /** Verifies keyboard-driven dismissal: Tab to the close button, press Enter to dismiss. */
 export const KeyboardDismiss: Story = {
+  name: 'Dismiss via Keyboard',
   render: () => html`
     <div style="max-width: 600px;">
       <hx-alert variant="warning" dismissible open>
@@ -1163,7 +1215,9 @@ export const KeyboardDismiss: Story = {
  */
 export const AriaRoles: Story = {
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;">
+    <div
+      style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 600px;"
+    >
       <hx-alert variant="info" open data-testid="alert-info">
         Info uses role="status" (implicit polite announcement).
       </hx-alert>
@@ -1212,7 +1266,7 @@ export const AriaRoles: Story = {
 export const DrugAllergyWarning: Story = {
   render: () => html`
     <div style="max-width: 600px;">
-      <hx-alert variant="error" dismissible>
+      <hx-alert variant="error" dismissible open>
         <strong>ALLERGY ALERT - Penicillin (Anaphylaxis)</strong>
         <br />
         <span style="display: block; margin-top: var(--hx-space-1, 0.25rem);">
@@ -1293,19 +1347,19 @@ export const AccentVariant: Story = {
     <div
       style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
     >
-      <hx-alert variant="info" accent>
+      <hx-alert variant="info" accent open>
         <strong>Session activity:</strong> Your patient chart session will expire in 10 minutes.
         Save any unsaved progress before the session ends.
       </hx-alert>
-      <hx-alert variant="success" accent>
+      <hx-alert variant="success" accent open>
         <strong>Prior authorization approved:</strong> PA #2026-04891 for Adalimumab 40mg/0.4ml has
         been approved by the patient's insurer. Valid through 2026-09-30.
       </hx-alert>
-      <hx-alert variant="warning" accent>
+      <hx-alert variant="warning" accent open>
         <strong>Allergy on file:</strong> Patient has a documented allergy to Penicillin
         (anaphylaxis). Review all antibiotic orders before administration.
       </hx-alert>
-      <hx-alert variant="error" accent>
+      <hx-alert variant="error" accent open>
         <strong>Critical lab value:</strong> Potassium 6.4 mEq/L (reference: 3.5–5.0). Immediate
         physician review required.
       </hx-alert>
@@ -1340,25 +1394,25 @@ export const WithTitleSlot: Story = {
     <div
       style="display: flex; flex-direction: column; gap: var(--hx-space-4, 1rem); max-width: 40rem;"
     >
-      <hx-alert variant="error" dismissible>
+      <hx-alert variant="error" dismissible open>
         <strong slot="title">Drug Interaction — High Risk</strong>
         Concurrent use of Warfarin and Amoxicillin may potentiate the anticoagulant effect. Monitor
         INR closely and consider dose adjustment. Consult pharmacy before prescribing.
       </hx-alert>
 
-      <hx-alert variant="warning" dismissible>
+      <hx-alert variant="warning" dismissible open>
         <strong slot="title">Isolation Precautions Required</strong>
         Patient is in Contact Isolation (MRSA). Gown and gloves required for all direct contact.
         Dedicated equipment must remain in room.
       </hx-alert>
 
-      <hx-alert variant="success">
+      <hx-alert variant="success" open>
         <strong slot="title">Authorization Approved</strong>
         Prior authorization #PA-2026-09281 for Adalimumab 40mg injection has been approved. Valid
         for 12 months from today's date.
       </hx-alert>
 
-      <hx-alert variant="info">
+      <hx-alert variant="info" open>
         <strong slot="title">Scheduled Downtime Notice</strong>
         The EHR system will be unavailable on Saturday March 15 from 02:00–04:00 AM for routine
         maintenance. Plan patient documentation accordingly.
@@ -1517,17 +1571,17 @@ export const PatientSafetyStack: Story = {
           padding: var(--hx-space-4, 1rem);
         "
       >
-        <hx-alert variant="error" dismissible>
+        <hx-alert variant="error" dismissible open>
           <strong>Fall Risk - High (Morse Score: 65):</strong> Patient has a history of falls within
           the past 90 days. Implement fall prevention protocol. Bed alarm must remain active.
         </hx-alert>
 
-        <hx-alert variant="error">
+        <hx-alert variant="error" open>
           <strong>Code Status: DNR/DNI</strong> - Documented advance directive on file. Last
           reviewed 2025-11-20 by attending. Do not remove this alert.
         </hx-alert>
 
-        <hx-alert variant="warning" dismissible>
+        <hx-alert variant="warning" dismissible open>
           <strong>Isolation Precautions - Contact:</strong> Active MRSA colonization. Gown and
           gloves required for all direct patient contact.
           <button
@@ -1546,18 +1600,18 @@ export const PatientSafetyStack: Story = {
           </button>
         </hx-alert>
 
-        <hx-alert variant="warning" dismissible>
+        <hx-alert variant="warning" dismissible open>
           <strong>Allergies (3):</strong> Penicillin (Anaphylaxis), Sulfonamides (Rash), Latex
           (Contact Dermatitis). Review allergy list before any procedure or medication
           administration.
         </hx-alert>
 
-        <hx-alert variant="info">
+        <hx-alert variant="info" open>
           <strong>Insurance Verification:</strong> Medicare Part A active through 2026-12-31.
           Pre-authorization required for outpatient imaging.
         </hx-alert>
 
-        <hx-alert variant="success" dismissible>
+        <hx-alert variant="success" dismissible open>
           <strong>Care Team Updated:</strong> Dr. Patricia Williams (Hospitalist) has been assigned
           as the attending physician for this encounter effective 2026-02-16 07:00 EST.
         </hx-alert>
