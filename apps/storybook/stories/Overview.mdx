@@ -1,4 +1,4 @@
-{/* Overview.mdx — HELiX Storybook landing page (AAA-led pitch) */}
+{/* Overview.mdx — HELiX Storybook landing page (component-library index) */}
 
 import { Meta } from '@storybook/addon-docs/blocks';
 import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_components';
@@ -8,152 +8,102 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
 <div className="hx-docs">
 
 <EyebrowHeading
-  eyebrow="HELiX · v0.1.0"
-  title="The OSS enterprise alternative to USWDS — engineered to clear AAA, not just AA."
+  eyebrow="HELiX Storybook · @helixui/library@3.9.0 · @helixui/icons@1.0.0"
+  title="44 P0 components, live in your browser."
   lede={
     <>
-      <strong>HELiX</strong> is a Lit&nbsp;3.x web component library for organizations where a
-      software failure can impact patient care. USWDS works to{' '}
-      <a href="https://designsystem.digital.gov/documentation/accessibility/">
-        WCAG&nbsp;2.1&nbsp;Level&nbsp;AA
-      </a>
-      {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
-      ; HELiX targets <strong>WCAG&nbsp;2.2&nbsp;Level&nbsp;AAA on its P0 surface</strong> — as
-      measured by the formal AAA harness against each P0 component&apos;s Default story — and we
-      ship the contrast ledger, the keyboard contracts, and per-component evidence to prove it.{' '}
-      <strong>
-        This cert is self-certified by the project maintainers; it is not third-party attested.
-      </strong>{' '}
-      <a href="/?path=/docs/accessibility-self-certification-scope--docs">
-        Read the self-cert scope first
-      </a>
-      .
+      Use the sidebar to inspect each component&apos;s API, behavior, and AAA cert evidence —
+      properties, attributes, slots, CSS parts, CSS custom properties, events, and per-component
+      audit verdicts. Storybook is where HELiX <em>proves</em>; the marketing site is where it
+      positions, and the docs site is where it onboards.{' '}
+      <a href="https://helix.bookedsolid.tech">Visit the docs site</a> for getting started,
+      framework integration, Drupal, and the self-certification scope.
     </>
   }
 />
 
 <section>
-  <SectionHead title="The AAA cert posture" meta="WCAG 2.2 · self-certified · default story" />
+  <SectionHead title="The AAA cert posture" meta="WCAG 2.2 · self-certified · formal harness" />
   <div className="hx-docs-stats">
-    <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
-    <StatCard
-      num="44"
-      unit="/44"
-      label="P0 components self-certed"
-      sub="2 honest Partials on 3.3.6"
-    />
-    <StatCard num="100" unit="%" label="forced-colors coverage" sub="every interactive primitive" />
-    <StatCard num="0" label="axe-core Supports violations" sub="default story · critical+serious" />
+    <StatCard num="376" label="Supports verdicts" sub="44 components × applicable criteria" />
+    <StatCard num="0" label="Partial verdicts" sub="every claim is whole" />
+    <StatCard num="0" label="Fail verdicts" sub="zero unresolved gaps on P0" />
+    <StatCard num="109" label="Not Applicable" sub="criterion does not apply per class" />
   </div>
   <p className="hx-docs-card-body" style={{ marginTop: 16, maxWidth: '70ch' }}>
-    The full ledger lives in <strong>Accessibility / Dashboard</strong>. The verdicts above are
-    measured against each component&apos;s <strong>Default story</strong> by the formal AAA harness
-    (<code>pnpm aaa:audit</code>) and recorded with evidence per (component × criterion) in{' '}
-    <code>.reports/formal-aaa-audit/audit.json</code>. Variant coverage is asserted by a separate
-    story-audit harness. For the explicit scope and honest limits of this self-cert, see{' '}
-    <a href="/?path=/docs/accessibility-self-certification-scope--docs">Self-Certification Scope</a>
-    .
+    Measured by the formal AAA harness (<code>pnpm aaa:audit</code>) against each P0 component&apos;s
+    Default story and recorded with evidence per (component × criterion) in{' '}
+    <code>.reports/formal-aaa-audit/audit.json</code>. This cert is self-certified by the project
+    maintainers; it is not third-party attested. For the explicit scope and honest limits, see{' '}
+    <a href="https://helix.bookedsolid.tech/accessibility/self-cert-scope/">
+      Self-Certification Scope
+    </a>{' '}
+    on the docs site.
   </p>
 </section>
 
 <section>
-  <SectionHead title="Why AAA, not AA" meta="positioning · the gap that exists today" />
+  <SectionHead title="Where to go on the docs site" meta="onboarding · integration · cert" />
   <div className="hx-docs-pillars">
     <article className="hx-docs-pillar">
-      <span className="hx-docs-pillar-tag">USWDS · AA</span>
-      <h3>The federal floor.</h3>
+      <span className="hx-docs-pillar-tag">Getting started</span>
+      <h3>Install + first component.</h3>
       <p>
-        The U.S. Web Design System works to <strong>WCAG&nbsp;2.1 Level AA</strong> and documents
-        conformance for 44 components of USWDS&nbsp;3.11.0 in its{' '}
-        <a href="https://designsystem.digital.gov/documentation/accessibility/">
-          VPAT&nbsp;2.5 (May&nbsp;2025)
-        </a>
-        {/* source: https://designsystem.digital.gov/documentation/accessibility/ (verified 2026-05-07) */}
-        . AAA is named in their docs as an aspirational direction, not a current claim. That posture
-        is correct for civic services with a broad-public remit and risk-averse delivery cadence.
+        <a href="https://helix.bookedsolid.tech/getting-started/installation/">Installation</a> for
+        npm + peer-dep setup, then{' '}
+        <a href="https://helix.bookedsolid.tech/getting-started/quick-start/">Quick start</a> for
+        your first <code>hx-button</code>.
       </p>
     </article>
     <article className="hx-docs-pillar">
-      <span className="hx-docs-pillar-tag">HELiX · AAA-targeted</span>
-      <h3>Healthcare-grade headroom.</h3>
+      <span className="hx-docs-pillar-tag">Framework integration</span>
+      <h3>React, Next, Vue, Angular, Svelte.</h3>
       <p>
-        Healthcare providers, claims systems, and patient-facing portals operate above the federal
-        floor — both because patients use assistive tech at a higher rate and because regulators
-        expect <em>headroom</em>. HELiX targets{' '}
-        <strong>WCAG 2.2 Level AAA on its P0 surface</strong>
-        and publishes per-component evidence (matrix + audit JSON + per-component AUDIT.md) so
-        consumers can stake their own claim against a reproducible self-cert.
+        <a href="https://helix.bookedsolid.tech/framework-integration/">Framework integration</a>{' '}
+        covers wrappers and plain-HTML usage. The Drupal-specific path lives at{' '}
+        <a href="https://helix.bookedsolid.tech/drupal/">Drupal integration</a>.
       </p>
     </article>
     <article className="hx-docs-pillar">
-      <span className="hx-docs-pillar-tag">OSS · enterprise</span>
-      <h3>Vendor-neutral, AGPL-clean.</h3>
+      <span className="hx-docs-pillar-tag">Accessibility</span>
+      <h3>Cert scope + consumer obligations.</h3>
       <p>
-        Every token, every component, every test ships under an OSS licence with a healthcare
-        warranty model attached. White-label brand registry, three-tier token cascade, Drupal and
-        React wrappers — built so an enterprise team can extend without forking.
+        <a href="https://helix.bookedsolid.tech/accessibility/self-cert-scope/">
+          Self-certification scope
+        </a>{' '}
+        for what the AAA cert covers and the limits;{' '}
+        <a href="https://helix.bookedsolid.tech/accessibility/consumer-obligations/">
+          consumer obligations
+        </a>{' '}
+        for the partial-AAA SCs the consuming app owns.
       </p>
     </article>
   </div>
 </section>
 
 <section>
-  <SectionHead title="Pillars" meta="why this exists" />
-  <div className="hx-docs-pillars">
-    <article className="hx-docs-pillar">
-      <span className="hx-docs-pillar-tag">Accessibility · WCAG 2.1 AAA target</span>
-      <h3>Contrast is a token contract, not a checklist.</h3>
-      <p>
-        Every <code>{`text.on-{role}`}</code> token is paired with its surface and pinned to ≥ 4.5 :
-        1 (AA floor). 103 of 163 graded pairs sit at ≥ 7 : 1 (AAA), with the remainder cleared at
-        AA; drift below the floor fails CI. Focus rings clear 1.4.11 in every mode, including
-        forced-colors.
-      </p>
-    </article>
-    <article className="hx-docs-pillar">
-      <span className="hx-docs-pillar-tag">Three-tier tokens</span>
-      <h3>Primitive → semantic → component.</h3>
-      <p>
-        Override <code>--hx-color-primary-500</code> at <code>:root</code> and the entire system
-        reflows. <code>{`action.*`}</code>, <code>{`surface.*`}</code>, <code>{`border.*`}</code>{' '}
-        sit between the ramp and the component — brands slot in at the semantic tier without
-        touching component CSS.
-      </p>
-    </article>
-    <article className="hx-docs-pillar">
-      <span className="hx-docs-pillar-tag">Themeable by design</span>
-      <h3>Light, dark, high-contrast — same tokens.</h3>
-      <p>
-        Mode is a single attribute on <code>:root</code>. Every token resolves through{' '}
-        <code>{`dark.*`}</code> and <code>{`high-contrast.*`}</code> overrides; AA is re-validated
-        per mode, so no surface goes dark without its on-token following.
-      </p>
-    </article>
-  </div>
-</section>
-
-<section>
-  <SectionHead title="Where to go next" meta="storybook sidebar" />
+  <SectionHead title="Where to go in Storybook" meta="sidebar map" />
   <div className="hx-docs-pillars">
     <article className="hx-docs-pillar">
       <span className="hx-docs-pillar-tag">Accessibility</span>
-      <h3>Start here for the AAA story.</h3>
+      <h3>The cert ledgers.</h3>
       <p>
         <strong>Accessibility / Dashboard</strong> for the cert roll-up,{' '}
-        <strong>Forced Colors</strong> for the Windows HC contract,{' '}
+        <strong>Success Criteria</strong> for the WCAG 2.2 ledger,{' '}
         <strong>Keyboard Contracts</strong> for APG-aligned interaction patterns,{' '}
         <strong>Focus Management</strong> for the ring + trap + restore contract,{' '}
+        <strong>Forced Colors</strong> for the Windows HC contract,{' '}
         <strong>Contrast Deep-Dive</strong> for the per-mode ledger.
       </p>
     </article>
     <article className="hx-docs-pillar">
       <span className="hx-docs-pillar-tag">Foundations</span>
-      <h3>Tokens, type, spacing, brands.</h3>
+      <h3>Tokens, type, spacing, brands, icons.</h3>
       <p>
         <strong>Foundations / Color</strong> for the 8 ramps × 11 stops, then{' '}
         <strong>Brand Registry</strong> for the white-label contract, then{' '}
-        <strong>Typography</strong>, <strong>Spacing</strong>, <strong>Iconography</strong>,{' '}
-        <strong>Layout</strong>.
+        <strong>Typography</strong>, <strong>Spacing</strong>, <strong>Iconography</strong> (
+        <code>@helixui/icons@1.0.0</code> registry), <strong>Layout</strong>.
       </p>
     </article>
     <article className="hx-docs-pillar">
@@ -163,7 +113,7 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
       </h3>
       <p>
         Each component ships with autodocs sourced from CEM — properties, attributes, slots, CSS
-        parts, CSS custom properties, events. Try the variant controls to see force-state matrices
+        parts, CSS custom properties, events. Use the variant controls to see force-state matrices
         update live.
       </p>
     </article>
@@ -176,7 +126,7 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
     language="bash"
     filename="coordinates.sh"
     code={`# install
-npm i @helixui/library @helixui/tokens
+npm i @helixui/library @helixui/icons @helixui/tokens
 
 # repo
 
@@ -189,7 +139,7 @@ https://helix.bookedsolid.tech
 # VPAT 2.5 — the conformance artefact
 
 https://helix.bookedsolid.tech/accessibility/vpat-2.5`}
-/>
+  />
 
 </section>
 
