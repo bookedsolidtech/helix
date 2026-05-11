@@ -1,6 +1,10 @@
 # @helixui/library
 
-## 4.0.0
+## 4.0.0 [DEPRECATED]
+
+Mistakenly published as MAJOR via a changeset-metadata defect (icons-1-0-0-initial.md was marked `major`, which cascaded through the linked-package group and peerDep range rules). The 4.0.0 release contains only additive minor changes — same code as 3.9.0. The 4.0.0 version is deprecated on npm; consumers should use 3.9.0.
+
+## 3.9.0
 
 ### Minor Changes
 
