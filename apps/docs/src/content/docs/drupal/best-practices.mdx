@@ -1,159 +1,17 @@
-{/* BestPractices.mdx — HELIX Drupal Integration Best Practices */}
+---
+title: Drupal Integration Best Practices
+description: Comprehensive guidance for integrating HELiX web components into Drupal 10/11 themes and modules — CDN loading, Twig patterns, Drupal behaviors, Form API integration, and performance optimization for enterprise healthcare applications.
+sidebar:
+  order: 2
+---
 
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Aside } from '@astrojs/starlight/components';
 
-<Meta title="Drupal/Best Practices" />
-
-<style>
-  {`
-  .drupal-best-practices {
-    max-width: 960px;
-    margin: 0 auto;
-    font-family: var(--hx-font-family-sans, 'Inter', sans-serif);
-    color: var(--hx-color-neutral-800, #1E293B);
-    line-height: var(--hx-line-height-normal, 1.5);
-  }
-
-  .drupal-best-practices h2 {
-    font-size: 1.75rem !important;
-    font-weight: 700 !important;
-    color: var(--hx-color-neutral-900, #0F172A) !important;
-    margin: 2rem 0 1rem 0 !important;
-    padding-bottom: 0.5rem !important;
-    border-bottom: 2px solid var(--hx-color-neutral-200, #E2E8F0) !important;
-  }
-
-  .drupal-best-practices h3 {
-    font-size: 1.25rem !important;
-    font-weight: 600 !important;
-    color: var(--hx-color-neutral-800, #1E293B) !important;
-    margin: 1.5rem 0 0.75rem 0 !important;
-  }
-
-  .drupal-best-practices p {
-    font-size: 1rem !important;
-    line-height: 1.7 !important;
-    margin: 0 0 1rem 0 !important;
-    color: var(--hx-color-neutral-600, #475569) !important;
-  }
-
-  .drupal-best-practices code {
-    font-family: var(--hx-font-family-mono, monospace) !important;
-    font-size: 0.875em !important;
-    padding: 0.125rem 0.375rem !important;
-    background: var(--hx-color-neutral-100, #F1F5F9) !important;
-    border-radius: 3px !important;
-    color: var(--hx-color-primary-700, #1E40AF) !important;
-  }
-
-  .drupal-best-practices .hero-banner {
-    background: linear-gradient(135deg, var(--hx-color-primary-50, #EFF6FF) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
-    border-radius: var(--hx-border-radius-xl, 0.75rem) !important;
-    padding: 2.5rem 2rem !important;
-    margin-bottom: 2.5rem !important;
-    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
-  }
-
-  .drupal-best-practices .hero-title {
-    font-size: 2rem !important;
-    font-weight: 800 !important;
-    color: var(--hx-color-neutral-900, #0F172A) !important;
-    margin: 0 0 0.5rem 0 !important;
-    letter-spacing: -0.025em !important;
-    line-height: 1.2 !important;
-  }
-
-  .drupal-best-practices .hero-desc {
-    font-size: 1rem !important;
-    color: var(--hx-color-neutral-500, #64748B) !important;
-    margin: 0 0 1rem 0 !important;
-    line-height: 1.6 !important;
-  }
-
-  .drupal-best-practices .info-box {
-    padding: 1.25rem !important;
-    background: var(--hx-color-info-50, #F0F9FF) !important;
-    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
-    border-left: 4px solid var(--hx-color-info-500, #0EA5E9) !important;
-    margin: 1.5rem 0 !important;
-  }
-
-  .drupal-best-practices .info-box p {
-    margin: 0 !important;
-    color: var(--hx-color-info-800, #0C4A6E) !important;
-  }
-
-  .drupal-best-practices .warning-box {
-    padding: 1.25rem !important;
-    background: var(--hx-color-warning-50, #FFFBEB) !important;
-    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
-    border-left: 4px solid var(--hx-color-warning-500, #F59E0B) !important;
-    margin: 1.5rem 0 !important;
-  }
-
-  .drupal-best-practices .warning-box p {
-    margin: 0 !important;
-    color: var(--hx-color-warning-800, #92400E) !important;
-  }
-
-  .drupal-best-practices .success-box {
-    padding: 1.25rem !important;
-    background: var(--hx-color-success-50, #F0FDF4) !important;
-    border-radius: var(--hx-border-radius-md, 0.375rem) !important;
-    border-left: 4px solid var(--hx-color-success-500, #10B981) !important;
-    margin: 1.5rem 0 !important;
-  }
-
-  .drupal-best-practices .success-box p {
-    margin: 0 !important;
-    color: var(--hx-color-success-800, #065F46) !important;
-  }
-
-  .drupal-best-practices ul {
-    margin: 0 0 1rem 0 !important;
-    padding-left: 1.5rem !important;
-  }
-
-  .drupal-best-practices li {
-    margin-bottom: 0.5rem !important;
-    color: var(--hx-color-neutral-600, #475569) !important;
-  }
-
-  .drupal-best-practices table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin: 1.5rem 0 !important;
-  }
-
-  .drupal-best-practices th {
-    background: var(--hx-color-neutral-100, #F1F5F9) !important;
-    padding: 0.75rem 1rem !important;
-    text-align: left !important;
-    font-weight: 600 !important;
-    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
-  }
-
-  .drupal-best-practices td {
-    padding: 0.75rem 1rem !important;
-    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
-  }
-`}
-</style>
-
-<div className="drupal-best-practices">
-
-<div className="hero-banner">
-  <div className="hero-title">Drupal Integration Best Practices</div>
-  <div className="hero-desc">
-    Comprehensive guidance for integrating HELIX web components into Drupal 10/11 themes and
-    modules. This guide covers CDN loading, Twig patterns, Drupal behaviors, Form API integration,
-    and performance optimization for enterprise healthcare applications.
-  </div>
-</div>
+Comprehensive guidance for integrating HELiX web components into Drupal 10/11 themes and modules. This guide covers CDN loading, Twig patterns, Drupal behaviors, Form API integration, and performance optimization for enterprise healthcare applications.
 
 ## Overview
 
-HELIX web components are designed to integrate seamlessly with Drupal CMS without requiring custom modules or complex build processes. Components work in standard Twig templates, participate in native form submission, and respond to Drupal's AJAX API.
+HELiX web components are designed to integrate seamlessly with Drupal CMS without requiring custom modules or complex build processes. Components work in standard Twig templates, participate in native form submission, and respond to Drupal's AJAX API.
 
 This guide establishes best practices for:
 
@@ -168,7 +26,7 @@ This guide establishes best practices for:
 
 ### CDN Loading (Recommended for Production)
 
-Load HELIX components from a CDN for automatic caching and global distribution.
+Load HELiX components from a CDN for automatic caching and global distribution.
 
 **Add to `your_theme.libraries.yml`:**
 
@@ -198,17 +56,15 @@ libraries:
 {{ attach_library('your_theme/helix-components') }}
 ```
 
-<div className="success-box">
-  <p>
-    <strong>Best Practice:</strong> Use CDN loading for production to benefit from browser caching
-    and HTTP/2 multiplexing. Pin to a specific version (e.g., <code>@1.0.0</code>) to prevent
-    breaking changes from auto-updating.
-  </p>
-</div>
+<Aside type="tip" title="Best Practice">
+  Use CDN loading for production to benefit from browser caching and HTTP/2
+  multiplexing. Pin to a specific version (e.g., `@1.0.0`) to prevent breaking
+  changes from auto-updating.
+</Aside>
 
 ### Local Installation (For Development or Private Hosting)
 
-Install HELIX via npm and serve from Drupal's libraries directory.
+Install HELiX via npm and serve from Drupal's libraries directory.
 
 **Install via npm:**
 
@@ -327,30 +183,28 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
 </hx-card>
 ```
 
-<div className="info-box">
-  <p>
-    <strong>Reference:</strong> See <strong>ADR-DRUPAL-001</strong> in the HELIX documentation for
-    detailed guidance on choosing between property-driven and slot-driven patterns.
-  </p>
-</div>
+<Aside type="note" title="Reference">
+  See **ADR-DRUPAL-001** in the HELiX documentation for detailed guidance on
+  choosing between property-driven and slot-driven patterns.
+</Aside>
 
 ## Drupal Behaviors Pattern
 
-Drupal.behaviors is the standard mechanism for initializing JavaScript in Drupal. Use it to set up event listeners, enhance components, and respond to AJAX updates.
+`Drupal.behaviors` is the standard mechanism for initializing JavaScript in Drupal. Use it to set up event listeners, enhance components, and respond to AJAX updates.
 
 ### Basic Behavior Template
 
 ```javascript
 /**
  * @file
- * HELIX components Drupal behavior.
+ * HELiX components Drupal behavior.
  */
 
 (function (Drupal, once) {
   'use strict';
 
   /**
-   * Initialize HELIX components.
+   * Initialize HELiX components.
    */
   Drupal.behaviors.helixComponents = {
     attach: function (context, settings) {
@@ -481,22 +335,20 @@ Handle multiple components in a single behavior file:
 })(Drupal, once);
 ```
 
-<div className="info-box">
-  <p>
-    <strong>Reference:</strong> See <strong>ADR-DRUPAL-002</strong> for event handling best
-    practices, including custom event naming conventions and cleanup patterns.
-  </p>
-</div>
+<Aside type="note" title="Reference">
+  See **ADR-DRUPAL-002** for event handling best practices, including custom
+  event naming conventions and cleanup patterns.
+</Aside>
 
 ## Form API Integration
 
-### Using HELIX Components in Drupal Forms
+### Using HELiX Components in Drupal Forms
 
-Map Drupal Form API elements to HELIX components using the `#attributes` property.
+Map Drupal Form API elements to HELiX components using the `#attributes` property.
 
 ```php
 function mymodule_patient_intake_form($form, &$form_state) {
-  // Attach HELIX library
+  // Attach HELiX library
   $form['#attached']['library'][] = 'your_theme/helix-components';
 
   // Text input
@@ -615,13 +467,10 @@ $build['facility_cards'] = [
 ];
 ```
 
-<div className="info-box">
-  <p>
-    <strong>Reference:</strong> See <strong>ADR-DRUPAL-003</strong> for comprehensive performance
-    optimization strategies, including HTTP/2 server push, asset aggregation, and lazy loading
-    patterns.
-  </p>
-</div>
+<Aside type="note" title="Reference">
+  See **ADR-DRUPAL-003** for comprehensive performance optimization strategies,
+  including HTTP/2 server push, asset aggregation, and lazy loading patterns.
+</Aside>
 
 ## Accessibility in Drupal Context
 
@@ -682,19 +531,17 @@ once('keyboard-init', 'hx-card[hx-href]', context).forEach((card) => {
 });
 ```
 
-<div className="info-box">
-  <p>
-    <strong>Reference:</strong> See <strong>ADR-DRUPAL-004</strong> for accessibility best
-    practices, including ARIA patterns, focus management, and screen reader compatibility in Drupal
-    workflows.
-  </p>
-</div>
+<Aside type="note" title="Reference">
+  See **ADR-DRUPAL-004** for accessibility best practices, including ARIA
+  patterns, focus management, and screen reader compatibility in Drupal
+  workflows.
+</Aside>
 
 ## Common Integration Patterns
 
 ### Views Integration
 
-Render HELIX components in Drupal Views:
+Render HELiX components in Drupal Views:
 
 ```twig
 {# views-view-unformatted--patient-list.html.twig #}
@@ -735,7 +582,7 @@ Use components in custom block templates:
 
 ### Paragraph Integration
 
-Render paragraphs as HELIX cards:
+Render paragraphs as HELiX cards:
 
 ```twig
 {# paragraph--card.html.twig #}
@@ -750,10 +597,10 @@ Render paragraphs as HELIX cards:
 
 ## Example: Complete Library Definition
 
-Here's a complete `your_theme.libraries.yml` for HELIX integration:
+Here's a complete `your_theme.libraries.yml` for HELiX integration:
 
 ```yaml
-# Global HELIX library (CDN)
+# Global HELiX library (CDN)
 helix-components:
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@1.0.0/dist/index.js:
@@ -763,7 +610,7 @@ helix-components:
   version: 1.0.0
   header: true
 
-# HELIX behaviors
+# HELiX behaviors
 helix-behaviors:
   js:
     js/helix-behaviors.js: {}
@@ -772,7 +619,7 @@ helix-behaviors:
     - core/once
     - your_theme/helix-components
 
-# HELIX styling overrides
+# HELiX styling overrides
 helix-theme:
   css:
     theme:
@@ -783,7 +630,7 @@ helix-theme:
 
 ## Resources and References
 
-### HELIX Documentation
+### HELiX Documentation
 
 - **Component API Reference**: See individual component MDX docs in Storybook
 - **Design Tokens**: See `@helixui/library` token documentation
@@ -800,7 +647,7 @@ Four architectural decision records document Drupal integration patterns:
 
 2. **ADR-DRUPAL-002**: Event handling and Drupal behaviors
    - Custom event naming conventions
-   - Cleanup patterns for detach()
+   - Cleanup patterns for `detach()`
    - AJAX integration strategies
 
 3. **ADR-DRUPAL-003**: Performance optimization
@@ -813,13 +660,11 @@ Four architectural decision records document Drupal integration patterns:
    - Focus management
    - Keyboard navigation patterns
 
-<div className="success-box">
-  <p>
-    <strong>Next Steps:</strong> Review individual component documentation (hx-card, hx-select,
-    hx-form) for specific Drupal integration examples. See the visual ADRs in the HELIX
-    documentation site for detailed architectural guidance.
-  </p>
-</div>
+<Aside type="tip" title="Next Steps">
+  Review individual component documentation (hx-card, hx-select, hx-form) for
+  specific Drupal integration examples. See the visual ADRs in the HELiX
+  documentation site for detailed architectural guidance.
+</Aside>
 
 ## Support and Contribution
 
@@ -828,5 +673,3 @@ For questions, issues, or contributions related to Drupal integration:
 - **GitHub Issues**: Report bugs or request features
 - **Slack Channel**: Join #helix-drupal for community support
 - **Documentation**: Contribute examples and patterns via pull requests
-
-</div>
