@@ -51,12 +51,10 @@ const shouldRenderSearch =
     height: 100%;
   }
 
-  /* Restore an opaque, finished header. No frosted glass, no teal accent —
-     just Starlight's default surface tokens so the nav reads as a clean,
-     intentional band above the content with a subtle hairline divider. */
+  /* Header blends into the page background — no inner nav-band, no border. */
   :global(header.header) {
-    background: var(--sl-color-bg-nav, var(--sl-color-bg)) !important;
-    border-bottom: 1px solid var(--sl-color-hairline-shade) !important;
+    background: var(--sl-color-bg) !important;
+    border-bottom: none !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
