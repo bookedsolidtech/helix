@@ -1,24 +1,25 @@
 ---
 title: 'VPAT 2.5 — @helixui/library'
-description: Voluntary Product Accessibility Template (VPAT) 2.5 baseline for the HELiX web component library — WCAG 2.1 AA conformance with AAA-targeted differentiation surface.
-draft: true
+description: Voluntary Product Accessibility Template (VPAT) 2.5 for the HELiX web component library — WCAG 2.2 AAA self-certified on the P0 surface (44 components × 11 criteria, 376 Supports verdicts), AA baseline on all components.
 sidebar:
   order: 1
   badge:
-    text: 'Draft v0.1'
-    variant: 'caution'
+    text: 'v1.0'
+    variant: 'success'
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="Draft v0.1 — Aspirational Baseline">
-  This is the **v0.1 baseline VPAT** for `@helixui/library`. Per-component AAA
-  certification populates this document over time as the [AAA Certification
-  Epic](#roadmap-to-v10) executes. Until a component is explicitly audited and
-  marked **Supports**, treat its conformance state as **Pending audit / Not
-  Evaluated**.
+<Aside type="note" title="v1.0 — Self-certified, third-party audit pending">
+  This is the **v1.0 published VPAT** for `@helixui/library`. The cert is
+  reproducible via `pnpm aaa:audit` against the canonical
+  [aaa-verdicts.json](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/aaa-verdicts.json)
+  snapshot. Current posture across 44 P0 components × 11 criteria:
+  **376 Supports / 0 Partial / 0 Fail / 109 Not Applicable**.
 
-**v1.0 publishes when 30+ P0 components reach AAA-cert status.**
+Third-party audit attestation is planned but not yet performed. See
+[Self-certification scope](/accessibility/self-cert-scope/) for the
+honest limits.
 
 </Aside>
 
@@ -29,20 +30,19 @@ HELiX healthcare web component library. The format follows the [ITI VPAT
 same structure adopted by the [U.S. Web Design System (USWDS) for its 44
 core components](https://designsystem.digital.gov/documentation/accessibility/).
 
-HELiX's strategic posture: where USWDS publishes a Level AA conformance
-claim, HELiX targets **Level AAA on its P0 (Tier 1) components** —
-positioning HELiX as the OSS enterprise-supported AAA competitor for global
-healthcare and public-sector teams that need conformance headroom above the
-508 floor.
+HELiX's conformance posture: **WCAG 2.2 Level AAA on its P0 (Tier 1) surface**
+(44 components against 11 criteria — 376 Supports verdicts), with AA baseline
+across all shipped components. WCAG 2.1 Understanding pages remain cited where
+WCAG 2.2 carries the criterion forward unchanged.
 
 ## Product Information
 
 | Field                     | Value                                                                                                                                                                                                                                                             |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Product Name**          | `@helixui/library`                                                                                                                                                                                                                                                |
-| **Product Version**       | 3.4.1                                                                                                                                                                                                                                                             |
-| **Report Date**           | 2026-05-06                                                                                                                                                                                                                                                        |
-| **Report Version**        | v0.1 (Draft baseline)                                                                                                                                                                                                                                             |
+| **Product Version**       | 3.9.0                                                                                                                                                                                                                                                             |
+| **Report Date**           | 2026-05-11                                                                                                                                                                                                                                                        |
+| **Report Version**        | v1.0 (Published)                                                                                                                                                                                                                                                  |
 | **Product Description**   | Enterprise healthcare web component library — 80 framework-agnostic custom elements built on Lit 3.x and the W3C Web Components standard. Ships with a three-tier design token system (light, dark, high-contrast) and Drupal CMS integration via Twig templates. |
 | **Contact Information**   | https://github.com/bookedsolidtech/helix/issues                                                                                                                                                                                                                   |
 | **Notes**                 | This VPAT covers the published `@helixui/library` package. The companion `@helixui/tokens` package and `@helixui/react` framework wrappers are evaluated under the same conformance posture and inherit the per-SC outcomes recorded here.                        |
@@ -55,11 +55,11 @@ This report covers conformance with the following standards:
 
 | Standard                                                                                              | Included In Report                                           |
 | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| [Web Content Accessibility Guidelines 2.1](https://www.w3.org/TR/WCAG21/), Level A                    | Yes                                                          |
-| [Web Content Accessibility Guidelines 2.1](https://www.w3.org/TR/WCAG21/), Level AA                   | Yes                                                          |
-| [Web Content Accessibility Guidelines 2.1](https://www.w3.org/TR/WCAG21/), Level AAA                  | Yes (HELiX differentiation surface)                          |
+| [Web Content Accessibility Guidelines 2.2](https://www.w3.org/TR/WCAG22/), Level A                    | Yes                                                          |
+| [Web Content Accessibility Guidelines 2.2](https://www.w3.org/TR/WCAG22/), Level AA                   | Yes                                                          |
+| [Web Content Accessibility Guidelines 2.2](https://www.w3.org/TR/WCAG22/), Level AAA                  | Yes — P0 surface (44 components × 11 criteria)               |
 | [Revised Section 508 standards (2017)](https://www.access-board.gov/ict/), 36 CFR Part 1194           | Yes — Chapters 3, 4, 5, 6 mapped via WCAG 2.0 Level A and AA |
-| [EN 301 549 V3.2.1 (2021-03)](https://www.etsi.org/deliver/etsi_en/301500_301599/301549/03.02.01_60/) | Yes — Chapters 9, 10, 11 mapped via WCAG 2.1 Level A and AA  |
+| [EN 301 549 V3.2.1 (2021-03)](https://www.etsi.org/deliver/etsi_en/301500_301599/301549/03.02.01_60/) | Yes — Chapters 9, 10, 11 mapped via WCAG 2.2 Level A and AA  |
 
 A Level AAA claim is **not** required by Section 508 or EN 301 549. HELiX's
 AAA targeting is voluntary and intended to provide conformance headroom for
@@ -83,16 +83,23 @@ broader U.S. federal procurement community:
 
 ## Conformance Summary
 
-The library currently asserts **AA conformance for the design-token
-contrast layer** (gated by the [`contrast.test.ts` regression
-matrix](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/src/__tests__/contrast.test.ts))
-and **forced-colors runtime adoption for the five mixin family
-representatives** (gated by
-[`forced-colors-runtime.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/components/__tests__/forced-colors-runtime.test.ts)).
+The library asserts **WCAG 2.2 AAA conformance on its P0 (Tier 1)
+surface** — 44 components against the 11-criterion AAA harness, producing
+376 Supports verdicts (0 Partial, 0 Fail, 109 Not Applicable). The cert
+is reproducible via `pnpm aaa:audit` against the canonical
+[aaa-verdicts.json](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/aaa-verdicts.json)
+snapshot.
 
-All other Success Criteria are scoped per-component and populate from the
-[Per-Component Coverage Matrix](#per-component-coverage-matrix) as the AAA
-Certification Epic executes.
+Underlying gates that backstop the cert:
+[`contrast.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-tokens/src/__tests__/contrast.test.ts)
+(design-token contrast regression matrix),
+[`forced-colors-runtime.test.ts`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/src/components/__tests__/forced-colors-runtime.test.ts)
+(forced-colors runtime adoption), and the
+[`check-aaa-verdicts.mjs`](https://github.com/bookedsolidtech/helix/blob/main/scripts/check-aaa-verdicts.mjs)
+preflight gate that refuses regression in the committed verdicts snapshot.
+
+All Success Criteria are scoped per-component and surfaced in the
+[Per-Component Coverage Matrix](#per-component-coverage-matrix).
 
 ### WCAG 2.1 Level A (30 Success Criteria)
 

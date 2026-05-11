@@ -4,7 +4,15 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "build/**", ".astro/**", ".next/**"]
+      "outputs": [
+        "dist/**",
+        "build/**",
+        ".astro/**",
+        ".next/**",
+        "custom-elements.json",
+        "aaa-verdicts.json",
+        "figma-inventory.json"
+      ]
     },
     "dev": {
       "dependsOn": ["^build"],

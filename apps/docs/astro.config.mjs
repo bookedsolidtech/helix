@@ -233,16 +233,9 @@ export default defineConfig({
                   label: 'Shadow DOM',
                   collapsed: true,
                   items: [
-                    { label: 'Architecture', slug: 'components/shadow-dom/architecture' },
-                    { label: 'Open vs Closed', slug: 'components/shadow-dom/open-closed' },
                     { label: 'Slots', slug: 'components/shadow-dom/slots' },
-                    {
-                      label: 'Advanced Slot Patterns',
-                      slug: 'components/shadow-dom/advanced-slots',
-                    },
                     { label: 'CSS Parts', slug: 'components/shadow-dom/parts' },
                     { label: 'Part Forwarding', slug: 'components/shadow-dom/part-forwarding' },
-                    { label: 'Events', slug: 'components/shadow-dom/events' },
                   ],
                 },
                 {
@@ -261,7 +254,6 @@ export default defineConfig({
                       link: '/adopted-stylesheets',
                       badge: { text: 'New', variant: 'tip' },
                     },
-                    { label: 'Responsive Components', slug: 'components/styling/responsive' },
                     { label: 'Dark Mode', slug: 'components/styling/dark-mode' },
                     { label: 'Animations & Transitions', slug: 'components/styling/animations' },
                     { label: 'CSS Performance', slug: 'components/styling/performance' },
@@ -270,12 +262,7 @@ export default defineConfig({
                 {
                   label: 'Events',
                   collapsed: true,
-                  items: [
-                    { label: 'Custom Events', slug: 'components/events/custom-events' },
-                    { label: 'Shadow DOM Events', slug: 'components/shadow-dom/events' },
-                    { label: 'Event Delegation', slug: 'components/events/delegation' },
-                    { label: 'Event Bus & PubSub', slug: 'components/events/event-bus' },
-                  ],
+                  items: [{ label: 'Custom Events', slug: 'components/events/custom-events' }],
                 },
                 {
                   label: 'Forms',
@@ -296,8 +283,6 @@ export default defineConfig({
                     { label: 'Typing Components', slug: 'components/typescript/typing-components' },
                     { label: 'Strict Mode', slug: 'components/typescript/strict-mode' },
                     { label: 'Event Types', slug: 'components/typescript/event-types' },
-                    { label: 'Generics', slug: 'components/typescript/generics' },
-                    { label: 'Advanced Patterns', slug: 'components/typescript/advanced-types' },
                     { label: 'Declaration Files', slug: 'components/typescript/declarations' },
                   ],
                 },
@@ -311,9 +296,6 @@ export default defineConfig({
                     },
                     { label: 'Reactive Controllers', slug: 'components/advanced/controllers' },
                     { label: 'State Management', slug: 'components/advanced/state-management' },
-                    { label: 'Mixins', slug: 'components/advanced/mixins' },
-                    { label: 'Async Tasks', slug: 'components/advanced/async-tasks' },
-                    { label: 'Context Protocol', slug: 'components/advanced/context-protocol' },
                   ],
                 },
                 {
@@ -321,8 +303,6 @@ export default defineConfig({
                   collapsed: true,
                   items: [
                     { label: 'Bundle Size', slug: 'components/performance/bundle-size' },
-                    { label: 'Rendering', slug: 'components/performance/rendering' },
-                    { label: 'Lazy Loading', slug: 'components/performance/lazy-loading' },
                     { label: 'SSR Considerations', slug: 'components/performance/ssr' },
                   ],
                 },
@@ -332,26 +312,9 @@ export default defineConfig({
                   items: [
                     { label: 'Vitest Setup', slug: 'components/testing/vitest-setup' },
                     { label: 'Writing Tests', slug: 'components/testing/vitest' },
-                    { label: 'Shadow DOM Testing', slug: 'components/testing/shadow-dom' },
-                    { label: 'Async Testing', slug: 'components/testing/async' },
                     { label: 'Event Testing', slug: 'components/testing/event-testing' },
                     { label: 'Form Testing', slug: 'components/testing/form-testing' },
                     { label: 'Visual Regression', slug: 'components/testing/visual-regression' },
-                  ],
-                },
-                {
-                  label: 'Accessibility',
-                  collapsed: true,
-                  items: [
-                    { label: 'WCAG 2.1 AA', slug: 'components/accessibility/wcag' },
-                    { label: 'ARIA Patterns', slug: 'components/accessibility/aria' },
-                    { label: 'Keyboard Navigation', slug: 'components/accessibility/keyboard' },
-                    {
-                      label: 'Focus Management',
-                      slug: 'components/accessibility/focus-management',
-                    },
-                    { label: 'Screen Readers', slug: 'components/accessibility/screen-readers' },
-                    { label: 'Accessibility Testing', slug: 'components/accessibility/testing' },
                   ],
                 },
                 {
@@ -493,10 +456,6 @@ export default defineConfig({
             {
               label: 'Best Practices',
               slug: 'guides/best-practices',
-            },
-            {
-              label: 'Custom Workflows',
-              slug: 'guides/custom-workflows',
             },
             {
               label: 'Local CI with act',
