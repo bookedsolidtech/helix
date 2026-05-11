@@ -3,9 +3,6 @@ title: Custom Events Best Practices
 description: Comprehensive guide to dispatching, documenting, and testing custom events in web components with TypeScript type safety, Shadow DOM integration, and real-world patterns from hx-library.
 sidebar:
   order: 1
-prev:
-  link: /components/fundamentals/overview/
-  label: Component Fundamentals Overview
 ---
 
 Custom events are the primary mechanism for web components to communicate with the outside world. They enable loose coupling, framework agnosticism, and standard DOM event patterns. This guide covers everything you need to master custom events in enterprise web components: from the CustomEvent constructor to TypeScript type safety, Shadow DOM integration, documentation patterns, and real-world examples from hx-library.

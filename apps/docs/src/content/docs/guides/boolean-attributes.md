@@ -43,11 +43,11 @@ The following HELIX components have one or more boolean properties whose default
 
 | Component | Property | Attribute | Default | Effect when absent |
 |---|---|---|---|---|
-| [`hx-alert`](/component-library/hx-alert) | `open` | `open` | `true` | Alert is hidden |
-| [`hx-alert`](/component-library/hx-alert) | `showIcon` | `show-icon` | `true` | Icon is hidden |
-| [`hx-code-snippet`](/component-library/hx-code-snippet) | `copyable` | `copyable` | `true` | Copy button is hidden |
-| [`hx-dialog`](/component-library/hx-dialog) | `modal` | `modal` | `true` | Dialog is non-modal |
-| [`hx-skeleton`](/component-library/hx-skeleton) | `animated` | `animated` | `true` | Pulse animation disabled |
+| [`hx-alert`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-hx-alert--docs) | `open` | `open` | `true` | Alert is hidden |
+| [`hx-alert`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-hx-alert--docs) | `showIcon` | `show-icon` | `true` | Icon is hidden |
+| [`hx-code-snippet`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-hx-code-snippet--docs) | `copyable` | `copyable` | `true` | Copy button is hidden |
+| [`hx-dialog`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-hx-dialog--docs) | `modal` | `modal` | `true` | Dialog is non-modal |
+| [`hx-skeleton`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-hx-skeleton--docs) | `animated` | `animated` | `true` | Pulse animation disabled |
 
 ---
 
@@ -176,6 +176,6 @@ The trade-off is that disabling a default-true feature requires JavaScript (or a
 
 ## Further Reading
 
-- [Properties vs Attributes](/components/fundamentals/properties-vs-attributes) — Deep dive into the property/attribute duality in Lit components
-- [Template Syntax](/components/fundamentals/template-syntax) — Lit binding syntax reference including `?boolean` bindings
-- [Drupal Behaviors](/drupal-integration/behaviors/fundamentals) — JavaScript lifecycle for Drupal-hosted components
+- [Reactive Properties](https://lit.dev/docs/components/properties/) on lit.dev — Deep dive into the property/attribute duality in Lit components
+- [Template Expressions](https://lit.dev/docs/templates/expressions/#boolean-attribute-expressions) on lit.dev — Lit binding syntax reference including `?boolean` bindings
+- [Drupal Behaviors](/drupal/behaviors/fundamentals/) — JavaScript lifecycle for Drupal-hosted components

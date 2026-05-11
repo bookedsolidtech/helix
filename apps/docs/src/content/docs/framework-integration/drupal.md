@@ -7,7 +7,7 @@ sidebar:
 
 # Drupal Integration
 
-HELIX is purpose-built for Drupal. The full integration guide lives in the [Drupal Integration](/drupal-integration/overview) section. This page is a quick-start summary covering the essential patterns.
+HELIX is purpose-built for Drupal. The full integration guide lives in the [Drupal Integration](/drupal/installation/getting-started/) section. This page is a quick-start summary covering the essential patterns.
 
 ## Installation
 
@@ -30,7 +30,7 @@ helix:
     https://cdn.jsdelivr.net/npm/@helixui/library/dist/index.js: { type: external, attributes: { type: module } }
 ```
 
-See [CDN Installation](/drupal-integration/installation/cdn) for the full setup.
+See [CDN Installation](/drupal/installation/cdn/) for the full setup.
 
 ## Using Components in Twig
 
@@ -108,7 +108,7 @@ Twig child content maps to the default slot:
 </hx-card>
 ```
 
-See [Slots in Twig](/drupal-integration/twig/slots) for named slot patterns.
+See [Slots in Twig](/drupal/twig-templates/slots/) for named slot patterns.
 
 ## Drupal Behaviors for Event Handling
 
@@ -134,7 +134,7 @@ Drupal Behaviors are the correct place to attach JavaScript event listeners to H
 })(Drupal);
 ```
 
-See [Drupal Behaviors — With Web Components](/drupal-integration/behaviors/web-components) for detailed patterns.
+See [Drupal Behaviors — With Web Components](/drupal/behaviors/web-components/) for detailed patterns.
 
 ## Form API Integration
 
@@ -153,7 +153,7 @@ $form['email'] = [
 ];
 ```
 
-For full Drupal Form API element plugins, see [Form API Integration](/drupal-integration/forms/form-api).
+For full Drupal Form API element plugins, see [Form API Integration](/drupal/forms/form-api/).
 
 ## Per-Component Loading
 
@@ -170,23 +170,22 @@ helix-text-input:
     /path/to/hx-text-input.js: { attributes: { type: module } }
 ```
 
-See [Per-Component Loading](/drupal-integration/per-component-loading) for the full strategy.
+See [Performance & Lazy Loading](/drupal/performance/lazy-loading/) for the full strategy.
 
 ## Full Documentation
 
 This page covers the basics. The complete Drupal integration guide includes:
 
-- [Installation (npm, CDN, Drupal Module)](/drupal-integration/installation/overview)
-- [Twig Templates — Fundamentals](/drupal-integration/twig/fundamentals)
-- [Twig — Properties & Attributes](/drupal-integration/twig/properties)
-- [Drupal Behaviors](/drupal-integration/behaviors/fundamentals)
-- [Library System](/drupal-integration/library-system)
-- [Forms — Form API](/drupal-integration/forms/form-api)
-- [Performance & Lazy Loading](/drupal-integration/performance/overview)
-- [Troubleshooting](/drupal-integration/troubleshooting/common-issues)
+- [Installation (npm, CDN, Drupal Module)](/drupal/installation/getting-started/)
+- [Twig Templates — Fundamentals](/drupal/twig-templates/fundamentals/)
+- [Twig — Properties & Attributes](/drupal/twig-templates/properties/)
+- [Drupal Behaviors](/drupal/behaviors/fundamentals/)
+- [Forms — Form API](/drupal/forms/form-api/)
+- [Performance & Lazy Loading](/drupal/performance/overview/)
+- [Troubleshooting](/drupal/troubleshooting/)
 
 ## Next Steps
 
-- [Full Drupal Integration Guide](/drupal-integration/overview)
-- [Boolean Attributes reference](/guides/boolean-attributes)
-- [Component Library](/component-library/overview)
+- [Full Drupal Integration Guide](/drupal/installation/getting-started/)
+- [Boolean Attributes reference](/guides/boolean-attributes/)
+- [Component Library](/component-library/overview/)
