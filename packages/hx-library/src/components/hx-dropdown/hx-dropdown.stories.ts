@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import './hx-dropdown.js';
 import '../hx-menu/hx-menu.js';
 import '../hx-menu/hx-menu-item.js';
@@ -127,7 +127,6 @@ export const Default: Story = {
     </div>
   `,
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const dropdown = canvasElement.querySelector('hx-dropdown');
     await expect(dropdown).toBeTruthy();
     await expect(dropdown?.shadowRoot?.querySelector('[part="panel"]')).toBeTruthy();
