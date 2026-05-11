@@ -160,8 +160,13 @@ export const Default: Story = {
     // the shadow boundary to confirm the icon hydrated.
     const iconPart = banner?.shadowRoot?.querySelector('[part="icon"]');
     await expect(iconPart).toBeTruthy();
-    const hxIcon = iconPart?.querySelector('hx-icon');
+    const hxIcon = iconPart?.querySelector('hx-icon') as
+      | (HTMLElement & { updateComplete?: Promise<unknown> })
+      | null;
     await expect(hxIcon).toBeTruthy();
+    // Lit child has its own async update cycle. Wait for hx-icon to finish
+    // stamping its shadow SVG before asserting on it (race-flake guard).
+    if (hxIcon?.updateComplete) await hxIcon.updateComplete;
     const svg = hxIcon?.shadowRoot?.querySelector('svg');
     await expect(svg).toBeTruthy();
 
