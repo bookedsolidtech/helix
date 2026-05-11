@@ -149,7 +149,10 @@ export const Default: Story = {
     if (trigger.updateComplete) await trigger.updateComplete;
     const innerButton = trigger.shadowRoot?.querySelector('button');
     await expect(innerButton).toBeTruthy();
-    await expect(innerButton?.textContent?.trim()).toMatch(/open menu/i);
+    // The visible label is light-DOM slotted content on hx-button, so read
+    // it from the host's textContent — the inner shadow <button> contains
+    // a <slot> placeholder, not the flattened text.
+    await expect(trigger.textContent?.trim()).toMatch(/open menu/i);
     await userEvent.click(trigger);
     await expect(dropdown?.open).toBe(true);
 
