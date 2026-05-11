@@ -29,7 +29,7 @@ HELIX follows a **layered architecture** designed for enterprise content organiz
 2. **Three-tier tokens** — Primitive, Semantic, Component tiers for maximum flexibility
 3. **Dual documentation** — Storybook for playground, Starlight for guides
 4. **Turborepo + pnpm monorepo** — Efficient builds with intelligent caching
-5. **WCAG 2.1 AA baseline** — Accessibility compliance as a first-class requirement
+5. **WCAG 2.2 AAA on P0 surface, AA baseline elsewhere** — Accessibility as a first-class requirement
 
 ## Next Steps
 
