@@ -1070,7 +1070,7 @@ For HELiX, these patterns are non-negotiable. Every component uses `:host` for d
 - [Design Token Architecture](/components/styling/tokens) — Complete token inventory and theming patterns
 - [CSS Parts Guide](/components/shadow-dom/parts) — Expose controlled styling hooks for consumers
 - [Slots Guide](/components/shadow-dom/slots) — Compose light DOM into shadow DOM templates
-- [Component Fundamentals](/components/fundamentals/overview) — Core concepts and lifecycle
+- [Lit: Components Overview](https://lit.dev/docs/components/overview/) — Core concepts and lifecycle
 
 ---
 

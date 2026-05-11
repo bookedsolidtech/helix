@@ -408,4 +408,4 @@ starlight({
 
 - [Svelte Integration](/framework-integration/svelte)
 - [Boolean Attributes reference](/guides/boolean-attributes)
-- [Component Library](/component-library/overview)
+- [Storybook](https://storybook.helix.bookedsolid.tech/)

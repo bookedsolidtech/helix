@@ -453,8 +453,309 @@ SDCs can include other SDCs. An `article-grid` SDC can include multiple `article
 
 ---
 
+## Nesting SDCs
+
+SDCs can include other SDCs. An `article-grid` SDC can include multiple `article-teaser` SDCs:
+
+```twig
+{# components/article-grid/article-grid.twig #}
+<div class="article-grid">
+  {% for item in items %}
+    {% include 'mytheme:article-teaser' with {
+      title: item.title,
+      url: item.url,
+      summary: item.summary,
+      category: item.category,
+      image: item.image,
+    } only %}
+  {% endfor %}
+</div>
+```
+
+---
+
+## Prop Mapping from Drupal Preprocess
+
+For complex prop derivation, use a `hook_preprocess_HOOK()` function rather than embedding Twig logic in the template.
+
+```php
+<?php
+// mytheme.theme
+
+/**
+ * Implements hook_preprocess_node() for article teaser display.
+ */
+function mytheme_preprocess_node__article__teaser(array &$variables): void {
+  $node = $variables['node'];
+
+  // Derive category variant from taxonomy field value.
+  $category_term = $node->get('field_category')->entity;
+  $category_label = $category_term ? $category_term->label() : '';
+  $category_variant = match ($category_label) {
+    'Clinical Research' => 'primary',
+    'Patient Safety' => 'danger',
+    'Wellness' => 'success',
+    default => 'default',
+  };
+
+  // Pass derived values to the SDC via the variables array.
+  $variables['category_label'] = $category_label;
+  $variables['category_variant'] = $category_variant;
+
+  // Pass the author entity for the avatar.
+  $author = $node->get('field_author')->entity;
+  $variables['author_name'] = $author?->label() ?? '';
+  $variables['author_image_url'] = '';
+
+  if ($author && !$author->get('field_profile_image')->isEmpty()) {
+    $image_entity = $author->get('field_profile_image')->entity;
+    if ($image_entity) {
+      $variables['author_image_url'] = \Drupal::service('file_url_generator')
+        ->generateAbsoluteString($image_entity->getFileUri());
+    }
+  }
+}
+```
+
+---
+
+## SDC Catalog
+
+The following table lists composition SDCs commonly authored alongside HELiX, grouped by content category. Each SDC composes multiple HELiX primitives into a complete editorial pattern. These patterns can be authored from scratch or generated with the `@helixui/drupal-starter` scaffolding.
+
+### Content Patterns
+
+| SDC Name           | HELiX Components                                             | Description                              |
+| ------------------ | ------------------------------------------------------------ | ---------------------------------------- |
+| `article-teaser`   | `hx-card`, `hx-badge`, `hx-avatar`, `hx-text`, `hx-button`   | News/blog teaser with author attribution |
+| `article-full`     | `hx-prose`, `hx-avatar`, `hx-badge`, `hx-divider`, `hx-text` | Full article layout with author bio      |
+| `featured-article` | `hx-card`, `hx-badge`, `hx-text`, `hx-button`                | Large-format featured story card         |
+| `related-articles` | `hx-card`, `hx-badge`, `hx-text`, `hx-grid`                  | 2-3 column related content grid          |
+| `content-listing`  | `hx-card`, `hx-badge`, `hx-pagination`, `hx-stack`           | Paginated content archive listing        |
+
+### Healthcare Patterns
+
+| SDC Name            | HELiX Components                                                | Description                       |
+| ------------------- | --------------------------------------------------------------- | --------------------------------- |
+| `staff-profile`     | `hx-card`, `hx-avatar`, `hx-badge`, `hx-text`, `hx-button`      | Provider/staff profile card       |
+| `staff-directory`   | `hx-card`, `hx-avatar`, `hx-grid`, `hx-text-input`, `hx-select` | Searchable provider directory     |
+| `department-card`   | `hx-card`, `hx-icon`, `hx-text`, `hx-button`                    | Clinical department overview card |
+| `service-line-hero` | `hx-banner`, `hx-text`, `hx-button-group`                       | Service line hero banner          |
+| `appointment-cta`   | `hx-card`, `hx-button`, `hx-icon`, `hx-text`                    | Appointment scheduling CTA block  |
+| `clinical-alert`    | `hx-alert`, `hx-icon`, `hx-text`, `hx-button`                   | Clinical advisory/safety alert    |
+| `patient-resource`  | `hx-card`, `hx-icon`, `hx-text`, `hx-badge`, `hx-button`        | Patient education resource card   |
+| `location-card`     | `hx-card`, `hx-icon`, `hx-text`, `hx-badge`, `hx-button`        | Facility/clinic location card     |
+| `insurance-list`    | `hx-structured-list`, `hx-text`, `hx-badge`                     | Accepted insurance plan list      |
+| `condition-teaser`  | `hx-card`, `hx-icon`, `hx-text`, `hx-badge`                     | Medical condition/treatment card  |
+
+### Navigation and Structure
+
+| SDC Name         | HELiX Components                                           | Description                         |
+| ---------------- | ---------------------------------------------------------- | ----------------------------------- |
+| `site-header`    | `hx-top-nav`, `hx-button`, `hx-icon-button`, `hx-dropdown` | Global site header with primary nav |
+| `site-footer`    | `hx-text`, `hx-link`, `hx-divider`, `hx-stack`             | Global site footer                  |
+| `breadcrumb-nav` | `hx-breadcrumb`, `hx-breadcrumb-item`                      | Drupal path breadcrumb              |
+| `section-nav`    | `hx-side-nav`, `hx-text`                                   | In-page section navigation          |
+| `pagination-nav` | `hx-pagination`, `hx-text`                                 | Views/listing pagination            |
+
+### Hero and Marketing
+
+| SDC Name           | HELiX Components                                              | Description                    |
+| ------------------ | ------------------------------------------------------------- | ------------------------------ |
+| `hero-banner`      | `hx-banner`, `hx-text`, `hx-button-group`                     | Full-width page hero           |
+| `stat-block`       | `hx-stat`, `hx-text`, `hx-grid`                               | Key metrics/statistics display |
+| `cta-block`        | `hx-card`, `hx-text`, `hx-button`, `hx-icon`                  | Single call-to-action block    |
+| `cta-band`         | `hx-banner`, `hx-text`, `hx-button-group`                     | Full-width CTA banner          |
+| `feature-grid`     | `hx-grid`, `hx-card`, `hx-icon`, `hx-text`                    | Feature highlights grid        |
+| `testimonial-card` | `hx-card`, `hx-avatar`, `hx-text`, `hx-rating`                | Patient/client testimonial     |
+| `event-card`       | `hx-card`, `hx-badge`, `hx-icon`, `hx-text`, `hx-button`      | Event listing card             |
+| `event-listing`    | `hx-card`, `hx-badge`, `hx-icon`, `hx-stack`, `hx-pagination` | Event archive listing          |
+
+### Forms and Interaction
+
+| SDC Name            | HELiX Components                                                       | Description                   |
+| ------------------- | ---------------------------------------------------------------------- | ----------------------------- |
+| `search-bar`        | `hx-text-input`, `hx-button`, `hx-icon`                                | Global/section search form    |
+| `contact-form`      | `hx-form`, `hx-text-input`, `hx-textarea`, `hx-select`, `hx-button`    | Basic contact form layout     |
+| `appointment-form`  | `hx-form`, `hx-text-input`, `hx-date-picker`, `hx-select`, `hx-button` | Appointment request form      |
+| `newsletter-signup` | `hx-text-input`, `hx-button`, `hx-text`                                | Email list signup inline form |
+| `filter-bar`        | `hx-select`, `hx-checkbox-group`, `hx-button`, `hx-tag`                | Views exposed filter bar      |
+
+### Feedback and Status
+
+| SDC Name           | HELiX Components                  | Description                         |
+| ------------------ | --------------------------------- | ----------------------------------- |
+| `status-message`   | `hx-alert`, `hx-icon`, `hx-text`  | Drupal status/error/warning message |
+| `empty-state`      | `hx-icon`, `hx-text`, `hx-button` | Empty Views/listing state           |
+| `loading-skeleton` | `hx-skeleton`, `hx-stack`         | AJAX loading placeholder            |
+
+---
+
+## Layout Builder and Experience Builder Integration
+
+### Layout Builder
+
+SDCs work as Layout Builder custom blocks. Create a block type that maps to your SDC, then expose it in Layout Builder sections.
+
+```twig
+{# block--helix-article-teaser.html.twig #}
+{% if content.field_article_reference[0] is defined %}
+  {% set node = content.field_article_reference[0]['#node'] %}
+  {% include 'mytheme:article-teaser' with {
+    title: node.label,
+    url: url('entity.node.canonical', {node: node.id()}),
+    summary: node.body.summary ?: node.body.value|striptags|slice(0, 200),
+    image: content.field_article_reference[0].field_hero_image,
+  } only %}
+{% endif %}
+```
+
+### Experience Builder (XB)
+
+Drupal's Experience Builder (experimental, Drupal 10.3+) exposes SDCs as drag-and-drop XB components when they include a complete props schema with `$ui` metadata for the editing interface.
+
+Add `$ui` hints to your schema to control how XB presents each prop in the visual editor:
+
+```yaml
+# components/article-teaser/article-teaser.component.yml
+name: Article Teaser
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: Article Title
+      '$ui':
+        widget: text
+    category_variant:
+      type: string
+      enum: [default, primary, success, warning, danger]
+      title: Category Color
+      '$ui':
+        widget: select
+        label: Category badge color
+    url:
+      type: string
+      title: Link URL
+      '$ui':
+        widget: url
+```
+
+Experience Builder SDC integration is available from Drupal 10.3. The `$ui` metadata schema is finalized in the XB initiative but may evolve before stable release. Review the [Drupal Experience Builder documentation](https://www.drupal.org/project/experience_builder) for the current specification.
+
+---
+
+## Progressive Enhancement
+
+HELiX components render their slotted content in the light DOM before JavaScript loads. This means the SDC output is accessible and indexable even when component JavaScript has not yet executed.
+
+Structure your SDC templates so the slot content is semantically complete without component enhancement:
+
+```twig
+{# article-teaser.twig — semantic fallback is the slot content itself #}
+<hx-card href="{{ url }}">
+  {# Before JS: renders as <div> with its content visible in light DOM #}
+  {# After JS: card Shadow DOM applies design, layout, and interaction #}
+  <span slot="heading">{{ title }}</span>
+  <hx-text>{{ summary }}</hx-text>
+  <div slot="footer">
+    <a href="{{ url }}">{{ 'Read More'|t }}</a>
+  </div>
+</hx-card>
+```
+
+The `<a href>` in the footer slot ensures keyboard navigation and screen reader access to the link before `hx-button` JavaScript loads. Once the component upgrades, `hx-button` takes over with its full interaction model.
+
+---
+
+## htmx Prefix Collision
+
+If your Drupal site uses [htmx](https://htmx.org/), you will encounter a namespace collision: htmx attributes use the `hx-` prefix (e.g., `hx-boost`, `hx-get`, `hx-target`), the same prefix HELiX uses for its custom element tag names (`hx-card`, `hx-button`).
+
+This is not a functional conflict — `hx-` attribute names on HTML elements (htmx's model) are different from `hx-` custom element tag names (HELiX's model) — but it creates readability confusion and may cause issues with htmx's attribute scanner if it attempts to process `hx-card` tags as htmx-enhanced elements.
+
+### Mitigation 1: Scope htmx to specific elements
+
+Do not apply htmx globally. Instead of adding `hx-boost` to `<body>`, scope it to specific regions:
+
+```twig
+{# Scope htmx to a specific container, not the whole page #}
+<div class="ajax-region" hx-boost="true">
+  {# htmx-enhanced links and forms go here #}
+</div>
+
+{# HELiX components outside the scoped container are unaffected #}
+<hx-card href="/article/1">...</hx-card>
+```
+
+### Mitigation 2: Configure htmx attribute prefix
+
+htmx 1.9+ allows configuring the attribute prefix away from `hx-`:
+
+```javascript
+// In your theme's JS, before htmx initializes
+htmx.config.attributeName = 'data-hx';
+htmx.config.boosted = 'data-hx-boost';
+```
+
+With this configuration, htmx reads `data-hx-boost`, `data-hx-get`, etc., and will not attempt to process `hx-card` or `hx-button` as htmx-enhanced elements.
+
+### Mitigation 3: Use htmx `hx-ignore` exclusions
+
+If you cannot change the prefix, use `hx-ignore` on HELiX component wrappers to prevent htmx from scanning their descendants:
+
+```twig
+<div hx-ignore>
+  <hx-card>...</hx-card>
+  <hx-button>...</hx-button>
+</div>
+```
+
+Mitigation 2 (changing htmx's attribute prefix to `data-hx-*`) is the cleanest long-term solution for sites that use both htmx and HELiX. Document this configuration choice in your theme's README so future maintainers understand why the prefix is non-standard.
+
+---
+
+## Troubleshooting
+
+### SDC is not discovered after adding component files
+
+Run `drush cr` after adding any new SDC directory. Drupal discovers components only on cache rebuild, not on page load.
+
+### Component renders as unknown HTML element (no styles)
+
+The component library JavaScript has not loaded. Check:
+
+1. The `attach_library()` call is present in the SDC Twig template, or the SDC's `libraryOverrides.dependencies` lists the component library.
+2. The library definition exists in `mytheme.libraries.yml`.
+3. The CDN URL or local file path is correct.
+4. Browser DevTools Network tab shows the script loaded without 404.
+
+### Drupal Behaviors do not fire on AJAX-loaded content
+
+Drupal Behaviors with `once()` fire automatically on AJAX responses. If your behavior is not running, verify:
+
+1. The behavior key in `Drupal.behaviors` is unique across your theme.
+2. The CSS selector in the `once()` call matches the actual rendered element.
+3. The `[data-helix-*]` attribute is present on the rendered element in the page source.
+
+### htmx processes `hx-card` as a directive
+
+Apply one of the three mitigations documented in the htmx section above. The fastest fix is adding `hx-ignore` to the wrapper `<div>` around HELiX component regions.
+
+### Props schema validation error in Drupal logs
+
+The value passed to a prop does not match the declared JSON Schema type or enum. Common causes:
+
+- Passing an integer where a string is declared (use `title|string` in Twig)
+- Passing a value not in the `enum` list (validate in `hook_preprocess_HOOK()` before passing)
+- Passing `null` for a required prop (guard with `{% if value %}` before the `include`)
+
+---
+
 ## Related
 
 - [SDC Architecture](/drupal/sdc/overview/) — Two-layer model, file structure, library registration
 - [SDC Variants](/drupal/sdc/variants/) — Variant props, CSS, theme and responsive variants
 - [Twig Templates: Slots](/drupal/twig-templates/slots/) — Slot projection mechanics
+- [Per-Component Loading](/drupal/per-component-loading/) — How libraries attach when SDCs render
+- [Library System Deep Dive](/drupal/library-system/) — `libraries.yml` complete reference

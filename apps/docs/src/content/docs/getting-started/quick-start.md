@@ -43,7 +43,7 @@ Load HELiX in any HTML page without a build step:
   <head>
     <meta charset="UTF-8" />
     <title>HELiX Quick Start</title>
-    <link rel="stylesheet" href="https://unpkg.com/@helixui/library@3.0.0/dist/css/helix-all.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@helixui/library@3.9.0/dist/css/helix-all.css" />
   </head>
   <body>
     <hx-card variant="elevated">
@@ -51,7 +51,7 @@ Load HELiX in any HTML page without a build step:
       <hx-button slot="actions" variant="primary">Learn More</hx-button>
     </hx-card>
 
-    <script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/index.js"></script>
+    <script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/index.js"></script>
   </body>
 </html>
 ```
@@ -69,11 +69,11 @@ The documentation site will be available at `http://localhost:3150`, Storybook a
 
 ## Explore the Component Library
 
-The [Component Library](/component-library/overview/) documents all components with API references, usage examples, and Storybook previews.
+[Storybook](https://storybook.helix.bookedsolid.tech/) documents all components with API references, usage examples, and live previews.
 
 ## Next Steps
 
 - [Installation](/getting-started/installation/) - npm, CDN, and monorepo setup details
 - [Project Structure](/getting-started/project-structure/) - Understand the codebase
-- [Component Library](/component-library/overview/) - Browse all components
+- [Storybook](https://storybook.helix.bookedsolid.tech/) - Browse all components
 - [Design Tokens](/design-tokens/overview/) - Learn the token system

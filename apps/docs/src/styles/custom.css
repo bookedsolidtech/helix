@@ -238,15 +238,6 @@ body {
   }
 }
 
-/* === Starlight Header Enhancements === */
-header.header {
-  background: rgba(7, 17, 26, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(0, 212, 200, 0.12) !important;
-  box-shadow: 0 1px 24px rgba(0, 212, 200, 0.06);
-}
-
 /* === Keyframe Animations === */
 
 @keyframes particle-drift {
@@ -695,47 +686,7 @@ body:has(.hero-section) .sl-container > *:first-child {
   padding-top: 0 !important;
 }
 
-/* === Header / Navigation Bar === */
-.header {
-  border-bottom: 1px solid rgba(0, 212, 200, 0.12) !important;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  background: rgba(7, 17, 26, 0.82) !important;
-  background-image: none !important;
-  box-shadow: 0 1px 24px rgba(0, 212, 200, 0.06);
-}
-
-.site-title {
-  font-weight: 900 !important;
-  font-size: 2.1rem !important;
-  letter-spacing: -0.02em !important;
-  background: linear-gradient(
-    135deg,
-    #06b6d4 0%,
-    #8b5cf6 25%,
-    #ec4899 50%,
-    #f97316 75%,
-    #06b6d4 100%
-  ) !important;
-  background-size: 200% 200% !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  animation: shimmerFlow 8s ease-in-out infinite !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-title {
-    animation: none !important;
-    background-position: 0% 50% !important;
-  }
-}
-
-.logo {
-  display: flex !important;
-  align-items: center !important;
-  gap: var(--space-3) !important;
-}
+/* Header + site-title + logo styles now live inline in src/components/Header.astro */
 
 .top-nav a,
 .social-icons a {
