@@ -1,7 +1,7 @@
 {
   "framework": "nextjs",
-  "installCommand": "cd ../.. && npm ci",
-  "buildCommand": "cd ../.. && npx turbo run build --filter=@helixui/admin",
+  "installCommand": "cd ../.. && corepack enable && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm turbo run build --filter=@helixui/admin",
   "headers": [
     {
       "source": "/(.*)",

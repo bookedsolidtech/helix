@@ -28,7 +28,7 @@ Current versions:
 | `@helixui/tokens`   | ^3.9.0   | Required peer — design tokens            |
 | `@helixui/react`    | ^3.9.0   | Optional — React 18/19 wrappers          |
 
-If you are upgrading an existing project from `@helixui/library@3.8.x` or earlier, see the [3.8.0 → 3.9.0 migration guide](/migration/3-8-0-to-3-9-0/) — `@helixui/icons` is a new required peer dependency.
+If you are upgrading an existing project from `@helixui/library@3.9.0.x` or earlier, see the [3.8.0 → 3.9.0 migration guide](/migration/3-8-0-to-3-9-0/) — `@helixui/icons` is a new required peer dependency.
 
 ## CDN (No Build Step)
 

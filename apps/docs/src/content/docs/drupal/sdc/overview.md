@@ -209,17 +209,17 @@ The `libraryOverrides.dependencies` key in `component.yml` attaches Drupal libra
 ```yaml
 # mytheme.libraries.yml
 helix-runtime:
-  version: 1.1.2
+  version: 3.9.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/lit-runtime.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/lit-runtime.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
 
 helix-card:
-  version: 1.1.2
+  version: 3.9.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -227,9 +227,9 @@ helix-card:
     - mytheme/helix-runtime
 
 helix-badge:
-  version: 1.1.2
+  version: 3.9.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-badge/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-badge/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -237,9 +237,9 @@ helix-badge:
     - mytheme/helix-runtime
 
 helix-button:
-  version: 1.1.2
+  version: 3.9.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -247,9 +247,9 @@ helix-button:
     - mytheme/helix-runtime
 
 helix-avatar:
-  version: 1.1.2
+  version: 3.9.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-avatar/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-avatar/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -325,8 +325,174 @@ HELiX components use `hx-size` (not `size`) for the component size attribute. Th
 
 ---
 
+## Getting Started
+
+The fastest way to bootstrap a HELiX-based Drupal theme is through the scaffolding CLI, which generates a complete `libraries.yml` fragment and a preset of starter SDC directories for common content patterns.
+
+1. **Install `@helixui/drupal-starter`**
+
+   The starter package provides a pre-built `libraries.yml` fragment and a set of starter SDC directories for the most common content patterns.
+
+   ```bash
+   # In your Drupal theme directory
+   npm install @helixui/drupal-starter
+   ```
+
+   Or use the scaffolding CLI:
+
+   ```bash
+   npx create-helix --drupal --preset healthcare
+   ```
+
+   The `--preset healthcare` flag scaffolds the subset of SDCs appropriate for healthcare content patterns: patient profiles, clinical article teasers, department cards, appointment CTAs, and alert banners.
+
+2. **Copy the library definitions**
+
+   ```bash
+   cp node_modules/@helixui/drupal-starter/libraries.yml.fragment mytheme.libraries.yml
+   ```
+
+   Edit the fragment to match your CDN version pin or local npm paths.
+
+3. **Copy the starter SDC components**
+
+   ```bash
+   cp -r node_modules/@helixui/drupal-starter/components/* components/
+   ```
+
+4. **Enable SDC in your theme info**
+
+   ```yaml
+   # mytheme.info.yml
+   name: My Healthcare Theme
+   type: theme
+   core_version_requirement: ^10 || ^11
+   base theme: false
+   libraries:
+     - mytheme/helix-runtime
+   components:
+     # Drupal discovers components in this directory automatically
+   ```
+
+5. **Clear Drupal caches**
+
+   ```bash
+   drush cr
+   ```
+
+   Drupal 10.1+ discovers SDC components automatically on cache rebuild. No additional module configuration is required.
+
+---
+
+## Site-Type Presets
+
+The `create-helix` scaffolding CLI generates a starter theme with the SDC subset appropriate for your site type.
+
+```bash
+# Healthcare system portal
+npx create-helix --drupal --preset healthcare
+
+# News/media organization
+npx create-helix --drupal --preset editorial
+
+# Corporate marketing site
+npx create-helix --drupal --preset marketing
+
+# Government/public sector
+npx create-helix --drupal --preset government
+```
+
+### Preset Contents
+
+**`healthcare`** — All Healthcare Patterns SDCs (patient, clinical, department, location); `article-teaser`, `article-full`, `featured-article` for health content; `appointment-form`, `contact-form` for patient acquisition; `clinical-alert`, `status-message` for compliance messaging; `staff-profile`, `staff-directory` for provider listings; `site-header`, `site-footer`, `breadcrumb-nav`. Total: 22 SDCs, 18 HELiX components.
+
+**`editorial`** — `article-teaser`, `article-full`, `featured-article`, `related-articles`, `content-listing`; `testimonial-card`, `event-card`, `event-listing`; `hero-banner`, `stat-block`, `cta-block`; `search-bar`, `filter-bar`, `pagination-nav`; `site-header`, `site-footer`, `breadcrumb-nav`, `section-nav`. Total: 19 SDCs, 16 HELiX components.
+
+**`marketing`** — `hero-banner`, `cta-band`, `feature-grid`, `stat-block`; `testimonial-card`, `department-card`, `cta-block`; `article-teaser`, `featured-article`; `contact-form`, `newsletter-signup`; `site-header`, `site-footer`. Total: 14 SDCs, 14 HELiX components.
+
+**`government`** — `article-teaser`, `article-full`, `content-listing`; `service-line-hero`, `feature-grid`, `cta-block`; `clinical-alert` (repurposed as general advisory alert); `search-bar`, `filter-bar`, `contact-form`; `site-header`, `site-footer`, `breadcrumb-nav`, `pagination-nav`; `status-message`, `empty-state`. Total: 16 SDCs, 15 HELiX components.
+
+### What the scaffold generates
+
+Running `create-helix --drupal --preset healthcare` produces:
+
+```
+web/themes/custom/mytheme/
+├── mytheme.info.yml
+├── mytheme.libraries.yml          # Pre-configured with all preset component libraries
+├── mytheme.theme                  # Preprocess functions for SDC prop mapping
+├── components/
+│   ├── article-teaser/            # All 22 preset SDCs
+│   ├── staff-profile/
+│   ├── appointment-form/
+│   └── ...
+└── templates/
+    ├── node--article--teaser.html.twig   # Pre-wired to article-teaser SDC
+    ├── node--staff--teaser.html.twig     # Pre-wired to staff-profile SDC
+    └── ...
+```
+
+---
+
+## Authoring Custom Composition SDCs
+
+When your content model has patterns that do not match the starter catalog, author your own SDC. The process is the same regardless of complexity.
+
+1. **Define the content pattern**
+
+   Name the SDC after the editorial concept, not the visual component it uses.
+
+   Good: `patient-testimonial`, `clinical-trial-listing`, `department-hero`
+   Avoid: `hx-card-wrapper`, `card-with-badge`, `big-card`
+
+2. **Identify which HELiX components compose the pattern**
+
+   Sketch the pattern on paper or in Figma. List every HELiX primitive you need. Each one requires a library entry in `libraries.yml` and an `attach_library()` call in the template (or a `libraryOverrides.dependencies` entry in `component.yml`).
+
+3. **Write the schema**
+
+   Define only the props the SDC actually needs. Do not expose every HELiX component prop — expose only what varies by content. Props that are always the same (e.g., `elevation="raised"` on every card) are hardcoded in the template.
+
+   ```yaml
+   # components/custom-pattern/custom-pattern.component.yml
+   name: Custom Pattern
+   status: stable
+   props:
+     type: object
+     required:
+       - title
+     properties:
+       title:
+         type: string
+       variant:
+         type: string
+         enum: [default, featured]
+         default: default
+   slots:
+     media:
+       title: Media
+     actions:
+       title: Actions
+   ```
+
+4. **Write the template**
+
+   Attach libraries first. Map props to HELiX attributes. Map slots to HELiX named slots using `<div slot="name">{{ slot_name }}</div>`.
+
+5. **Add layout CSS only**
+
+   Write only CSS that governs how this SDC positions itself in the page. Use `--hx-*` custom properties to theme component internals through Shadow DOM. Do not attempt to select inside `hx-*` elements — Shadow DOM encapsulation prevents it.
+
+6. **Test with realistic Drupal output**
+
+   Use `drush devel:generate` or fixture content to verify the SDC renders correctly with actual Drupal field output including image styles, text format filters, and taxonomy term links.
+
+---
+
 ## Related
 
-- [SDC Composition Patterns](/drupal/sdc/composition/) — Full article-teaser and staff-profile examples
+- [SDC Composition Patterns](/drupal/sdc/composition/) — Full article-teaser and staff-profile examples, SDC catalog, htmx collision, Layout Builder/XB integration
 - [SDC Variants](/drupal/sdc/variants/) — CSS variant classes, theme variants, responsive variants
 - [Twig Templates: Slots](/drupal/twig-templates/slots/) — How slot projection works with Drupal content
+- [Per-Component Loading](/drupal/per-component-loading/) — Loading HELiX components in Drupal
+- [Library System Deep Dive](/drupal/library-system/) — `libraries.yml` complete reference

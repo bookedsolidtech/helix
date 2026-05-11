@@ -335,14 +335,14 @@ An import map pins bare module specifiers to resolved URLs, preventing duplicate
     "lit/directives/if-defined.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/if-defined.js",
     "@lit/reactive-element": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@2/reactive-element.js",
     "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@3/lit-html.js",
-    "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/index.js",
-    "@helixui/library/components/": "https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/components/"
+    "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
+    "@helixui/library/components/": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/"
   }
 }
 </script>
 
 <!-- HELiX from CDN -->
-<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/index.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"></script>
 
 <!-- Your extended components from the theme's file system -->
 <script type="module" src="/themes/custom/my-theme/js/dist/index.js"></script>
@@ -359,14 +359,14 @@ For incremental adoption — loading only the components a specific page needs:
 {
   "imports": {
     "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
-    "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/components/hx-card/index.js"
+    "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js"
   }
 }
 </script>
 
 <script type="module">
   // Explicit import — only registers hx-card and its dependencies
-  import 'https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/components/hx-card/index.js';
+  import 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js';
   import '/themes/custom/my-theme/js/dist/components/org-patient-card/index.js';
 </script>
 ```
@@ -386,7 +386,7 @@ helix_base:
   dependencies:
     - my_theme/helix_importmap
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -621,10 +621,10 @@ For Drupal projects consuming via CDN, pin the CDN URL to the major version:
 
 ```html
 <!-- Pinned to major 1, receives patch + minor updates automatically -->
-<script src="https://cdn.jsdelivr.net/npm/@helixui/library@1/dist/index.js" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js" type="module"></script>
 
 <!-- Pinned to exact version for zero-change deployments in regulated environments -->
-<script src="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js" type="module"></script>
 ```
 
 For regulated healthcare environments (SOC 2, HIPAA-adjacent deployments), exact-version CDN pins or self-hosted copies are common — the `@1` floating major tag updates automatically on CDN cache refresh, which may violate change management policies.

@@ -299,17 +299,17 @@ public function buildForm(array $form, FormStateInterface $form_state): array {
 helix-forms:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-text-input/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js:
       type: external
       preprocess: false
       attributes:
         type: module
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-select/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-select/index.js:
       type: external
       preprocess: false
       attributes:
         type: module
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-checkbox/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-checkbox/index.js:
       type: external
       preprocess: false
       attributes:
@@ -325,7 +325,7 @@ Or load the full bundle:
 helix-forms:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       preprocess: false
       attributes:

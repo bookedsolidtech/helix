@@ -1252,7 +1252,7 @@ Design tokens are the foundation of HELiX's theming architecture. They provide:
 
 - [CSS Parts Guide](/components/shadow-dom/parts) — Expose controlled styling hooks for consumers
 - [Slots Guide](/components/shadow-dom/slots) — Compose light DOM into shadow DOM templates
-- [Component Fundamentals](/components/fundamentals/overview) — Core concepts and lifecycle
+- [Lit: Components Overview](https://lit.dev/docs/components/overview/) — Core concepts and lifecycle
 - [Theming Guide](/components/styling/theming) — Complete guide to creating custom themes
 
 ---

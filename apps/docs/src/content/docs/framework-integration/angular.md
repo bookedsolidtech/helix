@@ -249,4 +249,4 @@ export class AppComponent implements OnInit {
 
 - [Plain HTML / CDN Integration](/framework-integration/html)
 - [Boolean Attributes reference](/guides/boolean-attributes)
-- [Component Library](/component-library/overview)
+- [Storybook](https://storybook.helix.bookedsolid.tech/)

@@ -125,4 +125,4 @@ Behind-the-scenes helpers:
 
 - [Building Components](/components/building/) - How to create new components
 - [Component API](/components/api/) - API conventions and patterns
-- [Component Library](/component-library/overview/) - Browse all components with live demos
+- [Storybook](https://storybook.helix.bookedsolid.tech/) - Browse all components with live demos
