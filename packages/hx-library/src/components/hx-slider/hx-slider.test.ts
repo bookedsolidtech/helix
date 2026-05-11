@@ -391,6 +391,96 @@ describe('hx-slider', () => {
     });
   });
 
+  // ─── Constraint Validation (WCAG 3.3.6) ───
+
+  describe('Constraint validation', () => {
+    it('default value passes validity (form.checkValidity true)', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-slider name="vol" min="0" max="100" value="50"></hx-slider>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-slider') as HelixSlider;
+      await el.updateComplete;
+      expect(el.validity.valid).toBe(true);
+      expect(form.checkValidity()).toBe(true);
+    });
+
+    it('does NOT expose a `required` property — value defaults to 0 (numerically valid)', async () => {
+      // The slider does not implement `required` semantics. `value` defaults
+      // to 0 which is a numerically valid number, so a required-but-untouched
+      // slider would always submit `0` without any way for the leaf to know
+      // it was untouched. Exposing `required` would advertise validation
+      // behavior the component cannot deliver. Consumers needing
+      // required-on-touch semantics wire that at the form level. See
+      // hx-slider.ts._updateValidity for the design rationale.
+      const el = await fixture<HelixSlider>('<hx-slider></hx-slider>');
+      expect((el as unknown as { required?: boolean }).required).toBeUndefined();
+      expect(el.hasAttribute('required')).toBe(false);
+      // The validity object is valid even when value === 0 (the default).
+      expect(el.validity.valid).toBe(true);
+    });
+
+    it('rangeUnderflow flag is set when value < min', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="50"></hx-slider>');
+      // The slider's updated() clamps value into [min, max], so after a normal Lit
+      // cycle the validity will always be valid. To verify the underflow code path,
+      // we force value below min and call _updateValidity directly (bypassing clamp).
+      (el as unknown as { value: number }).value = -5;
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.rangeUnderflow).toBe(true);
+    });
+
+    it('rangeOverflow flag is set when value > max', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider min="0" max="100" value="50"></hx-slider>');
+      // Same approach as rangeUnderflow — bypass clamp by calling _updateValidity directly.
+      (el as unknown as { value: number }).value = 150;
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.rangeOverflow).toBe(true);
+    });
+
+    it('stepMismatch flag is set when value not aligned to step', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="100" step="10" value="50"></hx-slider>',
+      );
+      // Set a value that does not align to step (50 + 5 = 55 with step 10 → mismatch)
+      (el as unknown as { value: number }).value = 55;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(true);
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('aligned step value passes validity', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="100" step="10" value="50"></hx-slider>',
+      );
+      (el as unknown as { value: number }).value = 60;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(false);
+      expect(el.validity.valid).toBe(true);
+    });
+
+    it('floating-point step alignment tolerates small jitter', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="1" step="0.1" value="0.3"></hx-slider>',
+      );
+      // 0.1 + 0.2 = 0.30000000000000004 — should still be considered aligned within tolerance
+      (el as unknown as { value: number }).value = 0.1 + 0.2;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(false);
+    });
+
+    it('formResetCallback clears validity', async () => {
+      const el = await fixture<HelixSlider>(
+        '<hx-slider min="0" max="100" step="10" value="50"></hx-slider>',
+      );
+      (el as unknown as { value: number }).value = 55;
+      await el.updateComplete;
+      expect(el.validity.stepMismatch).toBe(true);
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.validity.valid).toBe(true);
+    });
+  });
+
   // ─── CSS Parts (7) ───
 
   describe('CSS Parts', () => {

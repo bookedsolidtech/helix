@@ -535,6 +535,95 @@ describe('hx-file-upload', () => {
     });
   });
 
+  // ─── Constraint Validation (WCAG 3.3.6) ───
+
+  describe('Constraint validation', () => {
+    it('default empty state passes validity (form.checkValidity true)', async () => {
+      const form = document.createElement('form');
+      form.innerHTML = '<hx-file-upload name="docs"></hx-file-upload>';
+      document.getElementById('test-fixture-container')!.appendChild(form);
+      const el = form.querySelector('hx-file-upload') as HelixFileUpload;
+      await el.updateComplete;
+      expect(el.validity.valid).toBe(true);
+      expect(form.checkValidity()).toBe(true);
+    });
+
+    it('valueMissing flag is set when required + no files', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload required></hx-file-upload>');
+      expect(el.validity.valueMissing).toBe(true);
+      expect(el.checkValidity()).toBe(false);
+    });
+
+    it('valueMissing clears when required + at least one file is selected', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload required multiple></hx-file-upload>',
+      );
+      expect(el.validity.valueMissing).toBe(true);
+      simulateFileInput(el, [makeFile('resume.pdf', 1024, 'application/pdf')]);
+      await el.updateComplete;
+      expect(el.validity.valueMissing).toBe(false);
+      expect(el.validity.valid).toBe(true);
+    });
+
+    it('customError flag is set when a file exceeds maxSize', async () => {
+      // _processFiles rejects oversized files before they enter _files, so to verify
+      // the validity wiring we directly mutate _files and call _updateValidity.
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload max-size="1024"></hx-file-upload>',
+      );
+      const big = makeFile('big.pdf', 4096, 'application/pdf');
+      (el as unknown as { _files: { file: File; progress: number }[] })._files = [
+        { file: big, progress: 0 },
+      ];
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.customError).toBe(true);
+      expect(el.validationMessage).toContain('exceeds maximum size');
+    });
+
+    it('customError flag is set when files.length > maxFiles', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload max-files="1" multiple></hx-file-upload>',
+      );
+      const f1 = makeFile('a.pdf', 100, 'application/pdf');
+      const f2 = makeFile('b.pdf', 100, 'application/pdf');
+      (el as unknown as { _files: { file: File; progress: number }[] })._files = [
+        { file: f1, progress: 0 },
+        { file: f2, progress: 0 },
+      ];
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.customError).toBe(true);
+      expect(el.validationMessage).toContain('Maximum of 1 file');
+    });
+
+    it('customError flag is set when a file does not match accept pattern', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload accept="image/*"></hx-file-upload>',
+      );
+      const wrong = makeFile('doc.pdf', 100, 'application/pdf');
+      (el as unknown as { _files: { file: File; progress: number }[] })._files = [
+        { file: wrong, progress: 0 },
+      ];
+      (el as unknown as { _updateValidity: () => void })._updateValidity();
+      expect(el.validity.customError).toBe(true);
+      expect(el.validationMessage).toContain('unsupported file type');
+    });
+
+    it('formResetCallback clears state and validity', async () => {
+      const el = await fixture<HelixFileUpload>(
+        '<hx-file-upload required multiple></hx-file-upload>',
+      );
+      simulateFileInput(el, [makeFile('resume.pdf', 1024, 'application/pdf')]);
+      await el.updateComplete;
+      expect(el.files).toHaveLength(1);
+      expect(el.validity.valid).toBe(true);
+      el.formResetCallback();
+      await el.updateComplete;
+      expect(el.files).toHaveLength(0);
+      // After reset, required + empty → valueMissing again
+      expect(el.validity.valueMissing).toBe(true);
+    });
+  });
+
   // ─── Error Display (3) ───
 
   describe('Error Display', () => {

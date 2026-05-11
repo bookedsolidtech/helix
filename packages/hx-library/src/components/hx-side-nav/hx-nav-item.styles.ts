@@ -153,10 +153,8 @@ export const helixNavItemStyles = css`
     transition: transform var(--hx-transition-normal, 300ms) ease;
   }
 
-  .nav-item__arrow svg {
-    width: var(--hx-space-4, 1rem);
-    height: var(--hx-space-4, 1rem);
-    fill: currentColor;
+  .nav-item__arrow .nav-item__arrow-glyph {
+    --hx-icon-size: var(--hx-space-4, 1rem);
   }
 
   :host([expanded]) .nav-item__arrow {

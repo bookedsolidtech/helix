@@ -110,15 +110,12 @@ export const helixClinicalStatusStyles = css`
     color: var(--hx-clinical-status-icon-color, var(--hx-color-info-500, #0c8beb));
   }
 
-  .clinical-status__icon svg {
-    width: var(--hx-space-5, 1.25rem);
-    height: var(--hx-space-5, 1.25rem);
-    fill: currentColor;
+  .clinical-status__glyph {
+    --hx-icon-size: var(--hx-space-5, 1.25rem);
   }
 
-  .clinical-status--compact .clinical-status__icon svg {
-    width: var(--hx-space-4, 1rem);
-    height: var(--hx-space-4, 1rem);
+  .clinical-status--compact .clinical-status__glyph {
+    --hx-icon-size: var(--hx-space-4, 1rem);
   }
 
   /* ─── Message ─── */

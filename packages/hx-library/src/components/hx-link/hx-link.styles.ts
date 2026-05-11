@@ -78,8 +78,7 @@ export const helixLinkStyles = css`
 
   .link__external-icon {
     display: inline-flex;
-    width: 0.75em;
-    height: 0.75em;
+    --hx-icon-size: 0.75em;
     flex-shrink: 0;
   }
 

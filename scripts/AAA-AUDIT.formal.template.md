@@ -15,7 +15,8 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 **Standards claimed:** [WCAG 2.2 Recommendation](https://www.w3.org/TR/WCAG22/) at level **AAA** for the 9 component-shippable Success Criteria below; plus 2 peer standards (forced-colors-mode, APG-aligned keyboard contract) documented separately.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
-**Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's Default story in Storybook (Chromium via Playwright); per-cell measurements written to `.reports/formal-aaa-audit/evidence/{{tagName}}.json`.
+**Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
+**Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/{{tagName}}.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
 **Audit run:** {{auditedAt}}
 **Audit harness run:** {{runAt}}
 **Re-cert branch:** `audit/formal-aaa-recert`
@@ -33,6 +34,18 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 | **Total criteria**  | **11** |
 
 **Headline:** {{headline}}
+
+> **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
+
+---
+
+## Variant coverage
+
+The formal AAA harness audits the **Default story only**. Visual coverage of every other story / variant of this component is tracked by the story-audit harness (`scripts/audit-stories.mjs`), which runs across all 1,635 Storybook entries in the library and flags any story that fails to render visible content, has below-AAA contrast, has below-WCAG target sizes, or trips axe-core AAA rules.
+
+{{variantCoverage}}
+
+A "Visual confirmation" verdict here means the story-audit harness has rendered the story in headless Chromium, sampled real pixels, and recorded zero serious findings. Stories without visual confirmation MAY still meet AAA in practice — but until the story-audit harness clears them, the component's AAA cert claim is bounded by what the Default story exercises.
 
 ---
 
@@ -66,6 +79,12 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 For the AAA verdicts above to hold in real-world deployment, the consumer MUST:
 
 {{consumerObligations}}
+
+---
+
+## Tooling notes
+
+{{toolingNotes}}
 
 ---
 

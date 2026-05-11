@@ -73,10 +73,8 @@ export const helixBannerStyles = css`
     color: var(--hx-banner-icon-color, var(--hx-color-info-500, #0c8beb));
   }
 
-  .banner__icon svg {
-    width: var(--hx-space-5, 1.25rem);
-    height: var(--hx-space-5, 1.25rem);
-    fill: currentColor;
+  .banner__icon .banner__glyph {
+    --hx-icon-size: var(--hx-space-5, 1.25rem);
   }
 
   /* ─── Message ─── */
@@ -156,10 +154,8 @@ export const helixBannerStyles = css`
     opacity: 1;
   }
 
-  .banner__close-button svg {
-    width: var(--hx-space-4, 1rem);
-    height: var(--hx-space-4, 1rem);
-    fill: currentColor;
+  .banner__close-button .banner__glyph {
+    --hx-icon-size: var(--hx-space-4, 1rem);
   }
 
   /* ─── Variant: info ─── */

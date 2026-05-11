@@ -100,7 +100,7 @@ Healthcare deploys make procurement decisions on conformance documentation. The 
 
 <SectionHead title="Live data, never hand-typed" meta="--source-of-truth" />
 
-The `AAAConformanceCard` and `APGPatternCard` components pull live from `@helixui/library/custom-elements.json`. The `InlineAuditPanel` pulls live from the source `AAA-AUDIT.md` via Vite `?raw`. There is no scenario where a docs page can drift from the cert payload — if the component loses its cert, the badge flips, the rows go Unknown, and the inline audit shows the failure.
+The `AAAConformanceCard` pulls verdicts from `@helixui/library/aaa-verdicts.json` — a slim snapshot of the formal harness output (`.reports/formal-aaa-audit/audit.json`) regenerated automatically by every `pnpm aaa:audit` run via `scripts/generate-aaa-verdicts.mjs`. The `APGPatternCard` reads `@helixui/library/custom-elements.json`. The `InlineAuditPanel` pulls live from the source `AAA-AUDIT.md` via Vite `?raw`. The verdict snapshot is committed to the repo so the docs build is deterministic; drift between the docs surface and the cert payload is bounded by the cadence at which the audit is re-run. When a re-audit lowers a verdict, the slim snapshot regenerates, the docs card re-renders the new verdict (Supports / Partially Supports / Does Not Support / Not Applicable), and the per-component `AAA-AUDIT.md` regenerates with new evidence — all in the same audit-run cycle. The cert payload, docs card, matrix table, and per-component audit file are now anchored on the same audit JSON; they cannot diverge silently.
 
 <SectionHead title="Consumer obligations are editorial" meta="--curated" />
 

@@ -15,12 +15,14 @@
 #   7. Changeset check (if component source changed)
 #   8. Full test suite (all components — catches CI Matrix failures locally)
 #   9. Docker CI (act — full CI pipeline in Docker containers)
+#  10. AAA cert integrity (committed verdicts snapshot — refuses Partial/Fail)
 #
 # Usage:
 #   pnpm run preflight
-#   SKIP_CHANGESET=1 pnpm run preflight   # bypass changeset gate (infra-only changes)
-#   SKIP_ACT=1 pnpm run preflight         # bypass Docker CI gate
-#   SKIP_FULL_TESTS=1 pnpm run preflight  # bypass full test suite (use smart only)
+#   SKIP_CHANGESET=1 pnpm run preflight                       # bypass changeset gate (infra-only changes)
+#   SKIP_ACT=1 pnpm run preflight                             # bypass Docker CI gate
+#   SKIP_FULL_TESTS=1 pnpm run preflight                      # bypass full test suite (use smart only)
+#   AAA_ALLOW_PARTIAL="hx-slider,hx-file-upload" pnpm ...     # acknowledge known Partial verdicts
 #
 # For full CI Matrix parity (Node 22/24):
 #   ./scripts/act-ci.sh --matrix
@@ -345,6 +347,23 @@ else
     echo "    Fix the errors above and re-run: pnpm run preflight"
     exit 1
   fi
+fi
+echo ""
+
+# ── Gate 10: AAA cert integrity ──────────────────────────────────────────────
+
+echo "▶ [10/10] AAA cert integrity"
+
+if node scripts/check-aaa-verdicts.mjs; then
+  : # passed (output already printed by the script)
+else
+  echo ""
+  echo "  ✗ AAA CERT INTEGRITY GATE FAILED — do NOT push."
+  echo "    A verdict regression would land Partially Supports or Does Not Support"
+  echo "    on at least one (component × criterion) cell in the committed snapshot."
+  echo "    Fix the underlying gap OR set AAA_ALLOW_PARTIAL=<tags> to acknowledge"
+  echo "    a known-honest Partial (paper-trail via commit message)."
+  exit 1
 fi
 echo ""
 

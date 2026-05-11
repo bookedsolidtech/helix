@@ -90,8 +90,7 @@ export const helixAvatarStyles = css`
   /* ─── Fallback Icon ─── */
 
   .avatar__fallback-icon {
-    width: 60%;
-    height: 60%;
+    --hx-icon-size: 60%;
     color: var(--hx-avatar-color, var(--hx-color-primary-700, #0f6363));
   }
 

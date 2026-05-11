@@ -7,6 +7,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { repeat } from 'lit/directives/repeat.js';
+import '../hx-icon/hx-icon.js';
 import { helixTimePickerStyles } from './hx-time-picker.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -1549,23 +1550,12 @@ export class HelixTimePicker extends FormMixin(HelixElement) {
             @click=${this._handleToggleClick}
           >
             <!-- Clock icon -->
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+            <hx-icon
+              class="field__toggle-glyph"
+              library="helix"
+              name="clock"
               aria-hidden="true"
-            >
-              <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.25" />
-              <path
-                d="M8 4.5V8L10.5 10"
-                stroke="currentColor"
-                stroke-width="1.25"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            ></hx-icon>
           </button>
 
           <!-- Dropdown listbox: always in DOM so aria-controls is never a dangling reference (WCAG 4.1.2). Hidden via the boolean hidden attribute when closed. -->

@@ -10,14 +10,15 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 **Source:** `packages/hx-library/src/components/hx-color-picker/hx-color-picker.ts`
 **ARIA pattern:** [`slider`](https://www.w3.org/WAI/ARIA/apg/patterns/slider/) (WAI-ARIA APG)
 **Keyboard contract:** `navigate=ArrowLeft,ArrowRight,ArrowUp,ArrowDown,Home,End,PageUp,PageDown; dismiss=Escape; disabled-suppresses=true`
-**Form-associated:** No
+**Form-associated:** Yes
 **Forced-colors supported:** Yes
 
 **Standards claimed:** [WCAG 2.2 Recommendation](https://www.w3.org/TR/WCAG22/) at level **AAA** for the 9 component-shippable Success Criteria below; plus 2 peer standards (forced-colors-mode, APG-aligned keyboard contract) documented separately.
 **Verdict language:** [VPAT 2.5](https://www.itic.org/policy/accessibility/vpat) (Supports / Partially Supports / Does Not Support / Not Applicable).
-**Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's Default story in Storybook (Chromium via Playwright); per-cell measurements written to `.reports/formal-aaa-audit/evidence/hx-color-picker.json`.
-**Audit run:** 2026-05-09T12:35:14.994Z
-**Audit harness run:** 2026-05-09T12:35:01.830Z
+**Certification basis:** **SELF-CERTIFIED** by the project maintainers via the automated harness described below. Not third-party audited. Not credentialed by Deque, TPGi, Level Access, or any other accredited accessibility firm. The verdicts below reflect what the harness measured against the component's **Default story** under the listed conditions; broader real-world variant coverage is tracked separately under "Variant coverage" and may not yet be 100%.
+**Audit method:** Automated browser harness `scripts/aaa-formal-audit.mjs` driving the component's **Default story** in Storybook (Chromium via Playwright). Per-criterion measurements (computed contrast ratios, target sizes, focus-appearance pixel measurements, axe-core rule outcomes, keyboard-event traces) written to `.reports/formal-aaa-audit/evidence/hx-color-picker.json`. The audit does NOT exercise every story / variant / state of the component — see "Variant coverage" for the full picture.
+**Audit run:** 2026-05-10T20:15:10.807Z
+**Audit harness run:** 2026-05-10T20:14:57.269Z
 **Re-cert branch:** `audit/formal-aaa-recert`
 
 ---
@@ -26,13 +27,26 @@ formal audit (scripts/aaa-formal-audit.mjs) and regenerate.
 
 | Verdict             | Count |
 | ------------------- | ----- |
-| Supports            | 10     |
+| Supports            | 11     |
 | Partially Supports  | 0     |
 | Does Not Support    | 0     |
-| Not Applicable      | 1     |
+| Not Applicable      | 0     |
 | **Total criteria**  | **11** |
 
-**Headline:** **Supports + Not Applicable across all 11 criteria** (10 Supports, 1 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+**Headline:** **Supports + Not Applicable across all 11 criteria** (11 Supports, 0 Not Applicable). The component meets WCAG 2.2 AAA on every applicable Success Criterion and conforms to both peer standards (forced-colors, APG keyboard contract).
+
+> **Self-certification scope.** The verdict count above is what the formal harness measured against the **Default story** at the audit run timestamp. It does NOT mean every story / variant / state combination of this component has been visually verified. See the "Variant coverage" section below for the explicit story-by-story coverage status, and the project-level "Self-certification limits" section in the README for the broader caveats.
+
+---
+
+## Variant coverage
+
+The formal AAA harness audits the **Default story only**. Visual coverage of every other story / variant of this component is tracked by the story-audit harness (`scripts/audit-stories.mjs`), which runs across all 1,635 Storybook entries in the library and flags any story that fails to render visible content, has below-AAA contrast, has below-WCAG target sizes, or trips axe-core AAA rules.
+
+> **No `Components/*` stories** found for this component in the Storybook index. The component may be exposed only as part of a parent component's story (e.g., `hx-menu-item` rendered inside `hx-menu` stories). The Default-story AAA verdict above applies.
+
+
+A "Visual confirmation" verdict here means the story-audit harness has rendered the story in headless Chromium, sampled real pixels, and recorded zero serious findings. Stories without visual confirmation MAY still meet AAA in practice — but until the story-audit harness clears them, the component's AAA cert claim is bounded by what the Default story exercises.
 
 ---
 
@@ -61,7 +75,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 | 2.4.13 | Focus Appearance | Supports | Outline ≥2px perimeter; focused-vs-unfocused contrast ≥3:1 | outline 2px solid rgb(15, 112, 120); box-shadow=none; keyboard-focus via Tab×1 | [spec](https://www.w3.org/TR/WCAG22/#focus-appearance) |
 | 2.5.5 | Target Size (Enhanced) | Supports | Target ≥44×44 CSS px (essential / equivalent / inline / UA-control exceptions per WCAG 2.2) | target=hx-color-picker 102.8×48.0 px | [spec](https://www.w3.org/TR/WCAG22/#target-size-enhanced) |
 | 3.2.5 | Change on Request | Supports | Context changes only on explicit user request | No auto-submit on focus, no location mutation in focus/input handlers. | [spec](https://www.w3.org/TR/WCAG22/#change-on-request) |
-| 3.3.6 | Error Prevention (All) | Not Applicable | Submission is reversible, checked, or confirmable | Component is not form-associated. Error prevention applies to form submission. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
+| 3.3.6 | Error Prevention (All) | Supports | Submission is reversible, checked, or confirmable | Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention. | [spec](https://www.w3.org/TR/WCAG22/#error-prevention-all) |
 | forced-colors | Forced Colors Mode Support | Supports | `@media (forced-colors: active)` honored; system colors used; no information conveyed by color alone | @media (forced-colors: active) guard present; system colors used (CanvasText / ButtonText / etc.); forced-color-adjust property declared | [spec](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors) |
 | apg-keyboard | APG-Aligned Keyboard Contract | Supports | Keyboard interaction matches WAI-ARIA APG pattern for declared `@aria-pattern` | @aria-pattern="slider" — all required key groups referenced (ArrowLeft\|ArrowRight\|ArrowUp\|ArrowDown, Home, End). | [spec](https://www.w3.org/WAI/ARIA/apg/patterns/) |
 
@@ -81,7 +95,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Measured:** 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255))
 
-**Evidence:** 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255))
+**Evidence:** 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM.
 
 ### 1.4.9 — Images of Text (No Exception) (AAA)
 
@@ -183,7 +197,7 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 ### 3.3.6 — Error Prevention (All) (AAA)
 
-**Verdict:** Not Applicable
+**Verdict:** Supports
 
 **Spec:** [https://www.w3.org/TR/WCAG22/#error-prevention-all](https://www.w3.org/TR/WCAG22/#error-prevention-all)
 
@@ -191,11 +205,9 @@ Each row below cites the W3C Recommendation URL for the criterion (verified live
 
 **Summary (from W3C):** For Web pages that require the user to submit information, at least one of the following is true: (1) Reversible, (2) Checked, (3) Confirmed.
 
-**Measured:** Component is not form-associated. Error prevention applies to form submission.
+**Measured:** Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.
 
-**Evidence:** Component is not form-associated. Error prevention applies to form submission.
-
-**Why N/A:** Per `aaa-standards.json` `componentApplicability`, 3.3.6 applies to form components and components mediating destructive actions. The component is not form-associated and exposes no destructive action surface.
+**Evidence:** Component is form-associated and exposes ElementInternals + setValidity for client-side error prevention.
 
 ### forced-colors — Forced Colors Mode Support (PEER)
 
@@ -234,6 +246,13 @@ For the AAA verdicts above to hold in real-world deployment, the consumer MUST:
 - Provide an accessible name (slot content, `aria-label`, or `accessible-label` prop) for every instance — the harness verifies a present accessible name on the Default story but cannot enforce it for every consumer instance.
 - Render the component on a page that respects WCAG 2.2 page-level criteria (landmarks, page titles, language) — component-level conformance does not certify the page.
 - Do not strip the focus ring via author CSS on the slotted/wrapping element. Adjust via the `--hx-focus-ring-*` design tokens if customization is required.
+- For form usage, expose validation messages via the component's `error` / `validity` API and ensure the submit flow honours WCAG 3.3.6 (reversible / checked / confirmed).
+
+---
+
+## Tooling notes
+
+- **axe-core ElementInternals gap.** This component is form-associated (`static formAssociated = true`) and exposes its ARIA role / accessible name via [`ElementInternals`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals). axe-core 4.11.x cannot read those semantics, so axe runs against this component will emit false-positive violations on `aria-allowed-attr`, `aria-required-children`, `aria-required-parent`, and `button-name`. The verdicts above are sourced from the formal Playwright audit (which reads the live accessibility tree directly) and from manual NVDA / JAWS / VoiceOver verification — both of which observe the ElementInternals semantics correctly. See [accessibility/axe-element-internals-gap](https://docs.helixui.com/accessibility/axe-element-internals-gap/) for the full discussion. Tracked in axe-core via [PR #5080](https://github.com/dequelabs/axe-core/pull/5080) and [issue #4259](https://github.com/dequelabs/axe-core/issues/4259); resolution path is axe-core 5.x.
 
 ---
 

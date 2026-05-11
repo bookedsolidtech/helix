@@ -150,6 +150,15 @@ const meta = {
       name=${args.name}
     ></hx-slider>
   `,
+  decorators: [
+    (story) => html`
+      <div
+        style="display: block; padding: 1.5rem 2rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; max-width: 28rem;"
+      >
+        ${story()}
+      </div>
+    `,
+  ],
 } satisfies Meta;
 
 export default meta;

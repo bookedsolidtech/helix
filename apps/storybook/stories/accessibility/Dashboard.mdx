@@ -16,8 +16,8 @@ import '@helixui/library/components/hx-icon-button';
 <div className="hx-docs">
 
 <EyebrowHeading
-  eyebrow="Accessibility · AAA cert dashboard"
-  title="WCAG 2.1 AAA is the target. AA is the floor we never touch."
+  eyebrow="Accessibility · AAA self-cert dashboard"
+  title="WCAG 2.2 AAA is the target. AA is the floor we never touch."
   lede={
     <>
       HELiX is an OSS enterprise component library positioned alongside USWDS — and where{' '}
@@ -31,6 +31,39 @@ import '@helixui/library/components/hx-icon-button';
     </>
   }
 />
+
+<aside
+  style={{
+    margin: '24px 0',
+    padding: '16px 20px',
+    borderLeft: '4px solid var(--hx-color-warning-500)',
+    background: 'var(--hx-color-surface-subtle)',
+    borderRadius: 'var(--hx-radius-md)',
+    maxWidth: '70ch',
+  }}
+>
+  <strong style={{ display: 'block', marginBottom: 8 }}>
+    Scope of this cert · read this first
+  </strong>
+  <p style={{ margin: '0 0 8px 0', fontSize: 14, lineHeight: 1.6 }}>
+    The verdicts on this dashboard and on every component page are{' '}
+    <strong>self-certified by the project maintainers</strong>, not third-party VPAT-attested. The
+    formal AAA harness (<code>pnpm aaa:audit</code>) measures each P0 component against{' '}
+    <strong>11 success criteria</strong> on the component&apos;s <strong>Default story only</strong>
+    . Variant coverage (every story state for every component) is asserted by a separate
+    visual-rendering harness (<code>scripts/audit-stories.mjs</code>); axe-core in browser-mode
+    smoke-tests the same surface.
+  </p>
+  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>
+    Per-component evidence lives under{' '}
+    <a href="https://github.com/bookedsolidtech/helix/tree/main/.reports/formal-aaa-audit/evidence">
+      <code>.reports/formal-aaa-audit/evidence/</code>
+    </a>
+    . Full self-cert scope and known limits:{' '}
+    <a href="/?path=/docs/accessibility-self-certification-scope--docs">Self-Certification Scope</a>
+    .
+  </p>
+</aside>
 
 <section>
   <SectionHead title="Coverage at a glance" meta="tokens 3.3.1 · regression-tested in CI" />

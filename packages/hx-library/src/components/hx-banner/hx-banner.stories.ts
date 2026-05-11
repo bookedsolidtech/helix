@@ -154,10 +154,20 @@ export const Default: Story = {
     // Role is applied to the host element, not the shadow DOM internal div
     await expect(banner?.getAttribute('role')).toBe('status');
 
-    // Verify icon is rendered
+    // Verify icon is rendered. Post-3.9.0 hx-banner delegates icon rendering
+    // to <hx-icon library="helix" name=…>, so the SVG lives inside hx-icon's
+    // shadow root rather than directly in banner's [part="icon"] slot. Walk
+    // the shadow boundary to confirm the icon hydrated.
     const iconPart = banner?.shadowRoot?.querySelector('[part="icon"]');
     await expect(iconPart).toBeTruthy();
-    const svg = iconPart?.querySelector('svg');
+    const hxIcon = iconPart?.querySelector('hx-icon') as
+      | (HTMLElement & { updateComplete?: Promise<unknown> })
+      | null;
+    await expect(hxIcon).toBeTruthy();
+    // Lit child has its own async update cycle. Wait for hx-icon to finish
+    // stamping its shadow SVG before asserting on it (race-flake guard).
+    if (hxIcon?.updateComplete) await hxIcon.updateComplete;
+    const svg = hxIcon?.shadowRoot?.querySelector('svg');
     await expect(svg).toBeTruthy();
 
     // Verify message slot is populated

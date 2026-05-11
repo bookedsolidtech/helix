@@ -181,4 +181,9 @@ export const helixTagStyles = css`
       border-width: 3px;
     }
   }
+
+  /* hx-icon glyph sizing for the migrated remove-button SVG. */
+  .tag__remove-glyph {
+    --hx-icon-size: 10px;
+  }
 `;

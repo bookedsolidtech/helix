@@ -46,7 +46,7 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       // Externalize Lit and workspace dependencies
-      external: [/^lit/, /^@lit/, /^@helixui\/tokens/, /^@floating-ui/],
+      external: [/^lit/, /^@lit/, /^@helixui\/tokens/, /^@helixui\/icons/, /^@floating-ui/],
       output: {
         // Place entry points at their expected paths
         entryFileNames: '[name].js',

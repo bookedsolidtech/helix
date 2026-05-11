@@ -383,13 +383,13 @@ describe('hx-banner', () => {
   // ─── Default Icons (1) ───
 
   describe('Default icons', () => {
-    it('renders a default SVG icon per variant', async () => {
+    it('renders a default hx-icon glyph per variant', async () => {
       const variants = ['info', 'success', 'warning', 'error'] as const;
       for (const variant of variants) {
         const el = await fixture<HxBanner>(`<hx-banner variant="${variant}">Test</hx-banner>`);
         const iconContainer = shadowQuery(el, '[part="icon"]')!;
-        const svg = iconContainer.querySelector('svg');
-        expect(svg).toBeTruthy();
+        const glyph = iconContainer.querySelector(`hx-icon[library="helix"][name="${variant}"]`);
+        expect(glyph).toBeTruthy();
       }
     });
   });

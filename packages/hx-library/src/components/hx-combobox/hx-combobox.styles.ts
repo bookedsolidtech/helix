@@ -386,4 +386,12 @@ export const helixComboboxStyles = css`
     outline-offset: var(--hx-focus-ring-offset, 2px);
     opacity: 1;
   }
+
+  /* hx-icon glyph sizing for migrated inline SVGs (library="helix"). */
+  .field__chip-remove-glyph {
+    --hx-icon-size: 8px;
+  }
+  .field__clear-button-glyph {
+    --hx-icon-size: 12px;
+  }
 `;

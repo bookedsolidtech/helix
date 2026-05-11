@@ -109,18 +109,12 @@ export const helixTreeItemStyles = css`
     outline-offset: var(--hx-focus-ring-offset, 2px);
   }
 
-  .expand-btn svg {
-    width: var(--hx-space-3, 0.75rem);
-    height: var(--hx-space-3, 0.75rem);
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .expand-btn .expand-glyph {
+    --hx-icon-size: var(--hx-space-3, 0.75rem);
     transition: transform var(--hx-transition-fast, 150ms ease);
   }
 
-  :host([expanded]) .expand-btn svg {
+  :host([expanded]) .expand-btn .expand-glyph {
     transform: rotate(90deg);
   }
 

@@ -1067,7 +1067,7 @@ describe('hx-carousel', () => {
   // ─── Vertical orientation icon rendering ───
 
   describe('Vertical orientation icon rendering', () => {
-    it('prev button contains up-chevron polyline in vertical orientation', async () => {
+    it('prev button uses chevron-up hx-icon in vertical orientation', async () => {
       const el = await fixture<HelixCarousel>(`
         <hx-carousel orientation="vertical" loop>
           <hx-carousel-item>1</hx-carousel-item>
@@ -1076,13 +1076,11 @@ describe('hx-carousel', () => {
       `);
       await el.updateComplete;
       const prevBtn = shadowQuery(el, '[part="prev-button"]');
-      // Vertical prev uses chevron-up: points="18 15 12 9 6 15"
-      const svgInPrev = prevBtn?.querySelector('svg');
-      const polyline = svgInPrev?.querySelector('polyline');
-      expect(polyline?.getAttribute('points')).toBe('18 15 12 9 6 15');
+      const glyph = prevBtn?.querySelector('hx-icon[library="helix"][name="chevron-up"]');
+      expect(glyph).toBeTruthy();
     });
 
-    it('next button contains down-chevron polyline in vertical orientation', async () => {
+    it('next button uses chevron-down hx-icon in vertical orientation', async () => {
       const el = await fixture<HelixCarousel>(`
         <hx-carousel orientation="vertical" loop>
           <hx-carousel-item>1</hx-carousel-item>
@@ -1091,13 +1089,11 @@ describe('hx-carousel', () => {
       `);
       await el.updateComplete;
       const nextBtn = shadowQuery(el, '[part="next-button"]');
-      // Vertical next uses chevron-down: points="6 9 12 15 18 9"
-      const svgInNext = nextBtn?.querySelector('svg');
-      const polyline = svgInNext?.querySelector('polyline');
-      expect(polyline?.getAttribute('points')).toBe('6 9 12 15 18 9');
+      const glyph = nextBtn?.querySelector('hx-icon[library="helix"][name="chevron-down"]');
+      expect(glyph).toBeTruthy();
     });
 
-    it('prev button contains left-chevron polyline in horizontal orientation', async () => {
+    it('prev button uses chevron-left hx-icon in horizontal orientation', async () => {
       const el = await fixture<HelixCarousel>(`
         <hx-carousel loop>
           <hx-carousel-item>1</hx-carousel-item>
@@ -1106,10 +1102,8 @@ describe('hx-carousel', () => {
       `);
       await el.updateComplete;
       const prevBtn = shadowQuery(el, '[part="prev-button"]');
-      // Horizontal prev uses chevron-left: points="15 18 9 12 15 6"
-      const svgInPrev = prevBtn?.querySelector('svg');
-      const polyline = svgInPrev?.querySelector('polyline');
-      expect(polyline?.getAttribute('points')).toBe('15 18 9 12 15 6');
+      const glyph = prevBtn?.querySelector('hx-icon[library="helix"][name="chevron-left"]');
+      expect(glyph).toBeTruthy();
     });
   });
 

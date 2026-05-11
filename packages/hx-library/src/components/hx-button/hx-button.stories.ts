@@ -233,6 +233,16 @@ export const Ghost: Story = {
     variant: 'ghost',
     label: 'Cancel',
   },
+  decorators: [
+    (story) => html`
+      <div
+        style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 14rem;"
+      >
+        ${story()}
+        <span style="font: 0.875rem system-ui, sans-serif; color: #4b5563;">Ghost variant</span>
+      </div>
+    `,
+  ],
 };
 
 export const Outline: Story = {
@@ -733,22 +743,27 @@ export const WithIcon: Story = {
 
 export const IconOnly: Story = {
   render: () => html`
-    <hx-button variant="ghost" aria-label="Close dialog">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M18 6L6 18M6 6l12 12" />
-      </svg>
-    </hx-button>
+    <div
+      style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; min-width: 14rem;"
+    >
+      <hx-button variant="ghost" aria-label="Close dialog">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </hx-button>
+      <span style="font: 0.875rem system-ui, sans-serif; color: #4b5563;">Icon only</span>
+    </div>
   `,
 };
 

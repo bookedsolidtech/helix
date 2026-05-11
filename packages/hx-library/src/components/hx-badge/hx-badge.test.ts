@@ -660,14 +660,14 @@ describe('hx-badge', () => {
     });
   });
 
-  // ─── remove button SVG aria-hidden ───
+  // ─── remove button glyph aria-hidden ───
 
-  describe('remove button SVG aria-hidden', () => {
-    it('remove button SVG has aria-hidden="true"', async () => {
+  describe('remove button glyph aria-hidden', () => {
+    it('remove button hx-icon has aria-hidden="true"', async () => {
       const el = await fixture<HxBadge>('<hx-badge removable>Tag</hx-badge>');
       const btn = shadowQuery(el, '[part="remove-button"]');
-      const svg = btn?.querySelector('svg');
-      expect(svg?.getAttribute('aria-hidden')).toBe('true');
+      const glyph = btn?.querySelector('hx-icon[library="helix"][name="close"]');
+      expect(glyph?.getAttribute('aria-hidden')).toBe('true');
     });
   });
 

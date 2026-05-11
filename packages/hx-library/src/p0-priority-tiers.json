@@ -4,8 +4,8 @@
   "generatedAt": "2026-05-07",
   "rationale": "Canonical priority-tier classification for the AAA Cert Epic (Tier 3). P0 = interactive + healthcare-critical components committed to AAA conformance per WCAG 2.1 + APG-aligned keyboard contracts. P1 = data display + progress + special-case components committed to AA-strict + AAA-informational. P2 = indicators + structural layout (AA-inherited; AAA where the component happens to qualify). Exempt = utility/theming primitives with no contrast obligation.",
   "p0": {
-    "count": 43,
-    "rationale": "Interactive primitives, healthcare-critical surfaces, form controls. AAA-certified per the 11 component-shippable criteria (1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, APG-aligned keyboard contract). VPAT v1.0 publishes when 30+ of these reach AAA-cert.",
+    "count": 44,
+    "rationale": "Interactive primitives, healthcare-critical surfaces, form controls, and the icon primitive (hx-icon — non-text-contrast surface consumed by 30+ components and certed against WCAG 1.4.11). AAA-certified per the 11 component-shippable criteria (1.4.6, 1.4.9, 2.1.3, 2.3.3, 2.4.12, 2.4.13, 2.5.5, 3.2.5, 3.3.6, forced-colors, APG-aligned keyboard contract). VPAT v1.0 publishes when 30+ of these reach AAA-cert.",
     "components": {
       "form-inputs": [
         "hx-text-input",
@@ -42,7 +42,8 @@
       "live-regions": ["hx-alert", "hx-toast", "hx-banner"],
       "sliders": ["hx-slider", "hx-rating"],
       "form-assembly": ["hx-form", "hx-field"],
-      "field-helpers": ["hx-field-label", "hx-help-text", "hx-clinical-status"]
+      "field-helpers": ["hx-field-label", "hx-help-text", "hx-clinical-status"],
+      "primitives": ["hx-icon"]
     }
   },
   "p1": {
@@ -62,7 +63,7 @@
     }
   },
   "p2": {
-    "count": 23,
+    "count": 22,
     "rationale": "Indicators, structural/layout primitives, decorative content. AA-inherited from token cascade; AAA where the surface naturally qualifies (e.g., text on default surfaces). No per-component AAA cert obligation; documented in VPAT as Pending audit / Not Evaluated until escalated.",
     "components": {
       "indicators": [
@@ -71,7 +72,6 @@
         "hx-spinner",
         "hx-avatar",
         "hx-image",
-        "hx-icon",
         "hx-status-indicator"
       ],
       "stat-metric": ["hx-stat", "hx-counter"],
@@ -99,9 +99,9 @@
     "components": ["hx-visually-hidden", "hx-style-scope", "hx-theme", "hx-format-date"]
   },
   "totals": {
-    "p0": 43,
+    "p0": 44,
     "p1": 11,
-    "p2": 23,
+    "p2": 22,
     "exempt": 4,
     "all": 81
   },

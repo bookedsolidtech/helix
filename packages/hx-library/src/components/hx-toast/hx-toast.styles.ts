@@ -124,6 +124,12 @@ export const helixToastStyles = css`
     display: none;
   }
 
+  /* Match the previous inline 16x16 SVG sizing for both the variant icon and
+     the close-button glyph migrated to hx-icon (library="helix"). */
+  .toast__glyph {
+    --hx-icon-size: 16px;
+  }
+
   /* ─── Message ─── */
 
   .toast__message {
