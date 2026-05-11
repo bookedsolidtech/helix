@@ -1,0 +1,74 @@
+---
+title: Upgrading to 3.9.0
+description: Breaking + back-compat notes for the @helixui/library 3.8.0 → 3.9.0 upgrade.
+---
+
+# Upgrading to 3.9.0
+
+This release adds the `@helixui/icons` peer dependency and refactors internal icon rendering across 25+ components to use `<hx-icon>`. Most consumers will not notice — pre-3.9.0 bare-name `<hx-icon name="check">` usage is preserved via the empty-default `library` attribute.
+
+## Install changes
+
+`@helixui/library@3.9.0` adds a new required peer dependency:
+
+```bash
+pnpm add @helixui/library @helixui/icons @helixui/tokens
+```
+
+If you're upgrading an existing project that already has `@helixui/library`, add `@helixui/icons` to your dependencies.
+
+## hx-icon attribute defaults
+
+The `library` attribute on `<hx-icon>` defaults to the empty string in 3.9.0. This preserves the pre-3.9.0 contract where `<hx-icon name="check">` renders `<use href="#check">` against a document-local sprite — exactly the behavior consumers had before. To opt into the new registry, set `library` explicitly:
+
+```html
+<!-- back-compat: document-local sprite (no change from 3.8.0) -->
+<hx-icon name="check"></hx-icon>
+
+<!-- new in 3.9.0: registry-resolved fa-free library -->
+<hx-icon library="fa-free" name="check"></hx-icon>
+
+<!-- new in 3.9.0: curated helix glyph set -->
+<hx-icon library="helix" name="check"></hx-icon>
+```
+
+See [the @helixui/icons docs](https://storybook.helix.bookedsolid.tech/?path=/docs/foundations-iconography--docs) for the registry API.
+
+## Internal SVG migration
+
+The following components were migrated from inline SVG to `<hx-icon library="helix">` internally — no consumer change required. Listed here for awareness:
+
+- hx-alert, hx-banner, hx-toast (status icons)
+- hx-checkbox, hx-radio (check/dot)
+- hx-rating (star)
+- hx-tree-item, hx-tree-view (chevron)
+- hx-copy-button (copy/check)
+- hx-stat (trend arrow)
+- hx-select, hx-combobox (chevron)
+- hx-date-picker, hx-time-picker (calendar/clock)
+- hx-file-upload (upload/file)
+- hx-pagination (chevrons)
+- plus ~10 more
+
+## Form validity integration
+
+`<hx-slider>` and `<hx-file-upload>` now wire `ElementInternals.setValidity()` so they participate in native form-validity machinery. Consumer apps reading `form.checkValidity()` or `form.reportValidity()` will now see these components in the validation flow.
+
+This closes the WCAG 3.3.6 Error Prevention (All) gap. No consumer migration required.
+
+## AAA cert remediation
+
+The 3.9.0 release fixes structural issues in the AAA cert harness that were producing inaccurate verdicts. The current matrix:
+
+- **376 Supports** verdicts (44 components × applicable criteria)
+- **0 Partial** verdicts
+- **0 Fail** verdicts
+- **109 Not Applicable** cells (criterion does not apply per component class)
+
+Reproducible via `pnpm aaa:audit` against a running Storybook.
+
+See the [VPAT 2.5 conformance report](/accessibility/vpat-2.5/) for the per-criterion ledger.
+
+## Breaking changes
+
+None. The version was originally cut as 4.0.0 due to a changeset-config defect (deprecated on npm); the corrected 3.9.0 publish is the canonical release.

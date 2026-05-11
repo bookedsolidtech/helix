@@ -1,5 +1,128 @@
 # @helixui/library
 
+## 4.0.0 [DEPRECATED]
+
+Mistakenly published as MAJOR via a changeset-metadata defect (icons-1-0-0-initial.md was marked `major`, which cascaded through the linked-package group and peerDep range rules). The 4.0.0 release contains only additive minor changes — same code as 3.9.0. The 4.0.0 version is deprecated on npm; consumers should use 3.9.0.
+
+## 3.9.0
+
+### Minor Changes
+
+- 7b42779: aaa-cert hx-icon as p0; wire @helixui/icons registry resolution
+
+  `<hx-icon>` resolves through the `@helixui/icons` registry and is
+  AAA-certed (P0) per WCAG 2.2 + 1.4.11 (non-text contrast). The
+  component now ships a `library` attribute (default `'fa-free'`)
+  that resolves through `getIconLibrary()`, plus integration of the
+  optional library mutator hook (runs AFTER security sanitization).
+
+  Adds the `--hx-icon-stroke-width` semantic token (default `2`)
+  consumed by stroke-paint and mixed-paint consumer libraries; the
+  bundled `helix` and `fa-free` libraries are fill-only and ignore
+  it.
+
+  The formal AAA harness gains a `non-text-contrast-icon` check that
+  measures rendered glyph contrast against the document background.
+  `iconLibraryAaaVerdict()` from `@helixui/icons` exposes the
+  per-library AAA verdict for both built-ins (`pass` across all three
+  dimensions). `packages/hx-icons/AAA-VERDICT.md` publishes the full
+  per-library evidence including borderline glyphs (`dot`, `dash`,
+  `star-outline`) with recommended minimum render sizes.
+
+  Existing `src` (inline-fetch) and `sprite-url` escape hatches are
+  preserved unchanged.
+
+- 723eec6: wire @helixui/icons registry into hx-icon and migrate internal components to `<hx-icon library="helix">`.
+
+  **hx-icon component**
+  - new `library` attribute (defaults to `'fa-free'`); resolves names through @helixui/icons registry
+  - mutator hook integration: registered libraries with `spriteSheet: false` can transform sanitized svg before injection
+  - existing `name`+`sprite-url` and `src` modes preserved as escape hatches — no consumer breaks
+
+  **internal migration (29 components)**
+
+  every inline svg glyph for status / direction / forms / actions / domain / navigation has been replaced with `<hx-icon library="helix" name="...">` (or `library="fa-free"` for the handful of glyphs that aren't in the helix vocabulary):
+
+  hx-checkbox, hx-radio, hx-alert, hx-toast, hx-banner, hx-rating, hx-stat, hx-help-text, hx-clinical-status, hx-phi-field, hx-file-upload, hx-combobox, hx-date-picker, hx-time-picker, hx-number-input, hx-tree-view, hx-side-nav (+nav-item), hx-accordion, hx-badge, hx-tag, hx-avatar (uses `fa-free name="user"`), hx-link, hx-steps, hx-overflow-menu (helix + fa-free), hx-menu, hx-split-button, hx-nav, hx-top-nav, hx-carousel (helix + fa-free), hx-drawer
+
+  structural svg components (hx-icon, hx-progress-ring, hx-spinner, hx-data-table sort indicators) are intentionally not migrated — their svgs are the visual, not glyph references.
+
+  **aaa cert**
+  - new p0: hx-icon — 6 supports / 6 not applicable / 0 partial / 0 fail. non-text contrast 1.4.11 measured at 21:1 against minimum render background.
+  - existing 43 p0 components recertified post-migration — no regressions.
+
+  **design tokens**
+  - new semantic token `--hx-icon-stroke-width` (default `2`) — applies to stroke-paint consumer libraries (lucide, phosphor regular, heroicons outline). built-in libraries are fill-only and ignore the token.
+
+  **peer dependency**
+  - adds `@helixui/icons@^1.0.0` to peerDependencies. install both packages together.
+
+### Patch Changes
+
+- 2068ed3: document axe-core elementinternals gap + project policy
+
+  The story-audit harness (`scripts/audit-stories.mjs`) now disables the
+  axe-core rules that are known to misreport FACE / `ElementInternals`
+  components — `aria-allowed-attr`, `aria-required-children`,
+  `aria-required-parent`, and `button-name`. axe-core 4.11.x cannot read
+  ARIA role / accessible-name semantics exposed via `ElementInternals`,
+  which produces false-positive violations against form-associated
+  HELiX components even when the live accessibility tree is correct.
+
+  The formal AAA audit (`pnpm aaa:audit`) is unchanged and remains the
+  cert authority — it sources verdicts from Playwright keyboard / role /
+  name probes that read the live accessibility tree directly. Manual
+  NVDA / JAWS / VoiceOver verification continues to gate every P0
+  component.
+
+  A new docs page at `accessibility/axe-element-internals-gap` describes
+  the gap, the affected components, the mitigation, and the resolution
+  path (axe-core 5.x or PR #5080 merged into a 4.x branch). The
+  per-component AAA-AUDIT.md template gains a "Tooling notes" section
+  that surfaces this gap on every FACE component's audit page.
+
+  This is a documentation + harness-tuning change. No component runtime
+  behaviour changes.
+
+- 1ea6a14: bump text.muted and success-text to AAA-strict (1.4.6) ratios
+
+  The story-audit harness flagged hundreds of contrast failures that
+  trace to two semantic text tokens being tuned to AA, not AAA-strict.
+  The 7:1 strict floor for body-sized text (WCAG 1.4.6 AAA) is the
+  HELiX cert authority — the AA tunings let the harness flag every
+  docs / MDX prose body that paints muted text on a sunken surface,
+  and every success callout that paints success text on a tinted
+  success-50 surface.
+
+  `text.muted` shifts from `neutral-600` (#4A5362) to `neutral-700`
+  (#313E4B). The prior value cleared 7.76:1 on white, 7.25:1 on
+  surface.raised, but only 6.63:1 on surface.sunken — sub-7:1 across
+  every audit story that paints muted text on the sunken background
+  chrome. The new value clears 10.93 / 10.20 / 9.34 across all three
+  surfaces. The shift collapses muted with secondary (also
+  neutral-700); the original neutral-600 / neutral-700 visual delta
+  was already imperceptible in body copy, and the AAA mandate
+  permits this collapse. text.muted retains its semantic identity
+  for italics / smaller-size affordances and remains brand-overridable.
+
+  `success-text` shifts from `success-700` (#146831) to `success-800`
+  (#0B4D23). The prior value cleared 6.88:1 on white but only 6.35:1
+  on success-50 and 5.85:1 on success-100 — sub-7:1 on every tinted
+  success callout. The new value clears 10.00 / 9.23 / 8.50 across
+  all three surfaces. Sister token `error-text` is already at
+  error-700 (7.96:1 on white) per the 3.8.0 AAA recert; this commit
+  brings the success ramp into matching AAA-strict territory.
+
+  The dark-mode override for text.muted (neutral-400 = 6.27:1 on
+  dark surface.default) is unchanged — dark-mode contrast was
+  already AAA-tuned via the 3.2.0 dark.color.text.muted override.
+
+- Updated dependencies [7b42779]
+- Updated dependencies [723eec6]
+- Updated dependencies [1ea6a14]
+  - @helixui/icons@2.0.0
+  - @helixui/tokens@4.0.0
+
 ## 3.8.0
 
 ### Minor Changes

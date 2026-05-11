@@ -10,21 +10,25 @@ If you already have a 2.x release of `@helixui/library` installed, read the [Upg
 ## Install via npm
 
 ```bash
-npm install @helixui/library @helixui/tokens
+npm install @helixui/library @helixui/icons @helixui/tokens
 ```
 
 Or with pnpm:
 
 ```bash
-pnpm add @helixui/library @helixui/tokens
+pnpm add @helixui/library @helixui/icons @helixui/tokens
 ```
 
 Current versions:
 
-| Package             | Version |
-| ------------------- | ------- |
-| `@helixui/library`  | 3.0.0   |
-| `@helixui/tokens`   | 3.0.0   |
+| Package             | Version  | Notes                                    |
+| ------------------- | -------- | ---------------------------------------- |
+| `@helixui/library`  | ^3.9.0   | Lit 3.x components (core)                |
+| `@helixui/icons`    | ^1.0.0   | Required peer — icon registry            |
+| `@helixui/tokens`   | ^3.9.0   | Required peer — design tokens            |
+| `@helixui/react`    | ^3.9.0   | Optional — React 18/19 wrappers          |
+
+If you are upgrading an existing project from `@helixui/library@3.8.x` or earlier, see the [3.8.0 → 3.9.0 migration guide](/migration/3-8-0-to-3-9-0/) — `@helixui/icons` is a new required peer dependency.
 
 ## CDN (No Build Step)
 
@@ -32,15 +36,15 @@ Load HELiX directly in any HTML page via unpkg or jsDelivr:
 
 ```html
 <!-- All components (recommended for prototyping) -->
-<script type="module" src="https://unpkg.com/@helixui/library@3.0.0/dist/index.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@helixui/library@3.0.0/dist/css/helix-all.css">
+<script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/index.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@helixui/library@3.9.0/dist/css/helix-all.css">
 ```
 
 jsDelivr alternative:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/css/helix-all.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css">
 ```
 
 ## Prerequisites
