@@ -15,6 +15,9 @@ Thank you for your interest in contributing to HELiX, an enterprise healthcare w
 - [Component Development](#component-development)
 - [Testing Requirements](#testing-requirements)
 - [Documentation Requirements](#documentation-requirements)
+  - [Where does this doc page go?](#where-does-this-doc-page-go)
+  - [Canonical-reference table](#canonical-reference-table)
+  - [Cross-linking convention](#cross-linking-convention)
 
 ## Code of Conduct
 
@@ -532,6 +535,44 @@ pnpm --filter=@helixui/library run test:ui
 
 ## Documentation Requirements
 
+HELiX docs live across three surfaces. Each surface has a specific job; pages must live in the surface whose job they serve. Surface mismatches create maintenance debt and consumer confusion.
+
+### Where does this doc page go?
+
+Before writing a new doc page, run it through the 3-question boundary test:
+
+1. **Does this page require a live HELiX component to make its point?** → **Storybook** (`apps/storybook/stories/`)
+2. **Is this page step-by-step instruction for someone past evaluation?** → **`apps/docs/`** (Astro Starlight)
+3. **Is this page first-5-seconds positioning for evaluators?** → **marketing site** (booked-solid-tech.com — out of this repo)
+
+If two answers apply, the page is too broad — split it. If zero apply, the page doesn't belong in any of our docs surfaces.
+
+### Canonical-reference table
+
+The single source of truth per content type. **Authoring the same fact in two places creates drift; one surface owns it and the other links.**
+
+| Content type | Canonical home | Cross-link from the other surface |
+| --- | --- | --- |
+| Component API (props, events, slots, CSS parts, CSS custom props) | **Storybook** (CEM-driven autodocs via `HelixDocsPage`) | `apps/docs` framework-integration pages link to `storybook.helix.bookedsolid.tech/?path=/docs/components-<name>--docs` |
+| Live component demo / playground | **Storybook** (`*.stories.ts`) | `apps/docs` references with static excerpts that link to the live demo |
+| Brand registry (live token swatches + theme switching) | **Storybook** (`foundations/BrandRegistry.mdx`) | `apps/docs/design-tokens/*` links to the live page |
+| Foundations (live swatches with brand toolbar) | **Storybook** (`foundations/Color`, `Typography`, etc.) | `apps/docs/design-tokens/*` for the static token tables; cross-link both ways |
+| Iconography (visual catalog) | **Storybook** (`foundations/Iconography.mdx`) | `apps/docs` references it from the `@helixui/icons` integration guide |
+| AAA cert dashboard + per-component AAAConformanceCard | **Storybook** (`accessibility/Dashboard.mdx`) | `apps/docs/accessibility/*` links to the dashboard |
+| Accessibility — VPAT scope, consumer obligations, WCAG SC reference | **`apps/docs`** (`accessibility/self-cert-scope.mdx`, `accessibility/consumer-obligations.mdx`, `accessibility/success-criteria.mdx`) | Storybook `accessibility/Dashboard.mdx` links to the apps/docs prose |
+| Drupal integration (Twig, behaviors, CDN, module install) | **`apps/docs`** (`drupal/`) | No Storybook duplicate (no live components needed) |
+| Framework integration (React, Next.js, Vue, Angular, Svelte, vanilla HTML) | **`apps/docs`** (`framework-integration/`) | Storybook Overview links back |
+| Getting started + migration + release policy | **`apps/docs`** (`getting-started/`, `migration/`) | Storybook Overview links back |
+| Architecture (monorepo, build, testing strategy) | **`apps/docs`** (`architecture/`) | Internal reference; no cross-link needed |
+| AI-agent context (`llms.txt`, `llms-full.txt`) | **`apps/docs`** (root, generated from CEM + `aaa-verdicts.json`) | Generated, not hand-authored |
+
+### Cross-linking convention
+
+- Component reference in `apps/docs/` ⇒ link to the deployed Storybook URL pattern: `https://storybook.helix.bookedsolid.tech/?path=/docs/components-<name>--docs`
+- Storybook page that needs framework-specific setup ⇒ link to `apps/docs/framework-integration/<framework>/`
+- Storybook page that explains the AAA cert scope ⇒ link to `apps/docs/accessibility/self-cert-scope/`
+- **Never duplicate prose across surfaces.** If you find yourself copy-pasting a paragraph from one surface to the other, the page is in the wrong surface — fix the surface, don't duplicate.
+
 ### Code Documentation
 
 - **JSDoc**: All public APIs must have JSDoc
@@ -540,23 +581,23 @@ pnpm --filter=@helixui/library run test:ui
 
 ### Storybook Stories
 
-Required for every component:
+Required for every component (Storybook is the canonical per-component reference):
 
 - Default story
 - All variants
 - All states (disabled, loading, error, etc.)
 - Interactive controls
-- Accessibility documentation
+- Accessibility documentation (`AAAConformanceCard` is auto-rendered from the committed `aaa-verdicts.json` snapshot)
 
-### Starlight Documentation
+### Starlight Documentation (`apps/docs/`)
 
-Required for new features:
+Required for new features that consumers integrate into their apps:
 
-- Component guide page
-- Usage examples
-- API reference (auto-generated from CEM)
-- Accessibility notes
-- Drupal integration examples
+- Getting-started + installation if it changes the install contract
+- Framework-integration page if a new framework wrapper ships
+- Drupal integration page if Drupal-specific guidance changes
+- Migration entry if breaking changes ship
+- **No per-component reference pages** — Storybook owns those via CEM-driven autodocs
 
 ## Questions or Issues?
 
