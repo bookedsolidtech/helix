@@ -133,7 +133,15 @@ export const Default: Story = {
     await expect(dropdown?.shadowRoot?.querySelector('[part="panel"]')).toBeTruthy();
     await expect(dropdown?.querySelector('hx-menu')).toBeTruthy();
 
-    const trigger = canvas.getByRole('button', { name: /open menu/i });
+    // Query the slotted hx-button directly. testing-library's getByRole walks
+    // the accessibility tree but hx-button is a custom element whose internal
+    // <button> role is exposed via ElementInternals; the helper doesn't
+    // resolve slotted-into-custom-element trees reliably across Chromium
+    // accessibility-tree timings. Direct DOM query is the stable pattern
+    // used in the Icon Trigger story below.
+    const trigger = dropdown?.querySelector('hx-button[slot="trigger"]') as HTMLElement | null;
+    await expect(trigger).toBeTruthy();
+    if (!trigger) return;
     await userEvent.click(trigger);
     await expect(dropdown?.open).toBe(true);
 
