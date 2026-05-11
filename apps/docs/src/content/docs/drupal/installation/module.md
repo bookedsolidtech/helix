@@ -238,7 +238,7 @@ Install HELiX locally and copy the built files:
 mkdir -p web/modules/custom/hx_library/libraries/helix
 
 # Install HELiX in a temporary location
-npm install @helixui/library@3.0.0 --prefix /tmp/helix-install
+npm install @helixui/library@3.9.0 --prefix /tmp/helix-install
 
 # Copy the dist directory
 cp -r /tmp/helix-install/node_modules/@helixui/library/dist \
@@ -312,7 +312,7 @@ Add a `package.json` to the module itself and run npm as part of module setup:
   "name": "hx-library-drupal-module",
   "private": true,
   "scripts": {
-    "sync": "npm install @helixui/library@3.0.0 && node scripts/copy-dist.js"
+    "sync": "npm install @helixui/library@3.9.0 && node scripts/copy-dist.js"
   },
   "devDependencies": {
     "@helixui/library": "1.1.2"
@@ -489,7 +489,7 @@ function hx_library_requirements($phase) {
         'title' => t('HELiX Library files'),
         'value' => t('Missing'),
         'description' => t(
-          'HELiX component files not found at @path. Copy the files from @helixui/library@3.0.0/dist/ or run composer install.',
+          'HELiX component files not found at @path. Copy the files from @helixui/library@3.9.0/dist/ or run composer install.',
           ['@path' => $library_file]
         ),
         'severity' => REQUIREMENT_ERROR,

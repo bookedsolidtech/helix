@@ -60,13 +60,13 @@ This creates a minimal `package.json`. You'll customize it in a moment.
 ## Step 2: Install HELiX
 
 ```bash
-npm install @helixui/library@3.0.0
+npm install @helixui/library@3.9.0
 ```
 
 To also install the design tokens package (required if your theme uses HELiX CSS custom properties outside of components):
 
 ```bash
-npm install @helixui/tokens@0.3.4
+npm install @helixui/tokens@3.9.0
 ```
 
 Verify the installation:
@@ -486,7 +486,7 @@ jobs:
 cd web/themes/custom/mytheme
 
 # Install the new version
-npm install @helixui/library@3.0.0
+npm install @helixui/library@3.9.0
 
 # Review the HELiX changelog before rebuilding
 
@@ -529,7 +529,7 @@ HELiX components encapsulate their styles in Shadow DOM. They do not require you
 If you want to use HELiX design token CSS custom properties in your own theme CSS (outside of components), import the tokens:
 
 ```bash
-npm install @helixui/tokens@0.3.4
+npm install @helixui/tokens@3.9.0
 ```
 
 ```javascript

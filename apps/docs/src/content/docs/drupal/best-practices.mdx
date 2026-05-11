@@ -182,11 +182,6 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
 </hx-card>
 ```
 
-<Aside type="note" title="Reference">
-  See **ADR-DRUPAL-001** in the HELiX documentation for detailed guidance on choosing between
-  property-driven and slot-driven patterns.
-</Aside>
-
 ## Drupal Behaviors Pattern
 
 `Drupal.behaviors` is the standard mechanism for initializing JavaScript in Drupal. Use it to set up event listeners, enhance components, and respond to AJAX updates.
@@ -334,11 +329,6 @@ Handle multiple components in a single behavior file:
 })(Drupal, once);
 ```
 
-<Aside type="note" title="Reference">
-  See **ADR-DRUPAL-002** for event handling best practices, including custom event naming
-  conventions and cleanup patterns.
-</Aside>
-
 ## Form API Integration
 
 ### Using HELiX Components in Drupal Forms
@@ -466,11 +456,6 @@ $build['facility_cards'] = [
 ];
 ```
 
-<Aside type="note" title="Reference">
-  See **ADR-DRUPAL-003** for comprehensive performance optimization strategies, including HTTP/2
-  server push, asset aggregation, and lazy loading patterns.
-</Aside>
-
 ## Accessibility in Drupal Context
 
 ### Form Validation and Error Handling
@@ -529,11 +514,6 @@ once('keyboard-init', 'hx-card[hx-href]', context).forEach((card) => {
   });
 });
 ```
-
-<Aside type="note" title="Reference">
-  See **ADR-DRUPAL-004** for accessibility best practices, including ARIA patterns, focus
-  management, and screen reader compatibility in Drupal workflows.
-</Aside>
 
 ## Common Integration Patterns
 
@@ -634,34 +614,10 @@ helix-theme:
 - **Design Tokens**: See `@helixui/library` token documentation
 - **Accessibility Guide**: WCAG 2.1 AA compliance documentation
 
-### Visual ADRs
-
-Four architectural decision records document Drupal integration patterns:
-
-1. **ADR-DRUPAL-001**: Property-driven vs slot-driven Twig patterns
-   - When to use properties vs slots
-   - Performance implications
-   - Maintainability considerations
-
-2. **ADR-DRUPAL-002**: Event handling and Drupal behaviors
-   - Custom event naming conventions
-   - Cleanup patterns for `detach()`
-   - AJAX integration strategies
-
-3. **ADR-DRUPAL-003**: Performance optimization
-   - CDN vs local loading trade-offs
-   - Lazy loading techniques
-   - BigPipe and render caching
-
-4. **ADR-DRUPAL-004**: Accessibility in Drupal context
-   - Form validation announcements
-   - Focus management
-   - Keyboard navigation patterns
-
 <Aside type="tip" title="Next Steps">
-  Review individual component documentation (hx-card, hx-select, hx-form) for specific Drupal
-  integration examples. See the visual ADRs in the HELiX documentation site for detailed
-  architectural guidance.
+  Review individual component documentation (hx-card, hx-select, hx-form) in the live
+  [Storybook](https://storybook.helix.bookedsolid.tech/) for specific Drupal integration examples
+  and live component playgrounds.
 </Aside>
 
 ## Support and Contribution

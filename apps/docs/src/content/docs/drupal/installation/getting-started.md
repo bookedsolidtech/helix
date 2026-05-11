@@ -106,7 +106,7 @@ Open your theme's `mytheme.libraries.yml` and add:
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -176,9 +176,9 @@ All installation guides on this site use these versions.
 
 | Use case | URL |
 |---|---|
-| Full bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/index.js` |
-| CSS bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/css/helix-all.css` |
-| Single component (example) | `https://cdn.jsdelivr.net/npm/@helixui/library@3.0.0/dist/components/hx-button/index.js` |
+| Full bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js` |
+| CSS bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css` |
+| Single component (example) | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js` |
 
 ---
 

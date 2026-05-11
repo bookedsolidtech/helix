@@ -722,7 +722,7 @@ A single `@helixui/library` instance on a CDN serves all Drupal multisite instal
                     ┌─────────────────────────────────┐
                     │   CDN / Static Asset Server     │
                     │                                 │
-                    │  @helixui/library@2.1.1          │
+                    │  @helixui/library@3.9.0          │
                     │  ├── helix.esm.js               │
                     │  └── helix.css (base tokens)    │
                     └──────────────┬──────────────────┘
