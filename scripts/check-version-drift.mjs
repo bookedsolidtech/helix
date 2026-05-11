@@ -111,7 +111,8 @@ function isArchive(relPath) {
 //   - exact semver:  3.9.0, 3.9.0-alpha.1
 //   - caret range:   ^3, ^3.9, ^3.9.0
 //   - tilde range:   ~3.9, ~3.9.0
-const VERSION_REF = /@helixui\/(library|icons|tokens|react)@(\^?\d+(?:\.\d+){0,2}(?:-[a-z0-9.]+)?|~\d+(?:\.\d+){0,2})/g;
+const VERSION_REF =
+  /@helixui\/(library|icons|tokens|react)@(\^?\d+(?:\.\d+){0,2}(?:-[a-z0-9.]+)?|~\d+(?:\.\d+){0,2})/g;
 
 function parseSemverParts(numericString) {
   // numericString is "3", "3.9", "3.9.0", optionally with "-pre.1".
