@@ -547,6 +547,17 @@ export default defineConfig({
             { label: 'Monorepo Structure', slug: 'architecture/monorepo' },
             { label: 'Build Pipeline', slug: 'architecture/build-pipeline' },
             { label: 'Testing Strategy', slug: 'architecture/testing' },
+            {
+              label: 'Decision Records',
+              collapsed: true,
+              items: [
+                { label: 'ADRs Overview', slug: 'architecture/adrs' },
+                { label: 'Slots vs Props', slug: 'architecture/adrs/slots-vs-props' },
+                { label: 'Component Loading', slug: 'architecture/adrs/component-loading' },
+                { label: 'Attribute Naming', slug: 'architecture/adrs/attribute-naming' },
+                { label: 'Light DOM Rendering', slug: 'architecture/adrs/light-dom' },
+              ],
+            },
           ],
         },
         {
