@@ -47,6 +47,7 @@ Refs #
 - [ ] Bundle size budgets respected (<5KB per component, <50KB total)
 - [ ] Accessibility requirements met (WCAG 2.1 AA minimum)
 - [ ] Documentation updated (if applicable)
+- [ ] Doc surface check — any new/moved doc page lives in the correct surface per the [boundary test](/CONTRIBUTING.md#where-does-this-doc-page-go): Storybook for live-component-anchored content, `apps/docs/` for prose/integration guides, marketing site for evaluator-facing positioning
 
 ## Accessibility
 
