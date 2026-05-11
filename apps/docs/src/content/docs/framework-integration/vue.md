@@ -269,4 +269,4 @@ To suppress Vue warnings about unknown elements during SSR, configure `isCustomE
 
 - [Angular Integration](/framework-integration/angular)
 - [Boolean Attributes reference](/guides/boolean-attributes)
-- [Component Library](/component-library/overview)
+- [Storybook](https://storybook.helix.bookedsolid.tech/)

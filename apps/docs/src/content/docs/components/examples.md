@@ -3,7 +3,7 @@ title: Component Examples
 description: Working examples of HELIX enterprise web components
 ---
 
-The following examples show common composition patterns for HELIX components. For live interactive demos, see the [Component Library](/component-library/overview/).
+The following examples show common composition patterns for HELIX components. For live interactive demos, see [Storybook](https://storybook.helix.bookedsolid.tech/).
 
 ## Card Component
 
@@ -82,5 +82,5 @@ The following examples show common composition patterns for HELIX components. Fo
 ## Next Steps
 
 - [Building Components](/components/building/) - Create your own components
-- [Drupal Integration](/drupal-integration/overview/) - Use components in Drupal
+- [Drupal Integration](/drupal/installation/getting-started/) - Use components in Drupal
 - [Design Tokens](/design-tokens/overview/) - Customize the visual design

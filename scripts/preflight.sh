@@ -16,6 +16,7 @@
 #   8. Full test suite (all components — catches CI Matrix failures locally)
 #   9. Docker CI (act — full CI pipeline in Docker containers)
 #  10. AAA cert integrity (committed verdicts snapshot — refuses Partial/Fail)
+#  11. Docs version drift (refuses stale `@helixui/*` version pins in docs)
 #
 # Usage:
 #   pnpm run preflight
@@ -23,6 +24,7 @@
 #   SKIP_ACT=1 pnpm run preflight                             # bypass Docker CI gate
 #   SKIP_FULL_TESTS=1 pnpm run preflight                      # bypass full test suite (use smart only)
 #   AAA_ALLOW_PARTIAL="hx-slider,hx-file-upload" pnpm ...     # acknowledge known Partial verdicts
+#   HELIX_ALLOW_VERSION_DRIFT=1 pnpm run preflight            # bypass docs version-drift gate (emergency only)
 #
 # For full CI Matrix parity (Node 22/24):
 #   ./scripts/act-ci.sh --matrix
@@ -352,7 +354,7 @@ echo ""
 
 # ── Gate 10: AAA cert integrity ──────────────────────────────────────────────
 
-echo "▶ [10/10] AAA cert integrity"
+echo "▶ [10/11] AAA cert integrity"
 
 if node scripts/check-aaa-verdicts.mjs; then
   : # passed (output already printed by the script)
@@ -363,6 +365,22 @@ else
   echo "    on at least one (component × criterion) cell in the committed snapshot."
   echo "    Fix the underlying gap OR set AAA_ALLOW_PARTIAL=<tags> to acknowledge"
   echo "    a known-honest Partial (paper-trail via commit message)."
+  exit 1
+fi
+echo ""
+
+# ── Gate 11: Docs version drift ──────────────────────────────────────────────
+
+echo "▶ [11/11] Docs version drift"
+
+if node scripts/check-version-drift.mjs; then
+  : # passed (output already printed by the script)
+else
+  echo ""
+  echo "  ✗ DOCS VERSION-DRIFT GATE FAILED — do NOT push."
+  echo "    At least one doc page references an outdated \`@helixui/*\` version."
+  echo "    Update the stale CDN URLs / install commands to the current package"
+  echo "    versions, OR set HELIX_ALLOW_VERSION_DRIFT=1 to bypass (emergency only)."
   exit 1
 fi
 echo ""

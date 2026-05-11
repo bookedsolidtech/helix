@@ -1107,7 +1107,7 @@ For HELiX, Shadow DOM is non-negotiable. Every component uses it. Every pattern 
 - [Slots Guide](/components/shadow-dom/slots) — Master content projection patterns
 - [CSS Parts Guide](/components/shadow-dom/parts) — Expose controlled styling hooks
 - [Styling Guide](/components/styling) — Design token integration
-- [Component Fundamentals](/components/fundamentals/overview) — Prerequisite concepts
+- [Lit: Components Overview](https://lit.dev/docs/components/overview/) — Prerequisite concepts
 
 ## Sources
 

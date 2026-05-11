@@ -457,4 +457,4 @@ During SSR, SvelteKit renders HELIX elements as inert HTML tags. They upgrade in
 
 - [Plain HTML / CDN Integration](/framework-integration/html)
 - [Boolean Attributes reference](/guides/boolean-attributes)
-- [Component Library](/component-library/overview)
+- [Storybook](https://storybook.helix.bookedsolid.tech/)
