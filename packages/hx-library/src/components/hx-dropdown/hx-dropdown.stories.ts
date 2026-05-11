@@ -136,11 +136,20 @@ export const Default: Story = {
     // the accessibility tree but hx-button is a custom element whose internal
     // <button> role is exposed via ElementInternals; the helper doesn't
     // resolve slotted-into-custom-element trees reliably across Chromium
-    // accessibility-tree timings. Direct DOM query is the stable pattern
-    // used in the Icon Trigger story below.
-    const trigger = dropdown?.querySelector('hx-button[slot="trigger"]') as HTMLElement | null;
+    // accessibility-tree timings. Direct DOM query is the stable pattern,
+    // BUT we still verify the trigger upgraded to a real button (host
+    // querySelector alone would pass even if hx-button failed to register)
+    // by asserting the internal <button> exists with the correct accessible
+    // name. Same pattern as Icon Trigger below.
+    const trigger = dropdown?.querySelector('hx-button[slot="trigger"]') as
+      | (HTMLElement & { updateComplete?: Promise<unknown> })
+      | null;
     await expect(trigger).toBeTruthy();
     if (!trigger) return;
+    if (trigger.updateComplete) await trigger.updateComplete;
+    const innerButton = trigger.shadowRoot?.querySelector('button');
+    await expect(innerButton).toBeTruthy();
+    await expect(innerButton?.textContent?.trim()).toMatch(/open menu/i);
     await userEvent.click(trigger);
     await expect(dropdown?.open).toBe(true);
 
