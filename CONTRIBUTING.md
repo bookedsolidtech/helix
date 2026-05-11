@@ -154,6 +154,13 @@ All code must pass the **7 Quality Gates** before merge:
 6. **Bundle Size**: <5KB per component (gzipped), <50KB total
 7. **Code Review**: 3-tier review process
 
+Preflight (`pnpm run preflight`) adds four further infrastructure gates on top of the seven above:
+
+8. **Full test suite**: complete component matrix (catches cross-component regressions)
+9. **Docker CI parity**: full GitHub Actions pipeline reproduced locally via `act`
+10. **AAA cert integrity**: refuses regression to `Partially Supports` or `Does Not Support` in the committed `aaa-verdicts.json` snapshot
+11. **Docs version drift**: scans `apps/docs/` + `apps/storybook/` for stale `@helixui/*` version pins; fails on any exact pin or caret/tilde range whose floor diverges from the canonical workspace version. Bypass with `HELIX_ALLOW_VERSION_DRIFT=1` (emergency only — every bypass leaves a paper trail in the commit message).
+
 ### Pre-Commit Hooks
 
 Our pre-commit hook will:
