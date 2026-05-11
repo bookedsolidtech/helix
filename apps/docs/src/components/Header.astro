@@ -51,13 +51,24 @@ const shouldRenderSearch =
     height: 100%;
   }
 
-  /* Header blends into the page background — no inner nav-band, no border. */
+  /* Flatten Starlight surfaces so header, sidebar, and main content share
+     one continuous background — no inner bands, no seams, no borders. */
+  :global(:root) {
+    --sl-color-bg-nav: var(--sl-color-bg) !important;
+    --sl-color-bg-sidebar: var(--sl-color-bg) !important;
+  }
+
   :global(header.header) {
     background: var(--sl-color-bg) !important;
     border-bottom: none !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+  }
+
+  :global(.sidebar-pane) {
+    background-color: var(--sl-color-bg) !important;
+    border-inline-end: none !important;
   }
 
   .title-link {
