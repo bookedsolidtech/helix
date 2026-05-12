@@ -432,8 +432,10 @@ for (const file of targetFiles) {
   const knownPackageNames = new Set(
     [...workspaceVersions.keys()].filter((n) => n.startsWith('@helixui/')),
   );
-  // Also accept these archival names that have appeared in CHANGELOG history
-  knownPackageNames.add('@helixui/adopted-stylesheets'); // documented internal pattern
+  // Aspirational packages that surface in docs as planned-future deliverables.
+  // (Adopted-stylesheets is NOT here — `guides/adopted-stylesheets.md` explicitly
+  //  says no such package exists, and any consumer-facing example that pretends
+  //  it does should be flagged.)
   knownPackageNames.add('@helixui/storybook-preset'); // planned future package
   packageRefRegex.lastIndex = 0;
   const seenBadRefs = new Set();
@@ -451,9 +453,11 @@ for (const file of targetFiles) {
 
     // Skip if explicitly framed as a typo / fabrication / non-existent /
     // example — the surrounding text identifies the package name as something
-    // that DOES NOT exist on npm or in the workspace.
+    // that DOES NOT exist on npm or in the workspace. Markdown emphasis
+    // markers (`**no standalone`) can sit between "is" and the negation, so
+    // patterns are written tolerant of intervening markup chars.
     if (
-      /typo|misspelled|fabricated|example|hypothetical|imagined|no separate|doesn['']t exist|do[es]*\s+not\s+exist|there is no|no such/i.test(
+      /typo|misspelled|fabricated|fictional|fictitious|example|hypothetical|imagined|no separate|no standalone|none of those (exports )?exist|doesn['']t exist|do[es]*\s+not\s+exist|there is no|no such/i.test(
         surroundingLines,
       )
     )
@@ -517,15 +521,22 @@ for (const file of targetFiles) {
     const floor = exactMatch ? pin : rangeMatch?.[1];
     if (!floor) continue;
 
-    // Compare major.minor floor against the canonical workspace version
-    const [floorMajorRaw, floorMinorRaw = '0'] = floor.split('.');
-    const [canonMajorRaw, canonMinorRaw = '0'] = canonical.split('.');
+    // Compare major.minor.patch numerically against the canonical workspace version.
+    // Exact pins compare on all three segments (CDN URLs / install snippets drift
+    // on patch bumps too); range pins (^X.Y, ~X.Y) only compare major+minor floor.
+    const [floorMajorRaw, floorMinorRaw = '0', floorPatchRaw = '0'] = floor.split('.');
+    const [canonMajorRaw, canonMinorRaw = '0', canonPatchRaw = '0'] = canonical.split('.');
     const floorMajor = Number(floorMajorRaw);
     const floorMinor = Number(floorMinorRaw);
+    const floorPatch = Number(floorPatchRaw);
     const canonMajor = Number(canonMajorRaw);
     const canonMinor = Number(canonMinorRaw);
-    // Numeric comparison — string compare misorders "3.10" < "3.9".
-    if (floorMajor !== canonMajor || floorMinor < canonMinor) {
+    const canonPatch = Number(canonPatchRaw);
+    const stale =
+      floorMajor !== canonMajor ||
+      floorMinor < canonMinor ||
+      (exactMatch && floorMinor === canonMinor && floorPatch < canonPatch);
+    if (stale) {
       add({
         file,
         line: idx,

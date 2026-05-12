@@ -2,9 +2,10 @@
 
 A production-ready Drupal 10/11 starter theme demonstrating full integration with the
 `@helixui/library` enterprise web component library. The theme uses Single Directory
-Components (SDC), Drupal behaviors, the `@helixui/adopted-stylesheets` pattern, and
-CSS custom property theming to compose HELiX `hx-*` web components into a complete
-Drupal front-end.
+Components (SDC), Drupal behaviors, the adopted-stylesheets pattern (using the native
+Constructable Stylesheets API directly — see the section below), and CSS custom
+property theming to compose HELiX `hx-*` web components into a complete Drupal
+front-end.
 
 ---
 
@@ -82,7 +83,10 @@ HELiX components use Shadow DOM internally for CSS encapsulation. This means:
 - **npm packages** (in Drupal project):
   - `@helixui/library` — the web component library
   - `@helixui/tokens` — design token CSS
-  - `@helixui/adopted-stylesheets` — the light-DOM/shadow-DOM bridge utilities
+  - (No separate `@helixui/adopted-stylesheets` package — the light-DOM/shadow-DOM
+    bridge uses the native `CSSStyleSheet` + `adoptedStyleSheets` primitives, wrapped
+    by `js/theme.behaviors.js`'s `helixuiAdoptedStylesheets` behavior. See the
+    "CSS Adopted Stylesheets" section below.)
 
 ---
 
@@ -338,26 +342,31 @@ to create `CSSStyleSheet` objects and inject them into any `Document` or `Shadow
 at runtime. This is the standard mechanism for sharing styles between the light DOM
 and shadow DOM without duplicating CSS text.
 
-The `@helixui/adopted-stylesheets` package exposes:
+There is no separate npm package wrapping these primitives — the theme uses
+`CSSStyleSheet` + `adoptedStyleSheets` directly. The pattern looks like this in
+practice (see `js/theme.behaviors.js` for the production version that adds
+reference counting and a tiny `cssText → sheet` cache):
 
 ```javascript
-import { adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
-import { createStyleSheet } from '@helixui/adopted-stylesheets';
-
-const tokenSheet = createStyleSheet(`
+// Build a single stylesheet from a CSS string.
+const tokenSheet = new CSSStyleSheet();
+tokenSheet.replaceSync(`
   :root {
     --hx-color-primary: #1a56db;
   }
 `);
 
-// Adopt into the document (affects light DOM)
-adoptStyles(document, tokenSheet);
+// Adopt into the document (affects light DOM).
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, tokenSheet];
 
-// Adopt into a shadow root (affects one component's internals)
-adoptStyles(myComponent.shadowRoot, tokenSheet);
+// Adopt into a shadow root (affects one component's internals).
+myComponent.shadowRoot.adoptedStyleSheets = [
+  ...myComponent.shadowRoot.adoptedStyleSheets,
+  tokenSheet,
+];
 
-// Reference-counted — remove when done
-removeStyles(document, tokenSheet);
+// Remove when done — filter the sheet out of the array.
+document.adoptedStyleSheets = document.adoptedStyleSheets.filter((s) => s !== tokenSheet);
 ```
 
 ### How it is used in this theme
