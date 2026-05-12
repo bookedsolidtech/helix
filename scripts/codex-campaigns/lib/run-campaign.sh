@@ -65,15 +65,26 @@ trap 'rm -f "$TARGET_LIST"' EXIT
 grep -vE '^\s*(#|$)' "$TARGETS_FILE" > "$TARGET_LIST" || true
 
 if (( RESUME == 1 )) && [[ -s "$FINDINGS" ]]; then
-  # The resume key is the full target path (the same string the campaign
-  # emits as `tag` on every finding). Basenames collide hard on this
-  # manifest — README.md appears 12+ times, overview.md 7+ — so a basename
-  # key would silently skip un-run siblings after a single matching basename
-  # landed in findings.jsonl.
+  # Resume-skip compares each pending target against the `.tag` values
+  # already in findings.jsonl. Two campaign conventions need to coexist:
+  #   - Component campaigns (aria-delegation, cem-accuracy, …) emit
+  #     `tag: "{TAG}"` where {TAG} is the BASENAME of the target dir
+  #     (e.g. `hx-button` for target `packages/.../hx-button`).
+  #   - Docs-fact-check style campaigns emit `tag: "{TARGET}"` (the FULL
+  #     relative path) because basenames collide hard (`README.md` × 12,
+  #     `overview.md` × 7) and would silently skip un-run siblings.
+  # The skip set therefore matches either the full path OR its basename.
   SEEN_TAGS="$(jq -r '.tag // empty' "$FINDINGS" | sort -u)"
   FILTERED="$(mktemp)"
   while IFS= read -r t; do
-    echo "$SEEN_TAGS" | grep -qxF "$t" || echo "$t" >> "$FILTERED"
+    base="$(basename "$t")"
+    if echo "$SEEN_TAGS" | grep -qxF "$t"; then
+      continue  # matched full path
+    fi
+    if echo "$SEEN_TAGS" | grep -qxF "$base"; then
+      continue  # matched basename
+    fi
+    echo "$t" >> "$FILTERED"
   done < "$TARGET_LIST"
   mv "$FILTERED" "$TARGET_LIST"
 fi

@@ -1,12 +1,9 @@
 {
-  "name": "create-helix",
+  "name": "@helixui/create-helix-stub",
   "version": "0.1.0",
   "private": true,
-  "description": "PLACEHOLDER STUB — the real create-helix CLI ships from github.com/bookedsolidtech/create-helix-app (npm: `create-helix@0.8.0` and up). This stub exists in the monorepo to reserve the namespace; its dist/ contents are NOT what consumers run when they invoke `npx create-helix project-name`. See packages/create-helix-app/README.md for the gap explanation, and apps/docs/src/content/docs/getting-started/create-helix.md for the documented PUBLISHED surface.",
+  "description": "PLACEHOLDER STUB — the real create-helix CLI ships from github.com/bookedsolidtech/create-helix-app (npm: `create-helix@0.8.0` and up). This stub exists in the monorepo to reserve the namespace; its dist/ contents are NOT what consumers run when they invoke `npx create-helix project-name`. The local package name is intentionally scoped (`@helixui/create-helix-stub`) so workspace resolution cannot serve the stub under the production `create-helix` name. See packages/create-helix-app/README.md for the gap explanation, and apps/docs/src/content/docs/getting-started/create-helix.md for the documented PUBLISHED surface.",
   "type": "module",
-  "bin": {
-    "create-helix": "./dist/cli.js"
-  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {

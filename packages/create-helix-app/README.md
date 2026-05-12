@@ -9,13 +9,14 @@
 
 ## What's actually shipping today
 
-| Concern                       | Answer                                                                                                                         |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **npm package name**          | `create-helix`                                                                                                                 |
-| **Invocation**                | `npx create-helix project-name` / `npm create helix project-name`                                                              |
-| **Current published version** | `0.8.0` (run `npm view create-helix version` to confirm)                                                                       |
-| **Source repo (canonical)**   | [bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app)                                        |
-| **Docs page**                 | [apps/docs/src/content/docs/getting-started/create-helix.md](../../apps/docs/src/content/docs/getting-started/create-helix.md) |
+| Concern                        | Answer                                                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Published npm package name** | `create-helix`                                                                                                                 |
+| **Invocation**                 | `npx create-helix project-name` / `npm create helix project-name`                                                              |
+| **Current published version**  | `0.8.0` (run `npm view create-helix version` to confirm)                                                                       |
+| **Source repo (canonical)**    | [bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app)                                        |
+| **Local workspace stub name**  | `@helixui/create-helix-stub` (private — intentionally scoped + bin-less so it never shadows the real `create-helix` locally)   |
+| **Docs page**                  | [apps/docs/src/content/docs/getting-started/create-helix.md](../../apps/docs/src/content/docs/getting-started/create-helix.md) |
 
 ## The stub vs the real package
 
