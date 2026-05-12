@@ -163,16 +163,10 @@ class HelixTextInput extends FormElementBase {
       $element['#attributes']['pattern'] = $element['#pattern'];
     }
 
-    // Numeric range attributes
-    if (isset($element['#min'])) {
-      $element['#attributes']['min'] = $element['#min'];
-    }
-    if (isset($element['#max'])) {
-      $element['#attributes']['max'] = $element['#max'];
-    }
-    if (isset($element['#step'])) {
-      $element['#attributes']['step'] = $element['#step'];
-    }
+    // hx-text-input does NOT expose or forward min/max/step — those
+    // belong on a numeric input. For numeric ranges, build a separate
+    // `helix_number_input` plugin that renders <hx-number-input>
+    // (which exposes min/max/step natively).
 
     // Pass current value to the component.
     if (isset($element['#value']) && $element['#value'] !== '') {
@@ -258,7 +252,6 @@ $form['username'] = [
   '#description' => $this->t('Between 3 and 32 characters.'),
   '#required' => TRUE,
   '#maxlength' => 32,
-  '#min' => 3, // Used with #input_type => 'number' only
   '#placeholder' => $this->t('jane.doe'),
   '#element_validate' => [[$this, 'validateUsername']],
 ];
@@ -338,9 +331,14 @@ class HelixSelect extends FormElementBase {
   public function getInfo(): array {
     $class = static::class;
 
+    // hx-select is a single-value combobox — there is no `multiple`
+    // attribute, no array value handling, and no name[] mutation. For
+    // multi-value selection use hx-combobox or hx-checkbox-group; build
+    // a separate element plugin (helix_combobox / helix_checkbox_group)
+    // for those cases.
+
     return [
       '#input' => TRUE,
-      '#multiple' => FALSE,
       '#options' => [],
       '#process' => [
         [$class, 'processHelixSelect'],
@@ -359,9 +357,9 @@ class HelixSelect extends FormElementBase {
 
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     if ($input !== FALSE && $input !== NULL) {
-      return !empty($element['#multiple']) ? (array) $input : (string) $input;
+      return (string) $input;
     }
-    return $element['#default_value'] ?? (!empty($element['#multiple']) ? [] : '');
+    return $element['#default_value'] ?? '';
   }
 
   public static function processHelixSelect(
@@ -370,11 +368,6 @@ class HelixSelect extends FormElementBase {
     array &$complete_form
   ): array {
     $element['#attributes']['name'] = $element['#name'];
-
-    if (!empty($element['#multiple'])) {
-      $element['#attributes']['multiple'] = 'multiple';
-      $element['#attributes']['name'] .= '[]';
-    }
 
     if (!empty($element['#required'])) {
       $element['#attributes']['required'] = 'required';
@@ -413,14 +406,7 @@ Twig template:
 {# templates/helix-select.html.twig #}
 <hx-select{{ attributes }}>
   {% for key, label in element['#helix_options'] %}
-    <option
-      value="{{ key }}"
-      {% if element['#helix_value'] is iterable %}
-        {% if key in element['#helix_value'] %}selected{% endif %}
-      {% elseif element['#helix_value'] == key %}
-        selected
-      {% endif %}
-    >
+    <option value="{{ key }}" {% if element['#helix_value'] == key %}selected{% endif %}>
       {{- label -}}
     </option>
   {% endfor %}
@@ -465,10 +451,13 @@ class HelixCheckbox extends FormElementBase {
   }
 
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
-    if ($input !== FALSE && $input !== NULL) {
-      return $element['#return_value'];
+    // A submitted-but-unchecked checkbox arrives as NULL — treat it as
+    // unchecked regardless of #default_value. Only fall back to
+    // #default_value during the pre-submit FALSE case (initial render).
+    if ($input === FALSE) {
+      return !empty($element['#default_value']) ? $element['#return_value'] : 0;
     }
-    return !empty($element['#default_value']) ? $element['#return_value'] : 0;
+    return $input !== NULL ? $element['#return_value'] : 0;
   }
 
   public static function processHelixCheckbox(
@@ -565,7 +554,7 @@ A complete FormElement plugin for a HELiX component requires:
 3. **`valueCallback()`** — extracts submitted value from `$_POST`
 4. **`#process` callback** — maps `#required`, `#placeholder`, `#maxlength`, etc. to `#attributes`
 5. **`#pre_render` callback** — maps `#title`, `#description`, `#errors` to component-specific attributes
-6. **Twig template** — renders `<hx-component{{ attributes }}>`
+6. **Twig template** — renders the chosen HELiX tag with the collected attribute object, e.g. `<hx-text-input{{ attributes }}></hx-text-input>`
 7. **`hook_theme()`** — registers the template
 
 Once registered, any form can use `'#type' => 'helix_text_input'` with full Form API support.
