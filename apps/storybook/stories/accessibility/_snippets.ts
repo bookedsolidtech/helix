@@ -98,20 +98,23 @@ export const FORCED_COLORS_DO_CSS = `/* DO — let the cascade keep author colou
   stroke: currentColor;
 }`;
 
-export const FOCUS_RING_CSS = `/* Default — no ring on mouse activation. */
-:host {
-  outline: none;
-}
-
-/* Keyboard activation only. The user agent decides; we do not author it. */
-:host(:focus-visible) {
-  outline: 2px solid var(--hx-color-focus-ring);
-  outline-offset: 2px;
+export const FOCUS_RING_CSS = `/*
+ * hx-button paints the focus ring on the inner .button element with
+ * :focus-visible so keyboard users see the ring on Tab and mouse users
+ * do not see it on click. Field components (hx-text-input, hx-select,
+ * hx-textarea) render an outline-style focus indicator on every focus
+ * regardless of pointer type — the inner input is :focus, not
+ * :focus-visible.
+ */
+.button:focus-visible {
+  outline: var(--hx-focus-ring-width, 2px) solid
+    var(--hx-button-focus-ring-color, var(--hx-focus-ring-color));
+  outline-offset: var(--hx-focus-ring-offset, 2px);
 }
 
 /* Forced-colors — user palette wins. */
 @media (forced-colors: active) {
-  :host(:focus-visible) {
+  .button:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }
@@ -119,62 +122,50 @@ export const FOCUS_RING_CSS = `/* Default — no ring on mouse activation. */
 
 export const DIALOG_HTML = `<hx-button id="open-prefs">Open preferences</hx-button>
 
-<hx-dialog id="prefs" aria-labelledby="prefs-title">
-  <h2 id="prefs-title" slot="header">Preferences</h2>
+<hx-dialog id="prefs" heading="Preferences">
+  <h2 slot="header">Preferences</h2>
 
-  <hx-text-input label="Display name" autofocus></hx-text-input>
-  <hx-text-input label="Email"></hx-text-input>
+  <!-- Native focusable controls; hx-dialog gathers tabbable shadow-DOM
+       focusables from slotted content, but the standard reliable
+       initial-focus targets are native inputs / buttons. -->
+  <input type="text" aria-label="Display name" autofocus>
+  <input type="email" aria-label="Email">
 
-  <hx-button slot="footer" variant="ghost" data-dialog-close>Cancel</hx-button>
-  <hx-button slot="footer" variant="primary" data-dialog-confirm>Save</hx-button>
+  <hx-button id="prefs-cancel" slot="footer" variant="ghost">Cancel</hx-button>
+  <hx-button id="prefs-save" slot="footer" variant="primary">Save</hx-button>
 </hx-dialog>`;
 
-export const DIALOG_TS = `const trigger = document.querySelector<HXButton>('#open-prefs')!;
-const dialog = document.querySelector<HXDialog>('#prefs')!;
+export const DIALOG_TS = `const trigger = document.querySelector<HelixButton>('#open-prefs')!;
+const dialog = document.querySelector<HelixDialog>('#prefs')!;
+const cancelBtn = document.querySelector<HelixButton>('#prefs-cancel')!;
 
 trigger.addEventListener('hx-click', () => {
-  // hx-dialog records the trigger and traps focus on open …
-  dialog.show({ returnFocusTo: trigger });
+  // showModal() guarantees the modal trap, inert backdrop, and
+  // return-focus contract regardless of the \`modal\` property.
+  // (show() opens non-modal by default.)
+  dialog.showModal();
 });
 
+cancelBtn.addEventListener('hx-click', () => dialog.close());
+
 dialog.addEventListener('hx-close', () => {
-  // … then restores focus to the trigger on close. No work for the consumer.
+  // Focus returns to the element that opened the dialog automatically.
+  // hx-cancel fires on Escape / backdrop dismiss; subscribe separately
+  // if you need to distinguish a user dismissal from a code-driven close.
 });`;
 
 export const ROVING_TABINDEX_TS = `/**
- * Reactive controller pattern shared across hx-tabs, hx-menu, hx-radio-group.
+ * Roving-tabindex behaviour is implemented per-component (hx-tabs,
+ * hx-menu, hx-radio-group) rather than through a single shared controller
+ * class; the canonical reference is hx-tabs' keydown handler below
+ * (see TABS_KEYDOWN_TS) which most other roving-tabindex widgets follow.
  *
- * The active item carries tabindex="0"; siblings carry tabindex="-1".
- * Arrow keys advance the active index; Home/End jump to ends.
- *
- * Tab leaves the group entirely — there is no internal Tab cycling.
- */
-export class RovingTabindexController implements ReactiveController {
-  #host: ReactiveControllerHost & HTMLElement;
-  #items: () => HTMLElement[];
-
-  constructor(host: ReactiveControllerHost & HTMLElement, items: () => HTMLElement[]) {
-    this.#host = host;
-    this.#items = items;
-    host.addController(this);
-  }
-
-  hostConnected() {
-    this.#host.addEventListener('keydown', this.#onKeydown);
-  }
-
-  hostDisconnected() {
-    this.#host.removeEventListener('keydown', this.#onKeydown);
-  }
-
-  setActive(index: number) {
-    const items = this.#items();
-    items.forEach((el, i) => (el.tabIndex = i === index ? 0 : -1));
-    items[index]?.focus();
-  }
-
-  // … #onKeydown wires Arrow / Home / End / type-ahead.
-}`;
+ * The contract every widget honours:
+ *   - Active item: tabindex="0"; siblings: tabindex="-1".
+ *   - Arrow keys advance the active index inside the widget.
+ *   - Home/End jump to the first / last enabled item.
+ *   - Tab leaves the widget entirely — no internal Tab cycling.
+ */`;
 
 export const TABS_KEYDOWN_TS = `#onKeydown = (event: KeyboardEvent) => {
   const tabs = this.#tabs;
