@@ -110,7 +110,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 function hx_library_help($route_name, RouteMatchInterface $route_match) {
   if ($route_name === 'help.page.hx_library') {
     $output = '<h3>' . t('About') . '</h3>';
-    $output .= '<p>' . t('Provides HELiX web components (@helixui/library v1.1.2) as Drupal library assets.') . '</p>';
+    $output .= '<p>' . t('Provides HELiX web components (@helixui/library v3.9.0) as Drupal library assets.') . '</p>';
     $output .= '<h3>' . t('Usage') . '</h3>';
     $output .= '<pre><code>';
     $output .= "# In mytheme.info.yml\nlibraries:\n  - hx_library/components\n\n";
@@ -133,7 +133,7 @@ function hx_library_help($route_name, RouteMatchInterface $route_match) {
 ```yaml
 # Full library bundle — loads all HELiX components
 components:
-  version: 1.1.2
+  version: 3.9.0
   js:
     libraries/helix/dist/index.js:
       attributes:
@@ -176,7 +176,7 @@ For large sites where different page types use different components:
 
 # Full bundle
 components:
-  version: 1.1.2
+  version: 3.9.0
   js:
     libraries/helix/dist/index.js:
       attributes:
@@ -186,7 +186,7 @@ components:
 
 # Individual component libraries
 button:
-  version: 1.1.2
+  version: 3.9.0
   js:
     libraries/helix/dist/components/hx-button/index.js:
       attributes:
@@ -195,7 +195,7 @@ button:
       minified: true
 
 card:
-  version: 1.1.2
+  version: 3.9.0
   js:
     libraries/helix/dist/components/hx-card/index.js:
       attributes:
@@ -204,7 +204,7 @@ card:
       minified: true
 
 text-input:
-  version: 1.1.2
+  version: 3.9.0
   js:
     libraries/helix/dist/components/hx-text-input/index.js:
       attributes:
@@ -273,7 +273,7 @@ Use Composer to manage the JavaScript dependency alongside your PHP packages.
 **Require the package:**
 
 ```bash
-composer require npm-asset/helixui--library:^1.1.2
+composer require npm-asset/helixui--library:^3.9.0
 ```
 
 **Configure installer path in `composer.json`:**
@@ -295,7 +295,7 @@ After `composer install`, the HELiX dist files land at `web/modules/custom/hx_li
 **Updating:**
 
 ```bash
-composer require npm-asset/helixui--library:^1.2.0
+composer require npm-asset/helixui--library:^3.9.0
 drush cr
 ```
 
@@ -315,7 +315,7 @@ Add a `package.json` to the module itself and run npm as part of module setup:
     "sync": "npm install @helixui/library@3.9.0 && node scripts/copy-dist.js"
   },
   "devDependencies": {
-    "@helixui/library": "1.1.2"
+    "@helixui/library": "3.9.0"
   }
 }
 ```
@@ -396,7 +396,7 @@ function mytheme_page_attachments(array &$attachments) {
 {{ attach_library('hx_library/components') }}
 
 <article{{ attributes }}>
-  <hx-card variant="elevated">
+  <hx-card variant="featured">
     <span slot="heading">{{ node.title.value }}</span>
     {{ content.body }}
   </hx-card>
@@ -412,12 +412,15 @@ function mytheme_page_attachments(array &$attachments) {
 <hx-button variant="primary" hx-size="lg">Submit</hx-button>
 <hx-button variant="secondary" hx-size="md">Cancel</hx-button>
 
-{# Card with href — the whole card is the link #}
+{# Card with hx-href — the whole card is the link. hx-card uses
+   hx-href (not native href) so CMS preprocessors and template
+   compilers leave the URL alone. The heading must be a semantic
+   heading element, not a <span>. #}
 <hx-card
-  variant="outlined"
-  href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+  variant="default"
+  hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
 >
-  <span slot="heading">{{ node.title.value }}</span>
+  <h3 slot="heading">{{ node.title.value }}</h3>
   <p>{{ node.field_summary.value }}</p>
 </hx-card>
 
@@ -501,12 +504,12 @@ function hx_library_requirements($phase) {
 }
 
 /**
- * Update HELiX library version to 1.1.2.
+ * Update HELiX library version to 3.9.0.
  */
 function hx_library_update_10001() {
   // Clear all caches to reload updated library definitions.
   drupal_flush_all_caches();
-  return t('HELiX Library updated to version 1.1.2. Cache cleared.');
+  return t('HELiX Library updated to version 3.9.0. Cache cleared.');
 }
 ```
 
@@ -521,7 +524,7 @@ The `hook_requirements()` implementation makes the status report at `/admin/repo
 **`config/install/hx_library.settings.yml`:**
 
 ```yaml
-version: '1.1.2'
+version: '3.9.0'
 use_cdn_fallback: false
 cdn_url: 'https://cdn.jsdelivr.net/npm/@helixui/library'
 ```
@@ -605,13 +608,25 @@ function hx_library_library_info_alter(&$libraries, $extension) {
 
   // Allow per-site CDN fallback via settings.
   if ($config->get('use_cdn_fallback')) {
-    $version = $config->get('version') ?? '1.1.2';
+    $version = $config->get('version') ?? '3.9.0';
     $cdn_url = $config->get('cdn_url') ?? 'https://cdn.jsdelivr.net/npm/@helixui/library';
 
+    // Rewrite BOTH the JS entry AND the CSS entries — if you only
+    // flip the JS to CDN and leave the CSS pointing at local files,
+    // the theme will load the JS from jsDelivr but try to load the
+    // stylesheets from local paths that may not exist on this
+    // environment, leaving consumers with unstyled components.
     $libraries['components']['js'] = [
       "{$cdn_url}@{$version}/dist/index.js" => [
         'type' => 'external',
         'attributes' => ['type' => 'module'],
+        'preprocess' => FALSE,
+      ],
+    ];
+
+    $libraries['components']['css']['theme'] = [
+      "{$cdn_url}@{$version}/dist/css/helix-all.css" => [
+        'type' => 'external',
         'preprocess' => FALSE,
       ],
     ];
@@ -624,7 +639,7 @@ Override in a site-specific `settings.php`:
 ```php
 // sites/site-a.example.com/settings.php
 $config['hx_library.settings']['use_cdn_fallback'] = TRUE;
-$config['hx_library.settings']['version'] = '1.1.2';
+$config['hx_library.settings']['version'] = '3.9.0';
 ```
 
 ---
@@ -697,7 +712,7 @@ libraries/helix/dist/index.js:
 
 ```yaml
 components:
-  version: 1.1.2
+  version: 3.9.0
   js:
     libraries/helix/dist/index.js:
       attributes:
@@ -727,11 +742,11 @@ When a new HELiX version is available:
 
 ```php
 /**
- * Update HELiX library files to version 1.2.0.
+ * Update HELiX library files to version 3.9.0.
  */
 function hx_library_update_10002() {
   drupal_flush_all_caches();
-  return t('HELiX Library updated to version 1.2.0.');
+  return t('HELiX Library updated to version 3.9.0.');
 }
 ```
 
