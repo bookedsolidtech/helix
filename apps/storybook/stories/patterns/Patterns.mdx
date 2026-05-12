@@ -21,9 +21,11 @@ import '@helixui/library/components/hx-avatar';
   title="The shapes our same components keep forming."
   lede={
     <>
-      Patterns aren't new components — they're recipes. Every example below uses only documented{' '}
-      <code>{`action.*`}</code> and <code>{`surface.*`}</code> tokens. Themed brands and densities
-      pass through them automatically.
+      Patterns aren&apos;t new components — they&apos;re recipes. The mockups below lean on the{' '}
+      <code>{`action.*`}</code> and <code>{`surface.*`}</code> token surface where it makes sense; a
+      few specimens use raw color or pixel-pinned spacing because the pattern itself is the point.
+      Real production code should bind to the semantic action / surface tokens so themed brands and
+      densities pass through cleanly.
     </>
   }
 />
@@ -136,10 +138,10 @@ import '@helixui/library/components/hx-avatar';
           {body}
         </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-          <hx-button variant="primary" size="small">
+          <hx-button variant="primary" hx-size="sm">
             {primary}
           </hx-button>
-          <hx-button variant="ghost" size="small">
+          <hx-button variant="ghost" hx-size="sm">
             {ghost}
           </hx-button>
         </div>
@@ -169,15 +171,15 @@ import '@helixui/library/components/hx-avatar';
       gap: 12,
     }}
   >
-    <hx-alert variant="error" open>
+    <hx-alert variant="error" open show-icon>
       <strong slot="title">Date of birth is invalid</strong>
       February has 28 days in 1991. Please re-check the day.
     </hx-alert>
-    <hx-alert variant="warning" open>
+    <hx-alert variant="warning" open show-icon>
       <strong slot="title">You're about to leave with unsaved work</strong>
       Your last 3 entries haven't been saved. Stay on this page or save before leaving.
     </hx-alert>
-    <hx-alert variant="info" open>
+    <hx-alert variant="info" open show-icon>
       <strong slot="title">This page didn't load</strong>
       Check the URL or head back home. If this keeps happening, contact the help desk with code{' '}
       <code>RX-7741</code>.
@@ -196,8 +198,10 @@ import '@helixui/library/components/hx-avatar';
       lineHeight: 1.6,
     }}
   >
-    Three jobs visible together so the user never wonders where they are in the search. Highlights
-    borrow <code>warning-500</code> at 30% — same hue, lower commitment.
+    Three jobs visible together so the user never wonders where they are in the search. (The
+    search-result mockup below is intentionally minimal — the highlighted-match treatment a
+    production result list would apply isn&apos;t rendered here; for that pattern, see the
+    consumer&apos;s own search component.)
   </p>
   <article
     style={{
@@ -280,7 +284,11 @@ import '@helixui/library/components/hx-avatar';
       ))}
     </aside>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <hx-text-input value="park" placeholder="Search by name, specialty, condition…" />
+      <hx-text-input
+        label="Search providers"
+        value="park"
+        placeholder="Search by name, specialty, condition…"
+      />
       <div
         style={{
           display: 'flex',
@@ -338,6 +346,7 @@ import '@helixui/library/components/hx-avatar';
             }}
           >
             <hx-avatar
+              label={nm}
               initials={initials}
               style={{
                 '--hx-avatar-bg': 'var(--hx-color-primary-600)',
@@ -429,12 +438,13 @@ import '@helixui/library/components/hx-avatar';
           display: 'grid',
           gap: 16,
         }}
-        // Visual mockup of an `hx-modal` recipe — the static article is not
-        // a real dialog (no aria-modal, no focus trap, mounted inline).
-        // Adding `role="dialog"` / `role="alertdialog"` would announce these
-        // decorative cards as live dialogs and trip axe `aria-dialog-name` /
-        // `aria-required-children` on a docs page that itself runs the AAA
-        // axe ruleset. The real recipe wires the role on `hx-modal`.
+        // Visual mockup of an `hx-dialog` recipe — the static article is
+        // not a real dialog (no aria-modal, no focus trap, mounted inline).
+        // Adding `role="dialog"` / `role="alertdialog"` here would announce
+        // these decorative cards as live dialogs and trip axe
+        // `aria-dialog-name` / `aria-required-children` whenever a story
+        // opts the page into axe (Storybook&apos;s default is AA contrast,
+        // not AAA). The real recipe wires the role on `hx-dialog` itself.
         aria-label={`${c.label} mockup`}
       >
         <span className="hx-docs-card-tag">{c.label}</span>
@@ -479,10 +489,10 @@ import '@helixui/library/components/hx-avatar';
           ))}
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
-          <hx-button variant="ghost" size="small">
+          <hx-button variant="ghost" hx-size="sm">
             {c.ghost}
           </hx-button>
-          <hx-button variant={c.primaryVariant} size="small">
+          <hx-button variant={c.primaryVariant} hx-size="sm">
             {c.primary}
           </hx-button>
         </div>
