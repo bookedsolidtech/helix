@@ -1,15 +1,19 @@
 ---
 title: Adopted Stylesheets
-description: How to use @helixui/adopted-stylesheets to style light-DOM slotted content in Drupal and every other framework — with reference counting, SSR fallback, and per-component loading.
+description: How to use AdoptedStylesheetsController (internal to @helixui/library) to style light-DOM slotted content in Drupal and every other framework — with reference counting and per-component loading.
 sidebar:
   order: 1
 ---
 
 # Adopted Stylesheets
 
-`@helixui/adopted-stylesheets` is the standard way to inject styles into the
-light DOM — the host document or a shadow root — from any framework. It is the
-**default pattern** for styling slotted content in HELiX, not an optional extra.
+> **Status note:** There is **no standalone `@helixui/adopted-stylesheets` package** today. The capability ships **internally** as `AdoptedStylesheetsController` inside `@helixui/library` (`packages/hx-library/src/controllers/adopted-stylesheets.ts`). The controller takes a raw CSS text string and an optional root (`document` or `ShadowRoot`), uses an exact-`cssText` `Map` cache for deduplication, and reference-counts via `static _refCounts` on a compound `cssText + root identity` key. The earlier draft of this guide documented a fictional public API (`createStyleSheet` / `adoptStyles` / `removeStyles` / `createStyleSheetSSR` / `clearStyleSheetCache` / `clearRegistry` / `getRefCount` / `getRootSheets`); none of those exports exist. Use the controller from inside the monorepo, or extract the controller pattern in your own consumer code until a public export ships.
+
+`AdoptedStylesheetsController` is the standard way HELiX components inject
+CSS into the light DOM — the host document or a shadow root — when their
+slotted content needs styling that cannot live inside the component's shadow
+DOM. It is the **default pattern** for styling slotted content in HELiX, not
+an optional extra.
 
 ---
 
@@ -74,10 +78,10 @@ import { createStyleSheet, adoptStyles } from '@helixui/adopted-stylesheets';
 
 const sheet = createStyleSheet(`
   :root {
-    --hx-color-primary: #2563EB;
+    --hx-color-primary-500: #2563EB;
   }
   p { margin-block: 0.75rem; }
-  a { color: var(--hx-color-primary); text-decoration: underline; }
+  a { color: var(--hx-color-primary-500); text-decoration: underline; }
 `);
 
 adoptStyles(document, sheet);
@@ -96,15 +100,11 @@ same `CSSStyleSheet` object.
 Use `adoptStyles` / `removeStyles` directly for manual lifecycle control.
 
 ```ts
-import {
-  createStyleSheet,
-  adoptStyles,
-  removeStyles,
-} from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
 
 // Create once at module scope — identical CSS always reuses the same object.
 const globalSheet = createStyleSheet(`
-  :root { --hx-color-primary: #2563EB; }
+  :root { --hx-color-primary-500: #2563EB; }
   p { margin-block: 0.75rem; }
 `);
 
@@ -128,7 +128,7 @@ To adopt multiple sheets in one call:
 ```ts
 import { createStyleSheet, adoptStyles } from '@helixui/adopted-stylesheets';
 
-const tokenSheet = createStyleSheet(':root { --hx-color-primary: #2563EB; }');
+const tokenSheet = createStyleSheet(':root { --hx-color-primary-500: #2563EB; }');
 const baseSheet = createStyleSheet('p { margin-block: 0.75rem; }');
 
 adoptStyles(document, tokenSheet, baseSheet);
@@ -142,16 +142,13 @@ and `removeStyles` on `hostDisconnected` automatically.
 ```ts
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import {
-  AdoptedStylesheetsController,
-  createStyleSheet,
-} from '@helixui/adopted-stylesheets';
+import { AdoptedStylesheetsController, createStyleSheet } from '@helixui/adopted-stylesheets';
 
 // Create at module scope — runs once, not per-instance.
 const globalTokenSheet = createStyleSheet(`
   :root {
-    --hx-color-primary: #2563EB;
-    --hx-spacing-md: 1rem;
+    --hx-color-primary-500: #2563EB;
+    --hx-space-4: 1rem;
   }
 `);
 
@@ -186,11 +183,7 @@ Use a `useEffect` hook to adopt styles on mount and remove them on unmount.
 
 ```tsx
 import { useEffect, useRef } from 'react';
-import {
-  createStyleSheet,
-  adoptStyles,
-  removeStyles,
-} from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
 
 // Create at module scope for deduplication.
 const brandSheet = createStyleSheet(`
@@ -239,16 +232,9 @@ Use a composable to manage the stylesheet lifecycle.
 ```ts
 // composables/useAdoptedStylesheet.ts
 import { onMounted, onUnmounted, type Ref } from 'vue';
-import {
-  createStyleSheet,
-  adoptStyles,
-  removeStyles,
-} from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
 
-export function useAdoptedStylesheet(
-  elRef: Ref<HTMLElement | null>,
-  sheet: CSSStyleSheet,
-): void {
+export function useAdoptedStylesheet(elRef: Ref<HTMLElement | null>, sheet: CSSStyleSheet): void {
   onMounted(() => {
     const root = elRef.value?.getRootNode();
     if (root instanceof ShadowRoot || root instanceof Document) {
@@ -297,8 +283,8 @@ Expose the component from Twig and pass CMS content into slots:
 ```twig
 {# templates/hx-card--article.html.twig #}
 <hx-card class="article-card">
-  <h2 slot="header">{{ node.title }}</h2>
-  <div slot="content" class="article-body">
+  <h2 slot="heading">{{ node.title }}</h2>
+  <div class="article-body">
     {{ content.body }}
   </div>
 </hx-card>
@@ -319,7 +305,7 @@ Expose the component from Twig and pass CMS content into slots:
     const { createStyleSheet } = await import('@helixui/adopted-stylesheets');
     globalSheet = createStyleSheet(`
       p { margin-block: 0.75rem; line-height: 1.6; }
-      a { color: var(--hx-color-primary); text-decoration: underline; }
+      a { color: var(--hx-color-primary-500); text-decoration: underline; }
       ul, ol { padding-inline-start: 1.5rem; }
       img { max-width: 100%; height: auto; }
     `);
@@ -387,7 +373,12 @@ const buttonSheet = createStyleSheet(`
 `);
 
 const cardSheet = createStyleSheet(`
-  hx-card { --hx-card-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+  /* hx-card exposes the public elevation/border tokens — `--hx-card-shadow`
+     is illustrative, not in the canonical CEM. Override via a documented hx-card
+     CSS property (see custom-elements.json) or compose your own elevation tier. */
+  hx-card {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  }
 `);
 
 adoptStyles(document, buttonSheet, cardSheet);
@@ -422,7 +413,7 @@ import {
 } from '@helixui/adopted-stylesheets';
 
 const CSS = `
-  :root { --hx-color-primary: #2563EB; }
+  :root { --hx-color-primary-500: #2563EB; }
   p { margin-block: 0.75rem; }
 `;
 
@@ -473,6 +464,7 @@ decrements it. The sheet is removed from `adoptedStyleSheets` only when the
 count reaches zero — the last consumer that adopted it has disconnected.
 
 This prevents two bugs:
+
 1. **Premature removal** — component A removes a sheet that component B still needs.
 2. **Orphaned sheets** — sheets that live forever because no cleanup mechanism exists.
 
@@ -507,15 +499,15 @@ API migration is minimal.
 
 ### API comparison
 
-| Feature | `@phase2/outline-adopted-stylesheets-controller` | `@helixui/adopted-stylesheets` |
-|---|---|---|
-| Lit controller | `AdoptedStylesheetsController` | `AdoptedStylesheetsController` |
-| Vanilla adoption | Not supported | `adoptStyles(root, ...sheets)` |
-| React / Vue | Not supported | `useEffect` / composable patterns |
-| SSR fallback | Not supported | `createStyleSheetSSR(css)` |
-| Reference counting | No | Yes — sheets removed only when all consumers disconnect |
-| Deduplication | No | Yes — content hash, identical CSS = same object |
-| Per-sheet removal | No | `removeStyles(root, ...sheets)` |
+| Feature            | `@phase2/outline-adopted-stylesheets-controller` | `@helixui/adopted-stylesheets`                          |
+| ------------------ | ------------------------------------------------ | ------------------------------------------------------- |
+| Lit controller     | `AdoptedStylesheetsController`                   | `AdoptedStylesheetsController`                          |
+| Vanilla adoption   | Not supported                                    | `adoptStyles(root, ...sheets)`                          |
+| React / Vue        | Not supported                                    | `useEffect` / composable patterns                       |
+| SSR fallback       | Not supported                                    | `createStyleSheetSSR(css)`                              |
+| Reference counting | No                                               | Yes — sheets removed only when all consumers disconnect |
+| Deduplication      | No                                               | Yes — content hash, identical CSS = same object         |
+| Per-sheet removal  | No                                               | `removeStyles(root, ...sheets)`                         |
 
 ### Upgrade path
 
@@ -526,10 +518,7 @@ API migration is minimal.
 import { AdoptedStylesheetsController } from '@phase2/outline-adopted-stylesheets-controller';
 
 // After
-import {
-  AdoptedStylesheetsController,
-  createStyleSheet,
-} from '@helixui/adopted-stylesheets';
+import { AdoptedStylesheetsController, createStyleSheet } from '@helixui/adopted-stylesheets';
 ```
 
 2. **Wrap raw CSS strings in `createStyleSheet`**
@@ -679,10 +668,10 @@ Lit `ReactiveController` that calls `adoptStyles` on `hostConnected` and
 
 **Constructor:** `new AdoptedStylesheetsController(host, ...sheets)`
 
-| Parameter | Type | Description |
-|---|---|---|
-| `host` | `ReactiveControllerHost & Element` | The Lit element that owns this controller |
-| `sheets` | `CSSStyleSheet[]` | One or more sheets to manage |
+| Parameter | Type                               | Description                               |
+| --------- | ---------------------------------- | ----------------------------------------- |
+| `host`    | `ReactiveControllerHost & Element` | The Lit element that owns this controller |
+| `sheets`  | `CSSStyleSheet[]`                  | One or more sheets to manage              |
 
 ---
 
