@@ -6,7 +6,7 @@ description: The canonical Storybook addon set HELiX recommends for every consum
 ## Overview
 
 HELiX dogfoods a single Storybook addon set across `apps/storybook` and every
-consumer scaffold produced by `create-helix-app`. This page is the source of
+consumer scaffold produced by `create-helix`. This page is the source of
 truth for that set. It exists so that:
 
 - Every HELiX consumer ships with the same a11y, theming, design-token, and
@@ -23,7 +23,7 @@ empty stubs against SB10.
 
 ## Required addons
 
-These are part of every HELiX-flavored Storybook. `create-helix-app` installs
+These are part of every HELiX-flavored Storybook. `create-helix` installs
 them automatically.
 
 | Package                         | Version   | Purpose                                                                                  |
@@ -109,7 +109,16 @@ import { dirname } from 'node:path';
 import type { StorybookConfig } from '@storybook/web-components-vite';
 
 const config: StorybookConfig = {
-  stories: ['../src/**/*.stories.@(ts|tsx)', '../stories/**/*.mdx'],
+  // The shipped apps/storybook/.storybook/main.ts dogfoods these globs:
+  // component stories live with the source in packages/hx-library/src,
+  // and pattern / foundation MDX lives in the storybook app's own
+  // stories tree. Mirror this layout in your downstream consumer
+  // preset.
+  stories: [
+    '../../../packages/hx-library/src/**/*.stories.@(ts|tsx)',
+    '../stories/**/*.stories.@(ts|tsx)',
+    '../stories/**/*.mdx',
+  ],
 
   addons: [
     getAbsolutePath('@storybook/addon-a11y'),
@@ -187,7 +196,7 @@ const preview: Preview = {
     design: {
       type: 'link',
       name: 'HELiX component source',
-      url: 'https://github.com/<org>/<repo>/tree/main/packages/hx-library/src/components',
+      url: 'https://github.com/bookedsolidtech/helix/tree/main/packages/hx-library/src/components',
       label: 'View component source on GitHub',
       showArrow: true,
       target: '_blank',
@@ -198,6 +207,28 @@ const preview: Preview = {
   initialGlobals: {
     theme: 'light',
     brand: '',
+  },
+
+  // The Brand toolbar needs a globalTypes entry so the Storybook toolbar
+  // renders the dropdown; without this, the brand decorator below sees
+  // an empty brand global and the toolbar is invisible.
+  globalTypes: {
+    brand: {
+      description: 'Active brand override (data-brand on :root)',
+      toolbar: {
+        title: 'Brand',
+        icon: 'paintbrush',
+        items: [
+          { value: '', title: 'Apex (default)' },
+          { value: 'meridian', title: 'Meridian (indigo)' },
+          { value: 'lumen', title: 'Lumen (violet)' },
+          { value: 'verdant', title: 'Verdant (forest)' },
+          { value: 'signal', title: 'Signal (cobalt)' },
+          { value: 'ember', title: 'Ember (amber)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
 
   decorators: [
@@ -244,7 +275,11 @@ export default meta;
 type Story = StoryObj;
 
 export const ClickEvent: Story = {
+  // hx-button doesn't expose a `label` attribute — the visible label
+  // is the default slot. Project args.label into the slot via a
+  // custom render function:
   args: { label: 'Verify Prescription' },
+  render: ({ label }) => html`<hx-button>${label}</hx-button>`,
   play: async ({ canvasElement }) => {
     const hxButton = canvasElement.querySelector('hx-button')!;
     const eventSpy = fn();
@@ -264,18 +299,23 @@ export const ClickEvent: Story = {
 };
 ```
 
-**Conventions used in every HELiX `play()` block:**
+**Conventions used in HELiX `play()` blocks:**
 
 - Imports from `'storybook/test'` (the SB10 entry point) — `expect`, `fn`,
   `userEvent`, `within`, `waitFor`. Do **not** install `@storybook/test`
   separately; it is bundled with `storybook` 10.x.
-- `canvasElement.querySelector('hx-*')` for the host. `host.shadowRoot!.querySelector(...)`
-  for the focusable native control. This is the documented test-utility
-  pattern in `packages/hx-library/src/test-utils.ts`.
-- Listener cleanup at the end of every block (`removeEventListener`) so
-  re-runs do not double-count.
-- Assertions on `bubbles` + `composed` for every `hx-*` event — the
-  shadow-boundary composition contract is load-bearing.
+- `canvasElement.querySelector('hx-*')` for the host;
+  `host.shadowRoot!.querySelector(...)` for the focusable native control.
+  The `shadowQuery` / `fixture` / `oneEvent` / `cleanup` helpers in
+  `packages/hx-library/src/test-utils.ts` cover the parallel Vitest
+  browser-mode pattern; the Storybook play-block convention above is
+  separate but follows the same shadow-root traversal idea.
+- Listener cleanup at the end of event-contract play blocks
+  (`removeEventListener`) so re-runs do not double-count.
+- Event-contract stories assert `bubbles` + `composed` on the dispatched
+  `hx-*` event because the shadow-boundary composition contract is
+  load-bearing — not every story does this, only the ones whose verdict
+  depends on the event escaping the shadow root.
 - Disabled / loading paths assert that the event spy fires zero times. A
   missing assertion is a regression target.
 
@@ -336,7 +376,7 @@ type Story = StoryObj;
 
 const renderScene = () => html`
   <div style="max-width: 720px; margin: 0 auto; padding: 32px 24px;">
-    <hx-form id="intake" novalidate>
+    <hx-form id="intake" action="/api/intake" method="post">
       <hx-text-input
         data-testid="intake-first-name"
         label="First name"
@@ -356,17 +396,22 @@ export const SubmitEmpty: Story = {
   render: renderScene,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    let submitted = false;
-    canvasElement.querySelector('#intake')!.addEventListener('hx-submit', () => {
-      submitted = true;
+    let submittedValid = false;
+    const form = canvasElement.querySelector('#intake') as HTMLElement;
+    form.addEventListener('hx-submit', (e) => {
+      // hx-form re-emits the inner form submit as hx-submit with
+      // structured detail; e.detail.valid reflects native constraint
+      // validity. Required fields that are empty drive valid=false.
+      submittedValid = (e as CustomEvent).detail.valid;
     });
 
     const submit = canvas.getByTestId('intake-submit') as HTMLElement;
     const innerSubmit = submit.shadowRoot!.querySelector('button')!;
     await userEvent.click(innerSubmit);
 
-    // Empty required fields must block submission.
-    await expect(submitted).toBe(false);
+    // Empty required fields must drive hx-submit.detail.valid === false.
+    // hx-form will dispatch hx-invalid alongside hx-submit when fields fail.
+    await expect(submittedValid).toBe(false);
   },
 };
 ```
@@ -374,7 +419,10 @@ export const SubmitEmpty: Story = {
 The reference scenes shipped in `apps/storybook/stories/patterns/scenes/`
 are:
 
-- `patient-intake.stories.ts` — `hx-form` validation + happy-path submission
+- `patient-intake.stories.ts` — `hx-form` validation. The HappyPath
+  story sets valid field values; a full submit-success assertion is not
+  yet wired (the play block stops once fields are filled, leaving
+  end-to-end submit verification for the per-component form tests).
 - `provider-dashboard.stories.ts` — layout density, `hx-data-table`,
   shadow-boundary event composition
 - `settings.stories.ts` — `hx-tabs` navigation, `hx-switch` toggles, save/cancel
@@ -448,7 +496,7 @@ export const Default: Story = {
 ## Panel expectations
 
 Every consumer scaffold must surface meaningful UI in each panel out of the
-box. Use this matrix to verify a freshly generated `create-helix-app` project
+box. Use this matrix to verify a freshly generated `create-helix` project
 before shipping.
 
 | Panel                    | What to expect                                                                               | Failure mode                                                         |
@@ -477,9 +525,9 @@ to the error state simultaneously.
 
 ## Migration
 
-### From a vanilla `create-helix-app` scaffold
+### From a vanilla `create-helix` scaffold
 
-Versions of `create-helix-app` published before `2026-05` shipped only the
+Versions of `create-helix` published before `2026-05` shipped only the
 five required addons (`a11y`, `docs`, `vitest`, `themes`, `links`). To bring
 an existing scaffold in line with this preset:
 
