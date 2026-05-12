@@ -1,8 +1,8 @@
 # @helixui/icons
 
-## 2.0.0 [UNPUBLISHED]
+## 2.0.0 [DEPRECATED]
 
-Mistakenly published as MAJOR — package.json was at 1.0.0 (initial-publish placeholder) and a `major` changeset bumped it to 2.0.0. Should have been the initial 1.0.0 publish. The 2.0.0 version was unpublished from npm; 1.0.0 below is the corrected initial publish (same code).
+Mistakenly bumped to MAJOR via a changeset metadata defect — the workspace package.json was at 1.0.0 as the initial-publish placeholder and a `major` changeset cascaded into a 2.0.0 version. The intended initial release is the **1.0.0** entry below; consumers should depend on `@helixui/icons@1.0.0`.
 
 ## 1.0.0
 
@@ -13,9 +13,9 @@ Mistakenly published as MAJOR — package.json was at 1.0.0 (initial-publish pla
   - two built-in libraries auto-registered on import:
     - `helix` — 32 curated fill-only system glyphs (mit). default sprite at `dist/helix.svg` + per-icon esm under `dist/tree-shake/helix/`
     - `fa-free` — 2,000-glyph fa free solid sprite (cc by 4.0). default sprite at `dist/fa-free-solid.svg` + per-icon esm under `dist/tree-shake/fa-free/solid/`
-  - optional `paintMode` field per library: `'fill' | 'stroke' | 'mixed'` for aaa harness dispatch
+  - optional `paintMode` field per library: `'fill' | 'stroke' | 'mixed'` — a registry hint that documents the library's paint strategy (the formal AAA harness measures rendered icon color/background samples to produce verdicts; `paintMode` is not a cert-dispatch axis)
   - optional `mutator` hook lets registered libraries transform sanitized svg before injection
-  - `iconLibraryAaaVerdict()` helper — query aaa validation state for any registered library
+  - `iconLibraryAaaVerdict()` helper — exposes baked-in AAA verdicts for the two **built-in** libraries (`helix`, `fa-free`); third-party libraries return `undefined` unless they publish their own verdict evidence
   - aaa verdict baked for built-in libraries: both `helix` and `fa-free` pass non-text contrast 1.4.11 at minimum render size
 
   required peer dependency of `@helixui/library@^3.9.0`. install both together. consumers register additional libraries (font awesome pro, phosphor, heroicons, iconify, brand sprites) via `registerIconLibrary(name, options)`.
@@ -24,11 +24,15 @@ Mistakenly published as MAJOR — package.json was at 1.0.0 (initial-publish pla
 
 - 7b42779: aaa-cert hx-icon as p0; wire @helixui/icons registry resolution
 
-  `<hx-icon>` resolves through the `@helixui/icons` registry and is
-  AAA-certed (P0) per WCAG 2.2 + 1.4.11 (non-text contrast). The
-  component now ships a `library` attribute (default `'fa-free'`)
-  that resolves through `getIconLibrary()`, plus integration of the
-  optional library mutator hook (runs AFTER security sanitization).
+  `<hx-icon>` resolves through the `@helixui/icons` registry. The component
+  is P0 AAA self-certified for the applicable WCAG 2.2 AAA criteria measured
+  by the formal audit harness, with supplemental **WCAG 1.4.11** non-text
+  contrast evidence recorded in `packages/hx-icons/AAA-VERDICT.md`. The
+  component ships a `library` attribute that defaults to `''` — registry
+  resolution requires the consumer to set `library="fa-free"`,
+  `library="helix"`, or another registered library explicitly. The lookup
+  runs through `getIconLibrary()` and honors the optional library mutator
+  hook (which runs AFTER security sanitization).
 
   Adds the `--hx-icon-stroke-width` semantic token (default `2`)
   consumed by stroke-paint and mixed-paint consumer libraries; the
