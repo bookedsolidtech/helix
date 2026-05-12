@@ -151,7 +151,7 @@ You MUST emit each finding as a single JSON line conforming to this schema:
   "codex_run": "<short hash>",
   "severity": "critical | high | medium | low | info",
   "category": "component-name | api-surface | package-version | code-sample | url | aaa | drupal | editorial",
-  "file": "<path:line>",
+  "file": "<path>",
   "line": <int>,
   "issue": "<one-sentence description>",
   "evidence": "<quote from the doc + quote from the source>",
@@ -175,6 +175,7 @@ If the file is clean, emit a single "pass" finding anchored to **line 1** (the s
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
+  "tag": "{TAG}",
   "ts": "...",
   "codex_run": "...",
   "severity": "info",

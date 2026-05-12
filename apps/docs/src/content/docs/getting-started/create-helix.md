@@ -24,68 +24,57 @@ The interactive TUI prompts you for a framework, component bundles, and optional
 
 ## Framework Templates
 
-`create-helix` supports 15 framework targets. Pass `--template` to skip the prompt:
+`create-helix` ships with 15 framework targets, all selected from the
+interactive prompt. The shipped CLI (`packages/create-helix-app/dist/cli.js`)
+treats its first positional argument as the project name only — flag-based
+template/bundle selection is part of the roadmap (see
+[Planned CLI Surface](#planned-cli-surface) below). For now, run the CLI and
+choose the template from the prompt:
 
 ```bash
-npx create-helix --template react-next
-npx create-helix --template react-vite
-npx create-helix --template remix
-npx create-helix --template vue-nuxt
-npx create-helix --template vue-vite
-npx create-helix --template svelte-kit
-npx create-helix --template angular
-npx create-helix --template astro
-npx create-helix --template vanilla
-npx create-helix --template solid-vite
-npx create-helix --template qwik-vite
-npx create-helix --template lit-vite
-npx create-helix --template preact-vite
-npx create-helix --template stencil
-npx create-helix --template ember
+npx create-helix my-app
+# → prompts you to pick from the 15 framework targets in the table below.
 ```
 
-| Template ID | Name | Description |
-| ----------- | ---- | ----------- |
-| `react-next` | React + Next.js 15 | App Router, SSR-ready, full HELiX integration — **recommended for new projects** |
-| `react-vite` | React + Vite | Lightning fast dev, SPA-first, HELiX with `@lit/react` |
-| `remix` | React Router (Remix) | Full-stack React with SSR, nested routes |
-| `vue-nuxt` | Vue + Nuxt 4 | Full-stack Vue with SSR, native web component support |
-| `vue-vite` | Vue + Vite | Lightweight Vue 3 SPA with native web component binding |
-| `svelte-kit` | SvelteKit | Svelte 5 + SvelteKit, native custom element support |
-| `angular` | Angular 18 | Enterprise Angular with `CUSTOM_ELEMENTS_SCHEMA` pre-configured |
-| `astro` | Astro | Content-first with islands architecture, zero JS by default |
-| `vanilla` | Vanilla (HTML + CDN) | No framework, no build step — just HTML and HELiX via CDN |
-| `solid-vite` | Solid.js + Vite | Fine-grained reactive SPA with native web component support |
-| `qwik-vite` | Qwik + Vite | Resumable framework with zero hydration |
-| `lit-vite` | Lit + Vite | Lightweight web components with Google Lit and Vite |
-| `preact-vite` | Preact + Vite | Fast 3kB React alternative with native web component support |
-| `stencil` | Stencil | Compiler for standards-based web components with lazy-loading |
-| `ember` | Ember.js | Convention-driven full-stack framework |
+| Template ID   | Name                 | Description                                                                      |
+| ------------- | -------------------- | -------------------------------------------------------------------------------- |
+| `react-next`  | React + Next.js 15   | App Router, SSR-ready, full HELiX integration — **recommended for new projects** |
+| `react-vite`  | React + Vite         | Lightning fast dev, SPA-first, HELiX with `@lit/react`                           |
+| `remix`       | React Router (Remix) | Full-stack React with SSR, nested routes                                         |
+| `vue-nuxt`    | Vue + Nuxt 4         | Full-stack Vue with SSR, native web component support                            |
+| `vue-vite`    | Vue + Vite           | Lightweight Vue 3 SPA with native web component binding                          |
+| `svelte-kit`  | SvelteKit            | Svelte 5 + SvelteKit, native custom element support                              |
+| `angular`     | Angular 18           | Enterprise Angular with `CUSTOM_ELEMENTS_SCHEMA` pre-configured                  |
+| `astro`       | Astro                | Content-first with islands architecture, zero JS by default                      |
+| `vanilla`     | Vanilla (HTML + CDN) | No framework, no build step — just HTML and HELiX via CDN                        |
+| `solid-vite`  | Solid.js + Vite      | Fine-grained reactive SPA with native web component support                      |
+| `qwik-vite`   | Qwik + Vite          | Resumable framework with zero hydration                                          |
+| `lit-vite`    | Lit + Vite           | Lightweight web components with Google Lit and Vite                              |
+| `preact-vite` | Preact + Vite        | Fast 3kB React alternative with native web component support                     |
+| `stencil`     | Stencil              | Compiler for standards-based web components with lazy-loading                    |
+| `ember`       | Ember.js             | Convention-driven full-stack framework                                           |
 
 ## Component Bundles
 
 Choose which component groups to include. Each bundle is a curated set of HELiX components optimized for tree-shaking:
 
-| Bundle ID | Name | Components |
-| --------- | ---- | ---------- |
-| `all` | All Components | All components — the full HELiX library |
-| `core` | Core UI | button, card, badge, text, icon, avatar, divider, tag, tooltip, popover |
-| `forms` | Form Components | text-input, select, checkbox, radio, switch, textarea, field, combobox, date-picker |
-| `navigation` | Navigation | nav, side-nav, tabs, breadcrumb, pagination, menu, tree-view |
-| `data-display` | Data Display | data-table, stat, progress-bar, meter, counter, structured-list, rating |
-| `feedback` | Feedback & Overlays | alert, toast, dialog, drawer, banner, skeleton, spinner |
-| `layout` | Layout | grid, stack, split-panel, accordion, carousel, container |
+| Bundle ID      | Name                | Components                                                                          |
+| -------------- | ------------------- | ----------------------------------------------------------------------------------- |
+| `all`          | All Components      | All components — the full HELiX library                                             |
+| `core`         | Core UI             | button, card, badge, text, icon, avatar, divider, tag, tooltip, popover             |
+| `forms`        | Form Components     | text-input, select, checkbox, radio, switch, textarea, field, combobox, date-picker |
+| `navigation`   | Navigation          | nav, side-nav, tabs, breadcrumb, pagination, menu, tree-view                        |
+| `data-display` | Data Display        | data-table, stat, progress-bar, meter, counter, structured-list, rating             |
+| `feedback`     | Feedback & Overlays | alert, toast, dialog, drawer, banner, skeleton, spinner                             |
+| `layout`       | Layout              | grid, stack, split-panel, accordion, carousel, container                            |
 
-Bundles can be combined. Select multiple bundles during the interactive prompt or pass `--bundles`:
-
-```bash
-npx create-helix --bundles core,forms,feedback
-npx create-helix --bundles all
-```
+Bundle selection is part of the same interactive flow — pick which bundles
+you want from the prompts after choosing a template.
 
 ## Drupal Theme Scaffolding
 
-For Drupal-first projects, use the `--drupal` flag. This scaffolds a complete Drupal theme directory with:
+For Drupal-first projects, the interactive prompts include a Drupal track that
+scaffolds a complete Drupal theme directory with:
 
 - Theme info and libraries YAML files
 - Single Directory Components (SDCs) with Twig templates
@@ -93,105 +82,59 @@ For Drupal-first projects, use the `--drupal` flag. This scaffolds a complete Dr
 - Drupal behaviors using the `once()` pattern
 - `composer.json` and `package.json`
 
-```bash
-npx create-helix --drupal
-```
+### Drupal Presets (interactive)
 
-### Drupal Presets
+The Drupal track exposes preset choices in the prompt:
 
-Presets apply a curated SDC set and configuration for specific Drupal use cases:
+| Preset       | Description                                         | SDC Count |
+| ------------ | --------------------------------------------------- | --------- |
+| `standard`   | Core Drupal SDCs for general-purpose themes         | 7         |
+| `blog`       | Standard + blog-specific content components         | 12        |
+| `healthcare` | Blog + healthcare-specific components (HIPAA-aware) | 16        |
+| `intranet`   | Standard + employee portal components               | 11        |
+| `ecommerce`  | Ecommerce-optimized component set                   | —         |
 
-```bash
-# Standard preset — Core Drupal SDCs for general-purpose themes
-npx create-helix --drupal --preset standard
+## Planned CLI Surface
 
-# Blog preset — Standard + blog-specific content components
-npx create-helix --drupal --preset blog
-
-# Healthcare preset — Blog + healthcare-specific components (HIPAA-aware)
-npx create-helix --drupal --preset healthcare
-
-# Intranet preset — Standard + employee portal components
-npx create-helix --drupal --preset intranet
-
-# Ecommerce preset — Ecommerce-optimized component set
-npx create-helix --drupal --preset ecommerce
-```
-
-| Preset | Description | SDC Count |
-| ------ | ----------- | --------- |
-| `standard` | Core Drupal SDCs for general-purpose themes | 7 |
-| `blog` | Standard + blog-specific content components | 12 |
-| `healthcare` | Blog + healthcare-specific components (HIPAA-aware) | 16 |
-| `intranet` | Standard + employee portal components | 11 |
-| `ecommerce` | Ecommerce-optimized component set | — |
-
-## Subcommands
-
-`create-helix` includes several utility subcommands:
-
-```bash
-# List all available framework templates
-npx create-helix list
-
-# Show details for a specific template
-npx create-helix info react-next
-
-# Run the environment diagnostics tool
-npx create-helix doctor
-
-# Upgrade an existing project's HELiX dependencies
-npx create-helix upgrade
-
-# View or set CLI configuration
-npx create-helix config
-npx create-helix config <key>
-```
-
-## All CLI Options
+The shipped CLI today is interactive-only. The following non-interactive
+surface is on the roadmap but **not yet implemented**:
 
 ```
+# PLANNED — these flags are not parsed by the current CLI build.
 create-helix [project-name] [options]
-create-helix list
-create-helix info <template>
-create-helix doctor
-create-helix upgrade
-create-helix config [key]
+create-helix list                       # list templates
+create-helix info <template>            # describe one template
+create-helix doctor                     # environment diagnostics
+create-helix upgrade                    # update an existing project
+create-helix config [key]               # view/set CLI defaults
 
-Scaffold Options:
-  --template <id>       Framework template ID (see table above)
-  --bundles <list>      Comma-separated bundle IDs: all, core, forms, navigation,
-                        data-display, feedback, layout
-  --output-dir, -o      Output directory (defaults to project name)
+Scaffold Options (planned):
+  --template <id>       Framework template ID
+  --bundles <list>      Comma-separated bundle IDs
+  --output-dir, -o      Output directory
   --drupal              Scaffold a Drupal theme instead of a framework project
-  --preset <name>       Drupal preset: standard, blog, healthcare, intranet, ecommerce
+  --preset <name>       Drupal preset
   --profile <name>      Load a saved configuration profile
 
-Feature Toggles (all default to enabled):
-  --typescript          Include TypeScript configuration
-  --no-typescript       Skip TypeScript configuration
-  --eslint              Include ESLint configuration
-  --no-eslint           Skip ESLint configuration
-  --tokens              Include design token scaffold
-  --no-tokens           Skip design token scaffold
-  --dark-mode           Include dark mode support
-  --no-dark-mode        Skip dark mode support
+Feature Toggles (planned, all default to enabled):
+  --typescript / --no-typescript
+  --eslint / --no-eslint
+  --tokens / --no-tokens
+  --dark-mode / --no-dark-mode
 
-Behavior Flags:
-  --dry-run             Preview files that would be generated without writing them
-  --force               Overwrite an existing directory
-  --no-install          Skip running the package manager install step
-  --no-config           Skip loading the .helixrc config file
-  --skip-audit          Skip the dependency security audit
-  --offline             Run in offline mode (skip network checks and version lookups)
-  --verbose             Enable verbose logging output
-  --quiet, -q           Suppress all non-error output
-  --json                Output machine-readable JSON (for CI/scripting)
+Behavior Flags (planned):
+  --dry-run, --force, --no-install, --no-config, --skip-audit,
+  --offline, --verbose, --quiet, --json
 
-Meta:
-  --version, -v         Show version number
-  --help, -h            Show help
+Meta (planned):
+  --version, -v
+  --help, -h
 ```
+
+Track [bookedsolidtech/helix#create-helix-cli-flags](https://github.com/bookedsolidtech/helix/labels/area%3Acreate-helix)
+for the implementation of the non-interactive surface. Until it lands, scripts
+that need a non-interactive scaffold should fall back to `git clone` against
+one of the template repos.
 
 ## Post-Scaffold Steps
 
@@ -212,11 +155,11 @@ cd my-helix-theme
 
 `create-helix` is part of the Booked Solid toolchain:
 
-| Tool | Purpose |
-| ---- | ------- |
-| **helix** (`@helixui/library`) | Enterprise web component library |
-| **helixir** (`@helixui/mcp`) | MCP server for AI-assisted development |
-| **create-helix** | Project scaffolding CLI |
+| Tool                           | Purpose                                |
+| ------------------------------ | -------------------------------------- |
+| **helix** (`@helixui/library`) | Enterprise web component library       |
+| **helixir** (`@helixui/mcp`)   | MCP server for AI-assisted development |
+| **create-helix**               | Project scaffolding CLI                |
 
 ## Next Steps
 
