@@ -65,11 +65,15 @@ trap 'rm -f "$TARGET_LIST"' EXIT
 grep -vE '^\s*(#|$)' "$TARGETS_FILE" > "$TARGET_LIST" || true
 
 if (( RESUME == 1 )) && [[ -s "$FINDINGS" ]]; then
+  # The resume key is the full target path (the same string the campaign
+  # emits as `tag` on every finding). Basenames collide hard on this
+  # manifest — README.md appears 12+ times, overview.md 7+ — so a basename
+  # key would silently skip un-run siblings after a single matching basename
+  # landed in findings.jsonl.
   SEEN_TAGS="$(jq -r '.tag // empty' "$FINDINGS" | sort -u)"
   FILTERED="$(mktemp)"
   while IFS= read -r t; do
-    tag="$(basename "$t")"
-    echo "$SEEN_TAGS" | grep -qxF "$tag" || echo "$t" >> "$FILTERED"
+    echo "$SEEN_TAGS" | grep -qxF "$t" || echo "$t" >> "$FILTERED"
   done < "$TARGET_LIST"
   mv "$FILTERED" "$TARGET_LIST"
 fi
@@ -111,7 +115,10 @@ CODEX_ARGS=(exec --sandbox read-only --skip-git-repo-check --color never -C "$RE
 
 run_target() {
   local target="$1" idx="$2"
-  local tag; tag="$(basename "$target")"
+  # tag is the full target path — it is the resume key and must be unique
+  # per target. The slug strips path separators / non-id chars to a safe
+  # transcript filename.
+  local tag="$target"
   local slug; slug="${tag//[^a-zA-Z0-9_-]/_}"
   local transcript="$REPORT_DIR/transcripts/$slug.log"
   local last_msg="$REPORT_DIR/transcripts/$slug.last.txt"

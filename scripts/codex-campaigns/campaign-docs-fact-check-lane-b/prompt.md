@@ -136,6 +136,7 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
+  "tag": "{TAG}",
   "ts": "<ISO 8601>",
   "codex_run": "<short hash>",
   "severity": "critical | high | medium | low | info",
@@ -149,20 +150,27 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 }
 ```
 
+`tag` is the **full `{TARGET}` path verbatim** — it's the resume key for
+`run-campaign.sh --resume`. Emit it on every record (including the clean-file
+pass row) so an interrupted lane resume skips completed targets instead of
+duplicating findings.
+
 Output ONE finding per line, JSONL. Do not wrap in arrays. Do not add markdown.
 
-If the file is clean, emit a single "pass" finding for the entire file:
+If the file is clean, emit a single "pass" finding anchored to **line 1**
+(the schema validator rejects any `line < 1`, so do not use `0`):
 
 ```json
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
+  "tag": "{TAG}",
   "ts": "...",
   "codex_run": "...",
   "severity": "info",
   "category": "editorial",
   "file": "{TARGET}",
-  "line": 0,
+  "line": 1,
   "issue": "File passes fact-check with no findings.",
   "evidence": "",
   "fix": "",

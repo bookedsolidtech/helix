@@ -160,10 +160,12 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 }
 ```
 
-`tag` is the **basename of `{TARGET}`** (e.g. `installation.md`, `hx-button.mdx`).
+`tag` is the **full `{TARGET}` path verbatim**
+(e.g. `apps/docs/src/content/docs/getting-started/installation.md`).
 `run-campaign.sh --resume` filters completed targets by matching this tag against
-`.tag` values already present in `findings.jsonl` — emit it exactly so a resumed
-sweep skips files you've already covered instead of reprocessing the full set.
+`.tag` values already present in `findings.jsonl` — basenames collide hard on
+this manifest (`README.md` × 12, `overview.md` × 7, etc.), so emit the full
+relative path verbatim or a resumed sweep will silently skip un-run siblings.
 
 Output ONE finding per line, JSONL. Do not wrap in arrays. Do not add markdown.
 
