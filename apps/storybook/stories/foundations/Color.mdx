@@ -30,9 +30,12 @@ import '@helixui/library/components/hx-alert';
   lede={
     <>
       HELiX color is a three-tier cascade — primitive ramps anchor the system, semantic surfaces
-      consume the ramps, and components consume the semantics. Every tier is overrideable; every
-      text-on-surface pair is contrast-graded across light, dark, and high-contrast modes. Click any
-      token reference on this page to copy <code>var(--hx-color-…)</code>.
+      consume the ramps, and components consume the semantics. The <strong>semantic tier</strong> is
+      the stable override point for consumers; primitive ramps are only overridden by registered
+      brand definitions (primary/secondary), and component-tier hooks may be internal,
+      variant-shadowed, or only effective in limited states. Every text-on-surface pair is
+      contrast-graded across light, dark, and high-contrast modes. Click any token reference on
+      this page to copy <code>var(--hx-color-…)</code>.
     </>
   }
 />
@@ -51,7 +54,7 @@ import '@helixui/library/components/hx-alert';
       <div className="hx-docs-cascade-stage" data-tier="primitive">
         <span className="hx-docs-cascade-tier">tier 1 · primitive</span>
         <h4>The raw ramp stop</h4>
-        <p>Anchor hue. Versioned, AA-tuned, never overridden by consumers.</p>
+        <p>Anchor hue. Versioned and AA-tuned; not overridden for routine theming. Registered brand definitions are the one exception — they override the primary and secondary ramp stops.</p>
         <TokenRef token="--hx-color-primary-600" variant="block" />
       </div>
 
@@ -65,8 +68,8 @@ import '@helixui/library/components/hx-alert';
       <div className="hx-docs-cascade-stage" data-tier="component">
         <span className="hx-docs-cascade-tier">tier 3 · component</span>
         <h4>The host element reads the role</h4>
-        <p>The element exposes its own var with the semantic as fallback.</p>
-        <TokenRef token={`hx-button[variant='primary'] { background: var(--hx-color-action-primary-bg); }`} copyValue="hx-button[variant='primary']" variant="block" />
+        <p>The variant CSS sets <code>--hx-button-bg</code> from the semantic role; the rendered button then paints from <code>--hx-button-bg</code>. Override the semantic token to retheme; override the component token only when you need to vary one variant in isolation.</p>
+        <TokenRef token={`.button--primary { --hx-button-bg: var(--hx-color-action-primary-bg); }\n.button { background-color: var(--hx-button-bg); }`} copyValue="--hx-button-bg" variant="block" />
       </div>
     </div>
 
@@ -116,64 +119,64 @@ import '@helixui/library/components/hx-alert';
   <SectionHead title="Status colors in context" meta="real components, real surfaces" />
   <p className="hx-docs-card-body">
     Status ramps are evaluated where users see them — inside <code>hx-alert</code>. Each card
-    shows the alert in production, the surface token that backs it, and the text token paired
-    with it. Click any token reference to copy.
+    shows the live alert (rendered with <code>open</code>), the tonal ramp stops the alert paints
+    from, and the matching surface tint. Click any token reference to copy.
   </p>
 
   <div className="hx-docs-status-grid" style={{ marginTop: 24 }}>
     <div className="hx-docs-status-card" data-status="success">
       <h4>Success</h4>
       <p>Confirmation, completion, positive verification.</p>
-      <hx-alert variant="success">
+      <hx-alert open variant="success">
         <span slot="title">Visit confirmed</span>
         Your appointment is on the calendar.
       </hx-alert>
       <div className="hx-docs-status-tokens">
+        <TokenRef token="--hx-color-success-50" />
         <TokenRef token="--hx-color-success-500" />
         <TokenRef token="--hx-color-success-600" />
-        <TokenRef token="--hx-color-surface-success-strong" />
       </div>
     </div>
 
     <div className="hx-docs-status-card" data-status="warning">
       <h4>Warning</h4>
       <p>Caution, attention required, soft block.</p>
-      <hx-alert variant="warning">
+      <hx-alert open variant="warning">
         <span slot="title">Action needed</span>
         Confirm your contact details before continuing.
       </hx-alert>
       <div className="hx-docs-status-tokens">
+        <TokenRef token="--hx-color-warning-50" />
         <TokenRef token="--hx-color-warning-500" />
         <TokenRef token="--hx-color-warning-600" />
-        <TokenRef token="--hx-color-surface-warning-strong" />
       </div>
     </div>
 
     <div className="hx-docs-status-card" data-status="error">
       <h4>Error</h4>
       <p>Failure, hard block, destructive consequence.</p>
-      <hx-alert variant="error">
+      <hx-alert open variant="error">
         <span slot="title">Could not save</span>
         Please retry — your network connection dropped.
       </hx-alert>
       <div className="hx-docs-status-tokens">
+        <TokenRef token="--hx-color-error-50" />
         <TokenRef token="--hx-color-error-500" />
         <TokenRef token="--hx-color-error-600" />
-        <TokenRef token="--hx-color-surface-danger-strong" />
       </div>
     </div>
 
     <div className="hx-docs-status-card" data-status="info">
       <h4>Info</h4>
       <p>Neutral context, advisory, FYI.</p>
-      <hx-alert variant="info">
+      <hx-alert open variant="info">
         <span slot="title">New protocol</span>
         Updated triage guidance is live for emergency intake.
       </hx-alert>
       <div className="hx-docs-status-tokens">
+        <TokenRef token="--hx-color-info-50" />
         <TokenRef token="--hx-color-info-500" />
         <TokenRef token="--hx-color-info-600" />
-        <TokenRef token="--hx-color-surface-info-strong" />
       </div>
     </div>
 
@@ -183,11 +186,15 @@ import '@helixui/library/components/hx-alert';
 <section>
   <SectionHead title="AAA contrast matrix" meta="every text × surface pair · all 3 modes" />
   <p className="hx-docs-card-body">
-    Every shipped text-on-surface pair, graded against the WCAG 2.2 contrast thresholds (SC 1.4.6 carries forward from 2.1): AAA at 7:1 normal
-    text, AA at 4.5:1, sub-AA = defect. Generated from{' '}
-    <code>packages/hx-tokens/.cache/contrast-report.json</code> via{' '}
-    <code>pnpm --filter=@helixui/tokens run contrast:report</code>. This is the headline a11y
-    artifact for the AAA certification — every value here is reproducible from the token source.
+    Every shipped text-on-surface pair, graded against the WCAG 2.2 contrast thresholds (SC 1.4.6
+    carries forward from 2.1): body text 7:1 AAA / 4.5:1 AA, large text 4.5:1 AAA / 3:1 AA, and
+    UI / non-text pairs 3:1 (SC 1.4.11). Rendered from{' '}
+    <code>@helixui/tokens/contrast-data</code> (the committed contrast report module imported by
+    Storybook); regenerate via{' '}
+    <code>pnpm --filter=@helixui/tokens run contrast:report</code>. This view is token contrast
+    telemetry — the canonical AAA cert authority is{' '}
+    <code>packages/hx-library/aaa-verdicts.json</code> backed by the formal audit harness
+    (<code>scripts/aaa-formal-audit.mjs</code>).
   </p>
   <div style={{ marginTop: 24 }}>
     <ContrastMatrix />
@@ -197,11 +204,13 @@ import '@helixui/library/components/hx-alert';
 <section>
   <SectionHead title="Brand swap" meta="primary + secondary ramps · semantic stays locked" />
   <p className="hx-docs-card-body">
-    Open the <strong>Brand</strong> toolbar at the top of this page. Selecting a brand reflows every{' '}
-    <TokenRef token="--hx-color-primary-500" /> consumer above — including the live{' '}
-    <code>hx-button</code> in the cascade walkthrough — because brand registries override only the
-    primitive primary and secondary ramps. The 22-token semantic tier stays untouched, so surface
-    contrast guarantees survive the swap.
+    Open the <strong>Brand</strong> toolbar at the top of this page. Selecting a brand overrides
+    the primary and secondary ramp stops; every consumer of those ramps reflows, including the
+    live <code>hx-button</code> in the cascade walkthrough — which paints from{' '}
+    <TokenRef token="--hx-color-action-primary-bg" /> (currently resolving to the brand{' '}
+    <code>primary-700</code> stop for AAA contrast on action surfaces). The 22-token brand
+    contract is the primary/secondary ramp set; semantic surface, text, and action tokens stay
+    inherited and recompute from those ramps, so contrast guarantees survive the swap.
   </p>
   <p className="hx-docs-card-body" style={{ marginTop: 16 }}>
     Full brand contract:{' '}
