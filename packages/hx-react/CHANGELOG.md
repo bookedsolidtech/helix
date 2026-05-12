@@ -14,27 +14,27 @@ Mistakenly published as MAJOR via the [library, tokens, react] linked-package gr
 - Updated dependencies [1ea6a14]
   - @helixui/library@4.0.0
 
+  > **Note:** the changesets cascade originally generated `@helixui/library@4.0.0` here. That entry is an unpublished/deprecated artifact of the linked-package major-bump cascade; the workspace-current library release is **`@helixui/library@3.9.0`**.
+
 ## 3.8.0
 
 ### Minor Changes
 
-- b5a3c60: AAA Tier 3 — full P0 surface measured against WCAG 2.2 AAA via formal audit harness (3.8.0).
+- b5a3c60: AAA Tier 3 — full P0 surface measured against WCAG 2.2 AAA via formal audit harness (3.8.0 release snapshot).
 
   ## Posture (read this first)
 
-  This release ships **self-attested AAA conformance posture** for 43 P0 components against WCAG 2.2 AAA, sourced from a formal audit harness with W3C-cited spec URLs and three-way cross-tool agreement (axe-core + WCAG luminance math + CEM helixMeta claims).
+  This release publishes a **self-attested WCAG 2.2 AAA conformance posture** sourced from the formal audit harness, with W3C-cited spec URLs and three-way cross-tool agreement (axe-core + WCAG luminance math + CEM helixMeta claims).
 
   **This is NOT a third-party-signed VPAT 2.5 cert.** Such a cert requires engagement with a credentialed accessibility vendor (e.g., Deque, TPGi, Level Access) and is on the roadmap, not in this release. We deliberately use "conformance posture per WCAG 2.2" (not "AAA Certified") in messaging to avoid mis-stating the legal/compliance weight of the claim.
 
-  What this release IS: the most rigorous self-attested AAA evidence stack we know of in any open enterprise web-component library. What it is NOT: a substitute for third-party AAA certification.
-
-  ## What ships
+  ## What ships at 3.8.0 (release-time snapshot)
 
   **43 of 43 P0 components measured against 11 AAA criteria** via the formal audit harness:
-  - Latest verification run: **473/473 cells, 356 Supports + 117 Not Applicable, zero Partials, zero Fails**
+  - 3.8.0 release-time verification: **473/473 cells, 356 Supports + 117 Not Applicable, zero Partials, zero Fails**. (The P0 surface has since grown — 3.9.0 measures **44 P0 components × 11 criteria = 484 cells / 376 Supports + 108 Not Applicable**; consult `packages/hx-library/aaa-verdicts.json` for the current numbers.)
   - Snapshot: `.reports/formal-aaa-audit/PRE-RELEASE-VERIFICATION-3.8.0.md` (gitignored evidence)
   - Cert toolkit (`scripts/aaa-cert.mjs`) gates on formal audit verdict, not the informational matrix harness
-  - Standards reference: `scripts/aaa-standards.json` (46 W3C URLs WebFetch-verified 2026-05-08)
+  - Standards reference: `scripts/aaa-standards.json` (W3C URLs WebFetch-verified — see the file for the current count)
 
   **Criteria measured per component (11 axes):**
   - 1.4.6 Contrast (Enhanced)
@@ -61,13 +61,13 @@ Mistakenly published as MAJOR via the [library, tokens, react] linked-package gr
   - Focus-ring contrast hardening across components where the previous semantic ring missed AAA contrast against adjacent surfaces
 
   ## Documentation
-  - 43 `AAA-AUDIT.md` files regenerated against `scripts/AAA-AUDIT.formal.template.md` using VPAT 2.5 verdict language ("Supports" / "Not Applicable") and W3C spec URLs
+  - At the 3.8.0 release: 43 `AAA-AUDIT.md` files regenerated against `scripts/AAA-AUDIT.formal.template.md` using VPAT 2.5 verdict language ("Supports" / "Not Applicable") and W3C spec URLs (the on-disk count tracks the current P0 set — 44 since 3.9.0)
   - Storybook A11y Dashboard with live cert-count hero (reads CEM directly, refreshes on every cert)
   - 5 anchor components (hx-button, hx-text-input, hx-checkbox, hx-dialog, hx-tabs) ship MDX stories as proper AAA conformance documentation (hero scenario + AAA card + APG walkthrough + consumer obligations + InlineAuditPanel embed)
   - Remaining 38 component MDX rewrites land in subsequent minors
 
   ## Cert tooling
-  - `scripts/aaa-formal-audit.mjs` — formal audit harness, cert authority for `pnpm aaa:cert`
+  - `scripts/aaa-formal-audit.mjs` — formal audit harness, the cert authority (invoke via `pnpm aaa:audit` or `pnpm exec node scripts/aaa-cert.mjs <component-name>` for the per-component cert stamp; no `pnpm aaa:cert` shortcut exists in the workspace)
   - `scripts/aaa-standards.json` — WCAG 2.2 reference with 46 verified W3C URLs
   - `scripts/aaa-matrix-verify.mjs` — demoted to informational coverage tool (header banner explicit; not a cert authority)
   - `pnpm aaa:audit` alias — runs the full 43-component formal sweep against live Storybook
@@ -148,12 +148,12 @@ Mistakenly published as MAJOR via the [library, tokens, react] linked-package gr
 - 191bda3: AAA conformance posture + Storybook canonical-template foundation.
 
   **`@helixui/tokens`**
-  - Added WCAG 1.4.6-correct contrast pair role classification (body-text 7:1 / large-text 4.5:1 / ui-element 3:1). Pair count: 156 of 163 AAA-passing, 0 sub-AA. Public test helpers (`PairRole`, `aaaThresholdForRole`) exposed for downstream conformance reporting.
+  - Added WCAG 1.4.6-correct contrast pair role classification (body-text 7:1 / large-text 4.5:1 / ui-element 3:1). 1.4.0 release-snapshot pair count: 156 of 163 AAA-passing, 0 sub-AA. (Current generator output is 114 of 160 AAA-pass, 46 AA-only, 0 sub-AA — consult `.cache/contrast-report.json` for the live numbers.) Public test helpers (`PairRole`, `aaaThresholdForRole`) exposed for downstream conformance reporting.
   - New `pnpm contrast:report` script generates `CONTRAST-REPORT.md` + `.cache/contrast-report.json` per release for the AAA conformance ledger.
 
   **`@helixui/library`**
   - `checkA11y(level: 'aa' | 'aaa')` test-utils API for per-component AAA opt-in (default unchanged for backward compat).
-  - New CEM analyzer plugin `cem-plugins/aaa-certified.mjs` reads `@aaa-certified <date>` JSDoc tags and emits `aaaCertified: true` + `aaaCertifiedDate` on the manifest. Allow-list infrastructure at `scripts/a11y-aaa-allowlist.json` (currently empty — per-component certification is the next major phase).
+  - New CEM analyzer plugin `cem-plugins/aaa-certified.mjs` reads `@aaa-certified <date>` JSDoc tags and emits `aaaCertified: true` + `aaaCertifiedDate` on the manifest. Allow-list infrastructure at `scripts/a11y-aaa-allowlist.json` was empty at the 1.4.0 release; the file has since been populated as components landed in the formal audit and now lists the P0 cohort.
 
   **Brand registry contract** (`apps/storybook` — not a published package, framing only)
   - 6 reference brands: Apex (default), Meridian, Lumen, Verdant, Signal, Ember. Every brand verified AAA at primary-700 against text-primary. Override-author contract documented: body-text uses ≥primary-700, button labels use the WCAG large-text bold carve-out at primary-500/600.
@@ -601,11 +601,11 @@ inverted>` resolves to `primary-500` in light and `primary-600` in dark
 
 ### Minor Changes
 
-- 54c2705: Add `@helixui/react` package with auto-generated React wrappers for all 98 HELiX web components.
+- 54c2705: Add `@helixui/react` package with auto-generated React wrappers for the HELiX web component surface (98 wrappers at the 1.1.0 release date; the wrapper set has grown to 96 in the current generator output — consult `packages/hx-react/src/index.ts` for the live list and `packages/hx-library/custom-elements.json` for the underlying CEM).
 
   Wrappers are generated from `custom-elements.json` via `scripts/generate-react-wrappers.ts` using `@lit/react` `createComponent()`. Each wrapper includes `'use client'` for Next.js 15 App Router compatibility, full TypeScript prop types derived from CEM declarations, and React-style event callbacks (`onHxClick`, `onHxInput`, `onHxChange`, etc.).
 
-  Tree-shakeable: each component is a separate entry point so importing `HxButton` does not bundle all 98 components.
+  Tree-shakeable: each component is a separate entry point so importing `HxButton` does not bundle every component.
 
 ### Patch Changes
 
