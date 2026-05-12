@@ -133,7 +133,7 @@ pnpm run build
 
 We use Husky hooks to enforce quality standards on commit and push (the active hooks live in `.husky/`):
 
-- **Pre-commit**: Scans staged files for secrets/credentials and refuses commits that include `.env*`, `*.pem`, `*.key`, or detected token patterns. Lint/format are handled via editor integrations and the `pnpm run preflight` gate before push, not by this hook.
+- **Pre-commit**: Runs `gitleaks protect --staged` against the staged diff (hard-fails if `gitleaks` is not installed) plus a filename block on `.env*` / `.envrc`. Note: `*.pem` and `*.key` are NOT filename-blocked — they're caught only when gitleaks detects credential patterns inside them, so treat the gitleaks pass as the secret guarantee, not the filename list. Lint/format are handled via editor integrations and the `pnpm run preflight` gate before push, not by this hook.
 - **Commit-msg**: Blocks structural AI attribution (Co-Authored-By with AI names, "Generated with [Tool]" footers, etc.) per `.rea/policy.yaml`. Conventional Commit format is enforced socially during code review, not by an executable commitlint hook.
 - **Pre-push**: Runs the targeted local gate fragments (lint, format:check, type-check, smart test) and the REA push-review gate. The full GitHub-CI-parity suite lives in `pnpm run preflight` — run it explicitly before pushing significant changes.
 
@@ -154,18 +154,19 @@ All code must pass the **7 Quality Gates** before merge:
 6. **Bundle Size**: Aspirational floor of `<5KB per component / <50KB total` (gzipped) tracked in [`.bundle-budget.json`](./.bundle-budget.json); the **CI-enforced ceiling** is **16KB per component / 200KB total** per [`bundle-budgets.json`](./bundle-budgets.json) — exceeding the ceiling is a blocking failure, exceeding only the floor is a regression flag
 7. **Code Review**: 3-tier review process
 
-Preflight (`pnpm run preflight`) adds four further infrastructure gates on top of the seven above:
+Preflight (`pnpm run preflight`) adds five further infrastructure gates on top of the seven above:
 
 8. **Full test suite**: complete component matrix (catches cross-component regressions)
 9. **Docker CI parity**: full GitHub Actions pipeline reproduced locally via `act`. **Best-effort** — preflight skips the gate (without failing) when Docker or `act` is not installed on the contributor machine, so the local pass is not a guarantee that CI will pass; if you need cert-level parity, install Docker + `act` and run preflight there.
 10. **AAA cert integrity**: refuses regression to `Partially Supports` or `Does Not Support` in the committed `aaa-verdicts.json` snapshot
-11. **Docs version drift**: scans the four currently tracked `@helixui/*` packages — `@helixui/library`, `@helixui/tokens`, `@helixui/icons`, `@helixui/react` — across `apps/docs/` + `apps/storybook/` for stale version pins. Other `@helixui/*` packages (e.g. `@helixui/drupal-behaviors`, `@helixui/drupal-starter`, `@helixui/mcp`, `@helixui/react-starter`) are not in the scanned set yet — extending `PACKAGES` is a tracked follow-up. Bypass with `HELIX_ALLOW_VERSION_DRIFT=1` (emergency only).
+11. **Docs version drift**: scans the four currently tracked `@helixui/*` packages — `@helixui/library`, `@helixui/tokens`, `@helixui/icons`, `@helixui/react` — across `apps/docs/`, `apps/storybook/`, and `packages/**/README.md` for stale version pins. Other `@helixui/*` packages (e.g. `@helixui/drupal-behaviors`, `@helixui/drupal-starter`, `@helixui/mcp`, `@helixui/react-starter`) are not in the scanned set yet — extending `PACKAGES` is a tracked follow-up. Bypass with `HELIX_ALLOW_VERSION_DRIFT=1` (emergency only).
+12. **Docs claims fact-check**: validates structural claims in `apps/docs/` + `apps/storybook/` against source-of-truth — `<hx-*>` references against the CEM, `--hx-*` token prefixes against `@helixui/tokens`, `@helixui/*` package references against the workspace + npm, internal `/<slug>/` links against surviving files, stale repo refs (`github.com/himerus/wc-2026`), and WCAG 2.1 AA conformance claims (should be 2.2 AAA on P0). Runs `scripts/check-docs-claims.mjs`; output goes to `.reports/docs-fact-check/programmatic-findings.md`.
 
 ### Pre-Commit Hooks
 
 Our pre-commit hook (`.husky/pre-commit`) currently:
 
-- Scans staged files for secret/credential patterns and refuses commits that include `.env*`, `*.pem`, `*.key`, or detected token strings
+- Runs `gitleaks protect --staged` and refuses commits that contain detected token strings, plus a filename block on `.env*` / `.envrc`. (`*.pem` / `*.key` are not filename-blocked — they're caught only when gitleaks finds credential patterns inside them; do not rely on the filename list alone.)
 - Hard-blocks files matching the secrets allow-list
 
 Formatting, linting, and type-checking are run explicitly via `pnpm run verify` / `pnpm run preflight` — they are not wired into the pre-commit hook today.

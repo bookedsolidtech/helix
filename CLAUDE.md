@@ -289,7 +289,7 @@ pnpm run dev:admin              # Admin Dashboard on port 3159
 ### Build & Quality
 
 ```bash
-pnpm run preflight              # MANDATORY before push: 11 gates (see "Pre-Push Quality Gate" below)
+pnpm run preflight              # MANDATORY before push: 12 gates (see "Pre-Push Quality Gate" below)
 pnpm run verify                 # Quality check: lint + format:check + type-check + build (~60s)
 pnpm run build                  # Build everything (Turborepo)
 pnpm run type-check             # TypeScript strict
@@ -384,10 +384,10 @@ Consumers override at the semantic/action level. Components consume at the compo
 **Run `pnpm run preflight` before every `git push`. Zero failures required.**
 
 ```bash
-pnpm run preflight   # runs 11 gates: lint, format, type-check, build, tests, CEM, changeset, full test suite, Docker CI (Gate 9), AAA cert integrity, docs version drift
+pnpm run preflight   # runs 12 gates: lint, format, type-check, build, tests, CEM, changeset, full test suite, Docker CI (Gate 9), AAA cert integrity, docs version drift, docs claims fact-check
 ```
 
-`preflight` mirrors the full GitHub Actions CI pipeline locally. **Gate 9** runs `./scripts/act-ci.sh` inside Docker — the exact same environment as GitHub CI; Gates 10–11 cover AAA cert integrity (refuses regression to `Partially Supports`/`Does Not Support` in the committed `aaa-verdicts.json`) and the docs version-drift scan (`scripts/check-docs-claims.mjs` / `scripts/check-version-drift.mjs`). If preflight passes locally, it should pass on GitHub — with the caveat that the Docker gate is best-effort and **skips silently** when Docker or `act` is unavailable on the machine.
+`preflight` mirrors the full GitHub Actions CI pipeline locally. **Gate 9** runs `./scripts/act-ci.sh` inside Docker — the exact same environment as GitHub CI. **Gates 10–12** cover AAA cert integrity (refuses regression to `Partially Supports`/`Does Not Support` in the committed `aaa-verdicts.json`), the docs version-drift scan (`scripts/check-version-drift.mjs`), and the docs claims fact-check (`scripts/check-docs-claims.mjs` — validates `<hx-*>` references, `--hx-*` token prefixes, `@helixui/*` package names, internal slug links, stale repo refs, and WCAG conformance claims against source-of-truth). If preflight passes locally, it should pass on GitHub — with the caveat that the Docker gate is best-effort and **skips silently** when Docker or `act` is unavailable on the machine.
 
 Do NOT push if `pnpm run preflight` fails. Fix the issue first, then re-run.
 
@@ -424,7 +424,7 @@ Code flows through three branches: `feature/* → dev → staging → main`.
 
 ## Git Rules
 
-- `pnpm run preflight` must pass before every `git push` (runs 11 gates, including Docker CI parity, AAA cert integrity, and docs version drift)
+- `pnpm run preflight` must pass before every `git push` (runs 12 gates, including Docker CI parity, AAA cert integrity, docs version drift, and docs claims fact-check)
 - Never use `--no-verify`
 - Never use `git reset --hard` or `git push --force` without explicit permission
 - Commit messages: concise, imperative ("Add hx-select component", not "Added")

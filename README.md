@@ -148,10 +148,11 @@ pnpm run build          # Build everything
 pnpm run test           # Run all tests (Vitest browser mode)
 pnpm run type-check     # TypeScript strict check
 pnpm run verify         # Lint + format:check + type-check + build (quick gate)
-pnpm run preflight      # Required before push — runs the full preflight gate set
+pnpm run preflight      # Required before push — runs the full 12-gate preflight
                         # (lint, format, type-check, build, smart tests, CEM drift,
                         # changeset check, full test matrix, Docker CI parity,
-                        # AAA verdict integrity, docs version drift; see scripts/preflight.sh)
+                        # AAA verdict integrity, docs version drift, docs claims
+                        # fact-check; see scripts/preflight.sh)
 ```
 
 ---
