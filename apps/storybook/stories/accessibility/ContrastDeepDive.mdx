@@ -42,7 +42,7 @@ import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
 </section>
 
 <section>
-  <SectionHead title="The thresholds" meta="WCAG 2.1 · 1.4.3, 1.4.6, 1.4.11" />
+  <SectionHead title="The thresholds" meta="WCAG 2.2 · 1.4.3, 1.4.6, 1.4.11" />
   <p className="hx-docs-card-body">
     HELiX classifies every pair against three thresholds. The matrix below colour-codes each
     pair against these bands.
@@ -171,9 +171,9 @@ import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
 </section>
 
 <section>
-  <SectionHead title="The math, briefly" meta="WCAG 2.1 relative-luminance formula" />
+  <SectionHead title="The math, briefly" meta="WCAG 2.2 relative-luminance formula (unchanged from 2.1)" />
   <p className="hx-docs-card-body">
-    The contrast generator turns each token's resolved hex into the WCAG 2.1 contrast ratio.
+    The contrast generator turns each token's resolved hex into the WCAG 2.2 contrast ratio (the formula carried forward unchanged from WCAG 2.1).
     Below is the canonical implementation it uses — pure, deterministic, no dependency on a
     colour library. Reproduce the matrix locally with this and the cached
     <code> contrast-report.json</code>.
