@@ -44,11 +44,15 @@ In the typical loading order, step 3 happens before step 4. When your `attach()`
 
   Drupal.behaviors.hxCardEnhance = {
     attach(context, settings) {
-      once('helixui:card-enhance', 'hx-card', context).forEach((card) => {
-        // Wait for definition before setting JavaScript properties
-        customElements.whenDefined('hx-card').then(() => {
-          // Safe to access component-specific properties and methods
-          card.someComplexProperty = { key: 'value' };
+      once('mysite:card-enhance', 'hx-card', context).forEach((card) => {
+        // Wait for definition before invoking any component method or
+        // reading Lit lifecycle state. (hx-card has no consumer-facing JS
+        // properties beyond the CEM-exposed attributes — set values via
+        // attributes/slots; whenDefined() is most useful when calling
+        // updateComplete or component-specific methods.)
+        customElements.whenDefined('hx-card').then(async () => {
+          await card.updateComplete;
+          // Now safe to read post-upgrade computed state.
         });
       });
     },
@@ -61,8 +65,8 @@ In the typical loading order, step 3 happens before step 4. When your `attach()`
 
 You need `whenDefined()` when:
 
-1. **Setting non-reflected JavaScript properties** — properties like `columns`, `data`, `options`, `config` that accept objects or arrays
-2. **Calling component methods** — methods defined on the component class (e.g., `card.refresh()`, `table.sort()`)
+1. **Setting non-reflected JavaScript properties** — properties that accept objects or arrays (e.g. `hx-data-table.columns`, `hx-data-table.rows`)
+2. **Calling component methods** — methods defined on the component class (e.g. `hx-dialog.showModal()` / `close()`, `hx-toast.show()`); always check the component's CEM `members` list for what's actually public
 3. **Accessing Lit-specific internals** — `updateComplete`, `renderRoot`, or anything from Lit's API
 
 You do NOT need `whenDefined()` for:
@@ -80,20 +84,28 @@ You do NOT need `whenDefined()` for:
   Drupal.behaviors.hxDashboardInit = {
     attach(context, settings) {
       // Initialize different component types concurrently
-      once('helixui:summary-card', 'hx-card[data-summary]', context).forEach((card) => {
+      once('mysite:summary-card', 'hx-card[data-summary]', context).forEach((card) => {
         customElements.whenDefined('hx-card').then(() => {
+          // hx-card has no `summaryData` property — drive content via slotted
+          // markup or by mutating slotted child elements. The pattern below
+          // assumes the summary HTML lives in a script[type=application/json]
+          // sibling that we render into the card's default slot.
+          const summaryEl = card.querySelector('[data-summary-target]');
           const summaryJson = card.getAttribute('data-summary');
-          if (summaryJson) {
-            card.summaryData = JSON.parse(summaryJson);
+          if (summaryEl && summaryJson) {
+            const data = JSON.parse(summaryJson);
+            summaryEl.textContent = data.label;
           }
         });
       });
 
-      once('helixui:data-chart', 'hx-chart[data-series]', context).forEach((chart) => {
-        customElements.whenDefined('hx-chart').then(() => {
-          const seriesJson = chart.getAttribute('data-series');
-          if (seriesJson) {
-            chart.series = JSON.parse(seriesJson);
+      // hx-data-table is the canonical data-bound surface; there's no
+      // shipped hx-chart component, so persist data via hx-data-table.rows.
+      once('mysite:data-summary-table', 'hx-data-table[data-rows]', context).forEach((table) => {
+        customElements.whenDefined('hx-data-table').then(() => {
+          const rowsJson = table.getAttribute('data-rows');
+          if (rowsJson) {
+            table.rows = JSON.parse(rowsJson);
           }
         });
       });
@@ -114,20 +126,24 @@ This is the canonical pattern for passing objects and arrays from Twig to a HELi
 **Twig template:**
 
 ```twig
-{# Encode the data as JSON in a data- attribute #}
+{# Encode the data as JSON in a data- attribute. hx-data-table is a complex
+   widget — pair it with an aria-label or labelledby for the data table
+   landmark so screen-reader users know what the table represents. #}
 <hx-data-table
   id="patient-table"
+  aria-label="{{ 'Patient roster — %d records'|format(rows|length) }}"
   data-columns="{{ columns|json_encode|escape }}"
   data-rows="{{ rows|json_encode|escape }}"
 >
-  {# Progressive-enhancement fallback for no-JS #}
+  {# Progressive-enhancement fallback for no-JS. Column keys in the CEM
+     are `key` (not `field`). #}
   <table>
     <thead>
       <tr>{% for col in columns %}<th>{{ col.label }}</th>{% endfor %}</tr>
     </thead>
     <tbody>
       {% for row in rows %}
-        <tr>{% for col in columns %}<td>{{ row[col.field] }}</td>{% endfor %}</tr>
+        <tr>{% for col in columns %}<td>{{ row[col.key] }}</td>{% endfor %}</tr>
       {% endfor %}
     </tbody>
   </table>
@@ -142,14 +158,15 @@ This is the canonical pattern for passing objects and arrays from Twig to a HELi
 
   Drupal.behaviors.hxDataTableInit = {
     attach(context, settings) {
-      once('helixui:data-table-init', 'hx-data-table[data-columns]', context).forEach((table) => {
+      once('mysite:data-table-init', 'hx-data-table[data-columns]', context).forEach((table) => {
         customElements.whenDefined('hx-data-table').then(() => {
           try {
             const columnsJson = table.getAttribute('data-columns');
             const rowsJson = table.getAttribute('data-rows');
 
             if (columnsJson) table.columns = JSON.parse(columnsJson);
-            if (rowsJson) table.data = JSON.parse(rowsJson);
+            // The public row-data property is `rows`, not `data`.
+            if (rowsJson) table.rows = JSON.parse(rowsJson);
 
             // Optional: remove the fallback table after hydration
             const fallback = table.querySelector('table');
@@ -171,27 +188,30 @@ This is the canonical pattern for passing objects and arrays from Twig to a HELi
 (function (Drupal, once) {
   'use strict';
 
-  Drupal.behaviors.hxMultiSelectInit = {
+  // hx-multi-select does not exist as a shipped component. For multi-selection,
+  // use hx-combobox (which supports a multiple attribute + chip rendering) and
+  // populate options via slotted <option> children — the standard pattern.
+  Drupal.behaviors.hxComboboxOptions = {
     attach(context, settings) {
-      once('helixui:multi-select-init', 'hx-multi-select[data-options]', context).forEach((select) => {
-        customElements.whenDefined('hx-multi-select').then(() => {
-          const optionsJson = select.getAttribute('data-options');
-          const selectedJson = select.getAttribute('data-selected');
-
-          if (optionsJson) {
-            try {
-              select.options = JSON.parse(optionsJson);
-            } catch (e) {
-              console.error('[HELiX] hx-multi-select: invalid options JSON', e);
-            }
-          }
-
-          if (selectedJson) {
-            try {
-              select.selectedValues = JSON.parse(selectedJson);
-            } catch (e) {
-              console.error('[HELiX] hx-multi-select: invalid selected JSON', e);
-            }
+      once('mysite:combobox-options', 'hx-combobox[data-options]', context).forEach((combo) => {
+        customElements.whenDefined('hx-combobox').then(() => {
+          const optionsJson = combo.getAttribute('data-options');
+          if (!optionsJson) return;
+          try {
+            const options = JSON.parse(optionsJson);
+            // Render <option> children — hx-combobox reads them via slot
+            // assignment. Replace any existing options first.
+            combo.replaceChildren(
+              ...options.map((opt) => {
+                const el = document.createElement('option');
+                el.value = opt.value;
+                el.textContent = opt.label;
+                if (opt.selected) el.selected = true;
+                return el;
+              }),
+            );
+          } catch (e) {
+            console.error('[HELiX] hx-combobox: invalid options JSON', e);
           }
         });
       });
@@ -215,17 +235,19 @@ HELiX components emit events with `composed: true`. This causes them to cross th
 
   Drupal.behaviors.hxFormSubmitHandler = {
     attach(context, settings) {
-      // Listen on the form — catches hx-submit from any hx-* inside it
-      once('helixui:form-submit', 'form[data-helix-form]', context).forEach((form) => {
-        form.addEventListener('hx-submit', (event) => {
-          // event.target is the hx-button that was activated
-          // event.detail contains component-specific data
-          console.log('Form submit from:', event.target.tagName);
-          console.log('Submitter:', event.detail?.submitter);
+      // hx-submit is dispatched by hx-form (not by inner hx-button) and only
+      // when the form runs in action-less Drupal-wrapped mode — see the
+      // hx-form CEM entry for the full event-detail shape (valid, values,
+      // formData). Listen at the hx-form host, not at the surrounding <form>.
+      once('mysite:form-submit', 'hx-form[data-helix-form]', context).forEach((hxForm) => {
+        hxForm.addEventListener('hx-submit', (event) => {
+          // event.target is the hx-form element
+          // event.detail = { valid, values, formData }
+          if (!event.detail.valid) return;
 
           // Prevent default browser form submission and handle via AJAX
           event.preventDefault();
-          submitFormAjax(form);
+          submitFormAjax(hxForm, event.detail.formData);
         });
       });
     },
@@ -257,9 +279,11 @@ document.addEventListener('hx-change', (event) => {
 
   Drupal.behaviors.hxAlertTracking = {
     attach(context, settings) {
-      // Track when users dismiss alerts
-      once('helixui:alert-dismiss-track', 'hx-alert[data-alert-id]', context).forEach((alert) => {
-        alert.addEventListener('hx-dismiss', (event) => {
+      // Track when users dismiss alerts. hx-alert emits hx-close on dismiss
+      // and hx-after-close after the close transition. Use hx-close for
+      // tracking; use hx-after-close if you need to defer DOM cleanup.
+      once('mysite:alert-dismiss-track', 'hx-alert[data-alert-id][dismissible]', context).forEach((alert) => {
+        alert.addEventListener('hx-close', () => {
           const alertId = alert.getAttribute('data-alert-id');
           // Store dismissal in session so it doesn't re-appear
           sessionStorage.setItem(`alert-dismissed-${alertId}`, Date.now().toString());
@@ -358,18 +382,25 @@ if (shadowRoot) {
 
 ```javascript
 // BAD: reaches into shadow DOM to manipulate internals
-once('helixui:bad-pattern', 'hx-card', context).forEach((card) => {
+once('mysite:bad-pattern', 'hx-card', context).forEach((card) => {
   const internalButton = card.shadowRoot?.querySelector('.card__action-button');
   if (internalButton) {
     internalButton.style.display = 'none'; // Breaks component assumptions
   }
 });
 
-// GOOD: use the component's public API
-once('helixui:good-pattern', 'hx-card', context).forEach((card) => {
-  // If you need to hide the actions, the component should expose a property for that
-  card.hideActions = true; // Or use a CSS custom property or part
+// GOOD: use the component's public surface — slots or CSS parts.
+// (hx-card does not expose a hideActions property; if you need to omit the
+// actions row, render the card without children in the actions slot, or
+// hide the part via ::part(actions) in your CSS.)
+once('mysite:good-pattern', 'hx-card', context).forEach((card) => {
+  const actionsSlot = card.querySelector('[slot="actions"]');
+  if (actionsSlot) actionsSlot.remove();
 });
+
+/* Or via CSS:
+hx-card.no-actions::part(actions) { display: none; }
+*/
 ```
 
 ---
@@ -413,8 +444,18 @@ When your Behavior needs to interact with a component that may not exist yet in 
 
   function initLazyCard(card) {
     customElements.whenDefined('hx-card').then(() => {
+      // hx-card has no lazyLoadConfig property. Hydrate the card's slotted
+      // content yourself (image src, heading text, action buttons) once
+      // the data-lazy descriptor resolves.
       const lazyData = card.getAttribute('data-lazy');
-      if (lazyData) card.lazyLoadConfig = JSON.parse(lazyData);
+      if (!lazyData) return;
+      const config = JSON.parse(lazyData);
+      // Set src/alt on the slotted image, fill in the heading, etc.
+      const img = card.querySelector('[slot="image"] img');
+      if (img && config.imageUrl) {
+        img.src = config.imageUrl;
+        img.alt = config.imageAlt ?? '';
+      }
     });
   }
 
@@ -428,14 +469,28 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
 ## Full Integration Example: Patient Card with Dynamic Data
 
 ```twig
-{# templates/node/node--patient--card.html.twig #}
+{# templates/node/node--patient--card.html.twig
+
+   IMPORTANT ARIA anti-pattern guard: hx-card with hx-href becomes an
+   interactive card (role="link") — the entire surface activates. Do NOT
+   combine hx-href with slot="actions" that contains additional buttons,
+   because nested interactive elements inside an interactive ancestor breaks
+   screen-reader navigation and form a focusable-inside-focusable trap.
+   Pick one model:
+     (a) interactive card (hx-href set, no actions slot — the whole card is
+         the activation surface), or
+     (b) non-interactive card (no hx-href, render action buttons in
+         slot="actions" for individual targets).
+#}
+{% set card_is_interactive = view_mode != 'full' %}
+
 <hx-card
   variant="{{ view_mode == 'full' ? 'featured' : 'default' }}"
   elevation="{{ view_mode == 'full' ? 'floating' : 'raised' }}"
   data-entity-id="{{ node.id }}"
   data-entity-bundle="patient"
   data-view-mode="{{ view_mode }}"
-  {% if view_mode != 'full' %}
+  {% if card_is_interactive %}
     hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
   {% endif %}
 >
@@ -465,12 +520,17 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
     </time>
   {% endif %}
 
-  <div slot="actions">
-    <hx-button variant="primary" hx-size="sm">View Record</hx-button>
-    {% if node.field_allow_scheduling.value %}
-      <hx-button variant="ghost" hx-size="sm">Schedule</hx-button>
-    {% endif %}
-  </div>
+  {# Only render the actions slot in the non-interactive variant.
+     In the interactive (hx-href) variant, the whole card activates;
+     nested buttons here would break the ARIA contract. #}
+  {% if not card_is_interactive %}
+    <div slot="actions">
+      <hx-button variant="primary" hx-size="sm">View Record</hx-button>
+      {% if node.field_allow_scheduling.value %}
+        <hx-button variant="ghost" hx-size="sm">Schedule</hx-button>
+      {% endif %}
+    </div>
+  {% endif %}
 </hx-card>
 ```
 
@@ -484,12 +544,12 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
    */
   Drupal.behaviors.mythemeHxPatientCard = {
     attach(context, settings) {
-      once('helixui:patient-card', 'hx-card[data-entity-bundle="patient"]', context).forEach((card) => {
+      once('mysite:patient-card', 'hx-card[data-entity-bundle="patient"]', context).forEach((card) => {
         const entityId = card.getAttribute('data-entity-id');
         const viewMode = card.getAttribute('data-view-mode');
 
         // hx-card with hx-href supplies role="link", tabindex="0", and Enter-only activation
-        // per WCAG 2.1.1 / ARIA APG — no custom keyboard handling is needed.
+        // per WCAG 2.1.3 / ARIA APG — no custom keyboard handling is needed.
 
         // Analytics: track card clicks if configured
         if (settings.helixui?.trackCardClicks) {
@@ -504,16 +564,20 @@ Note: For most Drupal use cases, a MutationObserver is not needed — Drupal's `
           });
         }
 
-        // Set complex properties if present
+        // hx-card has no `vitalsConfig` property — vitals data should be
+        // rendered into a child element (e.g. an hx-stat in the default
+        // slot, or an hx-data-table) rather than mutated through the host.
         const vitalsJson = card.getAttribute('data-vitals-config');
         if (vitalsJson) {
-          customElements.whenDefined('hx-card').then(() => {
+          const vitalsTarget = card.querySelector('[data-vitals-target]');
+          if (vitalsTarget) {
             try {
-              card.vitalsConfig = JSON.parse(vitalsJson);
+              const config = JSON.parse(vitalsJson);
+              vitalsTarget.textContent = `${config.systolic}/${config.diastolic}`;
             } catch (e) {
               console.error('[HELiX] Invalid vitals config JSON:', e);
             }
-          });
+          }
         }
       });
     },
