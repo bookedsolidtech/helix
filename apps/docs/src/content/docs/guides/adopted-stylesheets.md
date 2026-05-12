@@ -50,31 +50,84 @@ a mechanism to adopt stylesheets into the relevant document root, that content
 is unstyled inside components.
 
 The `@phase2/outline-adopted-stylesheets-controller` package solved this for
-the Outline design system. `@helixui/adopted-stylesheets` is the HELiX
-successor: a framework-agnostic package with reference counting, content-hash
-deduplication, and built-in SSR safety.
+the Outline design system. HELiX inherits that controller as an **internal**
+`AdoptedStylesheetsController` inside `@helixui/library`
+(`packages/hx-library/src/controllers/adopted-stylesheets.ts`); consumers
+either reach in for it (in-monorepo) or implement the same shape themselves
+(externally; see the helper module below).
 
 ---
 
 ## Quick Start
 
-### 1. Install
+### 1. No install — the helpers are consumer-owned today
 
-```bash
-npm install @helixui/adopted-stylesheets
-```
-
-Lit is an optional peer dependency. Install it only if you use the Lit
-controller:
+There is no `npm install @helixui/adopted-stylesheets`. Use the helper module
+shape below (Step 2) in your own `src/lib/` directory. Lit is required only if
+you use the controller wrapper at the bottom of Step 2.
 
 ```bash
 npm install lit
 ```
 
-### 2. Create a stylesheet and adopt it
+### 2. Implement the helper functions yourself
+
+Since there is no published `@helixui/adopted-stylesheets` package, the example
+snippets in the rest of this guide assume three small helpers that you author
+yourself (or copy from `packages/hx-library/src/controllers/adopted-stylesheets.ts`).
+The platform primitives are `CSSStyleSheet` + `document.adoptedStyleSheets`:
 
 ```ts
-import { createStyleSheet, adoptStyles } from '@helixui/adopted-stylesheets';
+// src/lib/adopted-stylesheets.ts (consumer-owned helpers)
+
+const _cache = new Map<string, CSSStyleSheet>();
+const _refCounts = new Map<string, number>();
+
+export function createStyleSheet(cssText: string): CSSStyleSheet {
+  let sheet = _cache.get(cssText);
+  if (!sheet) {
+    sheet = new CSSStyleSheet();
+    sheet.replaceSync(cssText);
+    _cache.set(cssText, sheet);
+  }
+  return sheet;
+}
+
+function rootKey(cssText: string, root: Document | ShadowRoot) {
+  return `${cssText}::${root === document ? 'document' : 'shadow'}`;
+}
+
+export function adoptStyles(root: Document | ShadowRoot, ...sheets: CSSStyleSheet[]) {
+  for (const sheet of sheets) {
+    if (!root.adoptedStyleSheets.includes(sheet)) {
+      root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
+    }
+    // Refcount per (cssText, root).
+    const cssText = [...sheet.cssRules].map((r) => r.cssText).join('\n');
+    const key = rootKey(cssText, root);
+    _refCounts.set(key, (_refCounts.get(key) ?? 0) + 1);
+  }
+}
+
+export function removeStyles(root: Document | ShadowRoot, ...sheets: CSSStyleSheet[]) {
+  for (const sheet of sheets) {
+    const cssText = [...sheet.cssRules].map((r) => r.cssText).join('\n');
+    const key = rootKey(cssText, root);
+    const next = (_refCounts.get(key) ?? 1) - 1;
+    if (next <= 0) {
+      _refCounts.delete(key);
+      root.adoptedStyleSheets = root.adoptedStyleSheets.filter((s) => s !== sheet);
+    } else {
+      _refCounts.set(key, next);
+    }
+  }
+}
+```
+
+### 3. Create a stylesheet and adopt it
+
+```ts
+import { createStyleSheet, adoptStyles } from './lib/adopted-stylesheets.js';
 
 const sheet = createStyleSheet(`
   :root {
@@ -88,8 +141,8 @@ adoptStyles(document, sheet);
 ```
 
 That is the entire surface for vanilla JS. The sheet is deduplicated by
-content hash — calling `createStyleSheet` twice with identical CSS returns the
-same `CSSStyleSheet` object.
+`cssText` map cache — calling `createStyleSheet` twice with identical CSS
+returns the same `CSSStyleSheet` object.
 
 ---
 
@@ -100,7 +153,7 @@ same `CSSStyleSheet` object.
 Use `adoptStyles` / `removeStyles` directly for manual lifecycle control.
 
 ```ts
-import { createStyleSheet, adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles, removeStyles } from './lib/adopted-stylesheets.js';
 
 // Create once at module scope — identical CSS always reuses the same object.
 const globalSheet = createStyleSheet(`
@@ -126,7 +179,7 @@ removeStyles(shadow, globalSheet);
 To adopt multiple sheets in one call:
 
 ```ts
-import { createStyleSheet, adoptStyles } from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles } from './lib/adopted-stylesheets.js';
 
 const tokenSheet = createStyleSheet(':root { --hx-color-primary-500: #2563EB; }');
 const baseSheet = createStyleSheet('p { margin-block: 0.75rem; }');
@@ -142,7 +195,7 @@ and `removeStyles` on `hostDisconnected` automatically.
 ```ts
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { AdoptedStylesheetsController, createStyleSheet } from '@helixui/adopted-stylesheets';
+import { AdoptedStylesheetsController, createStyleSheet } from './lib/adopted-stylesheets.js';
 
 // Create at module scope — runs once, not per-instance.
 const globalTokenSheet = createStyleSheet(`
@@ -183,7 +236,7 @@ Use a `useEffect` hook to adopt styles on mount and remove them on unmount.
 
 ```tsx
 import { useEffect, useRef } from 'react';
-import { createStyleSheet, adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles, removeStyles } from './lib/adopted-stylesheets.js';
 
 // Create at module scope for deduplication.
 const brandSheet = createStyleSheet(`
@@ -218,7 +271,7 @@ module scope — outside any component — so it runs once on load.
 
 ```ts
 // app/globals.ts — import this at your app entry point
-import { createStyleSheet, adoptStyles } from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles } from './lib/adopted-stylesheets.js';
 import styles from './base.css?inline';
 
 const baseSheet = createStyleSheet(styles);
@@ -232,7 +285,7 @@ Use a composable to manage the stylesheet lifecycle.
 ```ts
 // composables/useAdoptedStylesheet.ts
 import { onMounted, onUnmounted, type Ref } from 'vue';
-import { createStyleSheet, adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
+import { createStyleSheet, adoptStyles, removeStyles } from './lib/adopted-stylesheets.js';
 
 export function useAdoptedStylesheet(elRef: Ref<HTMLElement | null>, sheet: CSSStyleSheet): void {
   onMounted(() => {
@@ -255,7 +308,7 @@ export function useAdoptedStylesheet(elRef: Ref<HTMLElement | null>, sheet: CSSS
 <!-- BrandedSection.vue -->
 <script setup lang="ts">
 import { ref } from 'vue';
-import { createStyleSheet } from '@helixui/adopted-stylesheets';
+import { createStyleSheet } from './lib/adopted-stylesheets.js';
 import { useAdoptedStylesheet } from '@/composables/useAdoptedStylesheet';
 
 const sheet = createStyleSheet(':root { --brand-color: #2563EB; }');
@@ -302,7 +355,7 @@ Expose the component from Twig and pass CMS content into slots:
 
   async function ensureSheet() {
     if (globalSheet) return globalSheet;
-    const { createStyleSheet } = await import('@helixui/adopted-stylesheets');
+    const { createStyleSheet } = await import('./lib/adopted-stylesheets.js');
     globalSheet = createStyleSheet(`
       p { margin-block: 0.75rem; line-height: 1.6; }
       a { color: var(--hx-color-primary-500); text-decoration: underline; }
@@ -316,7 +369,7 @@ Expose the component from Twig and pass CMS content into slots:
     attach: async function (context) {
       const sheet = await ensureSheet();
       // Adopt on document so slotted content inherits these styles.
-      const { adoptStyles } = await import('@helixui/adopted-stylesheets');
+      const { adoptStyles } = await import('./lib/adopted-stylesheets.js');
       adoptStyles(document, sheet);
     },
   };
@@ -364,7 +417,7 @@ control what gets adopted:
 import {
   createStyleSheet,
   adoptStyles,
-} from '@helixui/adopted-stylesheets';
+} from './lib/adopted-stylesheets.js';
 
 // Each call is deduplicated by content hash.
 // Importing the same CSS string twice returns the same CSSStyleSheet.
@@ -392,7 +445,7 @@ each component can adopt its own stylesheet in its Drupal behavior:
 Drupal.behaviors.hxCardStyles = {
   attach: async function (context) {
     if (!context.querySelector('hx-card')) return;
-    const { createStyleSheet, adoptStyles } = await import('@helixui/adopted-stylesheets');
+    const { createStyleSheet, adoptStyles } = await import('./lib/adopted-stylesheets.js');
     adoptStyles(document, createStyleSheet(`hx-card { ... }`));
   },
 };
@@ -410,7 +463,7 @@ import {
   createStyleSheetSSR,
   createStyleSheet,
   adoptStyles,
-} from '@helixui/adopted-stylesheets';
+} from './lib/adopted-stylesheets.js';
 
 const CSS = `
   :root { --hx-color-primary-500: #2563EB; }
@@ -499,15 +552,15 @@ API migration is minimal.
 
 ### API comparison
 
-| Feature            | `@phase2/outline-adopted-stylesheets-controller` | `@helixui/adopted-stylesheets`                          |
-| ------------------ | ------------------------------------------------ | ------------------------------------------------------- |
-| Lit controller     | `AdoptedStylesheetsController`                   | `AdoptedStylesheetsController`                          |
-| Vanilla adoption   | Not supported                                    | `adoptStyles(root, ...sheets)`                          |
-| React / Vue        | Not supported                                    | `useEffect` / composable patterns                       |
-| SSR fallback       | Not supported                                    | `createStyleSheetSSR(css)`                              |
-| Reference counting | No                                               | Yes — sheets removed only when all consumers disconnect |
-| Deduplication      | No                                               | Yes — content hash, identical CSS = same object         |
-| Per-sheet removal  | No                                               | `removeStyles(root, ...sheets)`                         |
+| Feature            | `@phase2/outline-adopted-stylesheets-controller` | HELiX internal `AdoptedStylesheetsController` + consumer helper        |
+| ------------------ | ------------------------------------------------ | ---------------------------------------------------------------------- |
+| Lit controller     | `AdoptedStylesheetsController`                   | `AdoptedStylesheetsController` (same class name)                       |
+| Vanilla adoption   | Not supported                                    | `adoptStyles(root, ...sheets)` (consumer helper above)                 |
+| React / Vue        | Not supported                                    | `useEffect` / composable patterns (consumer-built)                     |
+| SSR fallback       | Not supported                                    | Roadmap — write a guarded `createStyleSheet` that no-ops on the server |
+| Reference counting | No                                               | Yes — sheets removed only when all consumers disconnect                |
+| Deduplication      | No                                               | Yes — `cssText` map cache, identical CSS = same object                 |
+| Per-sheet removal  | No                                               | `removeStyles(root, ...sheets)`                                        |
 
 ### Upgrade path
 
@@ -518,7 +571,7 @@ API migration is minimal.
 import { AdoptedStylesheetsController } from '@phase2/outline-adopted-stylesheets-controller';
 
 // After
-import { AdoptedStylesheetsController, createStyleSheet } from '@helixui/adopted-stylesheets';
+import { AdoptedStylesheetsController, createStyleSheet } from './lib/adopted-stylesheets.js';
 ```
 
 2. **Wrap raw CSS strings in `createStyleSheet`**
@@ -539,7 +592,9 @@ new AdoptedStylesheetsController(this, sheet);
 3. **Remove cleanup workarounds**
 
 If you had manual cleanup code to avoid Outline's lack of reference counting,
-remove it. `@helixui/adopted-stylesheets` handles cleanup automatically.
+remove it. The consumer-owned helper module shown in Step 2 (and the internal
+HELiX controller it mirrors) handles cleanup automatically through the
+`_refCounts` map.
 
 4. **Uninstall the old package**
 

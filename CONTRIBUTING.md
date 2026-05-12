@@ -172,13 +172,9 @@ Formatting, linting, and type-checking are run explicitly via `pnpm run verify` 
 
 ### Pre-Push Hooks
 
-Our pre-push hook (`.husky/pre-push`) currently:
+Our pre-push hook (`.husky/pre-push`) delegates to `rea hook push-gate`. The current REA-installed gate (v4) short-circuits on the `.rea/HALT` kill-switch and then runs the project's configured push-gate chain — what that chain enforces is controlled by `.rea/policy.yaml` and the REA version (recent versions of the gate verify a fresh codex audit entry covers `HEAD`; older 0.10.x hooks ran only verify/test fragments). Inspect `.husky/pre-push` + the policy file to see what's wired locally.
 
-- Runs `pnpm run verify` fragments (lint, format:check, type-check)
-- Runs `pnpm run test:smart` on the components touched in the diff
-- Enforces the REA push-review gate (recent audit entry must cover HEAD)
-
-It does **not** run the full test matrix, build every package, enforce the bundle ceiling, or scan for TODO/console.log. For the GitHub-CI-parity sweep — including Docker CI, bundle budgets, AAA cert integrity, and docs version drift — run `pnpm run preflight` before pushing significant changes.
+The pre-push gate does **not** run the full test matrix, build every package, enforce the bundle ceiling, or scan for TODO/console.log. For the GitHub-CI-parity sweep — including Docker CI, bundle budgets, AAA cert integrity, and docs version drift — run `pnpm run preflight` before pushing significant changes.
 
 ## Git Workflow
 

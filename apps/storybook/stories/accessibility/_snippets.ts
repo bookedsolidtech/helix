@@ -33,6 +33,15 @@ export const FORCED_COLORS_BUTTON_CSS = `/* author tokens — apply in every mod
     border: 2px solid ButtonText;
   }
 
+  .button:hover {
+    /* Hover affordance must survive in HC. Highlight/HighlightText is the
+       OS-level "selected" pair — applied on hover for ALL button variants,
+       NOT as the resting style of variant='primary'. */
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+
   .button:focus-visible {
     /* Focus ring tracks the user's selection accent. hx-button uses a
        3px outline with a 2px offset in this branch. */
@@ -40,17 +49,12 @@ export const FORCED_COLORS_BUTTON_CSS = `/* author tokens — apply in every mod
     outline-offset: 2px;
   }
 
-  :host([variant='primary']) .button {
-    /* Primary lifts to the selection accent in HC mode. */
-    background-color: Highlight;
-    color: HighlightText;
-    border-color: Highlight;
-  }
-
-  :host([disabled]) .button {
+  .button[disabled] {
     /* GrayText is the user's "unavailable" cue. */
+    background-color: ButtonFace;
     color: GrayText;
     border-color: GrayText;
+    opacity: 1;
   }
 }`;
 
@@ -122,9 +126,10 @@ export const FOCUS_RING_CSS = `/*
 
 export const DIALOG_HTML = `<hx-button id="open-prefs">Open preferences</hx-button>
 
+<!-- Either set the heading attribute (recommended — renders the built-in <h2>)
+     OR slot your own header element; do not do both, or the dialog renders two
+     headings. The heading="..." attribute is the canonical pattern. -->
 <hx-dialog id="prefs" heading="Preferences">
-  <h2 slot="header">Preferences</h2>
-
   <!-- Native focusable controls; hx-dialog gathers tabbable shadow-DOM
        focusables from slotted content, but the standard reliable
        initial-focus targets are native inputs / buttons. -->
