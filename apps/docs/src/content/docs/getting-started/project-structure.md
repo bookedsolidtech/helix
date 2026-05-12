@@ -42,9 +42,11 @@ helix/
 └── .claude/agents/           # Specialized engineering agents
 ```
 
-> `create-helix` (the consumer scaffolding CLI) lives in the sibling repo
-> [`bookedsolidtech/create-helix-app`](https://github.com/bookedsolidtech/create-helix-app)
-> and is published as `create-helix` on npm — not part of this monorepo.
+> `create-helix` is the consumer scaffolding CLI published on npm as
+> `create-helix` (no `-app` suffix). The source lives **inside this monorepo**
+> at [`packages/create-helix-app/`](https://github.com/bookedsolidtech/helix/tree/main/packages/create-helix-app)
+> — contributors update it from the same checkout as the rest of the
+> workspace.
 
 ## Key Configuration Files
 
@@ -60,15 +62,15 @@ helix/
 
 Turborepo orchestrates builds with task dependency awareness:
 
-| Task             | Depends On       | Description                                                                                         |
-| ---------------- | ---------------- | --------------------------------------------------------------------------------------------------- |
-| `build`          | `^build`         | Build all packages and apps in dependency order                                                     |
-| `type-check`     | `^build`         | TypeScript checking (requires build artifacts)                                                      |
-| `cem`            | `^build`         | Generate Custom Elements Manifest                                                                   |
-| `generate`       | `^cem`           | Generate React wrappers from CEM                                                                    |
-| `lint`           | `^build`         | ESLint across all packages                                                                          |
-| `test`           | `^build`         | Workspace test scripts via Turbo (mix of Vitest browser-mode for library/storybook + Node for token, drupal, MCP packages) |
-| `test:smart`     | —                | Tests for changed components only (no cache)                                                        |
+| Task         | Depends On | Description                                                                                                                |
+| ------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `build`      | `^build`   | Build all packages and apps in dependency order                                                                            |
+| `type-check` | `^build`   | TypeScript checking (requires build artifacts)                                                                             |
+| `cem`        | `^build`   | Generate Custom Elements Manifest                                                                                          |
+| `generate`   | `^cem`     | Generate React wrappers from CEM                                                                                           |
+| `lint`       | `^build`   | ESLint across all packages                                                                                                 |
+| `test`       | `^build`   | Workspace test scripts via Turbo (mix of Vitest browser-mode for library/storybook + Node for token, drupal, MCP packages) |
+| `test:smart` | —          | Tests for changed components only (no cache)                                                                               |
 
 ## pnpm Scripts
 

@@ -628,7 +628,7 @@ To verify strict mode compliance across the monorepo, run the workspace `type-ch
 pnpm run type-check
 ```
 
-That command fans out across every package's `type-check` script (each package invokes `tsc --noEmit` against its own `tsconfig.json`). Drop into a specific package with `pnpm --filter=@helixui/library run type-check` if you want a faster single-package run. The workspace task must pass with zero errors before any push.
+That command fans out across every package's `type-check` script. The shipped workspace packages — `@helixui/library`, `@helixui/tokens`, `@helixui/icons`, `@helixui/react`, `@helixui/react-starter`, `@helixui/drupal-behaviors`, `@helixui/mcp` — invoke `tsc --noEmit` against their own `tsconfig.json`. A small number of packages don't yet have a real type-check script (`create-helix-app` is a placeholder; `drupal-starter` has no script and isn't included in the workspace type-check fan-out) — extending coverage there is a tracked follow-up. Drop into a specific package with `pnpm --filter=@helixui/library run type-check` if you want a faster single-package run. The workspace task must pass with zero errors before any push.
 
 ## Migration Strategies
 
@@ -769,7 +769,7 @@ export class LegacyComponent extends LitElement {
 There isn't a single canonical strict-mode migration CLI we can recommend by name (the previous draft listed `ts-strict-mode-migration` — that package isn't on npm at the time of writing). The practical migration toolkit is:
 
 - **`tsc --noEmit` against a strict tsconfig** — surfaces every offending site as an error you can fix incrementally.
-- **TypeScript's `--strict-true-list`** — toggling one strict flag at a time so the error volume stays tractable.
+- **Flag-by-flag strict adoption** — toggle one strict flag at a time in `tsconfig.json` (`noImplicitAny` first, then `strictNullChecks`, etc.) so the error volume stays tractable each step.
 - **`ts-migrate`** (Airbnb) — semi-automated migration that adds explicit `any` shims you can then tighten; verify the latest version on npm before installing.
 - **`@typescript-eslint/no-explicit-any` + autofix** — once strict is on, lint catches new `any` additions in code review.
 
