@@ -1,6 +1,6 @@
 ---
 title: Form Accessibility
-description: Comprehensive guide to building accessible forms with web components. Master ARIA patterns, label association, error announcements, live regions, and healthcare compliance for WCAG 2.1 AA. Learn how to handle validation, screen reader integration, and Shadow DOM accessibility challenges.
+description: Comprehensive guide to building accessible forms with web components. Master ARIA patterns, label association, error announcements, live regions, and healthcare compliance for WCAG 2.2 AAA on the HELiX P0 surface. Learn how to handle validation, screen reader integration, and Shadow DOM accessibility challenges.
 sidebar:
   order: 3
 ---
@@ -9,9 +9,9 @@ sidebar:
 
 Forms are the most critical user interaction pattern in healthcare applications. They're how patients schedule appointments, clinicians enter medical records, and administrators manage systems. A single accessibility failure in a form can prevent a user from accessing essential healthcare services.
 
-This guide covers everything you need to build WCAG 2.1 AA compliant forms with web components: ARIA roles and attributes, label association patterns, error announcement strategies, required field indicators, field descriptions, live regions for validation, and healthcare-specific considerations. By the end, you'll understand how to build forms that work flawlessly with screen readers, keyboard navigation, and assistive technologies.
+This guide covers everything you need to build accessible forms with web components: ARIA roles and attributes, label association patterns, error announcement strategies, required field indicators, field descriptions, live regions for validation, and healthcare-specific considerations. The HELiX accessibility posture is **WCAG 2.2 AAA on the P0 component surface** (per `packages/hx-library/aaa-verdicts.json`) with **AA baseline** elsewhere; healthcare regulatory baselines vary by jurisdiction and contract — Section 504 of the Rehabilitation Act currently references WCAG 2.1 AA for federally funded U.S. healthcare providers, and the HHS rule timelines extend into 2027–2028 — so calibrate the legal floor against your specific obligations.
 
-**Healthcare Context:** Forms in healthcare applications must meet WCAG 2.1 AA as a minimum standard. This isn't aspirational—it's a regulatory requirement. Every form control, every error message, and every validation state must be accessible. Zero regressions. Zero exceptions.
+> **Reading note:** Several recipes below reach beyond the current shipped contract — the table of contents lists sections that were never written, some per-component snippets describe behavior the source doesn't implement (e.g. `hx-text-input` does not set `aria-required` directly because the native `required` attribute already maps to that semantic; the error live-region pattern varies per component rather than being one universal "container is always present" model; the `hx-switch` snippet shows the wrong internal control). Inline corrections call out the highest-impact mismatches; treat the rest as a pattern catalog you adapt against each component's CEM and `AAA-AUDIT.md`.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ This guide covers everything you need to build WCAG 2.1 AA compliant forms with 
 8. [Shadow DOM Accessibility Challenges](#shadow-dom-accessibility-challenges)
 9. [Keyboard Navigation in Forms](#keyboard-navigation-in-forms)
 10. [Screen Reader Testing](#screen-reader-testing)
-11. [Healthcare Compliance (WCAG 2.1 AA)](#healthcare-compliance-wcag-21-aa)
+11. [Healthcare Compliance (WCAG 2.2 AAA on P0 / AA baseline elsewhere)](#healthcare-compliance-wcag-22-aaa)
 12. [HELiX Form Accessibility Patterns](#HELiX-form-accessibility-patterns)
 13. [Real-World Examples](#real-world-examples)
 14. [Common Accessibility Failures](#common-accessibility-failures)
@@ -50,12 +50,12 @@ In healthcare applications, inaccessible forms create barriers that can:
 
 Healthcare organizations face:
 
-- **WCAG 2.1 AA compliance** — Required under ADA, Section 508, and international accessibility laws
+- **WCAG 2.2 AAA on the HELiX P0 surface / AA baseline elsewhere** — meets or exceeds the WCAG 2.1 AA floor referenced by ADA, Section 508 / Section 504, and international accessibility laws
 - **HIPAA security** — Accessible forms must also be secure (no ARIA attributes exposing PHI)
 - **Meaningful Use** — EHR incentive programs require accessible patient portals
 - **Legal liability** — Inaccessible forms can trigger lawsuits, OCR complaints, and audits
 
-### WCAG 2.1 Success Criteria for Forms
+### Key WCAG Success Criteria for Forms (WCAG 2.2 / 2.1 superset)
 
 Forms must meet these success criteria (minimum AA level):
 
@@ -1030,7 +1030,7 @@ render() {
 
 ---
 
-_(Content continues with remaining sections following the same comprehensive structure...)_
+> **Unfinished sections:** The earlier draft of this page reserved space here for "remaining sections following the same comprehensive structure" — those sections (Real-World Examples, the complete healthcare-compliance walkthrough) haven't been written yet. The pattern catalog above is the working content; the missing sections are tracked as a follow-up.
 
 ---
 
@@ -1040,14 +1040,14 @@ Form accessibility is non-negotiable in healthcare applications. Every form cont
 
 1. **Accessible name** — Label via `<label>`, `aria-labelledby`, or `aria-label`
 2. **Validation state** — `aria-invalid="true"` when error present
-3. **Error announcement** — `role="alert"` + `aria-live` for dynamic errors
-4. **Field description** — `aria-describedby` for help text and errors
-5. **Required indication** — `required` + `aria-required="true"` + visual indicator
+3. **Error announcement** — `role="alert"` + `aria-atomic="true"` for assertive errors; `role="status"` for polite live regions
+4. **Field description** — `aria-describedby` for help text and errors (both IDs can be present)
+5. **Required indication** — native `required` (HELiX form components rely on the native semantic; explicit `aria-required` is not added on top); paired with a visible indicator
 6. **Keyboard operability** — All controls accessible via keyboard alone
 7. **Focus indicator** — Visible focus ring on all interactive elements
 8. **Screen reader testing** — Manually tested with NVDA and VoiceOver
 
-**HELiX guarantees:** All form components meet WCAG 2.1 AA out of the box. No configuration needed. Zero accessibility regressions.
+**HELiX posture:** the 44 P0 components self-cert against WCAG 2.2 AAA via `scripts/aaa-formal-audit.mjs` (verdicts published in `packages/hx-library/aaa-verdicts.json`); WCAG 2.2 AA is the baseline elsewhere. Consumers retain responsibility for the larger context — label association in their own templates, page-level landmark structure, focus management around custom flows, and content/copywriting accessibility.
 
 ---
 
@@ -1055,10 +1055,10 @@ Form accessibility is non-negotiable in healthcare applications. Every form cont
 
 - [WCAG 2.1 AA Compliance Checklist](https://www.webability.io/blog/wcag-2-1-aa-the-standard-for-accessible-web-design)
 - [WAI-ARIA Overview (W3C)](https://www.w3.org/WAI/standards-guidelines/aria/)
-- [WCAG 2.1 Techniques (W3C)](https://www.w3.org/WAI/WCAG21/Techniques/)
+- [WCAG 2.2 Techniques (W3C)](https://www.w3.org/WAI/WCAG22/Techniques/)
 - [Labeling Controls (W3C)](https://www.w3.org/WAI/tutorials/forms/labels/)
-- [ARIA21: Using aria-invalid (W3C)](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA21)
-- [ARIA19: Using ARIA Live Regions (W3C)](https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19)
+- [ARIA21: Using aria-invalid (W3C)](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA21)
+- [ARIA19: Using ARIA Live Regions (W3C)](https://www.w3.org/WAI/WCAG22/Techniques/aria/ARIA19)
 - [aria-invalid Attribute (MDN)](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-invalid)
 - [aria-errormessage Attribute (MDN)](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-errormessage)
 - [Exposing Field Errors (Adrian Roselli)](https://adrianroselli.com/2023/04/exposing-field-errors.html)
