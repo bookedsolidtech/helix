@@ -207,11 +207,16 @@ export const TABS_KEYDOWN_TS = `#onKeydown = (event: KeyboardEvent) => {
 };`;
 
 export const CONTRAST_RATIO_TS = `/**
- * WCAG 2.1 contrast ratio for two sRGB hex colours.
+ * WCAG 2.2 contrast ratio for two sRGB hex colours.
  *
  *   1.4.3 (AA)  ≥ 4.5  for normal text
  *   1.4.6 (AAA) ≥ 7.0  for normal text
  *   1.4.11      ≥ 3.0  for non-text UI components
+ *
+ * The WCAG 2.x formula and the formal sRGB linearization threshold
+ * (0.04045 — the precise value from IEC 61966-2-1 sRGB) are unchanged
+ * from WCAG 2.1. Older docs cite 0.03928 (the value WCAG 2.0 quoted
+ * before the 2.1 erratum); HELiX uses 0.04045.
  *
  * Returns a number in the range [1.0, 21.0].
  */
@@ -226,7 +231,7 @@ function relativeLuminance(hex: string): number {
   const [r, g, b] = parseHex(hex).map((c) => {
     const s = c / 255;
     // Per WCAG: linearise sRGB before luminance.
-    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
   });
   // ITU-R BT.709 luminance coefficients.
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
@@ -237,9 +242,10 @@ function parseHex(hex: string): [number, number, number] {
   return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as [number, number, number];
 }`;
 
-export const REGENERATE_CONTRAST_BASH = `# Regenerate packages/hx-tokens/.cache/contrast-report.json from the
-# current token cascade. Output is gitignored but consumed by the
-# Storybook bundle at build time, so a stale cache shows stale numbers.
+export const REGENERATE_CONTRAST_BASH = `# Regenerate the committed @helixui/tokens contrast report module from
+# the current token cascade. Storybook imports the committed module
+# (not the gitignored .cache/contrast-report.json fixture) at build
+# time, so commit the regenerated module to surface the new matrix.
 
 pnpm --filter=@helixui/tokens run contrast:report
 

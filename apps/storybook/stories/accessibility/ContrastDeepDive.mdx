@@ -20,7 +20,7 @@ import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
 
 <EyebrowHeading
   eyebrow="Accessibility · contrast deep-dive"
-  title="163 pairings, 3 modes, 0 below the floor — and we show our work."
+  title="160 pair instances, 3 modes, 0 below the floor — and we show our work."
   lede={
     <>
       The Dashboard reports the headline numbers; this page is the underlying ledger. Every
@@ -32,12 +32,12 @@ import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
 />
 
 <section>
-  <SectionHead title="Roll-up by mode" meta="tokens 3.3.1 · 0 sub-AA" />
+  <SectionHead title="Roll-up by mode" meta="tokens 3.9.0 · 0 sub-AA" />
   <div className="hx-docs-stats">
-    <StatCard num="59" label="Light pairs" sub="29 AAA · 30 AA · 0 sub-AA" />
-    <StatCard num="58" label="Dark pairs" sub="31 AAA · 27 AA · 0 sub-AA" />
-    <StatCard num="46" label="HC pairs" sub="43 AAA · 3 AA · 0 sub-AA" />
-    <StatCard num="163" label="Total · 0 sub-AA" sub="103 AAA · 60 AA" />
+    <StatCard num="58" label="Light pairs" sub="37 AAA · 21 AA · 0 sub-AA" />
+    <StatCard num="57" label="Dark pairs" sub="33 AAA · 24 AA · 0 sub-AA" />
+    <StatCard num="45" label="HC pairs" sub="44 AAA · 1 AA · 0 sub-AA" />
+    <StatCard num="160" label="Total · 0 sub-AA" sub="114 AAA · 46 AA" />
   </div>
 </section>
 
@@ -94,7 +94,7 @@ import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
 <section>
   <SectionHead
     title="Light mode matrix"
-    meta="59 pairs · surface.{default,raised,sunken} backgrounds"
+    meta="58 pairs · surface.{default,raised,sunken} backgrounds"
   />
   <p className="hx-docs-card-body">
     Body text on every published surface, every status colour on its semantic surface, every
@@ -105,21 +105,25 @@ import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
 </section>
 
 <section>
-  <SectionHead title="Dark mode matrix" meta="58 pairs · re-graded for the dark surface palette" />
+  <SectionHead title="Dark mode matrix" meta="57 pairs · re-graded for the dark surface palette" />
   <p className="hx-docs-card-body">
     Dark mode is not a colour invert — every text-on-surface pair is re-tuned. Some semantic roles
-    (success-text, warning-text) shift up the ramp in dark mode to maintain the AA floor; the matrix
-    shows the result.
+    (success-text, text-on-warning) shift up the ramp in dark mode to maintain the AAA floor; the
+    matrix shows the result.
   </p>
   <ContrastMatrix mode="dark" />
 </section>
 
 <section>
-  <SectionHead title="High-contrast matrix" meta="46 pairs · 91% AAA, 0 sub-AA" />
+  <SectionHead title="High-contrast matrix" meta="45 pairs · 98% AAA, 0 sub-AA" />
   <p className="hx-docs-card-body">
-    High-contrast mode targets AAA on the structural surfaces and tightens the AA floor for
-    everything else. This is the mode to inspect when validating that HC consumers — including
-    Windows users on a forced-colors theme that defers to author CSS — get full readability.
+    HELiX&apos;s high-contrast mode is an <strong>author-side token theme</strong> tuned for users
+    who request a high-contrast palette but stay on the author&apos;s colors. It is distinct from
+    the Windows forced-colors / CSS <code>forced-colors: active</code> mode, where the user agent
+    swaps in the user&apos;s system palette and ignores author colors entirely — that path is
+    validated via system-color CSS keywords (<code>Highlight</code>, <code>CanvasText</code>, etc.)
+    rather than the author-token matrix shown here. See the Forced Colors page for the system-color
+    contract.
   </p>
   <ContrastMatrix mode="high-contrast" />
 </section>
@@ -147,11 +151,14 @@ import { CONTRAST_RATIO_TS, REGENERATE_CONTRAST_BASH } from './_snippets';
         We hold AA + pair the colour with an icon and a text label so the cue is ≥3 channels.
       </p>
     </DocsCard>
-    <DocsCard title="Action button text" tag="primary on accent">
+    <DocsCard title="Hue-bound status accents" tag="success / warning / error chromatic">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
-        White text on the brand accent (e.g. <code>action.primary.bg</code>) is AA. Lifting to
-        AAA would force every brand to a near-black accent — incompatible with the white-label
-        contract. Brands extending beyond the AAA floor opt in via the brand registry.
+        White text on <code>action.primary.bg</code> currently resolves to{' '}
+        <code>primary-700</code> (Apex) and clears the 7:1 AAA-strict floor across every shipped
+        brand. The AA-without-AAA pairs that remain are status hues (success / warning / error)
+        at their chromatic ramp stops, plus chart fills — pushing those to AAA would desaturate
+        the hue past the point of recognition. We hold AA + pair the colour with an icon and a
+        text label so the cue is ≥3 channels.
       </p>
     </DocsCard>
     <DocsCard title="UI component borders" tag="≥3:1 floor, AAA N/A">
