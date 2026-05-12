@@ -22,7 +22,7 @@ import auditRaw from '../../../../packages/hx-library/src/components/hx-checkbox
 
 ## Hero scenario — informed-consent acknowledgement
 
-The most consequential deployment of `hx-checkbox` in healthcare: an informed-consent acknowledgement before a procedure. Every checkbox here is required, the focus order matches the visual order, and the consent-confirmation button below remains disabled until all required acknowledgements are checked. The pattern lives or dies on AAA target size (2.5.5) — a clinician with motor difficulty must be able to land each checkbox reliably on the first try.
+The most consequential deployment of `hx-checkbox` in healthcare: an informed-consent acknowledgement before a procedure. Every checkbox here is required and the focus order matches the visual order. (The static MDX demo below shows the layout; the disabled-until-all-checked wiring is a consumer-authored pattern — bind the submit button's `disabled` property to a derived "all required boxes checked" state in your app shell.) The pattern lives or dies on AAA target size (2.5.5) — a clinician with motor difficulty must be able to land each checkbox reliably on the first try.
 
 <div
   style={{
@@ -130,7 +130,7 @@ This is the bar. Every checkbox above clears AAA target size at 44×44 CSS px, t
 
 <SectionHead title="Indeterminate (mixed)" meta="aria-checked=mixed" />
 
-The mixed state communicates "some children of this group are checked." Use as a master toggle in tree-style or grouped selection patterns. Activating an indeterminate checkbox clears the indeterminate state and sets it to checked.
+The mixed state communicates "some children of this group are checked." Use as a master toggle in tree-style or grouped selection patterns. Activating an indeterminate checkbox clears the indeterminate state and toggles `checked` — the resulting checked-vs-unchecked outcome depends on the box's current `checked` value; the host typically pairs this with logic that fans the change out to children.
 
 <div style={{ padding: '1rem 0' }}>
   <hx-checkbox
@@ -146,10 +146,10 @@ The mixed state communicates "some children of this group are checked." Use as a
 
 <SectionHead title="Required + error" meta="3.3.6 Error Prevention (All)" />
 
-A required checkbox in error state — the consumer attempted submission without acknowledging. Error styling routes through the same contrast tokens as `hx-text-input`'s error state.
+A required checkbox in error state — the consumer attempted submission without acknowledging. Error styling routes through `--hx-checkbox-error-color` (with semantic error-color fallbacks); `hx-text-input` exposes its own `--hx-input-error-color`, so the components share the underlying semantic error palette but each declares its own component-tier hook.
 
 <div style={{ padding: '1rem 0' }}>
-  <hx-checkbox name="demo_error" required error-message="You must accept the terms to continue.">
+  <hx-checkbox name="demo_error" required error="You must accept the terms to continue.">
     I accept the terms of service
   </hx-checkbox>
 </div>
