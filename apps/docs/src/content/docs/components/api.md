@@ -21,7 +21,7 @@ Attribute reflection is opt-in: a property only reflects back to its attribute w
 
 ## Property Types
 
-The examples below illustrate the **patterns** used by HELiX components — each component's CEM entry defines its actual property names, types, and defaults. Use the [component reference](/components/forms/text-input/) or `packages/hx-library/custom-elements.json` as the source of truth for any specific component.
+The examples below illustrate the **patterns** used by HELiX components — each component's CEM entry defines its actual property names, types, and defaults. Use [Storybook](https://storybook.helix.bookedsolid.tech/) or `packages/hx-library/custom-elements.json` as the source of truth for any specific component.
 
 ```typescript
 // String enum, reflected to attribute (e.g. hx-button `variant`)

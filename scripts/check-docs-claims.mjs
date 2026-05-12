@@ -38,7 +38,12 @@ async function walk(dir, accept) {
     for (const e of entries) {
       const full = join(d, e.name);
       if (e.isDirectory()) {
-        if (e.name === 'node_modules' || e.name === '.git' || e.name === '.worktrees' || e.name.startsWith('.')) {
+        if (
+          e.name === 'node_modules' ||
+          e.name === '.git' ||
+          e.name === '.worktrees' ||
+          e.name.startsWith('.')
+        ) {
           continue;
         }
         await recurse(full);
@@ -111,7 +116,9 @@ const workspaceVersions = await loadWorkspaceVersions();
 const targetFiles = [];
 
 // apps/docs content
-for (const f of await walk(join(REPO_ROOT, 'apps/docs/src/content/docs'), (p) => /\.(md|mdx)$/.test(p))) {
+for (const f of await walk(join(REPO_ROOT, 'apps/docs/src/content/docs'), (p) =>
+  /\.(md|mdx)$/.test(p),
+)) {
   targetFiles.push(f);
 }
 // apps/storybook MDX
@@ -119,7 +126,9 @@ for (const f of await walk(join(REPO_ROOT, 'apps/storybook/stories'), (p) => p.e
   targetFiles.push(f);
 }
 // package READMEs + CHANGELOGs
-for (const f of await walk(join(REPO_ROOT, 'packages'), (p) => /\/(README|CHANGELOG)\.md$/.test(p))) {
+for (const f of await walk(join(REPO_ROOT, 'packages'), (p) =>
+  /\/(README|CHANGELOG)\.md$/.test(p),
+)) {
   targetFiles.push(f);
 }
 // root docs
@@ -168,7 +177,8 @@ const internalLinkRegex = /\]\((\/[^)#?]+)(?:[?#][^)]*)?\)/g;
 // Stale repo refs
 const staleRepoRegex = /github\.com\/himerus\/wc-2026/g;
 // Old version pins on @helixui/* (drift gate handles this; we surface anyway)
-const versionPinRegex = /@helixui\/(library|icons|tokens|react|drupal-behaviors)@([0-9]+\.[0-9]+\.[0-9]+|\^[0-9]+(?:\.[0-9]+)?|~[0-9]+(?:\.[0-9]+)?)/g;
+const versionPinRegex =
+  /@helixui\/(library|icons|tokens|react|drupal-behaviors)@([0-9]+\.[0-9]+\.[0-9]+|\^[0-9]+(?:\.[0-9]+)?|~[0-9]+(?:\.[0-9]+)?)/g;
 // CLI name fabrications
 const cliFabricationRegex = /(npx|npm\s+(?:create|x))\s+create-helix-app\b/g;
 // WCAG 2.1 AA claims (vs the canonical 2.2 AAA)
@@ -188,10 +198,35 @@ for (const file of targetFiles) {
     const tag = m[1];
     if (!validTags.has(tag)) {
       const idx = content.slice(0, m.index).split(/\r?\n/).length;
+      const lineText = lines[idx - 1] ?? '';
+
       // Skip pedagogical "this is wrong" examples — look for nearby "BAD" or "don't" markers
       const surroundingLines = lines.slice(Math.max(0, idx - 3), idx + 2).join(' ');
       const isPedagogical = /BAD:|don['']t|wrong|incorrect|❌/i.test(surroundingLines);
       if (isPedagogical) continue;
+
+      // Skip prose tokens that aren't real tag references:
+      //  - completion stubs / typing examples (`<hx-bu...`, `<hx-…>`, `<hx-foo*`)
+      //  - inline backtick prose ("there is no `<hx-column>` element")
+      //  - `<hx-tag-name>` style placeholders inside angle brackets meant as generic
+      const charAfter = content[m.index + m[0].length] ?? '';
+      const isStub = charAfter === '.' || charAfter === '…' || charAfter === '*';
+      if (isStub) continue;
+
+      // Inline backtick context: the matched tag is inside a single-backtick run,
+      // and the surrounding line uses negation language ("no", "not", "doesn't exist",
+      // "there is no", "no such", "fabricated", "phantom", "fake", "fictional",
+      // "imaginary", "placeholder", "removed", "renamed"). These are corrections
+      // discussing a tag, not consumer-facing tag references.
+      const preTagText = content.slice(0, m.index);
+      const lineStart = preTagText.lastIndexOf('\n') + 1;
+      const linePrefix = preTagText.slice(lineStart);
+      const insideBacktickPair = (linePrefix.match(/`/g) ?? []).length % 2 === 1;
+      const looksLikeCorrection =
+        /(no such|there is no|doesn['']t exist|do[es]*\s+not\s+exist|fabricated|phantom|fake|fictional|imaginary|placeholder|removed|renamed|stale|deprecated)/i.test(
+          lineText,
+        );
+      if (insideBacktickPair && looksLikeCorrection) continue;
 
       add({
         file,
@@ -199,7 +234,7 @@ for (const file of targetFiles) {
         severity: 'high',
         category: 'component-name',
         issue: `Reference to <${tag}> but no such component in CEM`,
-        evidence: lines[idx - 1]?.slice(0, 120) ?? '',
+        evidence: lineText.slice(0, 120),
         fix: `Replace with a real component, or remove the reference.`,
       });
     }
@@ -219,9 +254,23 @@ for (const file of targetFiles) {
     //  - Anything matching --hx-<some-tag-that-doesnt-exist>-* where the tag part isn't a real component
     //    AND isn't a known token prefix.
     const knownTokenPrefixes = [
-      'color', 'space', 'spacing', 'font', 'radius', 'shadow', 'border',
-      'transition', 'z', 'animation', 'duration', 'easing', 'opacity',
-      'breakpoint', 'leading', 'tracking', 'size',
+      'color',
+      'space',
+      'spacing',
+      'font',
+      'radius',
+      'shadow',
+      'border',
+      'transition',
+      'z',
+      'animation',
+      'duration',
+      'easing',
+      'opacity',
+      'breakpoint',
+      'leading',
+      'tracking',
+      'size',
     ];
     const parts = prop.slice(5).split('-'); // strip "--hx-"
     if (parts.length === 0) continue;
@@ -271,29 +320,98 @@ for (const file of targetFiles) {
   }
 
   // --- 5. WCAG 2.1 AA claims (non-archival) ---
+  // Goal: flag prose that ASSERTS HELiX itself ships WCAG 2.1 AA (stale —
+  // current posture is WCAG 2.2 AAA on P0 / AA baseline elsewhere). Don't flag
+  // legitimate historical / external-baseline references like:
+  //   - "exceeds the WCAG 2.1 AA floor referenced by ADA / Section 504"
+  //   - the W3C Understanding-page URLs (already filtered)
+  //   - USWDS comparison context (already filtered)
+  //   - CHANGELOG entries discussing pre-3.8 posture (archival filter)
   if (!isArchival) {
     wcag21Regex.lastIndex = 0;
     while ((m = wcag21Regex.exec(content)) !== null) {
       const idx = content.slice(0, m.index).split(/\r?\n/).length;
-      // Skip if same line says "WCAG21/Understanding/..." which is a legitimate W3C URL
       const lineText = lines[idx - 1] ?? '';
+
+      // Skip legitimate W3C URLs
       if (/WCAG21\/Understanding\//.test(lineText)) continue;
-      // Skip if line is showing what USWDS targets (legit comparison context)
+
+      // Skip USWDS comparison context
       if (/USWDS/i.test(lineText) && /work(?:s)? to/i.test(lineText)) continue;
+
+      // Skip external-baseline references — language that frames WCAG 2.1 AA as
+      // a regulatory floor HELiX EXCEEDS, not the HELiX standard itself. The
+      // surrounding sentence will mention HHS / ADA / Section 504/508 / contract
+      // / exceeds / minimum / external / regulatory / legal / baseline.
+      const surroundingLines = lines.slice(Math.max(0, idx - 2), idx + 2).join(' ');
+      const isExternalBaselineContext =
+        /HHS|ADA|Section\s+50[48]|exceeds?|minimum|external|regulatory|legal|baseline|floor|contract|jurisdiction/i.test(
+          surroundingLines,
+        );
+      if (isExternalBaselineContext) continue;
+
+      // Skip lines that pair WCAG 2.1 with an explicit acknowledgement that
+      // HELiX itself is WCAG 2.2 AAA (the two appear together in honest framing).
+      if (/WCAG\s*2\.2\s*AAA/i.test(surroundingLines)) continue;
 
       add({
         file,
         line: idx,
         severity: 'medium',
         category: 'aaa',
-        issue: 'Claims WCAG 2.1 AA — current cert posture is WCAG 2.2 AAA on P0 surface',
+        issue:
+          'Claims WCAG 2.1 AA without framing as external baseline — current HELiX posture is WCAG 2.2 AAA on P0 surface',
         evidence: lineText.slice(0, 120),
-        fix: 'Update to "WCAG 2.2 AAA on P0 surface, AA baseline elsewhere" or similar.',
+        fix: 'Either frame WCAG 2.1 AA as an external regulatory floor that HELiX exceeds, or update to "WCAG 2.2 AAA on P0 surface, AA baseline elsewhere".',
       });
     }
   }
 
-  // --- 6. internal link 404s (apps/docs only) ---
+  // --- 6. @helixui/* package name + version-pin drift ---
+  // The drift CI gate (`scripts/check-version-drift.mjs`) is the authoritative
+  // blocker. This pass mirrors a subset so the programmatic report surfaces
+  // mispelled package names and obviously stale exact pins in the same rollup
+  // as the other findings.
+  versionPinRegex.lastIndex = 0;
+  while ((m = versionPinRegex.exec(content)) !== null) {
+    const pkgName = `@helixui/${m[1]}`;
+    const pin = m[2];
+    const idx = content.slice(0, m.index).split(/\r?\n/).length;
+    const lineText = lines[idx - 1] ?? '';
+
+    // Skip changelog / archival files — historical pins are not drift
+    if (isArchival) continue;
+
+    // Skip lines that explicitly mark the pin as deprecated/unpublished/cosmetic
+    const surroundingLines = lines.slice(Math.max(0, idx - 2), idx + 2).join(' ');
+    if (/deprecated|unpublished|cosmetic|artifact|placeholder/i.test(surroundingLines)) continue;
+
+    const canonical = workspaceVersions.get(pkgName);
+    if (!canonical) continue; // package not in the workspace; can't compare
+
+    // Extract the floor of caret/tilde ranges and the exact value of exact pins
+    const exactMatch = pin.match(/^[0-9]+\.[0-9]+\.[0-9]+$/);
+    const rangeMatch = pin.match(/^[\^~]([0-9]+(?:\.[0-9]+)?)/);
+    const floor = exactMatch ? pin : rangeMatch?.[1];
+    if (!floor) continue;
+
+    // Compare major.minor floor against the canonical workspace version
+    const [floorMajor, floorMinor = '0'] = floor.split('.');
+    const [canonMajor, canonMinor = '0'] = canonical.split('.');
+    if (floorMajor !== canonMajor || floorMinor < canonMinor) {
+      add({
+        file,
+        line: idx,
+        severity: 'medium',
+        category: 'package-version',
+        issue: `Stale ${pkgName} pin: ${pin} (workspace ships ${canonical})`,
+        evidence: lineText.slice(0, 120),
+        fix: `Update to a range covering ${canonical} (e.g. ^${canonical}) or mark this entry as historical / deprecated.`,
+      });
+    }
+  }
+
+  // --- 7. internal link 404s (apps/docs only) ---
   if (file.includes('apps/docs/src/content/docs/')) {
     internalLinkRegex.lastIndex = 0;
     while ((m = internalLinkRegex.exec(content)) !== null) {
@@ -319,9 +437,6 @@ for (const file of targetFiles) {
       });
     }
   }
-
-  // --- 7. version pins (informational; drift gate covers this) ---
-  // skip — already handled by check-version-drift.mjs
 }
 
 // ---- write findings ----

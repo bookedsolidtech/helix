@@ -151,7 +151,7 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 
 Output ONE finding per line, JSONL. Do not wrap in arrays. Do not add markdown.
 
-If the file is clean, emit a single "pass" finding for the entire file:
+If the file is clean, emit a single "pass" finding anchored to **line 1** (the schema validator rejects any `line < 1`, so don't use `0`):
 
 ```json
 {
@@ -162,7 +162,7 @@ If the file is clean, emit a single "pass" finding for the entire file:
   "severity": "info",
   "category": "editorial",
   "file": "{TARGET}",
-  "line": 0,
+  "line": 1,
   "issue": "File passes fact-check with no findings.",
   "evidence": "",
   "fix": "",

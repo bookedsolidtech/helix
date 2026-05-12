@@ -234,7 +234,7 @@ Card compositions are used for article teasers, patient summaries, provider prof
 </hx-card>
 ```
 
-**Component interaction:** `hx-card` exposes named slots `image`, `heading`, `actions`, and `footer`, plus a default slot for body content. Slot content lives in the light DOM, so it inherits your application's base typography styles. Use the [adopted-stylesheets pattern](/extending/adopted-stylesheets/) to ensure light-DOM content inside the card is styled correctly in Drupal. `hx-avatar` accepts a `label` (accessible name) and `initials` (visible fallback when no `src` loads); there is no `name` attribute. `hx-card` variants are `default | featured | compact` (no `outlined` variant). Card variants reflect content density, not interactivity — to make the entire card a link, set `hx-href` on the card host (do not combine with `slot="actions"`).
+**Component interaction:** `hx-card` exposes named slots `image`, `heading`, `actions`, and `footer`, plus a default slot for body content. Slot content lives in the light DOM, so it inherits your application's base typography styles. Use the [adopted-stylesheets pattern](/guides/adopted-stylesheets/) to ensure light-DOM content inside the card is styled correctly in Drupal. `hx-avatar` accepts a `label` (accessible name) and `initials` (visible fallback when no `src` loads); there is no `name` attribute. `hx-card` variants are `default | featured | compact` (no `outlined` variant). Card variants reflect content density, not interactivity — to make the entire card a link, set `hx-href` on the card host (do not combine with `slot="actions"`).
 
 **Accessibility notes:**
 
@@ -1127,7 +1127,7 @@ These patterns share common principles worth making explicit:
 
 **Properties for data, attributes for state.** Pass complex data (arrays, objects, non-string values) via JavaScript properties. Use HTML attributes for boolean flags, string identifiers, and initial state that must be set before JavaScript runs.
 
-**Slot content is light DOM.** Content passed into slots lives in the document's DOM, not inside the component's shadow root. This means it inherits your application styles but not the component's internal styles. Use the [adopted-stylesheets pattern](/extending/adopted-stylesheets/) when slotted content needs base typography, link styles, or CMS-authored formatting.
+**Slot content is light DOM.** Content passed into slots lives in the document's DOM, not inside the component's shadow root. This means it inherits your application styles but not the component's internal styles. Use the [adopted-stylesheets pattern](/guides/adopted-stylesheets/) when slotted content needs base typography, link styles, or CMS-authored formatting.
 
 **Design tokens, not inline styles.** Override component appearance by setting `--hx-*` custom properties at the appropriate scope. Never use `!important` or inline `style` attributes to force visual changes — these create maintenance debt and bypass the token system.
 
