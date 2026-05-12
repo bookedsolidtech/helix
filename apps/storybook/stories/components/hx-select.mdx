@@ -224,17 +224,17 @@ The Select component meets WCAG 2.2 AAA on the P0 surface (per `aaa-verdicts.jso
 
 Override these tokens to theme the select:
 
-| Property                       | Default                       | Description                                              |
-| ------------------------------ | ----------------------------- | -------------------------------------------------------- |
-| `--hx-select-bg`               | `var(--hx-color-neutral-0)`   | Background color                                         |
-| `--hx-select-color`            | `var(--hx-color-neutral-800)` | Text color                                               |
-| `--hx-select-border-color`     | `var(--hx-color-neutral-300)` | Border color                                             |
-| `--hx-select-border-radius`    | `var(--hx-border-radius-md)`  | Border radius                                            |
-| `--hx-select-font-family`      | `var(--hx-font-family-sans)`  | Font family                                              |
-| `--hx-select-label-color`      | `var(--hx-color-neutral-700)` | Label text color                                         |
-| `--hx-select-error-color`      | `var(--hx-color-error-500)`   | Error text color                                         |
-| `--hx-select-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color (inherits the global focus ring token)  |
-| `--hx-select-chevron-color`    | `var(--hx-color-neutral-500)` | Dropdown chevron color                                   |
+| Property                       | Default                       | Description                                             |
+| ------------------------------ | ----------------------------- | ------------------------------------------------------- |
+| `--hx-select-bg`               | `var(--hx-color-neutral-0)`   | Background color                                        |
+| `--hx-select-color`            | `var(--hx-color-neutral-800)` | Text color                                              |
+| `--hx-select-border-color`     | `var(--hx-color-neutral-300)` | Border color                                            |
+| `--hx-select-border-radius`    | `var(--hx-border-radius-md)`  | Border radius                                           |
+| `--hx-select-font-family`      | `var(--hx-font-family-sans)`  | Font family                                             |
+| `--hx-select-label-color`      | `var(--hx-color-neutral-700)` | Label text color                                        |
+| `--hx-select-error-color`      | `var(--hx-color-error-500)`   | Error text color                                        |
+| `--hx-select-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color (inherits the global focus ring token) |
+| `--hx-select-chevron-color`    | `var(--hx-color-neutral-500)` | Dropdown chevron color                                  |
 
 ## CSS Parts
 
@@ -644,7 +644,7 @@ Add to `your_theme.libraries.yml`:
 # pulls only the hx-select module + its shared dependencies)
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/hx-select/hx-select.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-select/index.js:
       type: external
       attributes:
         type: module
@@ -671,7 +671,7 @@ For local development:
 # Local approach
 helix-components-local:
   js:
-    /libraries/helix/dist/hx-select/hx-select.js:
+    /libraries/helix/dist/components/hx-select/index.js:
       type: file
       attributes:
         type: module

@@ -165,8 +165,10 @@ export async function handleRequest(req: Request): Promise<Response> {
     <html>
       <head>
         <meta charset="utf-8" />
-        <link rel="modulepreload" href="/dist/vendor-lit.js" />
-        <link rel="modulepreload" href="/dist/hx-card.js" />
+        <link
+          rel="modulepreload"
+          href="/node_modules/@helixui/library/dist/components/hx-card/index.js"
+        />
       </head>
       <body>
         <hx-card>

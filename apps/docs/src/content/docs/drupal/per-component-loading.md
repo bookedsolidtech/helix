@@ -174,11 +174,14 @@ Every HELiX integration starts with the runtime library. This is the shared foun
 # mytheme.libraries.yml
 
 # ─────────────────────────────────────────────────────
-# HELiX Runtime — Shared Dependencies
+# HELiX Runtime — Design Tokens (CSS only)
 # ─────────────────────────────────────────────────────
-# The Lit runtime and design tokens. Required by all
-# component libraries. Loaded once per page, cached
-# indefinitely (changes only when Lit version updates).
+# `@helixui/library` does not publish a separate Lit-only
+# runtime bundle. Each per-component module under
+# `dist/components/<tag>/index.js` resolves the Lit
+# runtime and any cross-component code through relative
+# imports into `dist/shared/`, so all you have to vendor
+# alongside the components is the design-token CSS.
 
 hx.runtime:
   version: 3.9.0
@@ -187,15 +190,6 @@ hx.runtime:
       # Design tokens: CSS custom properties for theming
       vendor/helix/tokens.css:
         minified: true
-  js:
-    # Lit core (lit + lit/decorators + lit/directives)
-    # Externalized from component builds
-    vendor/helix/index.js:
-      type: module
-      minified: true
-      preprocess: false
-      attributes:
-        crossorigin: anonymous
   dependencies:
     # No dependencies — this is the foundation
 ```
@@ -206,9 +200,19 @@ hx.runtime:
 themes/custom/mytheme/
 └── vendor/
     └── helix/
-        ├── index.js      (~16.8KB raw, ~5.8KB Brotli)
-        └── tokens.css          (~2.1KB raw, ~0.5KB Brotli)
+        ├── tokens.css                       (~2.1KB raw, ~0.5KB Brotli)
+        ├── components/
+        │   ├── hx-button/index.js           # entry per tag (Drupal references this)
+        │   └── …                            # one directory per registered element
+        └── shared/                          # resolved by relative imports from components/
+            └── *.js                         # Lit runtime + cross-component chunks
 ```
+
+Copy the entire `node_modules/@helixui/library/dist/` tree (or at minimum the
+`components/` and `shared/` directories) into `vendor/helix/`. Each component's
+`index.js` references its `shared/*.js` neighbors by relative path, so the
+shared chunks load automatically the first time any HELiX component is used on
+the page and are then cached for every subsequent component.
 
 ### Step 2: Per-Component Library Definitions
 
@@ -1033,9 +1037,11 @@ Use `<link rel="modulepreload">` to load critical components before they're disc
 <head>
   {# ... other head elements #}
 
-  {# Preload critical components for faster registration #}
-  <link rel="modulepreload" href="{{ base_path ~ directory }}/vendor/helix/index.js">
+  {# Preload critical components for faster registration. Each component
+     module relative-imports its shared chunks from vendor/helix/shared/,
+     so the browser preloads the runtime as part of the dependency graph. #}
   <link rel="modulepreload" href="{{ base_path ~ directory }}/vendor/helix/components/hx-button/index.js">
+  <link rel="modulepreload" href="{{ base_path ~ directory }}/vendor/helix/components/hx-icon/index.js">
 
   {{ page.head }}
 </head>
@@ -1043,8 +1049,7 @@ Use `<link rel="modulepreload">` to load critical components before they're disc
 
 **When to preload:**
 
-- Lit runtime (always needed)
-- Components above the fold (header, hero)
+- Components rendered above the fold (header, hero)
 - Components used on most pages (button, icon)
 
 **When NOT to preload:**
