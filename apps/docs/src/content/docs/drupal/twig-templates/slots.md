@@ -25,10 +25,10 @@ Your Twig markup (Light DOM):
 │ </hx-card>                      │
 └─────────────────────────────────┘
 
-Component Shadow DOM (owned by the library):
+Component Shadow DOM (owned by the library — illustrative, not the exact internal markup):
 ┌─────────────────────────────────────────────┐
 │ <div class="card">                          │
-│   <div class="card__header">                │
+│   <div class="card__heading">               │
 │     <slot name="heading"></slot>  ← receives <span slot="heading"> │
 │   </div>                                    │
 │   <div class="card__body">                  │
@@ -94,18 +94,24 @@ Content without a `slot` attribute goes to the component's default (unnamed) slo
 </hx-card>
 ```
 
-### `hx-button` Default Slot
+### `hx-button` Slots
 
-For simple components like `hx-button`, the entire content is a default slot:
+`hx-button` has a default slot for the label plus **`prefix`** and **`suffix`** named slots for leading and trailing icons (there is no `icon` slot):
 
 ```twig
 {# Text content #}
 <hx-button variant="primary">Submit Form</hx-button>
 
-{# Rich content: icon + text #}
+{# Rich content: leading icon + text #}
 <hx-button variant="primary" hx-size="lg">
-  <svg aria-hidden="true" slot="icon">...</svg>
+  <svg aria-hidden="true" slot="prefix">...</svg>
   Save Patient Record
+</hx-button>
+
+{# Trailing icon (e.g. a chevron) #}
+<hx-button variant="ghost">
+  View All
+  <svg aria-hidden="true" slot="suffix">...</svg>
 </hx-button>
 
 {# From Drupal field #}
@@ -265,9 +271,9 @@ Always check that content exists before rendering a slot element. Rendering an e
 ### Icons
 
 ```twig
-{# SVG icon in a named icon slot #}
+{# Leading icon — use the prefix slot, not "icon" (which is not a real slot). #}
 <hx-button variant="primary">
-  <svg slot="icon" aria-hidden="true" width="16" height="16">
+  <svg slot="prefix" aria-hidden="true" width="16" height="16">
     <use href="#icon-save"></use>
   </svg>
   Save Record
@@ -391,7 +397,10 @@ However, you should still guard optional slots with `{% if %}` checks to avoid e
   <div slot="footer">{{ content.field_optional_footer }}</div>
 </hx-card>
 
-{# With guard: footer slot is absent when there's no content; component fallback activates #}
+{# With guard: the footer slot is absent when there's no content, so hx-card
+   can hide the footer section entirely. (hx-card does not render fallback
+   content for `footer`; the guard just prevents an empty wrapper from
+   forcing the footer container to render.) #}
 <hx-card>
   <span slot="heading">{{ label }}</span>
   {% if content.field_optional_footer|render|trim %}
@@ -412,10 +421,16 @@ Views templates commonly map view result fields to component slots:
   {% for row in rows %}
     {% set patient = row.content['#row']._entity %}
 
+    {# Interactive card pattern: hx-href + hx-label make the whole card the
+       navigation. Don't pair an interactive card with an `actions` slot —
+       hx-card flags that combination as an ARIA anti-pattern. Drop the
+       actions slot here and render the "View Record" button outside the
+       card, or use a non-interactive card and rely on the action button. #}
     <hx-card
       variant="default"
       elevation="raised"
-      href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      hx-href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      hx-label="Open patient record for {{ patient.label }}"
     >
       {# Image slot #}
       {% if patient.field_photo.entity %}
@@ -424,7 +439,7 @@ Views templates commonly map view result fields to component slots:
           src="{{ file_url(patient.field_photo.entity.uri.value) }}"
           alt="{{ patient.field_photo.alt }}"
           loading="lazy"
-        >
+        />
       {% endif %}
 
       {# Heading slot #}
@@ -444,20 +459,12 @@ Views templates commonly map view result fields to component slots:
         {% endif %}
       </div>
 
-      {# Footer slot #}
+      {# Footer slot — informational only #}
       {% if patient.field_last_visit.value %}
-        <time
-          slot="footer"
-          datetime="{{ patient.field_last_visit.value|date('c') }}"
-        >
+        <time slot="footer" datetime="{{ patient.field_last_visit.value|date('c') }}">
           Last visit: {{ patient.field_last_visit.value|date('M j, Y') }}
         </time>
       {% endif %}
-
-      {# Actions slot #}
-      <div slot="actions">
-        <hx-button variant="primary" hx-size="sm">View Record</hx-button>
-      </div>
     </hx-card>
   {% endfor %}
 </div>
@@ -489,12 +496,12 @@ Views templates commonly map view result fields to component slots:
 </hx-card>
 ```
 
-### One Container Per Named Slot
+### One Container Per Named Slot (readability)
 
-Each named slot should have a single direct child element (which can contain multiple children):
+Native `<slot>` elements accept multiple assigned nodes — `hx-card` doesn't filter to the first child. The preference for a single wrapper element is a **readability** convention (and it keeps your CSS hooks consistent), not a rendering constraint:
 
 ```twig
-{# Good: single container wrapping multiple elements #}
+{# Recommended: single container wrapping multiple elements #}
 <hx-card>
   <div slot="footer">
     <span class="author">By Dr. Smith</span>
@@ -502,8 +509,7 @@ Each named slot should have a single direct child element (which can contain mul
   </div>
 </hx-card>
 
-{# Ambiguous: multiple direct children competing for the same slot #}
-{# Only the first may be rendered depending on component implementation #}
+{# Also renders — multiple slotted children all land in the footer slot. #}
 <hx-card>
   <span slot="footer">By Dr. Smith</span>
   <time slot="footer">February 16, 2026</time>
