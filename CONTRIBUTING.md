@@ -148,7 +148,7 @@ All code must pass the **7 Quality Gates** before merge:
 
 1. **TypeScript Strict**: Zero errors, no `any` types
 2. **Tests**: All tests pass, 80%+ coverage
-3. **Accessibility**: WCAG 2.1 AA compliant (zero violations)
+3. **Accessibility**: WCAG 2.2 AAA on the P0 surface (per `packages/hx-library/aaa-verdicts.json`), AA baseline elsewhere; zero violations on the CI axe-core regression guard
 4. **Storybook**: Stories for all component variants
 5. **CEM**: Custom Elements Manifest accurately reflects API
 6. **Bundle Size**: <5KB per component (gzipped), <50KB total

@@ -13,7 +13,7 @@ A production-ready Web Component library built with Lit 3.x and TypeScript for h
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Bundle Size](https://img.shields.io/badge/bundle-%3C50KB%20gzip-success)](packages/hx-library)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](tsconfig.base.json)
-[![WCAG 2.1 AA](https://img.shields.io/badge/WCAG%202.1-AA%20target-blue)](https://www.w3.org/TR/WCAG21/)
+[![WCAG 2.2 AAA](https://img.shields.io/badge/WCAG%202.2-AAA%20P0-blue)](https://www.w3.org/TR/WCAG22/)
 [![Docs](https://img.shields.io/badge/docs-helix.bookedsolid.tech-teal)](https://helix.bookedsolid.tech)
 [![Storybook](https://img.shields.io/badge/storybook-live-ff4785?logo=storybook)](https://helix-storybook.bookedsolid.tech)
 
@@ -56,7 +56,7 @@ import '@helixui/library/components/hx-card';
 
 ## Why HELiX?
 
-- **Healthcare accessibility built in** — Targeting WCAG 2.1 AA compliance ahead of the [HHS Section 504 mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/). Every component is keyboard-navigable, screen reader compatible, and tested with axe-core. Accessibility audits are ongoing as we work toward full AA conformance across all 73 components.
+- **Healthcare accessibility built in** — Certified to **WCAG 2.2 AAA on the 44 P0 components** (per `packages/hx-library/aaa-verdicts.json`: 376 Supports / 109 Not Applicable / 0 Partial / 0 Fail), with WCAG 2.2 AA as the baseline for the rest of the library. Aligned with the [HHS Section 504 digital accessibility mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/). Every component is keyboard-navigable, screen reader compatible, and tested with axe-core.
 
 - **Framework-agnostic Web Components** — Built on Lit 3.x and the Web Components standard. Works in React, Angular, Vue, Drupal, or plain HTML. No framework lock-in, no adapter libraries.
 
@@ -165,7 +165,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. All contributions must:
 
 - Pass TypeScript strict mode (`pnpm run type-check`)
 - Include tests with 80%+ coverage
-- Meet WCAG 2.1 AA accessibility standards
+- Meet WCAG 2.2 AAA on P0 surfaces / AA baseline elsewhere (verified via `pnpm aaa:audit`)
 - Include Storybook stories for all variants
 
 ---
