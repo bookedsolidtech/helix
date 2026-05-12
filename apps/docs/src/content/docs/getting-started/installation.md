@@ -10,10 +10,15 @@ If you already have a 2.x release of `@helixui/library` installed, read the [Upg
 ## Fastest path: scaffold a project
 
 ```bash
-npx create-helix
+npx create-helix project-name
+# or
+npm create helix project-name
 ```
 
-The `create-helix` CLI prompts through framework, components, and bundles, then writes a runnable project. See the [`create-helix` CLI guide](/getting-started/create-helix/) for templates, presets, and flags.
+The `create-helix` CLI prompts through framework, components, and bundles,
+then writes a runnable project at `./project-name/`. See the
+[`create-helix` CLI guide](/getting-started/create-helix/) for templates,
+presets, and flags.
 
 ## Install manually
 
@@ -31,13 +36,13 @@ pnpm add @helixui/library @helixui/icons @floating-ui/dom
 
 Current versions:
 
-| Package             | Version  | Notes                                                      |
-| ------------------- | -------- | ---------------------------------------------------------- |
-| `@helixui/library`  | ^3.9.0   | Lit 3.x components (core)                                  |
-| `@helixui/icons`    | ^1.0.0   | Required peer — icon registry                              |
-| `@floating-ui/dom`  | ^1.7.6   | Required peer — positioning engine for popover-style parts |
-| `@helixui/tokens`   | ^3.9.0   | Direct dependency of `@helixui/library`; installs automatically. Pin explicitly only if your build needs deterministic resolution. |
-| `@helixui/react`    | ^3.9.0   | Optional — React 18/19 wrappers                            |
+| Package            | Version | Notes                                                                                                                              |
+| ------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `@helixui/library` | ^3.9.0  | Lit 3.x components (core)                                                                                                          |
+| `@helixui/icons`   | ^1.0.0  | Required peer — icon registry                                                                                                      |
+| `@floating-ui/dom` | ^1.7.6  | Required peer — positioning engine for popover-style parts                                                                         |
+| `@helixui/tokens`  | ^3.9.0  | Direct dependency of `@helixui/library`; installs automatically. Pin explicitly only if your build needs deterministic resolution. |
+| `@helixui/react`   | ^3.9.0  | Optional — React 18/19 wrappers                                                                                                    |
 
 If you are upgrading an existing project from `@helixui/library@3.8.x` or earlier, see the [3.8.0 → 3.9.0 migration guide](/migration/3-8-0-to-3-9-0/) — `@helixui/icons` is a new required peer dependency.
 
@@ -52,16 +57,16 @@ The library is published in npm-package "library mode" — `dist/index.js` conta
 />
 
 <script type="importmap">
-{
-  "imports": {
-    "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
-    "@helixui/tokens":  "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-    "@helixui/icons":   "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
-    "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
-    "lit":              "https://cdn.jsdelivr.net/npm/lit@3/+esm",
-    "lit/":             "https://cdn.jsdelivr.net/npm/lit@3/"
+  {
+    "imports": {
+      "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
+    }
   }
-}
 </script>
 <script type="module">
   import '@helixui/library';
@@ -98,12 +103,12 @@ pnpm turbo run dev --filter=docs
 
 HELIX uses **Turborepo** with **pnpm workspaces** for build orchestration:
 
-| Package               | Description                       | Status |
-| --------------------- | --------------------------------- | ------ |
-| `apps/docs`           | Astro/Starlight documentation hub | Active |
-| `apps/storybook`      | Storybook component playground    | Active |
+| Package               | Description                                    | Status |
+| --------------------- | ---------------------------------------------- | ------ |
+| `apps/docs`           | Astro/Starlight documentation hub              | Active |
+| `apps/storybook`      | Storybook component playground                 | Active |
 | `packages/hx-library` | Lit 3.x component library (`@helixui/library`) | Active |
-| `packages/hx-tokens`  | Design tokens (`@helixui/tokens`) | Active |
+| `packages/hx-tokens`  | Design tokens (`@helixui/tokens`)              | Active |
 
 ## Next Steps
 

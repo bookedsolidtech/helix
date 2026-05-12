@@ -1,11 +1,11 @@
 {
-  "name": "create-helix-app",
+  "name": "create-helix",
   "version": "0.1.0",
   "private": true,
-  "description": "CLI scaffolding tool for HELiX applications",
+  "description": "CLI scaffolding tool for HELiX applications — invoked as `npx create-helix project-name`. Published on npm as `create-helix`; the workspace directory is `packages/create-helix-app/` for historical reasons but the package NAME (and the runnable bin) is `create-helix`.",
   "type": "module",
   "bin": {
-    "create-helix-app": "./dist/cli.js"
+    "create-helix": "./dist/cli.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

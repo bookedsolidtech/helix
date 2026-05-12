@@ -15,12 +15,15 @@ description: Scaffold a new project with HELiX web components using the create-h
 ## Quick Start
 
 ```bash
-npx create-helix
+npx create-helix project-name
 # or
-npm create helix
+npm create helix project-name
 ```
 
-The interactive TUI prompts you for a framework, component bundles, and optional features (TypeScript, ESLint, design tokens, dark mode). When done, it outputs a ready-to-run project.
+The CLI takes the new project's directory name as its first positional
+argument, then prompts you interactively for a framework, component bundles,
+and optional features (TypeScript, ESLint, design tokens, dark mode). When
+done, it writes a ready-to-run project at `./project-name/`.
 
 ## Framework Templates
 
