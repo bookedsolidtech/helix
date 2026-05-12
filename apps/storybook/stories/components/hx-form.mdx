@@ -254,11 +254,13 @@ properties above, or target the slotted children directly with global selectors.
 
 ## Events
 
-| Event        | Detail                                                                                                       | Description                                                                                                     |
-| ------------ | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `hx-submit`  | `{ valid: boolean, values: Record<string, FormDataEntryValue \| FormDataEntryValue[]>, formData: FormData }` | Fired by the host after the inner `<form>` submit; `valid` is `false` if any field failed constraint validation |
-| `hx-invalid` | `{ errors: Array<{ name: string, message: string }> }`                                                       | Fired when one or more fields fail validation at submit time                                                    |
-| `hx-reset`   | `CustomEvent` (no detail)                                                                                    | Fired when the form is reset                                                                                    |
+| Event        | Detail                                                                                                    | Description                                                                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-submit`  | `{ valid: true, values: Record<string, FormDataEntryValue \| FormDataEntryValue[]>, formData: FormData }` | Fired by the host **only when `action` is empty (client-side mode) AND all fields pass constraint validation**. Invalid submissions emit `hx-invalid` instead — `hx-submit` never carries `valid: false`. |
+| `hx-invalid` | `{ errors: Array<{ name: string, message: string }> }`                                                    | Fired when the inner `<form>` blocks submission because one or more fields failed constraint validation. This is the canonical signal for invalid submission.                                             |
+| `hx-reset`   | `CustomEvent` (no detail)                                                                                 | Fired when the form is reset                                                                                                                                                                              |
+
+> **Native submission path:** When `action` is set, the underlying `<form>` submits natively to the server. Neither `hx-submit` nor `hx-invalid` fires — the browser owns the submission and the server handles validation feedback. Listen for these events only when `action` is omitted (client-side mode).
 
 ## Form Participation
 
@@ -356,7 +358,10 @@ Drive multi-column layouts via CSS Grid in author CSS; `hx-form` itself does not
 per-field error UI.
 
 ```html
-<hx-form id="admission-form" action="/api/admissions">
+<!-- Client-side submission: omit `action` so hx-submit / hx-invalid fire.
+     When `action` is set, the native form submits to the server instead and
+     these listeners never receive an event. -->
+<hx-form id="admission-form">
   <hx-text-input label="Patient Name" name="patient-name" required></hx-text-input>
 
   <hx-select label="Admitting Department" name="department" required>

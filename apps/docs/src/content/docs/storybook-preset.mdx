@@ -109,11 +109,22 @@ import { dirname } from 'node:path';
 import type { StorybookConfig } from '@storybook/web-components-vite';
 
 const config: StorybookConfig = {
-  // The shipped apps/storybook/.storybook/main.ts dogfoods these globs:
-  // component stories live with the source in packages/hx-library/src,
-  // and pattern / foundation MDX lives in the storybook app's own
-  // stories tree. Mirror this layout in your downstream consumer
-  // preset.
+  // The shipped apps/storybook/.storybook/main.ts dogfoods these globs against
+  // the HELiX monorepo layout (component stories live in packages/hx-library/src).
+  // A `create-helix`-generated app does NOT have that path — replace the first
+  // glob with one that matches your project structure. Common consumer shapes:
+  //
+  //   // If you author stories alongside your own component source:
+  //   '../src/**/*.stories.@(ts|tsx)',
+  //   '../src/**/*.mdx',
+  //
+  //   // If you want stories sourced from the installed @helixui/library
+  //   // (only useful if you publish stories in the package, which @helixui/library
+  //   // does NOT today — most consumers will only need their own story tree):
+  //   '../node_modules/@helixui/library/dist/**/*.stories.@(ts|tsx)',
+  //
+  // The shipped HELiX-monorepo globs below are what `apps/storybook` actually uses;
+  // keep them only if you're vendoring this preset inside the HELiX monorepo.
   stories: [
     '../../../packages/hx-library/src/**/*.stories.@(ts|tsx)',
     '../stories/**/*.stories.@(ts|tsx)',
