@@ -1,44 +1,43 @@
 ---
 title: Consumer Obligations
-description: WCAG AAA partial-applicability contracts — what HELiX provides as a component library and what your consumer application must fulfill to close each conformance gap.
+description: WCAG 2.2 AAA partial-applicability contracts — what HELiX provides as a component library and what your consumer application must fulfill to close each conformance gap.
 sidebar:
   order: 3
 ---
 
-Some WCAG AAA success criteria are **partially applicable** to a component library: HELiX exposes the surface (an attribute, a slot, a token, an event) and the consumer application fulfills the substantive obligation (the autocomplete value, the heading hierarchy, the help-text content, the timeout policy). This page is the explicit handshake. Each section below names a partial-AAA SC, the contract HELiX provides, and the example a consumer ships to close the conformance gap.
+Some WCAG AAA success criteria are **partially applicable** to a component library: HELiX exposes the surface (an attribute, a slot, a token, an event) and the consumer application fulfills the substantive obligation (the autocomplete value, the heading hierarchy, the help-text content, the timeout policy). This page is the explicit handshake. Each section below names a partial-applicability SC, the contract HELiX provides, and the example a consumer ships to close the conformance gap.
 
 ## At a glance
 
-_WCAG 2.2 · 7 partial-applicability SCs._
+_WCAG 2.2 · 7 SCs with consumer obligations._
 
-- **7** partial-AAA contracts — component exposes, consumer fulfills
-- **9** fully-applicable AAA SCs — HELiX engineering owns
-- **14** out-of-scope AAA SCs — content-creator obligations
-- **28** WCAG 2.1 AAA total — A, AA, AAA stack
+- **7** SCs where the obligation crosses the component/consumer boundary — component exposes, consumer fulfills
+- **44** P0 components are AAA-certified end-to-end against the 11 cert criteria (`packages/hx-library/aaa-verdicts.json`)
+- The remaining AAA SCs are content-creator obligations (sign language, reading level, pronunciation, audio description) and fall outside any component-library scope
 
 ## Why partial applicability is honest
 
 _Component vs. application boundary._
 
-A component library cannot single-handedly ship AAA conformance. WCAG defines accessibility against a _web page_, not a button or a dialog in isolation. For 7 of the 28 AAA success criteria, HELiX's contribution is real but partial: we expose the API, you populate it. Calling these "done" without naming the consumer's share would be marketing — so we publish both ledgers. If a consumer ships a HELiX-based product without fulfilling these contracts, the page is not AAA, even if every component is.
+A component library cannot single-handedly ship AAA conformance. WCAG defines accessibility against a _web page_, not a button or a dialog in isolation. For the seven SCs below, HELiX's contribution is real but partial: we expose the API, you populate it. Calling these "done" without naming the consumer's share would be marketing — so we publish both ledgers. If a consumer ships a HELiX-based product without fulfilling these contracts, the page is not AAA, even if every component is.
 
-See the Success Criteria page in Storybook for the fully-applicable AAA SCs HELiX owns end-to-end, and the "What we do not claim" section for the 14 not-applicable AAA SCs (sign language, reading level, pronunciation, audio description) that fall outside any component-library scope.
+See the [Self-certification scope](/accessibility/self-cert-scope/) page for the 11 AAA + peer-standards criteria HELiX measures on its P0 surface, and the [VPAT 2.5 conformance report](/accessibility/vpat-2.5/) for the per-criterion ledger.
 
 ## 1.3.6 Identify Purpose
 
 _AAA · partial · consumer fulfills._
 
-**What WCAG 2.1 1.3.6 requires (user-agent identifies purpose):**
+**What WCAG 2.2 1.3.6 requires (user-agent identifies purpose):**
 
 In content implemented using markup languages, the purpose of UI components, icons, and regions can be programmatically determined. This lets assistive tech and personalization tools surface the right meaning (e.g. recolor "cancel" vs "submit", replace icons with words, autofill a name field correctly).
 
 **What HELiX provides (component contract):**
 
-`hx-text-input`, `hx-textarea`, `hx-select`, and `hx-combobox` all forward the native `autocomplete` attribute through ElementInternals; consumers populate it from the WCAG-defined token list (Section 7 of WCAG 2.1). Buttons and links accept `aria-label` + `aria-roledescription` for semantic intent beyond the visible text. Icon components honor `title` and `aria-labelledby`.
+`hx-text-input` exposes the native `autocomplete` attribute directly — it forwards through to the internal `<input>` so the browser-level autofill machinery sees a normal autocomplete declaration. Other form components (`hx-textarea`, `hx-select`, `hx-combobox`, `hx-date-picker`, etc.) **do not currently expose a public `autocomplete` attribute** — populating them requires either a future API addition or a consumer-side workaround (rendering the field's internal input directly, or layering `autocomplete` through a wrapping form). Buttons and links accept the standard `aria-label` / `accessible-label` attribute for semantic intent beyond the visible text. Icons use `hx-icon`'s `label` attribute (renders as `aria-label` plus a `<title>` inside the SVG).
 
 **What you fulfill (consumer code):**
 
-Populate `autocomplete` on every form control whose purpose matches Section 7's input-purpose tokens. A signup form should look like:
+Populate `autocomplete` on every `hx-text-input` whose purpose matches Section 7's input-purpose tokens. For other form-component types, file a tracking request or fall back to a native input until the API lands. A signup form should look like:
 
 ```html
 <hx-text-input name="given-name" autocomplete="given-name" label="First name"></hx-text-input>
@@ -51,7 +50,7 @@ Populate `autocomplete` on every form control whose purpose matches Section 7's 
 
 _AAA · partial · consumer fulfills._
 
-**What WCAG 2.1 1.4.8 requires (user-controllable presentation):**
+**What WCAG 2.2 1.4.8 requires (user-controllable presentation):**
 
 For blocks of text, the user can:
 
@@ -64,31 +63,30 @@ For blocks of text, the user can:
 
 **What HELiX provides (component contract):**
 
-`hx-prose` defaults to `line-height: 1.6` on body text and `paragraph spacing: 1.5em` (clears the 1.5x line-spacing rule). Width is bounded by `max-inline-size: var(--hx-prose-measure, 70ch)` — under the 80-char ceiling. Text alignment is `start` by default; we never emit `text-align: justify`. Color tokens (`--hx-color-text-primary`, `--hx-color-surface-default`) are user-overridable at the semantic tier — set them once on the consumer's root and every component recolors via cascade.
+`hx-prose` defaults to a relaxed line-height (`var(--hx-line-height-relaxed)`) and constrains body width via `--hx-prose-max-width` (default `720px` — under the 80-char ceiling for normal-size body text). Text alignment is `start` by default; HELiX never emits `text-align: justify`. Color tokens (`--hx-prose-color`, `--hx-color-surface-default`) are user-overridable at the semantic tier — set them once on the consumer's root and every component recolors via cascade. Per-component customisation hooks exposed by `hx-prose`: `--hx-prose-max-width`, `--hx-prose-font-size`, `--hx-prose-line-height`, `--hx-prose-color`, `--hx-prose-heading-color`, `--hx-prose-link-color`.
 
 **What you fulfill (consumer code):**
 
-Do not override `hx-prose` defaults to make text denser. If you do override typography globally, preserve the line-height and paragraph-spacing minimums. Do not apply `text-align: justify` to body content.
+Do not override `hx-prose` defaults to make text denser. If you do override typography globally, preserve the line-height and paragraph-spacing minimums via the prose tokens. Do not apply `text-align: justify` to body content.
 
 ```css
-/* OK: narrows measure but stays under the 80ch ceiling */
+/* OK: narrow the measure (stays under the 80ch ceiling) */
 hx-prose {
-  --hx-prose-measure: 60ch;
+  --hx-prose-max-width: 60ch;
 }
 
-/* OK: global type-scale override that preserves AAA minimums */
-:root {
-  --hx-text-line-height: 1.6; /* >= 1.5 */
-  --hx-text-paragraph-spacing: 1em; /* >= 0.5 * line-height */
+/* OK: adjust prose typography while preserving AAA minimums */
+hx-prose {
+  --hx-prose-line-height: var(--hx-line-height-loose);
 }
 
-/* NOT OK: kills the line-height floor */
-hx-prose {
+/* NOT OK: forces line-height below the 1.5 floor */
+hx-prose::part(content) {
   line-height: 1.2 !important;
 }
 
 /* NOT OK: full justification fails 1.4.8 */
-hx-prose {
+hx-prose::part(content) {
   text-align: justify;
 }
 ```
@@ -97,54 +95,73 @@ hx-prose {
 
 _AAA · partial · consumer fulfills._
 
-**What WCAG 2.1 2.2.4 requires (user can suppress):**
+**What WCAG 2.2 2.2.4 requires (user can suppress):**
 
 Interruptions (alerts, banners, toasts, system notifications) can be postponed or suppressed by the user, except interruptions involving an emergency.
 
 **What HELiX provides (component contract):**
 
-`hx-toast`, `hx-banner`, and `hx-alert` all fire dismissible events and accept a `persistent` attribute that disables auto-dismiss. `hx-toast` exposes a `duration` property (any positive number, or `Infinity` for "until dismissed"). The library reads `data-hx-no-interruptions` on the document root: when set, non-emergency toasts stay queued instead of rendering until cleared. Emergency-priority toasts (severity "error" with `persistent`) bypass the suppression.
+`hx-toast` exposes `open` (boolean), `duration` (number, default 5000ms), `closable` (boolean) and `variant` (`'default' | 'success' | 'warning' | 'danger' | 'info'`). `hx-banner` and `hx-alert` accept `dismissible` to render a close affordance and `open` to control visibility. `prefers-reduced-motion: reduce` automatically pauses motion across `hx-toast`, `hx-banner`, `hx-carousel`, and any timed transition.
+
+HELiX does **not** ship a global interruption-suppression mechanism today (no `persistent` attribute, no `data-hx-no-interruptions` document-level switch, no emergency queue bypass). Suppressing non-emergency notifications based on a user preference is consumer-application work: gate the call site that would otherwise create the toast.
 
 **What you fulfill (consumer code):**
 
-Wire a user-controllable preference (settings page, OS-level preference) to `data-hx-no-interruptions`. Do not auto-dismiss _error_ alerts about patient-care or safety conditions without an explicit user action.
+Wire a user-controllable preference (settings page, OS-level preference) into your toast-creation call sites. Keep emergency-priority signals (`variant="danger"` with explicit consumer routing) outside the suppression gate.
 
-```html
-<!-- Consumer settings UI toggles this attribute -->
-<html data-hx-no-interruptions>
-  <body>
-    <!-- routine toast queues silently until cleared -->
-    <hx-toast variant="info" duration="3000">Settings saved</hx-toast>
+```js
+// Consumer settings UI toggles this flag
+const interruptionsSilenced = getUserPreference('silence-non-emergency-toasts');
 
-    <!-- emergency toast still surfaces -->
-    <hx-toast variant="error" persistent>
-      Glucose reading 38 mg/dL — confirm patient response
-    </hx-toast>
-  </body>
-</html>
+function showRoutineToast(message) {
+  if (interruptionsSilenced) return; // queued/dropped at the call site
+  const toast = document.createElement('hx-toast');
+  toast.variant = 'info';
+  toast.duration = 3000;
+  toast.open = true;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+}
+
+function showEmergencyToast(message) {
+  // Emergency signals bypass the user-preference gate
+  const toast = document.createElement('hx-toast');
+  toast.variant = 'danger';
+  toast.closable = true;
+  toast.duration = 0; // 0 = no auto-dismiss
+  toast.open = true;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+}
 ```
 
 ## 2.2.6 Timeouts
 
 _AAA · partial · consumer fulfills._
 
-**What WCAG 2.1 2.2.6 requires (user warned of data loss):**
+**What WCAG 2.2 2.2.6 requires (user warned of data loss):**
 
 Users are warned of the duration of any user inactivity that could cause data loss, unless the data is preserved for more than 20 hours when the user does not take any actions.
 
 **What HELiX provides (component contract):**
 
-`hx-dialog` accepts a `persistent` attribute that disables click-outside and Escape dismissal — useful for unsaved-form-state warnings. `hx-toast` exposes `duration` + `persistent` for the inverse case (notifications that should not auto-disappear). `prefers-reduced-motion: reduce` automatically pauses auto-dismiss timers across `hx-toast`, `hx-banner`, `hx-carousel`, and any timed transition. The library does not impose session timeouts — those are the consumer application's concern.
+`hx-dialog` exposes `modal`, `open`, `heading`, `description`, and `close-on-backdrop` (default `true`). To prevent backdrop-dismissal during a critical interaction, set `close-on-backdrop="false"`. `hx-toast` exposes `duration` + `closable` for the inverse case (notifications that should not auto-disappear: pass `duration="0"`). The library does not impose session timeouts — those are the consumer application's concern.
+
+HELiX does **not** ship a `persistent` attribute on dialogs or toasts; that name does not exist in the CEM. To make a dialog non-dismissible, set `close-on-backdrop="false"` and handle Escape suppression in your own keydown handler (HELiX does not currently expose an `escape-disabled` switch).
 
 **What you fulfill (consumer code):**
 
-Surface a warning before any session-timeout-driven data loss. Use `hx-dialog` with `persistent` + a countdown to give the user a chance to extend, save, or discard.
+Surface a warning before any session-timeout-driven data loss. Use `hx-dialog` with `modal` + `close-on-backdrop="false"` + a countdown to give the user a chance to extend, save, or discard.
 
 ```html
-<hx-dialog persistent open id="session-timeout">
-  <h2 slot="header">Your session is about to expire</h2>
+<hx-dialog
+  modal
+  close-on-backdrop="false"
+  heading="Your session is about to expire"
+  id="session-timeout"
+>
   <p>You will be signed out in 2 minutes. Unsaved changes to this patient record will be lost.</p>
-  <hx-button slot="footer" variant="primary" onclick="extendSession()"> Stay signed in </hx-button>
+  <hx-button slot="footer" variant="primary" onclick="extendSession()">Stay signed in</hx-button>
   <hx-button slot="footer" variant="ghost" onclick="saveDraftAndSignOut()">
     Save draft and sign out
   </hx-button>
@@ -155,17 +172,17 @@ Surface a warning before any session-timeout-driven data loss. Use `hx-dialog` w
 
 _AAA · partial · consumer fulfills._
 
-**What WCAG 2.1 2.4.10 requires (content structure):**
+**What WCAG 2.2 2.4.10 requires (content structure):**
 
 Section headings are used to organize the content. Headings should follow a logical hierarchy (no skipped levels) and describe the section that follows.
 
 **What HELiX provides (component contract):**
 
-`hx-prose` renders consumer-supplied `<h1>`—`<h6>` with the correct visual hierarchy and clear margin rhythm, but it does _not_ auto-determine heading levels — that is the consumer's page-structure decision. `hx-text` exposes a `level` attribute for visual heading sizes that are _not_ document-outline headings (e.g. a card title that visually looks like an h3 but isn't part of the page outline). Component slots like `hx-card[slot=header]`, `hx-dialog[slot=header]`, and `hx-drawer[slot=header]` accept any heading element so the consumer chooses the level.
+`hx-prose` renders consumer-supplied `<h1>`–`<h6>` with the correct visual hierarchy and clear margin rhythm, but it does _not_ auto-determine heading levels — that is the consumer's page-structure decision. `hx-text` is a typography primitive with `variant` (`body`, `body-sm`, `body-lg`, `label`, `label-sm`, `caption`, `code`, `overline`) and an `as` attribute (`'span' | 'p' | 'strong' | 'em' | 'div'`); it does **not** expose a `level` attribute or render heading elements — for visual heading-like text that is not part of the outline, use `hx-text` with a styling variant inside a non-heading element, or author a real heading. Component slots like `hx-card[slot="heading"]`, `hx-dialog`'s `heading` attribute, and `hx-drawer[slot="heading"]` accept any heading element so the consumer chooses the level.
 
 **What you fulfill (consumer code):**
 
-Author your page's heading hierarchy explicitly. Do not skip levels. Use `hx-text level="h3"` for visual-only heading sizes that are not part of the outline.
+Author your page's heading hierarchy explicitly. Do not skip levels. Reach for `hx-text` only for non-outline typography; use real heading elements for the outline.
 
 ```html
 <main>
@@ -173,16 +190,16 @@ Author your page's heading hierarchy explicitly. Do not skip levels. Use `hx-tex
 
   <section>
     <h2>Vitals</h2>
-    <hx-card>
-      <!-- Card heading IS part of the outline → real h3 -->
-      <h3 slot="header">Heart rate</h3>
-      <hx-stat value="72 bpm" />
+    <hx-card variant="featured">
+      <!-- Card heading IS part of the outline → real h3 in the heading slot -->
+      <h3 slot="heading">Heart rate</h3>
+      <hx-stat value="72 bpm"></hx-stat>
     </hx-card>
 
-    <hx-card>
-      <!-- Decorative subheading not in outline → hx-text level="h4" -->
-      <hx-text slot="header" level="h4">Last reading</hx-text>
-      <hx-format-date value="2026-05-07T08:31:00Z" />
+    <hx-card variant="featured">
+      <!-- Decorative label not in outline → hx-text label variant -->
+      <hx-text slot="heading" variant="label" as="span">Last reading</hx-text>
+      <hx-format-date date="2026-05-07T08:31:00Z"></hx-format-date>
     </hx-card>
   </section>
 
@@ -197,13 +214,13 @@ Author your page's heading hierarchy explicitly. Do not skip levels. Use `hx-tex
 
 _AAA · partial · consumer fulfills._
 
-**What WCAG 2.1 3.1.4 requires (expansion available):**
+**What WCAG 2.2 3.1.4 requires (expansion available):**
 
 A mechanism for identifying the expanded form or meaning of abbreviations is available. In practice this is the `<abbr title="…">` element on first use, or a glossary linked from the page.
 
 **What HELiX provides (component contract):**
 
-`hx-prose` styles native `<abbr>` with a subtle dotted-underline affordance and surfaces the `title` via the browser's native tooltip plus `aria-label` when consumers attach one. `hx-tooltip` provides a richer surface for explanations longer than a single phrase. The library does not own content — we do not auto-detect abbreviations.
+`hx-prose` styles native `<abbr>` with a subtle dotted-underline affordance and surfaces the `title` via the browser's native tooltip plus `aria-label` when consumers attach one. `hx-tooltip` provides a richer surface for explanations longer than a single phrase (slots: default and `content`). The library does not own content — we do not auto-detect abbreviations.
 
 **What you fulfill (consumer code):**
 
@@ -219,11 +236,12 @@ Wrap every abbreviation in `<abbr>` on first occurrence per page or per section.
   </p>
 </hx-prose>
 
-<!-- For a richer explanation, hx-tooltip wraps the abbr -->
+<!-- For a richer explanation, hx-tooltip wraps the abbr; the abbr is the trigger
+     (default slot) and the explanation goes in the content slot. -->
 
 <hx-tooltip>
-  <abbr slot="anchor" title="Glasgow Coma Scale">GCS</abbr>
-  <p>
+  <abbr title="Glasgow Coma Scale">GCS</abbr>
+  <p slot="content">
     A 15-point scale used to assess level of consciousness. 15 = fully alert, 3 = deep coma. Scored
     on eye, verbal, and motor responses.
   </p>
@@ -234,13 +252,13 @@ Wrap every abbreviation in `<abbr>` on first occurrence per page or per section.
 
 _AAA · partial · consumer fulfills._
 
-**What WCAG 2.1 3.3.5 requires (context-sensitive help):**
+**What WCAG 2.2 3.3.5 requires (context-sensitive help):**
 
 Context-sensitive help is available for any component that requires user input. For forms in regulated contexts (legal, financial, medical), help should explain what the input is for and the format expected.
 
 **What HELiX provides (component contract):**
 
-Every form component (`hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-checkbox`, `hx-radio-group`, `hx-date-picker`, etc.) accepts a `helpText` attribute and a `help-text` slot for richer markup. `hx-help-text` is the canonical primitive — it wires `aria-describedby` through ElementInternals so the help text is announced after the field label by every screen reader. `hx-tooltip` + `hx-popover` surface longer explanations on demand. Field-level `hx-field-label` renders the required-marker and links the label-input pair via Shadow DOM-internal `for/id`.
+Every form component (`hx-text-input`, `hx-textarea`, `hx-select`, `hx-combobox`, `hx-checkbox-group`, `hx-radio-group`, `hx-date-picker`, etc.) accepts a `help-text` attribute (HTML) / `helpText` property (TS) and a `help-text` slot for richer markup. The component renders the help text in a labelled region inside its shadow root and references its ID from the internal input's `aria-describedby` so the help text is announced after the field label by every screen reader. `hx-help-text` is a standalone primitive for cases where you need the help-text styling outside a form component. `hx-tooltip` + `hx-popover` surface longer explanations on demand. Field-level `hx-field-label` renders the required-marker and links the label-input pair via Shadow DOM-internal `for`/`id`.
 
 **What you fulfill (consumer code):**
 
@@ -255,12 +273,12 @@ Populate `help-text` with substantive content — what the field is for, the for
   </span>
 </hx-text-input>
 
-<!-- For long-form help, hx-popover keeps the field uncluttered -->
+<!-- For long-form help, hx-popover surfaces the explanation on demand -->
 
 <hx-text-input name="advance-directive" label="Advance directive on file?">
   <hx-popover slot="help-text">
-    <button slot="anchor" type="button" aria-label="What is this?">?</button>
-    <p>
+    <button type="button" aria-label="What is this?">?</button>
+    <p slot="content">
       An advance directive is a legal document specifying your healthcare wishes if you cannot
       communicate them yourself. See the
       <a href="/help/advance-directives">advance-directive help page</a>
@@ -274,7 +292,7 @@ Populate `help-text` with substantive content — what the field is for, the for
 
 _Related ledgers._
 
-- **Success Criteria** (WCAG ledger · A · AA · AAA P0) — the full WCAG ledger: A and AA committed across every component, AAA on the P0 surface, plus the seven release-quality gates that block any merge below the floor. See the Success Criteria page in Storybook.
-- **Accessibility Dashboard** (overview · contracts) — high-level accessibility posture, contract summary, and entry points to every deep-dive. See the Dashboard page in Storybook.
-- **Keyboard Contracts** (2.1.1 · 2.1.3) — per-component keyboard interaction matrix. The other half of the partial-applicability story for 2.4.3 Focus Order and 2.4.7 Focus Visible. See the Keyboard Contracts page in Storybook.
-- **Focus Management** (2.4.3 · 2.4.7 · 2.4.13) — focus delegation, restoration on dialog/drawer/popover dismissal, and the focus-ring token contract. See the Focus Management page in Storybook.
+- **[Self-certification scope](/accessibility/self-cert-scope/)** — the 11 AAA + peer-standards criteria HELiX measures end-to-end on its P0 surface, plus the formal-audit harness and gating policy.
+- **[VPAT 2.5 conformance report](/accessibility/vpat-2.5/)** — the per-criterion conformance ledger published with each release.
+- **Keyboard Contracts** (Storybook) — per-component keyboard interaction matrix. Complements 2.4.3 Focus Order and 2.4.7 Focus Visible.
+- **Focus Management** (Storybook) — focus delegation, restoration on dialog/drawer/popover dismissal, and the focus-ring token contract.
