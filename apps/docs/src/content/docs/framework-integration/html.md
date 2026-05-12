@@ -9,9 +9,9 @@ sidebar:
 
 HELIX components work in any HTML page with a single `<script>` tag. No build tool, no npm, no bundler required.
 
-## CDN via Script Tag
+## CDN via Script Tag (import map)
 
-Load the full library bundle from a CDN:
+A bare specifier like `import '@helixui/library'` only resolves in the browser if an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) is in scope — otherwise the browser throws a module-resolution error. Use a pinned, version-locked CDN URL plus an import map for the library's bare dependencies (`lit`, `lit/*`, `@helixui/tokens`, `@helixui/icons`):
 
 ```html
 <!DOCTYPE html>
@@ -20,6 +20,17 @@ Load the full library bundle from a CDN:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My App</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+      "@helixui/icons":  "https://cdn.jsdelivr.net/npm/@helixui/icons@3.9.0/dist/index.js",
+      "lit":             "https://cdn.jsdelivr.net/npm/lit@3/+esm",
+      "lit/":            "https://cdn.jsdelivr.net/npm/lit@3/"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -27,19 +38,31 @@ Load the full library bundle from a CDN:
 
   <script type="module">
     import '@helixui/library';
-    // or from a CDN URL:
-    // import 'https://cdn.jsdelivr.net/npm/@helixui/library/dist/index.js';
   </script>
 
 </body>
 </html>
 ```
 
+Pin the version explicitly — `@latest` will silently roll forward across breaking changes. The version range above is illustrative; pick whatever matches your tested baseline.
+
 ## Loading Individual Components
 
-For performance, load only the components you use:
+For performance, load only the components you use. Per-component entry points resolve to `@helixui/library/components/<name>` (subpath export → `dist/components/<name>/index.js`):
 
 ```html
+<script type="importmap">
+{
+  "imports": {
+    "@helixui/library/components/hx-button":     "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js",
+    "@helixui/library/components/hx-text-input": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js",
+    "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+    "@helixui/icons":  "https://cdn.jsdelivr.net/npm/@helixui/icons@3.9.0/dist/index.js",
+    "lit":             "https://cdn.jsdelivr.net/npm/lit@3/+esm",
+    "lit/":            "https://cdn.jsdelivr.net/npm/lit@3/"
+  }
+}
+</script>
 <script type="module">
   import '@helixui/library/components/hx-button';
   import '@helixui/library/components/hx-text-input';
