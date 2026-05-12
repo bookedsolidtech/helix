@@ -6,6 +6,16 @@ order: 71
 
 Web components enable powerful composition patterns that promote reusability, maintainability, and flexibility. This guide explores proven patterns used throughout hx-library for building complex, coordinated component hierarchies while maintaining encapsulation and accessibility.
 
+> **Reading note:** Several samples below describe APIs that diverge from the shipped contract. Highest-impact mismatches:
+>
+> - `hx-radio` is a **presentational child** of `hx-radio-group`; it isn't a standalone form control. Use `hx-radio-group` as the form participant; the group's `hx-change` detail includes the selected `value` and `checked` state.
+> - `hx-alert` uses **`dismissible`** (not `dismissible`) and only renders the icon slot when **`show-icon`** is also set.
+> - `hx-icon-button` does **not** extend `HelixButton` and has no `icon` property — it's a standalone host that accepts `library` / `name` like `hx-icon`. Don't try to inherit from `HelixButton` to compose it.
+> - `hx-container` uses **`width`** (not `size`), and form controls use **`hx-size`** (not native `size`).
+> - There is no `org-theme-provider` / `org-themed-card` / `org-icon-form-input` in the library — those samples are **consumer-owned** patterns; rename them with an `org-` prefix in your own code.
+> - `hx-form` requires a native submit event from its underlying `<form>` (with `action=""`) to dispatch its `hx-submit` event — wiring an `hx-button type="submit"` inside an `hx-form` is the canonical pattern, but the dispatch path runs through the form element, not directly off the button.
+> - Use the per-component CEM (`packages/hx-library/custom-elements.json`) as the canonical API source when in doubt.
+
 ## What is Composition?
 
 Composition is the practice of building complex components from simpler building blocks. Unlike inheritance (extending class behavior), composition combines independent components through slots, events, and coordinated state management.
@@ -346,7 +356,7 @@ private _syncOptions(): void {
 For more complex rendering scenarios, consumers can provide full templates:
 
 ```html
-<hx-alert variant="warning" closable>
+<hx-alert variant="warning" dismissible>
   <div slot="icon">
     <!-- Custom SVG icon -->
     <svg>...</svg>
@@ -433,7 +443,7 @@ The provider/consumer pattern shares state across distant components without pro
 
 ```typescript
 // Theme provider component
-@customElement('hx-theme-provider')
+@customElement('org-theme-provider')
 export class ThemeProvider extends LitElement {
   @property({ type: String }) theme: 'light' | 'dark' = 'light';
 
@@ -475,7 +485,7 @@ export class ThemeProvider extends LitElement {
 
 ```typescript
 // Consumer component
-@customElement('hx-themed-card')
+@customElement('org-themed-card')
 export class ThemedCard extends LitElement {
   @state() private _theme: 'light' | 'dark' = 'light';
 
@@ -506,10 +516,10 @@ export class ThemedCard extends LitElement {
 **Usage:**
 
 ```html
-<hx-theme-provider theme="dark">
-  <hx-themed-card>This card is dark themed</hx-themed-card>
-  <hx-themed-card>So is this one</hx-themed-card>
-</hx-theme-provider>
+<org-theme-provider theme="dark">
+  <org-themed-card>This card is dark themed</org-themed-card>
+  <org-themed-card>So is this one</org-themed-card>
+</org-theme-provider>
 ```
 
 **Alternative: CSS Custom Properties**
@@ -517,7 +527,7 @@ export class ThemedCard extends LitElement {
 For styling-only context, CSS custom properties are simpler:
 
 ```typescript
-@customElement('hx-theme-provider')
+@customElement('org-theme-provider')
 export class ThemeProvider extends LitElement {
   @property({ type: String }) theme: 'light' | 'dark' = 'light';
 
@@ -582,7 +592,7 @@ private _handleEmailInput(e: CustomEvent<{ value: string }>): void {
 
 ```html
 <!-- Component manages its own open/closed state -->
-<hx-alert variant="info" closable open> This alert manages its own visibility. </hx-alert>
+<hx-alert variant="info" dismissible open> This alert manages its own visibility. </hx-alert>
 ```
 
 ```typescript
@@ -714,7 +724,7 @@ class IconFormInput extends FormInput {} // Too deep!
 
 ```typescript
 // Preferred: Flat hierarchy with composed behaviors
-@customElement('hx-icon-form-input')
+@customElement('org-icon-form-input')
 export class IconFormInput extends FormAssociatedMixin(LitElement) {
   render() {
     return html`
@@ -737,13 +747,13 @@ Compose multiple components for complex healthcare UI:
   <hx-card variant="featured">
     <h2 slot="heading">Active Patient Alerts</h2>
 
-    <hx-alert variant="error" closable open>
+    <hx-alert variant="error" dismissible open>
       <strong>Critical: Allergy Alert</strong>
       <p>Patient has documented penicillin allergy.</p>
       <hx-button slot="actions" variant="primary" size="sm"> Review History </hx-button>
     </hx-alert>
 
-    <hx-alert variant="warning" closable open>
+    <hx-alert variant="warning" dismissible open>
       <strong>Lab Results Pending</strong>
       <p>Blood work results expected within 2 hours.</p>
     </hx-alert>
