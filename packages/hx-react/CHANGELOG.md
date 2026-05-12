@@ -31,7 +31,7 @@ Mistakenly published as MAJOR via the [library, tokens, react] linked-package gr
   ## What ships at 3.8.0 (release-time snapshot)
 
   **43 of 43 P0 components measured against 11 AAA criteria** via the formal audit harness:
-  - 3.8.0 release-time verification: **473/473 cells, 356 Supports + 117 Not Applicable, zero Partials, zero Fails**. (The P0 surface has since grown — 3.9.0 measures **44 P0 components × 11 criteria = 484 cells / 376 Supports + 108 Not Applicable**; consult `packages/hx-library/aaa-verdicts.json` for the current numbers.)
+  - 3.8.0 release-time verification: **473/473 cells, 356 Supports + 117 Not Applicable, zero Partials, zero Fails**. (The P0 surface has since grown — current `aaa-verdicts.json` measures **44 P0 components / 376 Supports + 109 Not Applicable / 0 Partial / 0 Fail** across the 11 criteria; consult `packages/hx-library/aaa-verdicts.json` for the live numbers.)
   - Snapshot: `.reports/formal-aaa-audit/PRE-RELEASE-VERIFICATION-3.8.0.md` (gitignored evidence)
   - Cert toolkit (`scripts/aaa-cert.mjs`) gates on formal audit verdict, not the informational matrix harness
   - Standards reference: `scripts/aaa-standards.json` (W3C URLs WebFetch-verified — see the file for the current count)

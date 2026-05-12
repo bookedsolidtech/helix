@@ -431,10 +431,6 @@ for (const file of targetFiles) {
     const name = `@helixui/${m[1]}`;
     if (knownPackageNames.has(name)) continue;
 
-    const preTagText = content.slice(0, m.index);
-    const lineStart = preTagText.lastIndexOf('\n') + 1;
-    const linePrefix = preTagText.slice(lineStart);
-    const insideBacktickPair = (linePrefix.match(/`/g) ?? []).length % 2 === 1;
     const lineText = lines[content.slice(0, m.index).split(/\r?\n/).length - 1] ?? '';
     const surroundingLines = lines
       .slice(
@@ -459,13 +455,7 @@ for (const file of targetFiles) {
     // Skip Twig SDC include namespace references: `{{ include('@module/component', ...) }}`
     // or `extends '@module/component'`. Drupal SDC routes use the `@<namespace>`
     // form inside Twig template-loader calls, NOT npm package specifiers.
-    if (
-      /(?:\{\{\s*include|\{%\s*(?:include|extends|embed|import))\s*\(?\s*['"]?@helixui\//.test(
-        linePrefix.replace(/`/g, '') + '@helixui/',
-      ) ||
-      /(?:include|extends|embed|import)\s*\(?\s*['"]@helixui\//.test(lineText)
-    )
-      continue;
+    if (/(?:include|extends|embed|import)\s*\(?\s*['"]@helixui\//.test(lineText)) continue;
 
     if (seenBadRefs.has(`${file}:${name}`)) continue;
     seenBadRefs.add(`${file}:${name}`);
@@ -518,8 +508,13 @@ for (const file of targetFiles) {
     if (!floor) continue;
 
     // Compare major.minor floor against the canonical workspace version
-    const [floorMajor, floorMinor = '0'] = floor.split('.');
-    const [canonMajor, canonMinor = '0'] = canonical.split('.');
+    const [floorMajorRaw, floorMinorRaw = '0'] = floor.split('.');
+    const [canonMajorRaw, canonMinorRaw = '0'] = canonical.split('.');
+    const floorMajor = Number(floorMajorRaw);
+    const floorMinor = Number(floorMinorRaw);
+    const canonMajor = Number(canonMajorRaw);
+    const canonMinor = Number(canonMinorRaw);
+    // Numeric comparison — string compare misorders "3.10" < "3.9".
     if (floorMajor !== canonMajor || floorMinor < canonMinor) {
       add({
         file,
