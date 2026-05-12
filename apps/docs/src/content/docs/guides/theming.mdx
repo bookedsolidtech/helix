@@ -14,44 +14,58 @@ HELiX components are styled entirely through CSS custom properties. No class nam
 HELiX uses a **three-tier token cascade** that flows from raw values down to per-component properties:
 
 ```
-Primitive Tokens   raw values — scale steps, palette ramps
+Primitive Tokens   raw values — palette ramps (--hx-color-primary-{50…950}),
+                   spacing steps (--hx-space-{0…64}), font-size scale.
         ↓
-Semantic Tokens    purpose-driven — --hx-color-primary, --hx-spacing-md
+Semantic Tokens    role-bound — --hx-color-action-primary-bg,
+                   --hx-color-surface-default, --hx-color-text-primary.
         ↓
-Component Tokens   scoped — --hx-button-bg, --hx-card-padding
+Component Tokens   scoped — --hx-button-bg, --hx-card-padding.
 ```
 
 Inside every component's styles, there is a private fallback chain:
 
 ```css
 /* Inside hx-button shadow DOM */
-:host {
-  --_bg: var(--hx-button-bg, var(--hx-color-primary));
+.button--primary {
+  --hx-button-bg: var(--hx-color-action-primary-bg);
+}
+.button {
+  background-color: var(--hx-button-bg);
 }
 ```
 
-`--hx-button-bg` is the component token (easily overridden per-element). It falls back to `--hx-color-primary`, which is the semantic token. Override at either tier depending on how broadly you want the change to apply.
+`--hx-button-bg` is the component token (easily overridden per-element). The button's variant CSS
+sets it from `--hx-color-action-primary-bg`, the semantic action surface. Override at the semantic
+tier for brand-wide changes; override at the component tier when one variant needs to vary in
+isolation.
 
 ### Which tier to override?
 
-| Goal                    | Override tier | Example                             |
-| ----------------------- | ------------- | ----------------------------------- |
-| Brand-wide color change | Semantic      | `--hx-color-primary`                |
-| One component's look    | Component     | `--hx-button-bg`                    |
-| Full palette swap       | Primitive     | `--hx-color-blue-500` (+ full ramp) |
-| Dark mode surfaces      | Semantic      | `--hx-color-surface-default`        |
+| Goal                   | Override tier                 | Example                                                                        |
+| ---------------------- | ----------------------------- | ------------------------------------------------------------------------------ |
+| Brand-wide colour swap | Brand (via registry)          | `HelixBrandRegistry.register('mybrand', { '--hx-color-primary-700': '…', … })` |
+| Semantic role retune   | Semantic                      | `--hx-color-action-primary-bg`                                                 |
+| One component's look   | Component                     | `--hx-button-bg`                                                               |
+| Full palette swap      | Brand (via registry)          | Register a complete primary + secondary 22-token ramp set                      |
+| Dark mode surfaces     | Use `<hx-theme theme="dark">` | The dark adopted stylesheet swaps semantic references                          |
 
 **Do:**
 
-- Override semantic tokens for brand-wide themes
-- Override component tokens for targeted, per-component changes
-- Reference semantic tokens in component token overrides so the cascade stays intact
+- Use the brand registry (`HelixBrandRegistry.register()`) for brand-wide colour swaps — register the
+  22-token primary + secondary ramp set and `<hx-theme brand="…">` applies it to the entire subtree.
+- Override semantic role tokens (`--hx-color-action-primary-bg`, `--hx-color-surface-default`,
+  `--hx-color-text-primary`, etc.) for theme-wide tweaks that aren't a brand swap.
+- Override component tokens (`--hx-button-bg`, `--hx-card-padding`) for targeted per-component
+  changes.
+- Reference semantic tokens in component-token overrides so the cascade stays intact.
 
 **Don't:**
 
-- Override primitive tokens from consuming applications — change the primitive ramp when you need to shift a hue, not individual stops
-- Use `!important` — it breaks every downstream override
-- Hardcode raw values in component token overrides (use token references instead)
+- Override individual primitive ramp stops from consuming applications — register a brand instead
+  so the full ramp updates atomically.
+- Use `!important` — it breaks every downstream override.
+- Hardcode raw values in component-token overrides (use token references instead).
 
 ---
 
@@ -59,72 +73,81 @@ Inside every component's styles, there is a private fallback chain:
 
 Apply your brand to every HELiX component by overriding semantic tokens on `:root`:
 
+For brand colour swaps, prefer **`HelixBrandRegistry.register()`** (covered in the next section) — it
+updates the entire primary + secondary ramp atomically with a single call. The CSS-override
+pattern below is for retuning specific semantic roles (status messages, surface tints, typography,
+spacing) outside the brand ramp surface:
+
 ```css
-/* your-brand-theme.css */
+/* your-brand-theme.css — overrides semantic + spatial tokens only. */
 
 :root {
-  /* Primary action color — buttons, focus rings, links, selected states */
-  --hx-color-primary: #0066cc;
-  --hx-color-primary-hover: #0052a3;
-  --hx-color-primary-active: #003d7a;
-  --hx-color-on-primary: #ffffff;
-
-  /* Secondary actions */
-  --hx-color-secondary: #6b7280;
-  --hx-color-on-secondary: #ffffff;
+  /* Semantic action / surface / text roles. These are the canonical
+     override handles (the fabricated --hx-color-primary /
+     --hx-color-on-primary handles do not exist). */
+  --hx-color-action-primary-bg: var(--hx-color-primary-700);
+  --hx-color-action-primary-bg-hover: var(--hx-color-primary-800);
+  --hx-color-action-primary-bg-active: var(--hx-color-primary-900);
+  --hx-color-text-on-primary: var(--hx-color-neutral-0);
 
   /* Surface layers */
-  --hx-color-surface-default: #ffffff;
-  --hx-color-surface-raised: #f9fafb;
-  --hx-color-surface-sunken: #f3f4f6;
+  --hx-color-surface-default: var(--hx-color-neutral-0);
+  --hx-color-surface-raised: var(--hx-color-neutral-50);
+  --hx-color-surface-sunken: var(--hx-color-neutral-100);
 
   /* Text */
-  --hx-color-text-primary: #111827;
-  --hx-color-text-secondary: #374151;
-  --hx-color-text-muted: #6b7280;
-  --hx-color-text-inverse: #ffffff;
+  --hx-color-text-primary: var(--hx-color-neutral-900);
+  --hx-color-text-secondary: var(--hx-color-neutral-700);
+  --hx-color-text-muted: var(--hx-color-neutral-700);
+  --hx-color-text-inverse: var(--hx-color-neutral-0);
 
   /* Borders */
-  --hx-color-border-default: #d1d5db;
-  --hx-color-border-subtle: #e5e7eb;
-  --hx-color-border-focus: #0066cc;
+  --hx-color-border-default: var(--hx-color-neutral-200);
+  --hx-color-border-subtle: var(--hx-color-neutral-100);
 
-  /* Status */
-  --hx-color-error: #dc2626;
-  --hx-color-warning: #d97706;
-  --hx-color-success: #16a34a;
-  --hx-color-info: #0284c7;
+  /* Status text — error and success are canonical; warning text falls
+     back to --hx-color-text-on-warning (there is no flat
+     --hx-color-warning-text token). */
+  --hx-color-error-text: var(--hx-color-error-700);
+  --hx-color-success-text: var(--hx-color-success-800);
 
-  /* Typography */
+  /* Typography (canonical names: -sans, -mono, -serif) */
   --hx-font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --hx-font-size-md: 1rem;
   --hx-line-height-normal: 1.5;
 
-  /* Shape */
-  --hx-radius-sm: 0.25rem;
-  --hx-radius-md: 0.375rem;
-  --hx-radius-lg: 0.5rem;
-  --hx-radius-full: 9999px;
+  /* Shape (canonical: --hx-border-radius-*) */
+  --hx-border-radius-sm: 0.25rem;
+  --hx-border-radius-md: 0.375rem;
+  --hx-border-radius-lg: 0.5rem;
+  --hx-border-radius-full: 9999px;
 
-  /* Spacing */
-  --hx-spacing-xs: 0.25rem;
-  --hx-spacing-sm: 0.5rem;
-  --hx-spacing-md: 1rem;
-  --hx-spacing-lg: 1.5rem;
-  --hx-spacing-xl: 2rem;
+  /* Spacing (canonical: --hx-space-N, not --hx-spacing-{xs,sm,md,lg,xl}) */
+  --hx-space-1: 0.25rem;
+  --hx-space-2: 0.5rem;
+  --hx-space-4: 1rem;
+  --hx-space-6: 1.5rem;
+  --hx-space-8: 2rem;
 }
 ```
 
-Load your theme after the HELiX token stylesheet:
+Load your override stylesheet after the HELiX token bundle:
 
 ```html
-<link rel="stylesheet" href="https://cdn.helixui.dev/tokens/latest/tokens.css" />
+<!-- HELiX ships tokens via npm (@helixui/tokens). The CDN path follows
+     the package layout: -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/tokens@latest/dist/tokens.css" />
 <link rel="stylesheet" href="/your-brand-theme.css" />
 ```
 
-**Before** (HELiX defaults — blue primary, neutral surfaces): All buttons, links, focus rings, and selection states use the default `--hx-color-primary`.
+**Before** (Apex default brand): every interactive surface paints from the action token layer
+(`--hx-color-action-primary-bg` → `--hx-color-primary-700` → Apex `#0F6363`).
 
-**After** (your brand tokens applied): Every component that draws from `--hx-color-primary` updates automatically — `hx-button`, `hx-checkbox`, `hx-radio`, `hx-switch`, `hx-tabs`, `hx-badge`, `hx-alert`, `hx-progress-bar`, focus rings on all interactive elements.
+**After** (your semantic overrides applied): every component that consumes the action token layer
+(`hx-button`, `hx-checkbox`, `hx-radio`, `hx-switch`, `hx-tabs`, `hx-badge` primary, etc.) reads
+the new value automatically. For a full brand-ramp swap (changing the primary hue itself), register
+a brand via the brand registry — that updates every consumer of the primary/secondary ramps in one
+call rather than overriding semantic roles piecemeal.
 
 ---
 
@@ -139,9 +162,11 @@ CSS custom properties cascade through the DOM. Any token set on a parent element
   <!-- Default theme -->
   <hx-button>Brand button</hx-button>
 
-  <!-- Clinical theme — scoped to this section -->
-  <section data-theme="clinical">
-    <hx-button>Clinical button</hx-button>
+  <!-- Scoped overrides — author-defined data-attribute, applied via the
+       CSS below. There are no built-in 'clinical' / 'admin' presets in
+       HELiX; data-theme is just a CSS hook you author and own. -->
+  <section data-app-theme="patient-portal">
+    <hx-button>Portal button</hx-button>
     <hx-card>
       <hx-text-input label="Patient ID" />
     </hx-card>
@@ -150,39 +175,61 @@ CSS custom properties cascade through the DOM. Any token set on a parent element
 ```
 
 ```css
-[data-theme='clinical'] {
-  --hx-color-primary: #1a7f64;
-  --hx-color-primary-hover: #148f72;
-  --hx-color-on-primary: #ffffff;
+[data-app-theme='patient-portal'] {
+  --hx-color-action-primary-bg: #1a7f64;
+  --hx-color-action-primary-bg-hover: #148f72;
   --hx-color-surface-default: #f8f9fa;
   --hx-font-family-sans: 'Source Sans Pro', sans-serif;
-  --hx-radius-md: 2px;
+  --hx-border-radius-md: 2px;
   --hx-shadow-sm: none;
 }
 ```
 
 ### Using `hx-theme`
 
-HELiX ships an `hx-theme` utility component that applies a named theme to its subtree without requiring CSS class or data attribute management:
+HELiX ships an `hx-theme` utility component that applies a registered brand or a mode preset to
+its subtree without requiring per-section CSS:
 
 ```html
-<hx-theme name="clinical">
-  <hx-button>Clinical button</hx-button>
+<!--
+  hx-theme attributes:
+    theme   : 'light' | 'dark' | 'high-contrast' | 'auto'
+    brand   : a brand id registered via HelixBrandRegistry.register()
+    motion  : motion-mode preset (reduce / allow / auto)
+    density : density preset (comfortable / compact / spacious)
+  There is no `name` attribute and no built-in 'clinical' theme.
+-->
+<hx-theme brand="apex" theme="auto" density="comfortable">
+  <hx-button>Patient portal button</hx-button>
   <hx-card>Patient information</hx-card>
 </hx-theme>
 ```
 
-`hx-theme` renders as a `display: contents` wrapper that adds the named attribute and hosts the scoped token overrides. See the [hx-theme component docs](https://storybook.helix.bookedsolid.tech/?path=/docs/components-theme--docs) for available built-in theme names and how to register custom themes.
+Register a brand before referencing it via the `brand` attribute:
+
+```ts
+import { HelixBrandRegistry } from '@helixui/tokens';
+
+HelixBrandRegistry.register('patient-portal', {
+  '--hx-color-primary-50': '#…',
+  // … all 22 primary + secondary ramp tokens
+});
+```
+
+See the [Brand Registry foundation](/?path=/docs/foundations-brand-registry--docs) for the full
+registration contract and the shipped reference brands.
 
 ### Scope to CSS classes
 
 ```css
 .portal-section {
-  --hx-color-primary: #1a7f64;
+  --hx-color-action-primary-bg: #1a7f64;
+  --hx-color-action-primary-bg-hover: #166c55;
 }
 
 .admin-section {
-  --hx-color-primary: #7c3aed;
+  --hx-color-action-primary-bg: #7c3aed;
+  --hx-color-action-primary-bg-hover: #6d28d9;
 }
 ```
 
@@ -208,7 +255,7 @@ hx-button {
   --hx-button-bg: var(--hx-color-secondary);
   --hx-button-color: var(--hx-color-on-secondary);
   --hx-button-border-radius: 0;
-  --hx-button-padding-x: var(--hx-spacing-lg);
+  --hx-button-padding-x: var(--hx-space-6);
 }
 
 /* Per-instance override with inline style */
@@ -351,7 +398,7 @@ HELiX dark mode is controlled via a `data-theme="dark"` attribute on `<html>` (o
     --hx-color-border-default: #374151;
     --hx-color-border-subtle: #1f2937;
     /* Keep primary legible on dark backgrounds */
-    --hx-color-primary: #60a5fa;
+    --hx-color-action-primary-bg: #60a5fa;
   }
 }
 ```
@@ -371,7 +418,7 @@ HELiX dark mode is controlled via a `data-theme="dark"` attribute on `<html>` (o
   --hx-color-text-primary: #f9fafb;
   --hx-color-border-default: #374151;
   /* Lighten primary for dark background contrast */
-  --hx-color-primary: #60a5fa;
+  --hx-color-action-primary-bg: #60a5fa;
 }
 ```
 
@@ -414,10 +461,10 @@ A complete example switching HELiX from its default blue palette to a purple/vio
 
 :root {
   /* Primary ramp */
-  --hx-color-primary: #7c3aed;
-  --hx-color-primary-hover: #6d28d9;
-  --hx-color-primary-active: #5b21b6;
-  --hx-color-on-primary: #ffffff;
+  --hx-color-action-primary-bg: #7c3aed;
+  --hx-color-action-primary-bg-hover: #6d28d9;
+  --hx-color-action-primary-bg-active: #5b21b6;
+  --hx-color-text-on-primary: #ffffff;
 
   /* Secondary */
   --hx-color-secondary: #ec4899;
@@ -434,10 +481,10 @@ A complete example switching HELiX from its default blue palette to a purple/vio
   --hx-font-family-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
 
   /* Rounded corners for a friendly feel */
-  --hx-radius-sm: 0.5rem;
-  --hx-radius-md: 0.75rem;
-  --hx-radius-lg: 1rem;
-  --hx-radius-full: 9999px;
+  --hx-border-radius-sm: 0.5rem;
+  --hx-border-radius-md: 0.75rem;
+  --hx-border-radius-lg: 1rem;
+  --hx-border-radius-full: 9999px;
 
   /* Subtle shadows */
   --hx-shadow-sm: 0 1px 3px rgba(124, 58, 237, 0.1);
@@ -446,8 +493,8 @@ A complete example switching HELiX from its default blue palette to a purple/vio
 
 /* Dark mode variant */
 :root[data-theme='dark'] {
-  --hx-color-primary: #a78bfa;
-  --hx-color-primary-hover: #8b5cf6;
+  --hx-color-action-primary-bg: #a78bfa;
+  --hx-color-action-primary-bg-hover: #8b5cf6;
   --hx-color-border-focus: #a78bfa;
   --hx-color-surface-default: #1e1b4b;
   --hx-color-surface-raised: #312e81;
@@ -455,18 +502,22 @@ A complete example switching HELiX from its default blue palette to a purple/vio
 }
 ```
 
-**Token reference — primary/secondary/accent:**
+**Token reference — primary / secondary / accent:**
 
-| Token                       | Purpose                                              |
-| --------------------------- | ---------------------------------------------------- |
-| `--hx-color-primary`        | Main interactive color — buttons, links, focus rings |
-| `--hx-color-primary-hover`  | Hover state of primary elements                      |
-| `--hx-color-primary-active` | Active/pressed state                                 |
-| `--hx-color-on-primary`     | Text/icon color on primary surfaces                  |
-| `--hx-color-secondary`      | Secondary actions and highlights                     |
-| `--hx-color-on-secondary`   | Text on secondary surfaces                           |
-| `--hx-color-accent`         | Decorative highlights, badges, tags                  |
-| `--hx-color-on-accent`      | Text on accent surfaces                              |
+| Token                                  | Purpose                                                       |
+| -------------------------------------- | ------------------------------------------------------------- |
+| `--hx-color-action-primary-bg`         | Resting primary action surface (button bg, badge, active nav) |
+| `--hx-color-action-primary-bg-hover`   | Hover state of primary interactive surfaces                   |
+| `--hx-color-action-primary-bg-active`  | Active / pressed state of primary surfaces                    |
+| `--hx-color-text-on-primary`           | Text / icon color on primary surfaces                         |
+| `--hx-color-action-secondary-fg`       | Secondary action foreground (outline / ghost variant text)    |
+| `--hx-color-action-secondary-border`   | Secondary outline border                                      |
+| `--hx-color-action-secondary-bg-hover` | Secondary hover background                                    |
+| `--hx-color-action-danger-bg`          | Destructive primary surface (red action)                      |
+| `--hx-color-action-danger-bg-hover`    | Destructive hover background                                  |
+| `--hx-color-action-danger-bg-active`   | Destructive active / pressed background                       |
+| `--hx-color-action-ghost-fg`           | Ghost-button foreground                                       |
+| `--hx-color-action-ghost-bg-hover`     | Ghost-button hover background                                 |
 
 ---
 
@@ -479,10 +530,10 @@ Healthcare applications have mandatory contrast requirements (WCAG 2.2 AA minimu
 
 :root {
   /* Clinical blues — calming, trustworthy */
-  --hx-color-primary: #1d4ed8; /* 4.6:1 on white */
-  --hx-color-primary-hover: #1e40af; /* 5.8:1 on white */
-  --hx-color-primary-active: #1e3a8a;
-  --hx-color-on-primary: #ffffff;
+  --hx-color-action-primary-bg: #1d4ed8; /* 4.6:1 on white */
+  --hx-color-action-primary-bg-hover: #1e40af; /* 5.8:1 on white */
+  --hx-color-action-primary-bg-active: #1e3a8a;
+  --hx-color-text-on-primary: #ffffff;
 
   /* Accessible error — avoids pure red for colorblindness users */
   --hx-color-error: #b91c1c; /* 5.9:1 on white */
@@ -508,9 +559,9 @@ Healthcare applications have mandatory contrast requirements (WCAG 2.2 AA minimu
   --hx-size-touch-target: 2.75rem;
 
   /* Neutral shape — utilitarian, not decorative */
-  --hx-radius-sm: 2px;
-  --hx-radius-md: 4px;
-  --hx-radius-lg: 6px;
+  --hx-border-radius-sm: 2px;
+  --hx-border-radius-md: 4px;
+  --hx-border-radius-lg: 6px;
 }
 
 /* Enforce touch target minimums on interactive components */
@@ -620,9 +671,9 @@ mytheme/
 /* Drupal brand theme — loaded after HELiX defaults */
 
 :root {
-  --hx-color-primary: #0066cc;
+  --hx-color-action-primary-bg: #0066cc;
   --hx-font-family-sans: 'Source Sans Pro', sans-serif;
-  --hx-radius-md: 0.25rem;
+  --hx-border-radius-md: 0.25rem;
 }
 ```
 
@@ -643,7 +694,7 @@ Use a Drupal field or block template to output a `data-theme` attribute:
 [data-theme='dark-hero'] {
   --hx-color-surface-default: #111827;
   --hx-color-text-primary: #f9fafb;
-  --hx-color-primary: #60a5fa;
+  --hx-color-action-primary-bg: #60a5fa;
 }
 ```
 
