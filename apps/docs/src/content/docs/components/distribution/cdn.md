@@ -7,14 +7,15 @@ description: Distributing HELiX web components via CDN for zero-install consumpt
 
 import { Aside } from '@astrojs/starlight/components';
 
-<Aside type="caution" title="Doc is rewriting against current source">
-  This page mixes a planned dual-build architecture (a separate `dist/cdn/` CDN bundle) with the
-  current build that ships **one** ES-module distribution at `dist/`. As of @helixui/library@3.9.0:
-  the full bundle lives at <code>dist/index.js</code>, per-component modules live at
-  <code>dist/components/&lt;tag&gt;/index.js</code>, and the CDN-ready forms are the same files
-  served through jsDelivr / unpkg. The Vite/esbuild CDN-config sections below describe
-  aspirational future work; ignore them when wiring a CDN today and use the URL patterns under
-  <em>jsDelivr and unpkg Usage Patterns</em>.
+<Aside type="tip" title="Two build paths emit into `dist/`">
+  As of @helixui/library@3.9.0, `dist/` contains two distinct artifact layers:
+  the Vite library-mode tree at <code>dist/index.js</code> +
+  <code>dist/components/&lt;tag&gt;/index.js</code> (consumer bundlers resolve
+  bare specifiers via the import graph), AND the dedicated CDN bundle layer
+  at <code>dist/cdn/</code> produced by
+  <code>pnpm --filter=@helixui/library run build:cdn</code> (versioned,
+  Lit-inlined, no import map needed). The URL patterns under <em>jsDelivr
+  and unpkg Usage Patterns</em> describe how to consume each layer from a CDN.
 </Aside>
 
 Not every environment that needs HELiX can run `npm install`. Drupal themes, legacy CMS setups, and quick prototypes often need to load web components directly from a URL — no build step, no package manager, no bundler. CDN distribution is how HELiX serves those environments.
