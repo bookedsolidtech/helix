@@ -106,9 +106,23 @@ Some components should only load after a user interaction — opening a modal, s
 
 ### Click-triggered load
 
+Add `core/drupalSettings` as a dependency of this behavior's Drupal library so the IIFE can
+inject `drupalSettings` alongside `Drupal` and `once`:
+
+```yaml
+# mytheme.libraries.yml
+helix-on-demand:
+  js:
+    js/helix-on-demand.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/drupalSettings
+```
+
 ```javascript
 // js/helix-on-demand.js
-(function (Drupal, once) {
+(function (Drupal, once, drupalSettings) {
   'use strict';
 
   Drupal.behaviors.helixOnDemand = {
@@ -143,7 +157,7 @@ Some components should only load after a user interaction — opening a modal, s
       });
     },
   };
-})(Drupal, once);
+})(Drupal, once, drupalSettings);
 ```
 
 Template:
@@ -159,7 +173,10 @@ Template:
 
 <div id="results-region">
   <hx-data-table id="patient-data">
-    {# Slots populated server-side — table is visible structure only until JS loads #}
+    {# hx-data-table is driven by `columns` + `rows` JS properties
+       (not slotted table markup). The default state shows the
+       empty/loading slots until JS upgrades the element and the
+       behavior assigns the column + row data. #}
   </hx-data-table>
 </div>
 ```
@@ -221,7 +238,7 @@ Drupal.behaviors.helixCard = {
   attach(context) {
     // once() prevents double-initialization if attach runs more than once.
     once('hx-card-init', 'hx-card', context).forEach((card) => {
-      card.addEventListener('hx-card-click', (e) => {
+      card.addEventListener('hx-click', (e) => {
         console.log('Card clicked:', e.detail);
       });
     });
@@ -282,7 +299,7 @@ function mytheme_page_attachments(array &$attachments): void {
   // Always preload the runtime — it's shared by every component.
   $attachments['#attached']['html_head_link'][][] = [
     'rel' => 'modulepreload',
-    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/lit-runtime.js',
+    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js',
     'crossorigin' => 'anonymous',
   ];
 
@@ -333,22 +350,23 @@ All other component libraries are attached per-template or per-route.
 
 ## Avoiding Double Registration
 
-When the same component file might be imported multiple times (lazy loading + Drupal library), the browser prevents duplicate registration automatically via the ES module cache. However, if you use `customElements.define()` manually elsewhere, you will get a `DOMException`:
+When the same component file might be imported multiple times (lazy loading + Drupal library), the browser prevents duplicate registration automatically via the ES module cache — the same module specifier only executes once per page. If you call `customElements.define()` manually elsewhere with a name HELiX has already registered, the browser will throw a `DOMException`:
 
 ```
 Failed to execute 'define' on 'CustomElementRegistry': the name "hx-button" has already been used
 ```
 
-To prevent this, HELiX components guard their registration:
+To avoid this, **don't call `customElements.define()` manually** for any `hx-*` tag. HELiX components register themselves via Lit's `@customElement('hx-button')` decorator at module import time:
 
-```javascript
-// Inside each component's entry point
-if (!customElements.get('hx-button')) {
-  customElements.define('hx-button', HxButton);
+```typescript
+// Inside packages/hx-library/src/components/hx-button/hx-button.ts
+@customElement('hx-button')
+export class HelixButton extends mixinDelegatesAria(HelixElement) {
+  /* … */
 }
 ```
 
-This guard is built into the distributed files. As long as you import HELiX files (not manually call `customElements.define`), double-registration will not occur.
+Importing the module is the contract. The ES module cache deduplicates the module across every import site (`@helixui/library/components/hx-button`, the full bundle, the per-component CDN URL), so the decorator runs exactly once. If you ever need to register a different class against an `hx-*` tag (an extension subclass, say), do it *before* importing the HELiX module and guard with `customElements.get()` yourself.
 
 ---
 
