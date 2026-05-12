@@ -131,8 +131,22 @@ async function loadWorkspaceVersions() {
       }
     }
   }
-  // Add any non-scoped published packages of interest
-  versions.set('create-helix', 'npm-resolved');
+  // Add any non-scoped published packages of interest. `create-helix` is the
+  // HELiX scaffolder published on npm (its source lives in a separate repo).
+  // Query npm for the canonical version so docs pinned to e.g.
+  // `create-helix@0.8.0` are flagged once npm has a newer version.
+  try {
+    const { execSync } = await import('node:child_process');
+    const v = execSync('npm view create-helix version --silent 2>/dev/null', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    versions.set('create-helix', v || 'npm-resolved');
+  } catch {
+    // network failure (offline / restricted CI) — fall back to sentinel so
+    // package-name validation still works but version-drift skips.
+    versions.set('create-helix', 'npm-resolved');
+  }
   return versions;
 }
 const workspaceVersions = await loadWorkspaceVersions();
@@ -208,9 +222,13 @@ const staleRepoRegex = /github\.com\/himerus\/wc-2026/g;
 //   import {...} from '@helixui/icns';
 const packageRefRegex = /@helixui\/([a-z0-9][a-z0-9-]*)/g;
 
-// Old version pins on @helixui/* (drift gate handles this; we surface anyway)
+// Old version pins on @helixui/* AND on the unscoped `create-helix` CLI
+// (drift gate handles @helixui/*; we surface anyway. The create-helix arm is
+// drift-gate's blind spot today, so this checker is the only thing flagging
+// stale `create-helix@<version>` pins until the drift gate's PACKAGES set is
+// extended to cover unscoped packages.)
 const versionPinRegex =
-  /@helixui\/(library|icons|tokens|react|drupal-behaviors)@([0-9]+\.[0-9]+\.[0-9]+|\^[0-9]+(?:\.[0-9]+)?|~[0-9]+(?:\.[0-9]+)?)/g;
+  /(?:@helixui\/(library|icons|tokens|react|drupal-behaviors)|(create-helix))@([0-9]+\.[0-9]+\.[0-9]+|\^[0-9]+(?:\.[0-9]+)?|~[0-9]+(?:\.[0-9]+)?)/g;
 // CLI name fabrications
 const cliFabricationRegex = /(npx|npm\s+(?:create|x))\s+create-helix-app\b/g;
 // WCAG 2.1 AA claims (vs the canonical 2.2 AAA)
@@ -493,8 +511,10 @@ for (const file of targetFiles) {
   // as the other findings.
   versionPinRegex.lastIndex = 0;
   while ((m = versionPinRegex.exec(content)) !== null) {
-    const pkgName = `@helixui/${m[1]}`;
-    const pin = m[2];
+    // m[1] is the @helixui/* arm; m[2] is the create-helix arm (unscoped).
+    // Exactly one of them is non-empty per match.
+    const pkgName = m[1] ? `@helixui/${m[1]}` : m[2];
+    const pin = m[3];
     const idx = content.slice(0, m.index).split(/\r?\n/).length;
     const lineText = lines[idx - 1] ?? '';
 
@@ -514,6 +534,7 @@ for (const file of targetFiles) {
 
     const canonical = workspaceVersions.get(pkgName);
     if (!canonical) continue; // package not in the workspace; can't compare
+    if (canonical === 'npm-resolved') continue; // sentinel — offline / fetch failed; package-name check still ran
 
     // Extract the floor of caret/tilde ranges and the exact value of exact pins
     const exactMatch = pin.match(/^[0-9]+\.[0-9]+\.[0-9]+$/);
@@ -647,6 +668,8 @@ if (blockingFindings.length > 0 || (strict && findings.length > 0)) {
   console.error('');
   console.error(`✗ docs-claims: ${failedCount} blocking finding(s).`);
   console.error(`  Review ${ROLLUP_PATH} and fix, or set HELIX_DOCS_CLAIMS_STRICT=0 if you`);
-  console.error(`  want to opt out of strict-mode (low-severity findings are advisory by default).`);
+  console.error(
+    `  want to opt out of strict-mode (low-severity findings are advisory by default).`,
+  );
   process.exit(1);
 }

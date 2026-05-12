@@ -23,19 +23,30 @@ This page covers how the published bundles are structured, how CDN URLs are form
 
 ---
 
-## Today's distribution: one ESM tree, served by CDN
+## Today's distribution: library-mode ESM + dedicated CDN bundle layer
 
-`@helixui/library` publishes a single ES-module distribution under `dist/`. Both the full bundle
-and per-component modules are emitted by the same build (`pnpm --filter=@helixui/library build`);
-there is no separate `dist/cdn/` output today.
+`@helixui/library` publishes its ES-module distribution under `dist/`. Two
+build paths emit into that tree:
 
-| Artifact                                     | Used for                                                |
-| -------------------------------------------- | ------------------------------------------------------- |
-| `dist/index.js`                              | Full library bundle — registers every `hx-*` element    |
-| `dist/components/<tag>/index.js`             | Per-component module — registers only that element      |
-| `dist/css/helix-*.css`                       | Pre-built token / category stylesheets for consumer use |
-| `fouc.css`                                   | Pre-upgrade flash-of-unstyled-content guard             |
-| `custom-elements.json` / `aaa-verdicts.json` | CEM + AAA verdicts metadata                             |
+1. The default Vite build (`pnpm --filter=@helixui/library build`) writes the
+   library-mode tree at `dist/index.js`, `dist/components/<tag>/index.js`,
+   `dist/css/*`, etc. — designed for consumer bundlers that resolve bare
+   specifiers (`lit`, `@helixui/tokens`, …) via the import graph.
+2. The dedicated CDN build (`pnpm --filter=@helixui/library run build:cdn`)
+   writes the versioned, no-import-map-needed bundles under `dist/cdn/` with
+   SRI hashes in `dist/cdn/sri-hashes.json`.
+
+| Artifact                                     | Used for                                                             |
+| -------------------------------------------- | -------------------------------------------------------------------- |
+| `dist/index.js`                              | Full library bundle (Vite library mode) — registers every `hx-*`     |
+| `dist/components/<tag>/index.js`             | Per-component module (Vite library mode)                             |
+| `dist/css/helix-*.css`                       | Pre-built token / category stylesheets for consumer use              |
+| `dist/cdn/helix-{version}.min.js`            | **CDN full bundle** — all components + Lit inlined; no import map    |
+| `dist/cdn/helix-core-{version}.min.js`       | **CDN shared runtime** — shared Lit + core chunks (load before tags) |
+| `dist/cdn/components/hx-{tag}-{version}.js`  | **CDN per-component module** — imports from the shared runtime above |
+| `dist/cdn/sri-hashes.json`                   | Subresource Integrity hashes for every CDN artifact                  |
+| `fouc.css`                                   | Pre-upgrade flash-of-unstyled-content guard                          |
+| `custom-elements.json` / `aaa-verdicts.json` | CEM + AAA verdicts metadata                                          |
 
 These files are CDN-ready out of the box because `@helixui/library` declares Lit as a regular
 runtime dependency — jsDelivr and unpkg resolve the bare `lit` import through the dependency tree.
