@@ -36,35 +36,33 @@ done, it writes a ready-to-run project at `./project-name/`.
 
 ## Framework Templates
 
-`create-helix` ships with 15 framework targets, all selected from the
-interactive prompt. The shipped CLI (`packages/create-helix-app/dist/cli.js`)
-treats its first positional argument as the project name only — flag-based
-template/bundle selection is part of the roadmap (see
-[Planned CLI Surface](#planned-cli-surface) below). For now, run the CLI and
-choose the template from the prompt:
+`create-helix` ships with 16 framework targets. Pass `--template <id>` to
+skip the prompt, or run the CLI without it for the interactive picker:
 
 ```bash
-npx create-helix my-app
-# → prompts you to pick from the 15 framework targets in the table below.
+npx create-helix my-app --template react-next
+# or
+npx create-helix my-app   # prompts you to pick from the 16 targets below.
 ```
 
-| Template ID   | Name                 | Description                                                                      |
-| ------------- | -------------------- | -------------------------------------------------------------------------------- |
-| `react-next`  | React + Next.js 15   | App Router, SSR-ready, full HELiX integration — **recommended for new projects** |
-| `react-vite`  | React + Vite         | Lightning fast dev, SPA-first, HELiX with `@lit/react`                           |
-| `remix`       | React Router (Remix) | Full-stack React with SSR, nested routes                                         |
-| `vue-nuxt`    | Vue + Nuxt 4         | Full-stack Vue with SSR, native web component support                            |
-| `vue-vite`    | Vue + Vite           | Lightweight Vue 3 SPA with native web component binding                          |
-| `svelte-kit`  | SvelteKit            | Svelte 5 + SvelteKit, native custom element support                              |
-| `angular`     | Angular 18           | Enterprise Angular with `CUSTOM_ELEMENTS_SCHEMA` pre-configured                  |
-| `astro`       | Astro                | Content-first with islands architecture, zero JS by default                      |
-| `vanilla`     | Vanilla (HTML + CDN) | No framework, no build step — just HTML and HELiX via CDN                        |
-| `solid-vite`  | Solid.js + Vite      | Fine-grained reactive SPA with native web component support                      |
-| `qwik-vite`   | Qwik + Vite          | Resumable framework with zero hydration                                          |
-| `lit-vite`    | Lit + Vite           | Lightweight web components with Google Lit and Vite                              |
-| `preact-vite` | Preact + Vite        | Fast 3kB React alternative with native web component support                     |
-| `stencil`     | Stencil              | Compiler for standards-based web components with lazy-loading                    |
-| `ember`       | Ember.js             | Convention-driven full-stack framework                                           |
+| Template ID    | Name                         | Description                                                                      |
+| -------------- | ---------------------------- | -------------------------------------------------------------------------------- |
+| `wc-storybook` | Design System + Storybook 10 | Component-library + Storybook 10 scaffold (the design-system-author flow)        |
+| `react-next`   | React + Next.js 16           | App Router, SSR-ready, full HELiX integration — **recommended for new projects** |
+| `react-vite`   | React + Vite                 | Lightning fast dev, SPA-first, HELiX with `@lit/react`                           |
+| `remix`        | React Router (Remix)         | Full-stack React with SSR, nested routes                                         |
+| `vue-nuxt`     | Vue + Nuxt 4                 | Full-stack Vue with SSR, native web component support                            |
+| `vue-vite`     | Vue + Vite                   | Lightweight Vue 3 SPA with native web component binding                          |
+| `svelte-kit`   | SvelteKit                    | Svelte 5 + SvelteKit, native custom element support                              |
+| `angular`      | Angular 18                   | Enterprise Angular with `CUSTOM_ELEMENTS_SCHEMA` pre-configured                  |
+| `astro`        | Astro                        | Content-first with islands architecture, zero JS by default                      |
+| `vanilla`      | Vanilla (HTML + CDN)         | No framework, no build step — just HTML and HELiX via CDN                        |
+| `solid-vite`   | Solid.js + Vite              | Fine-grained reactive SPA with native web component support                      |
+| `qwik-vite`    | Qwik + Vite                  | Resumable framework with zero hydration                                          |
+| `lit-vite`     | Lit + Vite                   | Lightweight web components with Google Lit and Vite                              |
+| `preact-vite`  | Preact + Vite                | Fast 3kB React alternative with native web component support                     |
+| `stencil`      | Stencil                      | Compiler for standards-based web components with lazy-loading                    |
+| `ember`        | Ember.js                     | Convention-driven full-stack framework                                           |
 
 ## Component Bundles
 
@@ -106,47 +104,56 @@ The Drupal track exposes preset choices in the prompt:
 | `intranet`   | Standard + employee portal components               | 11        |
 | `ecommerce`  | Ecommerce-optimized component set                   | —         |
 
-## Planned CLI Surface
+## CLI Surface (v0.8.0)
 
-The shipped CLI today is interactive-only. The following non-interactive
-surface is on the roadmap but **not yet implemented**:
+The shipped binary parses subcommands and a full flag surface. Run
+`npx create-helix --help` for the exact list bundled with the version you
+have installed; the table below captures what `create-helix@0.8.0` supports.
 
 ```
-# PLANNED — these flags are not parsed by the current CLI build.
 create-helix [project-name] [options]
 create-helix list                       # list templates
 create-helix info <template>            # describe one template
-create-helix doctor                     # environment diagnostics
+create-helix doctor [--quick]           # environment diagnostics
 create-helix upgrade                    # update an existing project
-create-helix config [key]               # view/set CLI defaults
-
-Scaffold Options (planned):
-  --template <id>       Framework template ID
-  --bundles <list>      Comma-separated bundle IDs
-  --output-dir, -o      Output directory
-  --drupal              Scaffold a Drupal theme instead of a framework project
-  --preset <name>       Drupal preset
-  --profile <name>      Load a saved configuration profile
-
-Feature Toggles (planned, all default to enabled):
-  --typescript / --no-typescript
-  --eslint / --no-eslint
-  --tokens / --no-tokens
-  --dark-mode / --no-dark-mode
-
-Behavior Flags (planned):
-  --dry-run, --force, --no-install, --no-config, --skip-audit,
-  --offline, --verbose, --quiet, --json
-
-Meta (planned):
-  --version, -v
-  --help, -h
+create-helix config validate            # validate a .helixrc config file
 ```
 
-Track [bookedsolidtech/helix#create-helix-cli-flags](https://github.com/bookedsolidtech/helix/labels/area%3Acreate-helix)
-for the implementation of the non-interactive surface. Until it lands, scripts
-that need a non-interactive scaffold should fall back to `git clone` against
-one of the template repos.
+**Scaffold options:**
+
+| Flag                        | Description                                                              |
+| --------------------------- | ------------------------------------------------------------------------ |
+| `--template <id>`           | Framework template ID (see table above)                                  |
+| `--bundles <list>`          | Comma-separated bundle IDs                                               |
+| `--output-dir <dir>` / `-o` | Output directory (defaults to the project name)                          |
+| `--drupal`                  | Take the Drupal theme track instead of a framework template              |
+| `--preset <name>`           | Drupal preset: `standard`, `blog`, `healthcare`, `intranet`, `ecommerce` |
+| `--profile <name>`          | Load a saved configuration profile                                       |
+| `--config <path>`           | Load options from a specific `.helixrc` file                             |
+| `--yes` / `-y`              | Accept all interactive defaults non-interactively                        |
+
+**Design-system options (used with `wc-storybook`):**
+
+| Flag                                | Description                                         |
+| ----------------------------------- | --------------------------------------------------- |
+| `--ds-name <name>`                  | Design system / scaffold name                       |
+| `--token-prefix <prefix>`           | CSS custom-property prefix (e.g. `--my-`)           |
+| `--brand-tagline <text>`            | Brand tagline used in the generated Storybook intro |
+| `--brand-verticals <list>`          | Comma-separated brand verticals                     |
+| `--monorepo` / `--no-design-system` | Force or disable monorepo / DS-only modes           |
+
+**Feature toggles (default enabled):**
+
+`--typescript` / `--no-typescript`, `--eslint` / `--no-eslint`,
+`--tokens` / `--no-tokens`, `--dark-mode` / `--no-dark-mode`.
+
+**Behavior flags:**
+
+`--dry-run`, `--force`, `--no-install`, `--no-config`, `--skip-audit`,
+`--offline`, `--verbose`, `--quiet` / `-q`, `--json`,
+`--show-experimental`.
+
+**Meta:** `--version` / `-v`, `--help` / `-h`.
 
 ## Post-Scaffold Steps
 
