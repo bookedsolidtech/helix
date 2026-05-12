@@ -618,7 +618,7 @@ All HELiX tokens follow a strict naming pattern for consistency and discoverabil
 
 | Segment    | Required | Description          | Examples                     |
 | ---------- | -------- | -------------------- | ---------------------------- |
-| `prefix`   | Yes      | Namespace (`wc`)     | `wc`                         |
+| `prefix`   | Yes      | Namespace (`hx`)     | `hx`                         |
 | `category` | Yes      | Token category       | `color`, `space`, `font`     |
 | `property` | Yes      | Specific property    | `primary`, `neutral`, `size` |
 | `variant`  | Optional | Shade/scale position | `50`, `100`, `500`, `900`    |
@@ -932,14 +932,14 @@ hx-button.hero-cta {
 **Usage:**
 
 ```html
-<!-- System preference (default) -->
-<html>
-  <!-- Force dark theme -->
-  <html data-theme="dark">
-    <!-- Force light theme -->
-    <html data-theme="light"></html>
-  </html>
-</html>
+<!-- System preference (default) — no attribute, prefers-color-scheme drives the theme -->
+<html lang="en">…</html>
+
+<!-- Force dark theme on the document -->
+<html lang="en" data-theme="dark">…</html>
+
+<!-- Force light theme on the document -->
+<html lang="en" data-theme="light">…</html>
 ```
 
 ### Typography Theming
@@ -1023,27 +1023,28 @@ Every component documents its tokens via JSDoc so they appear in Custom Elements
  * A button component with multiple variants and sizes.
  *
  * @slot - Button text content
- * @slot icon - Icon slot (before text)
+ * @slot prefix - Icon or content rendered before the label
+ * @slot suffix - Icon or content rendered after the label
  *
- * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
- * @cssprop [--hx-button-color=var(--hx-color-neutral-0)] - Button text color.
+ * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color.
+ * @cssprop [--hx-button-color=var(--hx-color-text-on-primary)] - Button text color.
  * @cssprop [--hx-button-border-color=transparent] - Button border color.
  * @cssprop [--hx-button-border-radius=var(--hx-border-radius-md)] - Button corner radius.
  * @cssprop [--hx-button-font-family=var(--hx-font-family-sans)] - Button font family.
  * @cssprop [--hx-button-font-weight=var(--hx-font-weight-semibold)] - Button font weight.
  * @cssprop [--hx-button-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
- * @cssprop [--hx-button-padding-x=var(--hx-space-4)] - Horizontal padding.
- * @cssprop [--hx-button-padding-y=var(--hx-space-2)] - Vertical padding.
  *
  * @csspart button - The native button element.
  *
  * @fires hx-click - Fired when button is clicked (event forwarding from native click)
  */
 @customElement('hx-button')
-export class HxButton extends LitElement {
+export class HelixButton extends HelixElement {
   // Component implementation
 }
 ```
+
+`hx-button` does **not** expose `--hx-button-padding-x` or `--hx-button-padding-y` as public CSS custom properties — spacing comes from the `hx-size` attribute (`sm` / `md` / `lg`), which selects from token-driven sizing rules internally. See `bundle-budgets.json` for the canonical list.
 
 ### JSDoc Format
 
@@ -1180,13 +1181,16 @@ Every component with transitions or animations respects `prefers-reduced-motion`
 If multiple components use the same concept, they should reference the same semantic token:
 
 ```css
-/* All primary buttons use the same token */
+/* All primary-surface components consume the same SEMANTIC action token, which
+   itself resolves to a primary-ramp stop (currently --hx-color-primary-700 in
+   the Apex default brand). Targeting the primitive directly skips the semantic
+   layer and bypasses brand-swap propagation. */
 .button--primary {
-  background: var(--hx-color-primary-500, #2563eb);
+  background: var(--hx-color-action-primary-bg);
 }
 
 .badge--primary {
-  background: var(--hx-color-primary-500, #2563eb);
+  background: var(--hx-color-action-primary-bg);
 }
 
 .link--primary {
