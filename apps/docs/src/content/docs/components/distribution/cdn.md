@@ -29,13 +29,13 @@ This page covers how the published bundles are structured, how CDN URLs are form
 and per-component modules are emitted by the same build (`pnpm --filter=@helixui/library build`);
 there is no separate `dist/cdn/` output today.
 
-| Artifact                                          | Used for                                                    |
-| ------------------------------------------------- | ----------------------------------------------------------- |
-| `dist/index.js`                                   | Full library bundle — registers every `hx-*` element        |
-| `dist/components/<tag>/index.js`                  | Per-component module — registers only that element          |
-| `dist/css/helix-*.css`                            | Pre-built token / category stylesheets for consumer use     |
-| `fouc.css`                                        | Pre-upgrade flash-of-unstyled-content guard                 |
-| `custom-elements.json` / `aaa-verdicts.json`      | CEM + AAA verdicts metadata                                 |
+| Artifact                                     | Used for                                                |
+| -------------------------------------------- | ------------------------------------------------------- |
+| `dist/index.js`                              | Full library bundle — registers every `hx-*` element    |
+| `dist/components/<tag>/index.js`             | Per-component module — registers only that element      |
+| `dist/css/helix-*.css`                       | Pre-built token / category stylesheets for consumer use |
+| `fouc.css`                                   | Pre-upgrade flash-of-unstyled-content guard             |
+| `custom-elements.json` / `aaa-verdicts.json` | CEM + AAA verdicts metadata                             |
 
 These files are CDN-ready out of the box because `@helixui/library` declares Lit as a regular
 runtime dependency — jsDelivr and unpkg resolve the bare `lit` import through the dependency tree.
@@ -181,16 +181,25 @@ Once `@helixui/library` is published to npm, the CDN bundles are automatically a
 
 ### jsDelivr
 
-jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`:
+jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`. The shipped `dist/index.js` imports bare specifiers (`@helixui/tokens`, `@helixui/icons`, `@floating-ui/dom`, `lit`, `lit/*`) — those won't resolve in the browser without an **import map** first. Always pair the library script with the import map; a bare `<script src="…/dist/index.js">` will fail with `Failed to resolve module specifier`.
 
 ```html
-<!-- Latest within the 2.x major (auto-updates on minor/patch) -->
-<script
-  type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
-></script>
+<script type="importmap">
+  {
+    "imports": {
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
+    }
+  }
+</script>
 
-<!-- Pinned to exact version (recommended for production) -->
+<!-- Floating major — receives patch + minor updates automatically -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js"></script>
+
+<!-- Or pinned to exact version (recommended for production, pair with SRI) -->
 <script
   type="module"
   src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
@@ -206,13 +215,21 @@ jsDelivr supports:
 
 ### unpkg
 
-unpkg proxies npm at `https://unpkg.com/`:
+unpkg proxies npm at `https://unpkg.com/`. The same import-map prerequisite applies — `@helixui/library`'s bare specifiers won't resolve from the unpkg URL alone:
 
 ```html
-<script
-  type="module"
-  src="https://unpkg.com/@helixui/library@3.9.0/dist/index.js"
-></script>
+<script type="importmap">
+  {
+    "imports": {
+      "lit": "https://unpkg.com/lit@3/index.js?module",
+      "lit/": "https://unpkg.com/lit@3/",
+      "@helixui/tokens": "https://unpkg.com/@helixui/tokens@3/dist/index.js",
+      "@helixui/icons": "https://unpkg.com/@helixui/icons@1/dist/index.js",
+      "@floating-ui/dom": "https://unpkg.com/@floating-ui/dom@1/?module"
+    }
+  }
+</script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/index.js"></script>
 ```
 
 **Recommendation:** Use jsDelivr for production. It has better uptime guarantees and performance than unpkg, which is community-operated with no SLA.
@@ -229,7 +246,7 @@ Drupal's library system (`libraries.yml`) can reference CDN URLs directly with a
 # helix_theme.libraries.yml
 
 helix-components:
-  version: "3.9.0"
+  version: '3.9.0'
   header: true
   js:
     # Load Lit first (required by HELiX components)
@@ -255,7 +272,7 @@ Drupal can serve a local copy of the file when the CDN is unreachable. The `exte
 
 ```yaml
 helix-components:
-  version: "3.9.0"
+  version: '3.9.0'
   header: true
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
@@ -321,10 +338,7 @@ for (const file of files) {
   hashes[file] = `sha384-${hash}`;
 }
 
-writeFileSync(
-  resolve(__dirname, '..', 'dist/sri-hashes.json'),
-  JSON.stringify(hashes, null, 2),
-);
+writeFileSync(resolve(__dirname, '..', 'dist/sri-hashes.json'), JSON.stringify(hashes, null, 2));
 
 console.log('SRI hashes generated:');
 Object.entries(hashes).forEach(([file, hash]) => {
@@ -350,7 +364,7 @@ The `crossorigin="anonymous"` attribute is required when using `integrity` with 
 
 ```yaml
 helix-components:
-  version: "3.9.0"
+  version: '3.9.0'
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
@@ -593,25 +607,26 @@ Then create a test HTML file:
 
 Open `http://localhost:8080/test.html` and verify all components render and console confirms registration.
 
-### Testing the IIFE Bundle
+### Testing the (Hypothetical) IIFE Bundle
 
-The IIFE bundle is consumed as a classic `<script>` tag (no `type="module"`):
+> **Status note:** `@helixui/library` does **not** ship an IIFE / UMD artifact today — `dist/index.js` is an **ES module entry** with bare imports, and loading it as `<script src="…">` (without `type="module"`) syntax-errors on its first `import` statement. There is no `window.HxLibrary` global. The pattern below is what a build-step would look like **if** a separate IIFE artifact were added (e.g. a future `dist/iife/index.js` emitted by a `build:cdn` task) — keep it as a recipe, not a working snippet against the current published package.
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>HELiX IIFE Bundle Test</title>
+    <title>HELiX IIFE Bundle Test (hypothetical)</title>
   </head>
   <body>
-    <!-- IIFE — loaded as classic script, no module support needed -->
-    <script src="/index.js"></script>
+    <!-- IIFE — would only work against a real classic-script artifact like
+         dist/iife/index.js. Today, use the ESM + import-map pattern above. -->
+    <script src="/dist/iife/index.js"></script>
 
     <hx-button>Button</hx-button>
 
     <script>
-      // HxLibrary is available as a global after the IIFE executes
+      // After a real IIFE ships, the global would be exposed here.
       console.log('HxLibrary:', typeof window.HxLibrary);
     </script>
   </body>

@@ -53,6 +53,7 @@ The published distribution imports `lit` and `@helixui/icons` from bare specifie
     "imports": {
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
       "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3/dist/index.js",
       "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
       "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
     }
@@ -60,6 +61,8 @@ The published distribution imports `lit` and `@helixui/icons` from bare specifie
 </script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js"></script>
 ```
+
+> All four bare specifiers above are required — `dist/index.js` opens with `import { lightTokenCss } from '@helixui/tokens'`, the shared chunks import `lit` / `lit/decorators.js` / `lit/directives/*`, the icon registry pulls `@helixui/icons`, and any popover-positioned component pulls `@floating-ui/dom`. Omit any one of them and the browser will fail to resolve the module before the first component renders.
 
 For production loads, pin the major+minor (e.g. `@3.9`) and pair every CDN URL with an [SRI integrity hash](https://www.srihash.org). See the installation guide in the docs site for the full pattern.
 
