@@ -6,6 +6,8 @@ order: 72
 
 State management is the foundation of component interactivity. This guide covers local state, shared state, context API patterns, reactive controllers, and cross-component communication strategies used throughout hx-library.
 
+> **Reading note:** Several recipes below use **consumer-owned** custom-element names (`org-wizard`, `org-mouse-tracker`, `org-cart-badge`, `org-product-card`, `org-theme-toggle`, `org-search-results`) — those tag names aren't shipped components in `@helixui/library`, treat them as patterns to rename for your own codebase. The recipes also reference platform/library APIs (`@lit/context`, RxJS, signals) that you'd compose against your own dependency tree; HELiX itself does not import `@lit/context` and the shipped radio-group coordination uses **internal custom events**, not the context API. Inline corrections call out the highest-impact mismatches against the shipped HELiX surface — e.g. `hx-dropdown.open` is a public reflected property (not private `@state`), `hx-image` does publicly fire `hx-load`, `hx-dialog` toggles its `open` boolean (no `dialog.open()` method on top of the boolean), `hx-counter`'s public state lives on `value` not `count`, and `hx-radio-select` is the internal coordination event inside `hx-radio-group` — consumers listen for `hx-change` on the group instead.
+
 ---
 
 ## Overview
@@ -34,12 +36,14 @@ State management is the foundation of component interactivity. This guide covers
 
 Local state is private to the component and **does not appear as an attribute**. Changes trigger reactive updates.
 
+The example below uses a consumer-owned `org-dropdown` because the shipped `hx-dropdown` exposes `open` as a **public reflected property** (so consumers can drive it externally and CSS can target `[open]`), not a private `@state` field. The state-vs-property choice for any given component is a design decision — for HELiX overlays we generally lift "is the overlay visible" up to a public property:
+
 ```ts
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
-@customElement('hx-dropdown')
-export class HelixDropdown extends LitElement {
+@customElement('org-dropdown')
+export class OrgDropdown extends LitElement {
   @state() private _isOpen = false;
 
   private _toggle(): void {
@@ -89,20 +93,22 @@ Public properties are part of the component's API. They can be set via attribute
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('hx-alert')
-export class HelixAlert extends LitElement {
+// Illustrative — shipped hx-alert renders projected default-slot content
+// rather than a `message` property. The reactive-properties shape is the
+// teaching point here, not the real hx-alert API.
+@customElement('example-alert')
+export class ExampleAlert extends LitElement {
   @property({ type: String })
-  variant: 'info' | 'warning' | 'error' | 'success' = 'info';
+  variant: 'info' | 'success' | 'warning' | 'error' = 'info';
 
   @property({ type: Boolean, reflect: true })
   open = false;
 
-  @property({ type: String })
-  message = '';
-
   override render() {
     return html`
-      <div class="alert alert--${this.variant}" ?hidden=${!this.open}>${this.message}</div>
+      <div class="alert alert--${this.variant}" ?hidden=${!this.open}>
+        <slot></slot>
+      </div>
     `;
   }
 }
@@ -419,23 +425,23 @@ export class HelixCheckbox extends LitElement {
 **Siblings communicate via a shared parent:**
 
 ```ts
-@customElement('hx-wizard')
+@customElement('org-wizard')
 export class HelixWizard extends LitElement {
   @state() private _currentStep = 0;
 
   override render() {
     return html`
-      <hx-wizard-step ?active=${this._currentStep === 0} @hx-next=${this._handleNext}>
+      <org-wizard-step ?active=${this._currentStep === 0} @hx-next=${this._handleNext}>
         Step 1
-      </hx-wizard-step>
+      </org-wizard-step>
 
-      <hx-wizard-step
+      <org-wizard-step
         ?active=${this._currentStep === 1}
         @hx-next=${this._handleNext}
         @hx-previous=${this._handlePrevious}
       >
         Step 2
-      </hx-wizard-step>
+      </org-wizard-step>
     `;
   }
 
@@ -684,7 +690,7 @@ For complex async state, integrate RxJS:
 ```ts
 import { fromEvent, map } from 'rxjs';
 
-@customElement('hx-mouse-tracker')
+@customElement('org-mouse-tracker')
 export class HelixMouseTracker extends LitElement {
   @state() private _x = 0;
   @state() private _y = 0;
@@ -762,14 +768,14 @@ export function removeFromCart(id: string): void {
 import { SignalWatcher } from '@lit-labs/preact-signals';
 import { cartCount, addToCart } from './store.js';
 
-@customElement('hx-cart-badge')
+@customElement('org-cart-badge')
 export class HelixCartBadge extends SignalWatcher(LitElement) {
   override render() {
     return html`<hx-badge>${cartCount.value}</hx-badge>`;
   }
 }
 
-@customElement('hx-product-card')
+@customElement('org-product-card')
 export class HelixProductCard extends LitElement {
   @property({ type: String })
   productId = '';
@@ -814,7 +820,7 @@ effect(() => {
 ### localStorage
 
 ```ts
-@customElement('hx-theme-toggle')
+@customElement('org-theme-toggle')
 export class HelixThemeToggle extends LitElement {
   @property({ type: String })
   theme: 'light' | 'dark' = 'light';
@@ -845,7 +851,7 @@ const step = sessionStorage.getItem('wizard-step');
 For shareable/bookmarkable state:
 
 ```ts
-@customElement('hx-search-results')
+@customElement('org-search-results')
 export class HelixSearchResults extends LitElement {
   @property({ type: String })
   query = '';
