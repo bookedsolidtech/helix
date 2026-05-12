@@ -7,13 +7,15 @@ HELiX follows a predictable release cadence so that consuming teams can plan upg
 
 ## Semantic Versioning
 
-HELiX strictly follows [Semantic Versioning 2.0.0](https://semver.org/):
+HELiX follows [Semantic Versioning 2.0.0](https://semver.org/) for canonical releases:
 
 - **Patch** (`1.0.0` → `1.0.1`) — Bug fixes, documentation updates, internal refactors. No public API changes. Safe to adopt immediately.
 - **Minor** (`1.0.0` → `1.1.0`) — New components, new properties, new CSS parts or slots. All changes are backward-compatible. Existing code continues to work without modification.
 - **Major** (`1.0.0` → `2.0.0`) — Breaking changes to the public API: renamed properties, removed components, changed event signatures, or altered default behavior. Requires migration effort.
 
 > **Note:** Versions in the `0.y.z` range are considered initial development. The public API is not yet stable and breaking changes may occur in any release during this phase.
+
+> **`@helixui/library@4.0.0` is a deprecated accidental release** that shipped as a major during the 2026-05 icons epic without intentional breaking changes. `3.9.0` is the supported current line; do not upgrade past it. A planned 4.x reset will follow once the affected packages republish from a known-clean state.
 
 ### What Counts as Public API
 
@@ -31,11 +33,13 @@ Internal implementation details (private methods, internal DOM structure, undocu
 
 ## Release Cadence
 
-| Release Type | Frequency           | Content                      |
-| ------------ | ------------------- | ---------------------------- |
-| Patch        | As needed           | Bug fixes, security patches  |
-| Minor        | Monthly             | New features, new components |
-| Major        | Quarterly (at most) | Breaking changes, batched    |
+Releases are driven by accumulated changesets rather than a fixed calendar — `.github/workflows/publish.yml` opens a Release PR whenever unreleased changesets exist on `main`, and the team merges that PR when the changes are ready to ship. There is no enforced monthly/quarterly mechanism in CI today.
+
+| Release Type | Trigger                                  | Content                      |
+| ------------ | ---------------------------------------- | ---------------------------- |
+| Patch        | As needed (bug fixes accumulated)        | Bug fixes, security patches  |
+| Minor        | When new-feature changesets accumulate   | New features, new components |
+| Major        | When breaking-change changesets land     | Breaking changes, batched    |
 
 ### Pre-release Versions
 
@@ -45,7 +49,7 @@ Pre-release versions (e.g., `1.0.0-beta.1`) may be published for early testing o
 
 Breaking changes are never introduced without advance notice. The process is:
 
-1. **Deprecation** — The existing API is marked as deprecated in the current minor release. Deprecation warnings appear in the browser console at runtime, and the property/method is annotated with `@deprecated` in the Custom Elements Manifest.
+1. **Deprecation** — The existing API is marked as deprecated in the current minor release. Deprecation warnings appear in the browser console during **development** builds; production bundles strip them to avoid runtime overhead in shipped sites. The property/method is annotated with `@deprecated` in the Custom Elements Manifest, which also surfaces the deprecation in IDE tooling and Storybook regardless of build mode.
 2. **Migration guide** — A migration guide is published in the documentation describing the old API, the new API, and step-by-step migration instructions.
 3. **Deprecation window** — Deprecated APIs remain functional for at least one full minor release cycle (minimum 30 days) before removal.
 4. **Removal** — The deprecated API is removed in the next major release. The changelog and release notes clearly list all removals.
@@ -80,13 +84,18 @@ feature/* → dev → staging → main
 
 ### Changeset Requirements
 
-Every PR that modifies a published package (`@helixui/library`, `@helixui/tokens`, etc.) must include a changeset:
+PRs that change source files in published packages are gated by the `changeset` CI job (see `.github/workflows/ci.yml`). The job checks for a `.changeset/*.md` file when the diff touches source paths under monitored packages. It can be bypassed by:
+
+- adding the `skip-changeset` label (the canonical escape hatch for test-only, doc-only, or non-source PRs);
+- audit-branch and non-source-PR detection via the `detect-changes` filter, which auto-skips the job when no monitored source changed.
+
+Add a changeset with:
 
 ```bash
 pnpm exec changeset
 ```
 
-Test-only changes (only `*.test.ts` files modified) are exempt — add the `skip-changeset` label to the PR instead.
+Verify the gate's exact monitored-path list in `.github/workflows/ci.yml` before assuming a PR is or is not covered — the enforced scope is narrower than "every published-package PR" in practice.
 
 ### Linked Package Versions
 
@@ -94,11 +103,13 @@ Test-only changes (only `*.test.ts` files modified) are exempt — add the `skip
 
 ## Support Policy
 
-| Version        | Support Level                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------ |
-| Current major  | Full support — bug fixes, security patches, new features                                         |
-| Previous major | Maintenance — critical bug fixes and security patches for 12 months after the next major release |
-| Older majors   | Unsupported — no fixes, no patches                                                               |
+| Version        | Support Level                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| Current major (3.x for `@helixui/library`) | Full support — bug fixes, security patches, new features                |
+| Previous major | Maintenance — critical bug fixes and security patches for a published support window (see migration guide for the active line) |
+| Older majors   | Unsupported — no fixes, no patches                                                                  |
+
+> See [Upgrading to 3](/migration/upgrading-to-3/) for the canonical support-window statement of the 2.x → 3.x line. Other package lines (`@helixui/drupal-starter`, `@helixui/drupal-behaviors` on 4.x; `@helixui/icons` on 1.x; `@helixui/mcp` on 0.x) version independently and their support windows follow the same pattern relative to each line's current major.
 
 Security vulnerabilities in supported versions are patched as soon as possible, regardless of the regular release schedule.
 
@@ -106,4 +117,4 @@ Security vulnerabilities in supported versions are patched as soon as possible, 
 
 - **GitHub Releases** — All releases are tagged and published with full release notes.
 - **Changelog** — Every package contains a `CHANGELOG.md` file tracking all changes.
-- **Deprecation warnings** — Runtime console warnings alert you to deprecated APIs before they are removed.
+- **Deprecation warnings** — Development-build console warnings (stripped in production), plus `@deprecated` CEM annotations surfaced in IDE tooling and Storybook.
