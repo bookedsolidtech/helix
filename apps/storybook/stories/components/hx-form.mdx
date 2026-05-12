@@ -217,13 +217,13 @@ The Form component meets WCAG 2.2 AA baseline (and AAA on the P0 surface per `aa
 
 ## Properties
 
-| Property     | Type                  | Default | Description                                                                       |
-| ------------ | --------------------- | ------- | --------------------------------------------------------------------------------- |
-| `name`       | `string`              | `''`    | Name attribute mirrored to the inner `<form>`                                     |
-| `action`     | `string`              | `''`    | Form action URL on the inner `<form>` (rarely used with custom submit handlers)   |
-| `method`     | `'get' \| 'post'`     | `'get'` | HTTP method for the inner `<form>`                                                |
-| `enctype`    | `string`              | —       | Encoding type for the inner `<form>` (multipart forms etc.)                       |
-| `novalidate` | `boolean`             | `false` | Disable native HTML5 constraint validation on the inner `<form>`                  |
+| Property     | Type              | Default | Description                                                                     |
+| ------------ | ----------------- | ------- | ------------------------------------------------------------------------------- |
+| `name`       | `string`          | `''`    | Name attribute mirrored to the inner `<form>`                                   |
+| `action`     | `string`          | `''`    | Form action URL on the inner `<form>` (rarely used with custom submit handlers) |
+| `method`     | `'get' \| 'post'` | `'get'` | HTTP method for the inner `<form>`                                              |
+| `enctype`    | `string`          | —       | Encoding type for the inner `<form>` (multipart forms etc.)                     |
+| `novalidate` | `boolean`         | `false` | Disable native HTML5 constraint validation on the inner `<form>`                |
 
 Layout/gap presets are not attributes; spacing is driven entirely by the `--hx-form-gap` /
 `--hx-form-max-width` / `--hx-form-padding` CSS custom properties below.
@@ -254,11 +254,11 @@ properties above, or target the slotted children directly with global selectors.
 
 ## Events
 
-| Event        | Detail                                                                                                | Description                                                                                                       |
-| ------------ | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Event        | Detail                                                                                                       | Description                                                                                                     |
+| ------------ | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | `hx-submit`  | `{ valid: boolean, values: Record<string, FormDataEntryValue \| FormDataEntryValue[]>, formData: FormData }` | Fired by the host after the inner `<form>` submit; `valid` is `false` if any field failed constraint validation |
-| `hx-invalid` | `{ errors: Array<{ name: string, message: string }> }`                                                | Fired when one or more fields fail validation at submit time                                                      |
-| `hx-reset`   | `CustomEvent` (no detail)                                                                             | Fired when the form is reset                                                                                      |
+| `hx-invalid` | `{ errors: Array<{ name: string, message: string }> }`                                                       | Fired when one or more fields fail validation at submit time                                                    |
+| `hx-reset`   | `CustomEvent` (no detail)                                                                                    | Fired when the form is reset                                                                                    |
 
 ## Form Participation
 
@@ -334,10 +334,7 @@ Drive multi-column layouts via CSS Grid in author CSS; `hx-form` itself does not
 `layout="grid"`.
 
 ```html
-<hx-form
-  action="/api/patients"
-  style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"
->
+<hx-form action="/api/patients" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
   <hx-text-input label="First Name" name="first-name" required></hx-text-input>
   <hx-text-input label="Last Name" name="last-name" required></hx-text-input>
   <hx-text-input label="DOB" name="dob" type="date" required></hx-text-input>
