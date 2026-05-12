@@ -126,7 +126,10 @@ run_target() {
   # component case and falls back to a path-derived sanitisation for
   # docs-fact-check.
   local tag; tag="$(basename "$target")"
-  local slug; slug="${tag//[^a-zA-Z0-9_-]/_}"
+  # slug is derived from the FULL target path (not the basename) so transcript
+  # files don't collide across same-basename siblings (`README.md` × 12 in the
+  # docs-fact-check sweep would have written to the same `README_md.log`).
+  local slug; slug="${target//[^a-zA-Z0-9_-]/_}"
   local transcript="$REPORT_DIR/transcripts/$slug.log"
   local last_msg="$REPORT_DIR/transcripts/$slug.last.txt"
   local target_started; target_started="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
