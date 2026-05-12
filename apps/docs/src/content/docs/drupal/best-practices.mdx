@@ -612,7 +612,7 @@ helix-theme:
 
 - **Component API Reference**: See individual component MDX docs in Storybook
 - **Design Tokens**: See `@helixui/library` token documentation
-- **Accessibility Guide**: WCAG 2.1 AA compliance documentation
+- **Accessibility Guide**: WCAG 2.2 AAA P0 / AA baseline compliance documentation (`packages/hx-library/aaa-verdicts.json`)
 
 <Aside type="tip" title="Next Steps">
   Review individual component documentation (hx-card, hx-select, hx-form) in the live
@@ -1399,7 +1399,7 @@ module.exports = {
 - Component unit tests: 100% (HELiX library)
 - Integration tests: Critical user paths (Drupal + HELiX)
 - Visual regression: Storybook + Percy/Chromatic
-- Accessibility: Automated WCAG 2.1 AA audits
+- Accessibility: Automated WCAG 2.2 audits (axe-core for AA regression + `pnpm aaa:audit` for AAA cert)
 
 ---
 
@@ -1666,7 +1666,7 @@ Instrument component performance in production.
 
 - Migrated 12 jQuery widgets to 8 HELiX components
 - Implemented progressive enhancement (100% no-JS compatibility)
-- Added WCAG 2.1 AA compliance (keyboard nav, screen readers)
+- Added WCAG 2.2 AA compliance with WCAG 2.2 AAA on the P0 surface (keyboard nav, screen readers)
 - Reduced JavaScript bundle from 240KB to 35KB
 
 **Results:**
@@ -1742,7 +1742,7 @@ Instrument component performance in production.
 
 **Before adding any HELiX component:**
 
-- [ ] Component meets accessibility requirements (WCAG 2.1 AA)
+- [ ] Component meets accessibility requirements (WCAG 2.2 AA baseline; WCAG 2.2 AAA on P0)
 - [ ] Progressive enhancement strategy defined
 - [ ] Bundle size analyzed (`<5KB` per component)
 - [ ] Browser compatibility verified (evergreens + IE11 if required)

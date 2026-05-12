@@ -39,11 +39,11 @@ them automatically.
 
 ### Why each entry is required
 
-**`@storybook/addon-a11y`** — Healthcare consumers ship under WCAG 2.1 AA at
-minimum. Running axe-core on every story keeps regressions visible during
-authoring. HELiX upgrades the default `color-contrast` rule to
-`color-contrast-enhanced` (AAA) on a per-story basis via
-`parameters.a11y.config.rules`.
+**`@storybook/addon-a11y`** — Healthcare consumers ship under WCAG 2.2 AA at
+minimum, with WCAG 2.2 AAA on HELiX's P0 surface (per `aaa-verdicts.json`).
+Running axe-core on every story keeps regressions visible during authoring.
+HELiX upgrades the default `color-contrast` rule to `color-contrast-enhanced`
+(AAA) on a per-story basis via `parameters.a11y.config.rules`.
 
 **`@storybook/addon-docs`** — The CEM (`custom-elements.json`) emitted by
 `@helixui/library` is the source of truth for component APIs. addon-docs
