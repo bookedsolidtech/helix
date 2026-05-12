@@ -136,7 +136,7 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
-  "tag": "{TAG}",
+  "tag": "{TARGET}",
   "ts": "<ISO 8601>",
   "codex_run": "<short hash>",
   "severity": "critical | high | medium | low | info",
@@ -164,7 +164,7 @@ If the file is clean, emit a single "pass" finding anchored to **line 1**
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
-  "tag": "{TAG}",
+  "tag": "{TARGET}",
   "ts": "...",
   "codex_run": "...",
   "severity": "info",

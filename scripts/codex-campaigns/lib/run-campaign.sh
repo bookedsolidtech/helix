@@ -115,10 +115,17 @@ CODEX_ARGS=(exec --sandbox read-only --skip-git-repo-check --color never -C "$RE
 
 run_target() {
   local target="$1" idx="$2"
-  # tag is the full target path — it is the resume key and must be unique
-  # per target. The slug strips path separators / non-id chars to a safe
-  # transcript filename.
-  local tag="$target"
+  # {TAG} is the basename — the original meaning preserved for
+  # component-oriented campaigns (`aria-delegation`, `cem-accuracy`, …) that
+  # look up `tagName: "hx-button"` in the CEM. Campaigns whose targets are
+  # not unique by basename (the docs-fact-check sweep — `README.md` × 12,
+  # `overview.md` × 7 — collides) should emit the full `{TARGET}` path as
+  # the resume key in their finding schemas; `{TARGET}` is already a
+  # separate placeholder that substitutes to the verbatim path. The slug
+  # used for transcript filenames is derived from {TAG} for the
+  # component case and falls back to a path-derived sanitisation for
+  # docs-fact-check.
+  local tag; tag="$(basename "$target")"
   local slug; slug="${tag//[^a-zA-Z0-9_-]/_}"
   local transcript="$REPORT_DIR/transcripts/$slug.log"
   local last_msg="$REPORT_DIR/transcripts/$slug.last.txt"

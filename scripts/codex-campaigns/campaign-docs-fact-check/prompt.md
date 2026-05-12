@@ -146,7 +146,7 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
-  "tag": "{TAG}",
+  "tag": "{TARGET}",
   "ts": "<ISO 8601>",
   "codex_run": "<short hash>",
   "severity": "critical | high | medium | low | info",
@@ -160,12 +160,14 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 }
 ```
 
-`tag` is the **full `{TARGET}` path verbatim**
-(e.g. `apps/docs/src/content/docs/getting-started/installation.md`).
-`run-campaign.sh --resume` filters completed targets by matching this tag against
-`.tag` values already present in `findings.jsonl` — basenames collide hard on
-this manifest (`README.md` × 12, `overview.md` × 7, etc.), so emit the full
-relative path verbatim or a resumed sweep will silently skip un-run siblings.
+`tag` for this campaign is the **full `{TARGET}` path verbatim**
+(e.g. `apps/docs/src/content/docs/getting-started/installation.md`) — the
+runner's default `{TAG}` placeholder is a basename, which collides hard on
+this manifest (`README.md` × 12, `overview.md` × 7, etc.), so docs-fact-check
+specifically uses `{TARGET}` as the resume key. `run-campaign.sh --resume`
+filters completed targets by matching this `.tag` value against entries
+already present in `findings.jsonl` — emit `{TARGET}` verbatim or a resumed
+sweep will silently skip un-run siblings.
 
 Output ONE finding per line, JSONL. Do not wrap in arrays. Do not add markdown.
 
@@ -175,7 +177,7 @@ If the file is clean, emit a single "pass" finding anchored to **line 1** (the s
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
-  "tag": "{TAG}",
+  "tag": "{TARGET}",
   "ts": "...",
   "codex_run": "...",
   "severity": "info",
