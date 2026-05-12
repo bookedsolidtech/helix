@@ -76,9 +76,9 @@ Tier 3: Runtime theme provider injection
 The cascade resolves from most-specific to least-specific:
 
 1. **Inline `style` attribute** — per-instance override, highest priority
-2. **Component token** (`--hx-button-bg`) — per-component override
+2. **Component token** (`--hx-button-bg`) — per-component override. Note: variant-painted button surfaces resolve their fill internally from the action-layer semantic tokens, so a host-level `--hx-button-bg` override doesn't fully reach a `variant="primary"` button — override `--hx-color-action-primary-bg` (semantic) for variant-painted surfaces.
 3. **Brand scope** (`[data-brand="x"]`) — brand-specific primitive override
-4. **Semantic token** (`--hx-color-primary`) — purpose-driven alias
+4. **Semantic / action token** (e.g. `--hx-color-action-primary-bg`, `--hx-color-text-primary`) — purpose-driven alias
 5. **Library default** — the `@helixui/tokens` baseline
 
 Consumers override at tier 2 (brand scope). Components consume at tier 3 (component tokens) with tier 1/2 fallbacks. The structure means brands never need to know component internals — they set color palettes and typography, and every component updates automatically.
@@ -127,12 +127,12 @@ Harbor Health's identity: deep teal primary, rounded corners, Inter typeface.
 
 hx-theme[data-brand='harbor-health']:not([theme='high-contrast']) {
   /* ── Primary color ramp ─────────────────────────────────────── */
-  --hx-color-primary-50:  #eff6f8;
+  --hx-color-primary-50: #eff6f8;
   --hx-color-primary-100: #d0e9ef;
   --hx-color-primary-200: #a3d3df;
   --hx-color-primary-300: #6eb8c9;
   --hx-color-primary-400: #3a9db4;
-  --hx-color-primary-500: #006e8a;   /* primary action */
+  --hx-color-primary-500: #006e8a; /* primary action */
   --hx-color-primary-600: #005f78;
   --hx-color-primary-700: #004f65;
   --hx-color-primary-800: #003f52;
@@ -149,15 +149,15 @@ hx-theme[data-brand='harbor-health']:not([theme='high-contrast']) {
   --hx-border-radius-lg: 12px;
 
   /* ── Semantic overrides ─────────────────────────────────────── */
-  --hx-color-text-link:       var(--hx-color-primary-600);
+  --hx-color-text-link: var(--hx-color-primary-600);
   --hx-color-text-link-hover: var(--hx-color-primary-700);
-  --hx-color-border-focus:    var(--hx-color-primary-500);
-  --hx-color-focus-ring:      var(--hx-color-primary-500);
+  --hx-color-border-focus: var(--hx-color-primary-500);
+  --hx-color-focus-ring: var(--hx-color-primary-500);
 
   /* ── Brand-specific layout flags ────────────────────────────── */
-  --brand-logo-width:      160px;
-  --brand-sidebar-enabled: 1;   /* 1 = visible, 0 = hidden */
-  --brand-header-layout:   'standard';
+  --brand-logo-width: 160px;
+  --brand-sidebar-enabled: 1; /* 1 = visible, 0 = hidden */
+  --brand-header-layout: 'standard';
 }
 ```
 
@@ -170,12 +170,12 @@ St. Mary's identity: warm maroon primary, rectangular corners for clinical densi
 
 hx-theme[data-brand='st-marys-hospital']:not([theme='high-contrast']) {
   /* ── Primary color ramp ─────────────────────────────────────── */
-  --hx-color-primary-50:  #fdf2f4;
+  --hx-color-primary-50: #fdf2f4;
   --hx-color-primary-100: #fad5db;
   --hx-color-primary-200: #f4abb8;
   --hx-color-primary-300: #eb7a8d;
   --hx-color-primary-400: #dd4c65;
-  --hx-color-primary-500: #8b1a2e;   /* St. Mary's maroon */
+  --hx-color-primary-500: #8b1a2e; /* St. Mary's maroon */
   --hx-color-primary-600: #7a1628;
   --hx-color-primary-700: #661121;
   --hx-color-primary-800: #520d1a;
@@ -183,7 +183,7 @@ hx-theme[data-brand='st-marys-hospital']:not([theme='high-contrast']) {
   --hx-color-primary-950: #29060c;
 
   /* ── Typography ─────────────────────────────────────────────── */
-  --hx-font-family-sans:    'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
+  --hx-font-family-sans: 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
   --hx-font-family-display: 'Georgia', 'Times New Roman', serif;
 
   /* ── Geometry: tight for clinical density ───────────────────── */
@@ -192,15 +192,15 @@ hx-theme[data-brand='st-marys-hospital']:not([theme='high-contrast']) {
   --hx-border-radius-lg: 4px;
 
   /* ── Semantic overrides ─────────────────────────────────────── */
-  --hx-color-text-link:       var(--hx-color-primary-500);
+  --hx-color-text-link: var(--hx-color-primary-500);
   --hx-color-text-link-hover: var(--hx-color-primary-600);
-  --hx-color-border-focus:    var(--hx-color-primary-500);
-  --hx-color-focus-ring:      var(--hx-color-primary-500);
+  --hx-color-border-focus: var(--hx-color-primary-500);
+  --hx-color-focus-ring: var(--hx-color-primary-500);
 
   /* ── Brand-specific layout flags ────────────────────────────── */
-  --brand-logo-width:      140px;
-  --brand-sidebar-enabled: 0;   /* St. Mary's uses top-nav only */
-  --brand-header-layout:   'compact';
+  --brand-logo-width: 140px;
+  --brand-sidebar-enabled: 0; /* St. Mary's uses top-nav only */
+  --brand-header-layout: 'compact';
 }
 ```
 
@@ -213,12 +213,12 @@ Northwell's identity: deep navy primary, generous spacing, Lato typeface.
 
 hx-theme[data-brand='northwell-health']:not([theme='high-contrast']) {
   /* ── Primary color ramp ─────────────────────────────────────── */
-  --hx-color-primary-50:  #eef2f9;
+  --hx-color-primary-50: #eef2f9;
   --hx-color-primary-100: #d0dcee;
   --hx-color-primary-200: #a3b9de;
   --hx-color-primary-300: #7596cd;
   --hx-color-primary-400: #4a73bb;
-  --hx-color-primary-500: #003087;   /* Northwell navy */
+  --hx-color-primary-500: #003087; /* Northwell navy */
   --hx-color-primary-600: #002875;
   --hx-color-primary-700: #002162;
   --hx-color-primary-800: #001a4f;
@@ -234,15 +234,15 @@ hx-theme[data-brand='northwell-health']:not([theme='high-contrast']) {
   --hx-border-radius-lg: 16px;
 
   /* ── Semantic overrides ─────────────────────────────────────── */
-  --hx-color-text-link:       var(--hx-color-primary-500);
+  --hx-color-text-link: var(--hx-color-primary-500);
   --hx-color-text-link-hover: var(--hx-color-primary-600);
-  --hx-color-border-focus:    var(--hx-color-primary-400);
-  --hx-color-focus-ring:      var(--hx-color-primary-400);
+  --hx-color-border-focus: var(--hx-color-primary-400);
+  --hx-color-focus-ring: var(--hx-color-primary-400);
 
   /* ── Brand-specific layout flags ────────────────────────────── */
-  --brand-logo-width:      180px;
+  --brand-logo-width: 180px;
   --brand-sidebar-enabled: 1;
-  --brand-header-layout:   'expanded';
+  --brand-header-layout: 'expanded';
 }
 ```
 
@@ -264,7 +264,7 @@ export type ThemeMode = 'light' | 'dark' | 'high-contrast' | 'auto';
 export interface BrandConfig {
   id: BrandId;
   name: string;
-  tokensUrl: string;  // URL to the brand's tokens.css bundle
+  tokensUrl: string; // URL to the brand's tokens.css bundle
 }
 
 const BRAND_REGISTRY: Record<BrandId, BrandConfig> = {
@@ -358,7 +358,9 @@ class ThemeProviderElement extends HTMLElement {
       link.href = url;
       link.dataset['brandTokens'] = url;
       link.addEventListener('load', () => resolve());
-      link.addEventListener('error', () => reject(new Error(`Failed to load brand tokens: ${url}`)));
+      link.addEventListener('error', () =>
+        reject(new Error(`Failed to load brand tokens: ${url}`)),
+      );
       document.head.appendChild(link);
     });
   }
@@ -411,9 +413,11 @@ export function useBrand(providerRef: React.RefObject<HTMLElement>): UseBrandRes
 
   const switchBrand = useCallback(
     async (brand: BrandId, mode: ThemeMode = 'light'): Promise<void> => {
-      const el = providerRef.current as (HTMLElement & {
-        switchBrand?: (b: BrandId, m: ThemeMode) => Promise<void>;
-      }) | null;
+      const el = providerRef.current as
+        | (HTMLElement & {
+            switchBrand?: (b: BrandId, m: ThemeMode) => Promise<void>;
+          })
+        | null;
       await el?.switchBrand?.(brand, mode);
     },
     [providerRef],
@@ -426,10 +430,13 @@ export function useBrand(providerRef: React.RefObject<HTMLElement>): UseBrandRes
 ### HTML usage
 
 ```html
-<!-- Wrap your application in hx-brand-provider -->
-<hx-brand-provider brand="harbor-health">
+<!-- Wrap your application in a consumer-owned brand-provider element.
+     There is no `hx-brand-provider` in @helixui/library — the `hx-` prefix is
+     reserved for HELiX itself. Name your wrapper with your organization prefix
+     (e.g. `<org-brand-provider>`) and have it set the data-brand attribute
+     plus any brand-specific token overrides on its host. -->
+<org-brand-provider brand="harbor-health">
   <hx-theme theme="light">
-
     <header>
       <img
         src="/brands/harbor-health/assets/logo.svg"
@@ -442,9 +449,8 @@ export function useBrand(providerRef: React.RefObject<HTMLElement>): UseBrandRes
       <hx-button>Book Appointment</hx-button>
       <hx-text-input label="Patient Name"></hx-text-input>
     </main>
-
   </hx-theme>
-</hx-brand-provider>
+</org-brand-provider>
 ```
 
 ---
@@ -486,7 +492,7 @@ export async function switchBrand(
   if (transitionDuration > 0) {
     provider.style.transition = `opacity ${transitionDuration}ms ease`;
     provider.style.opacity = '0';
-    await new Promise<void>(resolve => setTimeout(resolve, transitionDuration));
+    await new Promise<void>((resolve) => setTimeout(resolve, transitionDuration));
   }
 
   await provider.switchBrand(brandId, mode);
@@ -534,7 +540,7 @@ restoreBrandPreference();
   "brand": "harbor-health",
   "version": "2.1.1",
   "primitive": {
-    "color-primary-50":  "#eff6f8",
+    "color-primary-50": "#eff6f8",
     "color-primary-100": "#d0e9ef",
     "color-primary-200": "#a3d3df",
     "color-primary-300": "#6eb8c9",
@@ -547,14 +553,14 @@ restoreBrandPreference();
     "color-primary-950": "#001f2a"
   },
   "semantic": {
-    "color-text-link":    "var(--hx-color-primary-600)",
+    "color-text-link": "var(--hx-color-primary-600)",
     "color-border-focus": "var(--hx-color-primary-500)",
-    "color-focus-ring":   "var(--hx-color-primary-500)"
+    "color-focus-ring": "var(--hx-color-primary-500)"
   },
   "layout": {
-    "brand-logo-width":      "160px",
+    "brand-logo-width": "160px",
     "brand-sidebar-enabled": "1",
-    "brand-header-layout":   "standard"
+    "brand-header-layout": "standard"
   }
 }
 ```
@@ -651,19 +657,23 @@ document.addEventListener('hx-brand-change', (e: Event) => {
 WCAG requires that information conveyed by color is also conveyed through text or icons. Brand-scoped alert variants follow this rule:
 
 ```css
-[data-brand='st-marys-hospital'] hx-alert[variant='danger']::part(icon) {
+/* hx-alert variants: info | success | warning | error (no `danger`).
+   hx-alert exposes its outer container as `::part(alert)`. */
+[data-brand='st-marys-hospital'] hx-alert[variant='error']::part(icon) {
   color: #b91c1c;
 }
 
-[data-brand='harbor-health'] hx-alert[variant='warning']::part(container) {
+[data-brand='harbor-health'] hx-alert[variant='warning']::part(alert) {
   border-inline-start: 4px solid var(--hx-color-primary-400);
 }
 ```
 
 ```html
-<!-- The icon slot ensures non-color differentiation for all brands -->
-<hx-alert variant="danger">
-  <hx-icon slot="icon" name="triangle-exclamation" aria-hidden="true"></hx-icon>
+<!-- The icon slot ensures non-color differentiation for all brands.
+     hx-icon's library attribute defaults to '' — select fa-free explicitly
+     for the bundled Font Awesome glyphs. -->
+<hx-alert open variant="error">
+  <hx-icon slot="icon" library="fa-free" name="triangle-exclamation" aria-hidden="true"></hx-icon>
   <strong>Critical:</strong> Drug interaction detected — review before administering.
 </hx-alert>
 ```
@@ -689,6 +699,8 @@ WCAG requires that information conveyed by color is also conveyed through text o
 #### Brand-specific logo position
 
 ```html
+<!-- hx-top-nav exposes a `logo` slot for branding and uses its default slot
+     for nav items (there is no separate `nav` slot). -->
 <hx-top-nav>
   <img
     slot="logo"
@@ -696,18 +708,18 @@ WCAG requires that information conveyed by color is also conveyed through text o
     alt="{{ brandName }}"
     style="width: var(--brand-logo-width, 160px);"
   />
-  <hx-nav-item slot="nav" href="/dashboard">Dashboard</hx-nav-item>
+  <hx-nav-item href="/dashboard">Dashboard</hx-nav-item>
 </hx-top-nav>
 ```
 
 ```css
 /* Northwell: center the logo in the header */
-[data-brand='northwell-health'] hx-top-nav::part(logo-slot) {
+[data-brand='northwell-health'] hx-top-nav::part(logo) {
   justify-self: center;
 }
 
 /* Harbor Health: logo flush left */
-[data-brand='harbor-health'] hx-top-nav::part(logo-slot) {
+[data-brand='harbor-health'] hx-top-nav::part(logo) {
   justify-self: start;
 }
 ```
@@ -794,8 +806,23 @@ function harbor_health_preprocess_html(array &$variables): void {
   <head>
     <title>{{ head_title }}</title>
     {{ head }}
-    {# HELiX library — loaded from CDN or Drupal library #}
-    <script type="module" src="/cdn/helix/2.1.1/helix.esm.js"></script>
+    {# HELiX library — loaded from CDN. The published distribution imports
+       `lit` and `@helixui/icons` from bare specifiers, so a CDN load needs
+       an import map; see /drupal/theming/ for the canonical snippet. #}
+    <script type="importmap">
+      {
+        "imports": {
+          "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+          "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+          "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
+        }
+      }
+    </script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+    ></script>
     {# Brand tokens loaded via Drupal library (harbor_health/brand-tokens) #}
   </head>
   <body{{ attributes.setAttribute('data-brand', 'harbor-health') }}>
@@ -860,60 +887,65 @@ The following CSS custom properties are available for brand override.
 
 ### Color
 
-| Property | Type | Default | Use case |
-|---|---|---|---|
-| `--hx-color-primary-50` | `<color>` | `#eff6ff` | Near-white primary tint (backgrounds) |
-| `--hx-color-primary-100` | `<color>` | `#dbeafe` | Light primary tint (hover backgrounds) |
-| `--hx-color-primary-200` | `<color>` | `#bfdbfe` | Soft primary (decorative borders) |
-| `--hx-color-primary-300` | `<color>` | `#93c5fd` | Muted primary (disabled states) |
-| `--hx-color-primary-400` | `<color>` | `#60a5fa` | Light primary action (dark mode links) |
-| `--hx-color-primary-500` | `<color>` | `#2563eb` | **Primary action** (buttons, links, focus) |
-| `--hx-color-primary-600` | `<color>` | `#1d4ed8` | Primary hover |
-| `--hx-color-primary-700` | `<color>` | `#1e40af` | Primary active/pressed |
-| `--hx-color-primary-800` | `<color>` | `#1e3a8a` | Dark primary (dark mode surfaces) |
-| `--hx-color-primary-900` | `<color>` | `#1e3a8a` | Darkest primary |
-| `--hx-color-primary-950` | `<color>` | `#172554` | Near-black primary shade |
-| `--hx-color-text-link` | `<color>` | `var(--hx-color-primary-600)` | Hyperlink color |
-| `--hx-color-text-link-hover` | `<color>` | `var(--hx-color-primary-700)` | Hyperlink hover color |
-| `--hx-color-border-focus` | `<color>` | `var(--hx-color-primary-500)` | Focus ring border |
-| `--hx-color-focus-ring` | `<color>` | `var(--hx-color-primary-500)` | Focus ring outline |
+Default values below reflect the canonical **Apex** brand from `@helixui/tokens@3.9.0` (`packages/hx-tokens/dist/tokens.css`); other shipped brands override the primary ramp at their `[data-brand]` scope.
+
+| Property                     | Type      | Default (Apex)                | Use case                                     |
+| ---------------------------- | --------- | ----------------------------- | -------------------------------------------- |
+| `--hx-color-primary-50`      | `<color>` | `#E2F1F1`                     | Near-white primary tint (backgrounds)        |
+| `--hx-color-primary-100`     | `<color>` | `#C6E3E3`                     | Light primary tint (hover backgrounds)       |
+| `--hx-color-primary-200`     | `<color>` | `#8FCAC9`                     | Soft primary (decorative borders)            |
+| `--hx-color-primary-300`     | `<color>` | `#5DB5B4`                     | Muted primary (disabled states)              |
+| `--hx-color-primary-400`     | `<color>` | `#46A6A5`                     | Light primary action (dark mode links)       |
+| `--hx-color-primary-500`     | `<color>` | `#429797`                     | Primary brand color                          |
+| `--hx-color-primary-600`     | `<color>` | `#2E7D7C`                     | Primary hover                                |
+| `--hx-color-primary-700`     | `<color>` | `#0F6363`                     | **AAA action surface** (`action.primary.bg`) |
+| `--hx-color-primary-800`     | `<color>` | `#0A4F4F`                     | Pressed / dark surfaces                      |
+| `--hx-color-primary-900`     | `<color>` | `#063838`                     | Darkest primary                              |
+| `--hx-color-primary-950`     | `<color>` | `#031F1F`                     | Near-black primary shade                     |
+| `--hx-color-text-link`       | `<color>` | `var(--hx-color-primary-700)` | Hyperlink color                              |
+| `--hx-color-text-link-hover` | `<color>` | `var(--hx-color-primary-800)` | Hyperlink hover color                        |
+| `--hx-color-border-focus`    | `<color>` | `var(--hx-color-focus-ring)`  | Focus ring border                            |
+| `--hx-color-focus-ring`      | `<color>` | `var(--hx-color-primary-600)` | Focus ring outline                           |
 
 ### Status colors (override with care — WCAG contrast required)
 
-| Property | Type | Default | Healthcare use case |
-|---|---|---|---|
-| `--hx-color-status-success` | `<color>` | `#16a34a` | Lab results normal, medication given |
-| `--hx-color-status-warning` | `<color>` | `#d97706` | Abnormal lab, order pending review |
-| `--hx-color-status-error` | `<color>` | `#dc2626` | Critical alert, overdue order |
-| `--hx-color-status-info` | `<color>` | `#2563eb` | Information, scheduled event |
+Status colors live in the success/warning/error/info **ramps** (`--hx-color-success-{50…900}`, etc.) plus their semantic action and surface aliases (`--hx-color-action-success-bg`, `--hx-color-surface-warning`, etc.). There are no `--hx-color-status-*` tokens — override the ramp or semantic tokens directly:
 
-**Healthcare note:** Status color differentiation must never be the only indicator. Always pair with an icon or text label. See [WCAG 1.4.1 Use of Color](https://www.w3.org/TR/WCAG21/#use-of-color).
+| Property                    | Type      | Default (Apex)                | Healthcare use case                  |
+| --------------------------- | --------- | ----------------------------- | ------------------------------------ |
+| `--hx-color-success-700`    | `<color>` | `#1F6B3D`                     | Lab results normal, medication given |
+| `--hx-color-warning-700`    | `<color>` | `#8A5A00`                     | Abnormal lab, order pending review   |
+| `--hx-color-error-700`      | `<color>` | `#A1191F`                     | Critical alert, overdue order        |
+| `--hx-color-action-info-bg` | `<color>` | `var(--hx-color-primary-700)` | Information, scheduled event         |
+
+**Healthcare note:** Status color differentiation must never be the only indicator. Always pair with an icon or text label. See [WCAG 1.4.1 Use of Color](https://www.w3.org/TR/WCAG22/#use-of-color).
 
 ### Typography
 
-| Property | Type | Default | Notes |
-|---|---|---|---|
-| `--hx-font-family-sans` | `<family-name>` | `'Inter', -apple-system, sans-serif` | Primary UI typeface |
-| `--hx-font-family-mono` | `<family-name>` | `'JetBrains Mono', ui-monospace` | Code, identifiers, MRN display |
-| `--hx-font-family-display` | `<family-name>` | Same as sans | Optional: display headings |
+| Property                   | Type            | Default                              | Notes                            |
+| -------------------------- | --------------- | ------------------------------------ | -------------------------------- |
+| `--hx-font-family-sans`    | `<family-name>` | `'Inter', -apple-system, sans-serif` | Primary UI typeface              |
+| `--hx-font-family-mono`    | `<family-name>` | `'JetBrains Mono', ui-monospace`     | Code, identifiers, MRN display   |
+| `--hx-font-family-serif`   | `<family-name>` | `'Source Serif Pro', Georgia, serif` | Optional: serif body / long-form |
+| `--hx-heading-font-family` | `<family-name>` | `var(--hx-font-family-sans)`         | Override for h1–h6 if distinct   |
 
 ### Geometry
 
-| Property | Type | Default | Effect |
-|---|---|---|---|
-| `--hx-border-radius-sm` | `<length>` | `4px` | Small elements (badges, tags) |
-| `--hx-border-radius-md` | `<length>` | `6px` | Standard elements (buttons, inputs) |
-| `--hx-border-radius-lg` | `<length>` | `8px` | Containers (cards, dialogs) |
+| Property                | Type       | Default | Effect                              |
+| ----------------------- | ---------- | ------- | ----------------------------------- |
+| `--hx-border-radius-sm` | `<length>` | `4px`   | Small elements (badges, tags)       |
+| `--hx-border-radius-md` | `<length>` | `6px`   | Standard elements (buttons, inputs) |
+| `--hx-border-radius-lg` | `<length>` | `8px`   | Containers (cards, dialogs)         |
 
 ### Brand layout flags
 
 These are not `--hx-*` library tokens. They are brand-defined custom properties that your application code reads to control layout.
 
-| Property | Type | Convention | Meaning |
-|---|---|---|---|
-| `--brand-logo-width` | `<length>` | `160px` | Logo element width in header |
-| `--brand-sidebar-enabled` | `0` or `1` | `1` | Whether the sidebar nav is visible |
-| `--brand-header-layout` | `<string>` | `'standard'` | `'standard'`, `'compact'`, `'expanded'` |
+| Property                  | Type       | Convention   | Meaning                                 |
+| ------------------------- | ---------- | ------------ | --------------------------------------- |
+| `--brand-logo-width`      | `<length>` | `160px`      | Logo element width in header            |
+| `--brand-sidebar-enabled` | `0` or `1` | `1`          | Whether the sidebar nav is visible      |
+| `--brand-header-layout`   | `<string>` | `'standard'` | `'standard'`, `'compact'`, `'expanded'` |
 
 ---
 
@@ -1000,4 +1032,4 @@ console.log(document.body.dataset.brand); // should print the brand id
 
 - [Theming Quick Start](/extending/theming-quick-start/) — Single-brand theming, dark mode, high contrast
 - [CSS Parts](/extending/style-components-with-css-parts/) — Styling component internals with `::part()`
-- [Drupal Integration](/getting-started/drupal/) — Loading HELiX in Twig templates
+- [Drupal Integration](/drupal/installation/getting-started/) — Loading HELiX in Twig templates
