@@ -33,27 +33,30 @@ Component properties are accessed and set in JavaScript on the element instance:
 
 ```javascript
 const button = document.querySelector('hx-button');
-button.variant = 'primary';   // string
-button.disabled = true;        // boolean
-button.size = 'lg';            // string (note: internal property name may differ from attribute)
-button.config = { theme: 'dark' }; // object — impossible via HTML attribute
+button.variant = 'primary'; // string
+button.disabled = true; // boolean
+button.size = 'lg'; // string (internal property name may differ from attribute)
+
+// Real object-typed properties exist on components like hx-data-table:
+const table = document.querySelector('hx-data-table');
+table.columns = [{ key: 'name', label: 'Name' }]; // array — impossible via plain HTML attribute
 ```
 
 ### Property-Attribute Reflection
 
 HELiX components use Lit's `@property({ reflect: true })` decorator so that certain properties stay synchronized with their HTML attributes. When you set `variant="primary"` in Twig, Lit reads that attribute on upgrade and sets the `variant` property. If the JavaScript then changes `component.variant = 'secondary'`, the attribute in the DOM updates too.
 
-Non-reflected properties do not appear in the HTML at all; they are JavaScript-only.
+Non-reflected properties may still be **initialized** from an HTML attribute on upgrade — they simply don't write subsequent property changes back to the DOM. They are not "JavaScript-only" in the sense of being unreachable from Twig; the asymmetry only matters when the script mutates the value after upgrade.
 
 ### When to Use Attributes vs. Properties
 
-| Use Case | Method | Example |
-|---|---|---|
-| Static string configuration | Attribute in Twig | `variant="primary"` |
-| Dynamic string from field | Attribute in Twig | `variant="{{ node.field_style.value }}"` |
-| Boolean state | Attribute presence/absence | `{% if disabled %}disabled{% endif %}` |
-| Numbers passed as strings | Attribute in Twig | `rows="8"` |
-| Objects or arrays | JavaScript via Drupal Behavior | `element.columns = [...]` |
+| Use Case                    | Method                         | Example                                  |
+| --------------------------- | ------------------------------ | ---------------------------------------- |
+| Static string configuration | Attribute in Twig              | `variant="primary"`                      |
+| Dynamic string from field   | Attribute in Twig              | `variant="{{ node.field_style.value }}"` |
+| Boolean state               | Attribute presence/absence     | `{% if disabled %}disabled{% endif %}`   |
+| Numbers passed as strings   | Attribute in Twig              | `rows="8"`                               |
+| Objects or arrays           | JavaScript via Drupal Behavior | `element.columns = [...]`                |
 
 ---
 
@@ -168,13 +171,13 @@ Boolean properties in web components follow the HTML specification: the **presen
 
 ### Boolean Coercion Table
 
-| Twig Output | HTML | Property Value | Why |
-|---|---|---|---|
-| `{% if true %}disabled{% endif %}` | `<el disabled>` | `true` | Attribute present |
-| `{% if false %}disabled{% endif %}` | `<el>` | `false` | Attribute absent |
-| `disabled=""` | `<el disabled="">` | `true` | Empty string is truthy |
-| `disabled="false"` | `<el disabled="false">` | `true` | Any string value is truthy |
-| `disabled="disabled"` | `<el disabled="disabled">` | `true` | Conventional pattern |
+| Twig Output                         | HTML                       | Property Value | Why                        |
+| ----------------------------------- | -------------------------- | -------------- | -------------------------- |
+| `{% if true %}disabled{% endif %}`  | `<el disabled>`            | `true`         | Attribute present          |
+| `{% if false %}disabled{% endif %}` | `<el>`                     | `false`        | Attribute absent           |
+| `disabled=""`                       | `<el disabled="">`         | `true`         | Empty string is truthy     |
+| `disabled="false"`                  | `<el disabled="false">`    | `true`         | Any string value is truthy |
+| `disabled="disabled"`               | `<el disabled="disabled">` | `true`         | Conventional pattern       |
 
 ### Common Boolean Properties
 
@@ -227,60 +230,67 @@ Boolean properties in web components follow the HTML specification: the **presen
 Lit automatically converts string attribute values to numbers when the property is declared with `type: Number`. You pass a string in Twig; the component receives a number in JavaScript.
 
 ```twig
-{# rows: string "8" → number 8 inside the component #}
+{# rows: string "8" → number 8 inside the component.
+   hx-textarea has no default slot — text content goes in the `value` attribute. #}
 <hx-textarea
   name="notes"
   label="Clinical Notes"
   rows="8"
   placeholder="Enter detailed notes..."
->{{ node.field_clinical_notes.value }}</hx-textarea>
+  value="{{ node.field_clinical_notes.value }}"
+></hx-textarea>
 
 {# Dynamic number from a Drupal field #}
 <hx-textarea
   name="description"
   label="Description"
   rows="{{ node.field_textarea_rows.value|default(4) }}"
->{{ node.field_description.value }}</hx-textarea>
+  value="{{ node.field_description.value }}"
+></hx-textarea>
 
-{# Numeric constraints on a number input #}
-<hx-text-input
-  type="number"
+{# Numeric constraints require hx-number-input — hx-text-input does not
+   expose `min` / `max` attributes. Use hx-number-input for clinical numerics. #}
+<hx-number-input
   name="heart_rate"
   label="Heart Rate (BPM)"
   min="{{ vital_config.min_heart_rate|default(40) }}"
   max="{{ vital_config.max_heart_rate|default(200) }}"
   value="{{ reading.heart_rate }}"
   required
->
-</hx-text-input>
+></hx-number-input>
 ```
 
 ---
 
 ## Object and Array Properties Require JavaScript
 
-Objects and arrays cannot be serialized to HTML attribute strings. The pattern is:
+Most object/array-typed properties cannot be serialized to plain HTML attributes — but some components ship JSON-string attribute converters that accept the serialized form directly. The default pattern is:
 
-1. **Twig**: JSON-encode the data into a `data-` attribute
-2. **Behavior**: Parse the JSON and assign the JavaScript property after component upgrade
+1. **First check the component's CEM** — if `columns`, `rows`, etc. are declared as string-typed attributes (as `hx-data-table` does), pass JSON inline from Twig.
+2. **Otherwise**: JSON-encode the data into a `data-` attribute and assign the JavaScript property in a Drupal Behavior.
+
+### Components with JSON attribute converters — pass directly from Twig
 
 ```twig
-{# Step 1: store data in a data- attribute #}
+{# hx-data-table accepts `columns`, `rows`, and `label` as JSON-string attributes.
+   No Drupal Behavior required for the array data path. #}
 <hx-data-table
   id="patient-table-{{ node.id }}"
-  data-columns="{{ columns|json_encode|escape }}"
-  data-rows="{{ rows|json_encode|escape }}"
->
-  {# No-JS fallback #}
-  <table>
-    <thead><tr>{% for col in columns %}<th>{{ col.label }}</th>{% endfor %}</tr></thead>
-    <tbody>
-      {% for row in rows %}
-        <tr>{% for col in columns %}<td>{{ row[col.field] }}</td>{% endfor %}</tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</hx-data-table>
+  label="{{ 'Patient records'|t }}"
+  columns="{{ columns|json_encode|e('html_attr') }}"
+  rows="{{ rows|json_encode|e('html_attr') }}"
+></hx-data-table>
+```
+
+### Components without JSON converters — Behavior-hydrate the property
+
+```twig
+{# Step 1: store data in a data- attribute on a component that does NOT
+   expose JSON-typed attributes. #}
+<hx-some-component
+  id="some-instance-{{ node.id }}"
+  data-config="{{ config|json_encode|escape }}"
+></hx-some-component>
 ```
 
 ```javascript
@@ -288,17 +298,14 @@ Objects and arrays cannot be serialized to HTML attribute strings. The pattern i
 (function (Drupal, once) {
   'use strict';
 
-  Drupal.behaviors.hxDataTableInit = {
+  Drupal.behaviors.hxSomeComponentInit = {
     attach(context) {
-      once('helixui:data-table-init', 'hx-data-table[data-columns]', context).forEach((table) => {
-        customElements.whenDefined('hx-data-table').then(() => {
+      once('helixui:some-component', 'hx-some-component[data-config]', context).forEach((el) => {
+        customElements.whenDefined('hx-some-component').then(() => {
           try {
-            const columnsJson = table.getAttribute('data-columns');
-            const rowsJson = table.getAttribute('data-rows');
-            if (columnsJson) table.columns = JSON.parse(columnsJson);
-            if (rowsJson) table.data = JSON.parse(rowsJson);
+            el.config = JSON.parse(el.getAttribute('data-config'));
           } catch (error) {
-            console.error('[HELiX] hx-data-table initialization failed:', error);
+            console.error('[HELiX] hx-some-component initialization failed:', error);
           }
         });
       });
@@ -306,6 +313,8 @@ Objects and arrays cannot be serialized to HTML attribute strings. The pattern i
   };
 })(Drupal, once);
 ```
+
+> The earlier draft of this guide showed `hx-data-table` going through the data-attribute + behavior path and assigned `table.data = …`. The component's public property is `rows`, not `data`, and the attribute converter pattern above is the documented contract — prefer it unless you need to compute `columns`/`rows` post-upgrade.
 
 ---
 
@@ -415,15 +424,22 @@ Use the `default` filter whenever a field value might be null to ensure a predic
 >
 </hx-text-input>
 
-{# DateTime field #}
-<hx-text-input
-  type="datetime-local"
+{# DateTime field — hx-text-input only supports the platform input types its
+   underlying <input> exposes; `datetime-local` is **not** in the component's
+   public type enum. Split the date and time into the dedicated pickers, or
+   keep the value in a hidden field and assemble it in a behavior. #}
+<hx-date-picker
+  name="visit_date"
+  label="Visit Date"
+  value="{{ node.field_visit_time.value|date('Y-m-d') }}"
+  required
+></hx-date-picker>
+<hx-time-picker
   name="visit_time"
   label="Visit Time"
-  value="{{ node.field_visit_time.value|date('Y-m-d\\TH:i') }}"
+  value="{{ node.field_visit_time.value|date('H:i') }}"
   required
->
-</hx-text-input>
+></hx-time-picker>
 ```
 
 ### Taxonomy Terms → Variant Strings
@@ -435,10 +451,12 @@ Use the `default` filter whenever a field value might be null to ensure a predic
   {{ term.name.value }}
 </hx-badge>
 
-{# Map term name to component variant #}
+{# Map term name to component variant.
+   hx-badge variants: primary | secondary | success | warning | error | neutral | info.
+   There is no `danger` variant — use `error` for high-severity statuses. #}
 {% set priority = node.field_priority.entity.name.value|lower %}
 {% set priority_variant_map = {
-  'urgent': 'danger',
+  'urgent': 'error',
   'high': 'warning',
   'normal': 'info',
   'low': 'neutral'
@@ -482,8 +500,8 @@ Twig auto-escapes HTML entities in attribute values by default. This means `"`, 
 1. **Use `default` filter** for any field-sourced attribute to prevent empty or null attribute values.
 2. **Boolean attributes must be conditional presence** — never `disabled="{{ value }}"`.
 3. **Use `hx-size`** not `size` for component size configuration.
-4. **Use `href`** not `hx-href` for card navigation.
-5. **Objects and arrays require a Drupal Behavior** — JSON-encode to `data-` attributes in Twig, parse in JavaScript.
+4. **Use `hx-href` for `hx-card` navigation** (it dispatches `hx-click`, not browser navigation); the `href` attribute applies to components whose CEM declares it (e.g. `hx-button`).
+5. **Check the CEM first for JSON-attribute support** — components like `hx-data-table` accept `columns`/`rows` as JSON strings directly from Twig; only fall back to the data-attribute + Drupal Behavior pattern for components without converters.
 6. **Keep property logic in Twig** — derive variant values, size values, and conditional states in the template rather than JavaScript.
 7. **Check field existence** before accessing `.value` to avoid Twig errors on nodes without that field type.
 
