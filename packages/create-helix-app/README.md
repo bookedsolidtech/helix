@@ -21,9 +21,10 @@
 
 The published `create-helix@0.8.0` package ships **278 files** including:
 
-- **15 framework templates** (`react-next`, `react-vite`, `vue-nuxt`,
-  `vue-vite`, `svelte-kit`, `angular`, `astro`, `vanilla`, plus more on
-  the way — see the docs page for the live table)
+- **16 framework templates** (`wc-storybook`, `react-next`, `react-vite`,
+  `remix`, `vue-nuxt`, `vue-vite`, `solid-vite`, `qwik-vite`, `svelte-kit`,
+  `angular`, `astro`, `vanilla`, `lit-vite`, `preact-vite`, `stencil`,
+  `ember` — see the docs page for the live table)
 - **Dynamic version pins** for `@helixui/library`, `@helixui/tokens`,
   `@helixui/icons` (constants like `HELIX_LIBRARY_VERSION` resolved at
   publish time; the obsolete `^1.0.0` / `^0.3.0` pins below are **stub

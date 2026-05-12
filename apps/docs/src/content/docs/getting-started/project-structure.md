@@ -42,11 +42,14 @@ helix/
 └── .claude/agents/           # Specialized engineering agents
 ```
 
-> `create-helix` is the consumer scaffolding CLI published on npm as
-> `create-helix` (no `-app` suffix). The source lives **inside this monorepo**
-> at [`packages/create-helix-app/`](https://github.com/bookedsolidtech/helix/tree/main/packages/create-helix-app)
-> — contributors update it from the same checkout as the rest of the
-> workspace.
+> `create-helix` is the consumer scaffolding CLI published on npm. The
+> implementation source lives in a **separate repository** at
+> [bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app)
+> — contributors updating the CLI work in that repo, not in this monorepo.
+> The `packages/create-helix-app/` directory inside HELiX is a placeholder
+> stub reserving the namespace for a future consolidation; see
+> [its README](https://github.com/bookedsolidtech/helix/blob/main/packages/create-helix-app/README.md)
+> for the gap explanation.
 
 ## Key Configuration Files
 
