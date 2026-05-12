@@ -15,9 +15,9 @@ A production-ready Web Component library built with Lit 3.x and TypeScript for h
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](tsconfig.base.json)
 [![WCAG 2.2 AAA](https://img.shields.io/badge/WCAG%202.2-AAA%20P0-blue)](https://www.w3.org/TR/WCAG22/)
 [![Docs](https://img.shields.io/badge/docs-helix.bookedsolid.tech-teal)](https://helix.bookedsolid.tech)
-[![Storybook](https://img.shields.io/badge/storybook-live-ff4785?logo=storybook)](https://helix-storybook.bookedsolid.tech)
+[![Storybook](https://img.shields.io/badge/storybook-live-ff4785?logo=storybook)](https://storybook.helix.bookedsolid.tech/)
 
-[Documentation](https://helix.bookedsolid.tech) · [Storybook](https://helix.bookedsolid.tech/storybook/) · [NPM Package](https://www.npmjs.com/package/@helixui/library) · [Contributing](CONTRIBUTING.md)
+[Documentation](https://helix.bookedsolid.tech) · [Storybook](https://storybook.helix.bookedsolid.tech/) · [NPM Package](https://www.npmjs.com/package/@helixui/library) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -38,7 +38,7 @@ Then use components in your HTML:
 
 <hx-button variant="primary">Get Started</hx-button>
 
-<hx-card variant="outlined" elevation="raised">
+<hx-card variant="featured" elevation="raised">
   <span slot="heading">Patient Portal</span>
   <p>Accessible, themeable components for healthcare UIs.</p>
   <hx-button slot="footer" variant="primary">Learn More</hx-button>
@@ -56,19 +56,19 @@ import '@helixui/library/components/hx-card';
 
 ## Why HELiX?
 
-- **Healthcare accessibility built in** — Certified to **WCAG 2.2 AAA on the 44 P0 components** (per `packages/hx-library/aaa-verdicts.json`: 376 Supports / 109 Not Applicable / 0 Partial / 0 Fail), with WCAG 2.2 AA as the baseline for the rest of the library. Aligned with the [HHS Section 504 digital accessibility mandate (May 2026)](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/). Every component is keyboard-navigable, screen reader compatible, and tested with axe-core.
+- **Healthcare accessibility built in** — Self-certified to **WCAG 2.2 AAA on the 44 P0 components** (per `packages/hx-library/aaa-verdicts.json`: 376 Supports / 109 Not Applicable / 0 Partial / 0 Fail), with WCAG 2.2 AA as the baseline for the rest of the library. Exceeds the current HHS Section 504 digital accessibility requirement (WCAG 2.1 AA); the HHS extension pushed the original May 2026 compliance deadline into 2027–2028 for federally funded healthcare providers — see the [HHS Section 504 final rule](https://www.hhs.gov/civil-rights/for-providers/compliance-enforcement/digital-accessibility/) for the current dates. Every component is keyboard-navigable, screen reader compatible, and tested with axe-core.
 
-- **Framework-agnostic Web Components** — Built on Lit 3.x and the Web Components standard. Works in React, Angular, Vue, Drupal, or plain HTML. No framework lock-in, no adapter libraries.
+- **Framework-agnostic Web Components** — Built on Lit 3.x and the Web Components standard. Works in React, Angular, Vue, Drupal, or plain HTML. No framework-specific adapter is required; optional [`@helixui/react`](packages/hx-react) wrappers are available for ergonomic React integration.
 
 - **Design token theming** — Three-tier token architecture (primitive → semantic → component) with CSS custom properties. Theme entire applications by overriding `--hx-*` tokens — light mode, dark mode, and high contrast modes included.
 
-- **Enterprise-grade quality** — TypeScript strict mode, 73 components, 3-tier code review, automated accessibility testing, and most components <5KB gzipped (hx-theme is larger due to design token imports). Built for organizations where software failures impact patient care.
+- **Enterprise-grade quality** — TypeScript strict mode, 81 component directories registering 102 custom elements (see [`packages/hx-library/custom-elements.json`](packages/hx-library/custom-elements.json) for the authoritative list), 3-tier code review, automated accessibility testing, and most components <5KB gzipped (hx-theme is larger due to design token imports). Built for organizations where software failures impact patient care.
 
 ---
 
 ## Components
 
-HELiX ships **73 production components** spanning the full spectrum of UI needs:
+HELiX ships **81 component directories** that register **102 custom elements** (the authoritative list lives in [`packages/hx-library/custom-elements.json`](packages/hx-library/custom-elements.json)). A curated selection of the most commonly consumed elements:
 
 | Category         | Components                                                                                                                  |
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -76,11 +76,11 @@ HELiX ships **73 production components** spanning the full spectrum of UI needs:
 | **Forms**        | `hx-text-input`, `hx-checkbox`, `hx-radio-group`, `hx-select`, `hx-combobox`, `hx-date-picker`, `hx-file-upload`, `hx-form` |
 | **Data Display** | `hx-card`, `hx-data-table`, `hx-list`, `hx-tree-view`, `hx-badge`, `hx-avatar`, `hx-tag`                                    |
 | **Feedback**     | `hx-alert`, `hx-toast`, `hx-progress-bar`, `hx-spinner`, `hx-skeleton`                                                      |
-| **Navigation**   | `hx-breadcrumb`, `hx-tabs`, `hx-pagination`, `hx-sidebar`, `hx-menu`                                                        |
-| **Layout**       | `hx-grid`, `hx-container`, `hx-divider`, `hx-header`, `hx-stack`                                                            |
+| **Navigation**   | `hx-breadcrumb`, `hx-tabs`, `hx-pagination`, `hx-side-nav`, `hx-menu`                                                       |
+| **Layout**       | `hx-grid`, `hx-container`, `hx-divider`, `hx-top-nav`, `hx-stack`                                                           |
 | **Overlays**     | `hx-dialog`, `hx-drawer`, `hx-tooltip`, `hx-popover`, `hx-dropdown`                                                         |
 
-[Browse all components in Storybook →](https://helix.bookedsolid.tech/storybook/)
+[Browse all components in Storybook →](https://storybook.helix.bookedsolid.tech/)
 
 ---
 
@@ -101,15 +101,23 @@ Full documentation is available at **[helix.bookedsolid.tech](https://helix.book
 HELiX is designed for seamless Drupal CMS integration:
 
 ```twig
-{# node--article--teaser.html.twig #}
-<hx-card variant="outlined" elevation="raised" href="{{ url }}">
-  <img slot="image" src="{{ image_url }}" alt="{{ image_alt }}">
+{# node--article--teaser.html.twig
+   hx-card variants: default | featured | compact. Use hx-href (component
+   attribute) + hx-label for the interactive whole-card pattern; the card
+   then dispatches hx-click rather than performing default browser navigation. #}
+<hx-card
+  variant="featured"
+  elevation="raised"
+  hx-href="{{ url }}"
+  hx-label="Read {{ node.label }}"
+>
+  <img slot="image" src="{{ image_url }}" alt="{{ image_alt }}" />
   <span slot="heading">{{ node.label }}</span>
   {{ node.body.summary }}
 </hx-card>
 ```
 
-See the [Drupal Integration Guide](https://helix.bookedsolid.tech/guides/drupal/) for complete setup instructions, Twig patterns, and JavaScript behaviors.
+See the [Drupal Integration Guide](https://helix.bookedsolid.tech/drupal/installation/getting-started/) for complete setup instructions, Twig patterns, and JavaScript behaviors.
 
 ---
 
@@ -139,7 +147,8 @@ pnpm run dev:docs       # Documentation site on port 3150
 pnpm run build          # Build everything
 pnpm run test           # Run all tests (Vitest browser mode)
 pnpm run type-check     # TypeScript strict check
-pnpm run verify         # Lint + format + type-check (required before push)
+pnpm run verify         # Lint + format:check + type-check + build (quick gate)
+pnpm run preflight      # Required before push — full 8-gate parity with GitHub CI
 ```
 
 ---
@@ -178,7 +187,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. All contributions must:
 
 <div align="center">
 
-**[Documentation](https://helix.bookedsolid.tech)** · **[Storybook](https://helix.bookedsolid.tech/storybook/)** · **[NPM](https://www.npmjs.com/package/@helixui/library)** · **[Issues](https://github.com/bookedsolidtech/helix/issues)**
+**[Documentation](https://helix.bookedsolid.tech)** · **[Storybook](https://storybook.helix.bookedsolid.tech/)** · **[NPM](https://www.npmjs.com/package/@helixui/library)** · **[Issues](https://github.com/bookedsolidtech/helix/issues)**
 
 Built with care for healthcare.
 
