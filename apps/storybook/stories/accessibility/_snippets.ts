@@ -11,36 +11,43 @@
 // they want to mirror the canonical patterns in their own docs preset.
 //
 
+// Mirrors the real hx-button forced-colors block in
+// packages/hx-library/src/components/hx-button/hx-button.styles.ts — paired
+// with explicit forced-color-adjust: none so the system keywords below
+// (ButtonFace/ButtonText/Highlight/HighlightText) win deterministically.
 export const FORCED_COLORS_BUTTON_CSS = `/* author tokens — apply in every mode, including forced-colors */
 :host {
   background: var(--hx-color-action-primary-bg);
-  color: var(--hx-color-action-primary-text);
-  border: 1px solid var(--hx-color-action-primary-border);
+  color: var(--hx-color-text-on-primary);
+  border: 1px solid currentColor;
 }
 
 /* forced-colors layer — system keywords win for structural roles */
 @media (forced-colors: active) {
-  :host {
-    /* Surface + text become the user's button palette. */
-    background: ButtonFace;
+  .button {
+    /* Opt out of the UA's automatic palette substitution so the system
+       keywords below apply deterministically. */
+    forced-color-adjust: none;
+    background-color: ButtonFace;
     color: ButtonText;
-    border-color: ButtonText;
+    border: 2px solid ButtonText;
   }
 
-  :host(:focus-visible) {
-    /* Focus ring tracks the user's selection accent. */
-    outline: 2px solid Highlight;
+  .button:focus-visible {
+    /* Focus ring tracks the user's selection accent. hx-button uses a
+       3px outline with a 2px offset in this branch. */
+    outline: 3px solid Highlight;
     outline-offset: 2px;
   }
 
-  :host([variant='primary']) {
+  :host([variant='primary']) .button {
     /* Primary lifts to the selection accent in HC mode. */
-    background: Highlight;
+    background-color: Highlight;
     color: HighlightText;
     border-color: Highlight;
   }
 
-  :host([disabled]) {
+  :host([disabled]) .button {
     /* GrayText is the user's "unavailable" cue. */
     color: GrayText;
     border-color: GrayText;

@@ -43,21 +43,23 @@ import '@helixui/library/components/hx-badge';
   <SectionHead title="The forced-colors contract" meta="WCAG 2.2 · 1.4.1, 1.4.11, 2.4.7, 2.4.13" />
   <div className="hx-docs-stats">
     <StatCard num="100" unit="%" label="Components covered" sub="every interactive primitive" />
-    <StatCard num="7" label="System keywords used" sub="CanvasText · Canvas · Highlight · …" />
+    <StatCard num="11" label="System keywords used" sub="CanvasText · Canvas · Highlight · Mark · Field · …" />
     <StatCard
       num="scoped"
       label="forced-color-adjust: none"
-      sub="opt-outs preserve focus rings + status indicators"
+      sub="explicit opt-out so system keywords win deterministically"
     />
-    <StatCard num="2" unit="px" label="Focus ring preserved" sub="renders as Highlight" />
+    <StatCard num="≥2" unit="px" label="Focus ring preserved" sub="hx-button uses 3px outline / 2px offset; mixin floor is 2px" />
   </div>
 </section>
 
 <section>
   <SectionHead title="System color keywords we rely on" meta="CSS Color Module 4" />
   <p className="hx-docs-card-body">
-    Forced-colors mode swaps your declared colors for one of seven user-controlled keywords.
-    HELiX's component CSS selects the right keyword by role inside an{' '}
+    Forced-colors mode swaps your declared colors for one of the user-controlled CSS system
+    keywords. HELiX uses 11 of them across components — the table below shows the most
+    common roles; see the [CSS Color Module Level 4 system colors](https://www.w3.org/TR/css-color-4/#css-system-colors)
+    spec for the full canonical list. HELiX's component CSS selects the right keyword by role inside an{' '}
     <code>@media (forced-colors: active)</code> block, so the component still communicates
     structure even when the author palette is gone.
   </p>
@@ -111,11 +113,12 @@ import '@helixui/library/components/hx-badge';
 <section>
   <SectionHead title="What a component looks like in forced-colors" meta="hx-button, lit" />
   <p className="hx-docs-card-body">
-    The pattern below is the canonical HELiX <code>@media (forced-colors: active)</code> block.
-    The author CSS still resolves all the design-token cascading; the forced-colors block layers
-    on top, mapping the resolved roles to system keywords. Notice we never reach for{' '}
-    <code>forced-color-adjust: none</code> — every keyword is supplied by the user agent, so the
-    user's stylesheet wins.
+    The pattern below mirrors the real <code>hx-button</code> forced-colors block. The author
+    CSS still resolves all the design-token cascading; the forced-colors block layers on top,
+    mapping the resolved roles to system keywords. HELiX pairs the layer with an explicit{' '}
+    <code>forced-color-adjust: none</code> so the system keywords below win deterministically
+    instead of fighting the UA's automatic substitution. Use this sparingly — only when you're
+    supplying explicit system colors to replace what the UA would otherwise infer.
   </p>
 
   <CodeBlock language="css" filename="hx-button.styles.ts" code={FORCED_COLORS_BUTTON_CSS} />
