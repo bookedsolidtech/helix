@@ -146,6 +146,7 @@ You MUST emit each finding as a single JSON line conforming to this schema:
 {
   "campaign": "docs-fact-check",
   "target": "{TARGET}",
+  "tag": "{TAG}",
   "ts": "<ISO 8601>",
   "codex_run": "<short hash>",
   "severity": "critical | high | medium | low | info",
@@ -158,6 +159,11 @@ You MUST emit each finding as a single JSON line conforming to this schema:
   "verdict_for_target": "pass | concerns | blocking"
 }
 ```
+
+`tag` is the **basename of `{TARGET}`** (e.g. `installation.md`, `hx-button.mdx`).
+`run-campaign.sh --resume` filters completed targets by matching this tag against
+`.tag` values already present in `findings.jsonl` — emit it exactly so a resumed
+sweep skips files you've already covered instead of reprocessing the full set.
 
 Output ONE finding per line, JSONL. Do not wrap in arrays. Do not add markdown.
 

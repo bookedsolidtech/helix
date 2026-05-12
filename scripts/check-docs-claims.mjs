@@ -16,7 +16,7 @@
 
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join, relative, dirname } from 'node:path';
+import { join, relative, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -100,7 +100,7 @@ for (const set of tagToCssProps.values()) {
 async function loadWorkspaceVersions() {
   const versions = new Map();
   for (const root of ['packages', 'apps']) {
-    const pkgs = await walk(join(REPO_ROOT, root), (p) => p.endsWith('/package.json'));
+    const pkgs = await walk(join(REPO_ROOT, root), (p) => basename(p) === 'package.json');
     for (const p of pkgs) {
       const pkg = await readJsonSafe(p);
       if (pkg?.name?.startsWith('@helixui/')) {
