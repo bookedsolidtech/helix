@@ -37,15 +37,19 @@ export const WEIGHTS = [
   title="Inter for prose. JetBrains Mono for code."
   lede={
     <>
-      Two families, ten sizes, six weights. Inter handles every reading surface — clinical density,
-      charts, dense tables — with OpenType variants tuned on (<code>cv11</code>, <code>ss01</code>)
-      for unambiguous numerals.
+      Three font-family tokens — <code>--hx-font-family-sans</code> (Inter),{' '}
+      <code>--hx-font-family-mono</code> (JetBrains Mono), and <code>--hx-font-family-serif</code>{' '}
+      (system serif fallback for editorial surfaces). Inter handles every reading surface; consumers
+      who need OpenType variants (Inter&apos;s <code>cv11</code>, <code>ss01</code> for unambiguous
+      numerals; <code>tnum</code> for tabular figures) can opt in via{' '}
+      <code>font-feature-settings</code> in author CSS — the shipped tokens do not toggle these
+      features by default.
     </>
   }
 />
 
 <section>
-  <SectionHead title="Families" meta="--hx-font-family-{sans,mono}" />
+  <SectionHead title="Families" meta="--hx-font-family-{sans,mono,serif}" />
   <div
     style={{
       display: 'grid',
@@ -203,13 +207,17 @@ export const WEIGHTS = [
           color: 'var(--hx-color-text-primary)',
         }}
       >
-        The mandate is May.
+        Built for compliance headroom.
       </h3>
       <p style={{ margin: 0, color: 'var(--hx-color-text-secondary)', lineHeight: 1.6 }}>
-        HHS Section 504 requires WCAG 2.1 AA for healthcare organizations by May 2026. HELiX
-        ships at WCAG 2.2 AA across the surface and WCAG 2.2 AAA on the P0 components (per
-        aaa-verdicts.json), so it clears the Section 504 floor with headroom. Every component is
-        keyboard-navigable, screen-reader compatible, and tested with axe-core.
+        HHS&apos;s Section 504 update adopts WCAG 2.1 Level AA as the technical baseline (small
+        public entities received a May 2027 extension in the May 2026 final-rule revision; large
+        entities remain on the original 2026 timeline). HELiX ships at WCAG 2.2 AA across the
+        surface and WCAG 2.2 AAA verdicts on the P0 components (per <code>aaa-verdicts.json</code>),
+        so it clears Section 504&apos;s 2.1 AA floor regardless of which deadline applies.
+        Per-component conformance — keyboard contracts, screen-reader announcements, axe-core
+        coverage — is documented case-by-case on each component&apos;s AAA Audit panel rather than
+        claimed as a blanket guarantee.
       </p>
       <div
         style={{
@@ -219,7 +227,7 @@ export const WEIGHTS = [
           color: 'var(--hx-color-text-muted)',
         }}
       >
-        heading 32 / 1.15 / -0.025em · body 16 / 1.6
+        heading 32 / 1.15 / -0.025em · body 16 / 1.6 — actual computed values for the demo above
       </div>
     </div>
     <div className="hx-docs-card">
