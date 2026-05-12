@@ -21,7 +21,7 @@ Content-Security-Policy:
 
 ## Why `style-src 'unsafe-inline'` is Required
 
-Six components use `Object.assign(el.style, ...)` or direct `.style` property manipulation for dynamic positioning that cannot be expressed in static CSS:
+Several components use `Object.assign(el.style, …)` or direct `.style` property manipulation for runtime values that cannot be expressed in static CSS. Floating-positioning components are the most visible reason; a handful of other components also write to `.style` for cross-axis layout values (e.g. progress bars setting widths from a percentage, sliders setting thumb positions during drag).
 
 | Component | Reason |
 |-----------|--------|
@@ -31,16 +31,19 @@ Six components use `Object.assign(el.style, ...)` or direct `.style` property ma
 | `hx-overflow-menu` | Dynamic menu positioning relative to trigger |
 | `hx-dropdown` | Floating listbox positioning below trigger |
 | `hx-color-picker` | Gradient thumb and slider positions during drag |
+| `hx-toast` | Stacked toast position offsets relative to container |
+| `hx-drawer` | Drag-to-dismiss offset during gesture |
+| `hx-carousel` | Slide translate offset during transition |
 
-These components calculate positions at runtime based on viewport dimensions and trigger element coordinates. Static CSS custom properties cannot replace this because the values are not known until layout time.
+The list is illustrative, not exhaustive — any HELiX component that does runtime layout math may write to `.style` and therefore require `'unsafe-inline'` for `style-src`. The shipped CSP guidance is to permit `'unsafe-inline'` for `style-src` in the meantime.
 
-### Alternative: CSP Nonce
+### CSP Nonces and Inline Styles
 
-If your environment supports CSP nonces, you can avoid `'unsafe-inline'` by configuring a nonce on the document. However, Lit's rendering pipeline applies inline styles directly via the DOM API (`el.style.top = ...`), not via `<style>` tags, so CSP nonces do not currently help with this pattern.
+CSP nonces do not currently replace `'unsafe-inline'` for HELiX runtime positioning. Nonces apply to `<style>` and `<link rel="stylesheet">` elements; components write to the inline-style attribute via the DOM (`el.style.top = …`), which is governed by the `'unsafe-inline'` style-src source rather than the nonce-source list. There is no nonce-bearing element in the runtime style path.
 
 ### Future Improvement
 
-The [CSS Anchor Positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning) specification (Chrome 125+) will eventually allow these components to express positioning in pure CSS. This is tracked as a future enhancement.
+The [CSS Anchor Positioning](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_anchor_positioning) specification (Chrome 125+) could let many of these components express positioning in pure CSS once browser support is reliable across the targets HELiX guarantees. There is no committed tracking issue today — treat this as a candidate future enhancement, not a roadmap commitment.
 
 ## Design Tokens
 
