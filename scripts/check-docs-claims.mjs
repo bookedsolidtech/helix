@@ -633,3 +633,20 @@ console.log(`Rollup:   ${ROLLUP_PATH}`);
 for (const [s, arr] of Object.entries(bySeverity)) {
   if (arr.length > 0) console.log(`  ${s}: ${arr.length}`);
 }
+
+// Preflight Gate 12 keys off process exit status — emit non-zero when there
+// are findings so the gate actually blocks pushes. `low`-severity findings
+// (currently used only for fabricated --hx-* token prefixes) are advisory and
+// do not fail the gate by default; set HELIX_DOCS_CLAIMS_STRICT=1 to fail on
+// any finding including `low`.
+const blockingSeverities = ['critical', 'high', 'medium'];
+const blockingFindings = findings.filter((f) => blockingSeverities.includes(f.severity));
+const strict = process.env.HELIX_DOCS_CLAIMS_STRICT === '1';
+if (blockingFindings.length > 0 || (strict && findings.length > 0)) {
+  const failedCount = strict ? findings.length : blockingFindings.length;
+  console.error('');
+  console.error(`✗ docs-claims: ${failedCount} blocking finding(s).`);
+  console.error(`  Review ${ROLLUP_PATH} and fix, or set HELIX_DOCS_CLAIMS_STRICT=0 if you`);
+  console.error(`  want to opt out of strict-mode (low-severity findings are advisory by default).`);
+  process.exit(1);
+}
