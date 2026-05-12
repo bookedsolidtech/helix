@@ -19,8 +19,8 @@ Paragraph Item (fields: heading, body, image, cta_url, cta_label)
 Render Array (rendered field output)
   ↓ Twig template override
 <hx-card>
-  <span slot="heading">{{ rendered heading }}</span>
-  <div slot="media">{{ rendered image }}</div>
+  <h3 slot="heading">{{ rendered heading }}</h3>
+  <div slot="image">{{ rendered image }}</div>
 </hx-card>
   ↓ browser upgrades
 Web component with Shadow DOM styles
@@ -36,11 +36,11 @@ The Paragraph type defines the content schema. The Twig template override maps t
 |---|---|---|
 | Hero Banner | `hx-card` (full-bleed) or custom hero slot | Large format, image-forward |
 | Content Card | `hx-card` | Teaser with media, heading, body, CTA |
-| Alert/Notice | `hx-alert` | Variant: info, warning, success, danger |
+| Alert/Notice | `hx-alert` | Variant: success, warning, error, info (plus primary / secondary / neutral) |
 | Staff Profile | `hx-card` + `hx-avatar` + `hx-badge` | Photo, name, role, department |
-| CTA Button | `hx-button` | href, variant, label |
+| CTA Button | `hx-button` | href, variant; the button label goes in the default slot, not a `label` attribute |
 | Accordion | `hx-accordion` + `hx-accordion-item` | FAQ, collapsible content |
-| Tabs | `hx-tabs` + `hx-tab-panel` | Sectioned content |
+| Tabs | `hx-tabs` with `<hx-tab slot="tab">` triggers + `<hx-tab-panel name="…">` panels | Sectioned content |
 | Form Embed | `hx-form` wrapping form elements | Contact forms, survey embeds |
 
 ---
@@ -58,7 +58,7 @@ Add fields:
 - `field_card_body` — Text (with text format)
 - `field_card_image` — Media reference (image)
 - `field_card_cta_url` — Link
-- `field_card_variant` — List (text): `default`, `elevated`, `outlined`
+- `field_card_variant` — List (text): `default`, `featured`, `compact`
 
 ### Step 2: Override the Paragraph template
 
@@ -82,16 +82,16 @@ cp web/modules/contrib/paragraphs/templates/paragraph.html.twig \
 
   {# Media: Drupal-rendered image with image style applied #}
   {% if content.field_card_image[0] %}
-    <div slot="media">
+    <div slot="image">
       {{- content.field_card_image -}}
     </div>
   {% endif %}
 
   {# Heading #}
   {% if content.field_card_heading[0] %}
-    <span slot="heading">
+    <h3 slot="heading">
       {{- content.field_card_heading -}}
-    </span>
+    </h3>
   {% endif %}
 
   {# Body — rendered through text format pipeline #}
@@ -143,12 +143,17 @@ A hero banner uses a full-bleed image with overlay text. The pattern differs fro
   aria-label="{{ paragraph.field_hero_headline.value|escape }}"
 >
   <div class="hero-banner__content">
-    <hx-text tag="h1" variant="display">
+    {# hx-text exposes `as` (element rewrite) and `variant`
+       (body | body-sm | body-lg | label | label-sm | caption | code |
+       overline). For hero-scale display copy, prefer a native heading
+       element styled via Foundations / Typography tokens — hx-text has
+       no `display` or `lead` variant. #}
+    <h1 class="hero-banner__headline">
       {{ paragraph.field_hero_headline.value|escape }}
-    </hx-text>
+    </h1>
 
     {% if content.field_hero_subheadline[0] %}
-      <hx-text tag="p" variant="lead">
+      <hx-text as="p" variant="body-lg">
         {{ paragraph.field_hero_subheadline.value|escape }}
       </hx-text>
     {% endif %}
@@ -226,7 +231,7 @@ Fields:
 ```twig
 {# No library needed — parent loads helix-accordion #}
 <hx-accordion-item>
-  <span slot="heading">
+  <span slot="trigger">
     {{- content.field_item_heading -}}
   </span>
   <div>
@@ -246,7 +251,7 @@ Drupal's media system renders images through image styles (responsive images, fo
 ```twig
 {# Correct: pass rendered content array — includes image styles, alt, srcset #}
 {% if content.field_card_image[0] %}
-  <div slot="media">
+  <div slot="image">
     {{- content.field_card_image -}}
   </div>
 {% endif %}
@@ -255,7 +260,7 @@ Drupal's media system renders images through image styles (responsive images, fo
 ```twig
 {# Wrong: extracts raw URL, loses image styles and srcset #}
 {% set img_url = content.field_card_image[0]['#media'].field_media_image.entity.fileuri.value|file_url %}
-<img src="{{ img_url }}" slot="media">
+<img src="{{ img_url }}" slot="image">
 ```
 
 The `|raw` filter is safe when applied to `content.*` render arrays because Drupal's rendering pipeline (not user input) produced the HTML.
@@ -301,8 +306,8 @@ class HelixCardBehavior extends ParagraphsBehaviorBase {
         '#title' => $this->t('Card Style'),
         '#options' => [
           'default' => $this->t('Default'),
-          'elevated' => $this->t('Elevated'),
-          'outlined' => $this->t('Outlined'),
+          "featured" => $this->t("Featured"),
+          "compact"  => $this->t("Compact"),
         ],
         '#default_value' => $paragraph->getBehaviorSetting('helix_card_behavior', 'card_variant', 'default'),
       ],
