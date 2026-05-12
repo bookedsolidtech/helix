@@ -1,8 +1,8 @@
 # @helixui/drupal-behaviors
 
-Drupal behaviors for all interactive HELiX web components using Drupal's `once()` pattern.
+Drupal behaviors for a curated set of interactive HELiX web components using Drupal's `once()` pattern.
 
-This package provides `Drupal.behaviors.*` registrations for every interactive `hx-*` component in the HELiX library. Each behavior handles initialization from data attributes, event wiring, accessibility announcements, and proper cleanup on detach — making HELiX components fully compatible with Drupal's AJAX, BigPipe, Layout Builder, and XB rendering pipelines.
+This package ships `Drupal.behaviors.*` registrations for **eight** HELiX components — `hx-accordion`, `hx-dialog`, `hx-drawer`, `hx-menu`, `hx-popover`, `hx-tabs`, `hx-toast`, `hx-tooltip` — covering the overlays, navigation primitives, and live-region surfaces that benefit most from Drupal-side wiring. Other interactive `hx-*` components (form controls, links, cards) upgrade from their own module imports and do not require a behavior wrapper. Each shipped behavior handles initialization from data attributes, event wiring, and detach-time cleanup; accessibility-affordance details vary per behavior (see the Behavior Reference + Accessibility Notes below for the actual contract). Behaviors are compatible with Drupal's AJAX, BigPipe, and Layout Builder rendering pipelines through the standard `Drupal.behaviors` + `once()` contract; Experience Builder (XB) compatibility is consumer-validated, not package-tested.
 
 ---
 
@@ -28,11 +28,14 @@ npm install @helixui/drupal-behaviors
 pnpm add @helixui/drupal-behaviors
 ```
 
-Copy or reference the files from `node_modules/@helixui/drupal-behaviors/src/` in your theme or module build.
+The published package ships the compiled bundle at `dist/index.js` plus the per-behavior files
+under `dist/behaviors/`. Reference those `dist/` paths from your theme libraries — the `src/` tree
+is repository-only and is **not** included in the published tarball.
 
 ### Direct download
 
-Download individual behavior files from the `src/behaviors/` directory and place them in your Drupal theme's `js/` folder.
+Download the compiled per-behavior files from the package's `dist/behaviors/` directory (or the
+shipped GitHub release) and place them in your Drupal theme's `js/` folder.
 
 ---
 
@@ -46,7 +49,7 @@ Reference `src/index.js` in your `mytheme.libraries.yml`:
 # mytheme.libraries.yml
 helix-behaviors:
   js:
-    path/to/node_modules/@helixui/drupal-behaviors/src/index.js: {}
+    path/to/node_modules/@helixui/drupal-behaviors/dist/index.js: {}
   dependencies:
     - core/drupal
     - core/once
@@ -60,14 +63,14 @@ For performance-sensitive pages, load only the behaviors you need:
 # mytheme.libraries.yml
 helix-accordion:
   js:
-    path/to/node_modules/@helixui/drupal-behaviors/src/behaviors/hx-accordion.behavior.js: {}
+    path/to/node_modules/@helixui/drupal-behaviors/dist/behaviors/hx-accordion.behavior.js: {}
   dependencies:
     - core/drupal
     - core/once
 
 helix-dialog:
   js:
-    path/to/node_modules/@helixui/drupal-behaviors/src/behaviors/hx-dialog.behavior.js: {}
+    path/to/node_modules/@helixui/drupal-behaviors/dist/behaviors/hx-dialog.behavior.js: {}
   dependencies:
     - core/drupal
     - core/once
@@ -89,7 +92,7 @@ Attaches to: `[data-drupal-accordion]`
 
 Behavior:
 - Auto-expands the first `hx-accordion-item` when `data-open-first="true"`
-- Announces panel state changes via `Drupal.announce()` for screen readers
+- The component itself manages ARIA expand/collapse state on each `hx-accordion-item` (`aria-expanded`, `aria-controls`); this behavior does not add an explicit `Drupal.announce()` layer on top — screen readers pick up the state change from the component's own ARIA
 
 ```html
 <div data-drupal-accordion data-open-first="true">
@@ -112,12 +115,12 @@ Attaches to: `[data-drupal-dialog]`
 Behavior:
 - Binds a click handler to the trigger element that sets `dialog.open = true`
 - Returns focus to the trigger element on `hx-close` and `hx-cancel` events
-- Handles focus management to meet WCAG 2.2 success criteria 2.4.3 (Focus Order) and 2.4.11 (Focus Not Obscured); satisfies the AAA-equivalent expectations on the P0 surface
+- Supports WCAG 2.2 SC 2.4.3 Focus Order; the dialog component itself owns focus-trap + return-focus and is covered by the formal AAA harness verdicts in `packages/hx-library/aaa-verdicts.json`
 
 ```html
 <div data-drupal-dialog data-trigger-selector="#open-patient-dialog">
-  <hx-dialog>
-    <span slot="heading">Patient Record</span>
+  <hx-dialog heading="Patient Record">
+    <h2 slot="header">Patient Record</h2>
     ...
   </hx-dialog>
 </div>
@@ -130,11 +133,11 @@ Behavior:
 
 Attaches to: `[data-drupal-drawer]`
 
-| Data attribute         | Type   | Description                                        |
-| ---------------------- | ------ | -------------------------------------------------- |
-| `data-trigger-selector`| string | CSS selector for the toggle button                 |
-| `data-direction`       | string | Sets `direction` attribute: `left`, `right`, `top`, `bottom` |
-| `data-size`            | string | Sets `size` attribute on the component             |
+| Data attribute         | Type   | Description                                                                                  |
+| ---------------------- | ------ | -------------------------------------------------------------------------------------------- |
+| `data-trigger-selector`| string | CSS selector for the toggle button                                                           |
+| `data-placement`       | string | Sets the `placement` attribute on hx-drawer (`start`, `end`, `top`, `bottom`)                |
+| `data-size`            | string | Sets the `hx-size` attribute on hx-drawer (the component's size attribute is `hx-size`, not `size`) |
 
 Behavior:
 - Applies body scroll lock (`overflow: hidden`) while the drawer is open
@@ -142,7 +145,7 @@ Behavior:
 - Releases scroll lock on detach to prevent stuck scroll state
 
 ```html
-<div data-drupal-drawer data-trigger-selector="#nav-toggle" data-direction="left">
+<div data-drupal-drawer data-trigger-selector="#nav-toggle" data-placement="start">
   <hx-drawer>
     <nav>...</nav>
   </hx-drawer>
@@ -161,10 +164,14 @@ Behavior:
 - Closes the menu on `Escape` key press
 - Properly removes the `document`-level click listener on detach
 
+`hx-menu` itself only exposes the default slot (its children are the menu items); the trigger
+button lives **outside** the component and opens it via the consumer's behavior code. Wrap the
+trigger + menu in `[data-drupal-menu]` so the behavior can find both elements.
+
 ```html
 <div data-drupal-menu>
-  <hx-menu>
-    <button slot="trigger">Actions</button>
+  <button id="actions-trigger">Actions</button>
+  <hx-menu trigger="actions-trigger">
     <hx-menu-item>Edit</hx-menu-item>
     <hx-menu-item>Delete</hx-menu-item>
   </hx-menu>
@@ -177,22 +184,26 @@ Behavior:
 
 Attaches to: `[data-drupal-tabs]`
 
-| Data attribute    | Type   | Description                                        |
-| ----------------- | ------ | -------------------------------------------------- |
-| `data-active-tab` | string | Tab ID to activate on initialization               |
+| Data attribute        | Type   | Description                                                                              |
+| --------------------- | ------ | ---------------------------------------------------------------------------------------- |
+| `data-active-panel`   | string | `hx-tab-panel name="…"` value to activate on initialization                              |
 
 Behavior:
-- Activates a tab on init, preferring the URL hash over `data-active-tab`
-- Syncs the URL hash via `history.replaceState()` on `hx-change` for direct linking
+- Activates the corresponding tab on init, preferring the URL hash over `data-active-panel`
+- Syncs the URL hash via `history.replaceState()` on the canonical tab-change lifecycle event for direct linking
 - Enables deep linking to specific tabs from Drupal views or blocks
 
+`hx-tabs` uses **`<hx-tab slot="tab" panel="…">`** triggers paired with
+**`<hx-tab-panel name="…">`** panels — the matching panel/name string is what wires activation
+and ARIA. Tabs are not addressed by a `value` attribute.
+
 ```html
-<div data-drupal-tabs data-active-tab="overview">
+<div data-drupal-tabs data-active-panel="overview">
   <hx-tabs>
-    <hx-tab value="overview">Overview</hx-tab>
-    <hx-tab value="history">History</hx-tab>
-    <hx-tab-panel value="overview">...</hx-tab-panel>
-    <hx-tab-panel value="history">...</hx-tab-panel>
+    <hx-tab slot="tab" panel="overview">Overview</hx-tab>
+    <hx-tab slot="tab" panel="history">History</hx-tab>
+    <hx-tab-panel name="overview">...</hx-tab-panel>
+    <hx-tab-panel name="history">...</hx-tab-panel>
   </hx-tabs>
 </div>
 ```
@@ -213,11 +224,15 @@ Behavior:
 - Closes on `Escape` key press
 - For click-triggered popovers, closes on click outside the wrapper
 
+`hx-popover` exposes an `anchor` slot for the triggering element and a default slot for the
+popover body. The trigger button lives in `slot="anchor"`; the body content sits in the default
+slot.
+
 ```html
 <div data-drupal-popover data-placement="bottom" data-trigger="click">
   <hx-popover>
-    <button slot="trigger">More info</button>
-    <div slot="content">Additional details here.</div>
+    <button slot="anchor">More info</button>
+    <div>Additional details here.</div>
   </hx-popover>
 </div>
 ```
@@ -252,19 +267,22 @@ Behavior:
 
 Attaches to: `[data-drupal-tooltip]`
 
-| Data attribute    | Type   | Description                                        |
-| ----------------- | ------ | -------------------------------------------------- |
-| `data-content`    | string | Tooltip text content                               |
+| Data attribute    | Type   | Description                                         |
+| ----------------- | ------ | --------------------------------------------------- |
 | `data-placement`  | string | Tooltip placement: `top`, `bottom`, `left`, `right` |
 
 Behavior:
-- Sets content and placement from data attributes
+- Sets `placement` from the data attribute
 - Closes on `Escape` key press for keyboard accessibility (WCAG 2.2 SC 1.4.13 — Content on Hover or Focus)
 
+`hx-tooltip` does not expose a `content` attribute or a `trigger` slot; the trigger element is
+the tooltip's preceding sibling, and the tooltip body content lives in the `content` slot.
+
 ```html
-<div data-drupal-tooltip data-content="Patient ID: 12345" data-placement="top">
+<div data-drupal-tooltip data-placement="top">
+  <button id="view-id-trigger">View ID</button>
   <hx-tooltip>
-    <button slot="trigger">View ID</button>
+    <span slot="content">Patient ID: 12345</span>
   </hx-tooltip>
 </div>
 ```
@@ -300,10 +318,10 @@ This separation allows Drupal theme layers (Twig templates, field formatters, vi
 
 ## Accessibility Notes
 
-- `hxAccordion`: Announces expand/collapse state via `Drupal.announce()` (requires `core/drupal.announce`)
-- `hxDialog` and `hxDrawer`: Return focus to trigger element on close (WCAG 2.2 SC 2.4.3 — Focus Order)
-- `hxTooltip`: `Escape` dismissal meets WCAG 2.2 SC 1.4.13 (Content on Hover or Focus)
-- `hxMenu` and `hxPopover`: `Escape` key closes via keyboard for SC 2.1.2 (No Keyboard Trap)
+- `hxAccordion`: state changes are announced by the component's own ARIA (`aria-expanded` on each item) — this behavior does not add a separate `Drupal.announce()` layer
+- `hxDialog` and `hxDrawer`: Return focus to trigger element on close (WCAG 2.2 SC 2.4.3 — Focus Order). The components themselves own the focus trap and are covered by the formal AAA harness verdicts
+- `hxTooltip`: `Escape` dismissal contributes to WCAG 2.2 SC 1.4.13 (Content on Hover or Focus); the canonical dismissable / hoverable / persistent contract is enforced by `hx-tooltip` itself
+- `hxMenu` and `hxPopover`: `Escape` key closes via keyboard (supports SC 2.1.2 — No Keyboard Trap)
 
 ---
 
