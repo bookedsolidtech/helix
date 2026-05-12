@@ -67,7 +67,7 @@ For external URLs (CDN):
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
       type: external
 ```
 
@@ -141,7 +141,7 @@ For CDN-hosted files:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
       type: external
       attributes:
         type: module
@@ -246,18 +246,28 @@ helix-button:
 **Version affects:**
 
 - Cache-busting query strings (`hx-button.js?v=3.9.0`)
-- Dependency resolution (Drupal checks version compatibility)
+- Cache and dependency-graph metadata (the version contributes to cache hashes and library replacement keys; Drupal's libraries API does not perform semver dependency-compatibility checks)
 - Library replacement (modules can replace libraries with specific versions)
 
 ### Dynamic Versioning
 
-Use `VERSION` placeholder for theme/module version:
+Drupal's Libraries API substitutes the `VERSION` placeholder with the **Drupal core version**
+(see drupal.org docs on libraries.yml), not the theme/module version. Use it when the asset's
+cache-bust should track Drupal core; for theme-scoped versioning, write the literal version
+string yourself:
 
 ```yaml
 helix-button:
-  version: VERSION # Replaced with theme version from .info.yml
+  version: VERSION # Substituted with Drupal core version (e.g. 10.4.0)
   js:
-    dist/js/hx-button.js:
+    dist/components/hx-button/index.js:
+      attributes:
+        type: module
+
+helix-button-theme-versioned:
+  version: '3.9.0' # Literal — track this library's version explicitly
+  js:
+    dist/components/hx-button/index.js:
       attributes:
         type: module
 ```
@@ -269,7 +279,7 @@ For CDN assets with their own versioning:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
       type: external
       version: -1 # Disable query string
       attributes:
@@ -296,13 +306,15 @@ helix-behaviors:
     - mytheme/helix-init
 ```
 
-**Weight ranges:**
+**Weight conventions:** Drupal accepts any integer (positive or negative). Negative weights load
+earlier; positive weights load later. The exact band you pick matters less than being consistent
+with the rest of your theme — Drupal core libraries hover around 0, and theme-level overrides
+typically land in the ±10 range. Reserve very negative values (e.g. < -50) for polyfills that
+genuinely must precede everything else.
 
-- `-100 to -1` — Early loading (polyfills, core utilities)
-- `0` — Default (most libraries)
-- `1 to 100` — Late loading (initialization, analytics)
-
-**Best practice:** Prefer `dependencies` over `weight` for ordering. Dependencies are explicit and easier to reason about.
+**Best practice:** Prefer `dependencies` over `weight` for ordering. Dependencies are explicit
+and easier to reason about; reach for weight only when you need fine-grained ordering inside a
+single dependency cohort.
 
 ## Attributes and Extra Options
 
@@ -372,7 +384,7 @@ For optimal performance, define one library per component. This enables tree-sha
 helix-all:
   version: 3.9.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
       type: external
       minified: true
       preprocess: false
@@ -473,16 +485,19 @@ helix-data-table:
   dependencies:
     - mytheme/helix-core
 
-helix-chart:
+helix-data-table:
   version: 3.9.0
   js:
-    dist/js/hx-chart.js:
+    dist/components/hx-data-table/index.js:
       preprocess: false
       attributes:
         type: module
   dependencies:
     - mytheme/helix-core
 ```
+
+(`hx-chart` is not a shipped HELiX component — substitute whichever heavy component your theme
+needs to load on demand, e.g. `hx-data-table`, `hx-date-picker`, or `hx-combobox`.)
 
 **Strategy:**
 
@@ -657,7 +672,7 @@ Drupal's library system integrates with its cache system:
    ```yaml
    helix-cdn:
      js:
-       https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js:
+       https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
          type: external
          minified: true
    ```
@@ -746,7 +761,12 @@ export default defineConfig({
     outDir: 'dist/js',
     lib: {
       entry: {
-        'hx-button': 'node_modules/@helixui/library/src/components/hx-button/index.js',
+        // The published @helixui/library package only ships the
+        // compiled `dist/` tree — there is no `src/` in the npm
+        // tarball, and the canonical per-component entry uses the
+        // package's `./components/<tag>` subpath export rather than
+        // a node_modules path.
+        'hx-button': 'node_modules/@helixui/library/dist/components/hx-button/index.js',
       },
       formats: ['es'],
     },
@@ -755,6 +775,12 @@ export default defineConfig({
     },
   },
 });
+```
+
+If you're consuming through the package's exports map (recommended), prefer:
+
+```js
+import '@helixui/library/components/hx-button';
 ```
 
 ### Example 3: hx-card Library (Full-Featured)
@@ -804,8 +830,8 @@ helix-card:
 
   Drupal.behaviors.helixCard = {
     attach(context) {
-      once('helix-card-init', 'hx-card[href]', context).forEach((card) => {
-        card.addEventListener('hx-card-click', (e) => {
+      once('helix-card-init', 'hx-card[hx-href]', context).forEach((card) => {
+        card.addEventListener('hx-click', (e) => {
           const { url } = e.detail;
 
           // Optional: Integrate with Drupal's AJAX system
