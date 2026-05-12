@@ -42,10 +42,14 @@ hx-button background
   ↓
 --hx-button-bg (component tier, defined inside hx-button's shadow root)
   ↓
-var(--hx-color-primary-500)  (fallback to primitive tier)
+var(--hx-color-action-primary-bg)  (semantic tier — what variant rules consume)
   ↓
-#2563eb  (default raw value)
+var(--hx-color-primary-700)  (primitive tier — the action token's default)
+  ↓
+brand-specific hex (e.g. Apex #0F6363)
 ```
+
+Brand swaps that override `--hx-color-primary-700` (or any other stop in the ramp) propagate up through `--hx-color-action-primary-bg` and into every variant rule automatically. The 3.4.0 cascade aligned `action.primary.bg → primary-700` so every brand clears WCAG 1.4.6 (7:1) on default buttons.
 
 The key insight: components reference component-tier tokens with semantic or primitive fallbacks. Override at any level in the chain and all downstream consumers update automatically.
 
@@ -59,7 +63,7 @@ Override the primary color ramp at the semantic (primitive) level to rebrand eve
 
 ### Why semantic level means everything updates
 
-`hx-button`, `hx-badge`, `hx-text-input` focus rings, `hx-dialog` headers — every component that references `--hx-color-primary-*` or the semantic tokens that depend on it will reflect the new values. You change one ramp; the entire library follows.
+`hx-button`, `hx-badge`, `hx-pagination`, `hx-checkbox`, `hx-text-input` focus rings, `hx-link`, `hx-tabs` active state, `hx-breadcrumb` links — every component that consumes `--hx-color-action-primary-bg`, `--hx-color-text-link`, or another semantic token in the primary chain reflects the new values. You change one ramp; the entire primary surface follows. (Components that don't consume primary — like neutral-only `hx-dialog` header styling — stay on their own ramp.)
 
 ### Full primary ramp override
 
@@ -106,12 +110,16 @@ When you want to change one component without affecting others, override its com
 
 ### Override a single button
 
+The `hx-button` shadow root re-defines `--hx-button-bg` inside each variant rule (e.g. the `primary` selector sets `--hx-button-bg: var(--hx-color-action-primary-bg, …)`), so a host-level override of `--hx-button-bg` alone is shadowed by those internal rules. To recolor the resting state, target the semantic action token instead:
+
 ```css
-/* Changes hx-button background only — no other component is affected */
-hx-button {
-  --hx-button-bg: var(--hx-color-primary-600);
+/* Recolor every primary hx-button via the semantic action token */
+hx-button[variant='primary'] {
+  --hx-color-action-primary-bg: var(--hx-color-primary-800);
 }
 ```
+
+Use the component-tier `--hx-button-bg` when you need to drive a non-variant state from outside (e.g. for an experimental custom selector) — it works on `variant="ghost"`/`"outline"` which read from `--hx-button-bg` directly without an internal variant rule.
 
 ### Target a specific variant or context
 
@@ -149,7 +157,7 @@ See [Customization](/design-tokens/customization/) for the full component token 
 <!-- The entire subtree gets dark-mode --hx-* tokens -->
 <hx-theme theme="dark">
   <hx-card>
-    <span slot="header">Medication Summary</span>
+    <h3 slot="heading">Medication Summary</h3>
     <hx-button>Administer</hx-button>
   </hx-card>
 </hx-theme>
@@ -380,12 +388,12 @@ High-contrast mode is not dark mode. It is an accessibility accommodation:
 - Yellow links (`#FFFF00`) with high luminance contrast
 - White borders (`#FFFFFF`) on all interactive elements
 - Yellow focus rings (`#FFFF00`) for maximum keyboard navigation visibility
-- Minimum 7:1 contrast ratio throughout (exceeds WCAG AA, meets WCAG AAA)
+- Aims at WCAG 1.4.6 / WCAG 1.4.11 contrast targets (7:1 for normal body text where applicable). Some non-text and large-text pairings may meet the relaxed 4.5:1 or 3:1 floors instead of strict 7:1; verify your composition with a contrast checker.
 
 Appropriate contexts:
 - Patient-facing portals where users may have low vision or cataracts
 - EHR interfaces used under bright clinical lighting
-- Any screen where WCAG 7:1 contrast is a legal or contractual requirement
+- Any screen where elevated contrast is a legal or contractual requirement
 
 ### Activate via `hx-theme`
 
@@ -540,8 +548,8 @@ Add the theme file as a `<link>` before any HELiX component scripts. No build to
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- 1. Load the HELiX component library -->
-    <script type="module" src="/dist/helix.js"></script>
+    <!-- 1. Load the HELiX component library (subpath into the npm bundle) -->
+    <script type="module" src="/node_modules/@helixui/library/dist/index.js"></script>
 
     <!-- 2. Load your brand theme — overrides the default :root tokens -->
     <link rel="stylesheet" href="/css/acme-health-theme.css" />
@@ -643,8 +651,8 @@ Load the HELiX library via CDN (or your Drupal library definition) and wrap a re
     <title>{{ head_title }}</title>
     {{ head }}
 
-    {# HELiX via CDN — substitute with your Drupal library path #}
-    <script type="module" src="https://cdn.example.com/helix/helix.esm.js"></script>
+    {# HELiX via CDN — substitute with your Drupal library path; pin a version #}
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"></script>
 
     {# Brand theme — a plain CSS file, no build step needed #}
     <link rel="stylesheet" href="/themes/custom/acme_health/css/acme-health-theme.css" />
@@ -693,7 +701,7 @@ For per-template overrides without a separate CSS file, place a `<style>` block 
 </style>
 
 <div class="clinical-alert-node">
-  <hx-alert variant="danger">
+  <hx-alert variant="error" open>
     {{ content.field_alert_body }}
   </hx-alert>
 
@@ -780,5 +788,5 @@ The CSS file loads as a standard stylesheet — no npm, no Webpack, no build pip
 - [MDN: Using CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) — CSS custom property inheritance and cascade
 - [MDN: `prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) — Media query for OS color scheme preference
 - [MDN: `prefers-contrast`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) — Media query for OS contrast preference
-- [WCAG 2.1 — Contrast (Enhanced) 1.4.6](https://www.w3.org/TR/WCAG21/#contrast-enhanced) — The 7:1 contrast ratio requirement
+- [WCAG 2.2 — Contrast (Enhanced) 1.4.6](https://www.w3.org/TR/WCAG22/#contrast-enhanced) — The 7:1 contrast ratio requirement (HELiX's canonical cert is WCAG 2.2 AAA on the P0 surface)
 - [Drupal.org: Adding stylesheets and JavaScript](https://www.drupal.org/docs/develop/theming-drupal/adding-stylesheets-css-and-javascript-js-to-a-drupal-theme) — Drupal library system for CSS assets
