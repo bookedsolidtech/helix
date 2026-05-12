@@ -5,7 +5,17 @@ description: Get up and running with HELIX web components in minutes
 
 This guide walks you through using HELiX components in your project.
 
-## Install the Package
+## Option A: Scaffold with `create-helix`
+
+The fastest way to start — `create-helix` generates a runnable project for your framework with the components you pick:
+
+```bash
+npx create-helix
+```
+
+Pick a framework (Astro, Next.js, Vue, Svelte, vanilla HTML, or Drupal), choose components, and start the dev server. Skip to [Using Components](#using-components-via-npm) if you'd rather wire HELiX into an existing project manually.
+
+## Option B: Install the Package
 
 ```bash
 npm install @helixui/library @helixui/tokens

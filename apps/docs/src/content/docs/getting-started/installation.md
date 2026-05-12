@@ -7,7 +7,17 @@ description: How to install and set up the HELIX enterprise web component librar
 If you already have a 2.x release of `@helixui/library` installed, read the [Upgrading to 3.0.0](/migration/3.0.0) guide first. 3.0.0 renames the `aria-label` attribute to `accessible-label` and removes several other 2.x shims on HELiX elements.
 :::
 
-## Install via npm
+## Fastest path: scaffold a project
+
+```bash
+npx create-helix
+```
+
+The `create-helix` CLI prompts through framework, components, and bundles, then writes a runnable project. See the [`create-helix` CLI guide](/getting-started/create-helix/) for templates, presets, and flags.
+
+## Install manually
+
+If you're adding HELiX to an existing project, install the packages directly:
 
 ```bash
 npm install @helixui/library @helixui/icons @helixui/tokens
