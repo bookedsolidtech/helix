@@ -27,7 +27,7 @@ Custom Elements Manifest is an open standard maintained by the Open Web Componen
 
 ### Schema Version
 
-hx-library uses CEM schema version 1.0.0, defined at [custom-elements-manifest.open-wc.org/schema](https://custom-elements-manifest.open-wc.org/schema). This version is stable and widely supported by tooling.
+hx-library uses CEM schema version `"1.0.0"` (the upstream [Custom Elements Manifest schema](https://github.com/webcomponents/custom-elements-manifest/blob/main/schema.json)). Tooling that reads CEM (Storybook, IDE plugins, our own docs build) generally targets this schema version. The string in the manifest is the schema version, not the @helixui/library package version.
 
 ---
 
@@ -99,10 +99,20 @@ Index files (`index.ts`) that re-export from other modules have empty `declarati
         "name": "HelixButton",
         "module": "./hx-button.js"
       }
+    },
+    {
+      "kind": "js",
+      "name": "HxButtonClickDetail",
+      "declaration": {
+        "name": "HxButtonClickDetail",
+        "module": "./hx-button.js"
+      }
     }
   ]
 }
 ```
+
+The hx-button index re-exports both the `HelixButton` class and the `HxButtonClickDetail` event-detail type — most components ship at least one detail/options type alongside the class.
 
 ---
 
@@ -115,7 +125,7 @@ Class declarations describe component classes. For custom elements, the class de
 ```json
 {
   "kind": "class",
-  "description": "A button component for user interaction.",
+  "description": "Primary action element. Use for triggering navigation or destructive/positive intent.",
   "name": "HelixButton",
   "cssProperties": [
     /* ... */
@@ -136,14 +146,16 @@ Class declarations describe component classes. For custom elements, the class de
     /* ... */
   ],
   "superclass": {
-    "name": "LitElement",
-    "package": "lit"
+    "name": "HelixElement",
+    "module": "/base/helix-element.js"
   },
   "tagName": "hx-button",
   "customElement": true,
-  "summary": "Primary interactive element for triggering actions."
+  "summary": "Button — variants, sizes, link mode, loading states. Form-associated."
 }
 ```
+
+> Treat the JSON above as illustrative shape only — the exact text in `description`/`summary`/`superclass` is drawn from JSDoc on the component and from its actual base class (`HelixElement`, the HELiX `LitElement` subclass), so it changes from release to release. Read the live entry in `packages/hx-library/custom-elements.json` for canonical metadata.
 
 **kind**: Always `"class"` for component classes.
 
@@ -174,15 +186,17 @@ CSS custom properties (CSS variables) that the component accepts for theming:
   {
     "description": "Button background color.",
     "name": "--hx-button-bg",
-    "default": "var(--hx-color-primary-500)"
+    "default": "var(--hx-color-action-primary-bg)"
   },
   {
     "description": "Button text color.",
     "name": "--hx-button-color",
-    "default": "var(--hx-color-neutral-0)"
+    "default": "var(--hx-color-text-on-primary)"
   }
 ]
 ```
+
+Defaults route through the semantic tier (`--hx-color-action-primary-bg`, `--hx-color-text-on-primary`) so brand-level overrides at the primitive palette propagate correctly. The semantic tokens are what variant rules read at paint time.
 
 **name**: CSS custom property name (always starts with `--hx-` in hx-library).
 
@@ -229,10 +243,9 @@ Content projection slots defined in component template:
 
 ```json
 "slots": [
-  {
-    "description": "Default slot for button label text or content.",
-    "name": ""
-  }
+  { "description": "Default slot for button label text or content.", "name": "" },
+  { "description": "Icon or content rendered before the label.", "name": "prefix" },
+  { "description": "Icon or content rendered after the label.", "name": "suffix" }
 ]
 ```
 
@@ -245,7 +258,8 @@ Extracted from `@slot` JSDoc tags:
 ```typescript
 /**
  * @slot - Default slot for button label text or content.
- * @slot icon - Custom icon to display before label.
+ * @slot prefix - Icon or content rendered before the label.
+ * @slot suffix - Icon or content rendered after the label.
  */
 ```
 
@@ -263,7 +277,7 @@ Properties are reactive attributes on the component class:
     "kind": "field",
     "name": "variant",
     "type": {
-      "text": "'primary' | 'secondary' | 'ghost'"
+      "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'"
     },
     "default": "'primary'",
     "description": "Visual style variant of the button.",
@@ -339,7 +353,7 @@ Custom events dispatched by the component:
 ]
 ```
 
-**name**: Event name (always prefixed with `hx-` in hx-library).
+**name**: Event name. HELiX components emit `hx-`-prefixed custom events (`hx-click`, `hx-change`, `hx-after-close`, …) for component-specific signals, and may additionally surface the standard `ElementInternals` form-validation event `invalid` on form-associated components. Treat the per-component CEM `events` list as authoritative.
 
 **type**: TypeScript type for event object.
 
@@ -369,7 +383,7 @@ Attributes mirror properties but use HTML attribute syntax:
   {
     "name": "variant",
     "type": {
-      "text": "'primary' | 'secondary' | 'ghost'"
+      "text": "'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'"
     },
     "default": "'primary'",
     "description": "Visual style variant of the button.",
@@ -383,7 +397,7 @@ Attributes mirror properties but use HTML attribute syntax:
 
 **attribute**: HTML attribute name.
 
-Generated automatically from `@property` decorators with `reflect: true` or `attribute` option.
+The analyzer emits an `attributes` entry for every Lit `@property()` field by default. Setting `attribute: false` opts the field out (no attribute emitted); a string value (e.g. `@property({ attribute: 'hx-size' })`) overrides the attribute name; `reflect: true` adds `"reflects": true` to the entry. Use the per-component CEM entry as the source of truth — many HELiX attributes (`hx-size`, `accessible-label`, `hx-href`) are renamed from their property names.
 
 ---
 
@@ -441,9 +455,15 @@ hx-library uses `@custom-elements-manifest/analyzer` to generate CEM from source
 
 ```json
 "scripts": {
-  "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\""
+  "cem": "custom-elements-manifest analyze --litelement --globs \"src/components/**/*.ts\" --exclude \"**/*.stories.ts\" --exclude \"**/*.styles.ts\" && node ../../scripts/validate-cem.mjs && pnpm run figma:inventory"
 }
 ```
+
+The `cem` script chains three steps:
+
+1. `custom-elements-manifest analyze …` — emits `custom-elements.json`.
+2. `node ../../scripts/validate-cem.mjs` — validates the manifest against HELiX-specific shape rules (every public component must have `tagName`, declared events, slot descriptions, etc.).
+3. `pnpm run figma:inventory` — refreshes the Figma component inventory snapshot from the just-generated CEM.
 
 **--litelement**: Enable Lit-specific metadata extraction (detects `@property`, `@customElement`, etc.).
 
@@ -479,27 +499,27 @@ This file is committed to version control and published with the package.
 ### Manual Generation
 
 ```bash
-npm run cem
+pnpm --filter=@helixui/library run cem
 ```
 
-Runs analyzer and writes `custom-elements.json` to package root.
+Runs the analyzer, the CEM validator, and the Figma inventory refresh. Writes `custom-elements.json` to the package root.
 
 ### Build Integration
 
-CEM generation is **not** part of the standard build pipeline. It must be run manually after component changes.
+CEM generation **is** part of the standard library build pipeline. The `hx-library` build script chains `vite build && pnpm run cem && pnpm run css:build`, so a normal `pnpm run build` emits a fresh CEM as a build artifact (and `turbo.json` lists `custom-elements.json` in `build.outputs` so it's cached and restored).
 
-**Rationale**: CEM generation is deterministic and only changes when component source changes. Separating it from build reduces build time and allows developers to review CEM diffs before commit.
+Local preflight (`scripts/preflight.sh`) additionally re-runs `cem` and `git diff --exit-code` against the committed manifest, so a stale CEM blocks pushes even if the developer forgets to regenerate.
 
 ### When to Regenerate
 
-Run `npm run cem` after:
+Run `pnpm --filter=@helixui/library run cem` after:
 
 - Adding or removing components
 - Changing component public API (properties, events, methods)
 - Updating JSDoc comments (`@cssprop`, `@csspart`, `@slot`, `@fires`)
 - Modifying TypeScript types for public members
 
-**Rule**: If a change affects what developers see in IDE autocomplete or Storybook controls, regenerate CEM.
+**Rule**: If a change affects what developers see in IDE autocomplete or Storybook controls, regenerate CEM. (A normal `pnpm run build` does the same thing, so the manual command is mostly for tight-loop authoring.)
 
 ### Validation
 
@@ -522,17 +542,17 @@ Storybook reads CEM to generate controls and documentation tabs automatically.
 
 #### Configuration
 
+Storybook does **not** auto-detect HELiX's CEM via the `customElements` field — the workspace explicitly registers it in `apps/storybook/.storybook/preview.ts`:
+
 ```typescript
-// apps/storybook/.storybook/main.ts
-export default {
-  addons: [
-    '@storybook/addon-essentials',
-    // CEM integration happens automatically when custom-elements.json is present
-  ],
-};
+// apps/storybook/.storybook/preview.ts
+import { setCustomElementsManifest } from '@storybook/web-components';
+import customElements from '@helixui/library/custom-elements.json';
+
+setCustomElementsManifest(customElements);
 ```
 
-Storybook detects `custom-elements.json` via the `customElements` field in `package.json`.
+Explicit registration is intentional — it lets the docs preset patch the manifest at runtime (e.g. injecting AAA-cert status from `aaa-verdicts.json`) before Storybook reads it for controls and the autodocs panel.
 
 #### Control Generation
 
@@ -582,17 +602,13 @@ This enables:
 
 Astro Starlight documentation can parse CEM to generate component reference pages.
 
-**hx-library approach**: Component reference is manually written in Starlight markdown. CEM provides ground truth for validation but is not directly consumed by docs build.
-
-**Alternative approach**: Some projects use CEM to generate markdown tables or interactive API explorers. This is not currently implemented in hx-library.
+**hx-library approach**: Most prose pages are hand-written, but several pages do consume CEM directly at build time — see `apps/docs/src/content/docs/api-reference/overview.md`, `apps/docs/src/content/docs/storybook-preset.mdx`, and `apps/docs/src/content/docs/components/api.md`, plus the Storybook-side `A11yStatusCard` which reads `@helixui/library/custom-elements.json` to render component-status chips. The CEM is the canonical source for any factual claim about an attribute, slot, event, or CSS property.
 
 ### Framework Adapters
 
 Framework wrappers (React, Vue, Angular) can use CEM to generate typed component wrappers automatically.
 
-**Example**: `@lit-labs/react` can read CEM to generate React components with correct TypeScript props.
-
-hx-library does not currently ship framework adapters, but CEM makes this possible in the future.
+**HELiX shipped**: `@helixui/react` is a workspace package whose React wrappers are regenerated from CEM by `scripts/generate-react-wrappers.ts` (also wired as the `prebuild` hook). The generator uses `@lit-labs/react` under the hood and emits one PascalCase wrapper component per `hx-*` tag in the manifest. CI enforces drift via `pnpm --filter=@helixui/react run generate:check`. See the [React Wrappers guide](/framework-integration/react-wrappers/) for usage.
 
 ---
 
@@ -600,7 +616,7 @@ hx-library does not currently ship framework adapters, but CEM makes this possib
 
 ### JSDoc Comments are Required
 
-Every public property, method, event, slot, CSS custom property, and CSS part must have a JSDoc comment. This is not optional.
+Every public property, method, event, slot, CSS custom property, and CSS part should have a JSDoc comment — the CEM analyzer surfaces those strings to Storybook, IDE tooling, and the docs build. The CEM validator (`scripts/validate-cem.mjs`) enforces presence of `tagName`, declared events, and slot/CSS-prop descriptions; it does not yet treat every empty `description` as a hard error, so a handful of inherited or trivial members still ship with empty descriptions. Treat empty descriptions as defects to fix, not a supported pattern.
 
 **Bad**:
 
