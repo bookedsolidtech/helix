@@ -22,7 +22,7 @@ import auditRaw from '../../../../packages/hx-library/src/components/hx-dialog/A
 
 ## Hero scenario — destructive confirmation modal
 
-The most consequential deployment of `hx-dialog` in healthcare: a confirmation modal before a destructive operation. Click "Delete patient record" below to open the dialog. While open, focus is trapped inside the modal, the page underneath is inert (cannot receive pointer or keyboard input), and <kbd>Escape</kbd> closes the dialog and returns focus to the triggering button. Initial focus lands on the secondary "Cancel" action so a stray <kbd>Enter</kbd> press defaults to the safe path — a deliberate UX choice for destructive flows.
+The most consequential deployment of `hx-dialog` in healthcare: a confirmation modal before a destructive operation. Click "Delete patient record" below to open the dialog. The sample below uses `showModal()` so focus is trapped inside the dialog, the page underneath is inert, and <kbd>Escape</kbd> closes the dialog and returns focus to the triggering button. (`show()` opens the dialog non-modally without those guarantees — pick `showModal()` for destructive flows.) Initial focus lands on the first focusable element inside the dialog (the close button by default, or the slotted Cancel button in this layout) — author the dialog content so the safe path is reached first.
 
 <div
   style={{
@@ -42,7 +42,7 @@ The most consequential deployment of `hx-dialog` in healthcare: a confirmation m
 variant="danger"
 onClick={(e) => {
 const dlg = document.querySelector('#consent-delete-dialog');
-if (dlg && typeof dlg.show === 'function') dlg.show();
+if (dlg && typeof dlg.showModal === 'function') dlg.showModal();
 }}
 
 >
@@ -51,8 +51,8 @@ if (dlg && typeof dlg.show === 'function') dlg.show();
 
   </hx-button>
 
-  <hx-dialog id="consent-delete-dialog" label="Confirm patient record deletion">
-    <h2 slot="header" style={{ margin: 0, fontSize: '1.25rem' }}>Delete patient record?</h2>
+  <hx-dialog id="consent-delete-dialog" heading="Confirm patient record deletion">
+    <h2 slot="heading" style={{ margin: 0, fontSize: '1.25rem' }}>Delete patient record?</h2>
     <p>
       This permanently deletes <strong>James Wilson, MRN 00012345</strong> and every associated note, order, lab result, and attachment. The action <strong>cannot</strong> be undone.
     </p>
@@ -64,7 +64,7 @@ if (dlg && typeof dlg.show === 'function') dlg.show();
         variant="ghost"
         onClick={() => {
           const dlg = document.querySelector('#consent-delete-dialog');
-          if (dlg && typeof dlg.hide === 'function') dlg.hide();
+          if (dlg && typeof dlg.close === 'function') dlg.close();
         }}
       >
         Cancel
@@ -100,23 +100,27 @@ The contract: focus trap, return focus, inert backdrop, Escape dismissal, initia
     <ul className="hx-apg-card-keyboard">
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Initial focus</strong> — when the dialog opens, focus moves into the dialog and
-          lands on the primary action (or the first focusable child if no <code>autofocus</code> is
-          set).
+          <strong>Initial focus</strong> — when the dialog opens, focus moves to the first
+          focusable element inside the dialog (the close button by default, or whatever you
+          slot in first). hx-dialog does not currently honor an <code>autofocus</code>{' '}
+          attribute on slotted children — re-order the slotted content so the desired
+          first-focus target appears first.
         </span>
       </li>
       <li>
         <span className="hx-apg-kbd-desc">
           <strong>Focus trap</strong> — <kbd className="hx-apg-kbd">Tab</kbd> and{' '}
           <kbd className="hx-apg-kbd">Shift+Tab</kbd> cycle through focusable descendants of the
-          dialog only; the rest of the page is inert.
+          dialog only; the rest of the page is inert (when opened via <code>showModal()</code> or
+          rendered with <code>modal</code>).
         </span>
       </li>
       <li>
         <span className="hx-apg-kbd-desc">
           <strong>Escape dismiss</strong> — <kbd className="hx-apg-kbd">Escape</kbd> closes the
-          dialog (unless <code>no-light-dismiss</code> is set, in which case explicit user action is
-          required).
+          dialog. To disable backdrop click dismissal (still letting Escape work), set{' '}
+          <code>close-on-backdrop="false"</code>. hx-dialog does not currently expose a switch
+          to disable Escape dismissal.
         </span>
       </li>
       <li>
@@ -134,23 +138,25 @@ The contract: focus trap, return focus, inert backdrop, Escape dismissal, initia
   tag="hx-dialog"
   obligations={[
     <>
-      Provide a <code>label</code> attribute (or render a heading into the <code>header</code> slot)
-      — the dialog's accessible name is what screen readers announce on open. Without it, the dialog
-      is announced as "dialog" with no context.
+      Provide a <code>heading</code> attribute (or render a heading element into the{' '}
+      <code>heading</code> slot) — the dialog's accessible name is what screen readers announce on
+      open. Without it, the dialog is announced as "dialog" with no context. (hx-dialog also accepts
+      a native <code>aria-label</code> attribute; there is no separate <code>label</code> attribute.)
     </>,
     <>
       Do not render multiple modal dialogs simultaneously. The APG pattern is
       single-modal-at-a-time; stacking modals breaks focus trap and makes the inert layer ambiguous.
     </>,
     <>
-      For dialogs that mediate destructive operations, set the initial-focused action to the{' '}
-      <strong>safe</strong> path (Cancel, not Delete). The default Enter activation should never
-      trigger a destructive operation.
+      For dialogs that mediate destructive operations, order the slotted footer so the{' '}
+      <strong>safe</strong> action (Cancel) appears first — initial focus lands on the first
+      focusable descendant, and the default Enter activation should never trigger a destructive
+      operation.
     </>,
     <>
-      Use <code>hx-drawer</code> instead of <code>hx-dialog</code> for non-blocking side-panel
-      patterns. Drawers do NOT trap focus and do NOT inert the underlying page; the two patterns are
-      not interchangeable.
+      Use <code>hx-drawer</code> for slide-in panel patterns. Drawers also trap focus and inert the
+      background by default; both modal-by-default surfaces are interchangeable in that sense, but
+      drawers are positioned on the edge of the viewport while dialogs centre.
     </>,
     <>
       Provide a visible Close mechanism inside the dialog. <kbd>Escape</kbd> alone is not enough —
@@ -172,14 +178,14 @@ Use a non-destructive dialog for confirmation of a successful operation, importa
     variant="primary"
     onClick={() => {
       const dlg = document.querySelector('#info-dialog');
-      if (dlg && typeof dlg.show === 'function') dlg.show();
+      if (dlg && typeof dlg.showModal === 'function') dlg.showModal();
     }}
   >
     Show notification dialog
   </hx-button>
 
-  <hx-dialog id="info-dialog" label="Order placed successfully">
-    <h2 slot="header" style={{ margin: 0, fontSize: '1.125rem' }}>Order placed</h2>
+  <hx-dialog id="info-dialog" heading="Order placed successfully">
+    <h2 slot="heading" style={{ margin: 0, fontSize: '1.125rem' }}>Order placed</h2>
     <p>
       Lab order #LX-249-007 has been transmitted to the reference lab. Results typically return within 24-48 hours.
     </p>
@@ -188,7 +194,7 @@ Use a non-destructive dialog for confirmation of a successful operation, importa
         variant="primary"
         onClick={() => {
           const dlg = document.querySelector('#info-dialog');
-          if (dlg && typeof dlg.hide === 'function') dlg.hide();
+          if (dlg && typeof dlg.close === 'function') dlg.close();
         }}
       >
         Acknowledge
@@ -199,36 +205,44 @@ Use a non-destructive dialog for confirmation of a successful operation, importa
 
 <SectionHead title="Form dialog" meta="--with-form" />
 
-A dialog containing a form. Submission and cancellation are both routed through the dialog's footer action row. The focus trap keeps tab order within the form, and submission closes the dialog before navigating.
+A dialog containing a form. Wrap the body in a real `<form>` so Enter-to-submit and FormData collection work natively; the footer Save button uses `type="submit"`. The focus trap keeps tab order within the form, and the submit handler closes the dialog before navigating.
 
 <div style={{ padding: '1rem 0' }}>
   <hx-button
     variant="secondary"
     onClick={() => {
       const dlg = document.querySelector('#form-dialog');
-      if (dlg && typeof dlg.show === 'function') dlg.show();
+      if (dlg && typeof dlg.showModal === 'function') dlg.showModal();
     }}
   >
     Add chart note
   </hx-button>
 
-  <hx-dialog id="form-dialog" label="Add chart note">
-    <h2 slot="header" style={{ margin: 0, fontSize: '1.125rem' }}>New chart note</h2>
-    <p style={{ margin: '0 0 1rem 0', fontSize: '0.875rem', color: 'var(--hx-color-text-secondary, #4d5b6b)' }}>
-      Notes are timestamped and signed automatically.
-    </p>
-    <hx-text-input label="Subject" name="note_subject" placeholder="Follow-up — labs reviewed"></hx-text-input>
+  <hx-dialog id="form-dialog" heading="Add chart note">
+    <form
+      id="chart-note-form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        // Persist the form data via your app's mutation layer here, then close.
+        document.querySelector('#form-dialog').close();
+      }}
+    >
+      <p style={{ margin: '0 0 1rem 0', fontSize: '0.875rem', color: 'var(--hx-color-text-secondary, #4d5b6b)' }}>
+        Notes are timestamped and signed automatically.
+      </p>
+      <hx-text-input label="Subject" name="note_subject" placeholder="Follow-up — labs reviewed"></hx-text-input>
+    </form>
     <div slot="footer" style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
       <hx-button
         variant="ghost"
         onClick={() => {
           const dlg = document.querySelector('#form-dialog');
-          if (dlg && typeof dlg.hide === 'function') dlg.hide();
+          if (dlg && typeof dlg.close === 'function') dlg.close();
         }}
       >
         Cancel
       </hx-button>
-      <hx-button variant="primary">Save note</hx-button>
+      <hx-button variant="primary" type="submit" form="chart-note-form">Save note</hx-button>
     </div>
   </hx-dialog>
 </div>
@@ -241,6 +255,6 @@ A dialog containing a form. Submission and cancellation are both routed through 
 
 ## Variant gallery
 
-The full enumeration of sizes, header/footer slot patterns, light-dismiss vs persistent variants, and integrations with `hx-form` lives in the `Components/Dialog` story tree.
+The full enumeration of heading/footer slot patterns, modal vs non-modal opens, and `close-on-backdrop` variations lives in the `Components/Dialog` story tree. Size-variant enumeration is not part of the current dialog API (`variant` only switches between `dialog` and `alertdialog` semantics); use `--hx-dialog-*` CSS custom properties for surface customisation.
 
 </div>
