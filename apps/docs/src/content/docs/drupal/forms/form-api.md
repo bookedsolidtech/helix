@@ -175,22 +175,17 @@ Rendered output:
 HELiX form components implement the `ElementInternals` API (`formAssociated = true`). This allows them to participate in native HTML form submission without any JavaScript bridging code.
 
 ```typescript
-// Inside hx-text-input (simplified)
-export class HxTextInput extends LitElement {
-  static formAssociated = true;
-  private _internals: ElementInternals;
-
-  constructor() {
-    super();
-    this._internals = this.attachInternals();
-  }
-
+// Inside hx-text-input (simplified — actual class is HelixTextInput,
+// built on FormMixin + HelixElement). The mixin attaches ElementInternals
+// and manages setFormValue/setValidity; the host component only updates
+// its public value property.
+export class HelixTextInput extends FormMixin(HelixElement) {
   @property({ type: String }) value = '';
 
   private _handleInput(e: InputEvent): void {
     this.value = (e.target as HTMLInputElement).value;
-    // Reports value directly to the containing <form>
-    this._internals.setFormValue(this.value);
+    // FormMixin reports the new value to the containing <form>
+    // via this._internals.setFormValue() automatically.
   }
 }
 ```
@@ -369,12 +364,15 @@ The element plugin's `#pre_render` callback passes `$element['#errors']` to the 
 
 ```html
 <!-- With a validation error, the component receives: -->
+<!-- aria-invalid is NOT a public hx-text-input attribute — the
+     component sets aria-invalid on its internal input automatically
+     whenever `error` is non-empty. The element-plugin pre_render
+     callback should map #errors → `error` only. -->
 <hx-text-input
   name="phone"
   label="Phone"
   value="+1-invalid"
   error="Enter a valid phone number."
-  aria-invalid="true"
 ></hx-text-input>
 ```
 
@@ -406,10 +404,12 @@ public function validateMrnAjax(array &$form, FormStateInterface $form_state): a
   $mrn = $form_state->getValue('mrn');
   $exists = $this->patientStorage->mrnExists($mrn);
 
+  // hx-alert defaults to closed — render it with `open` so the
+  // AJAX response actually shows the result.
   return [
     '#markup' => $exists
-      ? '<hx-alert variant="warning">MRN already registered.</hx-alert>'
-      : '<hx-alert variant="success">MRN available.</hx-alert>',
+      ? '<hx-alert open variant="warning">MRN already registered.</hx-alert>'
+      : '<hx-alert open variant="success">MRN available.</hx-alert>',
   ];
 }
 ```

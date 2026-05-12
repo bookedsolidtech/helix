@@ -81,8 +81,8 @@ export const FA_FREE_SAMPLE = [
 ];
 
 export const SIZES = [
-  { name: 'xs', label: '12px' },
-  { name: 'sm', label: '16px' },
+  { name: 'xs', label: '16px' },
+  { name: 'sm', label: '20px' },
   { name: 'md', label: '24px' },
   { name: 'lg', label: '32px' },
   { name: 'xl', label: '40px' },
@@ -96,12 +96,15 @@ export const SIZES = [
   lede={
     <>
       <code>hx-icon</code> resolves names through registered libraries — the same pattern Shoelace
-      established and that the WC ecosystem has converged on. <strong>FA Free</strong> is the
-      out-of-the-box default. <strong>helix</strong> is the curated internal glyph set powering
-      every checkmark, chevron, and status indicator across the library.{' '}
-      <strong>Bring your own</strong> — Font Awesome Pro, Phosphor, Heroicons, Material Symbols,
-      Iconify, or a brand-internal set — via a one-call registration. Powered by{' '}
-      <code>@helixui/icons</code>, a peer dependency required like <code>@helixui/tokens</code>.
+      established and that the WC ecosystem has converged on. The <code>library</code> attribute
+      defaults to the empty string (no library); set it to <code>fa-free</code> for the FA Free
+      Solid set bundled with <code>@helixui/icons</code>, <code>helix</code> for the curated
+      internal glyph set powering checkmarks, chevrons, and status indicators across the library, or
+      any name you register against your own resolver — Font Awesome Pro, Phosphor, Heroicons,
+      Material Symbols, Iconify, or a brand-internal set. Resolution is powered by{' '}
+      <code>@helixui/icons</code>, which ships as a regular dependency of{' '}
+      <code>@helixui/library</code>
+      (the same way <code>@helixui/tokens</code> ships).
     </>
   }
 />
@@ -134,8 +137,8 @@ export const SIZES = [
   >
     <StatCard
       label="Default library"
-      value="fa-free"
-      sublabel="2,000 FA Free Solid v7"
+      value="(none)"
+      sublabel="library='' until set; fa-free + helix bundled"
       tone="info"
     />
     <StatCard
@@ -145,7 +148,12 @@ export const SIZES = [
       tone="success"
     />
     <StatCard label="Bring-your-own" value="∞" sublabel="register any resolver" tone="neutral" />
-    <StatCard label="Conformance" value="AAA" sublabel="non-text contrast 1.4.11" tone="success" />
+    <StatCard
+      label="Conformance"
+      value="AA / Audited"
+      sublabel="WCAG 1.4.11 (3:1 non-text) verified at audit"
+      tone="success"
+    />
   </div>
 </section>
 
@@ -153,11 +161,7 @@ export const SIZES = [
   <SectionHead title="The shape" meta="hx-icon library=… name=…" />
   <CodeBlock
     language="html"
-    code={`<!-- Default library — no attribute needed -->
-<hx-icon name="heart" hx-size="md"></hx-icon>
-
-<!-- Explicit FA Free -->
-
+    code={`<!-- library defaults to '' — set it explicitly for any rendered glyph. -->
 <hx-icon library="fa-free" name="user-doctor" hx-size="md"></hx-icon>
 
 <!-- helix system glyph -->
@@ -174,11 +178,11 @@ export const SIZES = [
 <section>
   <SectionHead title="Live: helix library" meta="32 curated glyphs · paint-mode fill · MIT" />
   <p style={{ marginBottom: 16, maxWidth: '70ch' }}>
-    The internal glyph vocabulary every HELiX component renders through. Hand-drawn at 24×24, filled
-    silhouettes (no strokes), <code>currentColor</code> only. AAA-validated for WCAG 1.4.11 non-text
-    contrast at 16px+ render sizes. Phase 5 of the icons epic migrates internal components
-    (hx-checkbox, hx-alert, hx-toast, etc.) to consume these names — re-register <code>helix</code>{' '}
-    with your own resolver to override the entire system glyph surface.
+    The internal glyph vocabulary that HELiX components render through. Hand-drawn at 24×24, filled
+    silhouettes (no strokes), <code>currentColor</code> only. Per the library AAA audit every glyph
+    clears WCAG 1.4.11 non-text contrast at the audited render sizes. Internal components
+    (hx-checkbox, hx-alert, hx-toast, etc.) already consume these names — re-register
+    <code> helix</code> with your own resolver to override the entire system glyph surface.
   </p>
   <div
     style={{
@@ -424,7 +428,9 @@ paintMode: 'fill',
       }
     >
       Icon picks up <code>currentColor</code> by default — pair semantically with{' '}
-      <code>--hx-color-text-success</code> or <code>--hx-color-text-error</code> to signal status.
+      <code>--hx-color-success-700</code> or <code>--hx-color-error-700</code> (or another text-safe
+      stop on the status ramp) to signal status. There are no flat{' '}
+      <code>--hx-color-text-success</code> / <code>--hx-color-text-error</code> tokens.
     </DocsCard>
     <DocsCard
       title="Leading icon in a control"
@@ -459,7 +465,7 @@ paintMode: 'fill',
 </section>
 
 <section>
-  <SectionHead title="Accessibility" meta="WCAG 2.2 AAA · forced-colors · 1.4.11" />
+  <SectionHead title="Accessibility" meta="WCAG 2.2 · forced-colors · 1.4.11" />
   <div
     style={{
       display: 'grid',
@@ -501,9 +507,10 @@ paintMode: 'fill',
       tag="≥3:1 against background"
       demo={<code style={{ fontSize: 13 }}>{'iconLibraryAaaVerdict("helix")'}</code>}
     >
-      Both built-in libraries are validated against WCAG 2.2 1.4.11 at minimum render size. Custom
-      libraries inherit the same harness — call <code>iconLibraryAaaVerdict(name)</code> to verify
-      before claiming AAA on icon glyphs.
+      Both built-in libraries are validated against WCAG 1.4.11 at the audited render sizes;{' '}
+      <code>iconLibraryAaaVerdict(name)</code> returns the recorded verdict for built-in libraries
+      and <code>undefined</code> for custom registrations. Custom libraries must run their own
+      contrast audit — there is no built-in verifier for third-party resolvers.
     </DocsCard>
   </div>
 </section>
