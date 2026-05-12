@@ -14,9 +14,9 @@
 //
 // Output: JSONL findings to .reports/docs-fact-check/programmatic-findings.jsonl + a markdown rollup.
 
-import { readFile, writeFile, mkdir, readdir, stat } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join, relative, dirname, basename } from 'node:path';
+import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -95,14 +95,17 @@ for (const set of tagToCssProps.values()) {
   for (const p of set) allCssProps.add(p);
 }
 
-// Workspace package versions
+// Workspace package versions (walks BOTH packages/ and apps/ — @helixui/storybook
+// and other app-level workspace packages count as canonical names).
 async function loadWorkspaceVersions() {
   const versions = new Map();
-  const pkgs = await walk(join(REPO_ROOT, 'packages'), (p) => p.endsWith('/package.json'));
-  for (const p of pkgs) {
-    const pkg = await readJsonSafe(p);
-    if (pkg?.name?.startsWith('@helixui/')) {
-      versions.set(pkg.name, pkg.version);
+  for (const root of ['packages', 'apps']) {
+    const pkgs = await walk(join(REPO_ROOT, root), (p) => p.endsWith('/package.json'));
+    for (const p of pkgs) {
+      const pkg = await readJsonSafe(p);
+      if (pkg?.name?.startsWith('@helixui/')) {
+        versions.set(pkg.name, pkg.version);
+      }
     }
   }
   // Add any non-scoped published packages of interest
@@ -176,6 +179,12 @@ const cssPropRegex = /(--hx-[a-z0-9-]+)/g;
 const internalLinkRegex = /\]\((\/[^)#?]+)(?:[?#][^)]*)?\)/g;
 // Stale repo refs
 const staleRepoRegex = /github\.com\/himerus\/wc-2026/g;
+// Any @helixui/* package reference (with or without a version) — used to
+// catch typos in unpinned install / import snippets like:
+//   npm install @helixui/libray
+//   import {...} from '@helixui/icns';
+const packageRefRegex = /@helixui\/([a-z0-9][a-z0-9-]*)/g;
+
 // Old version pins on @helixui/* (drift gate handles this; we surface anyway)
 const versionPinRegex =
   /@helixui\/(library|icons|tokens|react|drupal-behaviors)@([0-9]+\.[0-9]+\.[0-9]+|\^[0-9]+(?:\.[0-9]+)?|~[0-9]+(?:\.[0-9]+)?)/g;
@@ -403,6 +412,74 @@ for (const file of targetFiles) {
         fix: 'Either frame WCAG 2.1 AA as an external regulatory floor that HELiX exceeds, or update to "WCAG 2.2 AAA on P0 surface, AA baseline elsewhere".',
       });
     }
+  }
+
+  // --- 5b. @helixui/* package-name typos / fabrications ---
+  // Catch references like `@helixui/libray`, `@helixui/iconz`, etc. — any
+  // bare scoped name that isn't one of the workspace packages (or the
+  // historical `drupal-behaviors-react` etc. that may still appear in
+  // archival snapshots).
+  const knownPackageNames = new Set(
+    [...workspaceVersions.keys()].filter((n) => n.startsWith('@helixui/')),
+  );
+  // Also accept these archival names that have appeared in CHANGELOG history
+  knownPackageNames.add('@helixui/adopted-stylesheets'); // documented internal pattern
+  knownPackageNames.add('@helixui/storybook-preset'); // planned future package
+  packageRefRegex.lastIndex = 0;
+  const seenBadRefs = new Set();
+  while ((m = packageRefRegex.exec(content)) !== null) {
+    const name = `@helixui/${m[1]}`;
+    if (knownPackageNames.has(name)) continue;
+
+    const preTagText = content.slice(0, m.index);
+    const lineStart = preTagText.lastIndexOf('\n') + 1;
+    const linePrefix = preTagText.slice(lineStart);
+    const insideBacktickPair = (linePrefix.match(/`/g) ?? []).length % 2 === 1;
+    const lineText = lines[content.slice(0, m.index).split(/\r?\n/).length - 1] ?? '';
+    const surroundingLines = lines
+      .slice(
+        Math.max(0, content.slice(0, m.index).split(/\r?\n/).length - 2),
+        content.slice(0, m.index).split(/\r?\n/).length + 1,
+      )
+      .join(' ');
+
+    // Skip if explicitly framed as a typo / fabrication / non-existent /
+    // example — the surrounding text identifies the package name as something
+    // that DOES NOT exist on npm or in the workspace.
+    if (
+      /typo|misspelled|fabricated|example|hypothetical|imagined|no separate|doesn['']t exist|do[es]*\s+not\s+exist|there is no|no such/i.test(
+        surroundingLines,
+      )
+    )
+      continue;
+
+    // Skip forward-looking "Planned" / "future" / "coming" roadmap rows.
+    if (/Planned|Future|Coming|Proposed|Roadmap|TBD/i.test(surroundingLines)) continue;
+
+    // Skip Twig SDC include namespace references: `{{ include('@module/component', ...) }}`
+    // or `extends '@module/component'`. Drupal SDC routes use the `@<namespace>`
+    // form inside Twig template-loader calls, NOT npm package specifiers.
+    if (
+      /(?:\{\{\s*include|\{%\s*(?:include|extends|embed|import))\s*\(?\s*['"]?@helixui\//.test(
+        linePrefix.replace(/`/g, '') + '@helixui/',
+      ) ||
+      /(?:include|extends|embed|import)\s*\(?\s*['"]@helixui\//.test(lineText)
+    )
+      continue;
+
+    if (seenBadRefs.has(`${file}:${name}`)) continue;
+    seenBadRefs.add(`${file}:${name}`);
+
+    const idx = content.slice(0, m.index).split(/\r?\n/).length;
+    add({
+      file,
+      line: idx,
+      severity: 'high',
+      category: 'package-version',
+      issue: `Unknown @helixui/* package: ${name} (not in workspace)`,
+      evidence: lineText.slice(0, 120),
+      fix: `Replace with a real workspace package (e.g. ${[...workspaceVersions.keys()].slice(0, 3).join(', ')}) or remove the reference.`,
+    });
   }
 
   // --- 6. @helixui/* package name + version-pin drift ---

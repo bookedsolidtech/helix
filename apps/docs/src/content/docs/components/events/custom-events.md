@@ -964,7 +964,11 @@ Testing that events are dispatched with correct detail payloads is essential for
 ### Basic Event Assertion
 
 ```typescript
-import { fixture, oneEvent } from '@helixui/test-utils';
+// In the @helixui/library monorepo, test helpers live at
+// `packages/hx-library/src/test-utils.ts`. There is no separate
+// `@helixui/test-utils` npm package today — for in-monorepo tests,
+// import from the per-component relative path.
+import { fixture, oneEvent } from '../../test-utils.js';
 
 it('dispatches hx-change when checkbox is toggled', async () => {
   const el = await fixture<HelixCheckbox>(html`<hx-checkbox></hx-checkbox>`);

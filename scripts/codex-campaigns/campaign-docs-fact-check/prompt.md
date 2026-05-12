@@ -46,7 +46,17 @@ referenced:
 - Verify the event name matches (doc says `hx-toggle` but source emits
   `hx-change` → fabrication).
 - Verify slot names are spelled correctly per CEM.
-- Verify CSS custom properties exist (`--hx-*` pattern).
+- Verify CSS custom properties exist (`--hx-*` pattern). **Two-tier check:**
+  - **Component-level tokens** (`--hx-button-*`, `--hx-card-*`, etc.) must
+    exist on the relevant component's `cssProperties` entry in the CEM.
+  - **Global tokens** (primitives like `--hx-color-primary-500` /
+    `--hx-space-4` / `--hx-font-family-sans`, and semantic / action-layer
+    tokens like `--hx-color-action-primary-bg` / `--hx-color-text-primary` /
+    `--hx-color-surface-default`) live in **`packages/hx-tokens`** — verify
+    them against `packages/hx-tokens/src/tokens.json` or the emitted
+    `packages/hx-tokens/dist/tokens.css`, not against any component CEM.
+    Token-system and theming docs that reference these globals are NOT
+    fabricating an API; do not flag them as missing-from-CEM.
 
 ### 3. Package names + versions
 

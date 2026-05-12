@@ -164,9 +164,14 @@ apps/storybook/stories/tokens/Borders.mdx
 apps/storybook/stories/tokens/Shadows.mdx
 packages/drupal-behaviors/README.md
 packages/drupal-starter/README.md
+packages/drupal-starter/cdn/README.md
+packages/drupal-starter/theme/README.md
 packages/hx-icons/README.md
 packages/hx-library/README.md
+packages/hx-library/src/components/hx-avatar/README.md
+packages/hx-library/src/drupal/README.md
 packages/hx-react/README.md
+packages/hx-react/test/README.md
 packages/hx-tokens/README.md
 packages/drupal-behaviors/CHANGELOG.md
 packages/drupal-starter/CHANGELOG.md
