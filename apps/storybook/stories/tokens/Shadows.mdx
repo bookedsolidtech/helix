@@ -10,14 +10,16 @@ import { tokensByCategory } from '@helixui/tokens';
 
 export const shadowTokens = tokensByCategory['shadow'] ?? [];
 
+// Every use-case below is grounded in an actual *.styles.ts shadow
+// binding in packages/hx-library/src/components.
 export const shadowUseCases = {
   none: 'Flat elements with no visual lift. Used for inline or flush elements.',
-  sm: 'Subtle elevation for cards at rest, input fields, and static containers.',
-  md: 'Moderate depth for dropdowns, popovers, and floating action elements.',
-  lg: 'Prominent elevation for modals, dialogs, and active focus states.',
-  xl: 'High elevation for toast notifications and slide-over panels.',
-  '2xl': 'Maximum depth for full-screen overlays and critical alert dialogs.',
-  inner: 'Inset shadow for pressed states, active inputs, and recessed surfaces.',
+  sm: 'Subtle elevation — hx-slider / hx-switch thumbs and hx-tooltip body.',
+  md: 'Moderate depth — hx-card at rest, hx-dropdown / hx-menu / hx-nav / hx-popover surfaces, hx-toast.',
+  lg: 'Hover elevation on hx-card (rest is md, hover lifts to lg).',
+  xl: 'High elevation for modal surfaces — hx-dialog and hx-drawer; also hx-card deep-hover.',
+  '2xl': 'Available token; not currently consumed by any shipped HELiX component. Reserved for consumer custom surfaces.',
+  inner: 'Available token; not currently consumed by any shipped HELiX component. Reserved for consumer pressed/recessed-input patterns.',
 };
 
 <style>
@@ -28,7 +30,7 @@ export const shadowUseCases = {
     margin: 0 auto;
     padding: 0 1rem 3rem;
     font-family: var(--hx-font-family-sans, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
-    color: var(--hx-color-neutral-800, #1E293B);
+    color: var(--hx-color-neutral-800, #202B39);
     line-height: 1.5;
   }
 
@@ -57,11 +59,11 @@ export const shadowUseCases = {
 
   /* ── Mini Hero Banner ───────────────────────────────── */
   .hx-token-shadows .hx-shadows-hero {
-    background: linear-gradient(135deg, var(--hx-color-neutral-100, #F1F5F9) 0%, var(--hx-color-neutral-50, #F8FAFC) 100%) !important;
+    background: linear-gradient(135deg, var(--hx-color-neutral-100, #EBEEE9) 0%, var(--hx-color-neutral-50, #F5F8F3) 100%) !important;
     border-radius: 0.75rem !important;
     padding: 2.5rem 2rem !important;
     margin-bottom: 2.5rem !important;
-    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    border: 1px solid var(--hx-color-neutral-200, #D6DBD5) !important;
     position: relative !important;
     overflow: hidden !important;
   }
@@ -73,7 +75,7 @@ export const shadowUseCases = {
     right: -20px !important;
     width: 180px !important;
     height: 180px !important;
-    background: radial-gradient(circle, var(--hx-color-neutral-200, #E2E8F0) 0%, transparent 70%) !important;
+    background: radial-gradient(circle, var(--hx-color-neutral-200, #D6DBD5) 0%, transparent 70%) !important;
     opacity: 0.6 !important;
     pointer-events: none !important;
   }
@@ -82,7 +84,7 @@ export const shadowUseCases = {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 2rem !important;
     font-weight: 800 !important;
-    color: var(--hx-color-neutral-900, #0F172A) !important;
+    color: var(--hx-color-neutral-900, #0D1825) !important;
     margin: 0 0 0.5rem 0 !important;
     letter-spacing: -0.025em !important;
     line-height: 1.2 !important;
@@ -91,7 +93,7 @@ export const shadowUseCases = {
   .hx-token-shadows .hx-shadows-hero-desc {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 1rem !important;
-    color: var(--hx-color-neutral-500, #64748B) !important;
+    color: var(--hx-color-neutral-500, #66787B) !important;
     margin: 0 0 1rem 0 !important;
     line-height: 1.6 !important;
     max-width: 600px !important;
@@ -101,8 +103,8 @@ export const shadowUseCases = {
     display: inline-flex !important;
     align-items: center !important;
     gap: 0.375rem !important;
-    background: var(--hx-color-neutral-200, #E2E8F0) !important;
-    color: var(--hx-color-neutral-700, #334155) !important;
+    background: var(--hx-color-neutral-200, #D6DBD5) !important;
+    color: var(--hx-color-neutral-700, #313E4B) !important;
     padding: 4px 12px !important;
     border-radius: 9999px !important;
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
@@ -115,7 +117,7 @@ export const shadowUseCases = {
   .hx-token-shadows .hx-shadows-section-desc {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 0.9375rem !important;
-    color: var(--hx-color-neutral-500, #64748B) !important;
+    color: var(--hx-color-neutral-500, #66787B) !important;
     margin: 0 0 1.5rem 0 !important;
     line-height: 1.6 !important;
     max-width: 640px !important;
@@ -127,9 +129,9 @@ export const shadowUseCases = {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
     gap: 24px !important;
     padding: 24px !important;
-    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    background: var(--hx-color-neutral-50, #F5F8F3) !important;
     border-radius: 0.75rem !important;
-    border: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    border: 1px solid var(--hx-color-neutral-100, #EBEEE9) !important;
   }
 
   .hx-token-shadows .hx-shadows-elevation-card {
@@ -144,21 +146,21 @@ export const shadowUseCases = {
   }
 
   .hx-token-shadows .hx-shadows-elevation-card--bordered {
-    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    border: 1px solid var(--hx-color-neutral-200, #D6DBD5) !important;
   }
 
   .hx-token-shadows .hx-shadows-card-name {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 1.125rem !important;
     font-weight: 700 !important;
-    color: var(--hx-color-neutral-800, #1E293B) !important;
+    color: var(--hx-color-neutral-800, #202B39) !important;
     margin: 0 0 0.375rem 0 !important;
   }
 
   .hx-token-shadows .hx-shadows-card-usecase {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 0.875rem !important;
-    color: var(--hx-color-neutral-500, #64748B) !important;
+    color: var(--hx-color-neutral-500, #66787B) !important;
     margin: 0 0 1rem 0 !important;
     line-height: 1.5 !important;
   }
@@ -167,11 +169,11 @@ export const shadowUseCases = {
     display: inline-block !important;
     font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
     font-size: 0.75rem !important;
-    color: var(--hx-color-neutral-600, #475569) !important;
+    color: var(--hx-color-neutral-600, #4A5362) !important;
     padding: 6px 10px !important;
-    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    background: var(--hx-color-neutral-50, #F5F8F3) !important;
     border-radius: 0.375rem !important;
-    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    border: 1px solid var(--hx-color-neutral-200, #D6DBD5) !important;
     word-break: break-all !important;
     line-height: 1.4 !important;
   }
@@ -183,9 +185,9 @@ export const shadowUseCases = {
     gap: 20px !important;
     flex-wrap: wrap !important;
     padding: 32px 24px !important;
-    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    background: var(--hx-color-neutral-50, #F5F8F3) !important;
     border-radius: 0.75rem !important;
-    border: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    border: 1px solid var(--hx-color-neutral-100, #EBEEE9) !important;
   }
 
   .hx-token-shadows .hx-shadows-comparison-item {
@@ -209,13 +211,13 @@ export const shadowUseCases = {
   }
 
   .hx-token-shadows .hx-shadows-comparison-box--bordered {
-    border: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    border: 1px solid var(--hx-color-neutral-200, #D6DBD5) !important;
   }
 
   .hx-token-shadows .hx-shadows-comparison-label {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 0.875rem !important;
-    color: var(--hx-color-neutral-600, #475569) !important;
+    color: var(--hx-color-neutral-600, #4A5362) !important;
     font-weight: 500 !important;
   }
 
@@ -229,9 +231,9 @@ export const shadowUseCases = {
   /* ── Interactive Demo ───────────────────────────────── */
   .hx-token-shadows .hx-shadows-demo-area {
     padding: 48px 32px !important;
-    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    background: var(--hx-color-neutral-50, #F5F8F3) !important;
     border-radius: 0.75rem !important;
-    border: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    border: 1px solid var(--hx-color-neutral-100, #EBEEE9) !important;
     display: flex !important;
     justify-content: center !important;
   }
@@ -256,14 +258,14 @@ export const shadowUseCases = {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 1.125rem !important;
     font-weight: 700 !important;
-    color: var(--hx-color-neutral-800, #1E293B) !important;
+    color: var(--hx-color-neutral-800, #202B39) !important;
     margin: 0 0 0.5rem 0 !important;
   }
 
   .hx-token-shadows .hx-shadows-demo-body {
     font-family: var(--hx-font-family-sans, 'Inter', sans-serif) !important;
     font-size: 0.875rem !important;
-    color: var(--hx-color-neutral-500, #64748B) !important;
+    color: var(--hx-color-neutral-500, #66787B) !important;
     line-height: 1.6 !important;
     margin: 0 0 1.25rem 0 !important;
   }
@@ -317,18 +319,18 @@ export const shadowUseCases = {
   }
 
   .hx-token-shadows .hx-shadows-ref-row:not(:last-child) {
-    border-bottom: 1px solid var(--hx-color-neutral-100, #F1F5F9) !important;
+    border-bottom: 1px solid var(--hx-color-neutral-100, #EBEEE9) !important;
   }
 
   .hx-token-shadows .hx-shadows-ref-row:hover {
-    background: var(--hx-color-neutral-50, #F8FAFC) !important;
+    background: var(--hx-color-neutral-50, #F5F8F3) !important;
     border-radius: 0.5rem !important;
   }
 
   .hx-token-shadows .hx-shadows-ref-name {
     font-family: var(--hx-font-family-mono, 'JetBrains Mono', monospace) !important;
     font-size: 0.8125rem !important;
-    color: var(--hx-color-neutral-700, #334155) !important;
+    color: var(--hx-color-neutral-700, #313E4B) !important;
     font-weight: 500 !important;
   }
 
@@ -343,7 +345,7 @@ export const shadowUseCases = {
   .hx-token-shadows .hx-shadows-footer {
     margin-top: 3rem !important;
     padding-top: 1.5rem !important;
-    border-top: 1px solid var(--hx-color-neutral-200, #E2E8F0) !important;
+    border-top: 1px solid var(--hx-color-neutral-200, #D6DBD5) !important;
     text-align: center !important;
   }
 
