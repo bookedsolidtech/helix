@@ -374,7 +374,7 @@ When creating a new component:
 
 - **Components**: `hx-component-name` (kebab-case)
 - **Events**: `hx-event-name` (kebab-case)
-- **CSS Custom Properties**: `--hx-component-property` (kebab-case)
+- **CSS Custom Properties**: `--hx-<component>-<property>` (kebab-case)
 - **CSS Parts**: `part-name` (kebab-case)
 - **TypeScript**: PascalCase for classes, camelCase for variables
 

@@ -82,7 +82,7 @@ export const FORCED_COLORS_DO_CSS = `/* DO — let the cascade keep author colou
    system keywords inside the forced-colors block. */
 :host {
   background: var(--hx-color-action-primary-bg);
-  color: var(--hx-color-action-primary-text);
+  color: var(--hx-color-text-on-primary);
 }
 
 @media (forced-colors: active) {

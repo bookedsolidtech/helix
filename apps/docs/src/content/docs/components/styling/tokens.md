@@ -148,46 +148,54 @@ HELiX uses a **three-tier cascade** that separates raw values (primitives), purp
 
 ## Tier 1: Primitive Tokens
 
-Primitive tokens define **what** styles are available. They are raw, context-free values that form the palette and scales of the design system.
+Primitive tokens define **what** styles are available. They are raw,
+context-free values that form the palette and scales of the design system.
+
+In `@helixui/tokens`, primitives live as **TypeScript constants in
+`packages/hx-tokens/src/`** — not as CSS custom properties. The build step
+inlines them into the semantic CSS (`dist/tokens.css`) at publish time, so the
+shipped surface is the semantic layer (Tier 2). Consumers never reference
+primitives directly because they aren't exposed as CSS variables.
 
 ### Characteristics
 
-- **Private** — Consumers never reference primitives directly
+- **Build-time only** — TypeScript constants, not runtime CSS custom properties
 - **Context-free** — No semantic meaning (e.g., "blue-500" not "primary")
 - **Comprehensive** — Full palette/scale, not just what's currently used
-- **Hardcoded fallbacks** — The last resort in fallback chains
+- **Hardcoded fallbacks** — Inlined as the last resort in semantic-tier `var()` chains
 
 ### Color Primitives
 
-```css
-/* Primitive tokens (used internally, not exposed) */
---hx-blue-50: #eff6ff;
---hx-blue-100: #dbeafe;
---hx-blue-200: #bfdbfe;
---hx-blue-300: #93c5fd;
---hx-blue-400: #60a5fa;
---hx-blue-500: #3b82f6; /* Base blue */
---hx-blue-600: #2563eb;
---hx-blue-700: #1d4ed8;
---hx-blue-800: #1e40af;
---hx-blue-900: #1e3a8a;
---hx-blue-950: #172554;
-```
+```ts
+// packages/hx-tokens/src/colors/* (conceptual shape — names baked into Tier 2)
+const blue = {
+  50: '#eff6ff',
+  100: '#dbeafe',
+  200: '#bfdbfe',
+  300: '#93c5fd',
+  400: '#60a5fa',
+  500: '#3b82f6', // Base blue
+  600: '#2563eb',
+  700: '#1d4ed8',
+  800: '#1e40af',
+  900: '#1e3a8a',
+  950: '#172554',
+};
 
-```css
-/* Neutral palette (grayscale) */
---hx-neutral-0: #ffffff;
---hx-neutral-50: #f8f9fa;
---hx-neutral-100: #f1f5f9;
---hx-neutral-200: #e9ecef;
---hx-neutral-300: #dee2e6;
---hx-neutral-400: #ced4da;
---hx-neutral-500: #adb5bd;
---hx-neutral-600: #6c757d;
---hx-neutral-700: #495057;
---hx-neutral-800: #343a40;
---hx-neutral-900: #212529;
---hx-neutral-950: #1a1a1a;
+const neutral = {
+  0: '#ffffff',
+  50: '#f8f9fa',
+  100: '#f1f5f9',
+  200: '#e9ecef',
+  300: '#dee2e6',
+  400: '#ced4da',
+  500: '#adb5bd',
+  600: '#6c757d',
+  700: '#495057',
+  800: '#343a40',
+  900: '#212529',
+  950: '#1a1a1a',
+};
 ```
 
 ### Spacing Primitives
@@ -302,35 +310,35 @@ Semantic tokens define **how** primitive values are applied. They carry purpose 
 #### Primary Colors
 
 ```css
-/* Primary color (brand identity) */
---hx-color-primary-50: var(--hx-blue-50-primitive, #eff6ff);
---hx-color-primary-100: var(--hx-blue-100-primitive, #dbeafe);
---hx-color-primary-200: var(--hx-blue-200-primitive, #bfdbfe);
---hx-color-primary-300: var(--hx-blue-300-primitive, #93c5fd);
---hx-color-primary-400: var(--hx-blue-400-primitive, #60a5fa);
---hx-color-primary-500: var(--hx-blue-500-primitive, #3b82f6);
---hx-color-primary-600: var(--hx-blue-600-primitive, #2563eb);
---hx-color-primary-700: var(--hx-blue-700-primitive, #1d4ed8);
---hx-color-primary-800: var(--hx-blue-800-primitive, #1e40af);
---hx-color-primary-900: var(--hx-blue-900-primitive, #1e3a8a);
---hx-color-primary-950: var(--hx-blue-950-primitive, #172554);
+/* Primary color (brand identity) — primitive hexes inlined at build time. */
+--hx-color-primary-50: #eff6ff;
+--hx-color-primary-100: #dbeafe;
+--hx-color-primary-200: #bfdbfe;
+--hx-color-primary-300: #93c5fd;
+--hx-color-primary-400: #60a5fa;
+--hx-color-primary-500: #3b82f6;
+--hx-color-primary-600: #2563eb;
+--hx-color-primary-700: #1d4ed8;
+--hx-color-primary-800: #1e40af;
+--hx-color-primary-900: #1e3a8a;
+--hx-color-primary-950: #172554;
 ```
 
 #### Neutral Colors
 
 ```css
-/* Neutral colors (text, backgrounds, borders) */
---hx-color-neutral-0: var(--hx-neutral-0-primitive, #ffffff);
---hx-color-neutral-50: var(--hx-neutral-50-primitive, #f8f9fa);
---hx-color-neutral-100: var(--hx-neutral-100-primitive, #f1f5f9);
---hx-color-neutral-200: var(--hx-neutral-200-primitive, #e9ecef);
---hx-color-neutral-300: var(--hx-neutral-300-primitive, #dee2e6);
---hx-color-neutral-400: var(--hx-neutral-400-primitive, #ced4da);
---hx-color-neutral-500: var(--hx-neutral-500-primitive, #adb5bd);
---hx-color-neutral-600: var(--hx-neutral-600-primitive, #6c757d);
---hx-color-neutral-700: var(--hx-neutral-700-primitive, #495057);
---hx-color-neutral-800: var(--hx-neutral-800-primitive, #343a40);
---hx-color-neutral-900: var(--hx-neutral-900-primitive, #212529);
+/* Neutral colors (text, backgrounds, borders) — primitives inlined. */
+--hx-color-neutral-0: #ffffff;
+--hx-color-neutral-50: #f8f9fa;
+--hx-color-neutral-100: #f1f5f9;
+--hx-color-neutral-200: #e9ecef;
+--hx-color-neutral-300: #dee2e6;
+--hx-color-neutral-400: #ced4da;
+--hx-color-neutral-500: #adb5bd;
+--hx-color-neutral-600: #6c757d;
+--hx-color-neutral-700: #495057;
+--hx-color-neutral-800: #343a40;
+--hx-color-neutral-900: #212529;
 ```
 
 #### Feedback Colors
@@ -716,7 +724,7 @@ Every CSS custom property in HELiX uses a **two-level fallback chain** (or three
 ### The Two-Level Pattern
 
 ```css
-property: var(--hx-semantic-token, primitive-value);
+property: var(<semantic-token>, <primitive-value>);
 ```
 
 **Example:**
@@ -738,7 +746,7 @@ property: var(--hx-semantic-token, primitive-value);
 ### The Three-Level Pattern
 
 ```css
-property: var(--hx-component-token, var(--hx-semantic-token, primitive-value));
+property: var(<component-token>, var(<semantic-token>, <primitive-value>));
 ```
 
 **Example:**
@@ -772,16 +780,19 @@ property: var(--hx-component-token, var(--hx-semantic-token, primitive-value));
 - **Con**: No global theming. To change the primary color, you must override every component token individually.
 - **Con**: Duplicates values across multiple component tokens.
 
-**Problem: Three levels without semantic**
+**Anti-pattern: skipping the semantic layer**
 
 ```css
-/* Three levels, but missing semantic */
+/* Component → primitive hex directly — no semantic indirection. */
 .button {
-  background: var(--hx-button-bg, var(--hx-blue-600, #2563eb));
+  background: var(--hx-button-bg, #2563eb);
 }
 ```
 
-- **Con**: Still no semantic layer. Consumers override primitives directly, which leaks implementation details.
+- **Con**: No semantic layer means consumers who want a global theme retune
+  have to override `--hx-button-bg` (and every sibling component token) directly.
+  Add the semantic tier (`--hx-color-primary-N`) so one override retheme works
+  across every component.
 
 **Solution: Two or three levels with semantic**
 
@@ -933,13 +944,19 @@ hx-button.hero-cta {
 
 ```html
 <!-- System preference (default) — no attribute, prefers-color-scheme drives the theme -->
-<html lang="en">…</html>
+<html lang="en">
+  …
+</html>
 
 <!-- Force dark theme on the document -->
-<html lang="en" data-theme="dark">…</html>
+<html lang="en" data-theme="dark">
+  …
+</html>
 
 <!-- Force light theme on the document -->
-<html lang="en" data-theme="light">…</html>
+<html lang="en" data-theme="light">
+  …
+</html>
 ```
 
 ### Typography Theming
@@ -1165,9 +1182,10 @@ Every component with transitions or animations respects `prefers-reduced-motion`
 ### 7. Use Semantic Tokens in Components
 
 ```css
-/* BAD — references primitive directly */
+/* BAD — pretends a primitive CSS variable exists (it doesn't — primitives are
+   build-time TS constants), so this always falls through to the raw hex. */
 .button {
-  background: var(--hx-blue-600, #2563eb);
+  background: #2563eb;
 }
 
 /* GOOD — references semantic token */

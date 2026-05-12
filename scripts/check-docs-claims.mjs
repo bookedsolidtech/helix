@@ -5,7 +5,11 @@
 //
 // Validates:
 //   1. <hx-*> tags referenced -> must exist in CEM
-//   2. CSS custom properties --hx-* referenced -> must exist in CEM (best-effort)
+//   2. CSS custom property *prefixes* (--hx-<head>-*) — checks the leading segment
+//      is a known global prefix (color/space/font/…) OR resolves to a real component
+//      tag. Does NOT validate the full token name; full-name validation (typos like
+//      --hx-color-action-primary-text vs --hx-color-text-on-primary) is left to the
+//      codex campaign because exhaustive enumeration drives too many false positives.
 //   3. @helixui/* package names -> must be a real workspace package or npm-resolved
 //   4. Version pins on @helixui/* -> must match workspace current (drift gate already catches; we'll surface anyway)
 //   5. Internal links /<slug>/ -> must resolve to a surviving content file
@@ -93,6 +97,25 @@ for (const mod of cem.modules ?? []) {
 const allCssProps = new Set();
 for (const set of tagToCssProps.values()) {
   for (const p of set) allCssProps.add(p);
+}
+
+// Global token prefixes loaded from @helixui/tokens. We strip the "--hx-" prefix
+// and capture the first hyphen-separated segment (e.g. "color", "space", "focus",
+// "line") to use as the legal global-prefix set. Anything starting with a head
+// not in this set AND not matching a component tag is flagged as fabricated.
+const HX_GLOBAL_PREFIXES = new Set();
+{
+  const tokensCss = await readFile(
+    join(REPO_ROOT, 'packages/hx-tokens/dist/tokens.css'),
+    'utf8',
+  ).catch(() => '');
+  for (const m of tokensCss.matchAll(/--hx-([a-z]+)-/g)) {
+    HX_GLOBAL_PREFIXES.add(m[1]);
+  }
+  // Aliases for prefixes consumers reasonably use (Tailwind/MUI muscle memory):
+  HX_GLOBAL_PREFIXES.add('spacing'); // alias for "space"
+  HX_GLOBAL_PREFIXES.add('radius'); // sub-prefix of "border"
+  HX_GLOBAL_PREFIXES.add('animation'); // sub-prefix of "transition"
 }
 
 // Workspace package versions (walks BOTH packages/ and apps/ — @helixui/storybook
@@ -269,44 +292,31 @@ for (const file of targetFiles) {
     seenProps.add(prop);
 
     // Built-in tokens have a prefix like --hx-color-*, --hx-space-*, --hx-font-*, etc.
-    // The component-level tokens follow --hx-<component>-<slot>.
-    // We don't have a token registry to validate against, so only flag clearly invented refs:
-    //  - Anything matching --hx-<some-tag-that-doesnt-exist>-* where the tag part isn't a real component
-    //    AND isn't a known token prefix.
-    const knownTokenPrefixes = [
-      'color',
-      'space',
-      'spacing',
-      'font',
-      'radius',
-      'shadow',
-      'border',
-      'transition',
-      'z',
-      'animation',
-      'duration',
-      'easing',
-      'opacity',
-      'breakpoint',
-      'leading',
-      'tracking',
-      'size',
-    ];
+    // (loaded dynamically from @helixui/tokens into HX_GLOBAL_PREFIXES).
+    // Component-level tokens follow --hx-<component>-<slot> and are matched against validTags below.
     const parts = prop.slice(5).split('-'); // strip "--hx-"
     if (parts.length === 0) continue;
     const head = parts[0];
-    if (knownTokenPrefixes.includes(head)) continue;
+    if (HX_GLOBAL_PREFIXES.has(head)) continue;
     // Could be a component-level token: --hx-<tag>-<slot>
-    // Try reconstructing the tag from the first 2-3 parts and checking validTags
     const possibleTags = [
       `hx-${parts.slice(0, 1).join('-')}`,
       `hx-${parts.slice(0, 2).join('-')}`,
       `hx-${parts.slice(0, 3).join('-')}`,
     ];
     if (possibleTags.some((t) => validTags.has(t))) continue;
-    // Otherwise — flag as possibly fabricated
-    // (low confidence; many tokens exist that aren't in CEM cssProperties for any component)
-    // SKIP — too many false positives. Will let codex handle this dimension.
+    // Unknown prefix AND not a known component tag — fabricated.
+    // Surface as low severity; full-name typos within a known prefix are left to codex.
+    const lineNo = content.slice(0, content.indexOf(prop)).split(/\r?\n/).length;
+    add({
+      file,
+      line: lineNo,
+      severity: 'low',
+      category: 'token',
+      issue: `Unknown --hx-* token prefix: ${prop} (head "${head}" is not a global token namespace and does not match any registered hx-* component tag)`,
+      evidence: lines[lineNo - 1]?.slice(0, 160) ?? '',
+      fix: 'Verify the token name against @helixui/tokens (global tokens) or the component CEM (component-level tokens).',
+    });
   }
 
   // --- 3. stale repo references ---

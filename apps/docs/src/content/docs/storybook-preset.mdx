@@ -407,22 +407,22 @@ export const SubmitEmpty: Story = {
   render: renderScene,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    let submittedValid = false;
+    let invalidFired = false;
     const form = canvasElement.querySelector('#intake') as HTMLElement;
-    form.addEventListener('hx-submit', (e) => {
-      // hx-form re-emits the inner form submit as hx-submit with
-      // structured detail; e.detail.valid reflects native constraint
-      // validity. Required fields that are empty drive valid=false.
-      submittedValid = (e as CustomEvent).detail.valid;
+
+    // Contract: on an invalid submit, hx-form returns *before* firing
+    // hx-submit — only hx-invalid is dispatched. hx-submit only fires on
+    // a successful client-side submit (form's action="" / no server post).
+    form.addEventListener('hx-invalid', () => {
+      invalidFired = true;
     });
 
     const submit = canvas.getByTestId('intake-submit') as HTMLElement;
     const innerSubmit = submit.shadowRoot!.querySelector('button')!;
     await userEvent.click(innerSubmit);
 
-    // Empty required fields must drive hx-submit.detail.valid === false.
-    // hx-form will dispatch hx-invalid alongside hx-submit when fields fail.
-    await expect(submittedValid).toBe(false);
+    // Empty required field must drive hx-invalid; hx-submit must NOT fire.
+    await expect(invalidFired).toBe(true);
   },
 };
 ```

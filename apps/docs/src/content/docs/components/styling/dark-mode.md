@@ -47,19 +47,27 @@ No component code changes. No properties to set. Just CSS cascade.
 
 HELiX separates token concerns across two layers:
 
-**Primitive tokens** — raw color values, never change between themes:
+**Primitive palette** — raw hex values that live as TypeScript constants in
+`@helixui/tokens/src` and are baked into the semantic CSS at build time. They
+are not exposed as CSS custom properties; consumers never read or override
+them directly.
 
-```css
-/* These never change — they are the palette */
---hx-neutral-0: #ffffff;
---hx-neutral-50: #f8f9fa;
---hx-neutral-800: #343a40;
---hx-neutral-900: #212529;
---hx-blue-500: #3b82f6;
---hx-blue-400: #60a5fa;
+```ts
+// packages/hx-tokens/src — conceptual shape
+const neutral = {
+  0: '#ffffff',
+  50: '#f8f9fa',
+  800: '#343a40',
+  900: '#212529',
+};
+const primary = {
+  400: '#60a5fa',
+  500: '#3b82f6',
+};
 ```
 
-**Semantic tokens** — purpose-based references that swap between themes:
+**Semantic tokens** — purpose-based CSS custom properties that swap between
+themes. These ARE the published surface — consumers override these to retheme:
 
 ```css
 /* Light theme — semantic tokens point to light primitives */

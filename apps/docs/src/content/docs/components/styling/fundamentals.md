@@ -661,7 +661,7 @@ Even though the shadow boundary blocks selector matching, CSS custom properties 
 HELiX uses a **two-level fallback chain** for every CSS custom property:
 
 ```css
-property: var(--hx-component-token, var(--hx-semantic-token, primitive-value));
+property: var(<component-token>, var(<semantic-token>, <primitive-value>));
 ```
 
 **Example:**
