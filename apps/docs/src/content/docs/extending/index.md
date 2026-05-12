@@ -34,14 +34,14 @@ npm install @helixui/library
 
 Two patterns exist for building on top of HELiX: **wrapping** (composition through slots) and **extending** (class inheritance).
 
-| Concern | Wrapping | Extending |
-|---|---|---|
-| Slot architecture | Delegated to HELiX | Inherited directly |
-| Styles | CSS custom properties only | Full access to extend `static styles` |
-| Reactive properties | Not accessible | Inherited + extensible |
-| `render()` override | Not possible | Full control via `super.render()` |
-| Custom element name | Your tag wraps `hx-*` | Single element in the DOM |
-| Best for | Simple layout composition | Domain-specific variants with new behavior |
+| Concern             | Wrapping                   | Extending                                  |
+| ------------------- | -------------------------- | ------------------------------------------ |
+| Slot architecture   | Delegated to HELiX         | Inherited directly                         |
+| Styles              | CSS custom properties only | Full access to extend `static styles`      |
+| Reactive properties | Not accessible             | Inherited + extensible                     |
+| `render()` override | Not possible               | Full control via `super.render()`          |
+| Custom element name | Your tag wraps `hx-*`      | Single element in the DOM                  |
+| Best for            | Simple layout composition  | Domain-specific variants with new behavior |
 
 Use **wrapping** when you need slot content reuse and the HELiX component's external API is sufficient.
 
@@ -55,15 +55,17 @@ Use **extending** when you need to add reactive properties, override render logi
 
 ```typescript
 // From packages/hx-library/src/components/hx-card/hx-card.ts
-export class HelixCard extends LitElement {
-  static override styles = helixCardStyles; // tokens cascade from document.adoptedStyleSheets
+export class HelixCard extends HelixElement {
+  static override styles = [helixCardStyles, forcedColorsSurface];
 
   variant: 'default' | 'featured' | 'compact' = 'default';
   elevation: 'flat' | 'raised' | 'floating' = 'flat';
-  href: string | undefined;   // attribute: 'href'
-  label: string | undefined;  // attribute: 'label' — accessible name for interactive cards
+  href: string | undefined; // attribute: 'hx-href'  (JS property: `href`)
+  label: string | undefined; // attribute: 'hx-label' (JS property: `label`) — accessible name for interactive cards
 
-  override render(): TemplateResult { /* ... */ }
+  override render(): TemplateResult {
+    /* ... */
+  }
 }
 ```
 
@@ -208,8 +210,10 @@ export interface PatientCardStatusChangeDetail {
 ```
 
 ```typescript
-override updated(changedProperties: Map<PropertyKey, unknown>): void {
-  super.updated(changedProperties as Parameters<typeof super.updated>[0]);
+import type { PropertyValues } from 'lit';
+
+override updated(changedProperties: PropertyValues<this>): void {
+  super.updated(changedProperties);
 
   if (changedProperties.has('status')) {
     const previousStatus = changedProperties.get('status') as PatientCard['status'];
@@ -248,14 +252,14 @@ override render(): TemplateResult {
         </div>`
       : ''}
     ${super.render()}
-    <span class="patient-status-badge" slot="footer">
+    <span class="patient-status-badge" aria-label="Patient status: ${this.status}">
       ${this.status}
     </span>
   `;
 }
 ```
 
-The `super.render()` call returns the full `<div part="card">` subtree including all named slots. Content you project into the extended element's slots continues to land in the correct named slots inside the parent's shadow DOM.
+The `super.render()` call returns the full `<div part="card">` subtree including all named slots. Content you project into the extended element's **light DOM** slots continues to land in the correct named slots inside the parent's shadow DOM. **Important:** `slot="footer"` only works on **light-DOM** children — on the consumer's `<org-patient-card>` host element. It does **not** work on shadow-DOM markup you render inside `render()`; that markup is already inside the same shadow root as `super.render()` and does not get re-projected. If you need to render badges into the footer slot specifically, accept them as light-DOM children from the consumer (recommended) or override the card template instead of layering on top.
 
 ---
 
@@ -318,9 +322,9 @@ const card = document.querySelector('org-patient-card');
 // card is PatientCard | null
 
 if (card) {
-  card.status = 'critical';     // PatientCard['status'] — 'stable' | 'monitoring' | 'critical' | 'discharged'
-  card.variant = 'featured';    // HelixCard['variant'] — 'default' | 'featured' | 'compact'
-  card.elevation = 'raised';    // HelixCard['elevation'] — 'flat' | 'raised' | 'floating'
+  card.status = 'critical'; // PatientCard['status'] — 'stable' | 'monitoring' | 'critical' | 'discharged'
+  card.variant = 'featured'; // HelixCard['variant'] — 'default' | 'featured' | 'compact'
+  card.elevation = 'raised'; // HelixCard['elevation'] — 'flat' | 'raised' | 'floating'
 }
 ```
 
@@ -368,6 +372,8 @@ card.status = 'critical';
 
 Once registered, use the element like any other custom element:
 
+Interactive card (whole card navigates) — `hx-href` + `hx-label`, no `actions` slot:
+
 ```html
 <org-patient-card
   variant="featured"
@@ -375,8 +381,29 @@ Once registered, use the element like any other custom element:
   status="critical"
   severity="high"
   mrn="MRN-00123456"
-  label="Navigate to patient James Martin's chart"
-  href="/patients/MRN-00123456"
+  hx-label="Navigate to patient James Martin's chart"
+  hx-href="/patients/MRN-00123456"
+>
+  <img slot="image" src="/photos/patient-thumb.jpg" alt="" />
+
+  <h2 slot="heading">James Martin</h2>
+
+  <p>DOB: 1958-03-11 &bull; Room 412 &bull; Attending: Dr. Okafor</p>
+  <p>Primary: Acute respiratory failure secondary to COPD exacerbation</p>
+
+  <time slot="footer" datetime="2026-03-24T14:22:00Z">Updated 14:22</time>
+</org-patient-card>
+```
+
+Non-interactive card with action buttons — drop `hx-href` and keep the `actions` slot:
+
+```html
+<org-patient-card
+  variant="featured"
+  elevation="raised"
+  status="critical"
+  severity="high"
+  mrn="MRN-00123456"
 >
   <img slot="image" src="/photos/patient-thumb.jpg" alt="" />
 
@@ -387,10 +414,12 @@ Once registered, use the element like any other custom element:
 
   <time slot="footer" datetime="2026-03-24T14:22:00Z">Updated 14:22</time>
 
-  <hx-button slot="actions" variant="primary" size="sm">View Chart</hx-button>
-  <hx-button slot="actions" variant="ghost" size="sm">Message Team</hx-button>
+  <hx-button slot="actions" variant="primary" hx-size="sm">View Chart</hx-button>
+  <hx-button slot="actions" variant="ghost" hx-size="sm">Message Team</hx-button>
 </org-patient-card>
 ```
+
+`hx-card` flags an interactive-card-plus-actions-slot combination as an ARIA anti-pattern (the entire card claims one accessible action, but focusable action buttons inside that interactive surface introduce nested activation targets). Pick one pattern per card instance.
 
 Listen for custom events:
 
@@ -416,11 +445,13 @@ HELiX components expose a full set of `--hx-card-*` tokens for per-card customiz
 ```css
 /* Preferred: token override at the element level */
 org-patient-card {
-  --hx-card-border-color: var(--hx-color-danger-300);
+  --hx-card-border-color: var(--hx-color-error-300);
 }
 
 /* Avoid when a token exists: new rule in styles array */
-.card { border-color: var(--hx-color-danger-300); }
+.card {
+  border-color: var(--hx-color-error-300);
+}
 ```
 
 ### Keep extended components focused
@@ -451,11 +482,11 @@ it('renders slotted heading inside the inherited slot structure', async () => {
 
 ## What to Extend vs. What Not to Touch
 
-| Safe to override | Approach with caution | Do not touch |
-|---|---|---|
-| `static styles` — spread pattern | `render()` — call `super.render()` | Private `_` prefixed methods |
-| `@property` additions | `updated()` — always call `super.updated()` | `shadowRootOptions` — inheriting is fine, changing `delegatesFocus` has a11y implications |
-| `connectedCallback()` / `disconnectedCallback()` — always call `super` | `willUpdate()` — always call `super.willUpdate()` | Internal `@state` properties from parent |
+| Safe to override                                                       | Approach with caution                             | Do not touch                                                                              |
+| ---------------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `static styles` — spread pattern                                       | `render()` — call `super.render()`                | Private `_` prefixed methods                                                              |
+| `@property` additions                                                  | `updated()` — always call `super.updated()`       | `shadowRootOptions` — inheriting is fine, changing `delegatesFocus` has a11y implications |
+| `connectedCallback()` / `disconnectedCallback()` — always call `super` | `willUpdate()` — always call `super.willUpdate()` | Internal `@state` properties from parent                                                  |
 
 ---
 
