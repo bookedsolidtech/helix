@@ -1470,7 +1470,7 @@ The browser's `reportValidity()` automatically:
 
 ### Validation Message Contrast
 
-Ensure error messages meet WCAG 2.1 AA contrast requirements:
+Ensure error messages meet at least WCAG 2.2 AA contrast (4.5:1 for body text); the HELiX cert posture is AAA (7:1) on the P0 surface — see `aaa-verdicts.json`:
 
 ```css
 .field__error {

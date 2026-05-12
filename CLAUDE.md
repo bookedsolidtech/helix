@@ -137,7 +137,7 @@ A feature is done when:
 | ---- | ----------------- | ------------------------ | ------------------------ |
 | 1    | TypeScript strict | `pnpm run type-check`    | Zero errors              |
 | 2    | Test suite        | `pnpm run test`          | 100% pass, 80%+ coverage |
-| 3    | Accessibility     | WCAG 2.1 AA audit        | Zero violations          |
+| 3    | Accessibility     | `pnpm aaa:audit` (formal) + CI axe-core | WCAG 2.2 AAA on P0 / AA baseline; zero violations |
 | 4    | Storybook         | Stories for all variants | Complete coverage        |
 | 5    | CEM accuracy      | `pnpm run cem`           | Matches public API       |
 | 6    | Bundle size       | Per-component analysis   | <5KB each, <50KB total   |
@@ -265,7 +265,7 @@ Every component must pass ALL gates before merge:
 
 1. `pnpm run type-check` — zero errors (TypeScript strict, no `any`)
 2. `pnpm run test` — all Vitest browser tests pass, 80%+ coverage
-3. Accessibility — WCAG 2.1 AA verified (healthcare mandate, zero regressions)
+3. Accessibility — WCAG 2.2 AAA on P0 (per `aaa-verdicts.json`) + AA baseline elsewhere; verified via `pnpm aaa:audit` (healthcare mandate, zero regressions)
 4. Storybook — stories for all variants, controls for all public properties
 5. CEM — `pnpm run cem` generates accurate Custom Elements Manifest
 6. Performance — no bundle size regression (<5KB per component min+gz, <50KB full bundle)
@@ -327,7 +327,7 @@ disagree, the formal audit wins.
 
 ## Non-Negotiables
 
-1. **Accessibility is not optional** — Healthcare mandate. WCAG 2.1 AA minimum. Zero regressions.
+1. **Accessibility is not optional** — Healthcare mandate. WCAG 2.2 AAA on the P0 surface (per `aaa-verdicts.json`); WCAG 2.2 AA baseline elsewhere. Zero regressions.
 2. **TypeScript strict always** — No `any`. No `@ts-ignore`. No non-null assertions.
 3. **Shadow DOM encapsulation** — Styles don't leak. Design tokens (`--hx-*`) are the only theming mechanism.
 4. **CEM accuracy** — Custom Elements Manifest must reflect actual public API at all times.

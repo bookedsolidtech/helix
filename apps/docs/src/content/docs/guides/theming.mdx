@@ -472,7 +472,7 @@ A complete example switching HELiX from its default blue palette to a purple/vio
 
 ## Healthcare Theme Example
 
-Healthcare applications have mandatory contrast requirements (WCAG 2.1 AA minimum). This theme applies calming clinical blues with high-contrast overrides suitable for patient-facing and clinician interfaces.
+Healthcare applications have mandatory contrast requirements (WCAG 2.2 AA minimum; AAA on canonical primary surfaces — see HELiX's `aaa-verdicts.json` for the P0 cert posture). This theme applies calming clinical blues with high-contrast overrides suitable for patient-facing and clinician interfaces.
 
 ```css
 /* healthcare-theme.css */
@@ -548,7 +548,7 @@ hx-switch {
 | Touch targets         | `--hx-size-touch-target`                           | 44×44px                   |
 | Error states          | `--hx-color-error`                                 | Never rely on color alone |
 
-> Run axe or Lighthouse after applying any custom theme. HELiX components meet WCAG 2.1 AA with the default tokens — custom overrides are your team's responsibility to validate.
+> Run axe or Lighthouse after applying any custom theme. With the default tokens, HELiX components meet WCAG 2.2 AA across the board and WCAG 2.2 AAA on the P0 surface (see `packages/hx-library/aaa-verdicts.json`). Custom overrides are your team's responsibility to validate against the same posture.
 
 ---
 

@@ -959,7 +959,7 @@ done
 - Brand token CSS files are visual configuration — they contain no PHI
 - Token JSON files (`colors.json`, `typography.json`) are design documentation — they contain no PHI
 - `localStorage` use for brand preference stores only a brand identifier string — no patient data
-- **High-contrast requirement:** Every brand must pass WCAG 2.1 AA contrast ratios (4.5:1 for text, 3:1 for UI components) before deploying
+- **High-contrast requirement:** Every brand must meet WCAG 2.2 AA contrast ratios as a floor (4.5:1 for text, 3:1 for UI components) before deploying; the HELiX cert posture is AAA (7:1) on the P0 surface — verify with `pnpm aaa:audit` for any brand override that touches P0 component tokens
 
 ### CDN structure for multisite
 

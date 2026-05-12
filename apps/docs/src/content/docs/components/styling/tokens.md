@@ -1113,11 +1113,12 @@ export class HxCard extends LitElement {}
 
 ### 4. Maintain Contrast Ratios
 
-All token combinations must meet WCAG 2.1 AA contrast requirements:
+All token combinations must meet at least WCAG 2.2 AA contrast — the HELiX cert posture goes further on the P0 surface (WCAG 2.2 AAA / 7:1, per `aaa-verdicts.json`):
 
-- **4.5:1** for normal text (16px and below)
-- **3:1** for large text (18pt+ or 14pt+ bold)
-- **3:1** for UI components (borders, icons)
+- **4.5:1** for normal text (16px and below) — WCAG 2.2 AA floor
+- **3:1** for large text (18pt+ or 14pt+ bold) — WCAG 2.2 AA floor
+- **3:1** for UI components (borders, icons) — WCAG 2.2 AA floor
+- **7:1** for normal body text on the P0 surface — WCAG 2.2 AAA
 
 ```css
 /* VERIFY: Does this meet 4.5:1? */
@@ -1243,7 +1244,7 @@ Design tokens are the foundation of HELiX's theming architecture. They provide:
 4. **Component tokens are optional** — Add them when surgical customization is needed
 5. **Never hardcode values** — Always use tokens with fallback chains
 6. **Document all tokens** — JSDoc for every CSS custom property
-7. **Maintain contrast ratios** — WCAG 2.1 AA minimum (4.5:1 for text, 3:1 for UI)
+7. **Maintain contrast ratios** — WCAG 2.2 AA minimum (4.5:1 for text, 3:1 for UI); 7:1 for body text on the P0 surface (AAA)
 8. **Respect user preferences** — Dark mode, high contrast, reduced motion
 
 ---
@@ -1262,5 +1263,6 @@ Design tokens are the foundation of HELiX's theming architecture. They provide:
 - [MDN: Using CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties)
 - [web.dev: Shadow DOM v1](https://web.dev/articles/shadowdom-v1)
 - [Design Tokens Community Group](https://www.designtokens.org/)
-- [WCAG 2.1: Contrast (Minimum)](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html)
+- [WCAG 2.2: Contrast (Minimum) — 1.4.3](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
+- [WCAG 2.2: Contrast (Enhanced) — 1.4.6](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html)
 - [Design Token-Based UI Architecture (Martin Fowler)](https://martinfowler.com/articles/design-token-based-ui-architecture.html)

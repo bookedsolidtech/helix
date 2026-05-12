@@ -1023,11 +1023,11 @@ export class HxButton extends LitElement {
 
 ### 7. Maintain Color Contrast
 
-All token combinations must meet WCAG 2.1 AA contrast requirements:
+All token combinations must meet at least WCAG 2.2 AA — the HELiX cert posture is AAA (7:1) on the P0 surface (per `aaa-verdicts.json`):
 
-- **4.5:1** for normal text
-- **3:1** for large text (18pt+ or 14pt+ bold)
-- **3:1** for UI components
+- **4.5:1** for normal text (AA floor)
+- **3:1** for large text (18pt+ or 14pt+ bold) and UI components (AA floor)
+- **7:1** for normal body text on P0 components (AAA)
 
 ```css
 /* VERIFY: Does this meet 4.5:1? */
@@ -1061,7 +1061,7 @@ For HELiX, these patterns are non-negotiable. Every component uses `:host` for d
 4. CSS custom properties are the theming API — document every token
 5. Two-level fallback chains enable component-level and global theming
 6. Never hardcode values — always use design tokens
-7. Maintain WCAG 2.1 AA contrast ratios for all color token combinations
+7. Maintain WCAG 2.2 AA contrast ratios for all color token combinations; AAA (7:1) on the P0 surface
 
 ---
 

@@ -464,7 +464,7 @@ In dark mode: the same markup renders with a dark surface, light text, dark bord
 
 ## Alert Variant Colors in Dark Mode
 
-HELiX `hx-alert` uses feedback color tokens (`--hx-color-info-*`, `--hx-color-success-*`, etc.) that may need adjustment in dark mode for sufficient contrast. The WCAG 2.1 AA requirement is 4.5:1 for text, 3:1 for UI components.
+HELiX `hx-alert` uses feedback color tokens (`--hx-color-info-*`, `--hx-color-success-*`, etc.) that may need adjustment in dark mode for sufficient contrast. The WCAG 2.2 contrast floors are 4.5:1 for normal-size text (AA), 3:1 for UI components / large text (AA), and 7:1 for body text on the P0 surface (AAA — see `aaa-verdicts.json`).
 
 Light mode alert backgrounds (very light tints) become nearly invisible on dark surfaces. Override the feedback color tokens for dark mode:
 
@@ -695,10 +695,11 @@ test.describe('dark mode visual regression', () => {
 
 ## WCAG Contrast Verification
 
-Every dark mode color combination must meet WCAG 2.1 AA:
+Every dark mode color combination must meet WCAG 2.2 AA at minimum, and the WCAG 2.2 AAA 7:1 floor for any combination on the P0 surface (per `aaa-verdicts.json`):
 
-- **4.5:1** minimum for normal text (body copy, labels)
-- **3:1** minimum for large text (18pt+ or 14pt+ bold) and UI components (borders, icons)
+- **AA:** 4.5:1 minimum for normal text (body copy, labels)
+- **AA:** 3:1 minimum for large text (18pt+ or 14pt+ bold) and UI components (borders, icons)
+- **AAA (P0 surface):** 7:1 for normal body text on the canonical primary action surfaces
 
 Spot-check critical combinations in dark mode:
 
@@ -739,7 +740,7 @@ Dark mode in HELiX works because CSS custom properties inherit through shadow bo
 - Override feedback color tokens (`--hx-color-info-50`, etc.) in dark mode — their default tints are too light for dark surfaces
 - Protect against FOUC with an inline `<head>` script that restores the saved preference before first render
 - Test dark mode by setting tokens directly on wrapper elements in Vitest and by using `page.emulateMedia()` in Playwright
-- Verify WCAG 2.1 AA contrast ratios for every dark mode color combination
+- Verify WCAG 2.2 AA contrast ratios for every dark mode color combination, and AAA (7:1) for any P0-surface pairing
 
 ---
 

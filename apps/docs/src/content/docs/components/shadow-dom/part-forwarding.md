@@ -353,7 +353,7 @@ For the page to reach the `input` element, each layer must forward explicitly:
 ```css
 hx-patient-form::part(patient-input) {
   font-size: 1rem;
-  min-height: 44px; /* WCAG 2.1 AA minimum touch target */
+  min-height: 44px; /* WCAG 2.2 SC 2.5.5 (Target Size — Enhanced, AAA): ≥44×44 CSS px */
 }
 ```
 

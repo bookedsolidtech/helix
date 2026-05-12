@@ -146,7 +146,7 @@ function toggleContrast() {
 
 ## WCAG Compliance
 
-Both themes are designed to meet **WCAG 2.1 AA** requirements:
+Both themes meet **WCAG 2.2 AA** across the surface and **WCAG 2.2 AAA** on the canonical P0 components (per `aaa-verdicts.json`):
 
 - Minimum 4.5:1 contrast ratio for normal text
 - Minimum 3:1 contrast ratio for large text and UI components

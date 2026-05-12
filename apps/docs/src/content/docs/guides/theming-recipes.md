@@ -131,7 +131,7 @@ if (saved) setTheme(saved);
 
 ## Recipe 2: Healthcare Brand Compliance (HIPAA-Friendly Color Contrast)
 
-Healthcare applications have non-negotiable contrast requirements (WCAG 2.1 AA minimum). This recipe configures a high-contrast palette suitable for clinical environments.
+Healthcare applications have non-negotiable contrast requirements (WCAG 2.2 AA minimum; WCAG 2.2 AAA on the canonical P0 surface, per `aaa-verdicts.json`). This recipe configures a high-contrast palette suitable for clinical environments.
 
 **Requirements**:
 - 4.5:1 contrast ratio for normal text
@@ -202,7 +202,7 @@ hx-switch {
 }
 ```
 
-> **Note**: HELiX components are built with WCAG 2.1 AA as the minimum bar. When you override color tokens, the components themselves do not re-validate contrast — that is your responsibility. Always run an accessibility audit (`axe`, browser a11y inspector, or Lighthouse) after applying a custom theme.
+> **Note**: HELiX components ship at WCAG 2.2 AA across the surface and WCAG 2.2 AAA on the P0 components (44 components, 376 Supports / 109 Not Applicable / 0 Partial / 0 Fail per `aaa-verdicts.json`). When you override color tokens, the components themselves do not re-validate contrast — that is your responsibility. Always run an accessibility audit (`axe`, browser a11y inspector, or Lighthouse) after applying a custom theme; for any override that touches a P0-surface token, also re-run `pnpm aaa:audit` locally.
 
 ---
 

@@ -1015,9 +1015,10 @@ a fully declarative, component-driven Drupal theme.
 
 ## Accessibility Compliance
 
-This theme and all HELiX components are designed for WCAG 2.1 AA compliance,
-which is the minimum standard for healthcare applications in the United States
-(Section 508 requirement).
+This theme and all HELiX components meet WCAG 2.2 AA as the baseline and
+WCAG 2.2 AAA on the P0 component surface (per `packages/hx-library/aaa-verdicts.json`).
+That clears the Section 508 / Section 504 requirements that apply to healthcare
+applications in the United States.
 
 ### Built-in accessibility features
 
@@ -1025,7 +1026,7 @@ which is the minimum standard for healthcare applications in the United States
 - Focus management in `hx-dialog`, `hx-drawer`, and `hx-popover` (focus trap)
 - ARIA roles, states, and properties on all interactive elements
 - Screen reader announcements via `aria-live` for dynamic content
-- Color contrast ratios meet WCAG 2.1 AA (4.5:1 for normal text, 3:1 for large text)
+- Color contrast ratios meet WCAG 2.2 AA (4.5:1 normal text, 3:1 large text / UI components) by default; WCAG 2.2 AAA (7:1) on the P0 surface
 - Focus rings use `--hx-focus-ring-color` token with fallback to a 3:1 contrast ratio
 
 ### Theme-level obligations

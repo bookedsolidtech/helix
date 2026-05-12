@@ -112,7 +112,7 @@ Attaches to: `[data-drupal-dialog]`
 Behavior:
 - Binds a click handler to the trigger element that sets `dialog.open = true`
 - Returns focus to the trigger element on `hx-close` and `hx-cancel` events
-- Correctly handles focus management for WCAG 2.1 AA compliance
+- Handles focus management to meet WCAG 2.2 success criteria 2.4.3 (Focus Order) and 2.4.11 (Focus Not Obscured); satisfies the AAA-equivalent expectations on the P0 surface
 
 ```html
 <div data-drupal-dialog data-trigger-selector="#open-patient-dialog">
@@ -259,7 +259,7 @@ Attaches to: `[data-drupal-tooltip]`
 
 Behavior:
 - Sets content and placement from data attributes
-- Closes on `Escape` key press for keyboard accessibility (WCAG 2.1 SC 1.4.13)
+- Closes on `Escape` key press for keyboard accessibility (WCAG 2.2 SC 1.4.13 — Content on Hover or Focus)
 
 ```html
 <div data-drupal-tooltip data-content="Patient ID: 12345" data-placement="top">
@@ -301,8 +301,8 @@ This separation allows Drupal theme layers (Twig templates, field formatters, vi
 ## Accessibility Notes
 
 - `hxAccordion`: Announces expand/collapse state via `Drupal.announce()` (requires `core/drupal.announce`)
-- `hxDialog` and `hxDrawer`: Return focus to trigger element on close (WCAG 2.1 SC 2.4.3)
-- `hxTooltip`: `Escape` dismissal meets WCAG 2.1 SC 1.4.13 (Content on Hover or Focus)
+- `hxDialog` and `hxDrawer`: Return focus to trigger element on close (WCAG 2.2 SC 2.4.3 — Focus Order)
+- `hxTooltip`: `Escape` dismissal meets WCAG 2.2 SC 1.4.13 (Content on Hover or Focus)
 - `hxMenu` and `hxPopover`: `Escape` key closes via keyboard for SC 2.1.2 (No Keyboard Trap)
 
 ---
