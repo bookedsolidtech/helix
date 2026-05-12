@@ -39,7 +39,7 @@ After three `attach()` calls on the same element:
 // WITH once() — correct pattern
 Drupal.behaviors.hxButtons = {
   attach(context, settings) {
-    once('helixui:button-tracker', 'hx-button', context).forEach((button) => {
+    once('mysite:button-tracker', 'hx-button', context).forEach((button) => {
       button.addEventListener('click', handleClick);
     });
   },
@@ -59,7 +59,7 @@ once(id, selector, context)
 | Parameter | Type | Description |
 |---|---|---|
 | `id` | string | Unique key identifying this initialization. Elements are marked with this key to prevent re-processing. |
-| `selector` | string or NodeList or Element | CSS selector string, DOM element, or NodeList of elements to process. |
+| `selector` | string \| Element \| NodeList \| Array&lt;Element&gt; | CSS selector string, single DOM element, NodeList, or array of elements to process. |
 | `context` | Element or Document | Root element to search within. Always pass the `context` from `Drupal.behaviors.attach()`. |
 
 Returns: an array of elements that had not yet been marked with `id`. If all elements were already marked, returns an empty array.
@@ -68,21 +68,21 @@ Returns: an array of elements that had not yet been marked with `id`. If all ele
 
 ## Namespaced Key Format
 
-The `id` parameter uses the format `helixui:behavior-name` for all HELiX-related behaviors. This namespace prevents collisions with other modules and themes that may use `once()` on the same elements.
+The shipped `@helixui/drupal-behaviors` package uses `hx-*` once IDs (e.g. `hx-dialog`, `hx-tooltip`) to namespace its keys. For project-local behaviors that build on top of HELiX components, pick a distinct project namespace (e.g. `mysite:patient-card-init`, `clinic:appointment-toolbar`) so your keys never collide with the package's.
 
 ```javascript
 // Correct namespacing
-once('helixui:card-init', 'hx-card', context)
-once('helixui:button-tracker', 'hx-button', context)
-once('helixui:data-table-columns', 'hx-data-table[data-columns]', context)
-once('helixui:alert-dismiss', 'hx-alert[dismissible]', context)
-once('helixui:patient-list-enhance', '.patient-list hx-card', context)
-once('helixui:form-validation', 'form[data-helix-validate]', context)
+once('mysite:card-init', 'hx-card', context)
+once('mysite:button-tracker', 'hx-button', context)
+once('mysite:data-table-columns', 'hx-data-table[data-columns]', context)
+once('mysite:alert-dismiss', 'hx-alert[dismissible]', context)
+once('mysite:patient-list-enhance', '.patient-list hx-card', context)
+once('mysite:form-validation', 'form[data-helix-validate]', context)
 
 // Avoid: generic names without namespace
 once('init', 'hx-card', context)         // Too generic
 once('card', 'hx-card', context)         // No namespace
-once('hx-card-init', 'hx-card', context) // Missing helixui: prefix
+once('hx-card-init', 'hx-card', context) // Collides with @helixui/drupal-behaviors hx-* keys
 ```
 
 ### Multiple Behaviors on the Same Element
@@ -91,12 +91,12 @@ Different behaviors on the same element each get their own key. Each key is trac
 
 ```javascript
 // First behavior: tracks clicks
-once('helixui:card-click', 'hx-card', context).forEach((card) => {
+once('mysite:card-click', 'hx-card', context).forEach((card) => {
   card.addEventListener('hx-click', handleCardClick);
 });
 
 // Second behavior: tracks impressions
-once('helixui:card-impression', 'hx-card', context).forEach((card) => {
+once('mysite:card-impression', 'hx-card', context).forEach((card) => {
   observeCardVisibility(card);
 });
 ```
@@ -113,12 +113,12 @@ Always pass the `context` parameter from `attach()` as the third argument to `on
 Drupal.behaviors.hxInit = {
   attach(context, settings) {
     // Correct: scoped to context
-    once('helixui:init', 'hx-card', context).forEach((card) => {
+    once('mysite:init', 'hx-card', context).forEach((card) => {
       // ...
     });
 
     // Wrong: queries the entire document
-    once('helixui:init', 'hx-card', document).forEach((card) => {
+    once('mysite:init', 'hx-card', document).forEach((card) => {
       // This works but defeats the purpose of context scoping.
       // It will also fail to find elements added to a modal or specific region.
     });
@@ -136,12 +136,13 @@ On initial page load, `context` is `document`. On AJAX responses, `context` is t
 
 ```javascript
 // Check which cards are already initialized
-const initializedCards = once.filter('helixui:card-init', document.querySelectorAll('hx-card'));
+const initializedCards = once.filter('mysite:card-init', document.querySelectorAll('hx-card'));
 console.log(`${initializedCards.length} cards are already initialized`);
 
-// Check if a specific element is initialized
+// Check if a specific element is initialized — guard against missing element
+// since once.filter() on `[null]` will throw.
 const card = document.querySelector('#patient-card-123');
-const isInitialized = once.filter('helixui:card-init', [card]).length > 0;
+const isInitialized = card !== null && once.filter('mysite:card-init', [card]).length > 0;
 ```
 
 ---
@@ -153,7 +154,7 @@ const isInitialized = once.filter('helixui:card-init', [card]).length > 0;
 ```javascript
 Drupal.behaviors.hxModalContent = {
   attach(context, settings) {
-    once('helixui:modal-init', '.modal hx-card', context).forEach((card) => {
+    once('mysite:modal-init', '.modal hx-card', context).forEach((card) => {
       initializeModalCard(card);
     });
   },
@@ -161,7 +162,7 @@ Drupal.behaviors.hxModalContent = {
   detach(context, settings, trigger) {
     // When the modal closes, remove once marks so the content
     // can be re-initialized when the modal opens again
-    once.remove('helixui:modal-init', context.querySelectorAll('.modal hx-card'));
+    once.remove('mysite:modal-init', context.querySelectorAll('.modal hx-card'), context);
   },
 };
 ```
@@ -169,10 +170,10 @@ Drupal.behaviors.hxModalContent = {
 ### `once.remove()` Signature
 
 ```javascript
-once.remove(id, selector)
+once.remove(id, selector, context)
 ```
 
-Note: `once.remove()` does not take a `context` parameter. It removes marks from all matching elements in the document.
+`once.remove()` accepts the same parameter shape as `once()` — the optional `context` (Element or Document) scopes the search so you only strip marks under the node you're cleaning up. Pass the `context` from `detach()` to limit cleanup to the unloading subtree.
 
 ---
 
@@ -201,7 +202,7 @@ Use it in the IIFE:
 
   Drupal.behaviors.hxCardInit = {
     attach(context, settings) {
-      once('helixui:card-init', 'hx-card', context).forEach((card) => {
+      once('mysite:card-init', 'hx-card', context).forEach((card) => {
         // ...
       });
     },
@@ -212,7 +213,7 @@ Use it in the IIFE:
 
 ### jQuery `$.once()` (Legacy — Drupal 7 / early Drupal 8)
 
-Older Drupal code used jQuery's `$.once()` plugin. This API is not available in Drupal 10 and 11 unless `drupal/jquery_ui` is explicitly installed. **Do not use `$.once()` in new code**.
+Older Drupal code used jQuery's `$.once()` plugin. That plugin was removed from Drupal core in 10.x — it is not available in Drupal 10 or 11 at all. (The unrelated `drupal/jquery_ui` package does not provide `$.once()`.) **Do not use `$.once()` in new code**.
 
 ```javascript
 // OLD — jQuery.once() — DO NOT USE in Drupal 10/11
@@ -221,7 +222,7 @@ $(context).find('hx-card').once('hx-card-init').each(function () {
 });
 
 // NEW — standalone once() — use this
-once('helixui:card-init', 'hx-card', context).forEach((card) => {
+once('mysite:card-init', 'hx-card', context).forEach((card) => {
   // ...
 });
 ```
@@ -234,7 +235,7 @@ once('helixui:card-init', 'hx-card', context).forEach((card) => {
 
 ```javascript
 // Most common form: selector string
-once('helixui:card-click', 'hx-card[href]', context).forEach((card) => {
+once('mysite:card-click', 'hx-card[hx-href]', context).forEach((card) => {
   card.addEventListener('hx-click', () => {
     window.location.href = card.getAttribute('href');
   });
@@ -247,7 +248,7 @@ once('helixui:card-click', 'hx-card[href]', context).forEach((card) => {
 // Single element: wrap in an array or use a NodeList
 const mainNav = context.querySelector('.main-navigation hx-button');
 if (mainNav) {
-  once('helixui:nav-button', [mainNav]).forEach((button) => {
+  once('mysite:nav-button', [mainNav]).forEach((button) => {
     button.addEventListener('hx-click', toggleNavigation);
   });
 }
@@ -257,7 +258,7 @@ if (mainNav) {
 
 ```javascript
 // When the context element IS what you want to initialize
-once('helixui:region-init', context === document ? document.body : context).forEach((el) => {
+once('mysite:region-init', context === document ? document.body : context).forEach((el) => {
   el.setAttribute('data-helix-region-ready', 'true');
 });
 ```
@@ -266,7 +267,7 @@ once('helixui:region-init', context === document ? document.body : context).forE
 
 ```javascript
 // only initialize cards that have an entity ID
-once('helixui:patient-card', 'hx-card', context)
+once('mysite:patient-card', 'hx-card', context)
   .filter((card) => card.hasAttribute('data-entity-id'))
   .forEach((card) => {
     initializePatientCard(card);
@@ -283,11 +284,11 @@ once('helixui:patient-card', 'hx-card', context)
 <!-- Before once() -->
 <hx-card variant="default">...</hx-card>
 
-<!-- After once('helixui:card-init', 'hx-card', context) -->
-<hx-card variant="default" data-once="helixui-card-init">...</hx-card>
+<!-- After once('mysite:card-init', 'hx-card', context) -->
+<hx-card variant="default" data-once="mysite:card-init">...</hx-card>
 ```
 
-The attribute is `data-once`, and its value is a space-separated list of all once keys that have been applied to the element.
+The attribute is `data-once`, and its value is a space-separated list of all once keys that have been applied to the element. Drupal's `once()` stores the id verbatim — there is no special colon-to-hyphen serialization step. (Older revisions of these docs implied otherwise; the runtime preserves the id as-is.)
 
 Knowing this lets you:
 
@@ -328,7 +329,7 @@ document.body.appendChild(container);
 let callCount = 0;
 Drupal.behaviors.hxTestBehavior = {
   attach(context, settings) {
-    once('helixui:test', 'hx-card[data-test]', context).forEach((card) => {
+    once('mysite:test', 'hx-card[data-test]', context).forEach((card) => {
       callCount++;
     });
   },
