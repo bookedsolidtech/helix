@@ -114,24 +114,18 @@ hx-text-input::part(error) {
 rg -l '::part\(error-message\)' | xargs sd '::part\(error-message\)' '::part(error)'
 ```
 
-## 4. `hx-date-picker` / `hx-time-picker` non-modal dialog
+## 4. `hx-date-picker` / `hx-time-picker` popup is still a focus-trapping dialog
 
-The calendar / clock popup migrates from a native modal `<dialog>` to a non-modal popup. Escape still closes and restores focus; click-outside still closes; arrow-key navigation is unchanged.
+The calendar / clock popup continues to render a native `<dialog>` element following the W3C APG
+date-picker dialog pattern, and continues to trap focus inside the popup while open. If your
+upgrade notes from an older draft of this guide promised a non-modal popup or a focus-trap
+removal, those changes did **not** ship — Escape still closes and restores focus, click-outside
+still closes, arrow-key navigation is unchanged, **and** Tab cycles inside the popup until the
+user dismisses it.
 
-**What's gone:**
-
-- Top-layer stacking — you may need to raise `z-index` in custom stacking contexts.
-- `::backdrop` styling — remove any rules targeting it.
-- Focus trap inside the popup — Tab from the last control moves to the next document-flow focusable.
-
-```css
-/* Remove these rules — the non-modal dialog has no ::backdrop */
-hx-date-picker::part(dialog)::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-}
-```
-
-Tests asserting focus-trap behavior must be updated. Escape-close and focus-restoration tests continue to pass unchanged.
+If you authored CSS targeting `::backdrop` against the dialog, those rules still apply. There is
+nothing to remove for this version. Tests asserting focus-trap behavior on `hx-date-picker` /
+`hx-time-picker` continue to pass.
 
 ## 5. `hx-dialog` — `modal` defaults to `false`
 
@@ -255,8 +249,12 @@ Consumers already using these hooks in 2.1.x need no code change — the `protec
 // Before
 import type { WcButton, WcCard, WcSwitch } from '@helixui/library';
 
-// After
-import type { HxButton, HxCard, HxSwitch } from '@helixui/library';
+// After — class types use Helix* naming; CustomEvent detail types
+// and a small set of legacy re-exports retain Hx* naming.
+import type { HelixButton, HelixCard, HxSwitch } from '@helixui/library';
+
+// Event-detail types use Hx* naming:
+import type { HxButtonClickDetail, HxSwitchChangeDetail } from '@helixui/library';
 ```
 
 **Codemod:**
@@ -291,7 +289,9 @@ static styles = ownStyles;
 
 ## 10. `@floating-ui/dom` dynamic import
 
-`hx-select`, `hx-combobox`, `hx-popover`, `hx-tooltip`, and `hx-overflow-menu` load `@floating-ui/dom` dynamically on first interaction.
+`hx-popover`, `hx-dropdown`, `hx-overflow-menu`, `hx-popup`, and `hx-tooltip` load
+`@floating-ui/dom` dynamically on first interaction. `hx-select` and `hx-combobox` do not — they
+position their listbox via custom CSS without the floating-ui dependency.
 
 **What you'll see:**
 
