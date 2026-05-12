@@ -5,13 +5,13 @@ web component library.
 
 ## Status
 
-| Phase | Scope                                                | Status      |
-| ----- | ---------------------------------------------------- | ----------- |
-| 1     | Package scaffold, exports map, type surface          | Done        |
-| 2     | Registry runtime (`registerIconLibrary` and friends) | Done        |
-| 3     | `helix` + `fa-free` libraries with auto-registration | Done        |
-| 4     | `<hx-icon>` upgrade in `@helixui/library` + P0 cert  | In progress |
-| 5     | Internal SVG migration, recert, public release       | Planned     |
+| Phase | Scope                                                | Status |
+| ----- | ---------------------------------------------------- | ------ |
+| 1     | Package scaffold, exports map, type surface          | Done   |
+| 2     | Registry runtime (`registerIconLibrary` and friends) | Done   |
+| 3     | `helix` + `fa-free` libraries with auto-registration | Done   |
+| 4     | `<hx-icon>` upgrade in `@helixui/library` + P0 cert  | Done — hx-icon ships in 3.9.0 with AAA verdicts recorded in `packages/hx-library/aaa-verdicts.json` |
+| 5     | Internal SVG migration + 1.0.0 public release        | Done — `@helixui/icons` 1.0.0 published, internal components consume the registry |
 
 ## Why a registry
 
@@ -53,6 +53,11 @@ Register a custom library (e.g. Font Awesome Pro Medical):
 ```ts
 import { registerIconLibrary } from '@helixui/icons';
 
+// External resolvers must be allow-listed by the consumer page via the
+// `allowed-origins` attribute on every <hx-icon> that targets the
+// library (or via the global allowlist on the page-level <hx-icon>
+// default), or the icon fetch will be blocked by the registry's
+// origin guard.
 registerIconLibrary('fa-pro-medical', {
   resolver: (name) =>
     `https://kit.fontawesome.com/your-kit/icons/medical/${name}.svg`,
@@ -65,7 +70,11 @@ registerIconLibrary('fa-pro-medical', {
 ```
 
 ```html
-<hx-icon library="fa-pro-medical" name="stethoscope"></hx-icon>
+<hx-icon
+  library="fa-pro-medical"
+  name="stethoscope"
+  allowed-origins="https://kit.fontawesome.com"
+></hx-icon>
 ```
 
 ## Tree-shake imports
@@ -89,16 +98,20 @@ glyphs are painted:
 - `'stroke'` — outline glyphs (e.g. Lucide, Phosphor Thin)
 - `'mixed'` — per-glyph fill + stroke (e.g. Phosphor Duotone)
 
-The `<hx-icon>` AAA contrast harness in Phase 4 dispatches per `paintMode`,
-so libraries that declare the correct mode get the right measurement model
-without consumer intervention.
+The formal AAA contrast harness measures rendered `<hx-icon>` color/background samples on the
+audit story and records the verdict in `packages/hx-library/aaa-verdicts.json`. `paintMode`
+is a registry hint that drives how a library's glyphs are painted (and how third-party
+tooling can reason about them); the cert verdict itself comes from the rendered measurement,
+not from `paintMode` dispatch.
 
 ## Attribution
 
 Bundled icon libraries carry their own licenses. **Font Awesome Free Solid
 icons are licensed under CC BY 4.0; attribution is required.** See
-[`NOTICE.md`](./NOTICE.md) for the canonical attribution text and the full
-list of bundled assets.
+[`NOTICE.md`](./NOTICE.md) for the canonical attribution text covering the
+bundled libraries (the file is an attribution / license disclosure, not an
+asset-level inventory — see the `helix` / `fa-free` library directories
+under `dist/` for the actual glyph filenames).
 
 ## License
 
