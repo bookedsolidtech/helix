@@ -21,7 +21,7 @@ Thank you for your interest in contributing to HELiX, an enterprise healthcare w
 
 ## Code of Conduct
 
-This project adheres to a code of conduct. By participating, you are expected to uphold this code. Please be respectful and constructive in all interactions.
+This project does not yet ship a formal `CODE_OF_CONDUCT.md`, but participants are expected to be respectful and constructive in all interactions. Aggressive or harassing behavior will be removed at maintainer discretion. (A formal Contributor Covenant–style document is planned; until it lands, the spirit of those guidelines is what we apply.)
 
 ## Developer Certificate of Origin (DCO)
 
@@ -65,9 +65,9 @@ Replace `N` with the number of commits to update.
 
 ### What Happens on PRs
 
-A DCO check runs automatically on all pull requests. If any commit is missing a sign-off, the check will fail and the PR cannot be merged until all commits are signed off.
+There is no automated DCO bot wired into this repository yet. External contributors should still include the `Signed-off-by` trailer (via `git commit -s`) so the commit log reflects intent. A formal DCO check workflow is on the roadmap; until it ships, reviewers spot-check sign-offs during PR review.
 
-Organization members are exempt from this requirement.
+Organization members typically commit without the trailer and that is fine for now; this stance changes once the automated check is in place.
 
 ## Getting Started
 
@@ -131,11 +131,11 @@ pnpm run build
 
 ### 4. Commit Your Changes
 
-We use Husky hooks to enforce quality standards on commit and push:
+We use Husky hooks to enforce quality standards on commit and push (the active hooks live in `.husky/`):
 
-- **Pre-commit**: Runs lint-staged (ESLint, Prettier) and quick quality checks
-- **Commit-msg**: Enforces conventional commit format
-- **Pre-push**: Runs full quality gate suite
+- **Pre-commit**: Scans staged files for secrets/credentials and refuses commits that include `.env*`, `*.pem`, `*.key`, or detected token patterns. Lint/format are handled via editor integrations and the `pnpm run preflight` gate before push, not by this hook.
+- **Commit-msg**: Blocks structural AI attribution (Co-Authored-By with AI names, "Generated with [Tool]" footers, etc.) per `.rea/policy.yaml`. Conventional Commit format is enforced socially during code review, not by an executable commitlint hook.
+- **Pre-push**: Runs the targeted local gate fragments (lint, format:check, type-check, smart test) and the REA push-review gate. The full GitHub-CI-parity suite lives in `pnpm run preflight` — run it explicitly before pushing significant changes.
 
 ```bash
 git add .
@@ -147,44 +147,38 @@ git commit -m "feat(button): add disabled state"
 All code must pass the **7 Quality Gates** before merge:
 
 1. **TypeScript Strict**: Zero errors, no `any` types
-2. **Tests**: All tests pass, 80%+ coverage
-3. **Accessibility**: WCAG 2.2 AAA on the P0 surface (per `packages/hx-library/aaa-verdicts.json`), AA baseline elsewhere; zero violations on the CI axe-core regression guard
+2. **Tests**: All tests pass; coverage is reported on every CI run but is not a blocking gate today (tracked as informational pending the [#1556 coverage-config follow-up](https://github.com/bookedsolidtech/helix/issues/1556) before flipping back to blocking)
+3. **Accessibility**: WCAG 2.2 AAA on the P0 surface (per `packages/hx-library/aaa-verdicts.json`), AA baseline elsewhere; the CI axe-core regression guard fails on any **critical or serious** violation and surfaces minor/moderate findings as informational
 4. **Storybook**: Stories for all component variants
 5. **CEM**: Custom Elements Manifest accurately reflects API
-6. **Bundle Size**: <5KB per component (gzipped), <50KB total
+6. **Bundle Size**: Aspirational floor of `<5KB per component / <50KB total` (gzipped) tracked in [`.bundle-budget.json`](./.bundle-budget.json); the **CI-enforced ceiling** is **16KB per component / 200KB total** per [`bundle-budgets.json`](./bundle-budgets.json) — exceeding the ceiling is a blocking failure, exceeding only the floor is a regression flag
 7. **Code Review**: 3-tier review process
 
 Preflight (`pnpm run preflight`) adds four further infrastructure gates on top of the seven above:
 
 8. **Full test suite**: complete component matrix (catches cross-component regressions)
-9. **Docker CI parity**: full GitHub Actions pipeline reproduced locally via `act`
+9. **Docker CI parity**: full GitHub Actions pipeline reproduced locally via `act`. **Best-effort** — preflight skips the gate (without failing) when Docker or `act` is not installed on the contributor machine, so the local pass is not a guarantee that CI will pass; if you need cert-level parity, install Docker + `act` and run preflight there.
 10. **AAA cert integrity**: refuses regression to `Partially Supports` or `Does Not Support` in the committed `aaa-verdicts.json` snapshot
-11. **Docs version drift**: scans `apps/docs/` + `apps/storybook/` for stale `@helixui/*` version pins; fails on any exact pin or caret/tilde range whose floor diverges from the canonical workspace version. Bypass with `HELIX_ALLOW_VERSION_DRIFT=1` (emergency only — every bypass leaves a paper trail in the commit message).
+11. **Docs version drift**: scans the four currently tracked `@helixui/*` packages — `@helixui/library`, `@helixui/tokens`, `@helixui/icons`, `@helixui/react` — across `apps/docs/` + `apps/storybook/` for stale version pins. Other `@helixui/*` packages (e.g. `@helixui/drupal-behaviors`, `@helixui/drupal-starter`, `@helixui/mcp`, `@helixui/react-starter`) are not in the scanned set yet — extending `PACKAGES` is a tracked follow-up. Bypass with `HELIX_ALLOW_VERSION_DRIFT=1` (emergency only).
 
 ### Pre-Commit Hooks
 
-Our pre-commit hook will:
+Our pre-commit hook (`.husky/pre-commit`) currently:
 
-- Format code with Prettier
-- Lint code with ESLint
-- Type-check staged TypeScript files
-- Run tests for modified components
-- Check bundle size impact
-- Validate Custom Elements Manifest
+- Scans staged files for secret/credential patterns and refuses commits that include `.env*`, `*.pem`, `*.key`, or detected token strings
+- Hard-blocks files matching the secrets allow-list
+
+Formatting, linting, and type-checking are run explicitly via `pnpm run verify` / `pnpm run preflight` — they are not wired into the pre-commit hook today.
 
 ### Pre-Push Hooks
 
-Our pre-push hook will:
+Our pre-push hook (`.husky/pre-push`) currently:
 
-- Run full TypeScript type check
-- Run complete test suite
-- Lint entire codebase
-- Check code formatting
-- Build all packages
-- Verify bundle size budgets
-- Generate Custom Elements Manifest
-- Check for TODO/FIXME (warning only)
-- Check for console.log (warning only)
+- Runs `pnpm run verify` fragments (lint, format:check, type-check)
+- Runs `pnpm run test:smart` on the components touched in the diff
+- Enforces the REA push-review gate (recent audit entry must cover HEAD)
+
+It does **not** run the full test matrix, build every package, enforce the bundle ceiling, or scan for TODO/console.log. For the GitHub-CI-parity sweep — including Docker CI, bundle budgets, AAA cert integrity, and docs version drift — run `pnpm run preflight` before pushing significant changes.
 
 ## Git Workflow
 
@@ -288,7 +282,7 @@ git commit -m "fix(input): prevent focus loss on validation #123"
 ### Creating a PR
 
 1. Push your branch to GitHub
-2. Open a pull request against `main`
+2. Open a pull request against `dev` (feature branches target `dev`; `main` only receives `staging → main` promotion PRs)
 3. Fill out the PR template completely
 4. Link related issues
 5. Request review from appropriate team members
@@ -317,7 +311,7 @@ The optional CI matrix (`ci-matrix.yml`, Node 22/24 on Ubuntu, `workflow_dispatc
 
 ### After Approval
 
-PRs are merged by maintainers using **merge commits** strategy (squash merging is disabled to preserve conventional commit messages for semantic-release).
+PRs are merged by maintainers using a **merge-commit** strategy (squash merging is disabled to preserve the per-commit history that Changesets relies on for release-note generation; the `dev → staging → main` promotion model and release publishing are driven by Changesets, not semantic-release).
 
 ## Component Development
 
@@ -344,7 +338,7 @@ Generated files are pre-formatted and pass `pnpm run verify` immediately. After 
 
 1. Implement logic in `hx-my-component.ts`
 2. Add styles in `hx-my-component.styles.ts`
-3. Export from `packages/hx-library/src/index.ts`
+3. Keep the per-component `hx-my-component/index.ts` re-export accurate (the **root** `packages/hx-library/src/index.ts` barrel is generated — do **not** edit it by hand; run `pnpm --filter=@helixui/library run generate:barrel` to regenerate it from the per-component indexes)
 4. Add Storybook stories in `hx-my-component.stories.ts`
 5. Write tests in `hx-my-component.test.ts`
 6. Run `pnpm run cem` to update the Custom Elements Manifest
@@ -400,23 +394,23 @@ When creating a new component:
 
 ### Test Section Pattern
 
-Every component test file follows this **required section order**. Import from shared utilities:
+Every component test file follows this **required section order**. The structure below is illustrated against `hx-button` (a real, shipped component); copy the pattern when adding a new component and swap the tag/type/part names for your own. The `hx-foo` placeholder used in earlier drafts of this guide was never a real component:
 
 ```typescript
 import { describe, it, expect, afterEach } from 'vitest';
 import { page, userEvent } from '@vitest/browser/context';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HelixFoo } from './hx-foo.js';
+import type { HelixButton } from './hx-button.js';
 import './index.js';
 
 afterEach(cleanup);
 
-describe('hx-foo', () => {
+describe('hx-button', () => {
   // ─── Rendering ───
   describe('Rendering', () => {
     // Shadow DOM exists, CSS parts exposed, default classes/attributes applied
     it('renders with shadow DOM', async () => {
-      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       expect(el.shadowRoot).toBeTruthy();
     });
   });
@@ -431,10 +425,10 @@ describe('hx-foo', () => {
   describe('Events', () => {
     // Each event: fires, bubbles, composed, detail shape
     // Negative cases: does NOT fire when disabled/loading
-    it('dispatches hx-change on interaction', async () => {
-      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
-      const eventPromise = oneEvent(el, 'hx-change');
-      // trigger interaction...
+    it('dispatches hx-click on activation', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      const eventPromise = oneEvent(el, 'hx-click');
+      el.click();
       const event = await eventPromise;
       expect(event).toBeTruthy();
     });
@@ -444,7 +438,7 @@ describe('hx-foo', () => {
   describe('Keyboard', () => {
     // Enter/Space activation, Tab focus order, Escape dismissal (as applicable)
     it('Enter activates component', async () => {
-      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
       el.focus();
       await userEvent.keyboard('{Enter}');
       // assert result...
@@ -455,7 +449,7 @@ describe('hx-foo', () => {
   describe('Slots', () => {
     // Default slot, named slots — verify slotted content via el.querySelector
     it('default slot renders text', async () => {
-      const el = await fixture<HelixFoo>('<hx-foo>Hello</hx-foo>');
+      const el = await fixture<HelixButton>('<hx-button>Hello</hx-button>');
       expect(el.textContent?.trim()).toBe('Hello');
     });
   });
@@ -463,16 +457,16 @@ describe('hx-foo', () => {
   // ─── CSS Parts ───
   describe('CSS Parts', () => {
     // Each @csspart is accessible via shadowQuery(el, '[part~="name"]')
-    it('exposes "root" part', async () => {
-      const el = await fixture<HelixFoo>('<hx-foo></hx-foo>');
-      expect(shadowQuery(el, '[part~="root"]')).toBeTruthy();
+    it('exposes "button" part', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      expect(shadowQuery(el, '[part~="button"]')).toBeTruthy();
     });
   });
 
-  // ─── Form ─── (only for form-associated components)
+  // ─── Form ─── (only for form-associated components — hx-button is form-associated)
   describe('Form', () => {
     it('has formAssociated=true', () => {
-      const ctor = customElements.get('hx-foo') as unknown as { formAssociated: boolean };
+      const ctor = customElements.get('hx-button') as unknown as { formAssociated: boolean };
       expect(ctor.formAssociated).toBe(true);
     });
   });
@@ -482,7 +476,7 @@ describe('hx-foo', () => {
     // checkA11y(el) for default state and key variants
     // Always call page.screenshot() before checkA11y
     it('has no axe violations in default state', async () => {
-      const el = await fixture<HelixFoo>('<hx-foo>Content</hx-foo>');
+      const el = await fixture<HelixButton>('<hx-button>Content</hx-button>');
       await page.screenshot();
       const { violations } = await checkA11y(el);
       expect(violations).toEqual([]);
@@ -513,14 +507,18 @@ describe('hx-foo', () => {
 ### Writing Tests (simple example)
 
 ```typescript
-import { expect, test } from 'vitest';
-import { fixture, cleanup } from '../test-utils';
-import './hx-button';
+import { describe, it, expect, afterEach } from 'vitest';
+import { fixture, cleanup } from '../../test-utils.js';
+import type { HelixButton } from './hx-button.js';
+import './index.js';
 
-test('renders with default variant', async () => {
-  const el = await fixture('<hx-button>Click me</hx-button>');
-  expect(el.variant).toBe('primary');
-  cleanup();
+afterEach(cleanup);
+
+describe('hx-button', () => {
+  it('renders with default variant', async () => {
+    const el = await fixture<HelixButton>('<hx-button>Click me</hx-button>');
+    expect(el.variant).toBe('primary');
+  });
 });
 ```
 
@@ -550,7 +548,7 @@ Before writing a new doc page, run it through the 3-question boundary test:
 
 1. **Does this page require a live HELiX component to make its point?** → **Storybook** (`apps/storybook/stories/`)
 2. **Is this page step-by-step instruction for someone past evaluation?** → **`apps/docs/`** (Astro Starlight)
-3. **Is this page first-5-seconds positioning for evaluators?** → **marketing site** (booked-solid-tech.com — out of this repo)
+3. **Is this page first-5-seconds positioning for evaluators?** → **marketing site** (canonical homepage is `helix.bookedsolid.tech`; pure marketing pages may live in a separate marketing-site repo if one is set up — out of this repo regardless)
 
 If two answers apply, the page is too broad — split it. If zero apply, the page doesn't belong in any of our docs surfaces.
 
@@ -558,20 +556,20 @@ If two answers apply, the page is too broad — split it. If zero apply, the pag
 
 The single source of truth per content type. **Authoring the same fact in two places creates drift; one surface owns it and the other links.**
 
-| Content type | Canonical home | Cross-link from the other surface |
-| --- | --- | --- |
-| Component API (props, events, slots, CSS parts, CSS custom props) | **Storybook** (CEM-driven autodocs via `HelixDocsPage`) | `apps/docs` framework-integration pages link to `storybook.helix.bookedsolid.tech/?path=/docs/components-<name>--docs` |
-| Live component demo / playground | **Storybook** (`*.stories.ts`) | `apps/docs` references with static excerpts that link to the live demo |
-| Brand registry (live token swatches + theme switching) | **Storybook** (`foundations/BrandRegistry.mdx`) | `apps/docs/design-tokens/*` links to the live page |
-| Foundations (live swatches with brand toolbar) | **Storybook** (`foundations/Color`, `Typography`, etc.) | `apps/docs/design-tokens/*` for the static token tables; cross-link both ways |
-| Iconography (visual catalog) | **Storybook** (`foundations/Iconography.mdx`) | `apps/docs` references it from the `@helixui/icons` integration guide |
-| AAA cert dashboard + per-component AAAConformanceCard | **Storybook** (`accessibility/Dashboard.mdx`) | `apps/docs/accessibility/*` links to the dashboard |
-| Accessibility — VPAT scope, consumer obligations, WCAG SC reference | **`apps/docs`** (`accessibility/self-cert-scope.mdx`, `accessibility/consumer-obligations.mdx`, `accessibility/success-criteria.mdx`) | Storybook `accessibility/Dashboard.mdx` links to the apps/docs prose |
-| Drupal integration (Twig, behaviors, CDN, module install) | **`apps/docs`** (`drupal/`) | No Storybook duplicate (no live components needed) |
-| Framework integration (React, Next.js, Vue, Angular, Svelte, vanilla HTML) | **`apps/docs`** (`framework-integration/`) | Storybook Overview links back |
-| Getting started + migration + release policy | **`apps/docs`** (`getting-started/`, `migration/`) | Storybook Overview links back |
-| Architecture (monorepo, build, testing strategy) | **`apps/docs`** (`architecture/`) | Internal reference; no cross-link needed |
-| AI-agent context (`llms.txt`, `llms-full.txt`) | **`apps/docs`** (root, generated from CEM + `aaa-verdicts.json`) | Generated, not hand-authored |
+| Content type                                                               | Canonical home                                                                                                                | Cross-link from the other surface                                                                                      |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Component API (props, events, slots, CSS parts, CSS custom props)          | **Storybook** (CEM-driven autodocs via `HelixDocsPage`)                                                                       | `apps/docs` framework-integration pages link to `storybook.helix.bookedsolid.tech/?path=/docs/components-<name>--docs` |
+| Live component demo / playground                                           | **Storybook** (`*.stories.ts`)                                                                                                | `apps/docs` references with static excerpts that link to the live demo                                                 |
+| Brand registry (live token swatches + theme switching)                     | **Storybook** (`foundations/BrandRegistry.mdx`)                                                                               | `apps/docs/design-tokens/*` links to the live page                                                                     |
+| Foundations (live swatches with brand toolbar)                             | **Storybook** (`foundations/Color`, `Typography`, etc.)                                                                       | `apps/docs/design-tokens/*` for the static token tables; cross-link both ways                                          |
+| Iconography (visual catalog)                                               | **Storybook** (`foundations/Iconography.mdx`)                                                                                 | `apps/docs` references it from the `@helixui/icons` integration guide                                                  |
+| AAA cert dashboard + per-component AAAConformanceCard                      | **Storybook** (`accessibility/Dashboard.mdx`)                                                                                 | `apps/docs/accessibility/*` links to the dashboard                                                                     |
+| Accessibility — VPAT scope, consumer obligations, WCAG SC reference        | **`apps/docs`** (`accessibility/self-cert-scope.mdx`, `accessibility/consumer-obligations.mdx`, `accessibility/vpat-2.5.mdx`) | Storybook `accessibility/Dashboard.mdx` links to the apps/docs prose                                                   |
+| Drupal integration (Twig, behaviors, CDN, module install)                  | **`apps/docs`** (`drupal/`)                                                                                                   | No Storybook duplicate (no live components needed)                                                                     |
+| Framework integration (React, Next.js, Vue, Angular, Svelte, vanilla HTML) | **`apps/docs`** (`framework-integration/`)                                                                                    | Storybook Overview links back                                                                                          |
+| Getting started + migration + release policy                               | **`apps/docs`** (`getting-started/`, `migration/`)                                                                            | Storybook Overview links back                                                                                          |
+| Architecture (monorepo, build, testing strategy)                           | **`apps/docs`** (`architecture/`)                                                                                             | Internal reference; no cross-link needed                                                                               |
+| AI-agent context (`llms.txt`, `llms-full.txt`)                             | **`apps/docs`** (root, generated from CEM + `aaa-verdicts.json`)                                                              | Generated, not hand-authored                                                                                           |
 
 ### Cross-linking convention
 
@@ -611,7 +609,7 @@ Required for new features that consumers integrate into their apps:
 - **Bugs**: Open an issue with reproduction steps
 - **Features**: Open an issue for discussion first
 - **Questions**: Use GitHub Discussions
-- **Security**: Email security@example.com
+- **Security**: Report security issues privately through GitHub's [private vulnerability reporting](https://github.com/bookedsolidtech/helix/security/advisories/new); a formal `SECURITY.md` with a dedicated reporting address is on the roadmap. Do not open public issues for security vulnerabilities.
 
 ## License
 
