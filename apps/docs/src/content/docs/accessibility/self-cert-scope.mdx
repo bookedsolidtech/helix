@@ -13,19 +13,20 @@ _Cert authority: `scripts/aaa-formal-audit.mjs`_
 
 - **44** P0 components self-certed — library 3.9.0 surface
 - **11** success criteria measured — 9 WCAG 2.2 AAA + 2 peer standards
-- **1** story per component — Default story; multi-variant deferred
-- **3** theme modes verified — light, dark, forced-colors
+- **1** primary story per component — usually Default; the harness uses a non-default audit story for a handful of components where the Default does not exercise the criterion under review
 
-The cert authority is [`scripts/aaa-formal-audit.mjs`](https://github.com/bookedsolidtech/helix/blob/main/scripts/aaa-formal-audit.mjs) (CLAUDE.md is explicit: the formal harness wins where any other tool disagrees). It sources every criterion from [`scripts/aaa-standards.json`](https://github.com/bookedsolidtech/helix/blob/main/scripts/aaa-standards.json) (W3C-verified URLs), spins up Playwright against a running Storybook, and produces measured verdicts plus evidence prose for each (component × criterion) cell. The output lives at `.reports/formal-aaa-audit/audit.json` and is regenerated on every release run.
+Brand × theme coverage (light / dark / forced-colors) is exercised by a **separate, informational** harness (`pnpm aaa:matrix`). That matrix is not the cert authority; the formal audit is.
+
+The cert authority is [`scripts/aaa-formal-audit.mjs`](https://github.com/bookedsolidtech/helix/blob/main/scripts/aaa-formal-audit.mjs) (CLAUDE.md is explicit: the formal harness wins where any other tool disagrees). It sources every criterion from [`scripts/aaa-standards.json`](https://github.com/bookedsolidtech/helix/blob/main/scripts/aaa-standards.json) (W3C-verified URLs), spins up Playwright against a running Storybook, and produces measured verdicts plus evidence prose for each (component × criterion) cell. The output lives at `.reports/formal-aaa-audit/audit.json`, regenerated when `pnpm aaa:audit` runs (typically before a release). The committed, consumable snapshot is [`packages/hx-library/aaa-verdicts.json`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/aaa-verdicts.json).
 
 ## What is verified
 
 _Explicit affirmative measurements._
 
-- **Contrast (1.4.6, 1.4.11)** — measured via the contrast ledger (`packages/hx-tokens/CONTRAST-REPORT.md`) plus axe-core `color-contrast-enhanced` sweep across the rendered Default story DOM. 163/163 pairings above AA threshold; per-component evidence records the exact foreground/background RGB pair and ratio.
-- **Keyboard contracts (2.1.3, APG-keyboard)** — for every interactive primitive with an APG pattern, the Default story is exercised with the documented key set and verified to match the contract.
-- **Focus indicator (2.4.13)** — measured against the rendered focus state of the Default story; verdict records the actual outline and box-shadow values.
-- **Forced-colors** — the source CSS is scanned for forbidden patterns (color-bound borders, opacity-based hide-states, non-system color tokens in forced-color modes); the Default story is also rendered in forced-colors mode for visual smoke.
+- **Contrast (1.4.6 Contrast Enhanced)** — measured via the contrast ledger (`packages/hx-tokens/CONTRAST-REPORT.md`) plus axe-core `color-contrast-enhanced` sweep across the rendered audit story DOM. The current ledger records 160 pair-instances all above AAA threshold; per-component evidence records the exact foreground/background RGB pair and ratio.
+- **Keyboard contracts (2.1.3, APG-keyboard)** — for every interactive primitive with an APG pattern, the formal harness verifies the contract by source inspection — `keydown` / `keyup` handlers and key-name matches against the APG-documented set, plus native delegation where the host element is a real `<button>` / `<input>` / `<a>`.
+- **Focus indicator (2.4.13)** — measured against the rendered focus state of the audit story; verdict records the actual outline and box-shadow values.
+- **Forced-colors** — the source CSS is scanned for forbidden patterns (color-bound borders, opacity-based hide-states, non-system color tokens in forced-color modes). The full visual smoke in a rendered forced-colors browser is part of the informational brand × theme matrix, not the formal cert.
 - **Error prevention (3.3.6)** — applies to form-associated **input** components. Submission triggers (aria-pattern=button) are NA — 3.3.6 is a form-flow contract the consumer app fulfills, not a leaf-component contract. Input components must expose `ElementInternals` + `setValidity()` so the consumer's form gets native form-validity participation; without setValidity, the verdict is Partially Supports.
 - **The remaining 5 criteria** — 1.4.9, 2.3.3, 2.4.12, 2.5.5, 3.2.5 — apply per component class; see the Success Criteria page in Storybook for the per-component applicability table.
 
@@ -40,9 +41,9 @@ _Honest limits._
 
 ## Where to read the evidence
 
-- [Per-component verdict matrix](https://github.com/bookedsolidtech/helix/blob/main/.reports/formal-aaa-audit/audit.matrix.md) — 44 × 11 cells. `audit.matrix.md` — single-glance grid of every (component × criterion) verdict, regenerated on every audit run.
-- [Per-component audit files](https://github.com/bookedsolidtech/helix/tree/main/packages/hx-library/src/components) — `.../AAA-AUDIT.md`. Inside each component directory under `packages/hx-library/src/components/<name>/AAA-AUDIT.md` — verdict prose, evidence values, citations.
-- [Raw audit JSON](https://github.com/bookedsolidtech/helix/blob/main/.reports/formal-aaa-audit/audit.json) — `audit.json`. Machine-readable verdicts + evidence URLs for every cell. The AAAConformanceCard on every docs page reads from a snapshot of this file.
+- [Per-component audit files](https://github.com/bookedsolidtech/helix/tree/main/packages/hx-library/src/components) — inside each component directory under `packages/hx-library/src/components/<name>/AAA-AUDIT.md` — verdict prose, evidence values, citations.
+- [Verdicts snapshot (committed)](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/aaa-verdicts.json) — `aaa-verdicts.json`. Machine-readable verdicts + evidence URLs for every (component × criterion) cell. This is the AAAConformanceCard data source on every docs page.
+- **Raw audit JSON (locally regenerable)** — `.reports/formal-aaa-audit/audit.json` and `audit.matrix.md` are produced by `pnpm aaa:audit` against a running Storybook. They are gitignored; the canonical committed artifact is the snapshot above.
 - [Story audit (multi-variant)](https://github.com/bookedsolidtech/helix/blob/main/scripts/audit-stories.mjs) — `audit-stories.mjs`. Renders every story across every component, screenshots the canvas, runs axe on the rendered DOM, and writes findings as JSONL.
 
 ## When a third-party VPAT is required
