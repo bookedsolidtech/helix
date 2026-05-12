@@ -237,17 +237,22 @@ async function scanFile(absPath, relPath, versions) {
       continue;
     }
 
-    // Skip bare floating-major forms (`@1`, `@3`, `@^4`) in CDN / import-map
-    // context. A bare `\d+` (no minor, no patch) is by definition the author
-    // signalling "track the major branch" — that's the intended pinning pattern,
-    // not a stale exact pin.
-    if (
-      /^\^?\d+$/.test(versionString) &&
-      /cdn\.|import\s*map|importmap|"imports"\s*:|"@helixui|<script\s+type="module"\s+src=/i.test(
-        surroundingLines,
-      )
-    ) {
-      continue;
+    // Skip bare floating-major forms (`@1`, `@3`, `@^4`) when they appear in
+    // a CDN / import-map context — those are intentional "track the major
+    // branch" pins, not stale exact pins. The context detector strips the
+    // matched span itself so a literal `@helixui/<pkg>@<ver>` on the line
+    // doesn't accidentally count as evidence of import-map shape.
+    if (/^\^?\d+$/.test(versionString)) {
+      const cleanedContext = surroundingLines
+        .slice(0, surroundingLines.indexOf(match[0]))
+        .concat(surroundingLines.slice(surroundingLines.indexOf(match[0]) + match[0].length));
+      if (
+        /cdn\.jsdelivr\.net|cdn\.skypack\.dev|unpkg\.com|import\s*map|importmap|"imports"\s*:|<script\s+type="module"\s+src=/i.test(
+          cleanedContext,
+        )
+      ) {
+        continue;
+      }
     }
 
     findings.push({
