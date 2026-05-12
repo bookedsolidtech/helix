@@ -42,8 +42,8 @@ Here's a minimal example:
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('hx-simple-input')
-export class HelixSimpleInput extends LitElement {
+@customElement('my-simple-input')
+export class MySimpleInput extends LitElement {
   // Step 1: Declare form association
   static formAssociated = true;
 
@@ -93,7 +93,7 @@ Now this component works in a form:
 
 ```html
 <form>
-  <hx-simple-input name="username"></hx-simple-input>
+  <my-simple-input name="username"></my-simple-input>
   <button type="submit">Submit</button>
 </form>
 ```
@@ -128,9 +128,9 @@ export class HelixInput extends LitElement {
 
 **Key constraints:**
 
-- **Call in constructor only** — `attachInternals()` throws if called outside the constructor
-- **Call once** — Calling `attachInternals()` multiple times throws
-- **Requires `formAssociated = true`** — Calling without this flag throws
+- **Call exactly once per element.** Calling `attachInternals()` twice throws — the constructor is the safest place to call it, but later lifecycle calls only throw if a previous call already succeeded.
+- **`formAssociated = true` enables form participation.** `attachInternals()` itself is callable on any custom element (it's how non-form-associated components reach ARIA / states / shadowRoot helpers); it only enables form callbacks like `formAssociatedCallback` / `formResetCallback` when `static formAssociated = true` is declared.
+- **HELiX shortcut.** Inside `@helixui/library`, components extend `HelixElement` and access `this._internals` — a lazy accessor that calls `attachInternals()` on first read. Form-participating subclasses additionally set `static override formAssociated = true`. You don't write the constructor / private field yourself.
 
 ### TypeScript Typing
 
@@ -190,7 +190,7 @@ export class BrokenInput extends LitElement {
 You can check if an element is form-associated via the constructor:
 
 ```typescript
-const input = document.createElement('hx-input');
+const input = document.createElement('hx-text-input');
 console.log(input.constructor.formAssociated); // true
 
 const div = document.createElement('div');
@@ -290,7 +290,7 @@ Like built-in inputs, form-associated custom elements support the `form` attribu
 </form>
 
 <!-- This input is associated with the form via the form attribute -->
-<hx-input name="username" form="my-form"></hx-input>
+<hx-text-input name="username" form="my-form"></hx-text-input>
 ```
 
 The browser handles this automatically. Your component's `this._internals.form` will point to the `<form id="my-form">` element.
@@ -332,7 +332,7 @@ export class HelixInput extends LitElement {
 
 ```html
 <form>
-  <hx-input name="username" value="alice"></hx-input>
+  <hx-text-input name="username" value="alice"></hx-text-input>
   <!-- Submits: username=alice -->
 </form>
 ```
@@ -373,7 +373,7 @@ export class HelixCheckbox extends LitElement {
 
 ### File Value
 
-For file inputs, pass a `File` or `FileList`:
+For file inputs, pass a single `File`, a `FormData` (for multiple files), or `null`. `setFormValue()` does not accept a raw `FileList` — extract the file(s) you want to submit and convert as needed:
 
 ```typescript
 export class HelixFileInput extends LitElement {
@@ -421,8 +421,12 @@ export class HelixDatePicker extends LitElement {
 
 ```html
 <form>
-  <hx-date-picker name="birthdate"></hx-date-picker>
-  <!-- Submits: birthdate-year=2026&birthdate-month=2&birthdate-day=16 -->
+  <hx-date-picker name="birthdate" value="2026-02-16"></hx-date-picker>
+  <!-- hx-date-picker submits a single ISO 8601 date string:
+       birthdate=2026-02-16
+       Use a FormData entry-list (multiple setFormValue calls) only when a
+       control genuinely needs split year/month/day submission — that's the
+       advanced FormData state pattern, not the hx-date-picker default. -->
 </form>
 ```
 
@@ -555,21 +559,27 @@ export class HelixSelect extends LitElement {
 Called when the browser restores form state (browser back/forward, session restore). The browser passes the **state** that was saved via `setFormValue(value, state)`.
 
 ```typescript
-formStateRestoreCallback(state: string, mode: 'restore' | 'autocomplete'): void;
+formStateRestoreCallback(
+  state: File | string | FormData | null,
+  mode: 'restore' | 'autocomplete'
+): void;
 ```
 
-- **`state`** — The state value passed to `setFormValue()` (or the value if no state was provided)
+- **`state`** — The state value passed to `setFormValue()` (or the value if no state was provided). May be `null` when the browser restores without a previously saved value.
 - **`mode`** — Either `'restore'` (back/forward) or `'autocomplete'` (autocomplete feature)
 
 #### Example: Text Input
 
 ```typescript
-export class HelixTextInput extends LitElement {
+export class MyTextInput extends LitElement {
   @property({ type: String })
   value = '';
 
-  formStateRestoreCallback(state: string) {
-    this.value = state;
+  formStateRestoreCallback(state: File | string | FormData | null) {
+    // Only treat state as the input's string value when it actually is one.
+    if (typeof state === 'string') {
+      this.value = state;
+    }
   }
 }
 ```
@@ -615,17 +625,25 @@ export class HelixMultiSelect extends LitElement {
 - **Handle invalid state gracefully** — Wrap in try/catch if parsing
 - **Don't call `setFormValue()`** — The browser already has the value; you're just syncing
 
-### formDisabledCallback() (Optional)
+### formDisabledCallback() — required for `<fieldset disabled>` propagation
 
-Called when the element's disabled state changes due to a containing `<fieldset>` being disabled. This is **optional** and rarely needed.
+Called when the element's disabled state changes due to a containing `<fieldset>` being disabled. The browser does **not** propagate fieldset-disabled state to custom elements automatically — you have to handle this callback for `:disabled` semantics to behave like a native input.
 
 ```typescript
+// Raw-platform shape
 formDisabledCallback(disabled: boolean): void {
   this.disabled = disabled;
 }
 ```
 
-Most components don't implement this. The browser handles disabled state automatically via CSS (`:disabled` selector) and ARIA.
+Inside HELiX, `HelixElement` exposes a `_onFormDisabled(disabled: boolean)` hook that `FormMixin` wires into the platform callback — every shipped form component overrides `_onFormDisabled` (not `formDisabledCallback` directly) so the inherited base owns the platform-callback shape and subclasses only sync their internal state:
+
+```typescript
+// HELiX subclass pattern
+protected override _onFormDisabled(disabled: boolean): void {
+  this.disabled = disabled;
+}
+```
 
 ## Form Validation
 
@@ -973,10 +991,10 @@ The `name` attribute is **required** for form submission. Without it, the contro
 
 ```html
 <!-- This value IS submitted -->
-<hx-input name="username" value="alice"></hx-input>
+<hx-text-input name="username" value="alice"></hx-text-input>
 
 <!-- This value is NOT submitted (no name) -->
-<hx-input value="bob"></hx-input>
+<hx-text-input value="bob"></hx-text-input>
 ```
 
 In your component:
@@ -1070,7 +1088,7 @@ export class HelixTextInput extends LitElement {
 The `disabled` attribute is honored by the browser:
 
 ```html
-<hx-input name="username" disabled></hx-input>
+<hx-text-input name="username" disabled></hx-text-input>
 ```
 
 - Disabled controls don't submit with the form
@@ -1090,7 +1108,7 @@ The `reflect: true` option ensures the attribute updates when the property chang
 
 ### Example 1: hx-text-input
 
-Full implementation from `packages/hx-library/src/components/hx-text-input/hx-text-input.ts`:
+Simplified illustration (the actual `packages/hx-library/src/components/hx-text-input/hx-text-input.ts` extends `HelixElement` + applies `FormMixin` and uses the inherited lazy `_internals` accessor — see the file for the full source):
 
 ```typescript
 import { LitElement, html } from 'lit';
@@ -1202,7 +1220,7 @@ export class HelixTextInput extends LitElement {
 
 ### Example 2: hx-checkbox
 
-Full implementation from `packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts`:
+Simplified illustration (real `hx-checkbox` extends `HelixElement` + applies `FormMixin`, integrates with `hx-checkbox-group` for grouped-form suppression, and renders its own ARIA-pattern markup — see `packages/hx-library/src/components/hx-checkbox/hx-checkbox.ts` for the full source):
 
 ```typescript
 import { LitElement, html } from 'lit';
@@ -1335,7 +1353,7 @@ export class HelixCheckbox extends LitElement {
 
 ### Example 3: hx-select
 
-Full implementation from `packages/hx-library/src/components/hx-select/hx-select.ts`:
+Simplified illustration (real `hx-select` is a host-canonical combobox with a hidden native `<select>` fallback, its own listbox keyboard/ARIA contract, and `setFormValue(null)` semantics for empty selections — see `packages/hx-library/src/components/hx-select/hx-select.ts` for the full source):
 
 ```typescript
 import { LitElement, html } from 'lit';
@@ -1583,16 +1601,19 @@ override focus(options?: FocusOptions): void {
 // (missing focus() method)
 ```
 
-### 9. Use null for Unchecked/Empty Controls
+### 9. Use null when a control should be **omitted from the submission**
 
 ```typescript
-// ✅ GOOD: Checkbox
+// ✅ GOOD for checkboxes: an unchecked checkbox should NOT appear in FormData,
+// matching native <input type="checkbox"> behavior.
 this._internals.setFormValue(this.checked ? this.value : null);
 
-// ❌ BAD: Always submits a value
+// ❌ Wrong here: an empty string is still a value and would submit
+// `agree=` rather than omitting the entry.
 this._internals.setFormValue(this.checked ? this.value : '');
-// Empty string is still a value!
 ```
+
+Scope this rule to controls whose empty state should be **omitted** (checkboxes, radio groups with no selection, file inputs with no file). Text inputs match native `<input type="text">` behavior — an empty text field submits an empty string, so `hx-text-input` calls `setFormValue('')`, not `setFormValue(null)`.
 
 ### 10. Reflect disabled and required for CSS
 
@@ -1721,7 +1742,7 @@ npm install element-internals-polyfill
 import 'element-internals-polyfill';
 ```
 
-The polyfill provides the same API surface, ensuring your components work everywhere.
+The polyfill provides a close approximation of the platform API but not full parity — see the [`element-internals-polyfill` README](https://github.com/WICG/webcomponents/issues/187) for documented limitations around form submission edge cases, focus delegation, and the runtime behavior on legacy browsers. Treat it as best-effort coverage rather than a universal-browser guarantee.
 
 ## Summary
 
@@ -1745,7 +1766,7 @@ Follow these patterns:
 - Anchor validation UI to internal inputs
 - Reflect `disabled` and `required` for CSS
 
-With these fundamentals, your form components will work seamlessly in any context: native HTML forms, React forms, server-side rendering, and accessibility tools.
+With these fundamentals, your form components participate cleanly in native HTML forms and assistive-tech accessibility trees. Framework usage carries an extra layer of integration work: `@helixui/react` ships `'use client'` wrappers (Server Components can import them but they execute as Client Components), and SSR scenarios need framework-specific hydration guidance — read your framework's web-component / `customElements` story before assuming the wrappers stream and hydrate identically to native React form controls.
 
 ## References
 
