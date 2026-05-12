@@ -13,7 +13,6 @@ This guide explores the CSS Parts API in depth, covering the `part` attribute, t
 
 Before diving into CSS Parts, ensure you understand:
 
-- [Shadow DOM Architecture](/components/shadow-dom/architecture) — Core concepts of shadow trees, shadow boundaries, and style encapsulation
 - Basic CSS selector syntax and specificity
 - Web component fundamentals (custom elements, templates)
 
@@ -864,9 +863,6 @@ For HELiX (hx-library), parts are essential for integrating components into dive
 ## Next Steps
 
 - [Shadow DOM Slots](/components/shadow-dom/slots) — Master content projection and composition
-- [Shadow DOM Events](/components/shadow-dom/events) — Understand event retargeting and composed events
-- [Advanced Slots](/components/shadow-dom/advanced-slots) — Conditional rendering, fallback content, slot observation
-- [Component Styling Guide](/components/styling) — Design token integration and theming architecture
 
 ## Sources
 

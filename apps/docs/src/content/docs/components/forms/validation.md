@@ -760,7 +760,7 @@ export class HelixPasswordInput extends LitElement {
 Validate one field based on another field's value:
 
 ```typescript
-export class HelixPasswordConfirmInput extends LitElement {
+export class OrgPasswordConfirmInput extends LitElement {
   @property({ type: String })
   value = '';
 
@@ -806,12 +806,12 @@ export class HelixPasswordConfirmInput extends LitElement {
     required
   ></hx-text-input>
 
-  <hx-password-confirm-input
+  <org-password-confirm-input
     id="confirm"
     name="password-confirm"
     label="Confirm Password"
     required
-  ></hx-password-confirm-input>
+  ></org-password-confirm-input>
 
   <button type="submit">Submit</button>
 </form>

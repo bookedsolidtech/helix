@@ -461,9 +461,6 @@ For HELiX components consumed through Drupal Twig templates, `exportparts` decla
 ## Next Steps
 
 - [CSS Parts API](/components/shadow-dom/parts) — The full `part` attribute and `::part()` selector reference
-- [Open vs Closed Shadow Roots](/components/shadow-dom/open-closed) — Why open mode is required for part forwarding to work
-- [Shadow DOM Architecture](/components/shadow-dom/architecture) — Shadow boundary fundamentals
-- [Advanced Slots](/components/shadow-dom/advanced-slots) — Composition patterns that work alongside part forwarding
 
 ## Sources
 

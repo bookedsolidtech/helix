@@ -200,33 +200,44 @@ for (const file of targetFiles) {
       const idx = content.slice(0, m.index).split(/\r?\n/).length;
       const lineText = lines[idx - 1] ?? '';
 
-      // Skip pedagogical "this is wrong" examples — look for nearby "BAD" or "don't" markers
+      // Skip pedagogical "this is wrong" examples — explicit negative markers
+      // near the tag indicate the doc is *correcting* readers, not pointing them
+      // at a real component.
       const surroundingLines = lines.slice(Math.max(0, idx - 3), idx + 2).join(' ');
-      const isPedagogical = /BAD:|don['']t|wrong|incorrect|❌/i.test(surroundingLines);
+      const isPedagogical =
+        /BAD:|don['']t|wrong|incorrect|❌|not\s+a\s+valid|no\s+such\s+(?:element|component|tag)|there\s+is\s+no\s+\S*\s*<?hx-/i.test(
+          surroundingLines,
+        );
       if (isPedagogical) continue;
 
       // Skip prose tokens that aren't real tag references:
       //  - completion stubs / typing examples (`<hx-bu...`, `<hx-…>`, `<hx-foo*`)
-      //  - inline backtick prose ("there is no `<hx-column>` element")
-      //  - `<hx-tag-name>` style placeholders inside angle brackets meant as generic
+      //  - obvious placeholder tag names (`<hx-some-component>`, `<hx-tag-name>`,
+      //    `<hx-foo>`, `<hx-bar>`, `<hx-example>`, `<hx-…>`)
       const charAfter = content[m.index + m[0].length] ?? '';
       const isStub = charAfter === '.' || charAfter === '…' || charAfter === '*';
       if (isStub) continue;
+      const placeholderTagNames = new Set([
+        'hx-some-component',
+        'hx-some-element',
+        'hx-tag-name',
+        'hx-foo',
+        'hx-bar',
+        'hx-baz',
+        'hx-example',
+        'hx-component',
+        'hx-element',
+      ]);
+      if (placeholderTagNames.has(tag)) continue;
 
-      // Inline backtick context: the matched tag is inside a single-backtick run,
-      // and the surrounding line uses negation language ("no", "not", "doesn't exist",
-      // "there is no", "no such", "fabricated", "phantom", "fake", "fictional",
-      // "imaginary", "placeholder", "removed", "renamed"). These are corrections
-      // discussing a tag, not consumer-facing tag references.
-      const preTagText = content.slice(0, m.index);
-      const lineStart = preTagText.lastIndexOf('\n') + 1;
-      const linePrefix = preTagText.slice(lineStart);
-      const insideBacktickPair = (linePrefix.match(/`/g) ?? []).length % 2 === 1;
+      // Skip correction-context prose, with or without backticks. The tag is a
+      // reference to something that does NOT exist — negation language earlier
+      // on the same line or its immediate predecessor.
+      const correctionRegex =
+        /(no such|there is no|there's no|no separate|doesn['']t exist|do[es]*\s+not\s+exist|isn['']t a real|fabricated|phantom|fake|fictional|imaginary|placeholder|removed|renamed|stale|deprecated|not\s+a\s+valid)/i;
       const looksLikeCorrection =
-        /(no such|there is no|doesn['']t exist|do[es]*\s+not\s+exist|fabricated|phantom|fake|fictional|imaginary|placeholder|removed|renamed|stale|deprecated)/i.test(
-          lineText,
-        );
-      if (insideBacktickPair && looksLikeCorrection) continue;
+        correctionRegex.test(lineText) || correctionRegex.test(lines[idx - 2] ?? '');
+      if (looksLikeCorrection) continue;
 
       add({
         file,
@@ -354,6 +365,33 @@ for (const file of targetFiles) {
       // HELiX itself is WCAG 2.2 AAA (the two appear together in honest framing).
       if (/WCAG\s*2\.2\s*AAA/i.test(surroundingLines)) continue;
 
+      // Skip axe-core literal references — `axe-core` itself ships rules with
+      // a WCAG 2.1 AA default, so doc prose describing what axe-core checks
+      // is intentionally literal, not a HELiX claim.
+      if (/axe-core/i.test(surroundingLines)) continue;
+
+      // Skip external-link references where the URL itself contains "wcag-2-1-aa"
+      // or "wcag2-1aa" — those are third-party reference docs / checklists.
+      if (/wcag[-_]?2[-_.]?1[-_]?aa/i.test(lineText)) continue;
+
+      // Skip VPAT 2.5 conformance-claim cells that explicitly note the gated
+      // posture alongside the targeted AAA on P0.
+      if (/AAA[-_\s]?targeted/i.test(lineText)) continue;
+
+      // Skip prose describing what an axe-core audit (or other consumer tool)
+      // configures by default, where the WCAG 2.1 AA mention is the tool's
+      // own default rather than a HELiX assertion.
+      if (
+        /audit|Default\s*=/i.test(lineText) &&
+        !/HELiX\s+(?:meets|ships|claims|guarantees)/i.test(lineText)
+      ) {
+        continue;
+      }
+
+      // Skip cons/limitation-style bullets that frame WCAG 2.1 AA as a failure
+      // condition — same external-baseline rationale.
+      if (/^\s*-\s*.+\bfails?\s+WCAG\s+2\.1\s+AA\b/i.test(lineText)) continue;
+
       add({
         file,
         line: idx,
@@ -382,9 +420,16 @@ for (const file of targetFiles) {
     // Skip changelog / archival files — historical pins are not drift
     if (isArchival) continue;
 
-    // Skip lines that explicitly mark the pin as deprecated/unpublished/cosmetic
+    // Skip lines that explicitly mark the pin as deprecated/unpublished/cosmetic,
+    // or that frame the pin as a hypothetical / illustrative / future-major example.
     const surroundingLines = lines.slice(Math.max(0, idx - 2), idx + 2).join(' ');
-    if (/deprecated|unpublished|cosmetic|artifact|placeholder/i.test(surroundingLines)) continue;
+    if (
+      /deprecated|unpublished|cosmetic|artifact|placeholder|hypothetical|illustrative|illustration|example major|future major|don['']t try|do not try/i.test(
+        surroundingLines,
+      )
+    ) {
+      continue;
+    }
 
     const canonical = workspaceVersions.get(pkgName);
     if (!canonical) continue; // package not in the workspace; can't compare

@@ -16,31 +16,29 @@ A bare specifier like `import '@helixui/library'` only resolves in the browser i
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My App</title>
-  <script type="importmap">
-  {
-    "imports": {
-      "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
-      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-      "@helixui/icons":  "https://cdn.jsdelivr.net/npm/@helixui/icons@3.9.0/dist/index.js",
-      "lit":             "https://cdn.jsdelivr.net/npm/lit@3/+esm",
-      "lit/":            "https://cdn.jsdelivr.net/npm/lit@3/"
-    }
-  }
-  </script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My App</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
+          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+          "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
+          "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <hx-button variant="primary" id="my-btn">Click me</hx-button>
 
-  <hx-button variant="primary" id="my-btn">Click me</hx-button>
-
-  <script type="module">
-    import '@helixui/library';
-  </script>
-
-</body>
+    <script type="module">
+      import '@helixui/library';
+    </script>
+  </body>
 </html>
 ```
 
@@ -52,16 +50,16 @@ For performance, load only the components you use. Per-component entry points re
 
 ```html
 <script type="importmap">
-{
-  "imports": {
-    "@helixui/library/components/hx-button":     "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js",
-    "@helixui/library/components/hx-text-input": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js",
-    "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-    "@helixui/icons":  "https://cdn.jsdelivr.net/npm/@helixui/icons@3.9.0/dist/index.js",
-    "lit":             "https://cdn.jsdelivr.net/npm/lit@3/+esm",
-    "lit/":            "https://cdn.jsdelivr.net/npm/lit@3/"
+  {
+    "imports": {
+      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js",
+      "@helixui/library/components/hx-text-input": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
+    }
   }
-}
 </script>
 <script type="module">
   import '@helixui/library/components/hx-button';
@@ -198,34 +196,47 @@ A complete, self-contained example:
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>HELIX Demo</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>HELIX Demo</title>
+  </head>
+  <body>
+    <form
+      id="login-form"
+      style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px; padding: 2rem;"
+    >
+      <hx-text-input
+        id="email"
+        name="email"
+        type="email"
+        required
+        placeholder="Email address"
+      ></hx-text-input>
+      <hx-text-input
+        id="password"
+        name="password"
+        type="password"
+        required
+        placeholder="Password"
+      ></hx-text-input>
+      <hx-button id="login-btn" type="submit" variant="primary">Sign in</hx-button>
+    </form>
 
-  <form id="login-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px; padding: 2rem;">
-    <hx-text-input id="email" name="email" type="email" required placeholder="Email address"></hx-text-input>
-    <hx-text-input id="password" name="password" type="password" required placeholder="Password"></hx-text-input>
-    <hx-button id="login-btn" type="submit" variant="primary">Sign in</hx-button>
-  </form>
+    <div id="output"></div>
 
-  <div id="output"></div>
+    <script type="module">
+      import '@helixui/library';
 
-  <script type="module">
-    import '@helixui/library';
+      const form = document.getElementById('login-form');
+      const output = document.getElementById('output');
 
-    const form = document.getElementById('login-form');
-    const output = document.getElementById('output');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      output.textContent = `Logging in as ${data.get('email')}...`;
-    });
-  </script>
-
-</body>
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = new FormData(form);
+        output.textContent = `Logging in as ${data.get('email')}...`;
+      });
+    </script>
+  </body>
 </html>
 ```
 

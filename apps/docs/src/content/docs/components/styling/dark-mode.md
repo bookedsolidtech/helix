@@ -749,7 +749,6 @@ Dark mode in HELiX works because CSS custom properties inherit through shadow bo
 - [Animations & Transitions](/components/styling/animations) — `prefers-reduced-motion` and animation tokens
 - [Design Token Architecture](/components/styling/tokens) — Complete three-tier token system reference
 - [Theming Web Components](/components/styling/theming) — Full theming strategies and multi-brand patterns
-- [Responsive Components](/components/styling/responsive) — Container queries and adaptive layouts
 
 ---
 

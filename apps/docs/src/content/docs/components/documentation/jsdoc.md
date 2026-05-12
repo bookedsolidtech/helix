@@ -1226,6 +1226,4 @@ Follow these patterns, and your components will have world-class documentation t
 
 **Related hx-library docs:**
 
-- [Custom Elements Manifest](/components/documentation/cem) (coming soon)
-- [Storybook Autodocs](/storybook/autodocs) (coming soon)
 - [TypeScript Strict Mode](/components/typescript/strict-mode)

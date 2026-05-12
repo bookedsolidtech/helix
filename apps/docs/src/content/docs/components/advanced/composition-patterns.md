@@ -969,8 +969,7 @@ Composition patterns enable flexible, maintainable component architectures:
 
 These patterns appear throughout hx-library, enabling enterprise-grade healthcare applications while maintaining testability, accessibility, and developer experience.
 
-**Next steps:**
+**Related:**
 
-- Review [Form Patterns](/components/forms/patterns) for form-specific composition
-- Explore [Accessibility Patterns](/components/accessibility/patterns) for inclusive coordination
-- Study [Custom Events](/components/advanced/events) for component communication
+- [Form Patterns](/guides/form-patterns/) — composition patterns for form-specific HELiX components
+- [Custom Events in HELiX components](/components/events/custom-events/) — the canonical event contract for cross-component coordination

@@ -366,14 +366,14 @@ it('hx-skeleton dispatches hx-load-complete after transition', async () => {
 });
 ```
 
-There is no shipped `<hx-async-component>` or `HelixDataComponent` — earlier drafts of this page used those as placeholders. Use the real `hx-skeleton.test.ts` or `hx-toast.test.ts` patterns for the canonical async-event template.
+There is no shipped `<org-async-component>` or `HelixDataComponent` — earlier drafts of this page used those as placeholders. Use the real `hx-skeleton.test.ts` or `hx-toast.test.ts` patterns for the canonical async-event template.
 
 For events that have a reasonable timeout bound, wrap `oneEvent()` in a `Promise.race()` against a timeout:
 
 ```typescript
 it('hx-loaded fires within 2 seconds', async () => {
   const el = await fixture<HelixDataComponent>(
-    '<hx-async-component src="/api/data"></hx-async-component>',
+    '<org-async-component src="/api/data"></org-async-component>',
   );
 
   const timeout = new Promise<never>((_, reject) =>
