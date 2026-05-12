@@ -96,7 +96,7 @@ Forms are the most common composition surface in healthcare applications — pat
   </hx-checkbox>
 
   <hx-field>
-    <hx-checkbox-group name="contactMethod" legend="Preferred contact method" required>
+    <hx-checkbox-group name="contactMethod" label="Preferred contact method" required>
       <hx-checkbox value="phone">Phone</hx-checkbox>
       <hx-checkbox value="email">Email</hx-checkbox>
       <hx-checkbox value="portal">Patient portal message</hx-checkbox>
@@ -167,15 +167,15 @@ Card compositions are used for article teasers, patient summaries, provider prof
 ### Article teaser card
 
 ```html
-<hx-card variant="default" elevation="raised">
+<hx-card variant="featured" elevation="raised">
   <hx-image
-    slot="media"
+    slot="image"
     src="/images/cardiology-news.jpg"
     alt="Cardiology research team reviewing data"
-    aspect-ratio="16/9"
+    ratio="16/9"
   ></hx-image>
 
-  <div slot="header">
+  <div slot="heading">
     <hx-badge variant="info">Cardiology</hx-badge>
     <h2>
       <a href="/articles/heart-failure-study">New Study Links Sleep Apnea to Heart Failure Risk</a>
@@ -183,15 +183,20 @@ Card compositions are used for article teasers, patient summaries, provider prof
   </div>
 
   <p>
-    Researchers at Northwell Health found a 40% increased risk of heart failure in patients with
-    untreated obstructive sleep apnea. The five-year longitudinal study tracked 12,000 patients
-    across three hospital systems.
+    Researchers found a 40% increased risk of heart failure in patients with untreated obstructive
+    sleep apnea. The five-year longitudinal study tracked 12,000 patients across three hospital
+    systems.
   </p>
 
   <div slot="footer">
-    <hx-avatar name="Dr. Amara Osei" src="/avatars/osei.jpg" size="sm"></hx-avatar>
+    <hx-avatar
+      label="Dr. Amara Osei"
+      initials="AO"
+      src="/avatars/osei.jpg"
+      hx-size="sm"
+    ></hx-avatar>
     <span>Dr. Amara Osei · March 20, 2026</span>
-    <hx-button variant="secondary" href="/articles/heart-failure-study">Read article</hx-button>
+    <hx-button variant="secondary" hx-href="/articles/heart-failure-study">Read article</hx-button>
   </div>
 </hx-card>
 ```
@@ -199,9 +204,14 @@ Card compositions are used for article teasers, patient summaries, provider prof
 ### Provider profile card
 
 ```html
-<hx-card variant="outlined">
-  <div slot="header">
-    <hx-avatar name="Dr. Kenji Watanabe" src="/avatars/watanabe.jpg" size="lg"></hx-avatar>
+<hx-card variant="default">
+  <div slot="heading">
+    <hx-avatar
+      label="Dr. Kenji Watanabe"
+      initials="KW"
+      src="/avatars/watanabe.jpg"
+      hx-size="lg"
+    ></hx-avatar>
     <div>
       <h3>Dr. Kenji Watanabe, MD</h3>
       <hx-badge variant="success">Accepting new patients</hx-badge>
@@ -217,20 +227,20 @@ Card compositions are used for article teasers, patient summaries, provider prof
     <dd>English, Japanese, Mandarin</dd>
   </dl>
 
-  <div slot="footer">
+  <div slot="actions">
     <hx-button variant="primary">Schedule appointment</hx-button>
     <hx-button variant="ghost">View full profile</hx-button>
   </div>
 </hx-card>
 ```
 
-**Component interaction:** `hx-card` exposes named slots: `media`, `header`, `footer`, and a default slot for body content. Slot content lives in the light DOM, so it inherits your application's base typography styles. Use `@helixui/adopted-stylesheets` to ensure light-DOM content inside the card is styled correctly in Drupal.
+**Component interaction:** `hx-card` exposes named slots `image`, `heading`, `actions`, and `footer`, plus a default slot for body content. Slot content lives in the light DOM, so it inherits your application's base typography styles. Use the [adopted-stylesheets pattern](/extending/adopted-stylesheets/) to ensure light-DOM content inside the card is styled correctly in Drupal. `hx-avatar` accepts a `label` (accessible name) and `initials` (visible fallback when no `src` loads); there is no `name` attribute. `hx-card` variants are `default | featured | compact` (no `outlined` variant). Card variants reflect content density, not interactivity — to make the entire card a link, set `hx-href` on the card host (do not combine with `slot="actions"`).
 
 **Accessibility notes:**
 
 - Heading hierarchy inside cards must follow document order (`h2` in a card on a page with an `h1`, not `h1` inside the card)
-- If the entire card is clickable, prefer a single `<a>` wrapping the heading rather than `onclick` on the card element
-- `hx-avatar` provides `alt` text from the `name` attribute when no `alt` prop is supplied explicitly; always verify the derived text is meaningful in context
+- If the entire card is clickable, set `hx-href` on the host card — this turns the card into one interactive link. Do NOT combine `hx-href` with `slot="actions"`; nested interactive controls inside a link break the activation contract.
+- `hx-avatar` exposes the accessible name via `label` and the visible-fallback text via `initials`; there is no `name` attribute. When an `src` is supplied, the avatar still renders the `initials` fallback if the image fails to load.
 - `hx-badge` communicates status visually; do not rely on color alone — the text label is required
 
 **Drupal Twig (SDC):**
@@ -242,12 +252,13 @@ Card compositions are used for article teasers, patient summaries, provider prof
 {{ attach_library('mytheme/helix-badge') }}
 {{ attach_library('mytheme/helix-button') }}
 
-<hx-card variant="outlined">
-  <div slot="header">
+<hx-card variant="default">
+  <div slot="heading">
     <hx-avatar
-      name="{{ provider.name }}"
+      label="{{ provider.name }}"
+      initials="{{ provider.initials }}"
       src="{{ provider.photo_url }}"
-      size="lg"
+      hx-size="lg"
     ></hx-avatar>
     <div>
       <h3>{{ provider.name }}</h3>
@@ -268,11 +279,11 @@ Card compositions are used for article teasers, patient summaries, provider prof
     {% endif %}
   </dl>
 
-  <div slot="footer">
-    <hx-button variant="primary" href="{{ provider.schedule_url }}">
+  <div slot="actions">
+    <hx-button variant="primary" hx-href="{{ provider.schedule_url }}">
       Schedule appointment
     </hx-button>
-    <hx-button variant="ghost" href="{{ provider.profile_url }}">
+    <hx-button variant="ghost" hx-href="{{ provider.profile_url }}">
       View full profile
     </hx-button>
   </div>
@@ -288,44 +299,45 @@ Navigation compositions combine `hx-top-nav`, `hx-side-nav`, `hx-breadcrumb`, an
 ### Application shell: top nav + side nav
 
 ```html
-<hx-top-nav accessible-label="Primary navigation">
+<hx-top-nav label="Primary navigation">
   <a slot="logo" href="/">
-    <img src="/logo.svg" alt="Northwell Health Patient Portal" width="160" height="40" />
+    <img src="/logo.svg" alt="Health Patient Portal" width="160" height="40" />
   </a>
 
-  <nav slot="links" aria-label="Main menu">
-    <a href="/dashboard">Dashboard</a>
-    <a href="/appointments">Appointments</a>
-    <a href="/messages">Messages</a>
-    <a href="/records">Health Records</a>
-  </nav>
+  <!-- hx-top-nav's default slot accepts anchor children directly;
+       do NOT nest another <nav> inside it. -->
+  <a href="/dashboard">Dashboard</a>
+  <a href="/appointments">Appointments</a>
+  <a href="/messages">Messages</a>
+  <a href="/records">Health Records</a>
 
   <div slot="actions">
-    <hx-button variant="ghost" accessible-label="Notifications (3 unread)">
+    <hx-icon-button label="Notifications (3 unread)">
       <hx-icon name="bell" aria-hidden="true"></hx-icon>
-      <hx-badge variant="danger">3</hx-badge>
-    </hx-button>
-    <hx-avatar name="Sarah Lindqvist" src="/avatars/slindqvist.jpg" size="sm"></hx-avatar>
+      <hx-badge variant="error">3</hx-badge>
+    </hx-icon-button>
+    <hx-avatar
+      label="Sarah Lindqvist"
+      initials="SL"
+      src="/avatars/slindqvist.jpg"
+      hx-size="sm"
+    ></hx-avatar>
   </div>
 </hx-top-nav>
 
 <div class="app-layout">
-  <hx-side-nav accessible-label="Section navigation">
-    <nav>
-      <a href="/appointments/upcoming" aria-current="page">Upcoming</a>
-      <a href="/appointments/past">Past visits</a>
-      <a href="/appointments/request">Request appointment</a>
-      <a href="/appointments/video">Video visits</a>
-    </nav>
+  <hx-side-nav label="Section navigation">
+    <hx-nav-item href="/appointments/upcoming" active>Upcoming</hx-nav-item>
+    <hx-nav-item href="/appointments/past">Past visits</hx-nav-item>
+    <hx-nav-item href="/appointments/request">Request appointment</hx-nav-item>
+    <hx-nav-item href="/appointments/video">Video visits</hx-nav-item>
   </hx-side-nav>
 
   <main id="main-content">
-    <hx-breadcrumb accessible-label="Breadcrumb">
-      <ol>
-        <li><a href="/">Home</a></li>
-        <li><a href="/appointments">Appointments</a></li>
-        <li aria-current="page">Upcoming</li>
-      </ol>
+    <hx-breadcrumb label="Breadcrumb">
+      <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+      <hx-breadcrumb-item href="/appointments">Appointments</hx-breadcrumb-item>
+      <hx-breadcrumb-item current>Upcoming</hx-breadcrumb-item>
     </hx-breadcrumb>
 
     <!-- Page content -->
@@ -338,42 +350,38 @@ Navigation compositions combine `hx-top-nav`, `hx-side-nav`, `hx-breadcrumb`, an
 Use `hx-tabs` for content within a single page view — not for page-level navigation. Tabs are appropriate when all content is available at once and the user needs to switch between views without leaving the page.
 
 ```html
-<hx-breadcrumb accessible-label="Breadcrumb">
-  <ol>
-    <li><a href="/">Home</a></li>
-    <li><a href="/records">Health Records</a></li>
-    <li aria-current="page">Medications</li>
-  </ol>
+<hx-breadcrumb label="Breadcrumb">
+  <hx-breadcrumb-item href="/">Home</hx-breadcrumb-item>
+  <hx-breadcrumb-item href="/records">Health Records</hx-breadcrumb-item>
+  <hx-breadcrumb-item current>Medications</hx-breadcrumb-item>
 </hx-breadcrumb>
 
-<hx-tabs>
-  <hx-tab-list accessible-label="Medication views">
-    <hx-tab id="tab-current" panel="panel-current">Current medications</hx-tab>
-    <hx-tab id="tab-history" panel="panel-history">History</hx-tab>
-    <hx-tab id="tab-allergies" panel="panel-allergies">Allergies &amp; reactions</hx-tab>
-  </hx-tab-list>
+<hx-tabs label="Medication views">
+  <hx-tab slot="tab" panel="current">Current medications</hx-tab>
+  <hx-tab slot="tab" panel="history">History</hx-tab>
+  <hx-tab slot="tab" panel="allergies">Allergies &amp; reactions</hx-tab>
 
-  <hx-tab-panel id="panel-current" tab="tab-current">
+  <hx-tab-panel name="current">
     <!-- Current medications content -->
   </hx-tab-panel>
 
-  <hx-tab-panel id="panel-history" tab="tab-history">
+  <hx-tab-panel name="history">
     <!-- Medication history content -->
   </hx-tab-panel>
 
-  <hx-tab-panel id="panel-allergies" tab="tab-allergies">
+  <hx-tab-panel name="allergies">
     <!-- Allergy list content -->
   </hx-tab-panel>
 </hx-tabs>
 ```
 
-**Component interaction:** `hx-top-nav` manages responsive behavior and mobile menu visibility. `hx-side-nav` collapses to a drawer pattern on narrow viewports. `hx-breadcrumb` is purely structural — it does not manage routing. `hx-tabs` controls `aria-selected`, `aria-controls`, and `aria-labelledby` relationships automatically between `hx-tab` and `hx-tab-panel` elements.
+**Component interaction:** `hx-top-nav` manages responsive behavior and the mobile menu. `hx-side-nav` provides an icon-collapsed mode (`collapsed` attribute) on narrow viewports rather than a drawer overlay. `hx-breadcrumb` is purely structural — it does not manage routing. `hx-tabs` controls `aria-selected`, `aria-controls`, and `aria-labelledby` relationships automatically; the panel key is `hx-tab[panel="X"]` matched against `hx-tab-panel[name="X"]`. There is no separate `hx-tab-list` component — slot the `<hx-tab>` triggers into the `tab` slot of `<hx-tabs>` directly.
 
 **Accessibility notes:**
 
-- `hx-top-nav` must include `aria-label="Primary navigation"` to distinguish it from other `<nav>` landmarks on the page
-- `hx-side-nav` requires its own `aria-label` distinct from the top nav
-- `hx-breadcrumb` should be wrapped in a `<nav aria-label="Breadcrumb">` landmark; the last item should have `aria-current="page"`
+- `hx-top-nav` requires a `label` attribute to distinguish it from other `<nav>` landmarks on the page
+- `hx-side-nav` requires its own `label` distinct from the top nav
+- `hx-breadcrumb` exposes a `label` attribute on the host; the last item should have `current` (which sets `aria-current="page"`)
 - `hx-tabs` implements the ARIA Tabs pattern: arrow key navigation between tabs, `Tab` moves focus to the active panel
 - Never use `hx-tabs` for top-level page navigation — use `<a>` elements and `aria-current="page"` instead
 
@@ -387,29 +395,29 @@ Use `hx-tabs` for content within a single page view — not for page-level navig
 {{ attach_library('mytheme/helix-avatar') }}
 {{ attach_library('mytheme/helix-button') }}
 
-<hx-top-nav accessible-label="Primary navigation">
+<hx-top-nav label="Primary navigation">
   <a slot="logo" href="{{ front_page }}">
     {{ logo }}
   </a>
 
-  <nav slot="links" aria-label="Main menu">
-    {% for item in main_menu_items %}
-      <a
-        href="{{ item.url }}"
-        {% if item.is_current %}aria-current="page"{% endif %}
-      >{{ item.title }}</a>
-    {% endfor %}
-  </nav>
+  {# default slot — anchor children directly; no nested <nav> #}
+  {% for item in main_menu_items %}
+    <a
+      href="{{ item.url }}"
+      {% if item.is_current %}aria-current="page"{% endif %}
+    >{{ item.title }}</a>
+  {% endfor %}
 
   <div slot="actions">
     {% if logged_in %}
       <hx-avatar
-        name="{{ user.display_name }}"
+        label="{{ user.display_name }}"
+        initials="{{ user.initials }}"
         src="{{ user.avatar_url }}"
-        size="sm"
+        hx-size="sm"
       ></hx-avatar>
     {% else %}
-      <hx-button variant="primary" href="/user/login">Sign in</hx-button>
+      <hx-button variant="primary" hx-href="/user/login">Sign in</hx-button>
     {% endif %}
   </div>
 </hx-top-nav>
@@ -423,51 +431,51 @@ Data display compositions pair `hx-data-table` with `hx-pagination` and `hx-acti
 
 ### Patient list with action bar and pagination
 
+`hx-action-bar` is a layout container with a default slot (no `search`, `filters`, or `actions`
+named slots). Lay out its children with author CSS — typically a flex row separating search,
+filters, and end-aligned actions.
+
 ```html
 <hx-action-bar>
   <hx-text-input
-    slot="search"
     type="search"
     placeholder="Search patients..."
     accessible-label="Search patients"
   ></hx-text-input>
 
-  <div slot="filters">
-    <hx-select accessible-label="Filter by status">
-      <option value="">All statuses</option>
-      <option value="active">Active</option>
-      <option value="discharged">Discharged</option>
-      <option value="pending">Pending admission</option>
-    </hx-select>
+  <hx-select accessible-label="Filter by status">
+    <option value="">All statuses</option>
+    <option value="active">Active</option>
+    <option value="discharged">Discharged</option>
+    <option value="pending">Pending admission</option>
+  </hx-select>
 
-    <hx-select accessible-label="Filter by unit">
-      <option value="">All units</option>
-      <option value="icu">ICU</option>
-      <option value="cardiac">Cardiac Care</option>
-      <option value="oncology">Oncology</option>
-    </hx-select>
-  </div>
+  <hx-select accessible-label="Filter by unit">
+    <option value="">All units</option>
+    <option value="icu">ICU</option>
+    <option value="cardiac">Cardiac Care</option>
+    <option value="oncology">Oncology</option>
+  </hx-select>
 
-  <div slot="actions">
-    <hx-button variant="primary">Add patient</hx-button>
-    <hx-button variant="secondary">Export CSV</hx-button>
-  </div>
+  <span style="flex: 1"></span>
+
+  <hx-button variant="primary">Add patient</hx-button>
+  <hx-button variant="secondary">Export CSV</hx-button>
 </hx-action-bar>
 
-<hx-data-table id="patient-list" accessible-label="Patient list" sortable>
-  <hx-column key="mrn" label="MRN" sortable></hx-column>
-  <hx-column key="name" label="Patient name" sortable></hx-column>
-  <hx-column key="dob" label="Date of birth" sortable></hx-column>
-  <hx-column key="status" label="Status"></hx-column>
-  <hx-column key="provider" label="Assigned provider" sortable></hx-column>
-  <hx-column key="actions" label="Actions" align="end"></hx-column>
-</hx-data-table>
+<!--
+  hx-data-table uses the `columns` + `rows` properties (set via JS).
+  There is no separate <hx-column> element. There is no host-level
+  `sortable` attribute either; per-column sortability is declared in
+  the columns array passed via JS (see below).
+-->
+<hx-data-table id="patient-list" label="Patient list"></hx-data-table>
 
 <hx-pagination
-  total-items="847"
+  total-pages="34"
   page-size="25"
   current-page="1"
-  accessible-label="Patient list pagination"
+  label="Patient list pagination"
 ></hx-pagination>
 ```
 
@@ -478,32 +486,41 @@ const table = document.querySelector('#patient-list');
 const pagination = document.querySelector('hx-pagination');
 const searchInput = document.querySelector('hx-text-input[type="search"]');
 
-// Load initial data
+// Columns are defined in JS (no separate <hx-column> element).
+table.columns = [
+  { key: 'mrn', label: 'MRN', sortable: true },
+  { key: 'name', label: 'Patient name', sortable: true },
+  { key: 'dob', label: 'Date of birth', sortable: true },
+  { key: 'status', label: 'Status' },
+  { key: 'provider', label: 'Assigned provider', sortable: true },
+  { key: 'actions', label: 'Actions', align: 'end' },
+];
+
+// Load and render rows.
 async function loadPatients(page = 1, query = '') {
   const response = await fetch(
     `/api/patients?page=${page}&q=${encodeURIComponent(query)}&per_page=25`,
   );
-  const { patients, total } = await response.json();
+  const { patients, totalPages } = await response.json();
 
-  // Set table data via property (not attribute — data is not a string)
-  table.data = patients.map((p) => ({
+  table.rows = patients.map((p) => ({
     mrn: p.mrn,
     name: `${p.lastName}, ${p.firstName}`,
     dob: new Intl.DateTimeFormat('en-US').format(new Date(p.dateOfBirth)),
     status: p.status,
     provider: p.assignedProvider,
-    actions: '', // rendered via column slot template
+    actions: '',
   }));
 
-  pagination.totalItems = total;
+  pagination.totalPages = totalPages;
 }
 
-// Handle pagination
+// hx-pagination emits hx-page-change with {page} detail.
 pagination.addEventListener('hx-page-change', (e) => {
   loadPatients(e.detail.page, searchInput.value);
 });
 
-// Handle search (debounced)
+// Search (debounced).
 let searchTimeout;
 searchInput.addEventListener('hx-input', (e) => {
   clearTimeout(searchTimeout);
@@ -516,14 +533,13 @@ searchInput.addEventListener('hx-input', (e) => {
 loadPatients();
 ```
 
-**Component interaction:** `hx-action-bar` is a layout container — it slots your search input, filters, and action buttons into a responsive toolbar. `hx-data-table` manages column configuration and sort state; populate it via the `data` property. `hx-pagination` fires `hx-page-change` events with the target page number. Coordinate these three components in your application layer, not inside the components themselves.
+**Component interaction:** `hx-action-bar` is a layout container with a single default slot — place your search, filters, and action buttons directly inside it and lay them out with CSS. `hx-data-table` manages column configuration and sort state via the `columns` and `rows` properties (set in JS, not via attribute). `hx-pagination` fires `hx-page-change` with `{ page }` detail and consumes `total-pages` (not `total-items`). Coordinate these three components in your application layer, not inside the components themselves.
 
 **Accessibility notes:**
 
-- `hx-data-table` renders a native `<table>` in its shadow DOM with proper `<th scope="col">` and `aria-sort` attributes managed automatically
-- `aria-label` on `hx-data-table` provides the table's accessible name (required when no visible `<caption>` is present)
-- `hx-pagination` announces page changes to screen readers via `aria-live` — do not add your own live region
-- Search inputs in `hx-action-bar` must have explicit `aria-label` when no visible `<label>` is present
+- `hx-data-table` renders a native `<table>` in its shadow DOM with `aria-sort` attributes managed automatically; the `label` attribute provides the table's accessible name when no visible `<caption>` is present
+- `hx-pagination` announces page changes to screen readers — do not add your own live region
+- Search inputs in `hx-action-bar` must have explicit `accessible-label` (or `aria-label`) when no visible `<label>` is present
 
 ---
 
@@ -537,11 +553,15 @@ Overlays — dialogs and drawers — collect focused user input or display suppl
 <!-- Trigger -->
 <hx-button id="open-add-medication" variant="primary">Add medication</hx-button>
 
-<!-- Dialog with embedded form -->
-<hx-dialog id="add-medication-dialog" aria-labelledby="dialog-title" size="md">
-  <span slot="heading" id="dialog-title">Add medication</span>
-
-  <hx-form id="add-medication-form" novalidate>
+<!--
+  hx-dialog is non-modal by default. Set the `modal` attribute (or open
+  via dialog.showModal()) to trap focus and inert the underlying page.
+  Use the `heading` attribute for the accessible name, or slot a
+  heading element into the `header` slot. Width is driven by
+  --hx-dialog-* CSS custom properties (there is no `size` attribute).
+-->
+<hx-dialog id="add-medication-dialog" modal heading="Add medication">
+  <hx-form id="add-medication-form" action="/api/medications" method="post" novalidate>
     <hx-field>
       <label slot="label" for="med-name">Medication name</label>
       <hx-text-input
@@ -584,15 +604,18 @@ Overlays — dialogs and drawers — collect focused user input or display suppl
   openBtn.addEventListener('click', () => (dialog.open = true));
   cancelBtn.addEventListener('click', () => (dialog.open = false));
 
-  // Dialog fires hx-close when dismissed via Escape or overlay click
+  // Dialog fires hx-close after dismissal (Escape, close button, or
+  // backdrop click when close-on-backdrop is enabled).
   dialog.addEventListener('hx-close', () => {
     form.reset();
   });
 
-  form.addEventListener('submit', async (e) => {
+  // hx-form re-emits the native submit as hx-submit with structured
+  // detail. Use that, not the inner <form> directly.
+  form.addEventListener('hx-submit', async (e) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(form));
-    await saveMedication(data);
+    if (!e.detail.valid) return; // hx-invalid already fired
+    await saveMedication(e.detail.values);
     dialog.open = false;
     form.reset();
   });
@@ -604,31 +627,33 @@ Overlays — dialogs and drawers — collect focused user input or display suppl
 ```html
 <hx-button id="open-patient-detail" variant="secondary">View patient details</hx-button>
 
-<hx-drawer id="patient-detail-drawer" position="end" size="lg" aria-labelledby="drawer-title">
-  <span slot="heading" id="drawer-title">Patient details</span>
-
+<!--
+  hx-drawer is modal-by-default — it inert-traps the page underneath
+  on open. Use `placement` to anchor an edge (start | end | top | bottom)
+  and `hx-size` for the preset width/height. The drawer's accessible
+  name comes from `label` (attribute) or the `label` slot.
+-->
+<hx-drawer id="patient-detail-drawer" placement="end" hx-size="lg" label="Patient details">
   <div class="patient-detail-content">
-    <hx-tabs>
-      <hx-tab-list accessible-label="Patient detail sections">
-        <hx-tab id="detail-tab-overview" panel="detail-panel-overview">Overview</hx-tab>
-        <hx-tab id="detail-tab-vitals" panel="detail-panel-vitals">Vitals</hx-tab>
-        <hx-tab id="detail-tab-notes" panel="detail-panel-notes">Notes</hx-tab>
-      </hx-tab-list>
+    <hx-tabs label="Patient detail sections">
+      <hx-tab slot="tab" panel="overview">Overview</hx-tab>
+      <hx-tab slot="tab" panel="vitals">Vitals</hx-tab>
+      <hx-tab slot="tab" panel="notes">Notes</hx-tab>
 
-      <hx-tab-panel id="detail-panel-overview" tab="detail-tab-overview">
+      <hx-tab-panel name="overview">
         <!-- Patient overview content -->
       </hx-tab-panel>
-      <hx-tab-panel id="detail-panel-vitals" tab="detail-tab-vitals">
+      <hx-tab-panel name="vitals">
         <!-- Vitals content -->
       </hx-tab-panel>
-      <hx-tab-panel id="detail-panel-notes" tab="detail-tab-notes">
+      <hx-tab-panel name="notes">
         <!-- Clinical notes content -->
       </hx-tab-panel>
     </hx-tabs>
   </div>
 
   <div slot="footer">
-    <hx-button variant="primary" href="/patients/p-001/record">Open full record</hx-button>
+    <hx-button variant="primary" hx-href="/patients/p-001/record">Open full record</hx-button>
     <hx-button id="close-drawer" variant="ghost">Close</hx-button>
   </div>
 </hx-drawer>
@@ -641,16 +666,20 @@ Overlays — dialogs and drawers — collect focused user input or display suppl
   document.querySelector('#close-drawer').addEventListener('click', () => {
     drawer.open = false;
   });
+  // hx-drawer's close lifecycle is hx-hide / hx-after-hide (not hx-close).
+  drawer.addEventListener('hx-after-hide', () => {
+    // restore UI state, blur, etc.
+  });
 </script>
 ```
 
-**Component interaction:** `hx-dialog` is a modal — it traps focus and blocks interaction with content behind it. Use it for actions requiring a decision before continuing. `hx-drawer` is non-modal by default — it slides in alongside main content. Set `modal` on `hx-drawer` if the supplemental content requires exclusive attention. Both components manage their own `aria-modal`, `role`, and focus trap behavior.
+**Component interaction:** `hx-dialog` is non-modal by default; set the `modal` attribute (or call `dialog.showModal()`) to trap focus and inert the page underneath. `hx-drawer` is modal-by-default — it traps focus on open. Both components manage their own `aria-modal`, `role`, and focus trap behavior; the dialog's accessible name comes from the `heading` attribute (or `header` slot), the drawer's from `label` (or `label` slot).
 
 **Accessibility notes:**
 
-- `hx-dialog` requires `aria-labelledby` pointing to the heading element in the `heading` slot
+- `hx-dialog` provides its accessible name via the `heading` attribute or the heading element slotted into `header` — there is no separate `heading` slot
 - Focus moves to the dialog when opened and returns to the trigger element when closed
-- Pressing `Escape` closes both `hx-dialog` and `hx-drawer` — listen for `hx-close` to reset form state
+- Pressing `Escape` closes both `hx-dialog` and `hx-drawer`. Listen for `hx-close` on dialog and `hx-hide` / `hx-after-hide` on drawer to reset form state
 - The `form` attribute on a submit button (e.g., `form="add-medication-form"`) correctly associates the button with a form outside the button's DOM ancestry — this is required when the submit button is in the footer slot
 
 **Drupal Twig (SDC):**
@@ -670,12 +699,15 @@ Overlays — dialogs and drawers — collect focused user input or display suppl
 
 <hx-dialog
   id="add-medication-dialog-{{ unique_id }}"
-  aria-labelledby="dialog-title-{{ unique_id }}"
-  size="md"
+  modal
+  heading="{{ dialog_title|default('Add medication') }}"
 >
-  <span slot="heading" id="dialog-title-{{ unique_id }}">{{ dialog_title|default('Add medication') }}</span>
-
-  <hx-form id="add-medication-form-{{ unique_id }}" novalidate action="{{ form_action }}" method="post">
+  <hx-form
+    id="add-medication-form-{{ unique_id }}"
+    novalidate
+    action="{{ form_action }}"
+    method="post"
+  >
     {{ form_fields }}
   </hx-form>
 
@@ -697,15 +729,19 @@ Feedback compositions communicate system status, validation results, and process
 ### Inline alert for form feedback
 
 ```html
-<!-- Shown after a failed save attempt -->
-<hx-alert variant="danger" role="alert">
-  <span slot="heading">Unable to save changes</span>
+<!--
+  hx-alert is hidden until `open` is set. variant values are
+  primary | secondary | success | warning | error | neutral | info
+  (no `danger`). The title slot is `title`, not `heading`.
+-->
+<hx-alert open variant="error">
+  <span slot="title">Unable to save changes</span>
   <p>Your session has expired. Please <a href="/user/login">sign in again</a> and resubmit.</p>
 </hx-alert>
 
 <!-- Shown after a successful action -->
-<hx-alert variant="success" dismissible>
-  <span slot="heading">Appointment scheduled</span>
+<hx-alert open variant="success" dismissible>
+  <span slot="title">Appointment scheduled</span>
   <p>
     Your appointment with Dr. Watanabe on March 28 at 2:00 PM has been confirmed. A confirmation has
     been sent to your email.
@@ -713,8 +749,8 @@ Feedback compositions communicate system status, validation results, and process
 </hx-alert>
 
 <!-- Advisory information with no action required -->
-<hx-alert variant="warning">
-  <span slot="heading">Incomplete health profile</span>
+<hx-alert open variant="warning">
+  <span slot="title">Incomplete health profile</span>
   <p>
     Some providers require a complete health history before scheduling.
     <a href="/profile/health-history">Complete your health history</a> to access all providers.
@@ -725,22 +761,24 @@ Feedback compositions communicate system status, validation results, and process
 ### Toast notifications for transient feedback
 
 ```html
-<!-- Toast container — place once at the application level -->
-<hx-toast-region accessible-label="Notifications" position="top-end"></hx-toast-region>
+<!-- Toast stack — place once at the application root. The shipped
+     container is hx-toast-stack (not hx-toast-region). -->
+<hx-toast-stack label="Notifications"></hx-toast-stack>
 
 <script>
-  const toastRegion = document.querySelector('hx-toast-region');
+  const toastStack = document.querySelector('hx-toast-stack');
 
-  // Utility to show a toast
+  // Show a toast. Appending alone is not enough — hx-toast defaults
+  // to closed; call show() (or set the `open` attribute) to display it.
   function showToast({ message, variant = 'info', duration = 5000 }) {
     const toast = document.createElement('hx-toast');
     toast.variant = variant;
     toast.duration = duration;
     toast.textContent = message;
-    toastRegion.appendChild(toast);
+    toastStack.appendChild(toast);
+    toast.show(); // or toast.setAttribute('open', '')
   }
 
-  // After a successful action
   async function handleSave() {
     try {
       await saveRecord();
@@ -748,8 +786,8 @@ Feedback compositions communicate system status, validation results, and process
     } catch (error) {
       showToast({
         message: 'Save failed. Please try again.',
-        variant: 'danger',
-        duration: 0, // Persist until dismissed
+        variant: 'error',
+        duration: 0,
       });
     }
   }
@@ -759,26 +797,36 @@ Feedback compositions communicate system status, validation results, and process
 ### Site-wide banner for system notices
 
 ```html
-<!-- Emergency maintenance notice — place above hx-top-nav -->
-<hx-banner variant="warning" dismissible id="maintenance-banner">
-  <hx-icon slot="icon" name="wrench" aria-hidden="true"></hx-icon>
+<!--
+  hx-banner exposes default + `action` slots only — there is no `icon`
+  slot. Use the `heading` attribute for the title and place an
+  action via slot="action" or via `action-label` + `action-href`.
+  Dismissal sets `open` to false and dispatches hx-dismiss; persistence
+  across sessions is your own concern (store the id in localStorage).
+-->
+<hx-banner
+  open
+  variant="warning"
+  dismissible
+  heading="Scheduled maintenance"
+  id="maintenance-banner"
+>
   Scheduled maintenance is planned for Sunday, March 29 from 2–4 AM EST. The patient portal will be
   unavailable during this window.
-  <a href="/notices/maintenance-march-29">Learn more</a>
+  <a slot="action" href="/notices/maintenance-march-29">Learn more</a>
 </hx-banner>
 
 <hx-top-nav><!-- ... --></hx-top-nav>
 ```
 
-**Component interaction:** `hx-alert` is static inline content — it renders immediately and persists until removed from the DOM or dismissed (if `dismissible`). `hx-toast` auto-dismisses after `duration` ms and supports a manual dismiss button. `hx-toast-region` manages stacking, animation, and `aria-live` announcement — create one region at the application root and append toasts to it programmatically. `hx-banner` spans full width and is typically placed above the navigation layer.
+**Component interaction:** `hx-alert` is hidden until `open` is set; once open it persists until removed from the DOM or dismissed (if `dismissible`). `hx-toast` auto-dismisses after `duration` ms (set `duration="0"` to require manual dismiss); the toast does not appear until `show()` is called or `open` is set. `hx-toast-stack` manages stacking, animation, and the polite live-region announcement — create one stack at the application root and append toasts to it programmatically. `hx-banner` spans full width above the navigation layer.
 
 **Accessibility notes:**
 
-- Use `role="alert"` on `hx-alert` only for critical errors that require immediate attention; it triggers an assertive live region announcement
-- For non-critical status messages, use `role="status"` (polite announcement)
-- `hx-toast-region` manages its own `aria-live` region — do not wrap it in another live region
-- `hx-banner` with `dismissible` stores dismissal state; provide a stable `id` so the preference can be persisted across sessions
-- Never rely on color alone to communicate alert severity — the `variant` prop also changes the icon and accessible label
+- Set `open` on `hx-alert` to make it appear and announce. For critical errors, prefer `severity-label="Error"` (or similar) — hx-alert manages its own `role`/`aria-live` based on variant
+- `hx-toast-stack` manages its own live region — do not wrap it in another `aria-live` region
+- `hx-banner` with `dismissible` flips `open` to false on dismiss and emits `hx-dismiss`; if you need cross-session persistence, capture that event and persist the banner id yourself (e.g. localStorage)
+- Never rely on color alone to communicate alert severity — `variant` also drives the default icon and accessible label
 
 **Drupal Twig (SDC):**
 
@@ -788,12 +836,12 @@ Feedback compositions communicate system status, validation results, and process
 
 {% if message %}
   <hx-alert
+    open
     variant="{{ variant|default('info') }}"
     {% if dismissible %}dismissible{% endif %}
-    {% if variant == 'danger' %}role="alert"{% elseif variant == 'success' %}role="status"{% endif %}
   >
     {% if heading %}
-      <span slot="heading">{{ heading }}</span>
+      <span slot="title">{{ heading }}</span>
     {% endif %}
     {{ message }}
   </hx-alert>
@@ -809,14 +857,24 @@ Healthcare applications have recurring UI patterns unique to the domain. These c
 ### Provider card with availability
 
 ```html
-<hx-card variant="outlined" class="provider-card">
-  <div slot="header" class="provider-header">
-    <hx-avatar name="Dr. Amara Osei, MD" src="/avatars/osei-amara.jpg" size="xl"></hx-avatar>
+<hx-card variant="default" class="provider-card">
+  <div slot="heading" class="provider-header">
+    <hx-avatar
+      label="Dr. Amara Osei, MD"
+      initials="AO"
+      src="/avatars/osei-amara.jpg"
+      hx-size="lg"
+    ></hx-avatar>
     <div class="provider-identity">
       <h2 class="provider-name">Dr. Amara Osei, MD</h2>
       <p class="provider-specialty">Cardiology · Interventional</p>
       <div class="provider-status">
-        <hx-status-indicator status="available"></hx-status-indicator>
+        <!--
+          hx-status-indicator values: online | offline | away | busy | unknown
+          ('available' is not part of the union — use 'online' for the
+          "accepting new patients" / "actively practicing" signal).
+        -->
+        <hx-status-indicator status="online" label="Active practice"></hx-status-indicator>
         <hx-badge variant="success">Accepting new patients</hx-badge>
       </div>
     </div>
@@ -826,7 +884,7 @@ Healthcare applications have recurring UI patterns unique to the domain. These c
     <dt>Board certified</dt>
     <dd>American Board of Internal Medicine (Cardiovascular Disease)</dd>
     <dt>Hospital affiliations</dt>
-    <dd>Northwell Health — Lenox Hill, Long Island Jewish</dd>
+    <dd>Lenox Hill, Long Island Jewish</dd>
     <dt>Languages</dt>
     <dd>English, Akan, French</dd>
     <dt>Next available</dt>
@@ -835,7 +893,7 @@ Healthcare applications have recurring UI patterns unique to the domain. These c
     </dd>
   </dl>
 
-  <div slot="footer">
+  <div slot="actions">
     <hx-button variant="primary">Schedule appointment</hx-button>
     <hx-button variant="secondary">Send message</hx-button>
     <hx-button variant="ghost">View full profile</hx-button>
@@ -846,13 +904,19 @@ Healthcare applications have recurring UI patterns unique to the domain. These c
 ### Appointment scheduler
 
 ```html
+<!--
+  hx-steps exposes only the default slot. Step children are
+  authored as hx-list-item / your own step components; the host
+  does not provide `current-step` / `total-steps` numeric attrs
+  or `step-N` named slots.
+-->
 <hx-card variant="default" class="appointment-scheduler">
   <span slot="heading">Request an appointment</span>
 
-  <hx-steps current-step="1" total-steps="3" accessible-label="Appointment scheduling progress">
-    <span slot="step-1">Choose provider</span>
-    <span slot="step-2">Select time</span>
-    <span slot="step-3">Confirm</span>
+  <hx-steps accessible-label="Appointment scheduling progress">
+    <hx-list-item aria-current="step">Choose provider</hx-list-item>
+    <hx-list-item>Select time</hx-list-item>
+    <hx-list-item>Confirm</hx-list-item>
   </hx-steps>
 
   <!-- Step 1: Provider selection -->
@@ -894,67 +958,78 @@ Healthcare applications have recurring UI patterns unique to the domain. These c
 
 ### Patient information display with PHI protection
 
-Healthcare applications must handle Protected Health Information (PHI) carefully. The `hx-phi-field` component provides a standardized pattern for displaying sensitive data with optional masking.
+Healthcare applications must handle Protected Health Information (PHI) carefully. The `hx-phi-field` component provides a standardized pattern for revealing sensitive data on demand with an audit hook.
 
 ```html
-<hx-card variant="outlined" class="patient-summary">
+<!--
+  hx-phi-field takes `field-type` (ssn | mrn | dob | insurance) and
+  `field-id` to identify the record being viewed. The actual PHI value
+  is fetched from a server-side endpoint on reveal — never set the
+  value as an attribute or render it pre-masked into the DOM. The
+  component emits `hx-phi-access` for audit logging on every
+  reveal/mask transition.
+-->
+<hx-card variant="default" class="patient-summary">
   <span slot="heading">Patient summary</span>
 
   <dl class="patient-info-grid">
     <div class="patient-info-row">
       <dt>Full name</dt>
-      <dd>
-        <hx-phi-field label="Patient full name" value="Margaret Elizabeth Thornton"></hx-phi-field>
-      </dd>
+      <dd>Margaret Elizabeth Thornton</dd>
     </div>
 
     <div class="patient-info-row">
       <dt>Date of birth</dt>
       <dd>
-        <hx-phi-field label="Date of birth" value="1948-03-12" format="date" masked></hx-phi-field>
+        <hx-phi-field field-type="dob" field-id="p-0044821" label="Date of birth"></hx-phi-field>
       </dd>
     </div>
 
     <div class="patient-info-row">
       <dt>Medical record number</dt>
       <dd>
-        <hx-phi-field label="Medical record number" value="MRN-0044821" masked></hx-phi-field>
+        <hx-phi-field
+          field-type="mrn"
+          field-id="p-0044821"
+          label="Medical record number"
+        ></hx-phi-field>
       </dd>
     </div>
 
     <div class="patient-info-row">
       <dt>Allergies</dt>
       <dd>
-        <hx-clinical-status status="critical">
-          Penicillin (anaphylaxis), Sulfa drugs (rash), Latex
-        </hx-clinical-status>
+        <hx-clinical-status
+          severity="critical"
+          message="Penicillin (anaphylaxis), Sulfa drugs (rash), Latex"
+        ></hx-clinical-status>
       </dd>
     </div>
 
     <div class="patient-info-row">
       <dt>Code status</dt>
       <dd>
-        <hx-clinical-status status="attention">DNR / DNI</hx-clinical-status>
+        <hx-clinical-status severity="warning" message="DNR / DNI"></hx-clinical-status>
       </dd>
     </div>
   </dl>
 
-  <div slot="footer">
-    <hx-button variant="secondary" href="/patients/p-0044821/record">Open full record</hx-button>
+  <div slot="actions">
+    <hx-button variant="secondary" hx-href="/patients/p-0044821/record">Open full record</hx-button>
     <hx-button variant="ghost" id="print-summary">Print summary</hx-button>
   </div>
 </hx-card>
 ```
 
-**Component interaction:** `hx-phi-field` manages its own masked/unmasked toggle state and emits `hx-reveal` / `hx-mask` events for audit logging. `hx-clinical-status` applies color, iconography, and semantic markup appropriate for clinical priority levels. Wire audit logging to `hx-phi-field` events:
+**Component interaction:** `hx-phi-field` manages reveal/mask state internally; on every transition it emits a single `hx-phi-access` event that consumers wire to their audit log. `hx-clinical-status` accepts a `severity` value of `info | warning | critical | emergent` and the message via the `message` attribute (or default slot). `attention` / `neutral` are not valid severities.
 
 ```javascript
 document.querySelectorAll('hx-phi-field').forEach((field) => {
-  field.addEventListener('hx-reveal', (e) => {
+  field.addEventListener('hx-phi-access', (e) => {
     auditLog.record({
-      action: 'phi_revealed',
-      field: e.target.label,
-      patient: currentPatientMrn,
+      action: e.detail.revealed ? 'phi_revealed' : 'phi_masked',
+      fieldType: field.getAttribute('field-type'),
+      fieldId: field.getAttribute('field-id'),
       user: currentUserId,
       timestamp: new Date().toISOString(),
     });
@@ -964,8 +1039,8 @@ document.querySelectorAll('hx-phi-field').forEach((field) => {
 
 **Accessibility notes:**
 
-- `hx-phi-field` with `masked` shows a visually obscured value and provides a toggle button with `aria-label="Reveal [field label]"` / `aria-label="Mask [field label]"`
-- `hx-clinical-status` uses `role="status"` for non-critical indicators and `role="alert"` for critical ones — verify these match your clinical workflow requirements
+- `hx-phi-field` shows the reveal/mask toggle as part of its shadow UI and labels it relative to the `label` attribute (e.g. "Reveal date of birth"); the value is fetched on demand, never embedded pre-masked
+- `hx-clinical-status` selects `role` based on `severity` — `critical` / `emergent` get assertive announcements; verify the mapping matches your clinical workflow requirements
 - Patient summary cards should include a visually hidden heading that identifies the patient by name so screen reader users can orient themselves
 - Code status and allergy information are safety-critical; never hide them behind a collapsed state without a clearly labeled disclosure control
 
@@ -978,28 +1053,22 @@ document.querySelectorAll('hx-phi-field').forEach((field) => {
 {{ attach_library('mytheme/helix-clinical-status') }}
 {{ attach_library('mytheme/helix-button') }}
 
-<hx-card variant="outlined" class="patient-summary">
+<hx-card variant="default" class="patient-summary">
   <span slot="heading">Patient summary</span>
 
   <dl class="patient-info-grid">
     <div class="patient-info-row">
       <dt>Full name</dt>
-      <dd>
-        <hx-phi-field
-          label="Patient full name"
-          value="{{ patient.full_name }}"
-        ></hx-phi-field>
-      </dd>
+      <dd>{{ patient.full_name }}</dd>
     </div>
 
     <div class="patient-info-row">
       <dt>Date of birth</dt>
       <dd>
         <hx-phi-field
+          field-type="dob"
+          field-id="{{ patient.id }}"
           label="Date of birth"
-          value="{{ patient.dob }}"
-          format="date"
-          masked
         ></hx-phi-field>
       </dd>
     </div>
@@ -1008,9 +1077,9 @@ document.querySelectorAll('hx-phi-field').forEach((field) => {
       <dt>Medical record number</dt>
       <dd>
         <hx-phi-field
+          field-type="mrn"
+          field-id="{{ patient.id }}"
           label="Medical record number"
-          value="{{ patient.mrn }}"
-          masked
         ></hx-phi-field>
       </dd>
     </div>
@@ -1019,9 +1088,10 @@ document.querySelectorAll('hx-phi-field').forEach((field) => {
       <div class="patient-info-row">
         <dt>Allergies</dt>
         <dd>
-          <hx-clinical-status status="critical">
-            {{ patient.allergies|join(', ') }}
-          </hx-clinical-status>
+          <hx-clinical-status
+            severity="critical"
+            message="{{ patient.allergies|join(', ') }}"
+          ></hx-clinical-status>
         </dd>
       </div>
     {% endif %}
@@ -1030,16 +1100,17 @@ document.querySelectorAll('hx-phi-field').forEach((field) => {
       <div class="patient-info-row">
         <dt>Code status</dt>
         <dd>
-          <hx-clinical-status status="{{ patient.code_status == 'DNR' ? 'attention' : 'neutral' }}">
-            {{ patient.code_status }}
-          </hx-clinical-status>
+          <hx-clinical-status
+            severity="{{ patient.code_status == 'DNR' ? 'warning' : 'info' }}"
+            message="{{ patient.code_status }}"
+          ></hx-clinical-status>
         </dd>
       </div>
     {% endif %}
   </dl>
 
-  <div slot="footer">
-    <hx-button variant="secondary" href="{{ patient.record_url }}">Open full record</hx-button>
+  <div slot="actions">
+    <hx-button variant="secondary" hx-href="{{ patient.record_url }}">Open full record</hx-button>
   </div>
 </hx-card>
 ```
@@ -1052,11 +1123,11 @@ These patterns share common principles worth making explicit:
 
 **One concern per layer.** Components handle their own rendering and accessibility. Compositions coordinate multiple components. Application code handles data, routing, and business logic. Do not put data fetching logic inside components; do not put component-specific accessibility overrides in application code.
 
-**Events over callbacks.** All HELiX components communicate outward via `CustomEvent` with an `hx-` prefix (e.g., `hx-change`, `hx-submit`, `hx-page-change`). Listen to these events at the composition layer to coordinate between components.
+**Events: typed `CustomEvent`s with `hx-` prefixes for the public lifecycle.** Most HELiX components emit `CustomEvent` instances with an `hx-` prefix (e.g. `hx-change`, `hx-submit`, `hx-page-change`). A few components extend `Event` directly when the detail payload is empty, and some still dispatch standard DOM events alongside the typed wrapper. Always consult the component's CEM `events` entry for the canonical name and detail shape before subscribing.
 
 **Properties for data, attributes for state.** Pass complex data (arrays, objects, non-string values) via JavaScript properties. Use HTML attributes for boolean flags, string identifiers, and initial state that must be set before JavaScript runs.
 
-**Slot content is light DOM.** Content passed into slots lives in the document's DOM, not inside the component's shadow root. This means it inherits your application styles but not the component's internal styles. Use `@helixui/adopted-stylesheets` when slotted content needs base typography, link styles, or CMS-authored formatting.
+**Slot content is light DOM.** Content passed into slots lives in the document's DOM, not inside the component's shadow root. This means it inherits your application styles but not the component's internal styles. Use the [adopted-stylesheets pattern](/extending/adopted-stylesheets/) when slotted content needs base typography, link styles, or CMS-authored formatting.
 
 **Design tokens, not inline styles.** Override component appearance by setting `--hx-*` custom properties at the appropriate scope. Never use `!important` or inline `style` attributes to force visual changes — these create maintenance debt and bypass the token system.
 
