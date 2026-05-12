@@ -2,7 +2,7 @@
   "name": "create-helix",
   "version": "0.1.0",
   "private": true,
-  "description": "CLI scaffolding tool for HELiX applications — invoked as `npx create-helix project-name`. Published on npm as `create-helix`; the workspace directory is `packages/create-helix-app/` for historical reasons but the package NAME (and the runnable bin) is `create-helix`.",
+  "description": "PLACEHOLDER STUB — the real create-helix CLI ships from github.com/bookedsolidtech/create-helix-app (npm: `create-helix@0.8.0` and up). This stub exists in the monorepo to reserve the namespace; its dist/ contents are NOT what consumers run when they invoke `npx create-helix project-name`. See packages/create-helix-app/README.md for the gap explanation, and apps/docs/src/content/docs/getting-started/create-helix.md for the documented PUBLISHED surface.",
   "type": "module",
   "bin": {
     "create-helix": "./dist/cli.js"

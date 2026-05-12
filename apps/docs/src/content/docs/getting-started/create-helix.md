@@ -3,10 +3,19 @@ title: create-helix CLI
 description: Scaffold a new project with HELiX web components using the create-helix CLI
 ---
 
+> **Source of truth:** This page describes the **published `create-helix`
+> package on npm** (current: `0.8.0` — verify with `npm view create-helix
+version`). The implementation source lives at
+> [github.com/bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app),
+> not in this monorepo. The `packages/create-helix-app/` directory here is a
+> placeholder stub reserved for a future consolidation — see
+> [its README](https://github.com/bookedsolidtech/helix/blob/main/packages/create-helix-app/README.md)
+> for the gap explanation. Don't validate this doc against the stub source.
+
 `create-helix` is the official scaffolding CLI for HELiX web components. It generates a production-ready project for any supported framework in seconds.
 
 - **npm:** [npmjs.com/package/create-helix](https://www.npmjs.com/package/create-helix)
-- **GitHub:** [github.com/bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app)
+- **GitHub (canonical source):** [github.com/bookedsolidtech/create-helix-app](https://github.com/bookedsolidtech/create-helix-app)
 
 ## Requirements
 
