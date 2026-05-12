@@ -69,12 +69,12 @@ Choose which component groups to include. Each bundle is a curated set of HELiX 
 | Bundle ID | Name | Components |
 | --------- | ---- | ---------- |
 | `all` | All Components | All components — the full HELiX library |
-| `core` | Core UI | button, card, badge, text, icon, avatar, divider, chip, tooltip, popover |
+| `core` | Core UI | button, card, badge, text, icon, avatar, divider, tag, tooltip, popover |
 | `forms` | Form Components | text-input, select, checkbox, radio, switch, textarea, field, combobox, date-picker |
-| `navigation` | Navigation | nav, sidebar, tabs, breadcrumb, pagination, menu, tree-view |
+| `navigation` | Navigation | nav, side-nav, tabs, breadcrumb, pagination, menu, tree-view |
 | `data-display` | Data Display | data-table, stat, progress-bar, meter, counter, structured-list, rating |
 | `feedback` | Feedback & Overlays | alert, toast, dialog, drawer, banner, skeleton, spinner |
-| `layout` | Layout | grid, stack, split-panel, accordion, carousel, container, scroll-area |
+| `layout` | Layout | grid, stack, split-panel, accordion, carousel, container |
 
 Bundles can be combined. Select multiple bundles during the interactive prompt or pass `--bundles`:
 
