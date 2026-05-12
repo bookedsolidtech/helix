@@ -16,8 +16,8 @@ This guide provides technical coverage of bundle size optimization for HELiX, co
 > - The **CI ceiling** is **16 KB per component / 200 KB total** (`bundle-budgets.json`); the **&lt;5 KB / &lt;50 KB** numbers are an **aspirational floor** (`.bundle-budget.json`), not the CI gate. Exceeding the floor flags a regression; exceeding the ceiling fails the PR.
 > - `@helixui/library` does **not** declare `sideEffects: false` — Custom Element packages can't, because `customElements.define()` is a real side effect. The shipped `package.json` ships an explicit `sideEffects` allow-list for `dist/index.js`, `dist/components/*/index.js`, and CSS.
 > - The published distribution ships `dist/index.js` plus `dist/components/<tag>/index.js`, not raw `src/` TypeScript. The Vite config auto-discovers component entry points from the `src/components/<tag>/index.ts` files — the hardcoded entry list shown in some samples below is illustrative.
-> - The element-class export is **`HelixButton`** (matching the source filename); **`HelixButton`** is the React-wrapper name in `@helixui/react`.
-> - There's no `hx-dialog` component (use `hx-dialog`) and no `hx-form` (the shipped form component is `hx-form`).
+> - The element-class export from `@helixui/library` is **`HelixButton`** (matching the source filename); the React-wrapper name in `@helixui/react` is `HxButton`.
+> - Earlier drafts referenced `hx-modal` and `wc-form`; the shipped library uses **`hx-dialog`** and **`hx-form`** respectively. Find-and-replace cleanups in this file moved those instances to the real names — if you see a sentence that reads tautologically, that's why.
 > - The Lighthouse plumbing in this repo is a **custom `lighthouse-performance` hook** wired in `package.json`, not the standalone `@lhci/cli` package — adapt the sample below if you want LHCI in your own pipeline.
 > - The Admin Dashboard `/health` page tracks **component health scoring** (per `apps/admin/src/lib/health-scorer.ts`); the bundle metrics referenced in some recipes are pulled from the bundle-size report, not surfaced as a dashboard widget today.
 
@@ -58,7 +58,7 @@ For a 500 KB bundle on a mid-range mobile device:
 
 This is why bundle size optimization is a top priority for hx-library.
 
-## wc-2026 Performance Budgets
+## HELiX Performance Budgets
 
 Performance budgets are hard limits enforced in CI. Every component must meet these thresholds or the build fails.
 
@@ -83,11 +83,11 @@ Performance budgets are hard limits enforced in CI. Every component must meet th
 
 ## Bundle Analysis Tools
 
-Measuring bundle size accurately requires the right tools. wc-2026 uses a combination of build-time analysis and runtime monitoring.
+Measuring bundle size accurately requires the right tools. HELiX uses a combination of build-time analysis and runtime monitoring.
 
 ### Vite Build Analysis
 
-Vite provides detailed bundle analysis during production builds. The wc-2026 configuration outputs granular metrics for each component.
+Vite provides detailed bundle analysis during production builds. The HELiX configuration outputs granular metrics for each component.
 
 ```bash
 npm run build
@@ -207,7 +207,7 @@ usedFunction(); // Only this code is included in bundle
 
 Tree-shaking only works with ES module syntax (`import`/`export`). CommonJS (`require`/`module.exports`) cannot be tree-shaken.
 
-**wc-2026 configuration:**
+**HELiX configuration:**
 
 ```json
 // package.json
@@ -249,7 +249,7 @@ The `sideEffects` field tells bundlers that modules are pure and safe to remove 
 
 #### 3. Per-Component Entry Points
 
-wc-2026 exposes each component as a separate entry point to enable granular imports.
+HELiX exposes each component as a separate entry point to enable granular imports.
 
 **Vite configuration:**
 
@@ -297,7 +297,7 @@ export * from './components/hx-text-input/index.js';
 import { HelixButton } from '@helixui/library';
 ```
 
-**wc-2026 approach:**
+**HELiX approach:**
 
 ```typescript
 // ✅ src/components/hx-button/index.ts
@@ -511,7 +511,7 @@ if ('requestIdleCallback' in window) {
 
 ## Minification
 
-Minification removes whitespace, comments, and shortens variable names to reduce code size. wc-2026 uses **esbuild** for fast, efficient minification.
+Minification removes whitespace, comments, and shortens variable names to reduce code size. HELiX uses **esbuild** for fast, efficient minification.
 
 ### Vite Minification Configuration
 
@@ -530,7 +530,7 @@ export default defineConfig({
 - **esbuild:** 10-100x faster, good compression (~95% of terser)
 - **terser:** Slower, slightly better compression (~5% smaller)
 
-**wc-2026 uses esbuild** for development speed. For production releases, consider terser for maximum compression:
+**HELiX uses esbuild** for development speed. For production releases, consider terser for maximum compression:
 
 ```typescript
 export default defineConfig({
@@ -704,7 +704,7 @@ Bundle size limits are only effective if they're continuously monitored and enfo
 
 ### CI Bundle Size Checks
 
-wc-2026 uses GitHub Actions to enforce bundle size budgets on every PR.
+HELiX uses GitHub Actions to enforce bundle size budgets on every PR.
 
 **Workflow configuration:**
 
@@ -837,9 +837,9 @@ Track bundle size trends over time using the Admin Dashboard.
 
 **Location:** `http://localhost:3159/health` → Performance section
 
-## wc-2026 Bundle Metrics
+## HELiX Bundle Metrics
 
-Current bundle size metrics for wc-2026 (as of latest build):
+Current bundle size metrics for HELiX (as of latest build):
 
 ### Full Library Bundle
 
@@ -888,7 +888,7 @@ Current bundle size metrics for wc-2026 (as of latest build):
 
 ## Best Practices Checklist
 
-When building components for wc-2026, follow these bundle size optimization practices:
+When building components for HELiX, follow these bundle size optimization practices:
 
 ### Library Configuration
 
