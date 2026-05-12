@@ -21,7 +21,7 @@ HELIX follows a comprehensive testing strategy designed for enterprise complianc
 
 ## Vitest Workspace
 
-Tests run across multiple packages using `vitest.workspace.ts` at the repo root:
+The root Vitest workspace currently runs three configs in one invocation:
 
 ```ts
 // vitest.workspace.ts
@@ -34,17 +34,17 @@ export default defineWorkspace([
 ]);
 ```
 
-Each package has its own `vitest.config.ts` tuned to its environment:
+Other packages have their own `vitest.config.ts` and run via Turbo / package-level scripts (`pnpm --filter=<pkg> run test`):
 
-| Package | Environment | Purpose |
+| Package | Environment | Runs via |
 | --- | --- | --- |
-| `packages/hx-library` | Browser (Playwright/Chromium) | Web component unit tests |
-| `apps/storybook` | Browser (Playwright/Chromium) | Storybook interaction tests |
-| `packages/drupal-starter` | Node | SDC schema and Twig validation |
-| `packages/hx-tokens` | Node | Token structure validation |
-| `packages/hx-react` | Browser (Playwright/Chromium) | React wrapper rendering tests |
-| `packages/drupal-behaviors` | Node | Drupal behavior unit tests |
-| `packages/helixui-mcp` | Node | MCP server handler tests |
+| `packages/hx-library` | Browser (Playwright/Chromium) | Root workspace + `pnpm test:library` |
+| `apps/storybook` | Browser (Playwright/Chromium) | Root workspace + `pnpm test:storybook` |
+| `packages/drupal-starter` | Node | Root workspace + `pnpm test:drupal-starter` |
+| `packages/hx-tokens` | Node | `pnpm test:tokens` |
+| `packages/hx-react` | Browser (Playwright/Chromium) | `pnpm test:react` |
+| `packages/drupal-behaviors` | Node | `pnpm test:drupal-behaviors` |
+| `packages/helixui-mcp` | Node | `pnpm test:mcp` |
 
 ## Test Types
 
@@ -84,8 +84,8 @@ pnpm run test:component hx-button
 # Run all library tests
 pnpm turbo test --filter=@helixui/library
 
-# Run with coverage
-pnpm run test:coverage
+# Run with coverage (library-scoped)
+pnpm --filter=@helixui/library run test:coverage
 ```
 
 > **Never** run `pnpm run test` (no filter) locally — it runs 3,200+ tests across all packages
@@ -110,24 +110,20 @@ pnpm run test:vrt:update
 
 #### Browser Coverage
 
-VRT runs against three browsers:
-
-- Chromium (Chrome/Edge)
-- Firefox
-- WebKit (Safari)
+VRT runs against **Chromium only** — the Playwright VRT config (`playwright.config.ts`) targets a single Chromium project. Cross-browser coverage for component logic is handled separately by `pnpm run test:cross-browser` and the weekly `.github/workflows/cross-browser.yml` job.
 
 #### Updating Baselines
 
 When you intentionally change component appearance:
 
 1. Verify the change is correct in Storybook
-2. Update baselines: `pnpm run test:vrt:update`
-3. Review the updated screenshots in `packages/hx-library/__screenshots__/`
-4. Commit the updated screenshots with your PR
+2. Update baselines locally: `pnpm run test:vrt:update`
+3. Review the updated screenshots under `packages/hx-library/__screenshots__/`
+4. Push the branch — CI regenerates baselines from the cached snapshot
 
 #### CI Integration
 
-VRT runs automatically on every PR. If tests fail:
+VRT runs on PRs that change component source — the workflow's `paths` filter limits it to source-relevant changes; doc-only PRs skip. If tests fail:
 
 1. Check the CI artifacts for diff images showing what changed
 2. If the change is intentional, update baselines locally and push
@@ -137,28 +133,26 @@ VRT runs automatically on every PR. If tests fail:
 
 - Location: `packages/hx-library/__screenshots__/vrt.spec.ts/`
 - Format: PNG images named `{component}--{variant}.png`
-- One baseline per component variant (shared across browsers)
-- Baselines are committed to git for version control
+- Baselines are **gitignored** — managed via CI cache + regeneration on intentional updates, not committed to git
 
 #### Adding New VRT Tests
 
 To add VRT coverage for a new component or variant:
 
 1. Create the Storybook story first
-2. Add the variant to `COMPONENT_VARIANTS` in `packages/hx-library/e2e/vrt.spec.ts`
-3. Run `pnpm run test:vrt:update` to generate baselines
-4. Commit the new screenshots
+2. Add the variant to `ALL_VARIANTS` in `packages/hx-library/e2e/vrt.spec.ts` (`COMPONENT_VARIANTS` is derived from `ALL_VARIANTS`; the editable list is `ALL_VARIANTS`)
+3. Run `pnpm run test:vrt:update` to generate baselines locally for review
+4. Push; CI regenerates the cached baselines
 
-### Accessibility — axe-core
+### Accessibility — axe-core CI regression guard
 
-Automated WCAG 2.1 AA compliance checks run as part of the CI pipeline:
+The `a11y-audit` CI job runs **axe-core against a static Storybook build** as an AA regression guard. Critical and serious violations block merge; minor/moderate are informational. Axe coverage:
 
-- Color contrast verification (4.5:1 text, 3:1 UI components)
+- Color contrast verification (axe rules: `color-contrast`, `color-contrast-enhanced`)
 - ARIA attribute validation
-- Keyboard navigation testing
 - Shadow DOM ARIA boundary checks
 
-The `a11y-audit` CI job runs axe-core against a static Storybook build using Playwright. Critical and serious violations block merge. Minor and moderate violations are reported as informational (warning-only).
+Keyboard contract verification is **not** part of axe; it runs in the AAA formal audit harness (`scripts/aaa-formal-audit.mjs`) via Playwright-driven source + key-name inspection. The canonical cert posture is **WCAG 2.2 AAA on the P0 surface**, not WCAG 2.1 AA — see [Self-certification scope](/accessibility/self-cert-scope/).
 
 ### Cross-Browser Testing
 
@@ -170,9 +164,11 @@ Coverage thresholds are enforced per-component via `scripts/check-coverage.mjs`,
 
 ## Coverage Targets
 
-| Category          | Target                 |
-| ----------------- | ---------------------- |
-| Unit tests        | ≥80% per component (enforced by `coverage-config.json`) |
-| Accessibility     | 100% axe-core pass (critical/serious violations) |
-| Visual regression | All component variants |
-| Integration       | Critical user flows    |
+| Category          | Current threshold | Aspirational |
+| ----------------- | ----------------- | ------------ |
+| Unit tests (blocking) | ≥50% per component (`coverage-config.json`) | 95% |
+| Accessibility     | 100% axe-core pass on critical/serious — CI gate | — |
+| Visual regression | Curated VRT variant set in `ALL_VARIANTS`; not full surface | All variants once VRT throughput scales |
+| Integration       | Critical user flows    | — |
+
+CI coverage reporting is currently informational; the 50% threshold is the blocking floor enforced by `scripts/check-coverage.mjs`. Raising the floor is tracked separately.
