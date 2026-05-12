@@ -184,3 +184,4 @@ packages/react-starter/CHANGELOG.md
 README.md
 CONTRIBUTING.md
 CLAUDE.md
+packages/create-helix-app/README.md

@@ -91,3 +91,4 @@ packages/hx-icons/CHANGELOG.md
 packages/hx-react/CHANGELOG.md
 packages/react-starter/CHANGELOG.md
 CONTRIBUTING.md
+packages/create-helix-app/README.md

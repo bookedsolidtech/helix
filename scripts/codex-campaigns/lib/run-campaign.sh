@@ -200,10 +200,18 @@ run_target() {
   # the failure.
   if (( codex_rc != 0 )) && (( parsed == 0 )); then
     local now; now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    # Synthetic failure records use the FULL target path as the tag, even
+    # for component campaigns whose normal findings emit a basename tag.
+    # The resume logic checks both basename and full path against the seen
+    # set, so a synthetic record under either convention skips correctly
+    # on the next run. Using the full path is the safer choice here because
+    # it can't collide on docs-fact-check sweeps with duplicate basenames
+    # (README.md × 12) — a synthetic crash on one of those siblings must
+    # not silently mark every other sibling as "already attempted".
     jq -nc \
       --arg campaign "$CAMPAIGN" \
       --arg target "$target" \
-      --arg tag "$tag" \
+      --arg tag "$target" \
       --arg ts "$now" \
       --arg sha "$HEAD_SHA" \
       --arg transcript "$transcript" \
