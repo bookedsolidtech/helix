@@ -9,7 +9,7 @@ sidebar:
 
 Astro 5 is an excellent host for HELIX web components. Because custom elements are pure browser APIs, they slot naturally into Astro's Islands architecture — zero framework overhead, full progressively-enhanced interactivity.
 
-> **Meta note:** The HELiX documentation site itself is built with Astro Starlight. Every pattern on this page is used in production here.
+> **Meta note:** The HELiX documentation site itself is built with Astro Starlight, so the import / Islands / Starlight-component-override patterns on this page reflect the same engine the docs run on. Some examples (Astro Actions, SSR hybrid rendering) are reference patterns for downstream consumers, not features the docs site itself uses.
 
 ## Installation
 
@@ -151,7 +151,7 @@ Astro's `<script>` tags run in the browser with full DOM access. Attach event li
   });
 
   input?.addEventListener('hx-input', (e: Event) => {
-    const value = (e.target as HTMLInputElement).value;
+    const { value } = (e as CustomEvent<{ value: string }>).detail;
     console.log('input:', value);
   });
 </script>
@@ -159,7 +159,7 @@ Astro's `<script>` tags run in the browser with full DOM access. Attach event li
 
 ## Hybrid Rendering with SSR
 
-When using Astro's SSR adapter (`output: 'server'`), custom element registration must happen client-side only. Astro 5 removed the `'hybrid'` output mode — use `output: 'server'` with per-page `export const prerender = true` to achieve the same selective-SSR pattern. The patterns above already handle this — `<script>` tags in `.astro` files are always client-side.
+When using Astro 5's SSR adapter (`output: 'server'`), custom element registration must happen client-side only. Astro 5 merged the previous `'hybrid'` mode into `output: 'static'` with per-page `export const prerender = false` to opt individual routes into SSR (rather than the prior pattern of `output: 'hybrid'` with `prerender = true`). The patterns above already handle this — `<script>` tags in `.astro` files are always client-side.
 
 For server-rendered pages that need dynamic data driving HELIX component props:
 
@@ -256,32 +256,28 @@ Astro uses TypeScript by default. Add type declarations for HELIX elements to ge
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
+// `@helixui/library` already ships HTMLElementTagNameMap entries for every hx-*
+// element. The block below is illustrative — for production apps, prefer
+// `import type { HelixButton, HelixTextInput, HelixTextarea } from '@helixui/library';`
+// and derive helper types from those instead of redeclaring tag keys (which
+// produces incompatible duplicate globals in TypeScript).
+
 declare global {
-  interface HTMLElementTagNameMap {
-    'hx-button': HTMLElement & {
-      variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-      size?: 'sm' | 'md' | 'lg';
-      disabled?: boolean;
-      loading?: boolean;
-      type?: 'button' | 'submit' | 'reset';
-    };
-    'hx-text-input': HTMLElement & {
-      value?: string;
-      placeholder?: string;
-      disabled?: boolean;
-      required?: boolean;
-      name?: string;
-      type?: string;
-      label?: string;
-    };
-    'hx-textarea': HTMLElement & {
-      value?: string;
-      placeholder?: string;
-      disabled?: boolean;
-      required?: boolean;
-      name?: string;
-      label?: string;
-    };
+  interface HxButtonProps {
+    variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline';
+    'hx-size'?: 'sm' | 'md' | 'lg';
+    disabled?: boolean;
+    loading?: boolean;
+    type?: 'button' | 'submit' | 'reset';
+  }
+  interface HxTextInputProps {
+    value?: string;
+    placeholder?: string;
+    disabled?: boolean;
+    required?: boolean;
+    name?: string;
+    type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' | 'date';
+    label?: string;
   }
 }
 
@@ -300,11 +296,14 @@ Apply HELIX design tokens via global CSS in your Astro layout:
   <head>
     <style is:global>
       :root {
-        /* Override semantic tokens for brand theming */
-        --hx-color-primary: #1a56db;
-        --hx-color-secondary: #6b7280;
-        --hx-spacing-md: 1.25rem;
-        --hx-radius-md: 0.5rem;
+        /* Override primitive tokens that semantic tokens consume.
+           HELiX uses scaled palettes (primary-50 → primary-900) and exposes
+           sizing/radius via --hx-size-* and --hx-border-radius-* tokens. See
+           packages/hx-tokens/src/tokens.json for the canonical list. */
+        --hx-color-primary-600: #1a56db;
+        --hx-color-primary-700: #143dac;
+        --hx-color-action-primary-bg: var(--hx-color-primary-700);
+        --hx-border-radius-md: 0.5rem;
       }
     </style>
   </head>
@@ -320,10 +319,12 @@ Apply HELIX design tokens via global CSS in your Astro layout:
 Per-component token overrides work via inline styles or a scoped `<style>` block:
 
 ```astro
-<hx-button style="--hx-button-bg: navy; --hx-button-radius: 0;">
+<hx-button style="--hx-button-bg: navy; --hx-button-border-radius: 0;">
   Custom Styled
 </hx-button>
 ```
+
+The `--hx-button-bg` and `--hx-button-border-radius` are component-level tokens defined by `hx-button` itself; check each component's CEM `cssProperties` block for the exact list it exposes.
 
 ## Starlight Integration
 
@@ -353,7 +354,7 @@ title: My Guide
 
 import '@helixui/library';
 
-<hx-alert variant="info">
+<hx-alert variant="info" open>
   This is an informational callout in your docs.
 </hx-alert>
 
@@ -372,7 +373,7 @@ Override Starlight's built-in components to embed HELIX UI:
 <header>
   <div class="header-inner">
     <slot name="site-title" />
-    <hx-button variant="ghost" size="sm" id="theme-toggle">
+    <hx-button variant="ghost" hx-size="sm" id="theme-toggle">
       Toggle Theme
     </hx-button>
   </div>
@@ -402,7 +403,7 @@ starlight({
 
 **TypeScript errors on `hx-*` elements.** Add the `HTMLElementTagNameMap` declarations shown above to `src/env.d.ts`. Astro's TypeScript config includes this file automatically.
 
-**SSR mismatch warnings.** Astro may warn about unknown custom elements during SSR. This is cosmetic — components hydrate correctly in the browser. Suppress the warning by wrapping HELIX elements in a `<div>` with `set:html` if needed, or configure Astro's `compilerOptions` to recognize `hx-*` elements.
+**SSR mismatch warnings.** Astro may warn about unknown custom elements during SSR. This is cosmetic — components hydrate correctly in the browser. If the warnings are noisy, wrap the HELiX element in a `<div>` with `set:html`, or render it inside a `client:only="lit"` island so it never enters the SSR diff in the first place. (Astro 5 has no `compilerOptions` knob that whitelists arbitrary `hx-*` custom elements.)
 
 ## Next Steps
 
