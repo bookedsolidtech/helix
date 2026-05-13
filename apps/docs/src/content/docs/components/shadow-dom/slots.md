@@ -22,7 +22,7 @@ Without slots, shadow DOM content is completely isolated:
 <template id="broken-card">
   <style>
     .card {
-      border: 1px solid var(--hx-color-border);
+      border: 1px solid var(--hx-color-border-default);
     }
   </style>
   <div class="card">
@@ -46,7 +46,7 @@ Children placed inside a custom element don't render by default when a shadow ro
 <template id="working-card">
   <style>
     .card {
-      border: 1px solid var(--hx-color-border);
+      border: 1px solid var(--hx-color-border-default);
     }
   </style>
   <div class="card">
@@ -87,8 +87,8 @@ The simplest slot pattern is a single unnamed slot that accepts all children.
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 
-@customElement('hx-panel')
-export class HelixPanel extends LitElement {
+@customElement('demo-panel')
+export class DemoPanel extends LitElement {
   static override styles = css`
     :host {
       display: block;
@@ -116,11 +116,11 @@ export class HelixPanel extends LitElement {
 **Usage:**
 
 ```html
-<hx-panel>
+<demo-panel>
   <h2>Panel Title</h2>
   <p>Any content works here.</p>
   <button>Action</button>
-</hx-panel>
+</demo-panel>
 ```
 
 All three elements (`<h2>`, `<p>`, `<button>`) are assigned to the default slot and render inside the `.panel` wrapper. The component controls the container styling, while the consumer controls the content.
@@ -200,9 +200,12 @@ export class HelixCard extends LitElement {
 Consumers use the global `slot` attribute to target specific slots:
 
 ```html
+<!-- hx-card's named slots are `image`, `heading`, `footer`, and `actions`
+     (default slot is the body). Generic shadow-DOM slot mechanics are the
+     same shape; the slot *names* below are real hx-card names. -->
 <hx-card>
-  <h2 slot="header">Card Title</h2>
-  <!-- Goes to slot[name="header"] -->
+  <h2 slot="heading">Card Title</h2>
+  <!-- Goes to slot[name="heading"] -->
   <p>This is the body content.</p>
   <!-- Goes to default slot (no slot attr) -->
   <span slot="footer">Last updated: Today</span>
@@ -212,7 +215,7 @@ Consumers use the global `slot` attribute to target specific slots:
 
 **Key rules:**
 
-- Elements with `slot="header"` → assigned to `<slot name="header">`
+- Elements with `slot="heading"` → assigned to `<slot name="heading">`
 - Elements with `slot="footer"` → assigned to `<slot name="footer">`
 - Elements **without** a `slot` attribute → assigned to default `<slot>` (unnamed)
 - If no matching slot exists, the element doesn't render
@@ -221,9 +224,9 @@ Consumers use the global `slot` attribute to target specific slots:
 
 ```html
 <hx-card>
-  <h2 slot="header">Title</h2>
-  <button slot="header">Close</button>
-  <!-- Both go to "header" slot -->
+  <h2 slot="heading">Title</h2>
+  <button slot="heading">Close</button>
+  <!-- Both go to "heading" slot -->
 
   <p>First paragraph</p>
   <p>Second paragraph</p>
@@ -263,21 +266,21 @@ export class HelixAlert extends LitElement {
 }
 ```
 
-**Usage without icon:**
+**Usage without icon:** (`hx-alert` is hidden until `open` is set, and the icon-slot fallback only renders the default `<hx-icon>` when `show-icon` is also set)
 
 ```html
-<hx-alert>
+<hx-alert open show-icon>
   <p>This is an alert message.</p>
-  <!-- No icon provided, fallback SVG renders -->
+  <!-- No icon provided in the slot → component renders its default <hx-icon> -->
 </hx-alert>
 ```
 
 **Usage with custom icon:**
 
 ```html
-<hx-alert>
+<hx-alert open show-icon>
   <img slot="icon" src="/warning.svg" alt="" />
-  <!-- Replaces fallback -->
+  <!-- Replaces the default <hx-icon> fallback -->
   <p>This is an alert message.</p>
 </hx-alert>
 ```
@@ -457,8 +460,11 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { queryAssignedElements } from 'lit/decorators.js';
 
-@customElement('hx-list')
-export class HelixList extends LitElement {
+// `hx-list` only exposes the default slot — the named-slot example below
+// is a generic pattern. Use a non-HELiX demo element when you need a named
+// slot like `header`.
+@customElement('demo-named-slot-list')
+export class DemoNamedSlotList extends LitElement {
   // Query all assigned elements in default slot
   @queryAssignedElements()
   private _allItems!: HTMLElement[];
@@ -513,9 +519,10 @@ export class HelixRadioGroup extends LitElement {
       console.warn('hx-radio-group should only contain hx-radio elements');
     }
 
-    // Setup radio button group behavior
+    // Setup radio button group behavior. `name` lives on hx-radio-group (the
+    // host); the group's setFormValue reports the selected radio's value
+    // under that single name. Don't assign `name` to each child hx-radio.
     this._radios.forEach((radio, index) => {
-      radio.setAttribute('name', this.name);
       radio.setAttribute('tabindex', index === 0 ? '0' : '-1');
     });
   }
@@ -551,19 +558,19 @@ When the browser encounters slotted content:
 // Initial markup
 const card = document.querySelector('hx-card');
 card.innerHTML = `
-  <h2 slot="header">Title</h2>
+  <h2 slot="heading">Title</h2>
   <p>Body content</p>
 `;
 
-// Reassign heading from header slot to footer slot
-const heading = card.querySelector('[slot="header"]');
+// Reassign heading from heading slot to footer slot
+const heading = card.querySelector('[slot="heading"]');
 heading.setAttribute('slot', 'footer'); // Triggers slotchange on both slots
 
 // Remove slot assignment (goes to default slot)
 heading.removeAttribute('slot'); // Triggers slotchange
 
 // Programmatically set slot via property (same effect)
-heading.slot = 'header'; // Triggers slotchange
+heading.slot = 'heading'; // Triggers slotchange
 ```
 
 **Important:** Changing the `slot` attribute fires `slotchange` on **both** the old slot (if any) and the new slot.
@@ -696,11 +703,11 @@ Shadow DOM encapsulation means component styles don't affect slotted content by 
 
 ### The ::slotted() Pseudo-Element
 
-`::slotted()` targets **top-level** slotted elements from within shadow CSS:
+`::slotted()` targets **top-level** slotted elements from within shadow CSS. The example below uses a `demo-list` element because the real `hx-list` exposes only the default slot and accepts `<hx-list-item>` (not raw `<li>`) as its slotted children — so the named-slot mechanics below are illustrated against a generic demo wrapper:
 
 ```typescript
-@customElement('hx-list')
-export class HelixList extends LitElement {
+@customElement('demo-list')
+export class DemoList extends LitElement {
   static override styles = css`
     /* Style the slot container */
     .list {
@@ -745,14 +752,14 @@ export class HelixList extends LitElement {
 **Only targets direct children:**
 
 ```html
-<hx-list>
+<demo-list>
   <li>Item 1</li>
   <!-- ✅ ::slotted(li) applies -->
   <div>
     <li>Nested</li>
     <!-- ❌ ::slotted(li) does NOT apply (not direct child) -->
   </div>
-</hx-list>
+</demo-list>
 ```
 
 **Cannot use complex selectors:**
@@ -806,7 +813,7 @@ static override styles = css`
 
   /* 3. Provide CSS custom properties for consumer overrides */
   ::slotted(p) {
-    color: var(--hx-card-text-color, var(--hx-color-neutral-800));
+    color: var(--hx-card-color, var(--hx-color-neutral-800));
   }
 `;
 ```
@@ -815,7 +822,7 @@ static override styles = css`
 
 ```css
 hx-card {
-  --hx-card-text-color: #333; /* Override via custom property */
+  --hx-card-color: #333; /* Override via custom property */
 }
 
 hx-card p {
@@ -839,9 +846,9 @@ Result:
 
 ## Composition Patterns and Best Practices
 
-### Pattern 1: Hybrid Slot/Property Strategy (ADR-001)
+### Pattern 1: Hybrid Slot/Property Strategy ([Slots vs Props ADR](/architecture/adrs/slots-vs-props/))
 
-HELiX follows a **hybrid approach**: use properties for data, slots for rich content.
+HELiX follows a **hybrid approach**: use properties for data, slots for rich content. See the [Slots vs Props ADR](/architecture/adrs/slots-vs-props/) for the canonical decision record.
 
 **When to use properties:**
 
@@ -849,7 +856,7 @@ HELiX follows a **hybrid approach**: use properties for data, slots for rich con
 @customElement('hx-alert')
 export class HelixAlert extends LitElement {
   @property({ type: String })
-  variant: 'info' | 'warning' | 'error' = 'info'; // ✅ Property for enum
+  variant: 'info' | 'success' | 'warning' | 'error' = 'info'; // ✅ Property for enum
 
   @property({ type: Boolean })
   dismissible = false; // ✅ Property for boolean flag
@@ -925,17 +932,20 @@ override render() {
 Enforce content types in `updated()`:
 
 ```typescript
-@customElement('hx-tab-group')
-export class HelixTabGroup extends LitElement {
-  @queryAssignedElements()
+// The shipped tabs container is `hx-tabs` (not `hx-tab-group`). The pattern
+// below illustrates the validation shape; consult the real hx-tabs source
+// for the canonical tab/tab-panel pairing contract.
+@customElement('hx-tabs')
+export class HelixTabs extends LitElement {
+  @queryAssignedElements({ slot: 'tab' })
   private _tabs!: HTMLElement[];
 
   override updated() {
-    // Validate: only hx-tab elements allowed
+    // Validate: only hx-tab elements allowed in the tab slot
     const invalidTabs = this._tabs.filter((el) => el.tagName.toLowerCase() !== 'hx-tab');
 
     if (invalidTabs.length > 0) {
-      console.error('hx-tab-group only accepts hx-tab elements as children', invalidTabs);
+      console.error('hx-tabs only accepts hx-tab elements in the tab slot', invalidTabs);
     }
   }
 }
@@ -994,18 +1004,26 @@ override render() {
 Children can communicate with parent through events:
 
 ```typescript
-// Child component
+// Child component. `hx-tab-select` is an internal event the shipped source
+// dispatches with `detail.panel` (the panel name to activate). The public
+// event consumers should listen for on the parent is `hx-tab-change` on
+// `<hx-tabs>`.
 @customElement('hx-tab')
 export class HelixTab extends LitElement {
-  @property({ type: Boolean })
-  active = false;
+  @property({ type: Boolean, reflect: true })
+  selected = false;
+
+  @property({ type: String })
+  panel = '';
 
   private _handleClick() {
+    // Internal coordination event — public consumers should listen for
+    // the canonical `hx-tab-change` on the parent `<hx-tabs>` instead.
     this.dispatchEvent(
       new CustomEvent('hx-tab-select', {
         bubbles: true,
-        composed: true, // Cross shadow boundary
-        detail: { tab: this },
+        composed: true,
+        detail: { panel: this.panel },
       }),
     );
   }
@@ -1019,24 +1037,34 @@ export class HelixTab extends LitElement {
   }
 }
 
-// Parent component
-@customElement('hx-tab-group')
-export class HelixTabGroup extends LitElement {
-  @queryAssignedElements()
+// Parent component — `hx-tabs` is the public container.
+@customElement('hx-tabs')
+export class HelixTabs extends LitElement {
+  @queryAssignedElements({ slot: 'tab' })
   private _tabs!: HelixTab[];
 
-  private _handleTabSelect(e: CustomEvent) {
-    const selectedTab = e.detail.tab;
+  private _handleTabSelect(e: CustomEvent<{ panel: string }>) {
+    const selectedPanel = e.detail.panel;
 
-    // Update all tabs
+    // Update all tabs.
     this._tabs.forEach((tab) => {
-      tab.active = tab === selectedTab;
+      tab.selected = tab.panel === selectedPanel;
     });
+
+    // Re-emit the canonical public event consumers actually subscribe to.
+    this.dispatchEvent(
+      new CustomEvent('hx-tab-change', {
+        bubbles: true,
+        composed: true,
+        detail: { panel: selectedPanel },
+      }),
+    );
   }
 
   override render() {
     return html`
       <div class="tabs" @hx-tab-select=${this._handleTabSelect}>
+        <slot name="tab"></slot>
         <slot></slot>
       </div>
     `;
@@ -1134,7 +1162,7 @@ Slots are the composition primitive that makes web components truly reusable. Ke
 2. **Fallback content** provides defaults when consumers don't provide content
 3. **slotchange events** enable dynamic components that react to content updates
 4. **::slotted()** styles direct slotted elements but has low specificity (consumers can override)
-5. **Hybrid strategy** (ADR-001): Properties for data, slots for rich content
+5. **Hybrid strategy** ([Slots vs Props ADR](/architecture/adrs/slots-vs-props/)): Properties for data, slots for rich content
 6. **Slot forwarding** enables multi-level composition through shadow boundaries
 7. **Always use `composed: true`** for events that should cross shadow DOM
 

@@ -9,7 +9,7 @@ HELiX form components follow a consistent pattern for announcing validation erro
 
 ## The Standard Pattern
 
-All form field components use `role="alert"` on error message containers:
+Most form field components use `role="alert"` on error message containers (notable exception: `hx-checkbox` uses `role="status"` on its individual error state — see [hx-checkbox Exception](#hx-checkbox-exception) below):
 
 ```html
 <!-- Rendered inside Shadow DOM when error property is set -->
@@ -32,7 +32,7 @@ All form field components use `role="alert"` on error message containers:
 
 3. **Error containers must have an `id`** — the associated input references the error via `aria-describedby`. This creates a programmatic association between the input and its error message.
 
-4. **Error containers are conditionally rendered** — the `role="alert"` element is only present in the DOM when an error exists. Lit's conditional rendering (`${hasError ? html\`...\` : nothing}`) ensures the element is inserted dynamically, which triggers the live region announcement.
+4. **Error containers are conditionally rendered in field-level components** — components like `hx-text-input`, `hx-textarea`, and `hx-select` only render the `role="alert"` container when `error` is set; Lit's conditional rendering (`${hasError ? html\`…\` : nothing}`) triggers the live region announcement on DOM insertion. Group-level and status components (`hx-checkbox-group`, `hx-toast`, `hx-banner`) instead keep a **persistent live region** in the DOM and rely on text-content mutation to trigger announcements. Both patterns are valid — pick based on whether announcements should fire on first appearance or on every text update.
 
 ## Components Using This Pattern
 
@@ -44,14 +44,14 @@ All form field components use `role="alert"` on error message containers:
 | `hx-textarea` | `[part="error"]` |
 | `hx-select` | `[part="error"]` |
 | `hx-combobox` | `[part="error"]` |
-| `hx-number-input` | `[part="error-message"]` |
+| `hx-number-input` | `[part="error"]` |
 | `hx-date-picker` | `[part="error"]` |
 | `hx-time-picker` | `[part="error"]` |
 | `hx-file-upload` | `[part="error"]` |
-| `hx-checkbox-group` | `[part="error-message"]` |
+| `hx-checkbox-group` | `[part="error"]` |
 | `hx-radio-group` | `[part="error"]` |
 | `hx-switch` | `[part="error"]` |
-| `hx-field` | `[part="error-message"]` |
+| `hx-field` | `[part="error"]` |
 
 ### Status Components (role="status" for polite updates)
 
@@ -60,8 +60,8 @@ These components use `role="status"` or `aria-live="polite"` for non-critical st
 | Component | Pattern |
 |-----------|---------|
 | `hx-alert` (info, success, warning) | `role="status"` on host |
-| `hx-banner` (info, success) | `role="status"` on host |
-| `hx-toast` (non-danger) | `role="status"` on base |
+| `hx-banner` (info, success, warning) | `role="status"` on host (warning is intentionally polite — see `hx-banner.ts:212`) |
+| `hx-toast` (non-danger) | `role="status"` on host |
 | `hx-status-indicator` | `aria-live="polite"` region |
 | `hx-spinner` | `role="status"` on host |
 | `hx-carousel` | `role="status"` live region |
@@ -72,8 +72,8 @@ These components use `role="status"` or `aria-live="polite"` for non-critical st
 | Component | Pattern |
 |-----------|---------|
 | `hx-alert` (error) | `role="alert"` on host |
-| `hx-banner` (warning, error) | `role="alert"` on host |
-| `hx-toast` (danger) | `role="alert"` on base |
+| `hx-banner` (error / critical) | `role="alert"` on host |
+| `hx-toast` (danger) | `role="alert"` on host |
 | `hx-clinical-status` (critical, emergent) | `role="alert"` on host |
 
 ## Form-Level Error Summary
@@ -82,10 +82,12 @@ The `hx-form` component renders an error summary with `role="alert"` and `aria-a
 
 ```html
 <div class="hx-form-error-summary" role="alert" aria-atomic="true" tabindex="-1">
-  <h3>N errors found</h3>
+  <p>N errors found</p>
   <ul>...</ul>
 </div>
 ```
+
+The component renders the summary as a flat `<div>` + `<ul>` (no `<h3>` heading element today); consumers who want a heading can slot one in via their template, or wrap the form with their own labelled region.
 
 The `tabindex="-1"` allows the summary to receive programmatic focus (via `focus()`) after form submission, ensuring keyboard users are moved to the error list.
 
@@ -110,7 +112,9 @@ expect(input?.getAttribute('aria-describedby')).toContain(errorDiv?.id);
 
 ### Dynamic Error Insertion vs. Text Update
 
-Lit's conditional rendering inserts the `role="alert"` element into the DOM when an error first appears. This DOM insertion triggers the live region announcement. If the error text changes while the element is already present, the mutation also triggers re-announcement because `role="alert"` announces on any content change.
+Field-level form components (`hx-text-input`, `hx-textarea`, `hx-select`, etc.) use Lit's conditional rendering — the `role="alert"` container is inserted into the shadow DOM when the `error` property is first set, which fires the live-region announcement. Subsequent text mutations on the same element also re-announce because `role="alert"` is on a continuously-present `aria-live="assertive"` region.
+
+Group-level and toast/banner components instead keep a **persistent live region** in their shadow DOM. The container is always present (often empty / `aria-hidden` when idle); when the message text changes, the mutation triggers the announcement. This matters for testing — query for `[role="alert"]` after the first error appears in field-level components, but always present in group/toast/banner components.
 
 ### hx-checkbox Exception
 

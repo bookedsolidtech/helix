@@ -48,13 +48,13 @@ Because slot content lives in the Light DOM before JavaScript loads, HELiX compo
 
 ### Server-Side vs. Client-Side Rendering
 
-| Concern | Rendered By | When |
-|---|---|---|
-| HTML structure (tags, attributes) | Drupal / Twig | Server-side, during page render |
-| Slot content | Drupal / Twig | Server-side |
-| Shadow DOM layout | Browser / HELiX | Client-side, after script loads |
-| Component styles | Browser / HELiX | Client-side, encapsulated in Shadow DOM |
-| Event handlers | Browser / HELiX | Client-side |
+| Concern                              | Rendered By        | When                                            |
+| ------------------------------------ | ------------------ | ----------------------------------------------- |
+| HTML structure (tags, attributes)    | Drupal / Twig      | Server-side, during page render                 |
+| Slot content                         | Drupal / Twig      | Server-side                                     |
+| Shadow DOM layout                    | Browser / HELiX    | Client-side, after script loads                 |
+| Component styles                     | Browser / HELiX    | Client-side, encapsulated in Shadow DOM         |
+| Event handlers                       | Browser / HELiX    | Client-side                                     |
 | Complex properties (objects, arrays) | Drupal Behavior JS | Client-side, via `customElements.whenDefined()` |
 
 ---
@@ -98,8 +98,10 @@ In a node template:
 ### Alert Banner
 
 ```twig
-{# Inline alert from a block field #}
+{# Inline alert from a block field — hx-alert is hidden until `open` is set,
+   so include it on the upgraded host when the alert should be visible. #}
 <hx-alert
+  open
   variant="{{ content.field_alert_type.0['#markup']|default('info') }}"
   {% if content.field_dismissible.0['#markup'] == '1' %}dismissible{% endif %}
 >
@@ -192,28 +194,50 @@ HELiX uses `hx-` prefixed attribute names where native HTML already reserves the
 <hx-button hx-size="lg" variant="primary">Large Button</hx-button>
 <hx-badge hx-size="sm" variant="secondary">New</hx-badge>
 
-{# href — makes the whole card a link; fires hx-click on activation #}
-<hx-card href="/patient/{{ node.id }}" variant="default">
+{# hx-href — makes the whole card interactive; fires an hx-click event
+   instead of performing default browser navigation. Pair with hx-label
+   so the card surfaces an accessible name to assistive tech. #}
+<hx-card
+  hx-href="/patient/{{ node.id }}"
+  hx-label="Open patient {{ label }}"
+  variant="default"
+>
   <span slot="heading">{{ label }}</span>
-  Click anywhere on this card to navigate
+  Click anywhere on this card to fire hx-click.
 </hx-card>
 ```
 
-Always use `hx-size` rather than `size`. `hx-card` uses `href` directly — it reflects to the `href` HTML attribute and activates via click or Enter/Space.
+Always use `hx-size` rather than `size`. `hx-card` exposes its own `hx-href` attribute (not the native `href`) and activates via click or **Enter** — there is no Space-key activation on `hx-card`, only on form-control components like `hx-button` that map to a native focusable element. The card dispatches `hx-click` rather than navigating; if you want browser navigation, handle it in a Drupal behavior by reading `event.detail.href`:
+
+```javascript
+once('mytheme:hx-card-nav', 'hx-card[hx-href]', context).forEach((card) => {
+  card.addEventListener('hx-click', (e) => {
+    window.location.href = e.detail.href;
+  });
+});
+```
 
 ### Boolean Attributes
 
 Boolean attributes are controlled by **presence** (truthy) or **absence** (falsy). Never set them to the string `"false"`:
 
 ```twig
-{# Correct: conditional attribute presence #}
+{# Correct: conditional attribute presence.
+   `disabled` is reflected on hx-button; `required` is a form-control concept —
+   apply it to inputs (hx-text-input, hx-checkbox, hx-select, etc.), not to
+   hx-button, which has no `required` in its public API. #}
 <hx-button
   variant="primary"
   {% if is_disabled %}disabled{% endif %}
-  {% if is_required %}required{% endif %}
 >
   Submit Form
 </hx-button>
+
+<hx-text-input
+  name="email"
+  label="Email"
+  {% if is_required %}required{% endif %}
+></hx-text-input>
 
 {# Correct: ternary produces empty string when false #}
 <hx-button variant="primary" {{ user.is_guest ? 'disabled' : '' }}>
@@ -308,17 +332,26 @@ Render a slot only when its content exists:
 
 ---
 
-## Complex Properties Require JavaScript
+## Complex Properties From Twig
 
-HTML attributes are always strings. Component properties that accept objects or arrays cannot be set from Twig. Pass the data as a JSON-encoded `data-` attribute and initialize it in a Drupal Behavior:
+HTML attributes are always strings. Components without an attribute-converter expect their object/array-typed properties to be set in JavaScript — for those, pass the data as a JSON-encoded `data-` attribute and hydrate via a Drupal Behavior.
+
+Some components (notably `hx-data-table`) ship attribute converters that parse JSON directly from `columns`, `rows`, and similar attributes — for those you can render the JSON inline from Twig with `e('html_attr')`-style escaping, no behavior required:
 
 ```twig
-{# templates/components/data-table.html.twig #}
+{# templates/components/data-table.html.twig
+   hx-data-table supports `columns` and `rows` JSON-string attributes plus a
+   `label` for accessible naming. Render both inline; no Drupal Behavior needed. #}
 <hx-data-table
   id="patient-table-{{ node.id }}"
-  data-drupal-columns="{{ columns|json_encode|escape }}"
->
-  {# Accessible fallback for no-JS #}
+  label="{{ 'Patient records'|t }}"
+  columns="{{ columns|json_encode|e('html_attr') }}"
+  rows="{{ rows|json_encode|e('html_attr') }}"
+></hx-data-table>
+
+{# If you need a no-JS fallback table, render it as a sibling so the upgraded
+   component does not project the table into its default slot. #}
+<noscript>
   <table>
     <thead>
       <tr>
@@ -337,8 +370,10 @@ HTML attributes are always strings. Component properties that accept objects or 
       {% endfor %}
     </tbody>
   </table>
-</hx-data-table>
+</noscript>
 ```
+
+For components that do **not** expose JSON attribute converters, fall back to the data-attribute + behavior hydration pattern:
 
 ```javascript
 // mytheme/js/behaviors/hx-data-table.js
@@ -347,18 +382,20 @@ HTML attributes are always strings. Component properties that accept objects or 
 
   Drupal.behaviors.hxDataTable = {
     attach(context) {
-      once('helixui:data-table-init', 'hx-data-table[data-drupal-columns]', context).forEach((table) => {
-        customElements.whenDefined('hx-data-table').then(() => {
-          const columnsJson = table.getAttribute('data-drupal-columns');
-          if (columnsJson) {
-            try {
-              table.columns = JSON.parse(columnsJson);
-            } catch (e) {
-              console.error('[HELiX] Failed to parse columns JSON', e);
+      once('helixui:data-table-init', 'hx-data-table[data-drupal-columns]', context).forEach(
+        (table) => {
+          customElements.whenDefined('hx-data-table').then(() => {
+            const columnsJson = table.getAttribute('data-drupal-columns');
+            if (columnsJson) {
+              try {
+                table.columns = JSON.parse(columnsJson);
+              } catch (e) {
+                console.error('[HELiX] Failed to parse columns JSON', e);
+              }
             }
-          }
-        });
-      });
+          });
+        },
+      );
     },
   };
 })(Drupal, once);
@@ -412,7 +449,11 @@ See the [Behaviors documentation](/drupal/behaviors/fundamentals/) for the compl
 ### Views Templates
 
 ```twig
-{# templates/views/views-view-unformatted--patient-list.html.twig #}
+{# templates/views/views-view-unformatted--patient-list.html.twig
+   Interactive-card pattern: hx-href makes the whole card open the record;
+   pair it with hx-label for the accessible name, and **do not** nest action
+   buttons inside the actions slot — hx-card flags that combination as an
+   ARIA anti-pattern. Render extra action links as siblings if needed. #}
 <div{{ attributes.addClass('patient-list') }}>
   {% for row in rows %}
     {% set patient = row.content['#row']._entity %}
@@ -420,14 +461,15 @@ See the [Behaviors documentation](/drupal/behaviors/fundamentals/) for the compl
     <hx-card
       variant="default"
       elevation="raised"
-      href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      hx-href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      hx-label="Open patient record for {{ patient.label }}"
     >
       {% if patient.field_photo.entity %}
         <img
           slot="image"
           src="{{ file_url(patient.field_photo.entity.uri.value) }}"
           alt="{{ patient.field_photo.alt }}"
-        >
+        />
       {% endif %}
 
       <span slot="heading">{{ patient.label }}</span>
@@ -445,10 +487,6 @@ See the [Behaviors documentation](/drupal/behaviors/fundamentals/) for the compl
           Last visit: {{ patient.field_last_visit.value|date('M j, Y') }}
         </time>
       {% endif %}
-
-      <div slot="actions">
-        <hx-button variant="primary" hx-size="sm">View Record</hx-button>
-      </div>
     </hx-card>
   {% endfor %}
 </div>
@@ -466,7 +504,10 @@ See the [Behaviors documentation](/drupal/behaviors/fundamentals/) for the compl
   {{ title_suffix }}
 
   {% block content %}
+    {# hx-alert is hidden until `open` is set — include it on the block-rendered
+       alert so the banner is visible after upgrade. #}
     <hx-alert
+      open
       variant="{{ content.field_alert_type.0['#markup']|default('info') }}"
       {% if content.field_dismissible.0['#markup'] == '1' %}dismissible{% endif %}
     >

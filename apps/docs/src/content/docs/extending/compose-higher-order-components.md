@@ -18,11 +18,11 @@ This guide walks through that pattern from first principles: a working `org-sear
 
 Three signals indicate that composition is preferable to inheritance:
 
-| Signal | Why composition wins |
-|---|---|
-| You need to combine **multiple** HELiX components | Inheritance gives you one parent class; composition lets you host as many components as you need |
-| The base component's API is too opinionated | Subclassing inherits all public properties and their defaults — composition lets you expose only what your use case requires |
-| You are targeting **multiple frameworks** | A composed Lit element works natively in React, Vue, Angular, and Twig; a subclass can trigger quirks with framework-specific element wrappers |
+| Signal                                            | Why composition wins                                                                                                                           |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| You need to combine **multiple** HELiX components | Inheritance gives you one parent class; composition lets you host as many components as you need                                               |
+| The base component's API is too opinionated       | Subclassing inherits all public properties and their defaults — composition lets you expose only what your use case requires                   |
+| You are targeting **multiple frameworks**         | A composed Lit element works natively in React, Vue, Angular, and Twig; a subclass can trigger quirks with framework-specific element wrappers |
 
 **Inherit** when you need to add reactive properties that change the rendering of a single HELiX component (see [Extending HELiX Components](/extending/)).
 
@@ -65,7 +65,7 @@ export interface OrgSearchDetail {
  * @fires {CustomEvent<OrgSearchDetail>} org-search - Fired when the user submits
  *   the search query. bubbles: true, composed: true.
  *
- * @cssprop [--org-search-bar-gap=var(--hx-spacing-sm)] - Gap between the input and button.
+ * @cssprop [--org-search-bar-gap=var(--hx-space-3)] - Gap between the input and button.
  * @cssprop [--org-search-bar-width=100%] - Width of the search bar container.
  */
 @customElement('org-search-bar')
@@ -156,7 +156,7 @@ import { css } from 'lit';
 
 export const styles = css`
   :host {
-    --_gap: var(--org-search-bar-gap, var(--hx-spacing-sm));
+    --_gap: var(--org-search-bar-gap, var(--hx-space-3));
     --_width: var(--org-search-bar-width, 100%);
 
     display: block;
@@ -292,9 +292,18 @@ Stopping propagation on the internal event (`e.stopPropagation()`) prevents `hx-
 
 ### Import Path
 
+`AdoptedStylesheetsController` is an **internal** utility — `@helixui/library`'s `package.json` does not currently export `./controllers/*`, so deep imports won't resolve in consumer projects. If your composition lives **inside the monorepo** (e.g., another `@helixui/*` package), import it from the source tree:
+
 ```typescript
-import { AdoptedStylesheetsController } from '@helixui/library/controllers/adopted-stylesheets';
+import { AdoptedStylesheetsController } from '@helixui/library/src/controllers/adopted-stylesheets-controller.js';
 ```
+
+For an **external consumer**, the supported alternatives are:
+
+- Use Lit's `static styles = css\`…\`` block to ship per-component styles — that's the canonical Lit path and what shadow-root CSS adoption usually wants.
+- Hand-roll a one-line `document.adoptedStyleSheets.push(sheet)` call from `connectedCallback()` and dedupe via a module-scoped `WeakMap` keyed on `cssText`.
+
+If you have a use case that requires `AdoptedStylesheetsController` from outside the monorepo, request a public `./controllers/*` export path — the controller itself is small enough to copy locally as a stop-gap until that export ships.
 
 ### Injecting Shared Styles at the Document Level
 
@@ -320,11 +329,7 @@ const SHARED_CSS = `
 export class OrgSearchBar extends LitElement {
   // Injects SHARED_CSS into document.adoptedStyleSheets on hostConnected,
   // and removes it (ref-counted) on hostDisconnected.
-  private _sharedStyles = new AdoptedStylesheetsController(
-    this,
-    SHARED_CSS,
-    document,
-  );
+  private _sharedStyles = new AdoptedStylesheetsController(this, SHARED_CSS, document);
 
   // ...
 }
@@ -332,16 +337,26 @@ export class OrgSearchBar extends LitElement {
 
 ### Injecting Styles into the Shadow Root
 
-Pass `this.shadowRoot` as the third argument to scope the injected stylesheet to the component's own shadow root:
+Pass the component's `renderRoot` (the shadow root) as the third argument to scope the injected stylesheet to that root. Lit's `renderRoot` is only available after the element has finished its first connection, so initialize the controller in `connectedCallback()` rather than at field-declaration time — `this.shadowRoot` is `null` while class fields are initialized:
 
 ```typescript
-// Injected into this component's shadow DOM — does not affect document.
-private _shadowStyles = new AdoptedStylesheetsController(
-  this,
-  `:host { --_transition: var(--hx-transition-fast, 150ms ease); }`,
-  this.shadowRoot!,
-);
+@customElement('org-styled-card')
+export class OrgStyledCard extends LitElement {
+  private _shadowStyles?: AdoptedStylesheetsController;
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    // renderRoot is non-null after super.connectedCallback() — safe to attach.
+    this._shadowStyles = new AdoptedStylesheetsController(
+      this,
+      `:host { --_transition: var(--hx-transition-fast, 150ms ease); }`,
+      this.renderRoot as ShadowRoot,
+    );
+  }
+}
 ```
+
+For static, build-time shadow-root CSS, prefer Lit's `static styles = css\`…\``; reserve `AdoptedStylesheetsController` for dynamic stylesheets generated at runtime.
 
 This pattern is useful for styles that depend on runtime values (e.g., dynamic theme tokens) or that you generate programmatically and do not want to ship as a static `css` tagged template.
 
@@ -452,16 +467,8 @@ export class OrgPatientSearch extends LitElement {
     const queryError = this._validation.errorFor('query');
 
     return html`
-      <hx-text-input
-        name="query"
-        label="Search"
-        .error=${queryError ?? ''}
-      ></hx-text-input>
-      <hx-button
-        variant="primary"
-        ?disabled=${!this._validation.valid}
-        @hx-click=${this._submit}
-      >
+      <hx-text-input name="query" label="Search" .error=${queryError ?? ''}></hx-text-input>
+      <hx-button variant="primary" ?disabled=${!this._validation.valid} @hx-click=${this._submit}>
         Search
       </hx-button>
     `;
@@ -570,16 +577,16 @@ Does the new component wrap multiple HELiX components?
 
 ### Quick Comparison
 
-| Concern | Composition | Inheritance |
-|---|---|---|
-| Combine multiple HELiX components | Natural fit | Not possible |
-| Add a new reactive property | Possible via wrapper | Direct — `@property` decorator |
-| Override render output | Full control — write your own `render()` | Via `super.render()` with limitations |
-| Framework compatibility | Works everywhere | May require wrapper in React/Vue |
-| CSS parts exposure | Requires `exportparts` declaration | Inherited automatically |
-| Public API surface | Explicitly defined — only what you expose | All parent public properties inherited |
-| Maintenance risk on HELiX upgrade | Low — API boundary is narrow | Medium — depends on parent internals |
-| When to use | Compound patterns, multi-framework, opinionated APIs | Single-component extension, domain variants |
+| Concern                           | Composition                                          | Inheritance                                 |
+| --------------------------------- | ---------------------------------------------------- | ------------------------------------------- |
+| Combine multiple HELiX components | Natural fit                                          | Not possible                                |
+| Add a new reactive property       | Possible via wrapper                                 | Direct — `@property` decorator              |
+| Override render output            | Full control — write your own `render()`             | Via `super.render()` with limitations       |
+| Framework compatibility           | Works everywhere                                     | May require wrapper in React/Vue            |
+| CSS parts exposure                | Requires `exportparts` declaration                   | Inherited automatically                     |
+| Public API surface                | Explicitly defined — only what you expose            | All parent public properties inherited      |
+| Maintenance risk on HELiX upgrade | Low — API boundary is narrow                         | Medium — depends on parent internals        |
+| When to use                       | Compound patterns, multi-framework, opinionated APIs | Single-component extension, domain variants |
 
 ---
 

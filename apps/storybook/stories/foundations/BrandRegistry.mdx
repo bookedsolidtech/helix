@@ -12,16 +12,16 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
 
 <EyebrowHeading
   eyebrow="Brand registry"
-  title="AAA-conformant. Brand-agnostic. Enterprise-ready."
+  title="White-label without forking."
   lede={
     <>
-      White-label without forking. HELiX is built to WCAG 2.1 AAA where it counts &mdash; the strict
-      accessibility posture that protects regulated industries (healthcare, financial services,
-      government, education) and any enterprise organization that cannot ship a frontend that
-      compromises compliance. Every brand registers a primary &amp; secondary ramp against
-      <code> HelixBrandRegistry</code>; <code>{'<hx-theme brand="…">'}</code> applies it to every
-      component in the subtree. Override <em>only what makes you, you</em>; the rest of the 22-token
-      semantic tier inherits from the HELiX base.
+      Six reference brands ship in HELiX Storybook/docs as demonstration tiles; production consumers
+      register their own brands at runtime. Every brand registers a primary &amp; secondary ramp
+      against <code>HelixBrandRegistry</code>;<code> {'<hx-theme brand="…">'}</code> applies it to
+      every component in the subtree. Override <em>only what makes you, you</em>; the rest of the
+      22-token semantic tier inherits from the HELiX base. The shipped P0 surface holds WCAG 2.2 AAA
+      verdicts: 44 components, 376 Supports, 109 Not Applicable, 0 Partial, 0 Fail (see{' '}
+      <code>aaa-verdicts.json</code>).
     </>
   }
 />
@@ -29,27 +29,26 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
 <section>
   <SectionHead title="Reference brands" meta="switch via the Brand toolbar above" />
   <p className="hx-docs-card-body">
-    Six reference brands ship with HELiX. Use the{' '}
-    <strong>Brand</strong> toolbar at the top of this page to apply each one — the swatches and
-    mock buttons below reflow immediately because they consume{' '}
+    Six reference brands ship in HELiX Storybook/docs (scoped to this surface, not exported by the
+    token package). Use the <strong>Brand</strong> toolbar at the top of this page to apply each
+    one — every tile&apos;s ramp swatches below reflow immediately because they consume{' '}
     <code>{`--hx-color-primary-*`}</code> / <code>{`--hx-color-secondary-*`}</code> through the
-    same cascade every component uses.
+    root brand cascade.
   </p>
 
   <div className="hx-docs-pillars" style={{ marginTop: 24 }}>
     {/*
-      Each tile renders the primary ramp through `var(--hx-color-primary-N)`
-      scoped under a local `[data-brand="…"]` attribute, so the swatches
-      reflect the actual brand-overrides cascade. Toggling the Brand toolbar
-      above changes the top-level <html> data-brand and the tiles whose
-      data-brand value matches will reflow alongside it; the remaining
-      tiles remain locked to their own brand because the inner
-      `data-brand` selector wins on every nested subtree.
+      Each tile renders the primary ramp through `var(--hx-color-primary-N)`.
+      The Storybook brand CSS targets `:root[data-brand]` only, so every tile
+      reads the same root brand — the article-level `data-brand` attributes
+      below are labels for the reader, not scoped overrides. Toggling the
+      Brand toolbar above changes the root data-brand and the entire grid
+      reflows together; the per-tile labels stay constant.
     */}
     <article className="hx-docs-pillar">
       <span className="hx-docs-pillar-tag">apex · live</span>
       <h3>Apex (live)</h3>
-      <p>Precision-cool teal. Primary-600 <code>#0F7078</code>, secondary-600 <code>#0F6B7E</code>. The cascade's reference posture — the AAA-tuned anchor every other brand inherits from. Healthcare-leaning by virtue of the AAA contract, but industry-agnostic by design. Override only the primary/secondary ramps; the 22-token semantic tier stays constant. White text on primary-700 <code>#0F6363</code> hits 7.03:1 (AAA body); white text on primary-600 hits 5.82:1 (AA body — clears the 4.5:1 1.4.3 floor but sits below 7:1, so default <code>hx-button</code> hover/active labels are AA, and primary-700 is the stop to use when AAA on buttons is required). This tile reflows when the Brand toolbar above changes; the others lock to their own subtree.</p>
+      <p>Precision-cool teal. Primary-600 <code>#0F7078</code>, secondary-600 <code>#0F6B7E</code>. The cascade's reference posture — the AAA-tuned anchor every other brand inherits from. Healthcare-leaning by virtue of the AAA contract, but industry-agnostic by design. Override only the primary/secondary ramps; the 22-token semantic tier stays constant. Default <code>hx-button variant="primary"</code> rests on primary-700 <code>#0F6363</code> (white text → 7.03:1, AAA body) and moves darker on hover/active, so the default surface and every interaction state clear the 7:1 floor; <code>hx-button</code> is one of the 44 P0 components covered by the WCAG 2.2 AAA verdicts. This tile reflows when the Brand toolbar above changes; the others lock to their own subtree.</p>
       <footer className="hx-docs-pillar-footer">
         <div className="hx-docs-pillar-ramp">
           {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((s) => (
@@ -152,10 +151,9 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
 
   <p className="hx-docs-card-body" style={{ marginTop: 24 }}>
     <em>Live demonstration:</em> open the <strong>Brand</strong> toolbar at the top of this page
-    and select a different reference brand. The Apex tile and the matching brand tile
-    above will reflow because they consume <code>{`--hx-color-primary-*`}</code> through the
-    same cascade. The other tiles remain locked to their own brand because each one scopes
-    <code> data-brand</code> on its own subtree.
+    and select a different reference brand. Every tile&apos;s ramp reflows together because each
+    swatch consumes <code>{`--hx-color-primary-*`}</code> from the root brand cascade — the
+    per-tile <code>data-brand</code> attributes label the reader, not scope the cascade.
   </p>
 </section>
 
@@ -168,12 +166,17 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
         label: 'JS',
         language: 'js',
         filename: 'register-meridian.js',
-        code: `HelixBrandRegistry.register('meridian', {
-  '--hx-color-primary-50':  '#EFF4FF',
-  '--hx-color-primary-100': '#DCE8FF',
-  // + 9 more primary stops
-  '--hx-color-secondary-500': '#5B8AFF',
-  // + 10 more secondary stops
+        code: `import { HelixBrandRegistry } from '@helixui/tokens';
+
+// register() requires all 22 semantic tokens — primary 50→950 and
+// secondary 50→950. Abbreviated below for legibility; in production
+// supply the full 22-key map.
+HelixBrandRegistry.register('meridian', {
+'--hx-color-primary-50': '#EFF4FF',
+'--hx-color-primary-100': '#DCE8FF',
+// … 9 more primary stops (200 → 950)
+'--hx-color-secondary-500': '#5B8AFF',
+// … 10 more secondary stops (50 → 950, excluding 500)
 });`,
       },
       {
@@ -181,13 +184,14 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
         language: 'html',
         filename: 'apply-in-markup.html',
         code: `<hx-theme brand="meridian">
-  <hx-button variant="primary">
-    Schedule visit
-  </hx-button>
+<hx-button variant="primary">
+Schedule visit
+</hx-button>
 </hx-theme>`,
-      },
-    ]}
-  />
+},
+]}
+/>
+
 </section>
 
 <section>
@@ -198,7 +202,7 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
     showCopy={false}
     code={`// 1. Brand merges over base on light/dark.
 // 2. High-contrast SUPPRESSES brand —
-//    AA-tuned tokens stay authoritative.
+//    WCAG 7:1+ / AAA-tuned tokens stay authoritative.
 // 3. Required: 22 semantic tokens
 //    (primary + secondary, 50→950).`}
   />

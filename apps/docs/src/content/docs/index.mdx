@@ -5,19 +5,29 @@ description: Lit 3.x web components for healthcare. WCAG 2.2 AAA self-certified 
 
 # HELiX
 
-Lit 3.x web components for healthcare applications. **WCAG 2.2 AAA self-certified on the P0 surface** (44 components, 376 Supports verdicts across 11 criteria; reproducible via `pnpm aaa:audit`).
+Lit 3.x web components for healthcare applications. **WCAG 2.2 AAA self-certified on the P0 surface** (44 components, 376 Supports / 109 Not Applicable / 0 Partial / 0 Fail across 11 cert criteria plus an hx-icon non-text-contrast supplemental verdict; reproducible via `pnpm aaa:audit`).
 
 ## Get started
+
+The fastest path is the scaffolder:
+
+```bash
+npx create-helix
+```
+
+It prompts for framework, components, and bundles — then writes a working project you can `pnpm dev` immediately. See [`create-helix` CLI](/getting-started/create-helix/) for flags, presets, and what each template ships.
+
+Or step through manually:
 
 - **[Install](/getting-started/installation/)** — npm packages + peer-dep setup
 - **[Quick start](/getting-started/quick-start/)** — your first hx-button
 - **[Component reference](https://storybook.helix.bookedsolid.tech/)** — live Storybook with every component
 - **[Drupal integration](/drupal/installation/getting-started/)** — module install, behaviors, Twig
-- **[Framework wrappers](/framework-integration/)** — React, Next.js, Vue, Angular, Svelte, plain HTML
+- **[Framework integration](/framework-integration/)** — React wrappers (`@helixui/react`), plus integration guides for Next.js, Vue, Angular, Svelte, Astro, and plain HTML
 
 ## Latest release
 
-`@helixui/library@3.9.0` + `@helixui/icons@1.0.0` — published 2026-05-11.
+`@helixui/library@3.9.0` + `@helixui/icons@1.0.0` — see [CHANGELOG](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/CHANGELOG.md) for the release date.
 
 Released: new icons package (registry-pattern with FA Free + curated helix glyph set), internal SVG migration across 25+ components, hx-slider + hx-file-upload form-validity integration, AAA cert remediation (every claim verified against the formal harness).
 

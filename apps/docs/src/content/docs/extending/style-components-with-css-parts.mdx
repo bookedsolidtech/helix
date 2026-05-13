@@ -49,7 +49,7 @@ The practical rule: reach for a CSS custom property first. If no token covers th
 
 ## The Part Catalog
 
-All parts listed here are verified against the component source and the Custom Elements Manifest. Each entry shows the part name, the element it targets, and typical styling use cases.
+The tables below cover the most commonly styled parts on each component. Each entry shows the part name, the element it targets, and typical styling use cases — but the listing is curated, not exhaustive. For the authoritative inventory (including parts not surfaced here for brevity), consult [`packages/hx-library/custom-elements.json`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/custom-elements.json) or each component's per-component docs page.
 
 ### Buttons and Actions
 
@@ -128,7 +128,7 @@ All parts listed here are verified against the component source and the Custom E
 | `increment`     | The increment (+) button                          | Increment button styling |
 | `decrement`     | The decrement (-) button                          | Decrement button styling |
 | `help-text`     | The help text container                           | Help text styling        |
-| `error-message` | The error message container                       | Error state styling      |
+| `error`         | The error message container                       | Error state styling      |
 
 #### `hx-select`
 
@@ -147,7 +147,6 @@ All parts listed here are verified against the component source and the Custom E
 
 | Part        | Element                               | Typical use                       |
 | ----------- | ------------------------------------- | --------------------------------- |
-| `field`     | The outer field container             | Field layout                      |
 | `control`   | The wrapper around checkbox and label | Control alignment                 |
 | `checkbox`  | The visual checkbox element           | Checkbox size, border, background |
 | `checkmark` | The SVG checkmark icon                | Checkmark color, size             |
@@ -245,7 +244,6 @@ All parts listed here are verified against the component source and the Custom E
 
 | Part       | Element                      | Typical use                     |
 | ---------- | ---------------------------- | ------------------------------- |
-| `item`     | The outer item container     | Item layout                     |
 | `link`     | The anchor or button element | Link padding, background, color |
 | `icon`     | The icon container           | Icon sizing                     |
 | `label`    | The label container          | Label typography                |
@@ -378,7 +376,7 @@ hx-button::part(button):active {
 }
 
 /* Tab selection state */
-hx-tab::part(tab):where([aria-selected='true']) {
+hx-tab[selected]::part(tab) {
   border-bottom: 3px solid var(--hx-color-primary-500);
 }
 ```
@@ -409,7 +407,7 @@ Scope part overrides to a page region using a context class on an ancestor:
 
 ### Host State + Part
 
-Use `:focus-within` and `:state()` on the host to reflect internal state externally:
+Use native pseudo-classes like `:focus-within`, `:hover`, and `:active` on the host element together with `::part()` to style internal regions in response to host state. (HELiX components don't currently expose CSS `CustomStateSet` states — the `:state(...)` selector is not part of the public API.)
 
 ```css
 /* Style the wrapper when the input inside is focused */
@@ -435,8 +433,10 @@ hx-text-input:has(+ hx-help-text)::part(field) {
   margin-bottom: 0;
 }
 
-/* The component also reflects error state via error property triggering re-render */
-/* Use the error attribute on the host element instead */
+/* hx-text-input does not reflect its `error` property to a host attribute, so
+   `hx-text-input[error]` only matches when consumers (or their templates) set
+   the `error` HTML attribute explicitly. If you want the selector to track
+   the JS property, set the attribute on the host alongside the property. */
 hx-text-input[error]::part(input-wrapper) {
   border-color: var(--hx-input-error-color);
 }
@@ -453,9 +453,13 @@ The most powerful patterns combine both mechanisms: tokens for the baseline visu
 ### Pattern: Token for Color, Part for Structure
 
 ```css
-/* Token override: changes the color across all variants */
+/* Token override at the semantic/action layer changes primary-painted buttons
+   across the whole page. `--hx-button-bg` is variant-shadowed inside hx-button —
+   `variant="primary"`/`secondary` rules resolve their fill directly from the
+   action tokens, so override there to reach every variant. */
 hx-button {
-  --hx-button-bg: var(--hx-color-brand-primary);
+  --hx-color-action-primary-bg: var(--hx-color-primary-700);
+  --hx-color-action-primary-bg-hover: var(--hx-color-primary-800);
 }
 
 /* Part override: adds structural decoration the token system cannot */
@@ -472,7 +476,7 @@ hx-button::part(button) {
 /* Set the base theme via tokens */
 hx-text-input {
   --hx-input-border-color: var(--hx-color-neutral-400);
-  --hx-input-focus-ring-color: var(--hx-color-brand-primary);
+  --hx-input-focus-ring-color: var(--hx-color-primary-500);
 }
 
 /* Add interaction effects via parts */
@@ -483,7 +487,7 @@ hx-text-input::part(input-wrapper) {
 }
 
 hx-text-input:focus-within::part(input-wrapper) {
-  border-color: var(--hx-color-brand-primary);
+  border-color: var(--hx-color-primary-500);
   box-shadow: 0 0 0 3px rgba(0, 94, 184, 0.15); /* NHS brand blue focus ring */
 }
 ```
@@ -493,7 +497,7 @@ hx-text-input:focus-within::part(input-wrapper) {
 ```css
 /* Tokens drive the color system */
 hx-card {
-  --hx-card-bg: var(--hx-color-surface-elevated);
+  --hx-card-bg: var(--hx-color-surface-raised);
   --hx-card-border-color: transparent;
 }
 
@@ -595,7 +599,7 @@ Patient summary cards in a list that lift on hover to indicate interactivity.
 
 ```css
 /* Base: minimal shadow */
-hx-card[href]::part(card) {
+hx-card[hx-href]::part(card) {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   transition:
     box-shadow 200ms ease,
@@ -604,7 +608,7 @@ hx-card[href]::part(card) {
 }
 
 /* Hover: elevation lift */
-hx-card[href]:hover::part(card) {
+hx-card[hx-href]:hover::part(card) {
   box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.1),
     0 2px 4px rgba(0, 0, 0, 0.08);
@@ -612,7 +616,7 @@ hx-card[href]:hover::part(card) {
 }
 
 /* Focus: visible ring for keyboard navigation */
-hx-card[href]:focus-within::part(card) {
+hx-card[hx-href]:focus-within::part(card) {
   outline: 3px solid var(--hx-color-primary-500);
   outline-offset: 2px;
   box-shadow:
@@ -621,7 +625,7 @@ hx-card[href]:focus-within::part(card) {
 }
 
 /* Active: depress on click */
-hx-card[href]:active::part(card) {
+hx-card[hx-href]:active::part(card) {
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
@@ -651,12 +655,12 @@ hx-alert[variant='warning']::part(alert) {
   border-left-color: var(--hx-color-warning-500);
 }
 
-hx-alert[variant='danger']::part(alert) {
+hx-alert[variant='error']::part(alert) {
   border-left-color: var(--hx-color-error-500);
 }
 
 /* Clinical urgency: larger title for critical alerts */
-hx-alert[variant='danger']::part(title) {
+hx-alert[variant='error']::part(title) {
   font-size: 1.0625rem;
   font-weight: 700;
 }
@@ -690,42 +694,43 @@ hx-top-nav::part(mobile-toggle):hover {
 
 ### Recipe 6: Slotted Content Alongside Parts
 
-`::slotted()` styles projected light DOM content — it works at the component boundary, complementing `::part()` which styles shadow DOM internals.
+`::slotted()` is a **component-author** selector — it lives inside a component's own shadow stylesheet and matches light-DOM nodes that have been projected into the component's slots. Consumers writing CSS in the **light DOM** don't reach into a component's shadow tree with `::slotted()`; they style their own light-DOM nodes directly with normal selectors, and use `::part()` for the shadow container around the slot.
 
 ```css
 /*
- * ::slotted() applies to elements placed in slots (light DOM).
- * ::part() applies to elements inside the shadow DOM.
- * They work at different levels of the DOM tree.
+ * Consumer light-DOM CSS:
+ *   - Style your slotted children with normal selectors (`hx-card > [slot='heading']`).
+ *   - Style the shadow container around the slot with `::part()`.
  */
 
-/* Style slotted heading content in hx-card */
-hx-card::slotted([slot='heading']) {
+/* The light-DOM heading content you projected into the card */
+hx-card > [slot='heading'] {
   font-size: var(--hx-font-size-lg);
   font-weight: var(--hx-font-weight-semibold);
   color: var(--hx-color-neutral-900);
   margin: 0;
 }
 
-/* Style slotted action buttons */
-hx-card::slotted([slot='actions'] hx-button) {
-  /* Note: this only works one level deep — ::slotted() cannot reach
-     into a nested component's shadow DOM */
+/* Action buttons nested in the actions slot — direct child selector only;
+   you can't reach into a nested component's shadow DOM from here. */
+hx-card > [slot='actions'] hx-button {
+  /* …light-DOM-side styling… */
 }
 
-/* Combine: style the hx-card part container AND slotted content */
+/* Combine: style the shadow container via ::part() and the projected
+   light-DOM nodes with ordinary selectors. */
 hx-card::part(heading) {
   padding-bottom: var(--hx-space-2);
   border-bottom: 1px solid var(--hx-color-neutral-100);
 }
 
-hx-card::slotted([slot='heading']) {
+hx-card > [slot='heading'] {
   font-size: 1.125rem;
   font-weight: 600;
 }
 ```
 
-**Important**: `::slotted()` only selects the top-level slotted element — it cannot select descendants of slotted content. For deeper targeting, pass styles via CSS custom properties on the slotted element.
+**Important:** `::slotted()` is only valid inside the shadow stylesheet of the component **doing** the slotting (i.e. the library author's CSS). From the consumer side, use direct light-DOM selectors plus `::part()`.
 
 ---
 
@@ -854,7 +859,7 @@ CSS Shadow Parts (`::part()`) has broad support across all modern browsers:
 | Safari / WebKit   | Full support | 13.1+   |
 | Samsung Internet  | Full support | 10.1+   |
 
-For the HELiX minimum browser baseline (Chrome 90+, Firefox 90+, Safari 14+), `::part()` can be used without any polyfill or fallback.
+For HELiX's supported browser baseline — see [`BROWSER_COMPATIBILITY.md`](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/BROWSER_COMPATIBILITY.md) for the authoritative matrix; current targets are Chromium/Edge/Firefox 120+ and Safari/Safari iOS 17+ — `::part()` can be used without any polyfill or fallback.
 
 **Note on `:has()` compatibility**: CSS `:has()` used on the host element (not inside `::part()`) requires Chrome 105+, Firefox 121+, Safari 15.4+. For healthcare deployments targeting older browser versions, test `:has()` selectors with your actual browser matrix before committing to them in production.
 

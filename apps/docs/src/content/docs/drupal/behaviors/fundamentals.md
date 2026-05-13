@@ -16,10 +16,13 @@ Drupal Behaviors are the JavaScript lifecycle system for Drupal 10 and 11. Every
 In a traditional web page you might initialize JavaScript like this:
 
 ```javascript
-// FRAGILE: only runs once on initial page load
+// FRAGILE: only runs once on initial page load — and the wrong event for
+// HELiX. hx-button dispatches `hx-click`; the native `click` event won't
+// carry the CustomEvent detail and won't fire for keyboard activation paths
+// where hx-button intercepts to suppress (e.g. when disabled/loading).
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('hx-button').forEach((button) => {
-    button.addEventListener('click', handleButtonClick);
+    button.addEventListener('hx-click', handleButtonClick);
   });
 });
 ```
@@ -215,13 +218,15 @@ Drupal.behaviors.hxLiveUpdates = {
 |---|---|
 | `'unload'` | The page is navigating away |
 | `'serialize'` | Form elements are being serialized for AJAX submission |
-| (other) | Module-specific trigger |
+| `'move'` | DOM nodes are being moved (e.g. tabs reordering) — listeners need to detach before the move so they can re-attach in the new location |
+| (other) | Genuinely custom triggers from modules that have documented one |
 
-For most HELiX behaviors `detach()` is optional. It is required only when you:
+`detach()` is required when you:
 
 - Start intervals or timeouts
 - Establish WebSocket or EventSource connections
 - Add event listeners to elements outside `context` (e.g., `window`, `document`)
+- Register `once()` keys you need to clean up on `unload` — the shipped `@helixui/drupal-behaviors` package follows the `once.remove(key, context, trigger === 'unload')` cleanup convention; mirror that when authoring custom behaviors
 
 ---
 
@@ -250,11 +255,12 @@ Drupal.behaviors.init = { ... };
 
 ### Naming the `once()` Key
 
-The `once()` key is a namespaced string that identifies the specific initialization. Use the `helixui:` prefix for HELiX-specific behaviors:
+The `once()` key is a namespaced string that identifies the specific initialization. The shipped `@helixui/drupal-behaviors` package uses the `hx-*` key prefix (e.g. `hx-dialog`, `hx-tooltip`). For your own project-local behaviors that build on top, pick a distinct project namespace (e.g. `mysite:patient-card-init`) so your keys never collide with the package's:
 
 ```javascript
-once('helixui:patient-card-init', 'hx-card[data-bundle="patient"]', context)
-once('helixui:badge-tooltip', 'hx-badge[title]', context)
+// Project-local behaviors — use your project's namespace
+once('mysite:patient-card-init', 'hx-card[data-bundle="patient"]', context)
+once('mysite:badge-tooltip', 'hx-badge[title]', context)
 once('helixui:data-table-columns', 'hx-data-table[data-columns]', context)
 ```
 
@@ -363,7 +369,10 @@ HELiX components handle their own internal initialization via Lit's `connectedCa
           return;
         }
 
-        alert.addEventListener('hx-dismiss', () => {
+        // hx-alert fires `hx-close` when the user activates dismiss; use
+        // `hx-after-close` if you need to defer work until the close transition
+        // finishes. There is no `hx-dismiss` event.
+        alert.addEventListener('hx-close', () => {
           if (alertId) {
             sessionStorage.setItem(`alert-dismissed-${alertId}`, '1');
           }

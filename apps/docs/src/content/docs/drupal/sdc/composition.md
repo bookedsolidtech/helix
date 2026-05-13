@@ -17,12 +17,12 @@ Before building, map each content type's fields to component primitives:
 |---|---|---|
 | `node.label` | `title` prop | `hx-card` heading slot |
 | `field_body` (summary) | `summary` prop | `hx-card` default slot |
-| `field_category` (taxonomy ref) | `category` + `category_variant` props | `hx-badge` inside heading slot |
-| `field_image` (media ref) | `image` slot | `hx-card` media slot |
-| `node.uid.entity.displayname` | `author_name` prop | `hx-avatar` in meta slot |
-| `field_avatar` (image) | `author_image_url` prop | `hx-avatar` src attribute |
-| `node.created` (timestamp) | `published_label` prop | `<time>` in meta slot |
-| `node.toUrl()` | `url` prop | `hx-button` href attribute |
+| `field_category` (taxonomy ref) | `category` + `category_variant` props | `hx-badge` inside `heading` slot |
+| `field_image` (media ref) | `image` slot | `hx-card` `image` slot (the canonical slot name; `media` is not real) |
+| `node.uid.entity.displayname` | `author_name` prop | `hx-avatar` in the default body slot |
+| `field_avatar` (image) | `author_image_url` prop | `hx-avatar` `src` attribute |
+| `node.created` (timestamp) | `published_label` prop | `<time>` in the default body slot |
+| `node.toUrl()` | `url` prop | `hx-button` `href` attribute |
 
 ---
 
@@ -69,7 +69,7 @@ props:
     category_variant:
       type: string
       title: Category Badge Variant
-      enum: [default, primary, success, warning, danger]
+      enum: [primary, secondary, success, warning, error, neutral, info]
       default: primary
     author_name:
       type: string
@@ -84,7 +84,7 @@ props:
     card_variant:
       type: string
       title: Card Visual Variant
-      enum: [default, elevated, outlined, filled]
+      enum: [default, featured, compact]
       default: default
 
 slots:
@@ -273,7 +273,7 @@ libraryOverrides:
 
 ```twig
 {# components/staff-profile/staff-profile.twig #}
-<hx-card variant="outlined" class="staff-profile">
+<hx-card variant="default" class="staff-profile">
 
   <div slot="image" class="staff-profile__photo">
     {% if photo_url %}
@@ -284,6 +284,7 @@ libraryOverrides:
       ></hx-avatar>
     {% else %}
       <hx-avatar
+        label="{{ name|escape }}"
         initials="{{ name|split(' ')|map(w => w[0])|join('')|upper }}"
         hx-size="xl"
       ></hx-avatar>
@@ -297,7 +298,7 @@ libraryOverrides:
 
   <div slot="footer">
     {% if department %}
-      <hx-badge variant="default">{{ department|escape }}</hx-badge>
+      <hx-badge variant="neutral">{{ department|escape }}</hx-badge>
     {% endif %}
     {% if accepting_patients %}
       <hx-badge variant="success">Accepting New Patients</hx-badge>
@@ -493,7 +494,7 @@ function mytheme_preprocess_node__article__teaser(array &$variables): void {
   $category_label = $category_term ? $category_term->label() : '';
   $category_variant = match ($category_label) {
     'Clinical Research' => 'primary',
-    'Patient Safety' => 'danger',
+    'Patient Safety' => 'error',
     'Wellness' => 'success',
     default => 'default',
   };
@@ -521,7 +522,12 @@ function mytheme_preprocess_node__article__teaser(array &$variables): void {
 
 ## SDC Catalog
 
-The following table lists composition SDCs commonly authored alongside HELiX, grouped by content category. Each SDC composes multiple HELiX primitives into a complete editorial pattern. These patterns can be authored from scratch or generated with the `@helixui/drupal-starter` scaffolding.
+The following table lists composition-SDC patterns commonly authored alongside HELiX, grouped
+by content category. Each pattern composes multiple HELiX primitives into a complete editorial
+shape. **These are illustrative pattern names**, not a one-for-one inventory of what
+`@helixui/drupal-starter` scaffolds — the starter ships a smaller curated set of SDCs; consumers
+typically author the remaining patterns from scratch using these primitives as the building
+blocks. See the starter's own `components/` directory for the exact list of shipped scaffolds.
 
 ### Content Patterns
 
@@ -629,7 +635,7 @@ props:
         widget: text
     category_variant:
       type: string
-      enum: [default, primary, success, warning, danger]
+      enum: [primary, secondary, success, warning, error, neutral, info]
       title: Category Color
       '$ui':
         widget: select
@@ -653,10 +659,10 @@ Structure your SDC templates so the slot content is semantically complete withou
 
 ```twig
 {# article-teaser.twig — semantic fallback is the slot content itself #}
-<hx-card href="{{ url }}">
+<hx-card hx-href="{{ url }}">
   {# Before JS: renders as <div> with its content visible in light DOM #}
   {# After JS: card Shadow DOM applies design, layout, and interaction #}
-  <span slot="heading">{{ title }}</span>
+  <h3 slot="heading">{{ title }}</h3>
   <hx-text>{{ summary }}</hx-text>
   <div slot="footer">
     <a href="{{ url }}">{{ 'Read More'|t }}</a>
@@ -664,7 +670,12 @@ Structure your SDC templates so the slot content is semantically complete withou
 </hx-card>
 ```
 
-The `<a href>` in the footer slot ensures keyboard navigation and screen reader access to the link before `hx-button` JavaScript loads. Once the component upgrades, `hx-button` takes over with its full interaction model.
+The `<a href>` in the `footer` slot ensures keyboard navigation and screen-reader access to the
+link **before** the HELiX runtime upgrades the card. After upgrade, `hx-card` continues to host
+that native `<a>` in its `footer` slot — the slotted content stays a real anchor, which is the
+correct progressive-enhancement story. (`hx-button` is not part of this sample; if you want a
+button-shaped CTA after upgrade, slot `<hx-button hx-size="sm" variant="ghost" href="...">Read
+More</hx-button>` instead of `<a>`.)
 
 ---
 
@@ -672,7 +683,11 @@ The `<a href>` in the footer slot ensures keyboard navigation and screen reader 
 
 If your Drupal site uses [htmx](https://htmx.org/), you will encounter a namespace collision: htmx attributes use the `hx-` prefix (e.g., `hx-boost`, `hx-get`, `hx-target`), the same prefix HELiX uses for its custom element tag names (`hx-card`, `hx-button`).
 
-This is not a functional conflict — `hx-` attribute names on HTML elements (htmx's model) are different from `hx-` custom element tag names (HELiX's model) — but it creates readability confusion and may cause issues with htmx's attribute scanner if it attempts to process `hx-card` tags as htmx-enhanced elements.
+This is not a functional conflict — htmx's `hx-*` attribute scanner reads **attributes on
+elements**, not **element tag names**, so it never tries to "process" `<hx-card>` as an
+htmx-boosted element. The collision is purely cosmetic: code reviewers eyeballing a Twig file
+have to distinguish `hx-boost` (htmx attribute) from `hx-card` (HELiX tag) and `hx-href`
+(HELiX attribute). The mitigations below reduce the cognitive load.
 
 ### Mitigation 1: Scope htmx to specific elements
 
@@ -685,27 +700,24 @@ Do not apply htmx globally. Instead of adding `hx-boost` to `<body>`, scope it t
 </div>
 
 {# HELiX components outside the scoped container are unaffected #}
-<hx-card href="/article/1">...</hx-card>
+<hx-card hx-href="/article/1">...</hx-card>
 ```
 
-### Mitigation 2: Configure htmx attribute prefix
+### Mitigation 2: Use the htmx data-* attribute syntax
 
-htmx 1.9+ allows configuring the attribute prefix away from `hx-`:
+htmx accepts both `hx-*` and `data-hx-*` forms for every directive (e.g. `data-hx-boost`,
+`data-hx-get`, `data-hx-target`). Using the `data-hx-*` form throughout your htmx markup makes
+the cognitive distinction obvious — anything starting with `hx-` is HELiX, anything starting with
+`data-hx-` is htmx. There is no global `htmx.config` prefix-rename knob; this is a coding
+convention, not a runtime configuration switch.
 
-```javascript
-// In your theme's JS, before htmx initializes
-htmx.config.attributeName = 'data-hx';
-htmx.config.boosted = 'data-hx-boost';
-```
+### Mitigation 3: Use htmx `hx-disable` exclusions
 
-With this configuration, htmx reads `data-hx-boost`, `data-hx-get`, etc., and will not attempt to process `hx-card` or `hx-button` as htmx-enhanced elements.
-
-### Mitigation 3: Use htmx `hx-ignore` exclusions
-
-If you cannot change the prefix, use `hx-ignore` on HELiX component wrappers to prevent htmx from scanning their descendants:
+If a region must be invisible to htmx altogether, mark its wrapper with `hx-disable` (or the
+`data-hx-disable` equivalent). htmx will not scan its descendants:
 
 ```twig
-<div hx-ignore>
+<div hx-disable>
   <hx-card>...</hx-card>
   <hx-button>...</hx-button>
 </div>
@@ -736,11 +748,11 @@ Drupal Behaviors with `once()` fire automatically on AJAX responses. If your beh
 
 1. The behavior key in `Drupal.behaviors` is unique across your theme.
 2. The CSS selector in the `once()` call matches the actual rendered element.
-3. The `[data-helix-*]` attribute is present on the rendered element in the page source.
+3. The `[data-drupal-*] (per /drupal-behaviors)` attribute is present on the rendered element in the page source.
 
 ### htmx processes `hx-card` as a directive
 
-Apply one of the three mitigations documented in the htmx section above. The fastest fix is adding `hx-ignore` to the wrapper `<div>` around HELiX component regions.
+Apply one of the three mitigations documented in the htmx section above. The fastest fix is adding `hx-disable` to the wrapper `<div>` around HELiX component regions.
 
 ### Props schema validation error in Drupal logs
 

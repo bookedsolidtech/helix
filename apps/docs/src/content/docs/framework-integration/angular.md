@@ -89,18 +89,17 @@ Angular binds to DOM events using `(eventName)` syntax. HELIX dispatches `hx-` p
 
 ```ts
 export class MyComponent {
-  onSave(event: Event) {
-    console.log('button clicked', event);
+  // HELiX events are CustomEvents — type the detail payload, don't read from event.target.
+  onSave(event: CustomEvent<{ originalEvent: MouseEvent | KeyboardEvent }>) {
+    console.log('button clicked', event.detail.originalEvent);
   }
 
-  onInput(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    console.log('input:', value);
+  onInput(event: CustomEvent<{ value: string }>) {
+    console.log('input:', event.detail.value);
   }
 
-  onChange(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    console.log('change:', value);
+  onChange(event: CustomEvent<{ value: string }>) {
+    console.log('change:', event.detail.value);
   }
 }
 ```
@@ -169,7 +168,7 @@ export class ContactComponent {
 HELIX components are not `ControlValueAccessor` implementations by default. For Reactive Forms, sync values via event listeners using `ElementRef`:
 
 ```ts
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -177,16 +176,19 @@ import { FormControl } from '@angular/forms';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `<hx-text-input #emailInput name="email"></hx-text-input>`,
 })
-export class EmailInputComponent implements OnInit {
+export class EmailInputComponent implements AfterViewInit {
   @ViewChild('emailInput') emailInput!: ElementRef<HTMLElement>;
 
   emailControl = new FormControl('');
 
-  ngOnInit() {
+  // Use AfterViewInit so the @ViewChild query is resolved before we wire listeners.
+  ngAfterViewInit() {
     const el = this.emailInput.nativeElement;
 
+    // hx-change is a CustomEvent<{ value: string }> — read from .detail, not .target.
     el.addEventListener('hx-change', (e: Event) => {
-      this.emailControl.setValue((e.target as HTMLInputElement).value);
+      const detail = (e as CustomEvent<{ value: string }>).detail;
+      this.emailControl.setValue(detail.value);
     });
 
     this.emailControl.valueChanges.subscribe((val) => {
@@ -198,31 +200,20 @@ export class EmailInputComponent implements OnInit {
 
 ## TypeScript Types
 
-Extend Angular's known elements for IDE autocompletion. Create a `helix-types.d.ts`:
+`@helixui/library` ships full TypeScript declarations including `HTMLElementTagNameMap` entries for every `hx-*` element. Once the package is in your dependencies, IDE autocompletion and `document.createElement('hx-button')` typing work without any extra type files.
+
+If you need app-local helpers (e.g. typed event-detail shorthand types), do NOT redeclare the existing tag keys in `HTMLElementTagNameMap` — that creates incompatible duplicate globals. Reference the published exports instead:
 
 ```ts
-// src/helix-types.d.ts
-declare global {
-  interface HTMLElementTagNameMap {
-    'hx-button': HTMLElement & {
-      variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-      size?: 'sm' | 'md' | 'lg';
-      disabled?: boolean;
-      loading?: boolean;
-      type?: 'button' | 'submit' | 'reset';
-    };
-    'hx-text-input': HTMLElement & {
-      value?: string;
-      placeholder?: string;
-      disabled?: boolean;
-      required?: boolean;
-      name?: string;
-    };
-  }
-}
+// src/helix-types.d.ts (helpers only)
+import type { HelixButton, HelixTextInput } from '@helixui/library';
 
-export {};
+// Example: a derived type that extracts the variant union from the canonical HelixButton type
+type HxButtonVariant = HelixButton['variant'];
+// = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'
 ```
+
+If you previously copied tag-map entries inline, delete them and rely on the package types. The legacy inline samples shipped stale variant unions and conflicting member shapes.
 
 ## SSR / Angular Universal
 

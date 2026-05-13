@@ -61,9 +61,11 @@ Add the HELiX type declarations to your `tsconfig.json`:
 Or import the component type directly:
 
 ```typescript
-import type { HxButton } from '@helixui/library/components/hx-button';
-const btn = document.querySelector('hx-button') as HxButton;
+import type { HelixButton } from '@helixui/library';
+const btn = document.querySelector('hx-button') as HelixButton;
 ```
+
+Note: HELiX exports the class as `HelixButton` (and `HelixTextInput`, `HelixCard`, etc.) from the package root, not `HxButton` from the per-component subpath.
 
 ---
 
@@ -143,7 +145,7 @@ HELiX form components use `ElementInternals` for form association. Form-associat
 
 ### `FormData` doesn't contain the component's value
 
-HELiX form components call `internals.setFormValue()` internally. Verify the component supports form association — check the API reference for `static formAssociated = true`. If the component doesn't declare this, it won't participate in native form submission.
+HELiX form components call `internals.setFormValue()` internally via the shared `FormMixin` (`packages/hx-library/src/mixins/`). `static formAssociated = true` is set on the class but isn't surfaced through CEM as a normal member — check the component's source directly, or the [form-associated component list](/components/forms/fundamentals/) for the canonical inventory. If a component you're using isn't form-associated, it won't participate in native form submission.
 
 For unsupported components, use a hidden `<input>` and sync it manually:
 
@@ -173,7 +175,9 @@ For programmatic validation state, see [Form Validation](/components/forms/valid
 
 ### `ElementInternals` errors in older browsers
 
-`ElementInternals` requires Chrome 77+, Firefox 93+, Safari 16.4+. For older browser support, use the [element-internals-polyfill](https://www.npmjs.com/package/element-internals-polyfill):
+`ElementInternals` requires Chrome 77+, Firefox 93+, and Safari 16.4+. HELiX targets evergreen-browser releases (Chrome / Edge / Firefox latest two majors and Safari 16+), so the API is available everywhere HELiX supports.
+
+If you need to support a strictly older browser matrix outside HELiX's official support window, the [element-internals-polyfill](https://www.npmjs.com/package/element-internals-polyfill) is a third-party option — it is **not** bundled or recommended by HELiX, and ships its own correctness/feature caveats. Use at your own risk:
 
 ```javascript
 import 'element-internals-polyfill';
@@ -281,27 +285,30 @@ Add HELiX element types to your React type declarations:
 
 ```typescript
 // src/custom-elements.d.ts
-import type { HxButton } from '@helixui/library/components/hx-button';
+import type { HelixButton } from '@helixui/library';
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
       'hx-button': React.DetailedHTMLProps<
-        React.HTMLAttributes<HxButton> & Partial<HxButton>,
-        HxButton
+        React.HTMLAttributes<HelixButton> & Partial<HelixButton>,
+        HelixButton
       >;
     }
   }
 }
 ```
 
+If you're building a React app, prefer `@helixui/react` — its generated wrappers ship with React-friendly types out of the box and avoid the manual `IntrinsicElements` declaration.
+
 ### Generic component props not resolving correctly
 
-HELiX components use TypeScript strict mode. If a prop type appears as `never` or doesn't match, verify you're importing the component's type (not the element class) and using the correct property name (camelCase in TypeScript, kebab-case in HTML):
+HELiX components use TypeScript strict mode. If a prop type appears as `never` or doesn't match, verify you're importing the component class from the package root and using the correct property name (camelCase in TypeScript, kebab-case in HTML):
 
 ```typescript
-import type { HxSelect } from '@helixui/library/components/hx-select';
-// Property: el.selectedValue (TS) → attribute: selected-value (HTML)
+import type { HelixSelect } from '@helixui/library';
+// Property: el.value (TS) → attribute: value (HTML)
+// hx-select is single-selection; for multi-select use the dedicated combobox.
 ```
 
 ### `@property` decorator type errors
@@ -335,7 +342,7 @@ npx webpack-bundle-analyzer stats.json
 
 ### Design tokens CSS file is large
 
-The full token file includes all primitive, semantic, and component tokens. For production, import only the tokens your theme uses, or generate a minimal token file using the HELiX token build script.
+The token CSS file (`packages/hx-tokens/dist/`) emits the primitive and semantic palette layers that every component depends on; per-component CSS tokens are defined in each component's `*.styles.ts` and ship as part of the component bundle, not in the token CSS file. There isn't a "minimal token build" toggle today — for production, lean on the per-component imports (each component pulls only the tokens it actually consumes) and let the consumer bundler dedupe.
 
 ### Lit is bundled multiple times
 
@@ -347,7 +354,7 @@ npm ls lit
 pnpm why lit
 ```
 
-All HELiX components share Lit as a peer dependency. If versions diverge, deduplication may fail.
+All HELiX components depend on Lit. `@helixui/library` declares `lit` as a **direct dependency** (not a peer), so the version is pinned by the package — duplicate copies of Lit in your bundle usually come from a separate `lit` install in your app or another library, not from HELiX itself.
 
 ---
 
@@ -432,4 +439,4 @@ If your issue isn't covered here:
 - **GitHub Issues**: [Search existing issues](https://github.com/bookedsolidtech/helix/issues) or file a new one with a minimal reproduction
 - **Drupal-specific issues**: Include your Drupal version, theme, and the HELiX library attachment method
 - **Component API reference**: Each component page lists all properties, events, slots, and CSS parts
-- **Architecture docs**: [Shadow DOM Architecture](/components/shadow-dom/architecture) and [Design Token Tiers](/design-tokens/tiers) cover foundational concepts
+- **Architecture docs**: [Light DOM ADR](/architecture/adrs/light-dom/), [Slots vs Props ADR](/architecture/adrs/slots-vs-props/), and [Design Token Tiers](/design-tokens/tiers/) cover the foundational concepts

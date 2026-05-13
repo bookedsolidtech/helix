@@ -9,6 +9,19 @@ Server-side rendering (SSR) improves Time to First Byte, enables search engine i
 
 This page gives an honest account of where Lit SSR stands today, what the `@lit-labs/ssr` package does, how Declarative Shadow DOM works, and what to do when SSR is not practical for a given component.
 
+> **Reading note:** Several examples in this guide reach beyond what HELiX
+> ships today: standard `shadowrootmode` Declarative Shadow DOM is Chromium
+> 111+ / Edge 111+ / Safari 16.4+ / Firefox 123+; `hx-card`'s real shadow
+> parts are `card` / `image` / `heading` / `body` / `footer` / `actions`
+> (no `header`, no `body` slot — the body is the default slot); HELiX does
+> not currently ship an `hx-chart` component; the workspace runs Astro 5
+> (the `@astrojs/lit` integration is deprecated for Astro 5 — current
+> guidance is client-side `<script>` registration); and several recipes call
+> browser globals that HELiX components don't actually invoke at construction
+> time. Verify a pattern against the per-component
+> [Custom Elements Manifest](/api-reference/overview/) before assuming it
+> works.
+
 ---
 
 ## The Core Problem: Shadow DOM Does Not Exist on the Server
@@ -48,7 +61,7 @@ Declarative Shadow DOM is the browser mechanism that makes web component SSR pos
         display: block;
       }
       .card {
-        padding: var(--hx-spacing-md);
+        padding: var(--hx-card-padding);
       }
     </style>
     <div class="card">
@@ -135,7 +148,7 @@ console.log(serverHtml);
 //   <template shadowrootmode="open">
 //     <style>/* ... component styles ... */</style>
 //     <div part="card" class="card">
-//       <div part="header"><slot name="heading"></slot></div>
+//       <div part="heading"><slot name="heading"></slot></div>
 //       <div part="body"><slot></slot></div>
 //     </div>
 //   </template>
@@ -163,8 +176,12 @@ export async function handleRequest(req: Request): Promise<Response> {
     <html>
       <head>
         <meta charset="utf-8" />
-        <link rel="modulepreload" href="/dist/vendor-lit.js" />
-        <link rel="modulepreload" href="/dist/hx-card.js" />
+        <!-- Preload from a publicly-served bundle URL. In a typical SSR app
+             your bundler emits the hx-card module under /assets/, /static/,
+             or a similar public prefix — substitute that for the placeholder
+             below. Direct /node_modules paths only work when the dev server
+             happens to expose them and will 404 in production. -->
+        <link rel="modulepreload" href="/assets/hx-card-[hash].js" />
       </head>
       <body>
         <hx-card>
@@ -352,7 +369,9 @@ Some components are inherently client-only — they measure the DOM, use `canvas
 
 ```astro
 ---
-import HxChart from '@helixui/library/components/hx-chart';
+// `hx-chart` is not a HELiX component. Replace with a real component import
+// or treat this as a hypothetical example for your own chart wrapper.
+import HxLineChart from './my-org/hx-line-chart';
 ---
 
 <!--
@@ -361,24 +380,33 @@ import HxChart from '@helixui/library/components/hx-chart';
   2. Load and hydrate on the client only
   3. Show nothing until the JS loads
 -->
-<HxChart client:only="lit" data={chartData} />
+<HxLineChart client:only="lit" data={chartData} />
 ```
 
 Use `client:only` sparingly. For every `client:only` component, users see nothing until JavaScript loads and executes. For charts and data visualisations this is usually acceptable because a meaningful server-rendered fallback would require significant additional work. For interactive form components, it is almost never the right choice.
 
-### Astro Configuration for Lit SSR
+### Astro Configuration for Lit (current Astro 5 guidance)
 
-```typescript
-// astro.config.mjs
-import { defineConfig } from 'astro/config';
-import lit from '@astrojs/lit';
+The `@astrojs/lit` integration was the recommended path in Astro 4 but is **deprecated in Astro 5**. This workspace runs Astro 5, and the current HELiX docs site loads HELiX via a client-side `<script>` block rather than via the integration:
 
-export default defineConfig({
-  integrations: [
-    lit(), // Enables @lit-labs/ssr for Lit components
-  ],
-});
+```astro
+---
+// src/pages/example.astro — no @astrojs/lit integration
+---
+
+<hx-card>
+  <span slot="heading">Server-rendered heading</span>
+  <p>Body content that renders before JavaScript loads.</p>
+</hx-card>
+
+<script>
+  // Registers the custom element on the client; the server emits plain HTML,
+  // the client hydrates it into the live web component.
+  import '@helixui/library/components/hx-card';
+</script>
 ```
+
+If you have an Astro 4 codebase still on `@astrojs/lit`, the integration's last published version is what you'd pin to — but treat that path as a transition, not a long-term plan, until upstream Lit ships a current-Astro integration.
 
 ---
 
@@ -398,7 +426,7 @@ import '@helixui/library/components/hx-card';
 
 describe('hx-card SSR', () => {
   it('produces DSD output with shadow root template', async () => {
-    const result = await collectResult(render(html`<hx-card><p slot="body">Content</p></hx-card>`));
+    const result = await collectResult(render(html`<hx-card><p>Content</p></hx-card>`));
 
     expect(result).toContain('<template shadowrootmode="open">');
     expect(result).toContain('part="card"');
@@ -481,6 +509,6 @@ SSR for Lit components is real and works. But it adds architectural complexity. 
 
 ## Related Pages
 
-- [Lazy Loading Web Components](./lazy-loading/) — Defer component registration until needed
+- [Drupal Lazy Loading Patterns](/drupal/performance/lazy-loading/) — Defer component registration until needed
 - [Bundle Size Fundamentals](./bundle-size/) — Keeping component footprint small
 - [CDN Distribution](../distribution/cdn/) — Distributing HELiX for zero-install consumption

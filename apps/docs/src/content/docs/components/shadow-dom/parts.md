@@ -13,7 +13,6 @@ This guide explores the CSS Parts API in depth, covering the `part` attribute, t
 
 Before diving into CSS Parts, ensure you understand:
 
-- [Shadow DOM Architecture](/components/shadow-dom/architecture) — Core concepts of shadow trees, shadow boundaries, and style encapsulation
 - Basic CSS selector syntax and specificity
 - Web component fundamentals (custom elements, templates)
 
@@ -566,7 +565,7 @@ override render() {
 }
 ```
 
-**Consumer use case**: Apply custom focus indicators for WCAG 2.1 AAA compliance.
+**Consumer use case**: Apply custom focus indicators that meet or exceed the WCAG 2.2 AAA focus visibility criteria (2.4.7 / 2.4.11 / 2.4.13).
 
 ```css
 /* Custom focus ring with increased contrast */
@@ -649,7 +648,7 @@ hx-text-input::part(input) {
   border-radius: 6px;
   padding: 0.875rem 1rem; /* Larger for accessibility */
   font-size: 1rem;
-  min-height: 44px; /* WCAG 2.1 AA minimum touch target */
+  min-height: 44px; /* WCAG 2.2 SC 2.5.5 (Target Size — Enhanced, AAA): ≥44×44 CSS px */
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
@@ -864,9 +863,6 @@ For HELiX (hx-library), parts are essential for integrating components into dive
 ## Next Steps
 
 - [Shadow DOM Slots](/components/shadow-dom/slots) — Master content projection and composition
-- [Shadow DOM Events](/components/shadow-dom/events) — Understand event retargeting and composed events
-- [Advanced Slots](/components/shadow-dom/advanced-slots) — Conditional rendering, fallback content, slot observation
-- [Component Styling Guide](/components/styling) — Design token integration and theming architecture
 
 ## Sources
 

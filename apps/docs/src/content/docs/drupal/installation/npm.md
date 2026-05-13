@@ -19,7 +19,7 @@ Your site has zero runtime dependency on external services. All assets live in y
 
 ### Tree-Shaking
 
-Import only the components your theme actually uses. If your site uses five of twenty available components, only those five ship to the browser. This typically reduces the JavaScript payload by 60–80% compared to loading the full CDN bundle.
+Import only the components your theme actually uses. If your site needs ten of the 81 components the library ships, only those ten (plus shared base modules) reach the browser. The payload savings depend on which components you import — see `packages/hx-library/bundle-budgets.json` for per-component budgets — but trimming to the components you actually use is the single biggest reduction available on top of CDN loading.
 
 ### Deterministic Versions
 
@@ -60,10 +60,14 @@ This creates a minimal `package.json`. You'll customize it in a moment.
 ## Step 2: Install HELiX
 
 ```bash
-npm install @helixui/library@3.9.0
+# @helixui/library declares @helixui/icons + @floating-ui/dom as peer
+# dependencies and bundles @helixui/tokens + lit as regular dependencies.
+# Install the library together with its peer deps:
+npm install @helixui/library@3.9.0 @helixui/icons @floating-ui/dom
 ```
 
-To also install the design tokens package (required if your theme uses HELiX CSS custom properties outside of components):
+If your theme needs to consume HELiX CSS custom properties outside of components (raw token CSS,
+brand registry, scoped overrides), install the tokens package explicitly:
 
 ```bash
 npm install @helixui/tokens@3.9.0
@@ -99,11 +103,11 @@ import '@helixui/library';
 // src/js/theme.js
 
 // Import only the components this theme uses
-import '@helixui/library/dist/components/hx-button/index.js';
-import '@helixui/library/dist/components/hx-card/index.js';
-import '@helixui/library/dist/components/hx-text-input/index.js';
-import '@helixui/library/dist/components/hx-select/index.js';
-import '@helixui/library/dist/components/hx-badge/index.js';
+import '@helixui/library/components/hx-button';
+import '@helixui/library/components/hx-card';
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-select';
+import '@helixui/library/components/hx-badge';
 ```
 
 Tree-shaking at import granularity is the most effective approach when you're using five or fewer components. For sites using the majority of the library, importing the full library is simpler and the size difference is minimal.
@@ -189,7 +193,7 @@ This separation allows browsers to cache HELiX independently of your theme code.
     "build:prod": "NODE_ENV=production vite build"
   },
   "dependencies": {
-    "@helixui/library": "1.1.2"
+    "@helixui/library": "3.9.0"
   },
   "devDependencies": {
     "vite": "^6.0.0"
@@ -197,7 +201,7 @@ This separation allows browsers to cache HELiX independently of your theme code.
 }
 ```
 
-Use exact versions (`"1.1.2"` not `"^1.1.2"`) for `@helixui/library` in production themes. This ensures identical bundles across environments.
+Use exact versions (`"3.9.0"` not `"^3.9.0"`) for `@helixui/library` in production themes. This ensures identical bundles across environments.
 
 ### Option B: Webpack
 
@@ -280,7 +284,10 @@ Verify the output:
 ```bash
 ls -lh dist/js/
 # Expected output (Vite with manualChunks):
-# helix.js        — HELiX library (~120KB unminified, ~45KB gzipped)
+# helix.js        — Full HELiX library chunk (see packages/hx-library/bundle-budgets.json
+#                   for the per-component + total bundle ceilings enforced in CI;
+#                   the full bundle target is ≤200 KB gzipped, with most production
+#                   themes landing well below that after tree-shaking unused components)
 # theme.js        — Your theme code (~small)
 ```
 
@@ -375,10 +382,10 @@ libraries:
 {# Article node template #}
 
 <article{{ attributes }}>
-  <hx-card variant="elevated">
-    <span slot="heading">{{ node.title.value }}</span>
+  <hx-card variant="featured">
+    <h3 slot="heading">{{ node.title.value }}</h3>
     {{ content.body }}
-    <div slot="footer">
+    <div slot="actions">
       <hx-button variant="primary" hx-size="sm">
         Read More
       </hx-button>
@@ -387,14 +394,17 @@ libraries:
 </article>
 ```
 
-For link cards, use `href` (not `hx-href`):
+For link cards, use the `hx-href` attribute (NOT native `href`). `hx-card` is an autonomous custom
+element on a non-anchor host; the `hx-` prefix prevents CMS preprocessors from rewriting the URL.
+Do not combine `hx-href` with `slot="actions"` — that nests an interactive control inside the link
+and breaks the activation contract:
 
 ```twig
 <hx-card
-  variant="outlined"
-  href="{{ url('entity.node.canonical', {'node': node.id}) }}"
+  variant="default"
+  hx-href="{{ url('entity.node.canonical', {'node': node.id}) }}"
 >
-  <span slot="heading">{{ node.title.value }}</span>
+  <h3 slot="heading">{{ node.title.value }}</h3>
   <p>{{ node.field_teaser.value }}</p>
 </hx-card>
 ```
@@ -497,7 +507,7 @@ npm run build:prod
 
 # Commit the updated package-lock.json and built assets
 git add package.json package-lock.json dist/
-git commit -m "chore(theme): update @helixui/library to 1.2.0"
+git commit -m "chore(theme): update @helixui/library to 3.9.0"
 ```
 
 Always review the HELiX changelog before updating. Check for attribute name changes, removed components, or slot renames that would require template updates.
@@ -534,7 +544,7 @@ npm install @helixui/tokens@3.9.0
 
 ```javascript
 // src/js/theme.js
-import '@helixui/tokens/dist/css/tokens.css';
+import '@helixui/tokens/tokens.css';
 import '@helixui/library';
 ```
 
@@ -542,7 +552,7 @@ Or import the tokens CSS directly in your theme's SCSS/CSS:
 
 ```css
 /* src/css/theme.css */
-@import '@helixui/tokens/dist/css/tokens.css';
+@import '@helixui/tokens/tokens.css';
 ```
 
 Add the compiled CSS to your Drupal library definition:
@@ -588,8 +598,12 @@ global:
 // Prefer this (uses package.json main entry, marked as sideEffect)
 import '@helixui/library';
 
-// Over this pattern if tree-shaking is too aggressive:
-// import { HxButton } from '@helixui/library';
+// Or this per-component side-effect import (preferred for tree-shaking;
+// @helixui/library exposes `./components/<tag>` subpaths in its exports
+// map). The class `HelixButton` (not `HxButton`) is what's exported as
+// a class; HxButton is not a class type — it lives under Hx*Detail
+// event-type aliases only.
+// import '@helixui/library/components/hx-button';
 ```
 
 ### `drush cr` needed after every build
@@ -612,7 +626,7 @@ In local development with `npm run dev` (watch mode), clear caches once after se
 - [ ] `node_modules/` is never deployed (only used at build time)
 - [ ] `attributes: { type: module }` present in `.libraries.yml` for all JS entries
 - [ ] `package-lock.json` is committed to source control
-- [ ] Exact version pinned in `package.json` (`"1.1.2"` not `"^1.1.2"`)
+- [ ] Exact version pinned in `package.json` (`"3.9.0"` not `"^3.9.0"`)
 - [ ] Source maps generated for production debugging
 - [ ] `drush cr` runs post-deployment
 - [ ] Components tested in target browsers after deployment

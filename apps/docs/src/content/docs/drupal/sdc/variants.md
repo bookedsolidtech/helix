@@ -23,7 +23,7 @@ props:
     card_variant:
       type: string
       title: Card Visual Style
-      enum: [default, elevated, outlined, filled]
+      enum: [default, featured, compact]
       default: default
       description: Passed to hx-card's variant attribute.
 ```
@@ -40,11 +40,11 @@ props:
 ### Pass it from a parent template
 
 ```twig
-{# node--article--featured.html.twig — uses elevated card #}
+{# node--article--featured.html.twig — uses featured card #}
 {% include 'mytheme:article-teaser' with {
   title: node.label,
   url: url,
-  card_variant: 'elevated',
+  card_variant: "featured",
   image: content.field_hero_image,
 } only %}
 ```
@@ -84,7 +84,7 @@ props:
 ```twig
 {# components/staff-profile/staff-profile.twig #}
 <div class="staff-profile staff-profile--{{ layout|default('card') }}">
-  <hx-card variant="outlined">
+  <hx-card variant="default">
     {# ... #}
   </hx-card>
 </div>
@@ -155,7 +155,7 @@ function mytheme_preprocess_node(array &$variables): void {
   summary: content.body[0]['#text']|striptags|trim|slice(0, 400),
   category: node.field_category.entity.label,
   image: content.field_hero_image,
-  card_variant: 'filled',
+  card_variant: "default",
 } only %}
 ```
 
@@ -187,8 +187,8 @@ props:
 {# components/article-teaser/article-teaser.twig #}
 {% set variant_map = {
   'editorial': 'default',
-  'healthcare': 'outlined',
-  'research': 'elevated',
+  'healthcare': 'default',
+  'research': 'featured',
 } %}
 <hx-card variant="{{ variant_map[theme_context]|default('default') }}">
   {# ... #}
@@ -252,10 +252,18 @@ Responsive variants change component presentation based on viewport. Use CSS cus
   }
 }
 
-/* Full layout in wider containers */
+/* Full layout in wider containers. hx-card's exposed image hook is
+   `--hx-card-image-aspect-ratio` (not a fixed `image-height` token).
+   For pixel-pinned image heights, style the slotted image yourself —
+   the slotted content lives in light DOM and inherits page CSS. */
 @container article-teaser (min-width: 600px) {
   hx-card {
-    --hx-card-media-height: 240px;
+    --hx-card-image-aspect-ratio: 16 / 9;
+  }
+  hx-card [slot='image'] img {
+    height: 240px;
+    width: 100%;
+    object-fit: cover;
   }
 }
 ```
@@ -284,7 +292,7 @@ props:
 
 ```twig
 <hx-card
-  variant="{{ compact ? 'outlined' : 'default' }}"
+  variant="{{ compact ? 'default' : 'default' }}"
   class="{{ compact ? 'article-teaser--compact' : '' }}"
 >
   {% if not compact and summary %}
@@ -306,7 +314,7 @@ props:
     # Strategy 1: HELiX component variant
     card_variant:
       type: string
-      enum: [default, elevated, outlined, filled]
+      enum: [default, featured, compact]
       default: default
 
     # Strategy 2: Layout CSS class variant
@@ -330,7 +338,7 @@ props:
 ```twig
 {% set resolved_variant = card_variant|default('default') %}
 {% if theme_context == 'healthcare' and card_variant is not defined %}
-  {% set resolved_variant = 'outlined' %}
+  {% set resolved_variant = 'default' %}
 {% endif %}
 
 <div class="article-teaser article-teaser--{{ layout|default('card') }}{% if compact %} article-teaser--compact{% endif %}">

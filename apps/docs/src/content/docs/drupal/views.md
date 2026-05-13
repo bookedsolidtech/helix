@@ -67,7 +67,7 @@ Override the Views unformatted style template to wrap each row in an `hx-card`:
       {# Image field — use the rendered row field if you have a Views field
          configured; otherwise access via the entity directly #}
       {% if row.content['#view'].field.field_hero_image is defined %}
-        <div slot="media">
+        <div slot="image">
           {{ row.content['#view'].field.field_hero_image.render() }}
         </div>
       {% endif %}
@@ -77,9 +77,11 @@ Override the Views unformatted style template to wrap each row in an `hx-card`:
         {{- node.label|escape -}}
       </span>
 
-      {# Category badge #}
+      {# Category badge — hx-card has no `meta` slot. Render the badge in
+         the default body slot, or use the real `footer` slot if the badge
+         is metadata that belongs below the body. #}
       {% if node.field_category.entity %}
-        <div slot="meta">
+        <div>
           <hx-badge variant="primary">
             {{- node.field_category.entity.label|escape -}}
           </hx-badge>
@@ -113,7 +115,7 @@ If your View is configured to display specific fields (not "Content: rendered en
 {# Row template using Views fields #}
 <hx-card variant="default">
   {% if fields.field_hero_image is defined %}
-    <div slot="media">{{ fields.field_hero_image.content }}</div>
+    <div slot="image">{{ fields.field_hero_image.content }}</div>
   {% endif %}
 
   <span slot="heading">{{ fields.title.content }}</span>
@@ -123,9 +125,7 @@ If your View is configured to display specific fields (not "Content: rendered en
   {% endif %}
 
   <div slot="actions">
-    <hx-button href="{{ fields.view_node.content }}" variant="ghost">
-      Read more
-    </hx-button>
+    <hx-button href="{{ fields.view_node.content }}" variant="ghost"> Read more </hx-button>
   </div>
 </hx-card>
 ```
@@ -218,8 +218,11 @@ Views AJAX replaces the view results region when filters change or pagination is
 
   Drupal.behaviors.viewsHelixCards = {
     attach(context) {
-      // context is the replaced DOM subtree after Views AJAX
-      once('views-helix-card', 'hx-card', context).forEach((card) => {
+      // context is the replaced DOM subtree after Views AJAX.
+      // hx-card only emits hx-click when it's in interactive mode
+      // (hx-href + hx-label) — scope the selector so the behavior only
+      // binds to cards that actually dispatch the event.
+      once('mytheme:views-helix-card', 'hx-card[hx-href]', context).forEach((card) => {
         card.addEventListener('hx-click', (e) => {
           // Handle card click — e.g., expand a details panel
           const target = e.currentTarget.dataset.nodeId;
@@ -230,7 +233,6 @@ Views AJAX replaces the view results region when filters change or pagination is
       });
     },
   };
-
 })(Drupal, once);
 ```
 
@@ -298,10 +300,10 @@ Show a "Showing X of Y results" counter using the Views pager or a custom render
 Add a Views attachment display type configured to show summary text. Override its template:
 
 ```twig
-{# templates/views/views-view--articles--summary-attachment.html.twig #}
-<hx-badge variant="default">
-  {{ rows }} results
-</hx-badge>
+{# templates/views/views-view--articles--summary-attachment.html.twig
+   hx-badge variants: primary | secondary | success | warning | error | neutral | info.
+   There is no `default` variant — `neutral` is the closest "no-emphasis" choice. #}
+<hx-badge variant="neutral">{{ rows }} results</hx-badge>
 ```
 
 ---
@@ -311,7 +313,10 @@ Add a Views attachment display type configured to show summary text. Override it
 Different display modes for the same View content:
 
 ```twig
-{# Detect display ID from the view and render appropriate layout #}
+{# Detect display ID from the view and render appropriate layout.
+   hx-card variants: default | featured | compact. There is no `outlined`
+   variant — use `compact` for dense list rows or omit `variant` for default
+   card styling. #}
 {% if view.current_display == 'page_grid' %}
   <div class="article-grid article-grid--3col">
     {% for row in rows %}
@@ -321,7 +326,7 @@ Different display modes for the same View content:
 {% else %}
   <div class="article-list">
     {% for row in rows %}
-      <hx-card variant="outlined" class="article-list__item">{{ row.content }}</hx-card>
+      <hx-card variant="compact" class="article-list__item">{{ row.content }}</hx-card>
     {% endfor %}
   </div>
 {% endif %}
@@ -353,7 +358,12 @@ In the template:
 
 ```twig
 {% for row in rows %}
-  <hx-card variant="{{ row.is_featured ? 'elevated' : 'default' }}">
+  {# hx-card has no `elevated` variant — use `featured` for emphasis,
+     or keep variant="default" and shift the emphasis to elevation. #}
+  <hx-card
+    variant="{{ row.is_featured ? 'featured' : 'default' }}"
+    elevation="{{ row.is_featured ? 'raised' : 'flat' }}"
+  >
     {{ row.content }}
   </hx-card>
 {% endfor %}

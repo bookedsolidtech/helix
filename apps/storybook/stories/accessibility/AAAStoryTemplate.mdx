@@ -15,7 +15,7 @@ import {
 
 # AAA Story Template
 
-This page is the canonical reference for documenting a component that has earned **WCAG 2.2 Level AAA + peer-standards certification**. Story files for cert'd components must follow this pattern so the public-facing docs page reads as **conformance documentation**, not as a CEM control enumeration.
+This page is the canonical reference for documenting a component that has earned **WCAG 2.2 Level AAA + peer-standards certification**. New cert'd component story files should follow this pattern so the public-facing docs page reads as **conformance documentation**, not as a CEM control enumeration. Existing certified component MDX may not yet conform to every detail of this template — it's a forward-looking standard that supersedes the prior per-component layouts.
 
 The pattern surfaces evidence in priority order: real-world usage first, conformance evidence second, ARIA/keyboard contract third, consumer obligations fourth, the full audit fifth, and CEM-driven variant gallery last.
 
@@ -25,7 +25,7 @@ The pattern surfaces evidence in priority order: real-world usage first, conform
 
 1. **Hero usage scenario** — hand-authored Lit template inside a component story (e.g., a sign-in form, a patient-lookup widget). The first thing a reader sees must be the component working in real context.
 2. **A11yStatusCard** — auto-rendered by `HelixDocsPage` (the Storybook autodocs template). Pulls `helixMeta.aaa.*` from CEM. No author action required.
-3. **AAA Conformance Card** — the `AAAConformanceCard` component. Renders one row per WCAG 2.2 AAA + peer criterion with verdict, plain-language summary, threshold, spec link, and N/A justification.
+3. **AAA Conformance Card** — the `AAAConformanceCard` component. Renders one row per WCAG 2.2 AAA + peer criterion with verdict, plain-language summary, spec link, and N/A justification. (Per-criterion numeric thresholds are documented in `scripts/aaa-standards.json` for now and surface on the conformance row only when authored into the audit's `Measured:` field — the card does not yet read thresholds from a structured source.)
 4. **ARIA Pattern Card** — the `APGPatternCard` component. Cites the W3C APG pattern, renders the keyboard contract as `<kbd>` clusters, and documents the expected screen-reader announcement.
 5. **Consumer obligations** — the `ConsumerObligations` component. Hand-curated from the AAA-AUDIT.md "Known consumer obligations" section.
 6. **Live state demos** — hand-authored stories for focus, hover, disabled, error, and loading states with annotated descriptions.
@@ -39,7 +39,7 @@ The pattern surfaces evidence in priority order: real-world usage first, conform
 This is the canonical MDX scaffold. Copy it verbatim, then customize the hero scenario, screen-reader announcement, and consumer obligations for the target component.
 
 ```mdx
-{/* hx-foo.mdx — AAA-cert'd story page for hx-foo */}
+{/* hx-button.mdx — AAA-cert'd story page for hx-button (replace tag for your component) */}
 
 import { Meta } from '@storybook/addon-docs/blocks';
 import {
@@ -48,13 +48,15 @@ import {
   ConsumerObligations,
   InlineAuditPanel,
 } from '../_components';
-import auditRaw from '../../../packages/hx-library/src/components/hx-foo/AAA-AUDIT.md?raw';
+// Story file lives at apps/storybook/stories/<group>/hx-button.mdx; the
+// AAA-AUDIT.md it pulls from lives four levels up under packages/hx-library.
+import auditRaw from '../../../../packages/hx-library/src/components/hx-button/AAA-AUDIT.md?raw';
 
-<Meta title="Components/Foo/Conformance" />
+<Meta title="Components/Button/Conformance" />
 
 <div className="hx-docs">
 
-## hx-foo — sign-in form context
+## hx-button — sign-in form context
 
 [Hero usage scenario goes here — show the component WORKING, not enumerated.]
 
@@ -64,12 +66,12 @@ The green "AAA Certified" badge above is rendered by the autodocs template
 from `helixMeta.aaa.*` in `custom-elements.json`. Each criterion chip is
 expanded into the row-level evidence below.
 
-<AAAConformanceCard tag="hx-foo" />
+<AAAConformanceCard tag="hx-button" />
 
-<APGPatternCard tag="hx-foo" screenReaderAnnouncement="Submit, button" />
+<APGPatternCard tag="hx-button" screenReaderAnnouncement="Submit, button" />
 
 <ConsumerObligations
-  tag="hx-foo"
+  tag="hx-button"
   obligations={[
     'Provide an accessible name (slot content or aria-label) on every instance.',
     'Do not strip the focus ring via author CSS — use the --hx-focus-ring-* tokens to customize.',
@@ -79,7 +81,7 @@ expanded into the row-level evidence below.
 
 [Hand-authored interactive state demos go here — focus, hover, error, disabled.]
 
-<InlineAuditPanel tag="hx-foo" markdown={auditRaw} />
+<InlineAuditPanel tag="hx-button" markdown={auditRaw} />
 
 ## Variant gallery
 
@@ -100,10 +102,12 @@ Healthcare deploys make procurement decisions on conformance documentation. The 
 
 <SectionHead title="Live data, never hand-typed" meta="--source-of-truth" />
 
-The `AAAConformanceCard` pulls verdicts from `@helixui/library/aaa-verdicts.json` — a slim snapshot of the formal harness output (`.reports/formal-aaa-audit/audit.json`) regenerated automatically by every `pnpm aaa:audit` run via `scripts/generate-aaa-verdicts.mjs`. The `APGPatternCard` reads `@helixui/library/custom-elements.json`. The `InlineAuditPanel` pulls live from the source `AAA-AUDIT.md` via Vite `?raw`. The verdict snapshot is committed to the repo so the docs build is deterministic; drift between the docs surface and the cert payload is bounded by the cadence at which the audit is re-run. When a re-audit lowers a verdict, the slim snapshot regenerates, the docs card re-renders the new verdict (Supports / Partially Supports / Does Not Support / Not Applicable), and the per-component `AAA-AUDIT.md` regenerates with new evidence — all in the same audit-run cycle. The cert payload, docs card, matrix table, and per-component audit file are now anchored on the same audit JSON; they cannot diverge silently.
+The `AAAConformanceCard` pulls verdicts from `@helixui/library/aaa-verdicts.json` — a slim snapshot of the formal harness output (`.reports/formal-aaa-audit/audit.json`) regenerated automatically by every `pnpm aaa:audit` run via `scripts/generate-aaa-verdicts.mjs`. The `APGPatternCard` reads `@helixui/library/custom-elements.json`. The `InlineAuditPanel` pulls live from the source `AAA-AUDIT.md` via Vite `?raw`.
+
+The verdict snapshot is committed to the repo so the docs build is deterministic; drift between the docs surface and the cert payload is bounded by the cadence at which the audit is re-run. When a re-audit lowers a verdict, the slim snapshot regenerates and the docs card re-renders the new verdict (Supports / Partially Supports / Does Not Support / Not Applicable) on the next build. Per-component `AAA-AUDIT.md` regeneration is a **separate** step today (`node scripts/regenerate-audits.mjs`) — it is not yet chained into the default `pnpm aaa:audit` pipeline. Re-run both to keep the cert payload + per-component audit file aligned.
 
 <SectionHead title="Consumer obligations are editorial" meta="--curated" />
 
-The only hand-curated section is `<ConsumerObligations>`. Obligations reflect editorial judgment about which footguns to flag for the target audience and live in story source so they evolve with the component contract. The obligations list MUST mirror (or be a strict subset of) the "Known consumer obligations" section in the component's `AAA-AUDIT.md`.
+The only hand-curated section is `<ConsumerObligations>`. Obligations reflect editorial judgment about which footguns to flag for the target audience and live in story source so they evolve with the component contract. The obligations list should **align with** the "Known consumer obligations" section in the component's `AAA-AUDIT.md` — strict mirroring is the goal, but scenario-specific editorial additions are permitted when a particular usage pattern surfaces an obligation that does not generalise to the audit text. Reviewers should keep the two sources directionally consistent.
 
 </div>

@@ -39,16 +39,17 @@ See [the @helixui/icons docs](https://storybook.helix.bookedsolid.tech/?path=/do
 The following components were migrated from inline SVG to `<hx-icon library="helix">` internally — no consumer change required. Listed here for awareness:
 
 - hx-alert, hx-banner, hx-toast (status icons)
-- hx-checkbox, hx-radio (check/dot)
+- hx-checkbox (check) — hx-radio's selected dot is still drawn in CSS, not migrated
 - hx-rating (star)
-- hx-tree-item, hx-tree-view (chevron)
-- hx-copy-button (copy/check)
+- hx-tree-item (chevron) — hx-tree-view itself does not render an icon; the chevron lives on the leaf item
 - hx-stat (trend arrow)
-- hx-select, hx-combobox (chevron)
+- hx-combobox (chevron) — hx-select continues to draw its chevron as a CSS shape, not migrated
 - hx-date-picker, hx-time-picker (calendar/clock)
-- hx-file-upload (upload/file)
-- hx-pagination (chevrons)
-- plus ~10 more
+- hx-file-upload (remove/close glyph for file removal — the upload affordance itself stays SVG)
+- hx-copy-button — renders icons via slots (does not import or render hx-icon internally)
+- plus a handful of smaller surfaces
+
+`hx-pagination` remains on literal chevron characters (`‹` / `›`) for now — not migrated to hx-icon in 3.9.0.
 
 ## Form validity integration
 

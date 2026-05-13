@@ -11,7 +11,11 @@ import { EyebrowHeading, SectionHead, StatCard } from '../_components';
 export const BREAKPOINTS = [
   { key: '— sm', width: '<640px', desc: 'Phones, narrow web views. Single column, 16px gutter.' },
   { key: 'sm', width: '640px', desc: 'Phablets. Two-up tiles, sticky headers.' },
-  { key: 'md', width: '768px', desc: 'Small tablets. Side-nav collapses to drawer.' },
+  {
+    key: 'md',
+    width: '768px',
+    desc: 'Small tablets. Side-nav switches to icon-only collapsed mode (no drawer overlay).',
+  },
   { key: 'lg', width: '1024px', desc: 'Standard laptops. Full app shell, 24px gutter.' },
   {
     key: 'xl · 2xl',
@@ -32,18 +36,30 @@ export const CONTAINERS = [
 
 <EyebrowHeading
   eyebrow="Layout · grid · density"
-  title="The grid is opinionated. The page templates aren't."
+  title="A parameterized grid. Recurring page templates. Three density modes."
   lede={
     <>
-      HELiX runs on a 12-column fluid grid with 24px gutters and a strict 4/8 spacing scale. Five
-      page templates absorb 90% of product surfaces; three density modes adapt the same components
-      for crowded screens.
+      HELiX gives you a parameterized <code>hx-grid</code> (defaulting to one column,{' '}
+      <code>md</code>
+      gap) plus a token-driven spacing scale (4 / 8 stops anchor the system, with finer 2px and 6px
+      stops available for tight UI). Five page-template silhouettes describe the most common
+      surfaces; three density modes — <code>comfortable</code> (default), <code>compact</code>, and{' '}
+      <code>spacious</code> — adapt the same components for low- or high-density information.
     </>
   }
 />
 
 <section>
-  <SectionHead title="The 12-column grid" meta="24px gutters · 4/8 spacing scale" />
+  <SectionHead
+    title="hx-grid · a parameterized grid primitive"
+    meta="default 1 column · md gap · author-chosen column count"
+  />
+  <p className="hx-docs-card-body">
+    <code>hx-grid</code> exposes <code>columns</code> (default <code>1</code>), <code>gap</code>{' '}
+    (default <code>md</code> — <code>var(--hx-space-4)</code>, ~16px), <code>align</code>, and{' '}
+    <code>justify</code>. The classic 12-column demonstration below is <code>columns="12"</code> on
+    a single grid — it&apos;s an opt-in shape, not a global page contract.
+  </p>
   <div
     style={{
       background: 'var(--hx-color-surface-raised)',
@@ -73,10 +89,15 @@ export const CONTAINERS = [
     </div>
   </div>
   <div className="hx-docs-stats" style={{ marginTop: 16 }}>
-    <StatCard num="12" label="Columns" sub="fluid · ratio-stable" />
-    <StatCard num="24" unit="px" label="Gutter" sub="space-6 · matches body" />
-    <StatCard num="64" unit="px" label="Page margin" sub="space-16 · >lg" />
-    <StatCard num="1480" unit="px" label="Max content" sub="container.content" />
+    <StatCard num="1" label="Default columns" sub="hx-grid columns='1'" />
+    <StatCard num="16" unit="px" label="Default gap" sub="gap='md' · --hx-space-4" />
+    <StatCard
+      num="24"
+      unit="px"
+      label="hx-container padding"
+      sub="default gutter inside container"
+    />
+    <StatCard num="1152" unit="px" label="container.content" sub="--hx-container-content · 72rem" />
   </div>
 </section>
 
@@ -160,7 +181,7 @@ export const CONTAINERS = [
 </section>
 
 <section>
-  <SectionHead title="Page templates" meta="absorb 90% of product surfaces" />
+  <SectionHead title="Page templates" meta="five recurring silhouettes" />
   <p className="hx-docs-card-body">
     Not every screen is unique. Reach for one of these first — they're the silhouettes that make a
     HELiX product feel like a HELiX product.
@@ -191,11 +212,13 @@ export const CONTAINERS = [
 </section>
 
 <section>
-  <SectionHead title="Density modes" meta="comfortable · default · compact" />
+  <SectionHead title="Density modes" meta="comfortable (default) · compact · spacious" />
   <p className="hx-docs-card-body">
-    A patient kiosk and a billing reconciliation grid both use HELiX, but they shouldn't share the
-    same row height. Density adjusts internal padding (never font-size, never touch-target) so the
-    same components feel right at every information density.
+    A patient kiosk and a billing reconciliation grid both use HELiX, but they shouldn&apos;t share
+    the same row height. <code>hx-theme density</code> rescales the <code>--hx-space-*</code> token
+    family for every descendant — <code>compact</code> reduces spacing tokens roughly 25% (which
+    pulls input height and font-size down with them), <code>spacious</code> increases tokens roughly
+    25% for touch-optimized bedside tablets. Default is <code>comfortable</code>.
   </p>
   <div
     style={{
@@ -206,9 +229,9 @@ export const CONTAINERS = [
     }}
   >
     {[
-      { name: 'Comfortable', pad: 14, tag: 'patient kiosk' },
-      { name: 'Default', pad: 10, tag: 'general product' },
-      { name: 'Compact', pad: 6, tag: 'EHR / billing only' },
+      { name: 'Comfortable (default)', pad: 10, tag: 'general product' },
+      { name: 'Compact', pad: 6, tag: 'EHR / billing dense grids' },
+      { name: 'Spacious', pad: 14, tag: 'bedside tablets / kiosks' },
     ].map((d) => (
       <div key={d.name} className="hx-docs-card">
         <div className="hx-docs-card-head">

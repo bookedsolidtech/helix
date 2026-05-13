@@ -21,9 +21,9 @@ This section documents the four foundational architecture decisions that shape h
 
 The decisions are independent but composable. A single component embodies all four:
 
-- **Composition** determines who provides the inner markup (`hx-card` uses slots, `hx-button` uses properties).
-- **Delivery** determines how the component's JavaScript reaches the page (`attach_library('helix/card')`).
-- **Attribute safety** determines whether props pass through Drupal Twig and CKEditor untouched (`hx-href`, not `href`).
+- **Composition** determines who provides the inner markup (`hx-card` uses slots for every content region; `hx-button` uses properties for state/appearance and slots for label / prefix / suffix content).
+- **Delivery** determines how the component's JavaScript reaches the page (`attach_library('helix/hx-card')`).
+- **Attribute safety** determines which HELiX-specific attributes are `hx-` prefixed to avoid Drupal Twig / CKEditor collisions, vs. which native HTML attributes (`href`, `src`, `action`, `method`, `for`) are preserved unprefixed.
 - **Rendering** determines whether the component creates a shadow boundary (`hx-card` does, `hx-prose` does not).
 
 Read in order, the ADRs build a complete picture of how HELiX integrates with Drupal without giving up the accessibility and encapsulation guarantees of Shadow DOM.

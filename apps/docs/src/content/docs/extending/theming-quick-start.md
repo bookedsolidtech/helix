@@ -27,11 +27,11 @@ Component tier   --hx-button-bg: var(--hx-color-primary-500)  (per-component)
 
 ### What each tier does
 
-| Tier | Examples | Purpose | When to override |
-| --- | --- | --- | --- |
-| **Primitive** | `--hx-color-primary-500`, `--hx-space-4` | Raw brand values: hex colors, rem sizes, font names | Replace to swap the raw brand palette |
-| **Semantic** | `--hx-color-text-primary`, `--hx-color-surface-default` | Contextual meaning: text, surfaces, borders, focus | Replace to theme a region (dark, high-contrast, brand) |
-| **Component** | `--hx-button-bg`, `--hx-card-padding` | Per-component overrides | Replace for surgical customization of one component |
+| Tier          | Examples                                                | Purpose                                             | When to override                                       |
+| ------------- | ------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------ |
+| **Primitive** | `--hx-color-primary-500`, `--hx-space-4`                | Raw brand values: hex colors, rem sizes, font names | Replace to swap the raw brand palette                  |
+| **Semantic**  | `--hx-color-text-primary`, `--hx-color-surface-default` | Contextual meaning: text, surfaces, borders, focus  | Replace to theme a region (dark, high-contrast, brand) |
+| **Component** | `--hx-button-bg`, `--hx-card-padding`                   | Per-component overrides                             | Replace for surgical customization of one component    |
 
 ### How a button background resolves
 
@@ -42,10 +42,14 @@ hx-button background
   ↓
 --hx-button-bg (component tier, defined inside hx-button's shadow root)
   ↓
-var(--hx-color-primary-500)  (fallback to primitive tier)
+var(--hx-color-action-primary-bg)  (semantic tier — what variant rules consume)
   ↓
-#2563eb  (default raw value)
+var(--hx-color-primary-700)  (primitive tier — the action token's default)
+  ↓
+brand-specific hex (e.g. Apex #0F6363)
 ```
+
+Brand swaps that override `--hx-color-primary-700` (or any other stop in the ramp) propagate up through `--hx-color-action-primary-bg` and into every variant rule automatically. The 3.4.0 cascade aligned `action.primary.bg → primary-700` so every brand clears WCAG 1.4.6 (7:1) on default buttons.
 
 The key insight: components reference component-tier tokens with semantic or primitive fallbacks. Override at any level in the chain and all downstream consumers update automatically.
 
@@ -59,7 +63,7 @@ Override the primary color ramp at the semantic (primitive) level to rebrand eve
 
 ### Why semantic level means everything updates
 
-`hx-button`, `hx-badge`, `hx-text-input` focus rings, `hx-dialog` headers — every component that references `--hx-color-primary-*` or the semantic tokens that depend on it will reflect the new values. You change one ramp; the entire library follows.
+`hx-button`, `hx-badge`, `hx-pagination`, `hx-checkbox`, `hx-text-input` focus rings, `hx-link`, `hx-tabs` active state, `hx-breadcrumb` links — every component that consumes `--hx-color-action-primary-bg`, `--hx-color-text-link`, or another semantic token in the primary chain reflects the new values. You change one ramp; the entire primary surface follows. (Components that don't consume primary — like neutral-only `hx-dialog` header styling — stay on their own ramp.)
 
 ### Full primary ramp override
 
@@ -69,12 +73,12 @@ The primary ramp runs from `-50` (near-white tint) to `-950` (near-black shade).
 /* my-brand.css — primary color ramp override */
 :root {
   /* Primitive tier: raw brand values */
-  --hx-color-primary-50:  #eff6f8;
+  --hx-color-primary-50: #eff6f8;
   --hx-color-primary-100: #d0e9ef;
   --hx-color-primary-200: #a3d3df;
   --hx-color-primary-300: #6eb8c9;
   --hx-color-primary-400: #3a9db4;
-  --hx-color-primary-500: #006e8a;   /* primary action color */
+  --hx-color-primary-500: #006e8a; /* primary action color */
   --hx-color-primary-600: #005f78;
   --hx-color-primary-700: #004f65;
   --hx-color-primary-800: #003f52;
@@ -93,7 +97,7 @@ To also adjust semantic-tier aliases (text on primary, focus borders), add:
 
   /* Semantic overrides that reference the primary ramp */
   --hx-color-border-focus: var(--hx-color-primary-500);
-  --hx-color-text-link:    var(--hx-color-primary-600);
+  --hx-color-text-link: var(--hx-color-primary-600);
   --hx-color-text-link-hover: var(--hx-color-primary-700);
 }
 ```
@@ -106,18 +110,22 @@ When you want to change one component without affecting others, override its com
 
 ### Override a single button
 
+The `hx-button` shadow root re-defines `--hx-button-bg` inside each variant rule (e.g. the `primary` selector sets `--hx-button-bg: var(--hx-color-action-primary-bg, …)`), so a host-level override of `--hx-button-bg` alone is shadowed by those internal rules. To recolor the resting state, target the semantic action token instead:
+
 ```css
-/* Changes hx-button background only — no other component is affected */
-hx-button {
-  --hx-button-bg: var(--hx-color-primary-600);
+/* Recolor every primary hx-button via the semantic action token */
+hx-button[variant='primary'] {
+  --hx-color-action-primary-bg: var(--hx-color-primary-800);
 }
 ```
+
+Use the component-tier `--hx-button-bg` when you need to drive a non-variant state from outside (e.g. for an experimental custom selector) — it works on `variant="ghost"`/`"outline"` which read from `--hx-button-bg` directly without an internal variant rule.
 
 ### Target a specific variant or context
 
 ```css
 /* Override only danger buttons */
-hx-button[variant="danger"] {
+hx-button[variant='danger'] {
   --hx-button-bg: #b91c1c;
 }
 
@@ -130,9 +138,7 @@ hx-button[variant="danger"] {
 ### Inline override for a single instance
 
 ```html
-<hx-button style="--hx-button-bg: #7c3aed;">
-  Schedule Appointment
-</hx-button>
+<hx-button style="--hx-button-bg: #7c3aed;"> Schedule Appointment </hx-button>
 ```
 
 Component-tier overrides follow standard CSS specificity. The most specific selector wins.
@@ -149,7 +155,7 @@ See [Customization](/design-tokens/customization/) for the full component token 
 <!-- The entire subtree gets dark-mode --hx-* tokens -->
 <hx-theme theme="dark">
   <hx-card>
-    <span slot="header">Medication Summary</span>
+    <h3 slot="heading">Medication Summary</h3>
     <hx-button>Administer</hx-button>
   </hx-card>
 </hx-theme>
@@ -157,12 +163,12 @@ See [Customization](/design-tokens/customization/) for the full component token 
 
 ### The `theme` attribute
 
-| Value | Behavior |
-| --- | --- |
-| `light` | Standard light-mode token set (default) |
-| `dark` | Dark-mode semantic overrides applied on top of light primitives |
-| `high-contrast` | WCAG 7:1+ contrast token set for low-vision users |
-| `auto` | Follows `prefers-color-scheme`; resolves to `light` or `dark` at runtime |
+| Value           | Behavior                                                                 |
+| --------------- | ------------------------------------------------------------------------ |
+| `light`         | Standard light-mode token set (default)                                  |
+| `dark`          | Dark-mode semantic overrides applied on top of light primitives          |
+| `high-contrast` | WCAG 7:1+ contrast token set for low-vision users                        |
+| `auto`          | Follows `prefers-color-scheme`; resolves to `light` or `dark` at runtime |
 
 `hx-theme` has `display: contents` — it inserts no wrapper element into layout. There is no box, no margin, no padding.
 
@@ -238,12 +244,15 @@ When you cannot wrap a region with `hx-theme` — for example, if a CMS controls
 
 ```html
 <div class="brand-section">
-  <hx-button>Book Appointment</hx-button>  <!-- teal -->
-  <hx-text-input label="Patient Name"></hx-text-input>  <!-- teal focus ring -->
+  <hx-button>Book Appointment</hx-button>
+  <!-- teal -->
+  <hx-text-input label="Patient Name"></hx-text-input>
+  <!-- teal focus ring -->
 </div>
 
 <div>
-  <hx-button>Default Action</hx-button>  <!-- original blue -->
+  <hx-button>Default Action</hx-button>
+  <!-- original blue -->
 </div>
 ```
 
@@ -278,22 +287,22 @@ Apply `data-theme="dark"` to `<html>` (or any ancestor element) and override the
 ```css
 [data-theme='dark'] {
   /* Text */
-  --hx-color-text-primary:    var(--hx-color-neutral-100);
-  --hx-color-text-secondary:  var(--hx-color-neutral-300);
-  --hx-color-text-muted:      var(--hx-color-neutral-400);
-  --hx-color-text-link:       var(--hx-color-primary-400);
+  --hx-color-text-primary: var(--hx-color-neutral-100);
+  --hx-color-text-secondary: var(--hx-color-neutral-300);
+  --hx-color-text-muted: var(--hx-color-neutral-400);
+  --hx-color-text-link: var(--hx-color-primary-400);
 
   /* Surfaces */
   --hx-color-surface-default: var(--hx-color-neutral-900);
-  --hx-color-surface-raised:  var(--hx-color-neutral-800);
-  --hx-color-surface-sunken:  var(--hx-color-neutral-950);
+  --hx-color-surface-raised: var(--hx-color-neutral-800);
+  --hx-color-surface-sunken: var(--hx-color-neutral-950);
 
   /* Borders */
-  --hx-color-border-default:  var(--hx-color-neutral-700);
-  --hx-color-border-subtle:   var(--hx-color-neutral-800);
+  --hx-color-border-default: var(--hx-color-neutral-700);
+  --hx-color-border-subtle: var(--hx-color-neutral-800);
 
   /* Body */
-  --hx-body-bg:    var(--hx-color-surface-default);
+  --hx-body-bg: var(--hx-color-surface-default);
   --hx-body-color: var(--hx-color-text-primary);
 
   /* Shadows — darken less against dark backgrounds */
@@ -324,19 +333,19 @@ Automatic dark mode that respects the OS preference, with a light-mode escape ha
 @media (prefers-color-scheme: dark) {
   /* Apply unless the user has explicitly chosen light mode */
   :root:not([data-theme='light']) {
-    --hx-color-text-primary:    var(--hx-color-neutral-100);
-    --hx-color-text-secondary:  var(--hx-color-neutral-300);
-    --hx-color-text-muted:      var(--hx-color-neutral-400);
-    --hx-color-text-link:       var(--hx-color-primary-400);
+    --hx-color-text-primary: var(--hx-color-neutral-100);
+    --hx-color-text-secondary: var(--hx-color-neutral-300);
+    --hx-color-text-muted: var(--hx-color-neutral-400);
+    --hx-color-text-link: var(--hx-color-primary-400);
 
     --hx-color-surface-default: var(--hx-color-neutral-900);
-    --hx-color-surface-raised:  var(--hx-color-neutral-800);
-    --hx-color-surface-sunken:  var(--hx-color-neutral-950);
+    --hx-color-surface-raised: var(--hx-color-neutral-800);
+    --hx-color-surface-sunken: var(--hx-color-neutral-950);
 
-    --hx-color-border-default:  var(--hx-color-neutral-700);
-    --hx-color-border-subtle:   var(--hx-color-neutral-800);
+    --hx-color-border-default: var(--hx-color-neutral-700);
+    --hx-color-border-subtle: var(--hx-color-neutral-800);
 
-    --hx-body-bg:    var(--hx-color-surface-default);
+    --hx-body-bg: var(--hx-color-surface-default);
     --hx-body-color: var(--hx-color-text-primary);
 
     --hx-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
@@ -380,12 +389,13 @@ High-contrast mode is not dark mode. It is an accessibility accommodation:
 - Yellow links (`#FFFF00`) with high luminance contrast
 - White borders (`#FFFFFF`) on all interactive elements
 - Yellow focus rings (`#FFFF00`) for maximum keyboard navigation visibility
-- Minimum 7:1 contrast ratio throughout (exceeds WCAG AA, meets WCAG AAA)
+- Aims at WCAG 1.4.6 / WCAG 1.4.11 contrast targets (7:1 for normal body text where applicable). Some non-text and large-text pairings may meet the relaxed 4.5:1 or 3:1 floors instead of strict 7:1; verify your composition with a contrast checker.
 
 Appropriate contexts:
+
 - Patient-facing portals where users may have low vision or cataracts
 - EHR interfaces used under bright clinical lighting
-- Any screen where WCAG 7:1 contrast is a legal or contractual requirement
+- Any screen where elevated contrast is a legal or contractual requirement
 
 ### Activate via `hx-theme`
 
@@ -463,12 +473,12 @@ The following is a production-ready brand theme file. It overrides all three tie
   /* ─── Primitive tier: Acme Health brand palette ─────────────────────────── */
 
   /* Primary: Acme teal */
-  --hx-color-primary-50:  #ecfaf8;
+  --hx-color-primary-50: #ecfaf8;
   --hx-color-primary-100: #c9f2ed;
   --hx-color-primary-200: #94e4da;
   --hx-color-primary-300: #5fd1c3;
   --hx-color-primary-400: #2dbdad;
-  --hx-color-primary-500: #00968a;  /* main action color */
+  --hx-color-primary-500: #00968a; /* main action color */
   --hx-color-primary-600: #007d73;
   --hx-color-primary-700: #006560;
   --hx-color-primary-800: #004e4c;
@@ -486,31 +496,31 @@ The following is a production-ready brand theme file. It overrides all three tie
 
   /* ─── Semantic tier: light mode overrides ────────────────────────────────── */
 
-  --hx-color-text-link:       var(--hx-color-primary-600);
+  --hx-color-text-link: var(--hx-color-primary-600);
   --hx-color-text-link-hover: var(--hx-color-primary-700);
-  --hx-color-border-focus:    var(--hx-color-primary-500);
-  --hx-color-focus-ring:      var(--hx-color-primary-500);
+  --hx-color-border-focus: var(--hx-color-primary-500);
+  --hx-color-focus-ring: var(--hx-color-primary-500);
 }
 
 /* ─── Dark mode overrides ──────────────────────────────────────────────────── */
 
 [data-theme='dark'] {
-  --hx-color-text-primary:    var(--hx-color-neutral-100);
-  --hx-color-text-secondary:  var(--hx-color-neutral-300);
-  --hx-color-text-muted:      var(--hx-color-neutral-400);
-  --hx-color-text-link:       var(--hx-color-primary-300);
+  --hx-color-text-primary: var(--hx-color-neutral-100);
+  --hx-color-text-secondary: var(--hx-color-neutral-300);
+  --hx-color-text-muted: var(--hx-color-neutral-400);
+  --hx-color-text-link: var(--hx-color-primary-300);
   --hx-color-text-link-hover: var(--hx-color-primary-200);
 
   --hx-color-surface-default: var(--hx-color-neutral-900);
-  --hx-color-surface-raised:  var(--hx-color-neutral-800);
-  --hx-color-surface-sunken:  var(--hx-color-neutral-950);
+  --hx-color-surface-raised: var(--hx-color-neutral-800);
+  --hx-color-surface-sunken: var(--hx-color-neutral-950);
 
-  --hx-color-border-default:  var(--hx-color-neutral-700);
-  --hx-color-border-subtle:   var(--hx-color-neutral-800);
-  --hx-color-border-focus:    var(--hx-color-primary-400);
-  --hx-color-focus-ring:      var(--hx-color-primary-400);
+  --hx-color-border-default: var(--hx-color-neutral-700);
+  --hx-color-border-subtle: var(--hx-color-neutral-800);
+  --hx-color-border-focus: var(--hx-color-primary-400);
+  --hx-color-focus-ring: var(--hx-color-primary-400);
 
-  --hx-body-bg:    var(--hx-color-surface-default);
+  --hx-body-bg: var(--hx-color-surface-default);
   --hx-body-color: var(--hx-color-text-primary);
 
   --hx-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
@@ -518,13 +528,13 @@ The following is a production-ready brand theme file. It overrides all three tie
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --hx-color-text-primary:    var(--hx-color-neutral-100);
-    --hx-color-text-secondary:  var(--hx-color-neutral-300);
+    --hx-color-text-primary: var(--hx-color-neutral-100);
+    --hx-color-text-secondary: var(--hx-color-neutral-300);
     --hx-color-surface-default: var(--hx-color-neutral-900);
-    --hx-color-surface-raised:  var(--hx-color-neutral-800);
-    --hx-color-border-default:  var(--hx-color-neutral-700);
-    --hx-color-border-focus:    var(--hx-color-primary-400);
-    --hx-body-bg:    var(--hx-color-surface-default);
+    --hx-color-surface-raised: var(--hx-color-neutral-800);
+    --hx-color-border-default: var(--hx-color-neutral-700);
+    --hx-color-border-focus: var(--hx-color-primary-400);
+    --hx-body-bg: var(--hx-color-surface-default);
     --hx-body-color: var(--hx-color-text-primary);
     --hx-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
   }
@@ -533,17 +543,36 @@ The following is a production-ready brand theme file. It overrides all three tie
 
 ### Import method 1: Plain CSS stylesheet (HTML / Drupal)
 
-Add the theme file as a `<link>` before any HELiX component scripts. No build tools required.
+Add the theme file as a `<link>` before any HELiX component scripts. No build
+tools required. The library loads from a CDN — see
+[CDN Distribution](/components/distribution/cdn/) for the import-map context
+that lets the bare `lit` / `@helixui/tokens` imports resolve.
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- 1. Load the HELiX component library -->
-    <script type="module" src="/dist/helix.js"></script>
+    <!-- 1. Import map so bare specifiers resolve over the CDN. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
+          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+          "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
+          "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
+          "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
+        }
+      }
+    </script>
 
-    <!-- 2. Load your brand theme — overrides the default :root tokens -->
+    <!-- 2. Load the HELiX component library over the CDN. -->
+    <script type="module">
+      import '@helixui/library';
+    </script>
+
+    <!-- 3. Load your brand theme — overrides the default :root tokens. -->
     <link rel="stylesheet" href="/css/acme-health-theme.css" />
   </head>
   <body>
@@ -606,7 +635,7 @@ import { css } from 'lit';
 export const acmeHealthTheme = css`
   :host {
     /* Primary ramp */
-    --hx-color-primary-50:  #ecfaf8;
+    --hx-color-primary-50: #ecfaf8;
     --hx-color-primary-500: #00968a;
     --hx-color-primary-600: #007d73;
     --hx-color-primary-950: #002020;
@@ -618,9 +647,9 @@ export const acmeHealthTheme = css`
     --hx-border-radius-md: 6px;
 
     /* Semantic overrides */
-    --hx-color-text-link:    var(--hx-color-primary-600);
+    --hx-color-text-link: var(--hx-color-primary-600);
     --hx-color-border-focus: var(--hx-color-primary-500);
-    --hx-color-focus-ring:   var(--hx-color-primary-500);
+    --hx-color-focus-ring: var(--hx-color-primary-500);
   }
 `;
 ```
@@ -643,8 +672,8 @@ Load the HELiX library via CDN (or your Drupal library definition) and wrap a re
     <title>{{ head_title }}</title>
     {{ head }}
 
-    {# HELiX via CDN — substitute with your Drupal library path #}
-    <script type="module" src="https://cdn.example.com/helix/helix.esm.js"></script>
+    {# HELiX via CDN — substitute with your Drupal library path; pin a version #}
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"></script>
 
     {# Brand theme — a plain CSS file, no build step needed #}
     <link rel="stylesheet" href="/themes/custom/acme_health/css/acme-health-theme.css" />
@@ -693,7 +722,7 @@ For per-template overrides without a separate CSS file, place a `<style>` block 
 </style>
 
 <div class="clinical-alert-node">
-  <hx-alert variant="danger">
+  <hx-alert variant="error" open>
     {{ content.field_alert_body }}
   </hx-alert>
 
@@ -749,26 +778,26 @@ The CSS file loads as a standard stylesheet — no npm, no Webpack, no build pip
 
 ### Override target decision
 
-| Goal | Where to override | Selector |
-| --- | --- | --- |
-| Rebrand the entire library | Primitive ramp | `:root` |
-| Theme a page region | Semantic tokens | `.my-section` or `hx-theme` |
-| Customize one component type | Component token | `hx-button` |
-| Customize a single instance | Component token | `hx-button[data-id="submit"]` or inline `style` |
-| Apply dark mode globally | Semantic tokens | `[data-theme="dark"]` or `@media (prefers-color-scheme: dark)` |
-| Apply high-contrast mode | `hx-theme` attribute | `<hx-theme theme="high-contrast">` |
+| Goal                         | Where to override    | Selector                                                       |
+| ---------------------------- | -------------------- | -------------------------------------------------------------- |
+| Rebrand the entire library   | Primitive ramp       | `:root`                                                        |
+| Theme a page region          | Semantic tokens      | `.my-section` or `hx-theme`                                    |
+| Customize one component type | Component token      | `hx-button`                                                    |
+| Customize a single instance  | Component token      | `hx-button[data-id="submit"]` or inline `style`                |
+| Apply dark mode globally     | Semantic tokens      | `[data-theme="dark"]` or `@media (prefers-color-scheme: dark)` |
+| Apply high-contrast mode     | `hx-theme` attribute | `<hx-theme theme="high-contrast">`                             |
 
 ### Token naming reference
 
-| Pattern | Tier | Example |
-| --- | --- | --- |
-| `--hx-color-{palette}-{stop}` | Primitive | `--hx-color-primary-500` |
-| `--hx-space-{step}` | Primitive | `--hx-space-4` |
-| `--hx-font-family-{variant}` | Primitive | `--hx-font-family-sans` |
-| `--hx-color-text-{role}` | Semantic | `--hx-color-text-primary` |
-| `--hx-color-surface-{role}` | Semantic | `--hx-color-surface-default` |
-| `--hx-color-border-{role}` | Semantic | `--hx-color-border-focus` |
-| `--hx-{component}-{property}` | Component | `--hx-button-bg` |
+| Pattern                       | Tier      | Example                      |
+| ----------------------------- | --------- | ---------------------------- |
+| `--hx-color-{palette}-{stop}` | Primitive | `--hx-color-primary-500`     |
+| `--hx-space-{step}`           | Primitive | `--hx-space-4`               |
+| `--hx-font-family-{variant}`  | Primitive | `--hx-font-family-sans`      |
+| `--hx-color-text-{role}`      | Semantic  | `--hx-color-text-primary`    |
+| `--hx-color-surface-{role}`   | Semantic  | `--hx-color-surface-default` |
+| `--hx-color-border-{role}`    | Semantic  | `--hx-color-border-focus`    |
+| `--hx-{component}-{property}` | Component | `--hx-button-bg`             |
 
 ---
 
@@ -780,5 +809,5 @@ The CSS file loads as a standard stylesheet — no npm, no Webpack, no build pip
 - [MDN: Using CSS custom properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) — CSS custom property inheritance and cascade
 - [MDN: `prefers-color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) — Media query for OS color scheme preference
 - [MDN: `prefers-contrast`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast) — Media query for OS contrast preference
-- [WCAG 2.1 — Contrast (Enhanced) 1.4.6](https://www.w3.org/TR/WCAG21/#contrast-enhanced) — The 7:1 contrast ratio requirement
+- [WCAG 2.2 — Contrast (Enhanced) 1.4.6](https://www.w3.org/TR/WCAG22/#contrast-enhanced) — The 7:1 contrast ratio requirement (HELiX's canonical cert is WCAG 2.2 AAA on the P0 surface)
 - [Drupal.org: Adding stylesheets and JavaScript](https://www.drupal.org/docs/develop/theming-drupal/adding-stylesheets-css-and-javascript-js-to-a-drupal-theme) — Drupal library system for CSS assets

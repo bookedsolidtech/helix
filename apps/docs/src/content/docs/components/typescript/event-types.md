@@ -7,6 +7,8 @@ sidebar:
 
 Custom events are the primary communication mechanism between HELIX components and their consumers. Type-safe event handling transforms events from runtime stringly-typed messages into compile-time validated contracts. This guide demonstrates how to leverage TypeScript's type system to make every event dispatch, listener, and detail payload fully typed and self-documenting.
 
+> **Reading note:** Several patterns below — per-component `addEventListener` overloads, the `hx-blur` / `hx-navigate` / `hx-ready` / `hx-before-change` event names, and the "complete source" sample blocks — are **aspirational teaching examples**, not the current shipped contract. The shipped HELiX events are documented in each component's CEM (`packages/hx-library/custom-elements.json`); detail-payload typing is currently surfaced via globally augmented `GlobalEventHandlersEventMap`-style declarations rather than per-element overloads, and components dispatch the events documented in their own source (e.g. `hx-text-input` emits `hx-input` / `hx-change`, not `hx-blur`). Treat the recipes below as patterns to adapt; verify each event name and detail interface against CEM before relying on it in shipped code.
+
 ## Why Type-Safe Events Matter
 
 In enterprise healthcare applications, event handling errors can cascade into runtime failures that impact patient-facing software. Type-safe events provide:
@@ -217,24 +219,22 @@ this.dispatchEvent(
 
 ### Events with No Detail
 
-Some events are markers that carry no data. Use an empty interface or `Record<string, never>`:
+Some events are markers that carry no data. HELiX components that fall into this category — like `hx-show` / `hx-reset` / `hx-close` on overlays — dispatch `CustomEvent<void>` with no `detail` payload at all. The example below uses a hypothetical `org-ready` event because there is no `hx-ready` event in the shipped library:
 
 ```typescript
-interface HxReadyDetail {}
-
+// Preferred for HELiX: CustomEvent<void> with no `detail` field.
 this.dispatchEvent(
-  new CustomEvent<HxReadyDetail>('hx-ready', {
+  new CustomEvent<void>('org-ready', {
     bubbles: true,
     composed: true,
-    detail: {},
   }),
 );
 
-// Or use Record<string, never> to enforce truly empty detail
+// Alternative when you want to forbid future fields with the type system.
 type EmptyDetail = Record<string, never>;
 
 this.dispatchEvent(
-  new CustomEvent<EmptyDetail>('hx-ready', {
+  new CustomEvent<EmptyDetail>('org-ready', {
     bubbles: true,
     composed: true,
     detail: {},
@@ -242,7 +242,7 @@ this.dispatchEvent(
 );
 ```
 
-**Best practice**: Use `detail: {}` for consistency, even if the event carries no data. This avoids confusion about whether `detail` is `undefined`.
+**Best practice**: Match the shipped HELiX pattern — `CustomEvent<void>` with no `detail` field — when an event carries no data, so consumers don't read `e.detail` on something that was never serialized.
 
 ## Type-Safe Event Listeners
 
@@ -351,7 +351,10 @@ button.addEventListener('hx-invalid', (e) => {
 For internal event handling within Lit templates, use `@event` bindings with typed handler methods:
 
 ```typescript
-@customElement('hx-form')
+// Use a non-HELiX tag for the illustrative form below — the shipped hx-form
+// has a different class shape; this snippet shows the event-typing pattern,
+// not the real hx-form implementation.
+@customElement('example-form')
 export class HelixForm extends LitElement {
   private _handleCheckboxChange(e: CustomEvent<HxChangeDetail>): void {
     console.log(e.detail.checked, e.detail.value); // ✅ Type-safe
@@ -453,17 +456,22 @@ interface HxBlurDetail {
   value: string;
 }
 
+// The shipped hx-text-input emits `hx-input` and `hx-change`, not `hx-blur`.
+// Per-component `addEventListener` overloads are illustrative — the shipped
+// library currently surfaces typed events via global `HTMLElementEventMap`
+// augmentation rather than per-element overloads.
 interface HxTextInputEventMap {
-  'hx-input': CustomEvent<HxInputDetail>;
-  'hx-change': CustomEvent<HxChangeDetail>;
-  'hx-blur': CustomEvent<HxBlurDetail>;
+  'hx-input': CustomEvent<HxTextInputDetail>;
+  'hx-change': CustomEvent<HxTextInputDetail>;
 }
 
-@customElement('hx-text-input')
-export class HelixTextInput extends LitElement {
+// Aspirational per-element overload pattern — adapt for your own components;
+// shipped HELiX components don't currently expose this overload shape.
+@customElement('example-typed-input')
+export class ExampleTypedInput extends LitElement {
   addEventListener<K extends keyof HxTextInputEventMap>(
     type: K,
-    listener: (this: HelixTextInput, ev: HxTextInputEventMap[K]) => void,
+    listener: (this: ExampleTypedInput, ev: HxTextInputEventMap[K]) => void,
     options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
@@ -476,21 +484,19 @@ export class HelixTextInput extends LitElement {
 }
 ```
 
-Consumers get autocomplete for all three event names:
+With the global-event-map approach (current shipped pattern), consumers annotate the listener parameter explicitly instead:
 
 ```typescript
+import type { HxTextInputDetail } from '@helixui/library';
+
 const input = document.querySelector('hx-text-input')!;
 
-input.addEventListener('hx-input', (e) => {
-  // e is CustomEvent<HxInputDetail>
+input.addEventListener('hx-input', (e: CustomEvent<HxTextInputDetail>) => {
+  console.log(e.detail.value);
 });
 
-input.addEventListener('hx-change', (e) => {
-  // e is CustomEvent<HxChangeDetail>
-});
-
-input.addEventListener('hx-blur', (e) => {
-  // e is CustomEvent<HxBlurDetail>
+input.addEventListener('hx-change', (e: CustomEvent<HxTextInputDetail>) => {
+  console.log(e.detail.value);
 });
 ```
 
@@ -735,17 +741,21 @@ private _handleClick(e: MouseEvent): void {
     return;
   }
 
+  // Note: shipped hx-button does NOT dispatch a separate `hx-navigate` event;
+  // it dispatches `hx-click` regardless of `href`. The split below is a
+  // hypothetical example for a consumer-owned button that distinguishes
+  // navigation activations from non-navigation activations.
   if (this.href) {
-    // Dispatch navigation event
+    // Hypothetical navigation event for org-button.
     this.dispatchEvent(
-      new CustomEvent<HxNavigateDetail>('hx-navigate', {
+      new CustomEvent<HxNavigateDetail>('org-navigate', {
         bubbles: true,
         composed: true,
         detail: { href: this.href, originalEvent: e },
       })
     );
   } else {
-    // Dispatch click event
+    // hx-click matches the real hx-button surface.
     this.dispatchEvent(
       new CustomEvent<HxClickDetail>('hx-click', {
         bubbles: true,
@@ -757,13 +767,13 @@ private _handleClick(e: MouseEvent): void {
 }
 ```
 
-### Event Cancellation
+### Event Cancellation (consumer-owned pattern)
 
-Allow consumers to cancel events using `event.preventDefault()`:
+Allow consumers to cancel events using `event.preventDefault()`. Note that no shipped HELiX input component currently dispatches an `hx-before-change` event — the pattern below is illustrative for a consumer-owned input that wants to expose a cancelable pre-commit hook:
 
 ```typescript
 private _handleBeforeChange(newValue: string): boolean {
-  const event = new CustomEvent<HxBeforeChangeDetail>('hx-before-change', {
+  const event = new CustomEvent<OrgBeforeChangeDetail>('org-before-change', {
     bubbles: true,
     composed: true,
     cancelable: true, // ✅ Allow preventDefault()
@@ -785,7 +795,7 @@ private _handleBeforeChange(newValue: string): boolean {
 Consumers can prevent the change:
 
 ```typescript
-input.addEventListener('hx-before-change', (e) => {
+orgInput.addEventListener('org-before-change', (e) => {
   if (e.detail.newValue === 'invalid') {
     e.preventDefault(); // Cancel the change
   }
@@ -1084,4 +1094,4 @@ input.addEventListener('hx-invalid', (e) => {
 - [Typing Lit Components](/components/typescript/typing-components) — Property types, lifecycle methods, and template typing
 - [Custom Events](/components/events/custom-events) — Event fundamentals and dispatch patterns (prerequisite)
 - [TypeScript Strict Mode](/components/typescript/strict-mode) — Enforcing strict type safety across the codebase
-- [Generics in TypeScript](/components/typescript/generics) — Advanced generic patterns for reusable type-safe utilities
+- [TypeScript Strict Mode](/components/typescript/strict-mode/) — Strict compiler flags + type-safety patterns used across HELiX (the dedicated "Generics" guide on the previous draft never landed)

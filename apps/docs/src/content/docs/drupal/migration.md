@@ -83,12 +83,12 @@ Pick the simplest, most self-contained pattern first. Cards are a good starting 
 
 <hx-card variant="default">
   {% if content.field_image %}
-    <div slot="media">{{ content.field_image }}</div>
+    <div slot="image">{{ content.field_image }}</div>
   {% endif %}
-  <span slot="heading">{{ node.label }}</span>
+  <h3 slot="heading">{{ node.label }}</h3>
   {{ content.body }}
   <div slot="actions">
-    <hx-button href="{{ url }}" variant="primary">Read More</hx-button>
+    <hx-button hx-href="{{ url }}" variant="primary">Read More</hx-button>
   </div>
 </hx-card>
 ```
@@ -110,7 +110,7 @@ HELiX component styles live inside Shadow DOM. Bootstrap's global CSS selectors 
 The only potential conflict is:
 
 - **CSS custom property names** — HELiX uses `--hx-` prefix to avoid collisions with Bootstrap's variables (Bootstrap 5 uses `--bs-` prefix).
-- **JavaScript variable names** — HELiX behaviors use the `helix` namespace in `once()` calls.
+- **JavaScript variable names** — the shipped `@helixui/drupal-behaviors` uses `hx-`-prefixed `once()` IDs (e.g. `hx-dialog`, `hx-tooltip`). Project-local behaviors should pick their own namespace (e.g. `mysite:foo`) so once-keys never collide with the package's `hx-*` keys.
 
 ### Running HELiX on specific page regions only
 
@@ -210,7 +210,10 @@ function my_module_form_contact_message_contact_form_alter(
 
 ```twig
 {{ attach_library('mytheme/helix-alert') }}
-<hx-alert variant="danger">
+{# hx-alert variants: primary | secondary | success | warning | error |
+   neutral | info. There is no 'danger' variant — destructive messaging
+   uses variant='error'. hx-alert is hidden until `open` is set. #}
+<hx-alert open variant="error">
   {{ message|escape }}
 </hx-alert>
 ```
@@ -249,8 +252,11 @@ Drupal.behaviors.accordion = {
 {{ attach_library('mytheme/helix-accordion') }}
 <hx-accordion>
   {% for item in items %}
-    <hx-accordion-item>
-      <span slot="heading">{{ item.title|escape }}</span>
+    {# hx-accordion-item exposes the trigger heading via the `trigger`
+       slot (NOT `heading`); panel content goes in the default slot.
+       `expanded` is the canonical open-state attribute. #}
+    <hx-accordion-item id="accordion-item-{{ loop.index }}">
+      <span slot="trigger">{{ item.title|escape }}</span>
       {{ item.body|escape }}
     </hx-accordion-item>
   {% endfor %}

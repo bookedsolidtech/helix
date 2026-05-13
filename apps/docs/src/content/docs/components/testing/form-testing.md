@@ -10,7 +10,7 @@ HELIX form components use the Form Association API (`ElementInternals`) to parti
 Every form-associated HELIX component must satisfy these contracts:
 
 1. `static formAssociated = true` — declares the element as form-associated
-2. `attachInternals()` — returns an `ElementInternals` instance in the constructor
+2. `attachInternals()` — returns an `ElementInternals` instance; HELiX components attach lazily on first `_internals` access (via `FormMixin` in `packages/hx-library/src/mixins/`), not in the constructor
 3. `setFormValue()` — keeps the form data updated as the user interacts
 4. `setValidity()` — reports constraint violations to the browser
 5. `formResetCallback()` — called by the form element when it is reset
@@ -314,10 +314,13 @@ it('required propagates to native input', async () => {
   expect(input.required).toBe(true);
 });
 
-it('required sets aria-required="true" on native input', async () => {
+it('required is reflected to the native input via the required attribute', async () => {
   const el = await fixture<HelixTextInput>('<hx-text-input required></hx-text-input>');
   const input = el.shadowRoot!.querySelector<HTMLInputElement>('input')!;
-  expect(input.getAttribute('aria-required')).toBe('true');
+  // hx-text-input intentionally relies on native `required` semantics; it does
+  // not set aria-required="true" because the browser exposes the same state
+  // through the implicit ARIA mapping of the required attribute.
+  expect(input.required).toBe(true);
 });
 
 it('required adds asterisk marker to label', async () => {
@@ -332,7 +335,7 @@ it('required adds asterisk marker to label', async () => {
 
 ## Testing Custom Validation Messages
 
-Components can accept a custom `error` prop that overrides the default browser validation message:
+Components accept a custom `error` prop that is displayed in the error container and exposed via the component's visual + ARIA error surface. The `error` string is used as the `setValidity()` validation message **only when the component is independently invalid** (e.g. `required` + empty); for browser-default constraint messages on otherwise-valid input, the native validation message still wins.
 
 ```typescript
 it('custom error message is displayed in the error div', async () => {
@@ -353,7 +356,7 @@ it('custom error sets aria-invalid="true" on native input', async () => {
 
 ## Testing aria-invalid and aria-describedby Updates
 
-Validation state changes must update ARIA attributes so screen readers can announce errors.
+`aria-invalid` on the internal native input is driven by the **`error` property / `error` slot** (presence + non-empty), not by every validity-state mutation — internal validity is also tracked via `ElementInternals` but the visible ARIA attribute follows the displayed error. Test the visible signal:
 
 ### aria-invalid on Validation State Change
 
@@ -403,25 +406,25 @@ it('aria-describedby references the help text element ID', async () => {
 });
 ```
 
-### Error Takes Priority Over Help Text
+### Error + Help Text — aria-describedby Composition
 
-When both `error` and `help-text` are set, only the error is shown and only the error ID is referenced:
+When `error` is set on `hx-text-input`, the error container is rendered with `role="alert"` and the slotted-help-text container is hidden (the help-text only renders when no error is active). `aria-describedby` on the internal native input references **both** the error ID and any present help-text/help-slot ID — they compose, with the error first:
 
 ```typescript
-it('error hides help text and references only the error ID', async () => {
+it('error renders alert + aria-describedby composes error+help IDs', async () => {
   const el = await fixture<HelixTextInput>(
     '<hx-text-input error="Bad" help-text="Some guidance"></hx-text-input>',
   );
 
   const input = el.shadowRoot!.querySelector<HTMLInputElement>('input')!;
-  const errorDiv = el.shadowRoot!.querySelector('.field__error');
-  const helpDiv = el.shadowRoot!.querySelector('.field__help-text');
+  const errorDiv = el.shadowRoot!.querySelector('[part="error"]');
 
   expect(errorDiv).toBeTruthy();
-  expect(helpDiv).toBeNull(); // Hidden when error is present
+  expect(errorDiv?.getAttribute('role')).toBe('alert');
 
   const describedBy = input.getAttribute('aria-describedby');
   expect(describedBy).toContain(errorDiv!.id);
+  // help-text id is also referenced when help-text/slot is present
 });
 ```
 
@@ -569,5 +572,5 @@ it('complete form lifecycle — fill, validate, submit, reset', async () => {
 **Related:**
 
 - [Testing Events](/components/testing/event-testing) — `hx-input`, `hx-change`, event payloads
-- [Testing Shadow DOM](/components/testing/shadow-dom) — `shadowQuery`, fixture, cleanup
-- [Accessibility Engineer](/components/accessibility/) — ARIA requirements for form components
+- [Vitest Setup](/components/testing/vitest-setup/) — Browser-mode Vitest setup and shared test utils
+- [Self-certification scope](/accessibility/self-cert-scope/) — WCAG 2.2 AAA P0 / AA baseline cert posture for form components

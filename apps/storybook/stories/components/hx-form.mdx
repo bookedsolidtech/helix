@@ -170,17 +170,18 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 ## Overview
 
-The `hx-form` component is a wrapper around the native `<form>` element that provides standardized layout,
-spacing, and event handling for HELIX form controls. It automatically manages form submission, integrates
-with ElementInternals-based form controls, and emits custom events for validation and submit actions.
+`hx-form` is a thin orchestration host that wraps (or lives inside) a native `<form>`. It does **not**
+replace `<form>` — submission still flows through the real form element, so the submit button and
+its `requestSubmit()`/Enter-key behaviour all work natively. `hx-form` listens for that submit event,
+collects values via `FormData`, and re-emits typed custom events (`hx-submit`, `hx-invalid`,
+`hx-reset`) so consumer code can react without touching the native event surface.
 
-Unlike a basic `<form>`, `hx-form` provides:
+What `hx-form` adds on top of a plain `<form>`:
 
-- Consistent vertical spacing between form fields
-- Automatic coordination of form-associated custom elements
-- Custom `hx-submit` events with structured data payloads
-- Built-in validation state management
-- Responsive layout patterns for multi-column forms
+- Consistent vertical spacing between form fields (`--hx-form-gap`)
+- Re-emission of submit/reset as `hx-submit` / `hx-reset` with structured detail
+- An `hx-invalid` event listing every failing field at submit time
+- A predictable max-width / padding contract via CSS custom properties
 
 ### When to Use
 
@@ -198,12 +199,12 @@ Unlike a basic `<form>`, `hx-form` provides:
 
 ## Accessibility
 
-The Form component follows WCAG 2.1 AA guidelines:
+The Form component meets WCAG 2.2 AA baseline (and AAA on the P0 surface per `aaa-verdicts.json`):
 
 - **Keyboard navigation** — Full support for Tab, Shift+Tab, Enter (submit)
 - **Screen reader support** — Proper `<form>` semantics, fieldset/legend for grouping
-- **Validation announcements** — Error messages are announced to assistive technologies
-- **Focus management** — Focus moves to the first invalid field on validation failure
+- **Validation announcements** — Each field's error UI is announced by the individual form control (via its own `aria-invalid` + describedby/ElementInternals wiring) when `hx-form` rejects submission
+- **Focus management** — Native HTML5 constraint validation moves focus to the first invalid native control; for ElementInternals-based HELIX controls, your `hx-invalid` handler is responsible for calling `.focus()` on the first failing field
 
 <div className="error-box">
   <p>
@@ -216,21 +217,25 @@ The Form component follows WCAG 2.1 AA guidelines:
 
 ## Properties
 
-| Property     | Type                                   | Default      | Description                                               |
-| ------------ | -------------------------------------- | ------------ | --------------------------------------------------------- |
-| `layout`     | `'vertical' \| 'horizontal' \| 'grid'` | `'vertical'` | Layout mode for form fields                               |
-| `gap`        | `'sm' \| 'md' \| 'lg'`                 | `'md'`       | Spacing between form fields                               |
-| `name`       | `string`                               | `''`         | Name attribute for the form                               |
-| `action`     | `string`                               | `''`         | Form action URL (rarely used with custom submit handlers) |
-| `method`     | `'get' \| 'post'`                      | `'post'`     | HTTP method for form submission                           |
-| `novalidate` | `boolean`                              | `false`      | Disable native HTML5 validation                           |
+| Property     | Type              | Default | Description                                                                     |
+| ------------ | ----------------- | ------- | ------------------------------------------------------------------------------- |
+| `name`       | `string`          | `''`    | Name attribute mirrored to the inner `<form>`                                   |
+| `action`     | `string`          | `''`    | Form action URL on the inner `<form>` (rarely used with custom submit handlers) |
+| `method`     | `'get' \| 'post'` | `'get'` | HTTP method for the inner `<form>`                                              |
+| `enctype`    | `string`          | —       | Encoding type for the inner `<form>` (multipart forms etc.)                     |
+| `novalidate` | `boolean`         | `false` | Disable native HTML5 constraint validation on the inner `<form>`                |
+
+Layout/gap presets are not attributes; spacing is driven entirely by the `--hx-form-gap` /
+`--hx-form-max-width` / `--hx-form-padding` CSS custom properties below.
 
 ## Slots
 
-| Slot        | Description                                 |
-| ----------- | ------------------------------------------- |
-| `(default)` | Form fields and content                     |
-| `actions`   | Form action buttons (Submit, Cancel, Reset) |
+| Slot        | Description             |
+| ----------- | ----------------------- |
+| `(default)` | Form fields and content |
+
+`hx-form` exposes only the default slot. Action buttons (Submit, Cancel, Reset) are placed in the
+default slot alongside the inputs — typically inside a flex `<div>` near the end of the form.
 
 ## CSS Custom Properties
 
@@ -239,30 +244,30 @@ Override these tokens to theme the form:
 | Property              | Default             | Description                            |
 | --------------------- | ------------------- | -------------------------------------- |
 | `--hx-form-gap`       | `var(--hx-space-4)` | Gap between form fields                |
-| `--hx-form-max-width` | `100%`              | Maximum width of the form container    |
+| `--hx-form-max-width` | `none`              | Maximum width of the form container    |
 | `--hx-form-padding`   | `0`                 | Internal padding of the form container |
 
 ## CSS Parts
 
-Style internal form elements using `::part()`:
-
-| Part      | Description                      |
-| --------- | -------------------------------- |
-| `form`    | The native `<form>` element      |
-| `fields`  | The container for form fields    |
-| `actions` | The container for action buttons |
+`hx-form` does not expose any `::part()` shadow parts. Style the form host via the CSS custom
+properties above, or target the slotted children directly with global selectors.
 
 ## Events
 
-| Event        | Detail                                                | Description                         |
-| ------------ | ----------------------------------------------------- | ----------------------------------- |
-| `hx-submit`  | `{ formData: FormData, values: Record<string, any> }` | Fired when the form is submitted    |
-| `hx-reset`   | `{}`                                                  | Fired when the form is reset        |
-| `hx-invalid` | `{ field: HTMLElement, message: string }`             | Fired when a field fails validation |
+| Event        | Detail                                                                                                    | Description                                                                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hx-submit`  | `{ valid: true, values: Record<string, FormDataEntryValue \| FormDataEntryValue[]>, formData: FormData }` | Fired by the host **only when `action` is empty (client-side mode) AND all fields pass constraint validation**. Invalid submissions emit `hx-invalid` instead — `hx-submit` never carries `valid: false`. |
+| `hx-invalid` | `{ errors: Array<{ name: string, message: string }> }`                                                    | Fired when the inner `<form>` blocks submission because one or more fields failed constraint validation. This is the canonical signal for invalid submission.                                             |
+| `hx-reset`   | `CustomEvent` (no detail)                                                                                 | Fired when the form is reset                                                                                                                                                                              |
+
+> **Native submission path:** When `action` is set, the underlying `<form>` submits natively to the server. Neither `hx-submit` nor `hx-invalid` fires — the browser owns the submission and the server handles validation feedback. Listen for these events only when `action` is omitted (client-side mode).
 
 ## Form Participation
 
-The `hx-form` component integrates with all HELIX form controls that use ElementInternals:
+`hx-form` does not turn the entire shadow tree into one form-associated control. The inner native
+`<form>` is the form root; any field placed inside it — native (`<input>`, `<select>`,
+`<textarea>`) **or** form-associated HELIX controls — participates in submission and `FormData`
+collection. Form-associated HELIX controls today include:
 
 - `hx-text-input`
 - `hx-textarea`
@@ -271,14 +276,19 @@ The `hx-form` component integrates with all HELIX form controls that use Element
 - `hx-switch`
 - `hx-radio-group`
 
-These components automatically participate in form submission and validation when placed inside `hx-form`.
+Use these inside `hx-form` for their native form-element participation; other HELIX components do
+not auto-register as form values.
 
 ## Usage Examples
 
 ### Basic Form
 
+`hx-form` only renders an inner native `<form>` when `action` is set. Set `action` (it can target a
+real endpoint or a stub like `/submit`) so the submit button has a form to fire — otherwise wrap the
+inputs in your own `<form>` inside the default slot.
+
 ```html
-<hx-form>
+<hx-form action="/api/referrals" method="post">
   <hx-text-input
     label="Patient Name"
     name="patient-name"
@@ -299,32 +309,43 @@ These components automatically participate in form submission and validation whe
     <option value="oncology">Oncology</option>
   </hx-select>
 
-  <div slot="actions">
+  <div class="hx-form-actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
     <hx-button type="submit">Submit Referral</hx-button>
     <hx-button type="reset" variant="ghost">Clear</hx-button>
   </div>
 </hx-form>
 ```
 
-### Horizontal Layout
+### Inline search form
+
+For a single-row search/filter form, lay the row out in your own CSS — there is no `layout`
+attribute on `hx-form`.
 
 ```html
-<hx-form layout="horizontal">
-  <hx-text-input label="Search" name="search" placeholder="Patient name or MRN"></hx-text-input>
-  <hx-button type="submit">Search</hx-button>
+<hx-form action="/search">
+  <div style="display: flex; gap: 0.5rem; align-items: end;">
+    <hx-text-input label="Search" name="search" placeholder="Patient name or MRN"></hx-text-input>
+    <hx-button type="submit">Search</hx-button>
+  </div>
 </hx-form>
 ```
 
-### Grid Layout
+### Multi-column form
+
+Drive multi-column layouts via CSS Grid in author CSS; `hx-form` itself does not enumerate
+`layout="grid"`.
 
 ```html
-<hx-form layout="grid">
+<hx-form action="/api/patients" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
   <hx-text-input label="First Name" name="first-name" required></hx-text-input>
   <hx-text-input label="Last Name" name="last-name" required></hx-text-input>
   <hx-text-input label="DOB" name="dob" type="date" required></hx-text-input>
   <hx-text-input label="Phone" name="phone" type="tel"></hx-text-input>
 
-  <div slot="actions">
+  <div
+    class="hx-form-actions"
+    style="grid-column: 1 / -1; display: flex; gap: 0.5rem; justify-content: flex-end;"
+  >
     <hx-button type="submit">Save Patient</hx-button>
   </div>
 </hx-form>
@@ -332,16 +353,23 @@ These components automatically participate in form submission and validation whe
 
 ### With Validation Handling
 
-```html
-<hx-form id="admission-form">
-  <hx-text-input label="Patient Name" name="patient-name" required error=""></hx-text-input>
+`hx-invalid` reports the full list of failing fields via
+`e.detail.errors: Array<{ name, message }>`. Re-look up each offending field by `name` to apply
+per-field error UI.
 
-  <hx-select label="Admitting Department" name="department" required error="">
+```html
+<!-- Client-side submission: omit `action` so hx-submit / hx-invalid fire.
+     When `action` is set, the native form submits to the server instead and
+     these listeners never receive an event. -->
+<hx-form id="admission-form">
+  <hx-text-input label="Patient Name" name="patient-name" required></hx-text-input>
+
+  <hx-select label="Admitting Department" name="department" required>
     <option value="cardiology">Cardiology</option>
     <option value="neurology">Neurology</option>
   </hx-select>
 
-  <div slot="actions">
+  <div class="hx-form-actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
     <hx-button type="submit">Admit Patient</hx-button>
   </div>
 </hx-form>
@@ -351,14 +379,27 @@ These components automatically participate in form submission and validation whe
 
   form.addEventListener('hx-submit', (e) => {
     e.preventDefault();
+    if (!e.detail.valid) return; // hx-invalid already fired with the field list
     console.log('Form data:', e.detail.values);
-    // Submit to API
+    console.log('FormData:', e.detail.formData);
+    // Submit to API …
   });
 
   form.addEventListener('hx-invalid', (e) => {
-    console.error('Validation failed:', e.detail.field, e.detail.message);
-    // Set error state on field
-    e.detail.field.setAttribute('error', e.detail.message);
+    console.error('Validation failed:', e.detail.errors);
+
+    // Project each error back onto its field by name.
+    for (const { name, message } of e.detail.errors) {
+      const field = form.querySelector(`[name="${name}"]`);
+      if (field) field.setAttribute('error', message);
+    }
+
+    // Move focus to the first failing field.
+    const first = e.detail.errors[0];
+    if (first) {
+      const target = form.querySelector(`[name="${first.name}"]`);
+      target?.focus?.();
+    }
   });
 </script>
 ```
@@ -368,14 +409,14 @@ These components automatically participate in form submission and validation whe
 ### Form Layout Selection
 
 - **Vertical (default)** — Best for most forms. Each field gets full width, easy to scan.
-- **Horizontal** — Search bars and single-field forms where label and input sit side-by-side.
-- **Grid** — Multi-column forms for dense data entry (e.g., patient demographics).
+- **Inline row** — Search bars and single-field forms where label and input sit side-by-side (compose via author CSS flexbox; not a built-in attribute).
+- **Multi-column grid** — Multi-column forms for dense data entry like patient demographics (compose via CSS Grid; not a built-in attribute).
 
 ### Spacing
 
-- Use `gap="sm"` for compact forms (filter panels, inline search)
-- Use `gap="md"` (default) for standard forms
-- Use `gap="lg"` for forms with complex fields or long labels
+Author-side spacing is driven by `--hx-form-gap`. The default of `var(--hx-space-4)` covers most
+forms; lower it (e.g. `--hx-form-gap: var(--hx-space-3)`) for compact filter panels, raise it
+(e.g. `var(--hx-space-6)`) for forms with complex fields or long labels.
 
 ### Button Placement
 
@@ -402,7 +443,7 @@ These components automatically participate in form submission and validation whe
 ### Patient Admission Form
 
 ```html
-<hx-form layout="grid" gap="md">
+<hx-form action="/api/admissions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
   <hx-text-input label="First Name" name="first-name" required></hx-text-input>
   <hx-text-input label="Last Name" name="last-name" required></hx-text-input>
   <hx-text-input label="Date of Birth" name="dob" type="date" required></hx-text-input>
@@ -434,7 +475,10 @@ These components automatically participate in form submission and validation whe
     <option value="medicare">Medicare</option>
   </hx-select>
 
-  <div slot="actions" style="grid-column: 1 / -1;">
+  <div
+    class="hx-form-actions"
+    style="grid-column: 1 / -1; display: flex; gap: 0.5rem; justify-content: flex-end;"
+  >
     <hx-button type="submit">Admit Patient</hx-button>
     <hx-button type="reset" variant="ghost">Clear Form</hx-button>
   </div>
@@ -444,7 +488,7 @@ These components automatically participate in form submission and validation whe
 ### Medication Order Form
 
 ```html
-<hx-form gap="lg">
+<hx-form action="/api/medication-orders" style="--hx-form-gap: var(--hx-space-6);">
   <hx-text-input
     label="Medication Name"
     name="medication"
@@ -475,7 +519,7 @@ These components automatically participate in form submission and validation whe
     placeholder="Dietary restrictions, administration notes, etc."
   ></hx-textarea>
 
-  <div slot="actions">
+  <div class="hx-form-actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
     <hx-button type="submit">Submit Order</hx-button>
     <hx-button type="button" variant="ghost">Save as Draft</hx-button>
   </div>
@@ -494,7 +538,7 @@ The `hx-form` component can wrap Drupal Form API elements or be used in custom T
 {# templates/custom/patient-intake-form.html.twig #}
 {{ attach_library('your_theme/helix-components') }}
 
-<hx-form id="patient-intake" layout="vertical" gap="md">
+<hx-form id="patient-intake" action="/api/patient-intake" method="post">
   <hx-text-input
     label="Patient Name"
     name="patient_name"
@@ -531,7 +575,7 @@ The `hx-form` component can wrap Drupal Form API elements or be used in custom T
     <option value="medicare">Medicare</option>
   </hx-select>
 
-  <div slot="actions">
+  <div class="hx-form-actions" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
     <hx-button type="submit">Submit Intake</hx-button>
     <hx-button type="reset" variant="ghost">Clear Form</hx-button>
   </div>
@@ -568,7 +612,11 @@ The `hx-form` component can wrap Drupal Form API elements or be used in custom T
 
 ```twig
 {# templates/custom/patient-registration.html.twig #}
-<hx-form layout="grid" gap="lg">
+<hx-form
+  action="/api/patient-registration"
+  method="post"
+  style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;"
+>
   <hx-text-input
     label="First Name"
     name="first_name"
@@ -610,7 +658,10 @@ The `hx-form` component can wrap Drupal Form API elements or be used in custom T
     placeholder="(555) 555-5555"
   ></hx-text-input>
 
-  <div slot="actions" style="grid-column: 1 / -1;">
+  <div
+    class="hx-form-actions"
+    style="grid-column: 1 / -1; display: flex; gap: 0.5rem; justify-content: flex-end;"
+  >
     <hx-button type="submit">Register Patient</hx-button>
   </div>
 </hx-form>
@@ -618,38 +669,40 @@ The `hx-form` component can wrap Drupal Form API elements or be used in custom T
 
 ### Drupal Form API Integration
 
-**Custom module form using hx-form wrapper:**
+`hx-form`, `hx-text-input`, `hx-select`, `hx-textarea`, and `hx-button` are **autonomous custom
+elements** — `is="hx-*"` on a native `<textfield>`/`<select>`/`<button>` will not upgrade. Render
+the HELIX tags directly from Twig (preferred), or build small `#theme` callbacks that emit them.
+The sample below shows a custom-render approach that wraps a Drupal-built form in an `<hx-form>`
+via `#prefix` / `#suffix` and delegates the field markup to `#theme` callbacks.
 
 ```php
 /**
- * Custom form with HELIX components.
+ * Custom form rendered through hx-form.
+ *
+ * `#prefix` / `#suffix` wrap the form output in <hx-form>; each field
+ * delegates to a project-supplied #theme callback that emits the
+ * autonomous HELIX tag instead of the native control.
  */
 function mymodule_medication_order_form($form, &$form_state) {
-  // Attach HELIX library
   $form['#attached']['library'][] = 'your_theme/helix-components';
 
-  // Use hx-form wrapper
-  $form['#prefix'] = '<hx-form id="medication-order" layout="vertical" gap="lg">';
+  $form['#prefix'] = '<hx-form id="medication-order" action="/forms/medication-order" method="post">';
   $form['#suffix'] = '</hx-form>';
 
   $form['medication'] = [
     '#type' => 'textfield',
     '#title' => t('Medication Name'),
     '#required' => TRUE,
-    '#attributes' => [
-      'is' => 'hx-text-input',
-      'placeholder' => 'Generic or brand name',
-    ],
+    '#theme' => 'hx_text_input',
+    '#placeholder' => 'Generic or brand name',
   ];
 
   $form['dosage'] = [
     '#type' => 'textfield',
     '#title' => t('Dosage'),
     '#required' => TRUE,
-    '#attributes' => [
-      'is' => 'hx-text-input',
-      'placeholder' => 'e.g., 500mg',
-    ],
+    '#theme' => 'hx_text_input',
+    '#placeholder' => 'e.g., 500mg',
   ];
 
   $form['route'] = [
@@ -662,9 +715,7 @@ function mymodule_medication_order_form($form, &$form_state) {
       'subq' => 'Subcutaneous (SubQ)',
     ],
     '#required' => TRUE,
-    '#attributes' => [
-      'is' => 'hx-select',
-    ],
+    '#theme' => 'hx_select',
   ];
 
   $form['frequency'] = [
@@ -677,40 +728,35 @@ function mymodule_medication_order_form($form, &$form_state) {
       'prn' => 'As needed (PRN)',
     ],
     '#required' => TRUE,
-    '#attributes' => [
-      'is' => 'hx-select',
-    ],
+    '#theme' => 'hx_select',
   ];
 
   $form['instructions'] = [
     '#type' => 'textarea',
     '#title' => t('Special Instructions'),
-    '#attributes' => [
-      'is' => 'hx-textarea',
-      'placeholder' => 'Dietary restrictions, administration notes, etc.',
-    ],
+    '#theme' => 'hx_textarea',
+    '#placeholder' => 'Dietary restrictions, administration notes, etc.',
   ];
 
   $form['actions'] = [
     '#type' => 'container',
-    '#attributes' => ['slot' => 'actions'],
+    '#attributes' => [
+      'class' => ['hx-form-actions'],
+      'style' => 'display: flex; gap: 0.5rem; justify-content: flex-end;',
+    ],
   ];
 
   $form['actions']['submit'] = [
     '#type' => 'submit',
     '#value' => t('Submit Order'),
-    '#attributes' => [
-      'is' => 'hx-button',
-    ],
+    '#theme' => 'hx_button',
   ];
 
   $form['actions']['draft'] = [
     '#type' => 'button',
     '#value' => t('Save as Draft'),
-    '#attributes' => [
-      'is' => 'hx-button',
-      'variant' => 'ghost',
-    ],
+    '#theme' => 'hx_button',
+    '#hx_variant' => 'ghost',
   ];
 
   return $form;
@@ -732,77 +778,81 @@ function mymodule_medication_order_form_submit($form, &$form_state) {
 }
 ```
 
-### Drupal Behaviors for Form Handling
+### Drupal Behaviors for Form Handling (project-local example)
+
+The shipped `@helixui/drupal-behaviors` package does not include an `hxForm` behavior — `hx-form`
+upgrades from its module import alone. The pattern below is a **project-local** behavior layered on
+top of the component, kept in a project namespace (`mysite:form-init`) so it never collides with
+the package's `hx-*` once keys.
 
 ```javascript
 /**
  * @file
- * hx-form Drupal behavior.
+ * mysite hx-form orchestration behavior (project-local).
  */
 
 (function (Drupal, once, drupalSettings) {
   'use strict';
 
-  /**
-   * Attach hx-form event listeners.
-   */
-  Drupal.behaviors.hxForm = {
+  // Store listener references so detach() can remove the same fn.
+  const handlers = new WeakMap();
+
+  Drupal.behaviors.mysiteFormOrchestration = {
     attach: function (context, settings) {
-      // Initialize all HELIX forms
-      once('hx-form-init', 'hx-form', context).forEach((form) => {
+      once('mysite:form-init', 'hx-form', context).forEach((form) => {
         const formId = form.getAttribute('id');
 
-        // Listen for form submission
-        form.addEventListener('hx-submit', async (e) => {
+        const onSubmit = async (e) => {
           e.preventDefault();
+          if (!e.detail.valid) return; // hx-invalid already fired
 
           const { formData, values } = e.detail;
-
           console.log('Form submitted:', formId, values);
 
-          // Option 1: Standard POST submission
           submitFormStandard(form, formData);
+          // …or AJAX/Drupal-AJAX variants
+        };
 
-          // Option 2: AJAX submission
-          // await submitFormAjax(form, formData);
-
-          // Option 3: Drupal AJAX API
-          // submitFormDrupalAjax(form, values);
-        });
-
-        // Listen for form reset
-        form.addEventListener('hx-reset', (e) => {
-          console.log('Form reset:', formId);
-
-          // Clear any custom errors
+        const onReset = () => {
           form.querySelectorAll('[error]').forEach((field) => {
             field.removeAttribute('error');
           });
-        });
+        };
 
-        // Listen for validation failures
-        form.addEventListener('hx-invalid', (e) => {
-          const { field, message } = e.detail;
+        const onInvalid = (e) => {
+          console.error('Validation failed:', e.detail.errors);
+          for (const { name, message } of e.detail.errors) {
+            const field = form.querySelector(`[name="${name}"]`);
+            if (field) field.setAttribute('error', message);
+          }
+          const first = e.detail.errors[0];
+          if (first) {
+            const target = form.querySelector(`[name="${first.name}"]`);
+            target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target?.focus?.();
+          }
+        };
 
-          console.error('Validation failed:', field.getAttribute('name'), message);
-
-          // Display error on the field
-          field.setAttribute('error', message);
-
-          // Scroll to first error
-          field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+        form.addEventListener('hx-submit', onSubmit);
+        form.addEventListener('hx-reset', onReset);
+        form.addEventListener('hx-invalid', onInvalid);
+        handlers.set(form, { onSubmit, onReset, onInvalid });
       });
     },
 
     detach: function (context, settings, trigger) {
-      if (trigger === 'unload') {
-        context.querySelectorAll('hx-form').forEach((form) => {
-          form.removeEventListener('hx-submit', () => {});
-          form.removeEventListener('hx-reset', () => {});
-          form.removeEventListener('hx-invalid', () => {});
-        });
-      }
+      if (trigger !== 'unload') return;
+
+      context.querySelectorAll('hx-form').forEach((form) => {
+        const refs = handlers.get(form);
+        if (refs) {
+          form.removeEventListener('hx-submit', refs.onSubmit);
+          form.removeEventListener('hx-reset', refs.onReset);
+          form.removeEventListener('hx-invalid', refs.onInvalid);
+          handlers.delete(form);
+        }
+      });
+      once.remove('mysite:form-init', context.querySelectorAll('hx-form'));
     },
   };
 
@@ -1003,14 +1053,28 @@ public function ajaxRefreshForm(array &$form, FormStateInterface $form_state) {
 Add to `your_theme.libraries.yml`:
 
 ```yaml
-# CDN approach (recommended for production)
+# Per-component CDN load (recommended for production —
+# pulls only hx-form + its shared dependencies)
 helix-components:
+  js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-form/index.js:
+      type: external
+      attributes:
+        type: module
+  version: 3.9.0
+  header: true
+```
+
+```yaml
+# Full-bundle CDN load — prototyping only; ships every component to
+# every visitor and should not be used in production page templates.
+helix-full-bundle:
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       attributes:
         type: module
-  version: 1.0.0
+  version: 3.9.0
   header: true
 ```
 
@@ -1020,7 +1084,7 @@ For local development:
 # Local approach
 helix-components-local:
   js:
-    /libraries/helix/dist/index.js:
+    /libraries/helix/dist/components/hx-form/index.js:
       type: file
       attributes:
         type: module
@@ -1030,12 +1094,8 @@ helix-components-local:
 
 ### References
 
-See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensive coverage:
-
-- **ADR-DRUPAL-001**: Property-driven vs slot-driven patterns for form layouts
-- **ADR-DRUPAL-002**: Event handling in Form API and AJAX contexts
-- **ADR-DRUPAL-003**: Performance optimization for complex multi-step forms
-- **ADR-DRUPAL-004**: Accessibility considerations for form validation and error handling
+See the [Drupal Integration Guide](/drupal/installation/getting-started/) for end-to-end setup,
+behaviors, and Form API patterns.
 
 <div className="warning-box">
   <p>
@@ -1058,12 +1118,14 @@ See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensi
 
 ## Browser Support
 
-HELIX components support all modern browsers:
+`hx-form` ships against the library's published minimums (see `packages/hx-library/BROWSER_COMPATIBILITY.md`):
 
-- Chrome/Edge 90+
-- Firefox 90+
-- Safari 14+
+- Chrome / Edge 120+
+- Firefox 120+
+- Safari / Safari iOS 17+
+- Chrome Android 120+
 
-Shadow DOM and Custom Elements are required. No polyfills are provided for IE11.
+Custom Elements v1, Shadow DOM v1, CSS Custom Properties, and `ElementInternals` are required. No
+polyfills are provided for legacy engines.
 
 </div>

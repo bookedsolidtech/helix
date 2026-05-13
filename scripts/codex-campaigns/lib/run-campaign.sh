@@ -65,11 +65,37 @@ trap 'rm -f "$TARGET_LIST"' EXIT
 grep -vE '^\s*(#|$)' "$TARGETS_FILE" > "$TARGET_LIST" || true
 
 if (( RESUME == 1 )) && [[ -s "$FINDINGS" ]]; then
+  # Resume-skip compares each pending target against the `.tag` values
+  # already in findings.jsonl. Two campaign conventions need to coexist:
+  #   - Component campaigns (aria-delegation, cem-accuracy, …) emit
+  #     `tag: "{TAG}"` where {TAG} is the BASENAME of the target dir
+  #     (e.g. `hx-button` for target `packages/.../hx-button`).
+  #   - Docs-fact-check style campaigns emit `tag: "{TARGET}"` (the FULL
+  #     relative path) because basenames collide hard (`README.md` × 12,
+  #     `overview.md` × 7) and would silently skip un-run siblings.
+  # A naive basename fallback (match if either basename OR full path is in
+  # the seen set) fails for docs-fact-check: stale synthetic-failure
+  # records that used basename tags would mark every `README.md` sibling
+  # as "already attempted". The fix scopes the basename match: it only
+  # applies when the seen tag is ITSELF a basename (no `/` in it), so a
+  # docs campaign with full-path tags never matches basename-only.
   SEEN_TAGS="$(jq -r '.tag // empty' "$FINDINGS" | sort -u)"
+  # Split seen tags into two sets: full-path tags vs basename-only tags.
+  FULL_PATH_TAGS="$(echo "$SEEN_TAGS" | grep '/' || true)"
+  BASENAME_TAGS="$(echo "$SEEN_TAGS" | grep -v '/' || true)"
   FILTERED="$(mktemp)"
   while IFS= read -r t; do
-    tag="$(basename "$t")"
-    echo "$SEEN_TAGS" | grep -qxF "$tag" || echo "$t" >> "$FILTERED"
+    if [[ -n "$FULL_PATH_TAGS" ]] && echo "$FULL_PATH_TAGS" | grep -qxF "$t"; then
+      continue  # matched full path
+    fi
+    base="$(basename "$t")"
+    # Basename match is only allowed against basename-only seen tags. This
+    # prevents a stale `README.md` synthetic record from masking all 12
+    # README.md siblings on a docs-fact-check resume.
+    if [[ -n "$BASENAME_TAGS" ]] && echo "$BASENAME_TAGS" | grep -qxF "$base"; then
+      continue  # matched basename in a basename-keyed campaign
+    fi
+    echo "$t" >> "$FILTERED"
   done < "$TARGET_LIST"
   mv "$FILTERED" "$TARGET_LIST"
 fi
@@ -111,8 +137,21 @@ CODEX_ARGS=(exec --sandbox read-only --skip-git-repo-check --color never -C "$RE
 
 run_target() {
   local target="$1" idx="$2"
+  # {TAG} is the basename — the original meaning preserved for
+  # component-oriented campaigns (`aria-delegation`, `cem-accuracy`, …) that
+  # look up `tagName: "hx-button"` in the CEM. Campaigns whose targets are
+  # not unique by basename (the docs-fact-check sweep — `README.md` × 12,
+  # `overview.md` × 7 — collides) should emit the full `{TARGET}` path as
+  # the resume key in their finding schemas; `{TARGET}` is already a
+  # separate placeholder that substitutes to the verbatim path. The slug
+  # used for transcript filenames is derived from {TAG} for the
+  # component case and falls back to a path-derived sanitisation for
+  # docs-fact-check.
   local tag; tag="$(basename "$target")"
-  local slug; slug="${tag//[^a-zA-Z0-9_-]/_}"
+  # slug is derived from the FULL target path (not the basename) so transcript
+  # files don't collide across same-basename siblings (`README.md` × 12 in the
+  # docs-fact-check sweep would have written to the same `README_md.log`).
+  local slug; slug="${target//[^a-zA-Z0-9_-]/_}"
   local transcript="$REPORT_DIR/transcripts/$slug.log"
   local last_msg="$REPORT_DIR/transcripts/$slug.last.txt"
   local target_started; target_started="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -172,10 +211,18 @@ run_target() {
   # the failure.
   if (( codex_rc != 0 )) && (( parsed == 0 )); then
     local now; now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    # Synthetic failure records use the FULL target path as the tag, even
+    # for component campaigns whose normal findings emit a basename tag.
+    # The resume logic checks both basename and full path against the seen
+    # set, so a synthetic record under either convention skips correctly
+    # on the next run. Using the full path is the safer choice here because
+    # it can't collide on docs-fact-check sweeps with duplicate basenames
+    # (README.md × 12) — a synthetic crash on one of those siblings must
+    # not silently mark every other sibling as "already attempted".
     jq -nc \
       --arg campaign "$CAMPAIGN" \
       --arg target "$target" \
-      --arg tag "$tag" \
+      --arg tag "$target" \
       --arg ts "$now" \
       --arg sha "$HEAD_SHA" \
       --arg transcript "$transcript" \

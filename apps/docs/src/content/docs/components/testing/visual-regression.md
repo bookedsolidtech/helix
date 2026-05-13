@@ -43,8 +43,6 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
 });
 ```
@@ -52,7 +50,8 @@ export default defineConfig({
 Key points:
 
 - **Storybook is the test harness.** Tests navigate to isolated story iframes via `?viewMode=story`.
-- **Snapshots are committed to git.** The `__screenshots__` directory is in the repository so baselines are shared across the team.
+- **Single browser (Chromium).** The shipped VRT config defines only the `chromium` project. Cross-browser checks (Firefox/WebKit) run separately via `pnpm run test:cross-browser` and the weekly `.github/workflows/cross-browser.yml` job, not VRT.
+- **Snapshots are NOT committed to git.** The `packages/hx-library/__screenshots__/` directory is in `.gitignore`; baselines are regenerated from a CI cache + the canonical run, not shared via the repo.
 - **CI runs single-threaded.** `workers: process.env.CI ? 1 : undefined` prevents flaky failures from parallel browser rendering differences.
 - **Retries on CI.** `retries: 2` handles transient network or rendering timing issues.
 
@@ -72,19 +71,23 @@ interface ComponentVariant {
   id: string;
 }
 
-const COMPONENT_VARIANTS: ComponentVariant[] = [
+// ALL_VARIANTS is the editable matrix. COMPONENT_VARIANTS is derived from
+// ALL_VARIANTS at module load (filtered by the changed-components env var when
+// running smart VRT) — see e2e/vrt.spec.ts for the actual derivation.
+const ALL_VARIANTS: ComponentVariant[] = [
   // hx-button
   { component: 'hx-button', story: 'Primary', id: 'components-button--primary' },
   { component: 'hx-button', story: 'Secondary', id: 'components-button--secondary' },
   { component: 'hx-button', story: 'Ghost', id: 'components-button--ghost' },
+  { component: 'hx-button', story: 'Small', id: 'components-button--small' },
+  { component: 'hx-button', story: 'Large', id: 'components-button--large' },
   { component: 'hx-button', story: 'Disabled', id: 'components-button--disabled' },
 
-  // hx-text-input
-  { component: 'hx-text-input', story: 'Default', id: 'components-text-input--default' },
-  { component: 'hx-text-input', story: 'WithError', id: 'components-text-input--with-error' },
-  { component: 'hx-text-input', story: 'Disabled', id: 'components-text-input--disabled' },
+  // TODO: hx-text-input, hx-checkbox, hx-radio-group, hx-textarea, hx-switch
+  // are excluded from VRT — they fail to render in static Storybook builds
+  // currently and are re-enabled component-by-component.
 
-  // ... one entry per component variant
+  // ... one entry per component variant included in the matrix
 ];
 
 for (const variant of COMPONENT_VARIANTS) {
@@ -296,14 +299,13 @@ const COMPONENT_VARIANTS: ComponentVariant[] = [
   // Disabled state
   { component: 'hx-button', story: 'Disabled', id: 'components-button--disabled' },
 
-  // Error state (for form components)
-  { component: 'hx-text-input', story: 'WithError', id: 'components-text-input--with-error' },
-
   // Size variants
-  { component: 'hx-button', story: 'SizeSm', id: 'components-button--size-sm' },
-  { component: 'hx-button', story: 'SizeLg', id: 'components-button--size-lg' },
+  { component: 'hx-button', story: 'Small', id: 'components-button--small' },
+  { component: 'hx-button', story: 'Large', id: 'components-button--large' },
 ];
 ```
+
+Form-component error states (hx-text-input WithError, hx-textarea, etc.) are currently excluded from the VRT matrix — see the TODO comment in `e2e/vrt.spec.ts`. Error-state coverage will return as static-Storybook rendering stabilises for those components.
 
 For interactive states (hover, focus) that require interaction before screenshotting, write a separate dedicated test rather than adding them to the data loop:
 
@@ -360,32 +362,37 @@ Dark mode baselines are separate files from light mode baselines. Store them wit
 The GitHub Actions workflow runs VRT after Storybook is built and served:
 
 ```yaml
-# .github/workflows/ci.yml (relevant portion)
-- name: Build Storybook
-  run: npm run build:storybook
+# .github/workflows/ci.yml (relevant portion — abbreviated)
+- uses: pnpm/action-setup@v4
+- uses: actions/setup-node@v4
+  with:
+    node-version: 22
+    cache: 'pnpm'
 
-- name: Serve Storybook
-  run: npx serve storybook-static --port 3151 &
-  # The & runs it in the background
+- run: pnpm install --frozen-lockfile
+- run: pnpm --filter=@helix/storybook run build
 
-- name: Wait for Storybook
-  run: npx wait-on http://localhost:3151 --timeout 60000
+- name: Serve Storybook (http-server)
+  run: pnpm exec http-server apps/storybook/storybook-static -p 3151 -s &
+- run: pnpm exec wait-on http://localhost:3151 --timeout 60000
 
-- name: Install Playwright browsers
-  run: npx playwright install --with-deps chromium firefox webkit
+- name: Install Chromium for Playwright
+  run: pnpm exec playwright install --with-deps chromium
 
-- name: Run Visual Regression Tests
-  run: npx playwright test
+- name: Run VRT (Chromium only)
+  run: pnpm --filter=@helixui/library run test:vrt
   env:
     CI: true
 
-- name: Upload VRT results
-  uses: actions/upload-artifact@v4
+- name: Upload VRT diff artifacts on failure
   if: failure()
+  uses: actions/upload-artifact@v4
   with:
-    name: vrt-results
-    path: packages/hx-library/.cache/vrt-results/
+    name: vrt-diffs
+    path: packages/hx-library/__screenshots__/**/*.png
 ```
+
+The job pulls only Chromium (matching the single-project Playwright config), serves Storybook with `http-server`, and waits for `localhost:3151` before running VRT. Baselines are cached + regenerated, not committed.
 
 In CI:
 
@@ -429,9 +436,9 @@ hx-text-input error state should show red border and error text
 hx-badge variant=warning should have amber background
 
 // ❌ Not worth a VRT — unit test instead
-hx-button should set aria-disabled="true" when disabled
+hx-button should set the native disabled attribute when disabled
 hx-text-input should dispatch hx-input on keystroke
-hx-checkbox should call form.requestSubmit() on check
+hx-checkbox should update form value + dispatch hx-change on toggle
 ```
 
 ## Running VRT Locally

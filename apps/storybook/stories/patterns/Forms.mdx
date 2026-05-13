@@ -39,8 +39,12 @@ import '@helixui/library/components/hx-file-upload';
 <section>
   <SectionHead title="Input states" meta="hx-text-input · all five states on one row" />
   <p style={{ color: 'var(--hx-color-text-secondary)', maxWidth: '70ch', marginBottom: 24 }}>
-    A single text input across rest, filled, error, success, and disabled. The same five-state
-    contract applies to every input-shaped control on this page.
+    A single text input across rest, filled, error, and disabled — plus a verified pattern that
+    consumers compose by slotting confirmation content into <code>help-text</code>. The shipped
+    <code> hx-text-input</code> exposes <code>rest</code>, <code>filled</code> (any non-empty
+    value), <code>error</code> (driven by the <code>error</code> attribute / slot), and{' '}
+    <code>disabled</code>. There is no built-in <em>success</em> state — the &quot;verified&quot;
+    tile below is an author-composed pattern, not a component state.
   </p>
   <div
     style={{
@@ -58,12 +62,7 @@ import '@helixui/library/components/hx-file-upload';
       </hx-text-input>
     </DocsCard>
     <DocsCard title="error" tag="aria-invalid">
-      <hx-text-input
-        label="Member ID"
-        value="MBR-9831"
-        invalid
-        error-message="No member matches this ID."
-      />
+      <hx-text-input label="Member ID" value="MBR-9831" error="No member matches this ID." />
     </DocsCard>
     <DocsCard title="success" tag="aria-describedby">
       <hx-text-input label="Member ID" value="MBR-1042">
@@ -106,14 +105,13 @@ import '@helixui/library/components/hx-file-upload';
       <hx-text-input
         label="Member ID"
         value="MBR-9831"
-        invalid
-        error-message="No member matches this ID. Check digits 4–8."
+        error="No member matches this ID. Check digits 4–8."
       />
       <hx-select label="Insurance plan" value="anthem">
-        <hx-option value="">Choose plan…</hx-option>
-        <hx-option value="anthem">Anthem Blue PPO</hx-option>
-        <hx-option value="kaiser">Kaiser HMO</hx-option>
-        <hx-option value="medicare">Medicare Part B</hx-option>
+        <option value="">Choose plan…</option>
+        <option value="anthem">Anthem Blue PPO</option>
+        <option value="kaiser">Kaiser HMO</option>
+        <option value="medicare">Medicare Part B</option>
       </hx-select>
       <hx-radio-group label="Visit type" value="telehealth" name="visit-type">
         <hx-radio value="in-person">In-person</hx-radio>
