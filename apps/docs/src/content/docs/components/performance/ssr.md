@@ -9,7 +9,18 @@ Server-side rendering (SSR) improves Time to First Byte, enables search engine i
 
 This page gives an honest account of where Lit SSR stands today, what the `@lit-labs/ssr` package does, how Declarative Shadow DOM works, and what to do when SSR is not practical for a given component.
 
-> **Reading note:** Several examples in this guide reach beyond what HELiX ships today: standard `shadowrootmode` Declarative Shadow DOM is Chromium 111+ / Edge 111+ / Safari 16.4+ / Firefox 123+; `hx-card`'s real shadow parts are `card` / `image` / `heading` / `body` / `footer` / `actions` (no `header`, no `body` slot — the body is the default slot); HELiX does not currently ship an `hx-chart` component; the workspace runs Astro 5 (the `@astrojs/lit` integration is deprecated for Astro 5 — current guidance is client-side `<script>` registration); and several recipes call browser globals that HELiX components don't actually invoke at construction time. Read the per-component CEM and the [`@helixui/library` SSR audit](../../../) before assuming a specific pattern works.
+> **Reading note:** Several examples in this guide reach beyond what HELiX
+> ships today: standard `shadowrootmode` Declarative Shadow DOM is Chromium
+> 111+ / Edge 111+ / Safari 16.4+ / Firefox 123+; `hx-card`'s real shadow
+> parts are `card` / `image` / `heading` / `body` / `footer` / `actions`
+> (no `header`, no `body` slot — the body is the default slot); HELiX does
+> not currently ship an `hx-chart` component; the workspace runs Astro 5
+> (the `@astrojs/lit` integration is deprecated for Astro 5 — current
+> guidance is client-side `<script>` registration); and several recipes call
+> browser globals that HELiX components don't actually invoke at construction
+> time. Verify a pattern against the per-component
+> [Custom Elements Manifest](/api-reference/overview/) before assuming it
+> works.
 
 ---
 
@@ -165,10 +176,12 @@ export async function handleRequest(req: Request): Promise<Response> {
     <html>
       <head>
         <meta charset="utf-8" />
-        <link
-          rel="modulepreload"
-          href="/node_modules/@helixui/library/dist/components/hx-card/index.js"
-        />
+        <!-- Preload from a publicly-served bundle URL. In a typical SSR app
+             your bundler emits the hx-card module under /assets/, /static/,
+             or a similar public prefix — substitute that for the placeholder
+             below. Direct /node_modules paths only work when the dev server
+             happens to expose them and will 404 in production. -->
+        <link rel="modulepreload" href="/assets/hx-card-[hash].js" />
       </head>
       <body>
         <hx-card>
