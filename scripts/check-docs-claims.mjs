@@ -137,14 +137,20 @@ async function loadWorkspaceVersions() {
   // `create-helix@0.8.0` are flagged once npm has a newer version.
   try {
     const { execSync } = await import('node:child_process');
+    // Hard timeout — Gate 12 runs on every push, so a slow / offline npm
+    // registry must NOT hang preflight. 3s is generous for a successful
+    // `npm view` (~300ms typical); anything beyond that we treat as offline
+    // and fall back to the sentinel.
     const v = execSync('npm view create-helix version --silent 2>/dev/null', {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
+      timeout: 3000,
     }).trim();
     versions.set('create-helix', v || 'npm-resolved');
   } catch {
-    // network failure (offline / restricted CI) — fall back to sentinel so
-    // package-name validation still works but version-drift skips.
+    // network failure (offline / restricted CI / timeout) — fall back to
+    // sentinel so package-name validation still works but version-drift
+    // skips for the create-helix arm.
     versions.set('create-helix', 'npm-resolved');
   }
   return versions;
@@ -542,9 +548,14 @@ for (const file of targetFiles) {
     const floor = exactMatch ? pin : rangeMatch?.[1];
     if (!floor) continue;
 
-    // Compare major.minor.patch numerically against the canonical workspace version.
-    // Exact pins compare on all three segments (CDN URLs / install snippets drift
-    // on patch bumps too); range pins (^X.Y, ~X.Y) only compare major+minor floor.
+    // Compare numerically against the canonical workspace version with
+    // semver-aware range semantics:
+    //   - Caret `^X.Y.Z` accepts >=X.Y.Z <(X+1).0.0 — stale only if majors differ
+    //   - Tilde `~X.Y.Z` accepts >=X.Y.Z <X.(Y+1).0 — stale if majors differ or
+    //     floor minor < canonical minor (i.e., the canonical has moved past the
+    //     tilde-pinned minor)
+    //   - Exact `X.Y.Z` — stale on any segment diff (CDN URLs / install
+    //     snippets drift on patch bumps too)
     const [floorMajorRaw, floorMinorRaw = '0', floorPatchRaw = '0'] = floor.split('.');
     const [canonMajorRaw, canonMinorRaw = '0', canonPatchRaw = '0'] = canonical.split('.');
     const floorMajor = Number(floorMajorRaw);
@@ -553,10 +564,15 @@ for (const file of targetFiles) {
     const canonMajor = Number(canonMajorRaw);
     const canonMinor = Number(canonMinorRaw);
     const canonPatch = Number(canonPatchRaw);
-    const stale =
-      floorMajor !== canonMajor ||
-      floorMinor < canonMinor ||
-      (exactMatch && floorMinor === canonMinor && floorPatch < canonPatch);
+    const isCaret = pin.startsWith('^');
+    const isTilde = pin.startsWith('~');
+    const stale = exactMatch
+      ? floorMajor !== canonMajor || floorMinor !== canonMinor || floorPatch < canonPatch
+      : isCaret
+        ? floorMajor !== canonMajor
+        : isTilde
+          ? floorMajor !== canonMajor || floorMinor < canonMinor
+          : floorMajor !== canonMajor || floorMinor < canonMinor;
     if (stale) {
       add({
         file,
