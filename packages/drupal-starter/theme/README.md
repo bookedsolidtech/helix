@@ -2,9 +2,10 @@
 
 A production-ready Drupal 10/11 starter theme demonstrating full integration with the
 `@helixui/library` enterprise web component library. The theme uses Single Directory
-Components (SDC), Drupal behaviors, the `@helixui/adopted-stylesheets` pattern, and
-CSS custom property theming to compose HELiX `hx-*` web components into a complete
-Drupal front-end.
+Components (SDC), Drupal behaviors, the adopted-stylesheets pattern (using the native
+Constructable Stylesheets API directly — see the section below), and CSS custom
+property theming to compose HELiX `hx-*` web components into a complete Drupal
+front-end.
 
 ---
 
@@ -82,7 +83,10 @@ HELiX components use Shadow DOM internally for CSS encapsulation. This means:
 - **npm packages** (in Drupal project):
   - `@helixui/library` — the web component library
   - `@helixui/tokens` — design token CSS
-  - `@helixui/adopted-stylesheets` — the light-DOM/shadow-DOM bridge utilities
+  - (No separate `@helixui/adopted-stylesheets` package — the light-DOM/shadow-DOM
+    bridge uses the native `CSSStyleSheet` + `adoptedStyleSheets` primitives, wrapped
+    by `js/theme.behaviors.js`'s `helixuiAdoptedStylesheets` behavior. See the
+    "CSS Adopted Stylesheets" section below.)
 
 ---
 
@@ -338,26 +342,31 @@ to create `CSSStyleSheet` objects and inject them into any `Document` or `Shadow
 at runtime. This is the standard mechanism for sharing styles between the light DOM
 and shadow DOM without duplicating CSS text.
 
-The `@helixui/adopted-stylesheets` package exposes:
+There is no separate npm package wrapping these primitives — the theme uses
+`CSSStyleSheet` + `adoptedStyleSheets` directly. The pattern looks like this in
+practice (see `js/theme.behaviors.js` for the production version that adds
+reference counting and a tiny `cssText → sheet` cache):
 
 ```javascript
-import { adoptStyles, removeStyles } from '@helixui/adopted-stylesheets';
-import { createStyleSheet } from '@helixui/adopted-stylesheets';
-
-const tokenSheet = createStyleSheet(`
+// Build a single stylesheet from a CSS string.
+const tokenSheet = new CSSStyleSheet();
+tokenSheet.replaceSync(`
   :root {
     --hx-color-primary: #1a56db;
   }
 `);
 
-// Adopt into the document (affects light DOM)
-adoptStyles(document, tokenSheet);
+// Adopt into the document (affects light DOM).
+document.adoptedStyleSheets = [...document.adoptedStyleSheets, tokenSheet];
 
-// Adopt into a shadow root (affects one component's internals)
-adoptStyles(myComponent.shadowRoot, tokenSheet);
+// Adopt into a shadow root (affects one component's internals).
+myComponent.shadowRoot.adoptedStyleSheets = [
+  ...myComponent.shadowRoot.adoptedStyleSheets,
+  tokenSheet,
+];
 
-// Reference-counted — remove when done
-removeStyles(document, tokenSheet);
+// Remove when done — filter the sheet out of the array.
+document.adoptedStyleSheets = document.adoptedStyleSheets.filter((s) => s !== tokenSheet);
 ```
 
 ### How it is used in this theme
@@ -481,14 +490,14 @@ Drupal.behaviors.myFormBehavior = {
 
 ### Behaviors provided by this theme
 
-| Behavior | Description |
-|---|---|
-| `helixuiTheme` | Marks `[data-helixui]` elements as ready; waits for upgrade |
-| `helixuiAdoptedStylesheets` | Injects token sheet into shadow roots via adoptStyles() |
-| `helixuiFocusManagement` | Restores focus after hx-dialog and hx-drawer close |
-| `helixuiToastRegion` | Creates global hx-toast container; exposes `Drupal.helixui.notify()` |
-| `helixuiFormEnhancement` | Syncs hx-change events to Drupal AJAX system |
-| `helixuiMobileDrawer` | Manages mobile nav drawer open/close and body scroll lock |
+| Behavior                    | Description                                                          |
+| --------------------------- | -------------------------------------------------------------------- |
+| `helixuiTheme`              | Marks `[data-helixui]` elements as ready; waits for upgrade          |
+| `helixuiAdoptedStylesheets` | Injects token sheet into shadow roots via adoptStyles()              |
+| `helixuiFocusManagement`    | Restores focus after hx-dialog and hx-drawer close                   |
+| `helixuiToastRegion`        | Creates global hx-toast container; exposes `Drupal.helixui.notify()` |
+| `helixuiFormEnhancement`    | Syncs hx-change events to Drupal AJAX system                         |
+| `helixuiMobileDrawer`       | Manages mobile nav drawer open/close and body scroll lock            |
 
 ---
 
@@ -572,12 +581,12 @@ Override tokens inside media queries to adapt spacing and typography:
 ```css
 /* css/theme.css */
 :root {
-  --hx-color-primary: #005d6e;      /* Healthcare teal */
+  --hx-color-primary: #005d6e; /* Healthcare teal */
   --hx-color-primary-hover: #004b59;
   --hx-color-primary-active: #003a46;
   --hx-color-primary-contrast: #ffffff;
 
-  --hx-color-secondary: #8a4000;    /* Warm accent */
+  --hx-color-secondary: #8a4000; /* Warm accent */
   --hx-color-secondary-hover: #6e3300;
   --hx-color-secondary-contrast: #ffffff;
 
@@ -611,7 +620,7 @@ Override tokens inside media queries to adapt spacing and typography:
   --hx-radius-lg: 2px;
   --hx-radius-xl: 2px;
   --hx-focus-ring-width: 3px;
-  --hx-focus-ring-color: #ffb300;  /* High-contrast gold on dark */
+  --hx-focus-ring-color: #ffb300; /* High-contrast gold on dark */
   --hx-focus-ring-offset: 3px;
 }
 ```
@@ -690,7 +699,7 @@ Replace the `helixui.libraries.yml` paths with CDN URLs:
 global:
   version: VERSION
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@1.1.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       attributes:
         type: module
@@ -699,6 +708,7 @@ global:
 ```
 
 Use CDN when:
+
 - You cannot run a build step on the Drupal server
 - You want zero-config setup for prototyping
 - You are using Drupal's managed hosting (Acquia, Pantheon, Platform.sh)
@@ -707,13 +717,14 @@ Use CDN when:
 
 ```bash
 # In your Drupal project root
-npm install @helixui/library@1.1.2
+npm install @helixui/library@3.9.0
 
 # Copy to /libraries/helixui/ (or use a post-install script)
 npx helixui-copy-assets  # provided by the helixui module
 ```
 
 This strategy:
+
 - Locks the component version in `package.json`
 - Works with Drupal's CSS/JS aggregation pipeline
 - Allows HTTP/2 server push for component bundles
@@ -771,6 +782,7 @@ as a query string to all aggregated files, invalidating CDN and browser caches.
 upgraded from an `HTMLElement` to the full web component.
 
 **Fix**:
+
 1. Check browser DevTools Network tab for failed requests to `hx-button/index.js`
 2. Verify `/libraries/helixui/` exists and contains the dist files
 3. Run `drush helixui:assets:install`
@@ -810,6 +822,7 @@ hx-text-input:defined {
 **Cause**: SDC auto-discovery has not found the component directory.
 
 **Fix**:
+
 1. Verify the `components/` directory exists at the theme root
 2. Check `helixui.info.yml` has `components: components/`
 3. Ensure each SDC subdirectory contains a matching `.component.yml` file
@@ -844,6 +857,7 @@ show the default blue.
 to win the specificity.
 
 **Fix**:
+
 1. Verify `helixui/global` is listed in `helixui.info.yml` libraries
 2. Ensure `css/theme.css` sets tokens at `:root` level (not nested in a class)
 3. Disable CSS aggregation temporarily to check raw load order
@@ -856,6 +870,7 @@ to win the specificity.
 `outline` too aggressively.
 
 **Fix**:
+
 1. Verify `helixui/adopted-stylesheets` is in `helixui.info.yml` libraries
 2. Check that your CSS does not contain `* { outline: none }` or similar
 3. Verify `--hx-focus-ring-color` and `--hx-focus-ring-width` tokens are set
@@ -869,15 +884,15 @@ to win the specificity.
 
 Full-width hero section. Use for landing pages and healthcare service entry points.
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `title` | string | — | Headline. Rendered as `h1`. Use once per page. |
-| `subtitle` | string | — | Supporting text below the headline. |
-| `cta_text` | string | — | Call-to-action button label. Requires `cta_url`. |
-| `cta_url` | string | — | CTA button destination URL. |
-| `image_url` | string | — | Background image URL. |
-| `image_alt` | string | `''` | Alt text for background image. Use empty for decorative. |
-| `variant` | string | `'primary'` | Color scheme: `light`, `dark`, or `primary`. |
+| Prop        | Type   | Default     | Description                                              |
+| ----------- | ------ | ----------- | -------------------------------------------------------- |
+| `title`     | string | —           | Headline. Rendered as `h1`. Use once per page.           |
+| `subtitle`  | string | —           | Supporting text below the headline.                      |
+| `cta_text`  | string | —           | Call-to-action button label. Requires `cta_url`.         |
+| `cta_url`   | string | —           | CTA button destination URL.                              |
+| `image_url` | string | —           | Background image URL.                                    |
+| `image_alt` | string | `''`        | Alt text for background image. Use empty for decorative. |
+| `variant`   | string | `'primary'` | Color scheme: `light`, `dark`, or `primary`.             |
 
 **Slots**: `default` — additional content below the CTA (trust indicators, stats).
 
@@ -901,15 +916,15 @@ Full-width hero section. Use for landing pages and healthcare service entry poin
 
 Content card with image, heading, body, footer, and optional CTA action.
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `title` | string | — | Card heading. |
-| `body` | string | — | Body content (HTML allowed). |
-| `image_url` | string | — | Optional card header image. |
-| `image_alt` | string | `''` | Alt text for image. |
-| `link_url` | string | — | When set with no `link_text`, makes the whole card a link. |
-| `link_text` | string | — | CTA button label. When set, renders a button in the actions slot. |
-| `variant` | string | `'default'` | `default`, `outlined`, or `filled`. |
+| Prop        | Type   | Default     | Description                                                       |
+| ----------- | ------ | ----------- | ----------------------------------------------------------------- |
+| `title`     | string | —           | Card heading.                                                     |
+| `body`      | string | —           | Body content (HTML allowed).                                      |
+| `image_url` | string | —           | Optional card header image.                                       |
+| `image_alt` | string | `''`        | Alt text for image.                                               |
+| `link_url`  | string | —           | When set with no `link_text`, makes the whole card a link.        |
+| `link_text` | string | —           | CTA button label. When set, renders a button in the actions slot. |
+| `variant`   | string | `'default'` | `default`, `outlined`, or `filled`.                               |
 
 **Slots**: `footer` — metadata row (author, date, taxonomy).
 
@@ -933,12 +948,13 @@ Content card with image, heading, body, footer, and optional CTA action.
 
 Global site header with logo, navigation, and mobile drawer.
 
-| Prop | Type | Description |
-|---|---|---|
-| `site_name` | string | Site name linked to front page. |
-| `logo_url` | string | Logo image URL. Falls back to site_name text. |
+| Prop        | Type   | Description                                   |
+| ----------- | ------ | --------------------------------------------- |
+| `site_name` | string | Site name linked to front page.               |
+| `logo_url`  | string | Logo image URL. Falls back to site_name text. |
 
 **Slots**:
+
 - `navigation` — primary nav menu (rendered from `page.primary_menu`)
 - `search` — search block or secondary menu
 
@@ -1015,9 +1031,10 @@ a fully declarative, component-driven Drupal theme.
 
 ## Accessibility Compliance
 
-This theme and all HELiX components are designed for WCAG 2.1 AA compliance,
-which is the minimum standard for healthcare applications in the United States
-(Section 508 requirement).
+This theme and all HELiX components meet WCAG 2.2 AA as the baseline and
+WCAG 2.2 AAA on the P0 component surface (per `packages/hx-library/aaa-verdicts.json`).
+That clears the Section 508 / Section 504 requirements that apply to healthcare
+applications in the United States.
 
 ### Built-in accessibility features
 
@@ -1025,7 +1042,7 @@ which is the minimum standard for healthcare applications in the United States
 - Focus management in `hx-dialog`, `hx-drawer`, and `hx-popover` (focus trap)
 - ARIA roles, states, and properties on all interactive elements
 - Screen reader announcements via `aria-live` for dynamic content
-- Color contrast ratios meet WCAG 2.1 AA (4.5:1 for normal text, 3:1 for large text)
+- Color contrast ratios meet WCAG 2.2 AA (4.5:1 normal text, 3:1 large text / UI components) by default; WCAG 2.2 AAA (7:1) on the P0 surface
 - Focus rings use `--hx-focus-ring-color` token with fallback to a 3:1 contrast ratio
 
 ### Theme-level obligations

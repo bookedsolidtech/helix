@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-HELiX components are styled entirely through CSS custom properties. Shadow DOM encapsulation prevents external stylesheets from reaching inside components, but CSS custom properties inherit through Shadow DOM boundaries. This makes `--hx-*` properties the complete theming API.
+HELiX components are styled primarily through CSS custom properties. Shadow DOM encapsulation prevents external stylesheets from reaching inside components, but CSS custom properties inherit through Shadow DOM boundaries. `--hx-*` properties are the primary theming API; for structural changes that custom properties cannot express, components also expose documented `::part()` selectors (see the [CSS Parts](#css-parts-for-structural-overrides) section below).
 
 ---
 
@@ -37,7 +37,7 @@ And why this works:
 ```css
 /* WORKS — custom properties inherit through the boundary */
 hx-button {
-  --hx-button-bg-primary: red;
+  --hx-button-bg: red;
 }
 ```
 
@@ -97,27 +97,28 @@ libraries:
 
 HELiX tokens follow a three-tier hierarchy:
 
-**Tier 1 — Primitive tokens:** Concrete values. Rarely overridden.
+**Tier 1 — Primitive tokens:** Concrete brand-palette values. Rarely overridden.
 
 ```css
---hx-color-blue-500: #2563eb;
+--hx-color-primary-500: #429797;
+--hx-color-primary-700: #0f6363;
 --hx-space-4: 1rem;
---hx-font-size-base: 1rem;
+--hx-font-size-md: 1rem;
 ```
 
-**Tier 2 — Semantic tokens:** Reference primitives. Override these for brand customization.
+**Tier 2 — Semantic / action tokens:** Reference primitives. Override these for brand customization.
 
 ```css
---hx-color-primary-500: var(--hx-color-blue-500);
---hx-color-surface: var(--hx-color-neutral-50);
---hx-font-size-body: var(--hx-font-size-base);
+--hx-color-action-primary-bg: var(--hx-color-primary-700);
+--hx-color-surface-default: #ffffff;
+--hx-color-text-primary: #111827;
 ```
 
 **Tier 3 — Component tokens:** Reference semantic tokens. Override for per-component customization.
 
 ```css
---hx-button-bg-primary: var(--hx-color-primary-500);
---hx-button-padding-x: var(--hx-space-4);
+--hx-button-bg: var(--hx-color-action-primary-bg);
+--hx-card-padding: var(--hx-space-4);
 ```
 
 Overriding at Tier 2 propagates to all components that reference those semantics. Overriding at Tier 3 affects only the target component.
@@ -131,24 +132,24 @@ Override semantic tokens in your theme's global CSS to change the design system'
 ```css
 /* web/themes/custom/mytheme/css/tokens.css */
 :root {
-  /* Brand primary color */
+  /* Brand primary palette (drives action.primary tokens by default) */
   --hx-color-primary-500: #1a56db;
-  --hx-color-primary-600: #1e429f;
+  --hx-color-primary-700: #1e429f;
   --hx-color-primary-400: #3f83f8;
 
-  /* Brand secondary */
+  /* Brand secondary palette */
   --hx-color-secondary-500: #6875f5;
 
   /* Typography */
-  --hx-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
-  --hx-font-size-base: 1rem;
+  --hx-font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --hx-body-font-size: 1rem;
 
   /* Spacing adjustments for dense UIs */
   --hx-space-4: 0.875rem;
 
   /* Border radius */
-  --hx-radius-md: 6px;
-  --hx-radius-full: 9999px;
+  --hx-border-radius-md: 6px;
+  --hx-border-radius-full: 9999px;
 }
 ```
 
@@ -165,7 +166,7 @@ helix-theme-overrides:
 ```yaml
 # mytheme.info.yml
 libraries:
-  - mytheme/helix-tokens          # Base token values
+  - mytheme/helix-tokens # Base token values
   - mytheme/helix-theme-overrides # Your brand overrides
 ```
 
@@ -178,22 +179,22 @@ For sites that support multiple themes (e.g., light/dark, brand A/brand B, edito
 ```css
 /* Default: light mode */
 :root {
-  --hx-color-surface: #ffffff;
-  --hx-color-on-surface: #111827;
+  --hx-color-surface-default: #ffffff;
+  --hx-color-text-primary: #111827;
   --hx-color-primary-500: #2563eb;
 }
 
 /* Dark mode */
-[data-theme="dark"] {
-  --hx-color-surface: #1f2937;
-  --hx-color-on-surface: #f9fafb;
+[data-theme='dark'] {
+  --hx-color-surface-default: #1f2937;
+  --hx-color-text-primary: #f9fafb;
   --hx-color-primary-500: #60a5fa;
 }
 
 /* Healthcare brand */
-[data-theme="healthcare"] {
+[data-theme='healthcare'] {
   --hx-color-primary-500: #0d9488;
-  --hx-color-primary-600: #0f766e;
+  --hx-color-primary-700: #0f766e;
 }
 ```
 
@@ -224,15 +225,14 @@ Override component-specific tokens on the component's host element:
 ```css
 /* Change button appearance for a specific context */
 .hero-section hx-button {
-  --hx-button-bg-primary: transparent;
-  --hx-button-color-primary: white;
-  --hx-button-border-primary: 2px solid white;
-  --hx-button-padding-x: var(--hx-space-6);
+  --hx-button-bg: transparent;
+  --hx-button-color: #ffffff;
+  --hx-button-border-color: #ffffff;
 }
 
 /* Change card border radius throughout a region */
 .sidebar hx-card {
-  --hx-card-radius: var(--hx-radius-sm);
+  --hx-card-border-radius: var(--hx-border-radius-sm);
 }
 ```
 
@@ -272,23 +272,23 @@ Component libraries are attached per-template or per-route, not globally (unless
 
 ## FOUC Prevention
 
-Flash of Unstyled Content occurs when components render as plain HTML before their JavaScript upgrades them. The `@helixui/tokens` package includes a `fouc.css` file for this:
+Flash of Unstyled Content occurs when components render as plain HTML before their JavaScript upgrades them. The `@helixui/library` package ships a `fouc.css` file for this — it lives in the library package, not in `@helixui/tokens`:
 
 ```yaml
 # mytheme.libraries.yml
 helix-fouc:
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/fouc.css:
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/fouc.css:
         type: external
 ```
 
-This CSS hides components using `:not(:defined)` until they upgrade, then fades them in.
+The packaged CSS hides components using `:not(:defined)` until they upgrade, at which point the rule no longer matches and the component becomes visible. The fade-in below is an **optional enhancement**, not part of the shipped stylesheet.
 
-If you prefer to write it manually:
+If you prefer to write it manually (the snippet below covers a small subset — for complete coverage use the shipped `@helixui/library/fouc.css`):
 
 ```css
-/* Hide all HELiX components before upgrade */
+/* Hide a subset of HELiX components before upgrade */
 hx-button:not(:defined),
 hx-card:not(:defined),
 hx-text-input:not(:defined),
@@ -308,8 +308,12 @@ hx-text-input:defined {
 }
 
 @keyframes hx-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 ```
 
@@ -337,8 +341,8 @@ Integrate HELiX token overrides with the browser's `prefers-color-scheme` media 
 ```css
 @media (prefers-color-scheme: dark) {
   :root {
-    --hx-color-surface: #1f2937;
-    --hx-color-on-surface: #f9fafb;
+    --hx-color-surface-default: #1f2937;
+    --hx-color-text-primary: #f9fafb;
     --hx-color-primary-500: #60a5fa;
     --hx-color-neutral-100: #374151;
     --hx-color-neutral-200: #4b5563;
@@ -351,17 +355,22 @@ For user-controlled preference (respecting Drupal's theme setting):
 ```css
 /* Default light */
 :root,
-[data-color-scheme="light"] {
-  --hx-color-surface: #ffffff;
-  --hx-color-on-surface: #111827;
+[data-color-scheme='light'] {
+  --hx-color-surface-default: #ffffff;
+  --hx-color-text-primary: #111827;
 }
 
 /* Explicit dark preference */
-[data-color-scheme="dark"],
+[data-color-scheme='dark'] {
+  --hx-color-surface-default: #1f2937;
+  --hx-color-text-primary: #f9fafb;
+}
+
+/* System dark preference — only applies when the user hasn't explicitly opted into light */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-color-scheme="light"]) {
-    --hx-color-surface: #1f2937;
-    --hx-color-on-surface: #f9fafb;
+  :root:not([data-color-scheme='light']) {
+    --hx-color-surface-default: #1f2937;
+    --hx-color-text-primary: #f9fafb;
   }
 }
 ```
@@ -379,8 +388,8 @@ hx-button::part(button) {
   text-transform: uppercase;
 }
 
-/* Style the card's media container */
-hx-card::part(media) {
+/* Style the card's image container */
+hx-card::part(image) {
   aspect-ratio: 16 / 9;
   overflow: hidden;
 }
@@ -399,19 +408,23 @@ To inspect which token values are active on a page:
 const styles = getComputedStyle(document.documentElement);
 const tokens = [
   '--hx-color-primary-500',
-  '--hx-color-surface',
-  '--hx-font-size-base',
+  '--hx-color-surface-default',
+  '--hx-color-text-primary',
+  '--hx-font-size-md',
   '--hx-space-4',
 ];
-tokens.forEach(t => console.log(t, styles.getPropertyValue(t)));
+tokens.forEach((t) => console.log(t, styles.getPropertyValue(t)));
 ```
 
 To check what tokens a specific component is using:
 
 ```javascript
 const card = document.querySelector('hx-card');
-const shadowStyles = getComputedStyle(card.shadowRoot.querySelector('[part="root"]'));
-console.log('card bg:', shadowStyles.backgroundColor);
+const inner = card.shadowRoot?.querySelector('[part="card"]');
+if (inner) {
+  const shadowStyles = getComputedStyle(inner);
+  console.log('card bg:', shadowStyles.backgroundColor);
+}
 ```
 
 ---

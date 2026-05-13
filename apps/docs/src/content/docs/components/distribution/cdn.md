@@ -5,27 +5,58 @@ description: Distributing HELiX web components via CDN for zero-install consumpt
 
 # CDN Distribution
 
+import { Aside } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Only the library-mode tree is published">
+  As of @helixui/library@3.9.0, the published npm package ships the Vite
+  library-mode tree only (<code>dist/index.js</code>,
+  <code>dist/components/&lt;tag&gt;/index.js</code>,
+  <code>dist/css/*</code>, etc.). The repo also contains a
+  <code>build:cdn</code> script that emits Lit-inlined, versioned bundles to
+  <code>dist/cdn/</code> for self-hosting — but the package's
+  <code>files</code> whitelist intentionally excludes
+  <code>dist/cdn/**</code>, so those bundles do <strong>not</strong> appear
+  on jsDelivr/unpkg. The URL patterns under <em>jsDelivr and unpkg Usage
+  Patterns</em> point at the library-mode tree only.
+</Aside>
+
 Not every environment that needs HELiX can run `npm install`. Drupal themes, legacy CMS setups, and quick prototypes often need to load web components directly from a URL — no build step, no package manager, no bundler. CDN distribution is how HELiX serves those environments.
 
-This page covers how to build CDN-ready bundles, how CDN URLs are structured, how Drupal consumes them via `libraries.yml`, how to protect integrity with Subresource Integrity (SRI) hashes, and how to test CDN bundles locally before shipping.
+This page covers how the published bundles are structured, how CDN URLs are formed, how Drupal consumes them via `libraries.yml`, how to protect integrity with Subresource Integrity (SRI) hashes, and how to test bundles locally before shipping.
 
 ---
 
-## Library Mode Bundles vs. CDN Bundles
+## Today's distribution: library-mode ESM only (no published CDN bundle layer)
 
-HELiX's primary build output (produced by `npm run build`) is a set of **ES module library bundles**. These are designed for consumption by bundlers (Vite, Webpack, Rollup) that understand ES module imports, handle tree-shaking, and resolve bare specifiers like `lit` from `node_modules`.
+`@helixui/library` publishes its ES-module distribution under `dist/`. The
+default Vite build (`pnpm --filter=@helixui/library build`) writes the
+library-mode tree at `dist/index.js`, `dist/components/<tag>/index.js`,
+`dist/css/*`, etc. — designed for consumer bundlers that resolve bare
+specifiers (`lit`, `@helixui/tokens`, …) via the import graph.
 
-A **CDN bundle** has different requirements:
+A separate CDN build script exists in the repo
+(`pnpm --filter=@helixui/library run build:cdn`) that emits versioned,
+Lit-inlined bundles into a **local-only** `dist/cdn/` tree. **Those CDN
+artifacts are NOT shipped with the published npm package** — the package's
+`files` whitelist covers `dist/index.js`, `dist/components/**`,
+`dist/css/**`, `dist/shared/**`, etc., but excludes `dist/cdn/**`. Requests
+to `https://cdn.jsdelivr.net/npm/@helixui/library@<version>/dist/cdn/...`
+will 404. Treat the build:cdn output as local infrastructure for consumers
+who self-host the CDN tree, not as a jsDelivr/unpkg-fetchable surface.
 
-| Requirement    | Library bundle                     | CDN bundle                             |
-| -------------- | ---------------------------------- | -------------------------------------- |
-| Import format  | ES module with bare specifiers     | Self-contained ESM or IIFE             |
-| Lit dependency | Externalized (`import from 'lit'`) | Bundled in or loaded separately        |
-| Tree-shaking   | Expected from consumer             | Optional — often ships everything      |
-| Loader         | npm + bundler                      | `<script type="module">` or `<script>` |
-| Caching        | Per-deployment                     | Long-lived, version-pinned URLs        |
+| Artifact                                     | Used for                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `dist/index.js`                              | Full library bundle (Vite library mode) — registers every `hx-*`                      |
+| `dist/components/<tag>/index.js`             | Per-component module (Vite library mode)                                              |
+| `dist/css/helix-*.css`                       | Pre-built token / category stylesheets for consumer use                               |
+| `fouc.css`                                   | Pre-upgrade flash-of-unstyled-content guard                                           |
+| `custom-elements.json` / `aaa-verdicts.json` | CEM + AAA verdicts metadata                                                           |
+| `dist/cdn/*` (local build:cdn output)        | **NOT published to npm** — locally-built versioned/SRI'd bundles for self-host setups |
 
-The key difference: library bundles say "go find `lit` yourself." CDN bundles must either include `lit` or explicitly load it from another URL first.
+These published files are CDN-ready out of the box because `@helixui/library` declares Lit as a
+regular runtime dependency — jsDelivr and unpkg resolve the bare `lit` import through the
+dependency tree. Consumers loading via plain `<script type="module">` can either let the CDN
+follow the import graph or provide an import map (see <em>Import maps</em> below).
 
 ---
 
@@ -100,11 +131,11 @@ Add the CDN build script to `package.json`:
 After `npm run build:cdn`, the output:
 
 ```
-dist-cdn/
-├── hx-library.es.js        (ESM, all components + Lit, ~55KB gzip)
-├── hx-library.es.js.map
-├── hx-library.iife.js      (IIFE global, all components + Lit, ~58KB gzip)
-└── hx-library.iife.js.map
+dist/
+├── index.js        (ESM, all components + Lit, ~55KB gzip)
+├── index.js.map
+├── index.js      (IIFE global, all components + Lit, ~58KB gzip)
+└── index.js.map
 ```
 
 ### Per-Component CDN Bundles — build configuration
@@ -150,7 +181,7 @@ export default defineConfig({
 This produces:
 
 ```
-dist-cdn/components/
+dist/components/
 ├── hx-button.js      (~6KB gzip — component only, Lit loaded from jsDelivr)
 ├── hx-card.js        (~5KB gzip)
 └── hx-text-input.js  (~7KB gzip)
@@ -166,19 +197,28 @@ Once `@helixui/library` is published to npm, the CDN bundles are automatically a
 
 ### jsDelivr
 
-jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`:
+jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`. The shipped `dist/index.js` imports bare specifiers (`@helixui/tokens`, `@helixui/icons`, `@floating-ui/dom`, `lit`, `lit/*`) — those won't resolve in the browser without an **import map** first. Always pair the library script with the import map; a bare `<script src="…/dist/index.js">` will fail with `Failed to resolve module specifier`.
 
 ```html
-<!-- Latest within the 2.x major (auto-updates on minor/patch) -->
-<script
-  type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
-></script>
+<script type="importmap">
+  {
+    "imports": {
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
+    }
+  }
+</script>
 
-<!-- Pinned to exact version (recommended for production) -->
+<!-- Floating major — receives patch + minor updates automatically -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js"></script>
+
+<!-- Or pinned to exact version (recommended for production, pair with SRI) -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
 ></script>
 ```
 
@@ -191,13 +231,21 @@ jsDelivr supports:
 
 ### unpkg
 
-unpkg proxies npm at `https://unpkg.com/`:
+unpkg proxies npm at `https://unpkg.com/`. The same import-map prerequisite applies — `@helixui/library`'s bare specifiers won't resolve from the unpkg URL alone:
 
 ```html
-<script
-  type="module"
-  src="https://unpkg.com/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
-></script>
+<script type="importmap">
+  {
+    "imports": {
+      "lit": "https://unpkg.com/lit@3/index.js?module",
+      "lit/": "https://unpkg.com/lit@3/",
+      "@helixui/tokens": "https://unpkg.com/@helixui/tokens@3/dist/index.js",
+      "@helixui/icons": "https://unpkg.com/@helixui/icons@1/dist/index.js",
+      "@floating-ui/dom": "https://unpkg.com/@floating-ui/dom@1/?module"
+    }
+  }
+</script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/index.js"></script>
 ```
 
 **Recommendation:** Use jsDelivr for production. It has better uptime guarantees and performance than unpkg, which is community-operated with no SLA.
@@ -214,7 +262,7 @@ Drupal's library system (`libraries.yml`) can reference CDN URLs directly with a
 # helix_theme.libraries.yml
 
 helix-components:
-  version: '2.3.1'
+  version: '3.9.0'
   header: true
   js:
     # Load Lit first (required by HELiX components)
@@ -224,7 +272,7 @@ helix-components:
       attributes:
         type: module
     # Then load the HELiX bundle
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       minified: true
       attributes:
@@ -240,10 +288,10 @@ Drupal can serve a local copy of the file when the CDN is unreachable. The `exte
 
 ```yaml
 helix-components:
-  version: '2.3.1'
+  version: '3.9.0'
   header: true
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       minified: true
       attributes:
@@ -251,18 +299,18 @@ helix-components:
         crossorigin: anonymous
         integrity: 'sha384-[SRI_HASH_HERE]'
     # Local fallback (relative to the theme root)
-    js/vendor/hx-library.es.js:
+    js/vendor/index.js:
       minified: true
       attributes:
         type: module
 ```
 
-Copy the CDN file to `js/vendor/hx-library.es.js` during your theme build process:
+Copy the CDN file to `js/vendor/index.js` during your theme build process:
 
 ```bash
 # In your theme's build script
-curl -o themes/custom/helix_theme/js/vendor/hx-library.es.js \
-  "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
+curl -o themes/custom/helix_theme/js/vendor/index.js \
+  "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
 ```
 
 **Note:** Drupal's `type: external` libraries do not automatically implement fallback logic. For true failover, use a small inline script that checks if `customElements.get('hx-button')` is defined after the CDN script tag and loads the local version if not.
@@ -277,7 +325,7 @@ SRI prevents CDN-delivered files from being tampered with. The browser computes 
 
 ```bash
 # Generate sha384 hash for the CDN bundle
-openssl dgst -sha384 -binary dist-cdn/hx-library.es.js \
+openssl dgst -sha384 -binary dist/index.js \
   | openssl base64 -A \
   | sed 's/^/sha384-/'
 
@@ -296,7 +344,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const files = ['dist-cdn/hx-library.es.js', 'dist-cdn/hx-library.iife.js'];
+const files = ['dist/index.js', 'dist/index.js'];
 
 const hashes: Record<string, string> = {};
 
@@ -306,10 +354,7 @@ for (const file of files) {
   hashes[file] = `sha384-${hash}`;
 }
 
-writeFileSync(
-  resolve(__dirname, '..', 'dist-cdn/sri-hashes.json'),
-  JSON.stringify(hashes, null, 2),
-);
+writeFileSync(resolve(__dirname, '..', 'dist/sri-hashes.json'), JSON.stringify(hashes, null, 2));
 
 console.log('SRI hashes generated:');
 Object.entries(hashes).forEach(([file, hash]) => {
@@ -323,7 +368,7 @@ Object.entries(hashes).forEach(([file, hash]) => {
 <!-- With SRI: browser refuses to execute if file has been tampered with -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
   integrity="sha384-ABC123..."
   crossorigin="anonymous"
 ></script>
@@ -335,9 +380,9 @@ The `crossorigin="anonymous"` attribute is required when using `integrity` with 
 
 ```yaml
 helix-components:
-  version: '2.3.1'
+  version: '3.9.0'
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       minified: true
       attributes:
@@ -355,12 +400,12 @@ CDN URLs should be immutable and versioned. Never serve different content at the
 **Versioned URL pattern (recommended):**
 
 ```
-https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js
+https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js
                                                    ^^^^^^
                                                    Exact semver version
 ```
 
-This URL is permanently cached. When `2.3.2` ships, a new URL is served. Old URLs continue to work indefinitely. Consumers upgrade by updating the version in their URL.
+This URL is permanently cached. When `3.10.0` ships, a new URL is served. Old URLs continue to work indefinitely. Consumers upgrade by updating the version in their URL.
 
 **Do not use floating ranges on CDN URLs:**
 
@@ -368,13 +413,13 @@ This URL is permanently cached. When `2.3.2` ships, a new URL is served. Old URL
 <!-- ❌ BAD — a new release changes what this URL serves -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
 ></script>
 
 <!-- ❌ BAD — minor/patch updates silently change the file -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
 ></script>
 ```
 
@@ -384,10 +429,10 @@ Floating ranges work in `package.json` (with a lockfile) because `npm ci` resolv
 
 ```
 # Exact version — immutable, cache-forever
-https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist-cdn/hx-library.es.js
+https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist/index.js
 
 # Per-component (when using import maps)
-https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist-cdn/components/hx-button.js
+https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist/components/hx-button/index.js
 ```
 
 ---
@@ -418,7 +463,7 @@ https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist-cdn/components/hx-b
 ```html
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/hx-library.es.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
 ></script>
 ```
 
@@ -450,8 +495,8 @@ https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist-cdn/components/hx-b
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
       "lit/decorators.js": "https://cdn.jsdelivr.net/npm/lit@3/decorators.js",
       "lit/directives/class-map.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/class-map.js",
-      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/components/hx-button.js",
-      "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist-cdn/components/hx-card.js"
+      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js",
+      "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js"
     }
   }
 </script>
@@ -540,7 +585,7 @@ live-server packages/hx-library/dist-cdn --port=8080
 Then create a test HTML file:
 
 ```html
-<!-- packages/hx-library/dist-cdn/test.html -->
+<!-- packages/hx-library/dist/test.html -->
 <!doctype html>
 <html lang="en">
   <head>
@@ -549,7 +594,7 @@ Then create a test HTML file:
   </head>
   <body>
     <!-- Load the local CDN bundle -->
-    <script type="module" src="/hx-library.es.js"></script>
+    <script type="module" src="/index.js"></script>
 
     <!-- Test every component -->
     <hx-button>Primary Button</hx-button>
@@ -578,25 +623,26 @@ Then create a test HTML file:
 
 Open `http://localhost:8080/test.html` and verify all components render and console confirms registration.
 
-### Testing the IIFE Bundle
+### Testing the (Hypothetical) IIFE Bundle
 
-The IIFE bundle is consumed as a classic `<script>` tag (no `type="module"`):
+> **Status note:** `@helixui/library` does **not** ship an IIFE / UMD artifact today — `dist/index.js` is an **ES module entry** with bare imports, and loading it as `<script src="…">` (without `type="module"`) syntax-errors on its first `import` statement. There is no `window.HxLibrary` global. The pattern below is what a build-step would look like **if** a separate IIFE artifact were added (e.g. a future `dist/iife/index.js` emitted by a `build:cdn` task) — keep it as a recipe, not a working snippet against the current published package.
 
 ```html
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>HELiX IIFE Bundle Test</title>
+    <title>HELiX IIFE Bundle Test (hypothetical)</title>
   </head>
   <body>
-    <!-- IIFE — loaded as classic script, no module support needed -->
-    <script src="/hx-library.iife.js"></script>
+    <!-- IIFE — would only work against a real classic-script artifact like
+         dist/iife/index.js. Today, use the ESM + import-map pattern above. -->
+    <script src="/dist/iife/index.js"></script>
 
     <hx-button>Button</hx-button>
 
     <script>
-      // HxLibrary is available as a global after the IIFE executes
+      // After a real IIFE ships, the global would be exposed here.
       console.log('HxLibrary:', typeof window.HxLibrary);
     </script>
   </body>
@@ -609,11 +655,11 @@ After generating SRI hashes, verify they are correct before adding them to `libr
 
 ```bash
 # Compute hash of the local file
-openssl dgst -sha384 -binary dist-cdn/hx-library.es.js \
+openssl dgst -sha384 -binary dist/index.js \
   | openssl base64 -A
 
 # Compare against the generated hash in sri-hashes.json
-cat dist-cdn/sri-hashes.json
+cat dist/sri-hashes.json
 ```
 
 Also test that the hash works in a browser — add the `integrity` attribute to your test HTML file and verify the console does not report an SRI failure.
@@ -625,16 +671,16 @@ Also test that the hash works in a browser — add the `integrity` attribute to 
 Before tagging a release that includes CDN bundles:
 
 - [ ] `npm run build:cdn` completes without errors
-- [ ] `dist-cdn/hx-library.es.js` and `dist-cdn/hx-library.iife.js` exist
+- [ ] `dist/index.js` and `dist/index.js` exist
 - [ ] Local test HTML confirms all components render correctly
-- [ ] SRI hashes generated and written to `dist-cdn/sri-hashes.json`
+- [ ] SRI hashes generated and written to `dist/sri-hashes.json`
 - [ ] CDN URLs updated in `CHANGELOG.md` for this release
 - [ ] Drupal integration docs updated with new version number and SRI hash
-- [ ] `dist-cdn/` is included in the npm package files (check `package.json` `files` field)
+- [ ] `dist/` is included in the npm package files (check `package.json` `files` field)
 
 ```json
 {
-  "files": ["dist/", "dist-cdn/", "src/", "custom-elements.json"]
+  "files": ["dist/", "dist/", "src/", "custom-elements.json"]
 }
 ```
 

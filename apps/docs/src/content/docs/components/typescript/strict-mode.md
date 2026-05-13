@@ -9,7 +9,7 @@ sidebar:
 
 TypeScript's strict mode is a collection of compiler options that enforce stronger type safety and catch potential runtime errors at compile time. For enterprise healthcare applications where software failures can impact patient care, strict mode is not optional—it is a fundamental requirement.
 
-The hx-library operates under a zero-tolerance policy: **no `any` types, no `@ts-ignore` directives, and no non-null assertions**. Every component, utility, and public API must pass TypeScript's strictest checks before deployment.
+The hx-library policy is: **no unapproved `any` types, no `@ts-ignore` directives, and non-null assertions discouraged outside narrow framework/decorator boundaries**. New code is held to that bar in code review; a small number of legacy `any` casts and `!` assertions remain in the current source under inline `// TODO: typed in <issue>` comments, each with a tracked follow-up. Every component, utility, and public API passes TypeScript's strictest checks before deployment.
 
 This guide explores each strict mode flag, explains why it matters for web component development, and demonstrates real-world patterns from the hx-library codebase.
 
@@ -25,6 +25,7 @@ The `strict` flag is a master switch that enables all strict type-checking optio
 - `noImplicitThis`
 - `alwaysStrict`
 - `useUnknownInCatchVariables` (TypeScript 4.4+)
+- `strictBuiltinIteratorReturn` (TypeScript 5.6+)
 
 **Important:** Future versions of TypeScript may introduce additional strict checks under this flag. Upgrades can surface new type errors, which is a feature—not a bug. These errors represent real issues that would have manifested as runtime failures.
 
@@ -45,7 +46,7 @@ The hx-library extends strict mode with additional safety checks in `tsconfig.ba
 }
 ```
 
-Every package in the monorepo inherits this configuration, ensuring consistent type safety across all web components, applications, and utilities.
+Every workspace **package** that extends `tsconfig.base.json` inherits this configuration. The Next.js admin app and Astro Starlight docs app ship their own framework-tuned `tsconfig.json` files (Next/Astro pin their own `module` / `jsx` / library shims), so the strict settings above govern `packages/*` directly — apps inherit the same strict philosophy but the exact compiler flags vary per framework.
 
 ## `noImplicitAny`
 
@@ -197,7 +198,7 @@ class HxButton extends LitElement {
 ```typescript
 class HxButton extends LitElement {
   @property({ type: String })
-  variant: 'primary' | 'secondary' | 'ghost' = 'primary'; // ✅ Explicit default
+  variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'primary'; // ✅ Explicit default
 }
 ```
 
@@ -207,7 +208,7 @@ From `packages/hx-library/src/components/hx-button/hx-button.ts`:
 
 ```typescript
 @property({ type: String, reflect: true })
-variant: 'primary' | 'secondary' | 'ghost' = 'primary';
+variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'primary';
 
 @property({ type: String, reflect: true, attribute: 'hx-size' })
 size: 'sm' | 'md' | 'lg' = 'md';
@@ -501,7 +502,7 @@ Explicit types serve as inline documentation. When reading a component's source 
 ```typescript
 // Types document the contract
 @property({ type: String })
-variant: 'primary' | 'secondary' | 'ghost' = 'primary';
+variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'primary';
 ```
 
 ### 3. Refactoring Confidence
@@ -550,13 +551,18 @@ this._input?.focus();
 When querying the DOM, use type guards to narrow types:
 
 ```typescript
-function isHxButton(el: Element): el is HxButton {
+import { HelixButton } from '@helixui/library';
+
+function isHelixButton(el: Element): el is HelixButton {
   return el.tagName.toLowerCase() === 'hx-button';
 }
 
 const elements = document.querySelectorAll('*');
-const buttons = Array.from(elements).filter(isHxButton);
-// Type: HxButton[]
+const buttons = Array.from(elements).filter(isHelixButton);
+// Type: HelixButton[]
+
+// `HxButton` is the React-wrapper name in @helixui/react; the element class
+// shipped by @helixui/library is `HelixButton` (matching the source filename).
 ```
 
 ### Issue: Unknown vs. Any
@@ -616,13 +622,13 @@ The hx-library package extends the base configuration with component-specific se
 
 ## Verification
 
-To verify strict mode compliance across the monorepo:
+To verify strict mode compliance across the monorepo, run the workspace `type-check` task:
 
 ```bash
-npm run type-check
+pnpm run type-check
 ```
 
-This command runs TypeScript's compiler in check mode without emitting files. It must pass with zero errors before any commit.
+That command fans out across every package's `type-check` script. The shipped workspace packages — `@helixui/library`, `@helixui/tokens`, `@helixui/icons`, `@helixui/react`, `@helixui/react-starter`, `@helixui/drupal-behaviors`, `@helixui/mcp` — invoke `tsc --noEmit` against their own `tsconfig.json`. A small number of packages don't yet have a real type-check script (`create-helix-app` is a placeholder; `drupal-starter` has no script and isn't included in the workspace type-check fan-out) — extending coverage there is a tracked follow-up. Drop into a specific package with `pnpm --filter=@helixui/library run type-check` if you want a faster single-package run. The workspace task must pass with zero errors before any push.
 
 ## Migration Strategies
 
@@ -636,12 +642,12 @@ Enable strict mode flags one at a time, fixing errors before moving to the next 
 
 Start with `noImplicitAny` because it surfaces the most obvious type safety gaps.
 
-```json
+```jsonc
 // tsconfig.json
 {
   "compilerOptions": {
-    "noImplicitAny": true
-  }
+    "noImplicitAny": true,
+  },
 }
 ```
 
@@ -760,33 +766,29 @@ export class LegacyComponent extends LitElement {
 
 ### Strategy 4: Automated Migration Tools
 
-Use automated tools to accelerate migration:
+There isn't a single canonical strict-mode migration CLI we can recommend by name (the previous draft listed `ts-strict-mode-migration` — that package isn't on npm at the time of writing). The practical migration toolkit is:
 
-#### TypeScript Strict Mode Migration Tool
-
-```bash
-npm install -g ts-strict-mode-migration
-ts-strict-mode-migration --project ./tsconfig.json
-```
-
-This tool automatically adds type annotations for implicit `any` cases.
+- **`tsc --noEmit` against a strict tsconfig** — surfaces every offending site as an error you can fix incrementally.
+- **Flag-by-flag strict adoption** — toggle one strict flag at a time in `tsconfig.json` (`noImplicitAny` first, then `strictNullChecks`, etc.) so the error volume stays tractable each step.
+- **`ts-migrate`** (Airbnb) — semi-automated migration that adds explicit `any` shims you can then tighten; verify the latest version on npm before installing.
+- **`@typescript-eslint/no-explicit-any` + autofix** — once strict is on, lint catches new `any` additions in code review.
 
 #### ESLint with TypeScript Rules
 
 Configure ESLint to flag strict mode violations:
 
-```json
+```jsonc
 // .eslintrc.json
 {
   "extends": [
     "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-non-null-assertion": "error",
-    "@typescript-eslint/strict-boolean-expressions": "warn"
-  }
+    "@typescript-eslint/strict-boolean-expressions": "warn",
+  },
 }
 ```
 
@@ -961,7 +963,7 @@ TypeScript's strict mode is not a hindrance—it is an enabler. By catching erro
 
 In the hx-library, strict mode is paired with zero-tolerance enforcement: no `any`, no `@ts-ignore`, no shortcuts. This discipline ensures that every component is reliable, maintainable, and safe for enterprise healthcare applications.
 
-Strict mode turns TypeScript from a type checker into a safety net—one that catches bugs before they reach production and saves lives.
+Strict mode catches a wide class of type errors before runtime, surfaces null/undefined propagation at the boundary where it actually happens, and dramatically reduces the maintenance burden of refactoring across a long-lived monorepo.
 
 ## Sources
 

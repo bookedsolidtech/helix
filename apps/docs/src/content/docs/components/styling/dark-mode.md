@@ -47,19 +47,27 @@ No component code changes. No properties to set. Just CSS cascade.
 
 HELiX separates token concerns across two layers:
 
-**Primitive tokens** — raw color values, never change between themes:
+**Primitive palette** — raw hex values that live as TypeScript constants in
+`@helixui/tokens/src` and are baked into the semantic CSS at build time. They
+are not exposed as CSS custom properties; consumers never read or override
+them directly.
 
-```css
-/* These never change — they are the palette */
---hx-neutral-0: #ffffff;
---hx-neutral-50: #f8f9fa;
---hx-neutral-800: #343a40;
---hx-neutral-900: #212529;
---hx-blue-500: #3b82f6;
---hx-blue-400: #60a5fa;
+```ts
+// packages/hx-tokens/src — conceptual shape
+const neutral = {
+  0: '#ffffff',
+  50: '#f8f9fa',
+  800: '#343a40',
+  900: '#212529',
+};
+const primary = {
+  400: '#60a5fa',
+  500: '#3b82f6',
+};
 ```
 
-**Semantic tokens** — purpose-based references that swap between themes:
+**Semantic tokens** — purpose-based CSS custom properties that swap between
+themes. These ARE the published surface — consumers override these to retheme:
 
 ```css
 /* Light theme — semantic tokens point to light primitives */
@@ -464,7 +472,7 @@ In dark mode: the same markup renders with a dark surface, light text, dark bord
 
 ## Alert Variant Colors in Dark Mode
 
-HELiX `hx-alert` uses feedback color tokens (`--hx-color-info-*`, `--hx-color-success-*`, etc.) that may need adjustment in dark mode for sufficient contrast. The WCAG 2.1 AA requirement is 4.5:1 for text, 3:1 for UI components.
+HELiX `hx-alert` uses feedback color tokens (`--hx-color-info-*`, `--hx-color-success-*`, etc.) that may need adjustment in dark mode for sufficient contrast. The WCAG 2.2 contrast floors are 4.5:1 for normal-size text (AA), 3:1 for UI components / large text (AA), and 7:1 for body text on the P0 surface (AAA — see `aaa-verdicts.json`).
 
 Light mode alert backgrounds (very light tints) become nearly invisible on dark surfaces. Override the feedback color tokens for dark mode:
 
@@ -695,10 +703,11 @@ test.describe('dark mode visual regression', () => {
 
 ## WCAG Contrast Verification
 
-Every dark mode color combination must meet WCAG 2.1 AA:
+Every dark mode color combination must meet WCAG 2.2 AA at minimum, and the WCAG 2.2 AAA 7:1 floor for any combination on the P0 surface (per `aaa-verdicts.json`):
 
-- **4.5:1** minimum for normal text (body copy, labels)
-- **3:1** minimum for large text (18pt+ or 14pt+ bold) and UI components (borders, icons)
+- **AA:** 4.5:1 minimum for normal text (body copy, labels)
+- **AA:** 3:1 minimum for large text (18pt+ or 14pt+ bold) and UI components (borders, icons)
+- **AAA (P0 surface):** 7:1 for normal body text on the canonical primary action surfaces
 
 Spot-check critical combinations in dark mode:
 
@@ -739,7 +748,7 @@ Dark mode in HELiX works because CSS custom properties inherit through shadow bo
 - Override feedback color tokens (`--hx-color-info-50`, etc.) in dark mode — their default tints are too light for dark surfaces
 - Protect against FOUC with an inline `<head>` script that restores the saved preference before first render
 - Test dark mode by setting tokens directly on wrapper elements in Vitest and by using `page.emulateMedia()` in Playwright
-- Verify WCAG 2.1 AA contrast ratios for every dark mode color combination
+- Verify WCAG 2.2 AA contrast ratios for every dark mode color combination, and AAA (7:1) for any P0-surface pairing
 
 ---
 
@@ -748,7 +757,6 @@ Dark mode in HELiX works because CSS custom properties inherit through shadow bo
 - [Animations & Transitions](/components/styling/animations) — `prefers-reduced-motion` and animation tokens
 - [Design Token Architecture](/components/styling/tokens) — Complete three-tier token system reference
 - [Theming Web Components](/components/styling/theming) — Full theming strategies and multi-brand patterns
-- [Responsive Components](/components/styling/responsive) — Container queries and adaptive layouts
 
 ---
 

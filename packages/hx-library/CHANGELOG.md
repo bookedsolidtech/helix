@@ -12,9 +12,12 @@ Mistakenly published as MAJOR via a changeset-metadata defect (icons-1-0-0-initi
 
   `<hx-icon>` resolves through the `@helixui/icons` registry and is
   AAA-certed (P0) per WCAG 2.2 + 1.4.11 (non-text contrast). The
-  component now ships a `library` attribute (default `'fa-free'`)
-  that resolves through `getIconLibrary()`, plus integration of the
-  optional library mutator hook (runs AFTER security sanitization).
+  component ships a `library` attribute that defaults to `''` —
+  registry resolution requires the consumer to set `library="fa-free"`,
+  `library="helix"`, or another registered library explicitly. The
+  library lookup runs through `getIconLibrary()` and honors the
+  optional library mutator hook (which runs AFTER security
+  sanitization).
 
   Adds the `--hx-icon-stroke-width` semantic token (default `2`)
   consumed by stroke-paint and mixed-paint consumer libraries; the
@@ -35,15 +38,15 @@ Mistakenly published as MAJOR via a changeset-metadata defect (icons-1-0-0-initi
 - 723eec6: wire @helixui/icons registry into hx-icon and migrate internal components to `<hx-icon library="helix">`.
 
   **hx-icon component**
-  - new `library` attribute (defaults to `'fa-free'`); resolves names through @helixui/icons registry
+  - new `library` attribute (defaults to `''` — consumers must opt in by setting `library="helix"`, `library="fa-free"`, or another registered library); resolves names through @helixui/icons registry
   - mutator hook integration: registered libraries with `spriteSheet: false` can transform sanitized svg before injection
   - existing `name`+`sprite-url` and `src` modes preserved as escape hatches — no consumer breaks
 
-  **internal migration (29 components)**
+  **internal migration (28 components)**
 
   every inline svg glyph for status / direction / forms / actions / domain / navigation has been replaced with `<hx-icon library="helix" name="...">` (or `library="fa-free"` for the handful of glyphs that aren't in the helix vocabulary):
 
-  hx-checkbox, hx-radio, hx-alert, hx-toast, hx-banner, hx-rating, hx-stat, hx-help-text, hx-clinical-status, hx-phi-field, hx-file-upload, hx-combobox, hx-date-picker, hx-time-picker, hx-number-input, hx-tree-view, hx-side-nav (+nav-item), hx-accordion, hx-badge, hx-tag, hx-avatar (uses `fa-free name="user"`), hx-link, hx-steps, hx-overflow-menu (helix + fa-free), hx-menu, hx-split-button, hx-nav, hx-top-nav, hx-carousel (helix + fa-free), hx-drawer
+  hx-checkbox, hx-alert, hx-toast, hx-banner, hx-rating, hx-stat, hx-help-text, hx-clinical-status, hx-phi-field, hx-file-upload, hx-combobox, hx-date-picker, hx-time-picker, hx-number-input, hx-tree-view, hx-side-nav (+nav-item), hx-accordion, hx-badge, hx-tag, hx-avatar (uses `fa-free name="user"`), hx-link, hx-steps, hx-overflow-menu (helix + fa-free), hx-menu, hx-split-button, hx-nav, hx-top-nav, hx-carousel (helix + fa-free), hx-drawer
 
   structural svg components (hx-icon, hx-progress-ring, hx-spinner, hx-data-table sort indicators) are intentionally not migrated — their svgs are the visual, not glyph references.
 
@@ -120,8 +123,10 @@ Mistakenly published as MAJOR via a changeset-metadata defect (icons-1-0-0-initi
 - Updated dependencies [7b42779]
 - Updated dependencies [723eec6]
 - Updated dependencies [1ea6a14]
-  - @helixui/icons@2.0.0
-  - @helixui/tokens@4.0.0
+  - @helixui/icons@1.0.0
+  - @helixui/tokens@3.9.0
+
+  > **Note:** the changesets cascade originally generated `@helixui/icons@2.0.0` and `@helixui/tokens@4.0.0` entries here. Those were artifacts of the same major-bump cascade that deprecated `@helixui/library@4.0.0`. The workspace-current sibling releases are **`@helixui/icons@1.0.0`** and **`@helixui/tokens@3.9.0`**; the npm-published `2.0.0` / `4.0.0` versions of those packages are deprecated.
 
 ## 3.8.0
 
@@ -176,7 +181,7 @@ Mistakenly published as MAJOR via a changeset-metadata defect (icons-1-0-0-initi
   - Remaining 38 component MDX rewrites land in subsequent minors
 
   ## Cert tooling
-  - `scripts/aaa-formal-audit.mjs` — formal audit harness, cert authority for `pnpm aaa:cert`
+  - `scripts/aaa-formal-audit.mjs` — formal audit harness, the cert authority (invoke via `pnpm aaa:audit` or `pnpm exec node scripts/aaa-cert.mjs <component-name>` for the per-component cert stamp; no `pnpm aaa:cert` shortcut exists in the workspace)
   - `scripts/aaa-standards.json` — WCAG 2.2 reference with 46 verified W3C URLs
   - `scripts/aaa-matrix-verify.mjs` — demoted to informational coverage tool (header banner explicit; not a cert authority)
   - `pnpm aaa:audit` alias — runs the full 43-component formal sweep against live Storybook
@@ -1712,7 +1717,8 @@ This is a **silent behavior change** — no type error, no runtime warning. Ever
 Find all instances missing the attribute:
 
 ```bash
-rg '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
+# ripgrep with PCRE2 — lookahead requires the -P flag.
+rg -P '<hx-dialog\b(?![^>]*\bmodal\b)' --type html --type tsx --type vue
 ```
 
 Drupal / Twig consumers should grep `*.twig` templates for the same pattern.

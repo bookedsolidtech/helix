@@ -78,7 +78,7 @@ export class PatientCard extends HelixCard {
     ...HelixCard.styles,
     css`
       :host([status='critical']) {
-        --org-patient-card-status-color: var(--hx-color-danger-600, #dc2626);
+        --org-patient-card-status-color: var(--hx-color-error-600, #dc2626);
       }
       :host([status='stable']) {
         --org-patient-card-status-color: var(--hx-color-success-600, #16a34a);
@@ -110,10 +110,7 @@ export class PatientCard extends HelixCard {
 
       .patient-severity-banner {
         padding: var(--hx-space-2, 0.5rem) var(--hx-card-padding, var(--hx-space-6, 1.5rem));
-        background-color: var(
-          --org-patient-card-severity-bg,
-          var(--hx-color-warning-100, #fef3c7)
-        );
+        background-color: var(--org-patient-card-severity-bg, var(--hx-color-warning-100, #fef3c7));
         color: var(--hx-color-warning-800, #92400e);
         font-size: var(--hx-font-size-sm, 0.875rem);
         font-weight: var(--hx-font-weight-medium, 500);
@@ -179,12 +176,9 @@ export class PatientCard extends HelixCard {
             </div>
           `
         : ''}
-
       ${super.render()}
 
-      <span class="patient-status-badge" aria-label="Status: ${this.status}">
-        ${this.status}
-      </span>
+      <span class="patient-status-badge" aria-label="Status: ${this.status}"> ${this.status} </span>
     `;
   }
 }
@@ -202,6 +196,8 @@ declare global {
 
 ## Usage
 
+Interactive card pattern (whole card navigates — `hx-href` + `hx-label`, no `actions` slot):
+
 ```html
 <org-patient-card
   variant="featured"
@@ -209,23 +205,43 @@ declare global {
   status="critical"
   severity="high"
   mrn="MRN-00123456"
-  label="Navigate to patient James Martin's chart"
-  href="/patients/MRN-00123456"
+  hx-label="Navigate to patient James Martin's chart"
+  hx-href="/patients/MRN-00123456"
 >
   <img slot="image" src="/photos/patient-thumb.jpg" alt="" />
   <h2 slot="heading">James Martin</h2>
   <p>DOB: 1958-03-11 &bull; Room 412 &bull; Attending: Dr. Okafor</p>
   <time slot="footer" datetime="2026-03-24T14:22:00Z">Updated 14:22</time>
-  <hx-button slot="actions" variant="primary" size="sm">View Chart</hx-button>
 </org-patient-card>
 ```
 
+Or — non-interactive card with action buttons (the destination lives on the button instead):
+
+```html
+<org-patient-card
+  variant="featured"
+  elevation="raised"
+  status="critical"
+  severity="high"
+  mrn="MRN-00123456"
+>
+  <img slot="image" src="/photos/patient-thumb.jpg" alt="" />
+  <h2 slot="heading">James Martin</h2>
+  <p>DOB: 1958-03-11 &bull; Room 412 &bull; Attending: Dr. Okafor</p>
+  <time slot="footer" datetime="2026-03-24T14:22:00Z">Updated 14:22</time>
+  <hx-button slot="actions" variant="primary" hx-size="sm" href="/patients/MRN-00123456">
+    View Chart
+  </hx-button>
+</org-patient-card>
+```
+
+`HelixCard` flags interactive-card-plus-actions-slot as an ARIA anti-pattern; pick one pattern per card instance.
+
 ```javascript
-document.querySelector('org-patient-card')
-  .addEventListener('org-status-change', (e) => {
-    const { status, previousStatus, mrn } = e.detail;
-    auditLog.record({ mrn, from: previousStatus, to: status, at: Date.now() });
-  });
+document.querySelector('org-patient-card').addEventListener('org-status-change', (e) => {
+  const { status, previousStatus, mrn } = e.detail;
+  auditLog.record({ mrn, from: previousStatus, to: status, at: Date.now() });
+});
 ```
 
 ---

@@ -20,8 +20,10 @@ import '@helixui/library/components/hx-card';
   title="Density when you need it. Quiet when you don't."
   lede={
     <>
-      Cards, tables, badges, tags, avatars. Status badges pull AA-tuned <code>{`{role}-text`}</code>{' '}
-      tokens that meet 4.5:1 in light and dark — no manual checking required.
+      Cards, tables, badges, tags, avatars. Status badges paint from the role ramps (
+      <code>{`--hx-color-{role}-500/600`}</code>) and pair with the canonical{' '}
+      <code>{`text-on-{role}`}</code> foreground tokens — every shipped pair clears AA contrast in
+      light and dark, and most clear AAA. No manual checking required.
     </>
   }
 />
@@ -76,7 +78,7 @@ import '@helixui/library/components/hx-card';
   >
     <hx-card>
       <div
-        slot="header"
+        slot="heading"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
       >
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -128,7 +130,7 @@ import '@helixui/library/components/hx-card';
     </hx-card>
     <hx-card>
       <div
-        slot="header"
+        slot="heading"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
       >
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -180,7 +182,7 @@ import '@helixui/library/components/hx-card';
     </hx-card>
     <hx-card>
       <div
-        slot="header"
+        slot="heading"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
       >
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

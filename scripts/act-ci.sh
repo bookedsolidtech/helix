@@ -168,7 +168,12 @@ echo ""
 
 START_TIME=$(date +%s)
 
-if act pull_request -W "$WORKFLOW" $JOB_ARGS \
+# act event must match the workflow's `on:` triggers. act-ci.yml is
+# `on: workflow_dispatch:` only (per fix-change-act-ci-trigger commit), so
+# passing `pull_request` here resolves to zero stages and exits with
+# "Could not find any stages to run" in <1s, falsely failing preflight
+# Gate 9. workflow_dispatch matches the yml's single trigger.
+if act workflow_dispatch -W "$WORKFLOW" $JOB_ARGS \
   $ENV_ARGS \
   $ARCH_ARGS \
   --eventpath .github/act-event.json \

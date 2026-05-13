@@ -52,15 +52,17 @@ A change is breaking if it requires consumers to update their code, templates, o
 
 **Example of a breaking CSS change:**
 
+A concrete example: if a future release renamed a public CSS custom property, every site that overrode the old name would silently regress.
+
 ```css
-/* v2.x — consumers override this to change button colour */
+/* Today — consumers override this to change button background */
 :host {
-  --hx-button-bg: var(--hx-color-primary);
+  --hx-button-bg: var(--hx-color-action-primary-bg);
 }
 
-/* ❌ v3.0.0 BREAKING — the custom property name changed */
+/* ❌ Hypothetical breaking rename — every consumer that set --hx-button-bg silently stops working */
 :host {
-  --hx-button-background: var(--hx-color-primary);
+  --hx-button-background: var(--hx-color-action-primary-bg);
 }
 ```
 
@@ -72,7 +74,7 @@ hx-button {
 }
 ```
 
-must now be updated to `--hx-button-background`. This is a breaking change that requires a major version bump and a migration guide.
+would need to be updated to the new name in lockstep with the release. Renames like this require a major version bump and a documented migration.
 
 ### What Counts as a MINOR (Non-Breaking) Change
 
@@ -209,9 +211,10 @@ This tells the consumer nothing. Updated how? Does it affect my buttons?
 **Good:**
 
 ```
-- `hx-button`: Increase default `font-size` from `0.875rem` to `1rem` to meet
-  WCAG 1.4.4 (Resize Text) in healthcare contexts. If your design requires the
-  smaller size, set `--hx-button-font-size: 0.875rem` on the element.
+- `hx-button`: Increase default font-size on size="md" from 0.875rem to 1rem to
+  meet WCAG 1.4.4 (Resize Text) in healthcare contexts. To opt back in to the
+  smaller size, use hx-size="sm" — the size token shipped at 0.875rem is
+  unchanged.
 ```
 
 **Poor:**
@@ -220,21 +223,21 @@ This tells the consumer nothing. Updated how? Does it affect my buttons?
 - Breaking: renamed property
 ```
 
-**Good:**
+**Good (illustrative — uses a hypothetical rename, not a shipped change):**
 
 ````
-- **BREAKING** `hx-text-input`: Rename `errorMessage` property to `error` to
-  align with the rest of the form component API. Update all usages:
+- **BREAKING** `hx-text-input`: Rename a property to align with the rest of the
+  form API. Update all usages:
 
   ```html
   <!-- Before -->
-  <hx-text-input error-message="Required"></hx-text-input>
+  <hx-text-input old-attribute-name="Required"></hx-text-input>
 
   <!-- After -->
-  <hx-text-input error="Required"></hx-text-input>
+  <hx-text-input new-attribute-name="Required"></hx-text-input>
 ````
 
-The `error-message` attribute will be removed in v4.0.
+The old attribute would be removed in the next major release.
 
 ````
 
@@ -282,36 +285,37 @@ The `error-message` attribute will be removed in v4.0.
 When a release contains several breaking changes, group them clearly. Consumers need to see all migrations at once to assess the total upgrade cost.
 
 ```markdown
-## 3.0.0
+## 3.0.0 (illustrative template)
 
 ### Breaking Changes
 
-This release includes breaking changes to the CSS API across three components.
-All changes align the `--hx-*` property naming scheme with the revised design
-token specification.
+This template release groups three breaking renames so consumers see the full
+migration cost in one place. None of these are actual shipped renames — replace
+the body with the real items the release contains.
 
 - **BREAKING** `hx-button`: Rename `--hx-button-bg` to `--hx-button-background`.
 - **BREAKING** `hx-button`: Rename `--hx-button-color` to `--hx-button-foreground`.
 - **BREAKING** `hx-card`: Rename `--hx-card-bg` to `--hx-card-background`.
 
-**Migration:** Search your codebase for `--hx-button-bg`, `--hx-button-color`,
-and `--hx-card-bg` and update them to the new names. The old names are not
-supported in v3 and will have no effect.
+**Migration:** Search your codebase for the renamed properties and update them.
+The old names are not supported in the new major and will have no effect.
 
 ### Migration Guide
 
-See [Migration: v2 to v3](../migration/v2-to-v3/) for the full list of changes
-and automated codemod instructions.
+See [Upgrading to 3](/migration/upgrading-to-3/) for the full list of real
+shipped changes in HELiX 3.0.
 
 ### New Features
 
-- `hx-select`: Add `multiple` property for multi-select mode.
 - `hx-checkbox`: Add `indeterminate` property for tri-state checkboxes.
 
 ### Bug Fixes
 
 - `hx-text-input`: Fix `required` indicator not rendering when `label` slot is used.
 ```
+
+> Note: `hx-select` is intentionally single-selection. A separate multi-select component
+> is on the roadmap; do not document a `multiple` property on `hx-select`.
 
 ---
 
@@ -363,15 +367,15 @@ The changelog for Release N+1 notes that `error-message` was deprecated in Relea
 When a breaking change ships, Storybook stories must be updated to show the new API. Additionally, a migration note should appear in the relevant story's documentation tab.
 
 ```typescript
-// hx-button.stories.ts — after v3.0 breaking change
+// hx-button.stories.ts — illustrative migration callout pattern
 export default {
   title: 'Components/hx-button',
   parameters: {
     docs: {
       description: {
         component: `
-> **v3.0 Migration:** \`--hx-button-bg\` has been renamed to \`--hx-button-background\`.
-> See the [v2 to v3 migration guide](/docs/migration/v2-to-v3/) for details.
+> **Migration:** \`--hx-button-bg\` has been renamed to \`--hx-button-background\` (hypothetical example).
+> See the [upgrade guide](/migration/upgrading-to-3/) for the actual list of breaking changes.
         `,
       },
     },
@@ -385,60 +389,65 @@ This surfaces the migration note directly in Storybook's autodocs panel, which i
 
 ## Automated Changelog Generation in CI
 
-Changesets integrates with GitHub Actions to automate the release PR creation:
+Changesets integrates with GitHub Actions to automate version bumping and publishing. The actual HELiX configuration lives in [`.github/workflows/publish.yml`](https://github.com/bookedsolidtech/helix/blob/main/.github/workflows/publish.yml) — what follows is a faithful sketch of its shape:
 
 ```yaml
-# .github/workflows/release.yml
-name: Release
+# .github/workflows/publish.yml — abbreviated
+name: Publish
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  release:
-    name: Release
+  secret-scan: # … pre-publish gitleaks on the packed tarballs
+  publish:
+    name: Publish
+    needs: [secret-scan]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter=@helixui/library run cem
+      - run: pnpm run build
 
-      - name: Create Release Pull Request or Publish
+      - name: Create Release PR or Publish
         uses: changesets/action@v1
         with:
-          # This command is run when a release PR is merged
-          publish: npm run release
-          # Title for the release PR
-          title: 'chore: release packages'
-          # Commit message for the version bump commit
+          publish: pnpm exec changeset publish
+          version: pnpm exec changeset version
           commit: 'chore: version packages'
+          title: 'chore: release packages'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
 The workflow has two modes:
 
-1. **On every push to `main`:** If there are pending changesets, it creates or updates a "Release" PR that shows what version will be bumped and what the changelog will say.
-2. **When the Release PR is merged:** It runs `changeset publish`, which publishes to npm and creates git tags.
+1. **On every push to `main`:** If unreleased changesets exist, the action opens (or updates) a "Release" PR that shows the proposed version bumps and aggregated changelog.
+2. **When the Release PR is merged:** It runs `changeset publish` to push tagged versions to npm.
+
+HELiX uses `pnpm`, not `npm`, and uses a separate `CHANGESET_TOKEN` (fine-grained PAT) because GitHub-issued `GITHUB_TOKEN` suppresses workflow events on PRs it creates — which would prevent CI from running on the bump PR.
 
 ---
 
 ## Versioning the Custom Elements Manifest
 
-The `custom-elements.json` CEM file describes the public API of every component. It is generated by `npm run cem` and committed to the repository. When the API changes, the CEM must be regenerated.
+The `custom-elements.json` CEM file describes the public API of every component. It is generated by `pnpm run cem` and committed to the repository. When the API changes, the CEM must be regenerated.
 
-The CEM version field should match the package version:
+The CEM's top-level `schemaVersion` is the **Custom Elements Manifest schema** version (the spec @custom-elements-manifest emits against), not the `@helixui/library` package version — there is no package-version field in the manifest. The package version is the source of truth for what API a given CEM snapshot describes (every release ships a fresh CEM):
 
 ```json
 {
@@ -454,13 +463,13 @@ The CEM version field should match the package version:
 }
 ```
 
-In CI, a check verifies that the committed CEM matches the output of `npm run cem`. If a developer modifies a component's public API without regenerating the CEM, the CI build fails.
+In CI, a check verifies that the committed CEM matches the output of `pnpm run cem`. If a developer modifies a component's public API without regenerating the CEM, the CI build fails.
 
 ```yaml
 # In CI:
 - name: Verify CEM is up to date
   run: |
-    npm run cem
+    pnpm --filter=@helixui/library run cem
     git diff --exit-code packages/hx-library/custom-elements.json
 ```
 

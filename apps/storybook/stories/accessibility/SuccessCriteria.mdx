@@ -12,14 +12,16 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
 
 <EyebrowHeading
   eyebrow="Accessibility · Conformance bar"
-  title="How we know we're AAA — the success criteria + the release gate."
+  title="How we measure conformance — the success criteria + the release gate."
   lede={
     <>
-      Two ledgers, one bar. The <strong>WCAG success criteria</strong> below enumerate every
-      conformance row HELiX commits to — Level A, AA, and the AAA targets we hit on the P0 surface.
-      The <strong>release quality bar</strong> further down lists the seven build-time gates that
-      block any merge below the floor. A criterion without a test is a marketing claim. Every row
-      here cites both.
+      Two ledgers, one bar. The <strong>WCAG success criteria</strong> below enumerate the rows
+      HELiX commits to across Level A, AA, and the AAA criteria the formal harness measures on the
+      P0 surface (per <code>aaa-verdicts.json</code>: 44 components, 376 Supports, 109 Not
+      Applicable, 0 Partial, 0 Fail across 11 measured criteria). The{' '}
+      <strong>release quality bar</strong> further down lists the build-time gates that block any
+      merge below the floor. A criterion without a test is a marketing claim — every row cites its
+      method.
     </>
   }
 />
@@ -27,9 +29,9 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
 <section>
   <SectionHead title="At a glance" meta="WCAG 2.2 · evidence-backed · self-cert" />
   <div className="hx-docs-stats">
-    <StatCard num="21" label="Success criteria tracked" sub="A · AA · AAA highlights" />
-    <StatCard num="7" label="Release-quality gates" sub="all green or no merge" />
-    <StatCard num="0" unit=" gaps" label="Untested SCs in P0" sub="every row has a method" />
+    <StatCard num="11" label="AAA cert criteria" sub="measured by aaa-formal-audit.mjs" />
+    <StatCard num="44" label="P0 components" sub="376 Supports · 109 NA · 0 Partial" />
+    <StatCard num="0" unit=" Fail" label="Cert failures" sub="aaa-verdicts.json" />
     <StatCard num="2.2" label="WCAG version" sub="formal AAA harness baseline" />
   </div>
 </section>
@@ -48,9 +50,13 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
       lineHeight: 1.6,
     }}
   >
-    Each row pairs a WCAG success criterion with the test that proves it. Status reflects the
-    P0 surface; non-P0 components are committed to A/AA but may have AAA work pending. Cited
-    methods are the primary evidence path — most rows have multiple corroborating signals.
+    Each row pairs a WCAG success criterion with the test that proves it. The A and AA rows below
+    are author-tracked engineering targets (status reflects the most common evidence path); they
+    are NOT the formal AAA cert verdicts. The canonical conformance authority is the formal harness
+    output in <code>aaa-verdicts.json</code> — refer to{' '}
+    <a href="/?path=/docs/accessibility-vpat-2-5--docs">VPAT 2.5</a> for the row-by-row Supports /
+    Not Applicable / Partial / Fail verdicts. Where this ledger and the VPAT disagree, the VPAT
+    wins.
   </p>
 
 <div className="hx-docs-sc-table">
@@ -61,7 +67,7 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
     ['1.4.1', 'Use of color', 'A', 'pass', 'manual + design-token review'],
     ['1.4.3', 'Contrast (minimum) ≥ 4.5:1', 'AA', 'pass', 'contrast-report.json (CI)'],
     ['1.4.4', 'Resize text to 200%', 'AA', 'pass', 'rem-only typography · VRT'],
-    ['1.4.6', 'Contrast (enhanced) ≥ 7:1', 'AAA', 'in-progress', 'contrast-report.json (P0)'],
+    ['1.4.6', 'Contrast (enhanced) ≥ 7:1', 'AAA', 'pass', 'aaa-formal-audit.mjs (P0)'],
     ['1.4.10', 'Reflow at 320px', 'AA', 'pass', 'VRT viewport matrix'],
     ['1.4.11', 'Non-text contrast ≥ 3:1', 'AA', 'pass', 'contrast-report.json (UI)'],
     ['1.4.12', 'Text spacing', 'AA', 'pass', 'logical-property author rules'],
@@ -185,8 +191,8 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
       {
         n: 4,
         name: 'Storybook coverage',
-        cmd: 'pnpm run dev:storybook',
-        threshold: 'Stories for every variant + state',
+        cmd: 'pnpm --filter=storybook run build',
+        threshold: 'Stories build clean; every variant + state has a story',
         kind: 'review',
       },
       {
@@ -199,8 +205,9 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
       {
         n: 6,
         name: 'Bundle size',
-        cmd: 'per-component size analysis',
-        threshold: '<5 KB per component (min+gz) · <50 KB total',
+        cmd: 'pnpm check:bundle (per-component size scan)',
+        threshold:
+          'CI ceiling 16 KB / component, 200 KB total (bundle-budgets.json); aspirational floor 5 KB / 50 KB (.bundle-budget.json) for atoms',
         kind: 'automated',
       },
       {
@@ -307,7 +314,7 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
         Exception), 2.3.3 (Animation from Interactions), 2.4.12 (Focus Not Obscured Enhanced),
         2.4.13 (Focus Appearance), 2.5.5 (Target Size Enhanced), 3.2.5 (Change on Request), 3.3.6
         (Error Prevention All). Plus 2 peer standards (forced-colors, APG keyboard).{' '}
-        <a href="https://helixui.dev/accessibility/self-cert-scope/">
+        <a href="/?path=/docs/accessibility-self-cert-scope--docs">
           What the cert covers and doesn&apos;t
         </a>
         .
@@ -316,17 +323,19 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
     <DocsCard title="Cognitive AAA SCs" tag="3.1.5 · 3.1.6 · scope-limited">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
         Reading-level (3.1.5) and Pronunciation (3.1.6) are content-side SCs. HELiX provides the
-        primitives (plain-language defaults, ruby support in <code>hx-text</code>); the consuming
-        app owns the content that fulfills them.
+        rendering primitives (semantic <code>hx-text</code>, <code>hx-prose</code>); the consuming
+        app owns the plain-language content and any pronunciation hints (e.g. native HTML{' '}
+        <code>&lt;ruby&gt;</code>) that fulfill them. <code>hx-text</code> does not expose a
+        ruby-specific API.
       </p>
     </DocsCard>
-    <DocsCard title="VPAT 2.5" tag="scaffolded · publish on P0 cert">
+    <DocsCard title="VPAT 2.5" tag="published v1.0 · refreshed per release">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
-        A formal <a href="https://www.itic.org/policy/accessibility/vpat">VPAT&nbsp;2.5</a>
+        The formal <a href="https://www.itic.org/policy/accessibility/vpat">VPAT&nbsp;2.5</a>
         {/* source: https://www.itic.org/policy/accessibility/vpat (verified 2026-05-07) */} (ITI
-        ICT Accessibility Testing Initiative template) is scaffolded for the P0 surface and
-        publishes when the P0 components reach AAA cert in production. Until then, the SC ledger
-        above is the machine-checkable substitute and is updated on every release.
+        ICT Accessibility Testing Initiative template) for <code>@helixui/library</code> is
+        published at v1.0 and refreshes with every release. The SC ledger above is the engineering
+        view; the VPAT is the row-by-row Supports / Not Applicable / Partial / Fail report.
       </p>
     </DocsCard>
   </div>
@@ -349,7 +358,7 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard } from '../_components'
       </a>
     </li>
     <li>
-      <a href="https://helixui.dev/accessibility/consumer-obligations/">
+      <a href="/?path=/docs/accessibility-consumer-obligations--docs">
         Consumer Obligations (partial-AAA SC contracts: 1.3.6, 1.4.8, 2.2.4, 2.2.6, 2.4.10, 3.1.4,
         3.3.5)
       </a>

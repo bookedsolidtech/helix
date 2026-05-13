@@ -130,7 +130,8 @@ This is the contract: tab-key roving (one tab stop for the entire tablist, arrow
           <strong>Wrapping navigation</strong> — pressing{' '}
           <kbd className="hx-apg-kbd">Arrow Right</kbd> on the last tab wraps to the first;{' '}
           <kbd className="hx-apg-kbd">Arrow Left</kbd> on the first wraps to the last. Disabled tabs
-          are skipped.
+          may still receive arrow-key focus for discoverability, but click / Enter / Space
+          activation is suppressed.
         </span>
       </li>
     </ul>
@@ -147,9 +148,10 @@ This is the contract: tab-key roving (one tab stop for the entire tablist, arrow
     </>,
     <>
       Match every <code>hx-tab</code>'s <code>panel</code> attribute to an <code>hx-tab-panel</code>
-      's <code>name</code> attribute. The component wires <code>aria-controls</code> +{' '}
-      <code>aria-labelledby</code> automatically, but only if the names match — a typo silently
-      breaks the screen-reader association.
+      's <code>name</code> attribute. The matching value is what drives activation and panel
+      visibility; ARIA <code>aria-controls</code> + <code>aria-labelledby</code> wiring falls back
+      to the same-index panel when no name match exists, so the visible behaviour still works on a
+      typo — but the screen-reader association may not match what you intended.
     </>,
     <>
       Do not nest one tablist inside another. The roving-tabindex model assumes a single tablist on
@@ -157,12 +159,13 @@ This is the contract: tab-key roving (one tab stop for the entire tablist, arrow
     </>,
     <>
       Use <code>hx-tabs</code> for peer-content navigation (chart sections, settings categories),
-      not for primary site navigation. For site nav, use <code>hx-top-nav</code> or{' '}
-      <code>hx-side-nav</code> — those expose the URL-route + visited-state surface tabs do not.
+      not for primary site navigation. For site nav, use <code>hx-top-nav</code> (slotted links) or{' '}
+      <code>hx-side-nav</code> with <code>hx-nav-item href=</code> children and the
+      active/current-page state — those compose around real anchor semantics that tabs do not.
     </>,
     <>
-      Keep tab labels short (1–3 words). Long labels truncate, the truncation reduces the AAA target
-      hit area, and the truncated label may not match the screen-reader announcement.
+      Keep tab labels short (1–3 words). <code>hx-tab</code> does not truncate long labels; long
+      labels increase horizontal scrolling and reduce scanability rather than ellipsising.
     </>,
   ]}
 />
@@ -211,6 +214,6 @@ A disabled tab cannot receive arrow-key focus and is skipped during the roving c
 
 ## Variant gallery
 
-The full enumeration of orientation variants (horizontal, vertical), size modifiers, scrollable tablists, and integration with `hx-card` and `hx-form` lives in the `Components/Tabs` story tree.
+The full enumeration of orientation variants (horizontal, vertical) and scrollable tablists lives in the `Components/Tabs` story tree. (Size modifiers and `hx-card` / `hx-form` integrations are not in the current API surface — neither size variants nor those integration stories ship today.)
 
 </div>

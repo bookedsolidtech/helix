@@ -7,6 +7,8 @@ sidebar:
 
 This guide covers every layer of form building with HELiX: basic composition, validation, error display, complex inputs, accessibility, and Drupal integration.
 
+> **Reading note:** Several samples below are recipes that anticipate a fuller `hx-form` coordination surface than the shipped source currently exposes. The shipped `hx-form` dispatches `hx-submit` (with `detail.formData`) only when `action` is empty; the `hx-invalid` payload key is `errors`, not `invalidFields`; the field-coordination allowlist is narrower than the full HELiX form-component set; and several components have different event/attribute names than the recipes suggest (notably `hx-file-upload` → `hx-upload` with `detail.files: File[]`, no `help-text` attribute; `hx-grid` has no `responsive` attribute; `hx-steps` has no `current` property; there is no `<hx-combobox-option>` element). Inline corrections call out each mismatch — read the component CEM (`packages/hx-library/custom-elements.json`) before composing these patterns into shipped code.
+
 ---
 
 ## Basic Form
@@ -36,7 +38,14 @@ The core building block is `hx-form` wrapping `hx-text-input` (and other field c
 
 ### Submit handling
 
-`hx-form` dispatches `hx-submit` on valid submission (constraint validation passes) and `hx-invalid` when submission is blocked by invalid fields.
+`hx-form` dispatches the custom `hx-submit` event **only when `action` is empty** (client-side mode). When `action` is set, submission falls through to the native browser form-submit path, and you should not listen for `hx-submit` — handle the result on your server instead. `hx-invalid` is dispatched when client-side constraint validation blocks submission; its `detail` shape is `{ errors: Array<{ name: string; message: string }> }`.
+
+```html
+<!-- Client-side: no action, hx-submit fires -->
+<hx-form id="contact-form">
+  <!-- …fields… -->
+</hx-form>
+```
 
 ```js
 const form = document.querySelector('#contact-form');
@@ -52,7 +61,10 @@ form.addEventListener('hx-submit', (e) => {
 });
 
 form.addEventListener('hx-invalid', (e) => {
-  console.log('Invalid fields:', e.detail.invalidFields);
+  console.log('Invalid fields:', e.detail.errors);
+  // To focus the first invalid field, resolve a name back to its DOM node:
+  const firstName = e.detail.errors[0]?.name;
+  if (firstName) form.querySelector(`[name="${firstName}"]`)?.focus?.();
 });
 ```
 
@@ -60,14 +72,18 @@ form.addEventListener('hx-invalid', (e) => {
 
 `hx-form` operates in two modes:
 
-- **Standalone** — set `action` and `hx-form` renders its own `<form>` element.
-- **Drupal mode** — omit `action` and Drupal provides the `<form>` tag; `hx-form` contributes only styles and validation orchestration.
+- **Standalone (client-side)** — omit `action`; `hx-form` validates fields, emits `hx-submit`, and your JavaScript handles the POST.
+- **Native / Drupal mode** — set `action`; the underlying `<form>` submits natively to the server. Server-side frameworks (Drupal included) handle the actual form pipeline, and `hx-form` contributes styles plus per-field display of validation messages. A nested `hx-form` inside an ancestor Drupal `<form>` will **not** receive that ancestor form's submit events — Drupal mode is layout/styling assistance, not cross-form validation orchestration.
 
 ```html
-<!-- Standalone: hx-form renders <form action="/api/submit"> -->
+<!-- Standalone (client-side): hx-submit fires; you POST it yourself. -->
+<hx-form id="standalone-form">...</hx-form>
+
+<!-- Native submission: action is set, hx-submit does NOT fire. -->
 <hx-form action="/api/submit">...</hx-form>
 
-<!-- Drupal mode: Drupal's <form> is already in the DOM -->
+<!-- Drupal mode: Drupal owns the <form>. hx-form contributes styling and
+     per-field validation messages, not cross-form orchestration. -->
 <form action="/node/add/article">
   <hx-form>...</hx-form>
 </form>
@@ -251,14 +267,23 @@ input.addEventListener('hx-input', () => {
 
 ### Responsive breakpoints
 
-`hx-grid` collapses to a single column on mobile automatically. Use the `responsive` attribute to control the breakpoint:
+`hx-grid` does **not** ship a `responsive` attribute or built-in automatic single-column collapse — `columns` sets the column count, and consumers control breakpoint behavior with their own CSS / container queries. Wrap the grid in a container-query root or media-query wrapper:
 
 ```html
-<!-- Collapses to 1 column below 640px -->
-<hx-grid columns="2" responsive>
-  <hx-grid-item><hx-text-input name="first" label="First"></hx-text-input></hx-grid-item>
-  <hx-grid-item><hx-text-input name="last" label="Last"></hx-text-input></hx-grid-item>
-</hx-grid>
+<div class="form-grid">
+  <hx-grid columns="2">
+    <hx-grid-item><hx-text-input name="first" label="First"></hx-text-input></hx-grid-item>
+    <hx-grid-item><hx-text-input name="last" label="Last"></hx-text-input></hx-grid-item>
+  </hx-grid>
+</div>
+
+<style>
+  @media (max-width: 640px) {
+    .form-grid hx-grid {
+      --hx-grid-columns: 1;
+    }
+  }
+</style>
 ```
 
 ---
@@ -287,15 +312,17 @@ select.addEventListener('hx-change', (e) => {
 Use `hx-combobox` when the option list is long or users need to type to filter.
 
 ```html
+<!-- hx-combobox uses native <option> elements assigned to the `option` slot —
+     there is no <hx-combobox-option> element in the library or CEM. -->
 <hx-combobox
   name="diagnosis"
   label="Primary diagnosis"
   placeholder="Search ICD-10 codes..."
   required
 >
-  <hx-combobox-option value="E11.9">E11.9 — Type 2 diabetes</hx-combobox-option>
-  <hx-combobox-option value="I10">I10 — Essential hypertension</hx-combobox-option>
-  <hx-combobox-option value="J18.9">J18.9 — Pneumonia, unspecified</hx-combobox-option>
+  <option slot="option" value="E11.9">E11.9 — Type 2 diabetes</option>
+  <option slot="option" value="I10">I10 — Essential hypertension</option>
+  <option slot="option" value="J18.9">J18.9 — Pneumonia, unspecified</option>
 </hx-combobox>
 ```
 
@@ -325,23 +352,25 @@ datePicker.addEventListener('hx-change', (e) => {
 
 ### `hx-file-upload` — file attachment
 
+`hx-file-upload` does not expose a `help-text` attribute; render guidance copy alongside the component (or use the component's slot, where supported). The component emits `hx-upload` (not `hx-change`) when files are accepted, with `detail.files` typed as `File[]`. It also dispatches `hx-remove` and `hx-error` separately.
+
 ```html
-<hx-file-upload
-  name="attachment"
-  label="Supporting documents"
-  accept=".pdf,.doc,.docx"
-  multiple
-  help-text="PDF or Word documents, max 10 MB each."
-></hx-file-upload>
+<hx-file-upload name="attachment" label="Supporting documents" accept=".pdf,.doc,.docx" multiple>
+</hx-file-upload>
+<p class="upload-help">PDF or Word documents, max 10 MB each.</p>
 ```
 
 ```js
-fileUpload.addEventListener('hx-change', (e) => {
-  const files = e.detail.files; // FileList
+fileUpload.addEventListener('hx-upload', (e) => {
+  const files = e.detail.files; // File[]
   console.log(
     'Files:',
-    [...files].map((f) => f.name),
+    files.map((f) => f.name),
   );
+});
+
+fileUpload.addEventListener('hx-error', (e) => {
+  console.warn('File rejected:', e.detail);
 });
 ```
 
@@ -400,13 +429,13 @@ radioGroup.addEventListener('hx-change', (e) => {
 
 ## Multi-Step Forms
 
-Use `hx-steps` with `hx-step` children to indicate progress, and conditionally render form sections based on the current step.
+Use `hx-steps` with `hx-step` children to indicate progress. The shipped `hx-steps` does **not** expose a `current` attribute or property — each `hx-step` carries its own `status` (`upcoming` | `current` | `complete`), and you advance the wizard by mutating those statuses rather than setting a parent-level current index. Conditionally render the form sections themselves based on which step is `status="current"`.
 
 ```html
-<hx-steps id="wizard-steps" current="1">
-  <hx-step label="Personal info"></hx-step>
-  <hx-step label="Contact details"></hx-step>
-  <hx-step label="Review & submit"></hx-step>
+<hx-steps id="wizard-steps">
+  <hx-step status="current" label="Personal info"></hx-step>
+  <hx-step status="upcoming" label="Contact details"></hx-step>
+  <hx-step status="upcoming" label="Review & submit"></hx-step>
 </hx-steps>
 
 <!-- Step 1 -->
@@ -447,26 +476,43 @@ const steps = document.querySelector('#wizard-steps');
 const formData = {}; // accumulate across steps
 
 function goTo(step) {
+  // Update `<section>` visibility.
   document.querySelectorAll('section[id^="step-"]').forEach((s, i) => {
     s.hidden = i + 1 !== step;
   });
-  steps.current = step;
+
+  // Drive progress by updating each hx-step's status (no parent `current` setter).
+  steps.querySelectorAll('hx-step').forEach((el, i) => {
+    const pos = i + 1;
+    el.status = pos < step ? 'complete' : pos === step ? 'current' : 'upcoming';
+  });
 }
 
-// Step 1 → 2
+// Step 1 → 2.
+// Note: hx-form is a custom element. `new FormData()` only accepts a real
+// HTMLFormElement — gather the field values yourself, or place a native
+// <form> wrapper around each step's hx-form.
 document.querySelector('#next-1').addEventListener('click', () => {
   const form = document.querySelector('#step-1-form');
-  if (!form.checkValidity()) return form.reportValidity();
-  Object.assign(formData, Object.fromEntries(new FormData(form)));
+  if (!form.checkValidity?.()) return form.reportValidity?.();
+  const stepData = {};
+  for (const field of form.querySelectorAll('[name]')) {
+    stepData[field.name] = field.value;
+  }
+  Object.assign(formData, stepData);
   goTo(2);
 });
 
-// Step 2 → 3
+// Step 2 → 3 — same caveat: collect field values from hx-form children
+// directly rather than via new FormData(hxForm).
 document.querySelector('#next-2').addEventListener('click', () => {
   const form = document.querySelector('#step-2-form');
-  if (!form.checkValidity()) return form.reportValidity();
-  Object.assign(formData, Object.fromEntries(new FormData(form)));
-  // Populate review summary
+  if (!form.checkValidity?.()) return form.reportValidity?.();
+  const stepData = {};
+  for (const field of form.querySelectorAll('[name]')) {
+    stepData[field.name] = field.value;
+  }
+  Object.assign(formData, stepData);
   document.querySelector('#review-summary').textContent = JSON.stringify(formData, null, 2);
   goTo(3);
 });

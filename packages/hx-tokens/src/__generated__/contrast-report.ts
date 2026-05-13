@@ -52,7 +52,7 @@ export interface ContrastReport {
 }
 
 export const contrastReport: ContrastReport = {
-  tokenVersion: '3.8.0',
+  tokenVersion: '3.9.0',
   modes: {
     light: {
       summary: {

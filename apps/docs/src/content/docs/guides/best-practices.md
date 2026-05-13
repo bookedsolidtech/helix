@@ -20,13 +20,13 @@ Slot content into HELiX components using semantic HTML. The Shadow DOM handles p
 ```html
 <!-- Good: semantic content in slots -->
 <hx-card>
-  <h2 slot="header">Patient Summary</h2>
+  <h2 slot="heading">Patient Summary</h2>
   <p>Last updated: <time datetime="2026-01-15">January 15, 2026</time></p>
 </hx-card>
 
 <!-- Avoid: presentational wrappers with no semantic value -->
 <hx-card>
-  <div slot="header"><span>Patient Summary</span></div>
+  <div slot="heading"><span>Patient Summary</span></div>
 </hx-card>
 ```
 
@@ -37,7 +37,7 @@ HTML attributes are strings. For booleans, numbers, and objects, set the propert
 ```javascript
 // Preferred for non-string values
 const datePicker = document.querySelector('hx-date-picker');
-datePicker.value = new Date('2026-01-15');
+datePicker.value = '2026-01-15'; // hx-date-picker.value is an ISO date string
 datePicker.disabled = userIsReadOnly;
 
 // Only use attributes for initial static values or strings
@@ -67,9 +67,12 @@ Prefer `::part()` and CSS custom properties over inline styles. This keeps custo
   border-radius: 0;
 }
 
-/* Token override for a section */
+/* Token override for a section — drive button typography via the typographic
+   token chain (hx-button reads --hx-font-family-sans / weight tokens directly;
+   pair with --hx-button-bg / --hx-button-color for color, and --hx-size-* for
+   spacing). */
 .sidebar {
-  --hx-button-font-size: var(--hx-font-size-sm);
+  --hx-font-family-sans: var(--hx-font-family-mono);
 }
 ```
 
@@ -82,15 +85,21 @@ Prefer `::part()` and CSS custom properties over inline styles. This keeps custo
 Consumers customize the design system by overriding semantic tokens, not primitive values. This ensures all components pick up the change:
 
 ```css
-/* Correct: override the semantic token */
+/* Correct: override semantic action tokens — every primary-surface component picks this up */
 :root {
-  --hx-color-primary: #005fcc;
-  --hx-color-primary-hover: #004db3;
+  --hx-color-action-primary-bg: #005fcc;
+  --hx-color-action-primary-bg-hover: #004db3;
 }
 
-/* Avoid: override at the primitive tier */
+/* Also correct: shift the primary ramp itself (semantic action tokens chain from it) */
 :root {
-  --hx-color-blue-600: #005fcc; /* Fragile — other semantics may reference this */
+  --hx-color-primary-700: #005fcc;
+  --hx-color-primary-800: #004db3;
+}
+
+/* Avoid: ad-hoc overrides outside the documented chain */
+:root {
+  --hx-color-blue-600: #005fcc; /* No --hx-color-blue-* tokens exist in the public API */
 }
 ```
 
@@ -99,10 +108,12 @@ Consumers customize the design system by overriding semantic tokens, not primiti
 When one specific component needs to deviate from the theme, use its component-scoped token:
 
 ```css
-/* Only affects hx-button — doesn't change the global primary color */
-hx-button.cta {
-  --hx-button-bg: var(--hx-color-accent);
-  --hx-button-bg-hover: var(--hx-color-accent-hover);
+/* Only affects hx-button.cta — doesn't change the global primary color.
+   For variant-aware overrides, target the variant token instead so the
+   shadow-root variant rules pick up the change (see Theming guide). */
+hx-button.cta[variant='primary'] {
+  --hx-color-action-primary-bg: var(--hx-color-primary-900);
+  --hx-color-action-primary-bg-hover: var(--hx-color-primary-950, var(--hx-color-primary-900));
 }
 ```
 
@@ -116,8 +127,8 @@ Every color, spacing value, border radius, and font size should reference a `--h
 
 /* Correct */
 .my-component {
-  background: var(--hx-color-primary);
-  padding: var(--hx-spacing-sm) var(--hx-spacing-md);
+  background: var(--hx-color-action-primary-bg);
+  padding: var(--hx-space-3) var(--hx-space-6);
 }
 ```
 
@@ -135,10 +146,10 @@ Every interactive component needs a label. Use `label` properties, `aria-label`,
 <!-- hx-button with visible text — no extra label needed -->
 <hx-button>Save changes</hx-button>
 
-<!-- Icon-only button — must have aria-label -->
-<hx-button accessible-label="Close dialog" icon-only>
-  <hx-icon name="x"></hx-icon>
-</hx-button>
+<!-- Icon-only button — must have an accessible-label; use hx-icon-button for the icon-only surface. -->
+<hx-icon-button accessible-label="Close dialog">
+  <hx-icon library="default" name="x"></hx-icon>
+</hx-icon-button>
 
 <!-- Form inputs — use label or aria-label -->
 <hx-text-input label="Email address" type="email" name="email"></hx-text-input>
@@ -153,7 +164,6 @@ Use `aria-describedby` (or the component's `error` property) to associate error 
   name="dob"
   label="Date of birth"
   error="Enter a date in MM/DD/YYYY format"
-  invalid
 ></hx-text-input>
 ```
 
@@ -215,24 +225,21 @@ observer.observe(document.querySelector('hx-data-table'));
 
 ### Avoid re-registering components
 
-Calling `customElements.define()` for an already-registered element throws an error. HELiX component imports are safe to call multiple times — they check for existing registration internally. Don't guard imports yourself:
+Calling `customElements.define()` for an already-registered element throws an error. HELiX components call `@customElement('hx-…')` directly at module load — the **module loader** itself dedupes imports (a second `import` returns the cached module without re-executing it), not a runtime guard inside the component. The practical rule is the same:
 
 ```javascript
-// Unnecessary — safe to import multiple times
-if (!customElements.get('hx-button')) {
-  await import('@helixui/library/components/hx-button');
-}
-
-// Simpler — the import handles deduplication
+// Safe to call from many places; the ESM cache prevents double registration
 await import('@helixui/library/components/hx-button');
 ```
+
+If you load the library across multiple realms (e.g. a CMS that injects scripts into multiple shadow roots), then a guard becomes useful — `customElements.get('hx-button')` is fine for that case.
 
 ### Tree-shake unused components
 
 Only import the components you use. Barrel imports load every component:
 
 ```javascript
-// Wrong: loads all 81 components
+// Wrong: loads the entire library
 import '@helixui/library';
 
 // Correct: loads only what you need
@@ -240,7 +247,7 @@ import '@helixui/library/components/hx-button';
 import '@helixui/library/components/hx-text-input';
 ```
 
-For bundle analysis guidance, see [Bundle Size](/components/performance/bundle-size).
+For bundle analysis guidance, see [Bundle Size](/guides/bundle-size/).
 
 ---
 
@@ -268,18 +275,18 @@ document.getElementById('patient-form').addEventListener('submit', (e) => {
 
 ### Validate before submit, report after
 
-Use `reportValidity()` to trigger browser-native validation UI, and `setCustomValidity()` for server-side errors:
+Use the form's `reportValidity()` to trigger browser-native validation UI (HELiX form controls participate via `ElementInternals`, so the native form-level validity sweep includes them). For server-side errors, set the component's `error` property — HELiX form controls do not expose `setCustomValidity()` as a public API; they own validity state via `ElementInternals` internally and surface the user-facing error string through the `error` property.
 
 ```javascript
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  if (!form.reportValidity()) return; // Show built-in validation errors
+  if (!form.reportValidity()) return; // Native form-level validity report
 
   const result = await submitToServer(new FormData(form));
 
   if (result.errors) {
-    // Show server-side errors using the component API
+    // Server-side errors flow through the component API:
     document.querySelector('hx-text-input[name="email"]').error = result.errors.email;
   }
 });
@@ -308,16 +315,17 @@ const name = formData.get('name');
 Global theme overrides belong on `:root` (or `<html>`). Component-scoped overrides target the element or a containing selector:
 
 ```css
-/* Global brand theme */
+/* Global brand theme — override the primary palette and the canonical font/radius tokens */
 :root {
-  --hx-color-primary: #005fcc;
-  --hx-font-family-base: 'Inter', sans-serif;
-  --hx-radius-md: 0.25rem;
+  --hx-color-primary-700: #005fcc;
+  --hx-color-action-primary-bg: var(--hx-color-primary-700);
+  --hx-font-family-sans: 'Inter', sans-serif;
+  --hx-border-radius-md: 0.25rem;
 }
 
-/* Page-section variant */
+/* Page-section variant — scoped brand swap */
 .admin-panel {
-  --hx-color-primary: #7c3aed;
+  --hx-color-primary-700: #7c3aed;
 }
 ```
 
@@ -339,9 +347,9 @@ For dark mode sections or multi-brand layouts, use the `hx-theme` component to s
 For healthcare applications with multiple brand or department themes, define each as a CSS class on the root element:
 
 ```css
-.theme-cardiology { --hx-color-primary: #dc2626; }
-.theme-neurology  { --hx-color-primary: #7c3aed; }
-.theme-oncology   { --hx-color-primary: #059669; }
+.theme-cardiology { --hx-color-primary-700: #dc2626; }
+.theme-neurology  { --hx-color-primary-700: #7c3aed; }
+.theme-oncology   { --hx-color-primary-700: #059669; }
 ```
 
 ```javascript
@@ -380,8 +388,12 @@ If you need to inspect rendered output inside a component, use the shadow root:
 
 ```javascript
 const button = document.querySelector('hx-button');
+button.disabled = true;
+await button.updateComplete;
 const internalButton = button.shadowRoot.querySelector('button');
-expect(internalButton.getAttribute('aria-disabled')).toBe('true');
+// hx-button's internal native <button> uses the native `disabled` property —
+// aria-disabled is intentionally not set, because disabled is the canonical signal.
+expect(internalButton.disabled).toBe(true);
 ```
 
 ### Run accessibility audits in your test suite
@@ -410,4 +422,4 @@ it('can submit the form using only keyboard', async () => {
 });
 ```
 
-For complete testing patterns, see [Shadow DOM Testing](/components/testing/shadow-dom) and [Form Testing](/components/testing/form-testing).
+For complete testing patterns, see [Testing Strategy](/architecture/testing/), [Vitest Setup](/components/testing/vitest-setup/), and [Form Testing](/components/testing/form-testing/).

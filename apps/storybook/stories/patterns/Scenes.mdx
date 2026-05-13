@@ -128,10 +128,10 @@ export const SceneFrame = ({ url, badge, children }) => (
         <span>Help</span>
       </div>
       <div style={{ display: 'flex', gap: 8 }}>
-        <hx-button variant="ghost" size="small">
+        <hx-button variant="ghost" hx-size="sm">
           Sign in
         </hx-button>
-        <hx-button variant="primary" size="small">
+        <hx-button variant="primary" hx-size="sm">
           Get started
         </hx-button>
       </div>
@@ -188,10 +188,10 @@ export const SceneFrame = ({ url, badge, children }) => (
             flexWrap: 'wrap',
           }}
         >
-          <hx-button variant="primary" size="large">
+          <hx-button variant="primary" hx-size="lg">
             Book your first visit
           </hx-button>
-          <hx-button variant="secondary" size="large">
+          <hx-button variant="secondary" hx-size="lg">
             See how it works
           </hx-button>
           <span style={{ fontSize: 12, color: 'var(--hx-color-text-muted)' }}>
@@ -273,16 +273,18 @@ export const SceneFrame = ({ url, badge, children }) => (
       lineHeight: 1.6,
     }}
   >
-    App-shell template. Inverse rail (<code>surface.inverse</code>) on the left; greeting card uses
-    the brand primary as a hero surface; quick-stat cards and timeline use the same{' '}
-    <code>hx-card</code> primitive at three different densities.
+    App-shell template. Inverse rail (<code>surface.inverse</code>) on the left; the greeting block
+    uses the brand primary as a hero surface; quick-stat tiles and timeline are rendered as plain{' '}
+    <code>&lt;article&gt;</code> elements in this mockup so the layout reads through without
+    component-upgrade noise. The real consumer scene swaps those plain articles for{' '}
+    <code>hx-card</code> at three densities.
   </p>
   <SceneFrame url="helix.health/home" badge="Auth">
     <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', minHeight: 480 }}>
       <aside
         style={{
           background: 'var(--hx-color-surface-inverse, #0d1825)',
-          color: 'var(--hx-color-text-on-inverse, #f8f9fa)',
+          color: 'var(--hx-color-text-inverse, #f8f9fa)',
           padding: '24px 16px',
           display: 'flex',
           flexDirection: 'column',
@@ -441,10 +443,10 @@ export const SceneFrame = ({ url, badge, children }) => (
               <span>30 min</span>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <hx-button variant="ghost" size="small">
+              <hx-button variant="ghost" hx-size="sm">
                 Get directions
               </hx-button>
-              <hx-button variant="ghost" size="small">
+              <hx-button variant="ghost" hx-size="sm">
                 Reschedule
               </hx-button>
             </div>
@@ -727,8 +729,10 @@ export const SceneFrame = ({ url, badge, children }) => (
       lineHeight: 1.6,
     }}
   >
-    Search-first home. Categories below; popular questions in a 2-up. Reuses the search pattern from
-    the Patterns page, the <code>hx-card</code> primitive, and the inverse-CTA closer pattern.
+    Search-first home. Categories below; popular questions in a 2-up. This mockup reuses the visual
+    layout from the Patterns page&apos;s search recipe; the real consumer scene would upgrade the
+    category tiles to <code>hx-card</code> and add an inverse-CTA closer (neither is rendered in
+    this static mockup).
   </p>
   <SceneFrame url="helix.health/help" badge="Public">
     <div

@@ -39,60 +39,64 @@ Because `show-icon` is a boolean attribute, its _presence_ flips the property to
 
 ## Components with Boolean Properties Defaulting to `true`
 
-The following HELIX components have one or more boolean properties whose default value is `true`. These are the components where the gotcha is most likely to trip up consumers.
+The following HELIX boolean properties default to `true` (per `packages/hx-library/custom-elements.json`). These are the cases where you cannot set `false` from plain HTML alone:
 
 | Component | Property | Attribute | Default | Effect when absent |
 |---|---|---|---|---|
-| [`hx-alert`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-alert--docs) | `open` | `open` | `true` | Alert is hidden |
-| [`hx-alert`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-alert--docs) | `showIcon` | `show-icon` | `true` | Icon is hidden |
-| [`hx-code-snippet`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-code-snippet--docs) | `copyable` | `copyable` | `true` | Copy button is hidden |
-| [`hx-dialog`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-dialog--docs) | `modal` | `modal` | `true` | Dialog is non-modal |
-| [`hx-skeleton`](https://storybook.helix.bookedsolid.tech/?path=/docs/components-skeleton--docs) | `animated` | `animated` | `true` | Pulse animation disabled |
+| `hx-banner` | `open` | `open` | `true` | Banner is hidden when explicitly removed via JS / Lit binding |
+| `hx-dialog` | `closeOnBackdrop` | `close-on-backdrop` | `true` | Dialog will not close on backdrop click |
+| `hx-patient-banner` | `enforceIdentifierRule` | `enforce-identifier-rule` | `true` | Patient-identifier validation is skipped |
+| `hx-skeleton` | `animated` | `animated` | `true` | Pulse animation disabled |
+| `hx-table` | `fullWidth` | `full-width` | `true` | Table renders at intrinsic width instead of stretching |
+
+For comparison, properties that look like they should be default-true but **are not** (they default to `false`, so adding the attribute enables the feature):
+
+| Component | Property | Default |
+|---|---|---|
+| `hx-alert` | `open`, `showIcon`, `dismissible`, `accent` | `false` — alert is hidden / icon hidden / dismissible off / no accent by default |
+| `hx-code-snippet` | `copyable`, `inline`, `wrap`, `lineNumbers` | `false` — copy button hidden unless opted in |
+| `hx-dialog` | `modal` | `false` — non-modal by default; use `modal` attribute or `showModal()` for modal behavior |
 
 ---
 
 ## Correct Usage Patterns
 
-### Pattern 1: Omit the attribute (pure HTML)
+### Pattern 1: Omit the attribute (pure HTML, for default-false props)
 
-To disable a boolean feature that defaults to `true`, **do not include the attribute at all**:
+For properties that default to `false`, omitting the attribute leaves them off — adding it (even as `attr="false"`) enables the feature.
 
 ```html
-<!-- showIcon defaults to true — icon is visible -->
-<hx-alert variant="info">Alert with icon.</hx-alert>
+<!-- show-icon defaults to false — icon is hidden -->
+<hx-alert variant="info" open>Alert without icon.</hx-alert>
 
-<!-- Attribute absent — showIcon is false, icon is hidden -->
-<hx-alert variant="info" show-icon="...">
-  <!--
-    Wait — this still shows the icon! Attribute presence = true.
-    Remove the attribute entirely:
-  -->
-</hx-alert>
+<!-- show-icon attribute present → showIcon = true (icon visible) -->
+<hx-alert variant="info" open show-icon>Alert with icon.</hx-alert>
 
-<!-- Correct: no show-icon attribute means showIcon = false -->
-<!-- But wait — showIcon defaults to true, so absence = false.
-     Omitting the attribute gives you the DEFAULT (true).
-     To get false, you need JavaScript (see Pattern 2). -->
+<!-- WRONG: attribute string "false" still flips the property to true -->
+<hx-alert variant="info" open show-icon="false">Still shows the icon</hx-alert>
 ```
 
-Because `showIcon` defaults to `true`, omitting the attribute means the component uses its default — `true`. To set it to `false` in markup alone is not possible (see [HTML Living Standard §2.3.2](https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes)). Use JavaScript or a template framework for that.
+For properties that default to `true` (the table above), the inverse rule applies — markup alone cannot turn the property off. There is no HTML syntax that conveys `false` for a boolean attribute (see [HTML Living Standard §2.3.2 — Boolean attributes](https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes)). Use JavaScript or a template framework binding (Patterns 2–3 below).
 
 ### Pattern 2: JavaScript property assignment
 
 Set the property directly on the element reference after it is connected:
 
 ```javascript
-const alert = document.querySelector('hx-alert');
-alert.showIcon = false;  // ✅ Sets the property, not the attribute
-
-const snippet = document.querySelector('hx-code-snippet');
-snippet.copyable = false;  // ✅ Copy button hidden
-
+// Disabling default-true properties from JS:
 const dialog = document.querySelector('hx-dialog');
-dialog.modal = false;  // ✅ Non-modal dialog
+dialog.closeOnBackdrop = false;  // ✅ Dialog ignores backdrop clicks
 
 const skeleton = document.querySelector('hx-skeleton');
-skeleton.animated = false;  // ✅ Pulse animation disabled
+skeleton.animated = false;       // ✅ Pulse animation disabled
+
+const table = document.querySelector('hx-table');
+table.fullWidth = false;         // ✅ Table renders at intrinsic width
+
+// Enabling default-false properties also works from JS, but in plain HTML
+// you'd just add the attribute. JS is mostly useful for dynamic toggles:
+const alert = document.querySelector('hx-alert');
+alert.showIcon = true;           // Equivalent to adding the show-icon attribute
 ```
 
 ### Pattern 3: Lit binding syntax (`?attr`)
@@ -101,11 +105,13 @@ In Lit templates, use the `?` boolean binding prefix. This adds or removes the a
 
 ```typescript
 html`
-  <!-- Adds show-icon attribute when showIcon is true, removes it when false -->
-  <hx-alert ?show-icon=${this.showIcon}>Message</hx-alert>
+  <!-- Adds show-icon attribute when showIcon is true (false → attribute absent) -->
+  <hx-alert ?show-icon=${this.showIcon} ?open=${this.alertOpen}>Message</hx-alert>
 
-  <!-- Removes copyable attribute — copy button hidden -->
-  <hx-code-snippet ?copyable=${false}>const x = 1;</hx-code-snippet>
+  <!-- For a default-true prop, ?attr=${false} is the canonical way to disable
+       it from a template: -->
+  <hx-skeleton ?animated=${false}></hx-skeleton>
+  <hx-dialog ?close-on-backdrop=${false}>…</hx-dialog>
 `
 ```
 
@@ -126,15 +132,15 @@ In Twig, conditionally render boolean attributes using the conditional block syn
 >{{ message }}</hx-alert>
 ```
 
-For properties that default to `true` and must be disabled, use a Drupal behavior to set the property via JavaScript after the element is defined:
+For default-true properties that need to be disabled in a Drupal context, use a Drupal behavior to set the property via JavaScript after the element is defined. The example below disables the dialog's backdrop close behavior on dialogs marked with a data attribute from Twig:
 
 ```javascript
 // my_module/js/my-module.behaviors.js
-Drupal.behaviors.myModuleAlertIcon = {
+Drupal.behaviors.myModuleStrictDialog = {
   attach(context) {
-    once('hx-alert-icon', 'hx-alert[data-hide-icon]', context).forEach((el) => {
-      customElements.whenDefined('hx-alert').then(() => {
-        el.showIcon = false;
+    once('hx-dialog-strict', 'hx-dialog[data-strict]', context).forEach((el) => {
+      customElements.whenDefined('hx-dialog').then(() => {
+        el.closeOnBackdrop = false;
       });
     });
   },
@@ -142,23 +148,23 @@ Drupal.behaviors.myModuleAlertIcon = {
 ```
 
 ```twig
-<hx-alert
-  variant="{{ variant }}"
-  {% if not show_icon %}data-hide-icon{% endif %}
->{{ message }}</hx-alert>
+<hx-dialog
+  heading="{{ heading }}"
+  {% if strict_mode %}data-strict{% endif %}
+>{{ message }}</hx-dialog>
 ```
 
 ---
 
 ## Why This Design Exists
 
-Some features are "on by default" because hiding or disabling them is the exception. For example:
+Some features are "on by default" because turning them off is the exception. For example:
 
-- `hx-alert` shows an icon by default because icons reinforce semantic meaning (error = red X, success = green check). Most consumers want icons; only edge-case dense UIs hide them.
-- `hx-code-snippet` shows a copy button by default because copy-to-clipboard is the primary value of a code block component.
-- `hx-dialog` is modal by default because non-modal dialogs are rare and accessibility-risky.
+- `hx-skeleton.animated` defaults to `true` because the pulse motion is the visible "this is loading" signal — disabling it is the prefers-reduced-motion / hidden-skeleton case.
+- `hx-dialog.closeOnBackdrop` defaults to `true` because a backdrop click escape hatch is the standard dialog UX — `false` is the destructive-confirmation special case.
+- `hx-table.fullWidth` defaults to `true` because content-width tables are the rare exception in dashboards.
 
-The trade-off is that disabling a default-true feature requires JavaScript (or a framework binding) rather than a plain HTML attribute. This is a known HTML limitation — the spec has no mechanism for a boolean attribute to convey `false`.
+The trade-off is that disabling a default-true feature requires JavaScript (or a framework binding) rather than a plain HTML attribute. This is a known HTML limitation — the spec has no mechanism for a boolean attribute to convey `false` (see [HTML Living Standard §2.3.2](https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes)). Defaulting features that are commonly disabled (icons, copy buttons, modal mode) to `false` lets consumers opt in cleanly from plain HTML.
 
 ---
 
@@ -167,8 +173,8 @@ The trade-off is that disabling a default-true feature requires JavaScript (or a
 | Goal | Method |
 |---|---|
 | Enable a default-false boolean | Add the attribute: `<hx-button disabled>` |
-| Disable a default-true boolean (JS) | `el.showIcon = false` |
-| Disable a default-true boolean (Lit) | `?show-icon=${false}` |
+| Disable a default-true boolean (JS) | `el.closeOnBackdrop = false` |
+| Disable a default-true boolean (Lit) | `?close-on-backdrop=${false}` |
 | Disable a default-true boolean (Twig) | Drupal behavior + JS property |
 | **Do not use** | `attr="false"` — this enables the feature |
 

@@ -25,6 +25,15 @@ export type Category =
   | 'test-gap'
   | 'api-design'
   | 'performance'
+  // Docs fact-check campaign categories
+  | 'component-name'
+  | 'api-surface'
+  | 'package-version'
+  | 'code-sample'
+  | 'url'
+  | 'aaa'
+  | 'drupal'
+  | 'editorial'
   | 'other';
 
 export interface Finding {
@@ -76,6 +85,15 @@ const CATEGORY: ReadonlySet<Category> = new Set([
   'test-gap',
   'api-design',
   'performance',
+  // Docs fact-check campaign categories
+  'component-name',
+  'api-surface',
+  'package-version',
+  'code-sample',
+  'url',
+  'aaa',
+  'drupal',
+  'editorial',
   'other',
 ]);
 

@@ -149,8 +149,8 @@ import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { ResizeController } from './resize-controller.js';
 
-@customElement('hx-responsive-card')
-export class HelixResponsiveCard extends LitElement {
+@customElement('org-responsive-card')
+export class OrgResponsiveCard extends LitElement {
   private resizeController = new ResizeController(this);
 
   render() {
@@ -715,8 +715,8 @@ export class HelixApp extends LitElement {
 
   render() {
     return html`
-      <hx-header></hx-header>
-      <hx-content></hx-content>
+      <org-page-header></org-page-header>
+      <org-page-content></org-page-content>
     `;
   }
 }
@@ -1118,12 +1118,12 @@ describe('ResizeController', () => {
 ```typescript
 import { fixture, expect } from '@open-wc/testing';
 import { html } from 'lit';
-import './hx-responsive-card.js';
-import type { HelixResponsiveCard } from './hx-responsive-card.js';
+import './org-responsive-card.js';
+import type { OrgResponsiveCard } from './org-responsive-card.js';
 
-describe('hx-responsive-card', () => {
+describe('org-responsive-card', () => {
   it('changes layout on resize', async () => {
-    const el = await fixture<HelixResponsiveCard>(html`<hx-responsive-card></hx-responsive-card>`);
+    const el = await fixture<OrgResponsiveCard>(html`<org-responsive-card></org-responsive-card>`);
 
     // Mock small viewport
     Object.defineProperty(window, 'innerWidth', { value: 500, writable: true });

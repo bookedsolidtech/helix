@@ -22,7 +22,7 @@ import auditRaw from '../../../../packages/hx-library/src/components/hx-button/A
 
 ## Hero scenario — sign-in form
 
-The most common deployment of `hx-button`: a primary submit action in a sign-in form, paired with a secondary "Forgot password" ghost button. Tab through the fields below to see the focus ring (`outline 2px solid` against the form surface — clears 2.4.13 Focus Appearance), and press <kbd>Enter</kbd> in any field to submit (Space + Enter both activate the submit button per APG `button` pattern).
+The most common deployment of `hx-button`: a primary submit action in a sign-in form, paired with a secondary "Forgot password" ghost button. Tab through the fields below to see the focus ring (`outline 2px solid` against the form surface — clears 2.4.13 Focus Appearance). The hero scenario below is a layout snippet, not a real `<form>` — to submit on <kbd>Enter</kbd> in a field, wrap the inputs in a `<form>` element; `hx-button` with `type="submit"` will then activate via Space or Enter per APG `button` pattern.
 
 <div
   style={{
@@ -114,7 +114,9 @@ The green **AAA Certified** card above this section is rendered by the autodocs 
     </>,
     <>
       Icon-only buttons require an explicit accessible name via <code>accessible-label</code> or{' '}
-      <code>aria-label</code>; the component emits a <code>devWarn</code> when the name is missing.
+      <code>aria-label</code>. The component's <code>devWarn</code> currently triggers when the
+      default slot is empty (which covers most icon-only cases that omit a label) — it does not
+      detect every accessible-name gap, so adding the attribute explicitly is the safe pattern.
     </>,
   ]}
 />
@@ -143,7 +145,7 @@ A disabled button suppresses both pointer activation AND keyboard activation (`E
 
 <SectionHead title="Loading state" meta="3.2.5 Change on Request" />
 
-Loading state shows an inline spinner and prevents double-click submission. The button remains in DOM flow with stable dimensions (no layout shift), and the accessible name is preserved so the announcement remains stable for screen readers during the in-flight state.
+Loading state shows an inline spinner and prevents double-click submission. The spinner is conditionally rendered, so the button width grows when `loading` flips to true — reserve space in your layout (e.g. via `min-width` on the surrounding column) if you need to suppress that shift. The accessible name is preserved so the announcement remains stable for screen readers during the in-flight state.
 
 <div style={{ padding: '1rem 0' }}>
   <hx-button variant="primary" loading>
@@ -153,7 +155,7 @@ Loading state shows an inline spinner and prevents double-click submission. The 
 
 <SectionHead title="Danger variant" meta="1.4.6 Contrast (Enhanced)" />
 
-The danger variant uses `--hx-color-danger-500` against `text.on-danger` (white) — the contrast ratio clears 7:1 (AAA) on every shipping brand (Apex, Meridian, Lumen, Verdant, Signal, Ember). Use sparingly and pair with confirmation flows for destructive operations.
+The danger variant routes through the semantic `--hx-color-action-danger-bg` and `--hx-color-text-on-error` tokens (the canonical CEM-exposed surfaces; `--hx-color-danger-500` is not a public hx-button hook). The active/hover state pair is AAA-strict; the resting state for the filled danger variant is currently classified at AA per the formal contrast report (the canonical token classification — not all interactive states reach the AAA 7:1 floor). Use sparingly and pair with confirmation flows for destructive operations.
 
 <div style={{ padding: '1rem 0' }}>
   <hx-button variant="danger">Delete patient record</hx-button>
@@ -167,8 +169,8 @@ The danger variant uses `--hx-color-danger-500` against `text.on-danger` (white)
 
 ## Variant gallery
 
-CEM-driven enumeration of every variant × size combination. Use this as a reference once you've understood the conformance evidence and ARIA pattern above; new docs readers should not start here.
+Hand-authored variant + size enumeration for reference. Use this once you've understood the conformance evidence and ARIA pattern above; new docs readers should not start here.
 
-The **Storybook canvas** for `Components/Button` (the `--default` story tree on the sidebar) renders every variant, size, prefix/suffix slot, link mode, form integration, and healthcare scenario as individual stories with a11y panel + viewport + theme + brand toolbars.
+The **Storybook canvas** for `Components/Button` (the `--default` story tree on the sidebar) renders every variant, size, prefix/suffix slot, link mode, form integration, and healthcare scenario as individual hand-authored stories with a11y panel + viewport + theme + brand toolbars.
 
 </div>

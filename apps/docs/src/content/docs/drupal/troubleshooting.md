@@ -51,8 +51,10 @@ helix-button:
       type: external
       preprocess: false
       attributes:
-        type: module   # Without this, the ES module fails to parse
+        type: module # Without this, the ES module fails to parse
 ```
+
+> **Heads up:** the per-component CDN module above imports a shared chunk that pulls `lit` and `@helixui/icons` from bare specifiers, so the page also needs an [import map](#) (or a CDN that bundles dependencies) for the module to resolve. The simpler path is to load the aggregate `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js` after an import map. See [Theming HELiX Components in Drupal](/drupal/theming/) and [XSS Prevention](/drupal/security-xss/) for the canonical import-map snippet.
 
 **Fix — Library not attached:**
 
@@ -74,9 +76,9 @@ Or in a template:
 drush cr
 ```
 
-### Component renders but has no styles
+### Component renders with fallback styling (theme tokens not applied)
 
-The Shadow DOM upgraded successfully but design tokens are not defined, so the component uses fallback styles.
+The Shadow DOM upgraded successfully but design tokens are not defined, so the component falls back to its inline default values rather than the theme palette.
 
 **Fix — Load `@helixui/tokens` CSS:**
 
@@ -129,7 +131,7 @@ document.querySelectorAll('script[src*="hx-button"]').length;
 # REQUIRED for ES modules — aggregation concatenates files, breaking imports
 helix-button:
   js:
-    dist/hx-button.js:
+    dist/components/hx-button/index.js:
       preprocess: false
 ```
 
@@ -151,7 +153,7 @@ Ensure the library is attached to the AJAX response's render array, or loaded gl
 
 ### AJAX #ajax listener not triggering
 
-Drupal's `#ajax` binds to DOM events. HELiX components emit custom events (`hx-change`, `hx-input`, `hx-select`) rather than native `change` and `input` events.
+Drupal's `#ajax` binds to DOM events. HELiX form controls emit custom events — `hx-change` and `hx-input` for value-bearing inputs, plus `hx-change` on selection components like `hx-select`, `hx-combobox`, `hx-radio-group`, and `hx-checkbox-group` — rather than the native `change` and `input` events. There is no `hx-select` event; the selection components dispatch `hx-change`.
 
 ```php
 // Wrong: listens for 'change' — HELiX emits 'hx-change'
@@ -180,7 +182,7 @@ If you attach a listener in a Drupal behavior and it does not fire, verify:
 ```javascript
 Drupal.behaviors.myBehavior = {
   attach(context) {
-    once('hx-search', 'hx-text-input[name="search"]', context).forEach((input) => {
+    once('mytheme:hx-search', 'hx-text-input[name="search"]', context).forEach((input) => {
       input.addEventListener('hx-change', (e) => {
         console.log('value:', e.detail.value);
       });
@@ -189,11 +191,13 @@ Drupal.behaviors.myBehavior = {
 };
 ```
 
+Use a project-scoped `once()` key (e.g. `mytheme:…`) so project-local behaviors don't collide with the namespace used by `@helixui/drupal-behaviors` (which owns the bare `hx-*` keys).
+
 ---
 
 ## Form Not Submitting
 
-### Value missing from $_POST
+### Value missing from $\_POST
 
 The component does not have a `name` attribute. Without `name`, `ElementInternals.setFormValue()` has no key to submit under.
 
@@ -261,7 +265,7 @@ After deploying a library change, increment the `version` key in your libraries 
 
 ```yaml
 helix-card:
-  version: 1.1.2  # Was 1.1.1 — increment on every component update
+  version: 1.1.2 # Was 1.1.1 — increment on every component update
 ```
 
 ### Drupal aggregation breaking ES modules
@@ -272,8 +276,8 @@ Drupal's JS aggregation concatenates files — this breaks `import` statements i
 # Required on every HELiX library entry
 helix-button:
   js:
-    dist/hx-button.js:
-      preprocess: false  # Disables aggregation for this file
+    dist/components/hx-button/index.js:
+      preprocess: false # Disables aggregation for this file
       minified: true
       attributes:
         type: module
@@ -293,17 +297,19 @@ Drupal.behaviors.myBehavior = {
   },
 };
 
-// Correct — once() tracks initialization, runs only for new elements
+// Correct — once() tracks initialization, runs only for new elements.
+// hx-card only dispatches hx-click when it has hx-href (interactive card mode),
+// so scope the selector to interactive cards.
 Drupal.behaviors.myBehavior = {
   attach(context) {
-    once('hx-card-behavior', 'hx-card', context).forEach((card) => {
+    once('mytheme:card-behavior', 'hx-card[hx-href]', context).forEach((card) => {
       card.addEventListener('hx-click', handler);
     });
   },
 };
 ```
 
-The `context` parameter is the DOM subtree that was just modified by AJAX. `once()` with `context` ensures only new elements in that subtree receive the behavior.
+The `context` parameter is the DOM subtree that was just modified by AJAX. `once()` with `context` ensures only new elements in that subtree receive the behavior. The `mytheme:` prefix on the once key keeps project-local behaviors out of the `@helixui/drupal-behaviors` namespace.
 
 ---
 

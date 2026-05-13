@@ -5,10 +5,17 @@
  *
  * Reads the canonical versions from the four published workspace packages
  * (`@helixui/library`, `@helixui/icons`, `@helixui/tokens`, `@helixui/react`)
- * and walks `apps/docs/src/content/docs/**` and `apps/storybook/stories/**`
- * for any `@helixui/<pkg>@<version>` references. Fails with exit 1 if any
- * exact-version pin or caret/tilde-range floor diverges from the current
- * package version.
+ * and walks every consumer-facing markdown surface for stale
+ * `@helixui/<pkg>@<version>` references:
+ *
+ *   - `apps/docs/src/content/docs/**` (Starlight docs site)
+ *   - `apps/storybook/stories/**` (Storybook MDX surface)
+ *   - `packages/** /README.md` (every workspace package README — these are
+ *     the pages consumers see on npmjs.com and on GitHub package pages,
+ *     and they ship install snippets pinned to the current library version)
+ *
+ * Fails with exit 1 if any exact-version pin or caret/tilde-range floor
+ * diverges from the current package version.
  *
  * Background:
  *   The Phase 1 docs sync (PR #1711) shipped phases 2-5 but left ~17 docs
@@ -50,9 +57,22 @@ const PACKAGES = {
   react: 'packages/hx-react/package.json',
 };
 
-// Scan roots — relative to REPO_ROOT. Both contain markdown surfaces.
-const SCAN_ROOTS = ['apps/docs/src/content/docs', 'apps/storybook/stories'];
+// Scan roots — relative to REPO_ROOT. Markdown surfaces that contain
+// consumer-facing install snippets or CDN URLs must all be scanned, or
+// version pins added there will go stale silently after a release.
+const SCAN_ROOTS = [
+  'apps/docs/src/content/docs',
+  'apps/storybook/stories',
+  // Workspace package READMEs — drupal-starter, hx-library, hx-react etc. all
+  // ship install snippets pinned to the current library version. The /apps
+  // scans don't cover these, and they're the docs consumers see on
+  // npmjs.com / GitHub package pages.
+  'packages',
+];
 const SCAN_EXTS = new Set(['.md', '.mdx']);
+// Within `packages/`, only scan README files — the source code, fixtures,
+// changelogs, and CHANGELOG/migration archives are intentionally excluded.
+const PACKAGES_NAME_ALLOWLIST = new Set(['README.md', 'README.mdx']);
 
 // Archival paths — historical version refs allowed.
 const ARCHIVE_PATTERNS = [/(^|\/)migration\//];
@@ -78,7 +98,8 @@ async function readCurrentVersions() {
   return versions;
 }
 
-async function walkMarkdownFiles(rootAbs) {
+async function walkMarkdownFiles(rootAbs, opts = {}) {
+  const { nameAllowlist } = opts;
   const out = [];
   let entries;
   try {
@@ -90,11 +111,23 @@ async function walkMarkdownFiles(rootAbs) {
   for (const entry of entries) {
     const fullPath = join(rootAbs, entry.name);
     if (entry.isDirectory()) {
-      const sub = await walkMarkdownFiles(fullPath);
+      // Skip node_modules/dist/.turbo etc — they're build artifacts and
+      // contain copies of upstream READMEs we don't own.
+      if (
+        entry.name === 'node_modules' ||
+        entry.name === 'dist' ||
+        entry.name === '.turbo' ||
+        entry.name.startsWith('.')
+      ) {
+        continue;
+      }
+      const sub = await walkMarkdownFiles(fullPath, opts);
       out.push(...sub);
     } else if (entry.isFile()) {
       const dot = entry.name.lastIndexOf('.');
-      if (dot >= 0 && SCAN_EXTS.has(entry.name.slice(dot))) {
+      const matchesExt = dot >= 0 && SCAN_EXTS.has(entry.name.slice(dot));
+      const matchesAllowlist = !nameAllowlist || nameAllowlist.has(entry.name);
+      if (matchesExt && matchesAllowlist) {
         out.push(fullPath);
       }
     }
@@ -188,6 +221,7 @@ async function scanFile(absPath, relPath, versions) {
   }
 
   const archival = isArchive(relPath);
+  const lines = content.split(/\r?\n/);
   VERSION_REF.lastIndex = 0;
   let match;
   while ((match = VERSION_REF.exec(content)) !== null) {
@@ -197,9 +231,66 @@ async function scanFile(absPath, relPath, versions) {
     const reason = evaluateMatch(versionString, current);
     if (reason === null) continue;
 
+    const line = findLineNumber(content, match.index);
+    // Pull the line plus its two neighbors for context-aware skipping.
+    const surroundingLines = lines.slice(Math.max(0, line - 2), line + 1).join(' ');
+
+    // Skip lines that explicitly mark the pin as deprecated / unpublished /
+    // cosmetic / hypothetical / illustrative — these are walkthroughs and
+    // intentional historical references, not stale CDN pins to update.
+    if (
+      /deprecated|unpublished|cosmetic|artifact|placeholder|hypothetical|illustrative|illustration|example major|future major|new major|don['']t try|do not try|reset|known-clean|accidental release/i.test(
+        surroundingLines,
+      )
+    ) {
+      continue;
+    }
+
+    // Skip explicit floating-major / floating-minor tag forms when they are
+    // shown alongside a comment that this is the intended pinning pattern
+    // (e.g. CDN guidance: "Pin to @<major> for floating patches" or
+    // "Pinned to major 3, receives patch + minor updates").
+    if (
+      /floating[\s-]?major|floating[\s-]?minor|pin(?:ned)?\s+to\s+(?:@?\d|major\s*\d)|range covering|use\s+@\d\s+for|receives\s+patch/i.test(
+        surroundingLines,
+      )
+    ) {
+      continue;
+    }
+
+    // Skip migration / upgrade-guide references. Anything that mentions
+    // "upgrading from" or "migration guide" near the pin is documenting a
+    // historical version the reader is moving away from, not asserting a
+    // currently-correct CDN target.
+    if (
+      /upgrad(?:e|ing)\s+(?:from|an existing)|migration guide|3\.\d+\s*→\s*3\.\d+/i.test(
+        surroundingLines,
+      )
+    ) {
+      continue;
+    }
+
+    // Skip bare floating-major forms (`@1`, `@3`, `@^4`) when they appear in
+    // a CDN / import-map context — those are intentional "track the major
+    // branch" pins, not stale exact pins. The context detector strips the
+    // matched span itself so a literal `@helixui/<pkg>@<ver>` on the line
+    // doesn't accidentally count as evidence of import-map shape.
+    if (/^\^?\d+$/.test(versionString)) {
+      const cleanedContext = surroundingLines
+        .slice(0, surroundingLines.indexOf(match[0]))
+        .concat(surroundingLines.slice(surroundingLines.indexOf(match[0]) + match[0].length));
+      if (
+        /cdn\.jsdelivr\.net|cdn\.skypack\.dev|unpkg\.com|import\s*map|importmap|"imports"\s*:|<script\s+type="module"\s+src=/i.test(
+          cleanedContext,
+        )
+      ) {
+        continue;
+      }
+    }
+
     findings.push({
       file: relPath,
-      line: findLineNumber(content, match.index),
+      line,
       pkg: pkgShort,
       versionString,
       current,
@@ -216,7 +307,8 @@ async function main() {
   const allFiles = [];
   for (const root of SCAN_ROOTS) {
     const abs = resolve(REPO_ROOT, root);
-    const files = await walkMarkdownFiles(abs);
+    const opts = root === 'packages' ? { nameAllowlist: PACKAGES_NAME_ALLOWLIST } : {};
+    const files = await walkMarkdownFiles(abs, opts);
     allFiles.push(...files);
   }
 
@@ -232,7 +324,7 @@ async function main() {
 
   if (realFails.length === 0) {
     console.log(
-      `${ANSI.green}✓ version-drift: scanned ${allFiles.length} files across apps/docs + apps/storybook; zero stale @helixui/* refs${ANSI.reset}`,
+      `${ANSI.green}✓ version-drift: scanned ${allFiles.length} files across apps/docs + apps/storybook + packages/**/README.md; zero stale @helixui/* refs${ANSI.reset}`,
     );
     if (archivalInfos.length > 0) {
       console.log(

@@ -19,7 +19,7 @@ The most fundamental pattern: find HELiX components in context, guard against do
 
   Drupal.behaviors.mythemeHxCardInit = {
     attach(context, settings) {
-      once('helixui:card-init', 'hx-card', context).forEach((card) => {
+      once('mysite:card-init', 'hx-card', context).forEach((card) => {
         // Add entity data from a data- attribute
         const entityId = card.getAttribute('data-entity-id');
         if (entityId) {
@@ -46,14 +46,15 @@ HTML attributes set in Twig become available immediately on the DOM element. But
 
   Drupal.behaviors.hxDataTableInit = {
     attach(context, settings) {
-      once('helixui:data-table-init', 'hx-data-table[data-columns]', context).forEach((table) => {
+      once('mysite:data-table-init', 'hx-data-table[data-columns]', context).forEach((table) => {
         customElements.whenDefined('hx-data-table').then(() => {
           const columnsJson = table.getAttribute('data-columns');
           const rowsJson = table.getAttribute('data-rows');
 
           try {
             if (columnsJson) table.columns = JSON.parse(columnsJson);
-            if (rowsJson) table.data = JSON.parse(rowsJson);
+            // hx-data-table's row data property is `rows`, not `data`.
+            if (rowsJson) table.rows = JSON.parse(rowsJson);
           } catch (error) {
             console.error('[HELiX] hx-data-table: failed to parse JSON data', error);
           }
@@ -88,7 +89,7 @@ HELiX components emit custom DOM events. Listen for them in a Behavior to integr
 
   Drupal.behaviors.hxFormChangeTracker = {
     attach(context, settings) {
-      once('helixui:form-change', 'form hx-text-input, form hx-select, form hx-checkbox', context).forEach((field) => {
+      once('mysite:form-change', 'form hx-text-input, form hx-select, form hx-checkbox', context).forEach((field) => {
         field.addEventListener('hx-change', (event) => {
           const form = field.closest('form');
           if (form) {
@@ -117,7 +118,7 @@ HELiX components emit custom DOM events. Listen for them in a Behavior to integr
 
   Drupal.behaviors.hxPatientSearchForm = {
     attach(context, settings) {
-      once('helixui:patient-search', 'hx-button[data-search-submit]', context).forEach((button) => {
+      once('mysite:patient-search', 'hx-button[data-search-submit]', context).forEach((button) => {
         button.addEventListener('hx-click', (event) => {
           event.preventDefault();
 
@@ -151,7 +152,7 @@ document.addEventListener('hx-change', (event) => {
 });
 
 // In a Behavior: listen at context level
-once('helixui:composed-handler', 'form', context).forEach((form) => {
+once('mysite:composed-handler', 'form', context).forEach((form) => {
   form.addEventListener('hx-change', (event) => {
     // event.target is the originating hx-* component inside the form
     console.log('Field changed:', event.target.name, event.detail?.value);
@@ -175,7 +176,9 @@ Drupal's AJAX system calls `Drupal.attachBehaviors(context)` after inserting new
     attach(context, settings) {
       // `context` is the newly inserted DOM subtree on AJAX responses
       // `once()` ensures we only process elements we haven't seen before
-      once('helixui:patient-list-item', 'hx-card[data-bundle="patient"]', context).forEach((card) => {
+      // Constrain the selector to interactive cards (hx-card only fires hx-click
+      // when hx-href is set or the consumer wires up the activation surface).
+      once('mysite:patient-list-item', 'hx-card[data-bundle="patient"][hx-href]', context).forEach((card) => {
         // This runs for initial page load AND for AJAX-loaded cards
         const patientId = card.getAttribute('data-patient-id');
         card.addEventListener('hx-click', () => {
@@ -199,7 +202,7 @@ Views AJAX pager replaces the content region entirely. The new page of results a
   Drupal.behaviors.hxViewsCardEnhance = {
     attach(context, settings) {
       // Runs on initial load and after every Views AJAX page change
-      once('helixui:views-card', '.views-row hx-card', context).forEach((card) => {
+      once('mysite:views-card', '.views-row hx-card', context).forEach((card) => {
         // Enhance each card in the Views results
         card.setAttribute('tabindex', '0');
         card.addEventListener('keydown', (event) => {
@@ -229,22 +232,23 @@ When a single page context contains several HELiX component types that all need 
     attach(context, settings) {
 
       // Each component type gets its own once() key
-      once('helixui:card-click', 'hx-card[href]', context).forEach((card) => {
+      once('mysite:card-click', 'hx-card[hx-href]', context).forEach((card) => {
         card.addEventListener('hx-click', () => {
-          window.location.href = card.getAttribute('href');
+          window.location.href = card.getAttribute('hx-href');
         });
       });
 
-      once('helixui:badge-tooltip', 'hx-badge[data-tooltip]', context).forEach((badge) => {
+      once('mysite:badge-tooltip', 'hx-badge[data-tooltip]', context).forEach((badge) => {
         badge.title = badge.getAttribute('data-tooltip');
       });
 
-      once('helixui:alert-session', 'hx-alert[data-alert-id]', context).forEach((alert) => {
+      once('mysite:alert-session', 'hx-alert[data-alert-id]', context).forEach((alert) => {
         const alertId = alert.getAttribute('data-alert-id');
         if (sessionStorage.getItem(`dismissed-${alertId}`)) {
           alert.hidden = true;
         }
-        alert.addEventListener('hx-dismiss', () => {
+        // hx-alert emits hx-close on dismiss, not hx-dismiss.
+        alert.addEventListener('hx-close', () => {
           sessionStorage.setItem(`dismissed-${alertId}`, '1');
         });
       });
@@ -291,7 +295,7 @@ Always write Behaviors that enhance content that is already functional, rather t
 
   Drupal.behaviors.hxPatientActionEnhance = {
     attach(context, settings) {
-      once('helixui:patient-action', 'form[data-hx-enhanced]', context).forEach((form) => {
+      once('mysite:patient-action', 'form[data-hx-enhanced]', context).forEach((form) => {
         // Enhance form submit to use AJAX instead of full page reload
         form.addEventListener('submit', (event) => {
           event.preventDefault();
@@ -349,7 +353,7 @@ When a Behavior establishes resources that persist beyond the element's DOM life
       const pollUrl = settings.helixui?.statusPollUrl;
       if (!pollUrl) return;
 
-      once('helixui:live-status', 'hx-card[data-live-status]', context).forEach((card) => {
+      once('mysite:live-status', 'hx-card[data-live-status]', context).forEach((card) => {
         const cardId = card.getAttribute('data-entity-id');
 
         const intervalId = setInterval(() => {
@@ -394,16 +398,22 @@ When a Behavior establishes resources that persist beyond the element's DOM life
       const baseUrl = apiConfig.apiBaseUrl || '/api';
       const csrfToken = apiConfig.csrfToken || '';
 
-      once('helixui:api-config', 'hx-data-table[data-api-endpoint]', context).forEach((table) => {
+      once('mysite:api-config', 'hx-data-table[data-api-endpoint]', context).forEach((table) => {
         customElements.whenDefined('hx-data-table').then(() => {
           const endpoint = table.getAttribute('data-api-endpoint');
-          table.fetchConfig = {
-            url: `${baseUrl}${endpoint}`,
+          // hx-data-table does not expose a `fetchConfig` property. Fetch
+          // the data yourself and assign the resulting columns + rows.
+          fetch(`${baseUrl}${endpoint}`, {
             headers: {
               'X-CSRF-Token': csrfToken,
               'Content-Type': 'application/json',
             },
-          };
+          })
+            .then((r) => r.json())
+            .then((payload) => {
+              table.columns = payload.columns;
+              table.rows = payload.rows;
+            });
         });
       });
     },
@@ -435,7 +445,7 @@ Sometimes one Behavior needs to coordinate between multiple HELiX component inst
 
   Drupal.behaviors.hxFilteredList = {
     attach(context, settings) {
-      once('helixui:filtered-list', '[data-filtered-list]', context).forEach((container) => {
+      once('mysite:filtered-list', '[data-filtered-list]', context).forEach((container) => {
         const filterInput = container.querySelector('hx-text-input[data-filter-input]');
         const cards = container.querySelectorAll('hx-card[data-searchable]');
 
@@ -480,7 +490,7 @@ attach(context, settings) {
 
 // CORRECT: scoped to context, protected by once()
 attach(context, settings) {
-  once('helixui:card-click', 'hx-card', context).forEach((card) => {
+  once('mysite:card-click', 'hx-card', context).forEach((card) => {
     card.addEventListener('click', handler);
   });
 },
@@ -510,7 +520,7 @@ attach(context, settings) {
 
 // SAFE: property is set after upgrade guarantees the component accepts it
 attach(context, settings) {
-  once('helixui:table-init', 'hx-data-table', context).forEach((table) => {
+  once('mysite:table-init', 'hx-data-table', context).forEach((table) => {
     customElements.whenDefined('hx-data-table').then(() => {
       table.columns = JSON.parse(columnsJson);
     });

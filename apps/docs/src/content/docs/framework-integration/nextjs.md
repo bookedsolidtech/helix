@@ -189,21 +189,24 @@ Create `src/helix.d.ts` so TypeScript recognizes HELiX elements in JSX:
 
 ```ts
 // src/helix.d.ts
-import type { HxButton, HxTextInput, HxCard } from '@helixui/library';
+import type { HelixButton, HelixTextInput, HelixCard } from '@helixui/library';
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'hx-button': React.DetailedHTMLProps<React.HTMLAttributes<HxButton>, HxButton> & {
-        variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-        size?: 'sm' | 'md' | 'lg';
+      'hx-button': React.DetailedHTMLProps<
+        React.HTMLAttributes<HelixButton>,
+        HelixButton
+      > & {
+        variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline';
+        'hx-size'?: 'sm' | 'md' | 'lg';
         disabled?: boolean;
         loading?: boolean;
         type?: 'button' | 'submit' | 'reset';
       };
       'hx-text-input': React.DetailedHTMLProps<
-        React.HTMLAttributes<HxTextInput>,
-        HxTextInput
+        React.HTMLAttributes<HelixTextInput>,
+        HelixTextInput
       > & {
         value?: string;
         placeholder?: string;
@@ -211,17 +214,23 @@ declare global {
         disabled?: boolean;
         required?: boolean;
         name?: string;
-        type?: string;
-        'error-message'?: string;
+        type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number' | 'date';
+        error?: string;
       };
-      'hx-card': React.DetailedHTMLProps<React.HTMLAttributes<HxCard>, HxCard> & {
-        elevated?: boolean;
+      'hx-card': React.DetailedHTMLProps<
+        React.HTMLAttributes<HelixCard>,
+        HelixCard
+      > & {
+        variant?: 'default' | 'featured' | 'compact';
+        elevation?: 'flat' | 'raised' | 'floating';
       };
       // Add additional components as needed
     }
   }
 }
 ```
+
+> The attribute name is `hx-size` (not `size`) on `hx-button` — HELiX prefixes the size attribute to avoid clashing with the native HTML `size` attribute that Next.js / React may forward to other elements.
 
 ### Using `@helixui/react` wrappers for full typing (recommended)
 
@@ -254,15 +263,28 @@ HELiX form components use the `ElementInternals` API for native form participati
 
 ### Basic Server Action form
 
+Server Components must not import HELiX modules directly — `@customElement` registration is browser-only. Split the page into a Server Component (the route + action wiring) and a Client Component (the rendered form):
+
 ```tsx
-// app/contact/page.tsx
-import '@helixui/library/components/hx-text-input';
-import '@helixui/library/components/hx-button';
+// app/contact/page.tsx — Server Component
 import { submitContact } from './actions';
+import { ContactForm } from './contact-form';
 
 export default function ContactPage() {
+  return <ContactForm action={submitContact} />;
+}
+```
+
+```tsx
+// app/contact/contact-form.tsx — Client Component
+'use client';
+
+import '@helixui/library/components/hx-text-input';
+import '@helixui/library/components/hx-button';
+
+export function ContactForm({ action }: { action: (fd: FormData) => void }) {
   return (
-    <form action={submitContact}>
+    <form action={action}>
       <hx-text-input name="name" label="Full name" required />
       <hx-text-input name="email" type="email" label="Email" required />
       <hx-button type="submit" variant="primary">Send</hx-button>
@@ -423,7 +445,7 @@ Inside `contact-form.tsx`, import only what you need:
 ```tsx
 'use client';
 
-// Tree-shakeable per-component imports (~3–5 KB each, min+gz)
+// Tree-shakeable per-component imports — import only what the route uses.
 import '@helixui/library/components/hx-text-input';
 import '@helixui/library/components/hx-button';
 ```
@@ -431,9 +453,11 @@ import '@helixui/library/components/hx-button';
 Avoid importing the full library on every page:
 
 ```tsx
-// Avoid unless you use most components on every route
-import '@helixui/library'; // ~50 KB total
+// Avoid unless you use most components on every route.
+import '@helixui/library';
 ```
+
+Measure current component and bundle sizes locally before optimising for a budget — run `node scripts/measure-component-size.js` (in the HELiX monorepo) or `pnpm run check:bundle` to inspect per-entry min+gz output rather than relying on a doc-time approximation.
 
 ### Bundling with Next.js `transpilePackages`
 
@@ -567,4 +591,5 @@ const MyForm = dynamic(
 - [React Integration](/framework-integration/react) — general React 18+ patterns
 - [Design Tokens](/design-tokens/overview) — theming HELiX in your Next.js app
 - [Storybook](https://storybook.helix.bookedsolid.tech/) — browse available components
-- [Accessibility Guide](/components/accessibility/aria) — WCAG 2.1 AA in Next.js
+- [Self-certification scope](/accessibility/self-cert-scope/) — WCAG 2.2 AAA on P0 surface, AA baseline elsewhere
+- [Consumer obligations](/accessibility/consumer-obligations/) — what callers must wire when embedding HELiX in a Next.js app

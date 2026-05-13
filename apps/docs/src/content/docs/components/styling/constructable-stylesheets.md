@@ -16,7 +16,6 @@ For HELiX, Constructable Stylesheets are the **foundation** of our styling archi
 Before diving into Constructable Stylesheets, ensure you understand:
 
 - [Component Styling Fundamentals](/components/styling/fundamentals) — Shadow DOM styling, `:host` selectors, CSS custom properties
-- [Shadow DOM Architecture](/components/shadow-dom/architecture) — Encapsulation boundaries and shadow tree composition
 - Basic JavaScript module loading and static class properties
 
 ---

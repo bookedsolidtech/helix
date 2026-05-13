@@ -11,6 +11,8 @@ Testing web components requires a real browser environment. Shadow DOM behavior,
 
 This guide covers the complete Vitest browser mode setup: configuration structure, provider selection, headless vs headed testing, test environment configuration, and the production-ready setup used in `hx-library`.
 
+> **Reading note:** The configuration samples below are illustrative — the shipped Vitest 3 Playwright provider has a slightly different option shape than the snippets show, browser mode is **headless by default** (no `--headed` CLI flag on the current Vitest browser CLI), coverage is **disabled by default** in `packages/hx-library/vitest.config.ts` (the active blocking threshold when enabled is **50%**, not 80%), and the Browser Context API exposes `userEvent` / `page.elementLocator` rather than `page.click` / `page.fill` / `page.keyboard`. Use the recipes here as a pattern catalog and consult the live `packages/hx-library/vitest.config.ts` for the canonical shape. The internal "Test Theater" page in the Admin Dashboard reads from generated artifacts under `apps/admin/.cache/` and `.reports/` — the `.cache/test-results.json` path mentioned earlier in some drafts is one of several inputs, not the single source.
+
 ## Why Browser Mode?
 
 **Vitest browser mode runs tests in a real browser**, not a Node.js environment with a simulated DOM. This provides critical advantages for web component testing:
@@ -384,7 +386,7 @@ coverage: {
 }
 ```
 
-If coverage falls below these thresholds, the test run fails. **HELiX enforces 80% minimum coverage** for all components.
+When coverage is enabled, the active blocking threshold is **50%** (see `coverage-config.json` and the `pnpm test:smart` coverage path). Coverage is reported as informational on every CI run today but is not gating the merge until the [#1556 coverage-config follow-up](https://github.com/bookedsolidtech/helix/issues/1556) lands and the threshold is raised.
 
 ## HELiX Production Configuration
 
@@ -513,7 +515,7 @@ In GitHub Actions or other CI environments:
 - Runs all tests once
 - Generates JSON output to `.cache/test-results.json`
 - Generates coverage report to `.cache/coverage/`
-- Fails if coverage < 80%
+- Reports coverage as informational (50% threshold when enabled; not currently a blocking gate — see [#1556](https://github.com/bookedsolidtech/helix/issues/1556))
 
 ### Browser Context API
 
@@ -741,9 +743,8 @@ Browser mode is slower than jsdom because it launches a real browser. Optimize w
 
 Now that you understand Vitest browser mode configuration, learn how to write tests:
 
-- **[Writing Component Tests](/components/testing/vitest)** — Test patterns, utilities, and best practices
-- **[Shadow DOM Testing](/components/testing/shadow-dom)** — Querying shadow roots and handling encapsulation
-- **[Async Testing](/components/testing/async)** — Handling promises, events, and Lit's updateComplete
+- **[Storybook standards](/guides/storybook-standards/)** — canonical Storybook story patterns for HELiX components (the per-page testing guides referenced in earlier drafts haven't been written yet)
+- **[Testing Extended Components](/extending/testing-extended-components/)** — Vitest + axe-core patterns for consumer packages extending HELiX
 
 ## Sources
 

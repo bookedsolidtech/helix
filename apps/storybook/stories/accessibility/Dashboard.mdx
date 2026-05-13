@@ -20,10 +20,10 @@ import '@helixui/library/components/hx-icon-button';
   title="WCAG 2.2 AAA is the target. AA is the floor we never touch."
   lede={
     <>
-      HELiX targets <strong>WCAG 2.2 Level AAA on its P0 surface</strong>. 163 contrast pairings
-      graded across light, dark, and high-contrast; APG-aligned keyboard contracts on every
-      interactive primitive; <strong>zero sub-AA tokens</strong>. Adding a token below the floor
-      fails CI.
+      HELiX targets <strong>WCAG 2.2 Level AAA on its P0 surface</strong>. 160 contrast pair
+      instances graded across light, dark, and high-contrast (per the checked-in token contrast
+      report); APG-aligned keyboard contracts on every interactive primitive;{' '}
+      <strong>zero sub-AA tokens</strong>. Adding a token below the floor fails CI.
     </>
   }
 />
@@ -45,26 +45,32 @@ import '@helixui/library/components/hx-icon-button';
     The verdicts on this dashboard and on every component page are{' '}
     <strong>self-certified by the project maintainers</strong>, not third-party VPAT-attested. The
     formal AAA harness (<code>pnpm aaa:audit</code>) measures each P0 component against{' '}
-    <strong>11 success criteria</strong> on the component&apos;s <strong>Default story only</strong>
-    . Variant coverage (every story state for every component) is asserted by a separate
-    visual-rendering harness (<code>scripts/audit-stories.mjs</code>); axe-core in browser-mode
-    smoke-tests the same surface.
+    <strong>9 WCAG success criteria plus 2 peer standards</strong> (forced-colors + APG keyboard).
+    Audit-story selection is per-component: many components use a curated <code>AaaAudit</code>{' '}
+    story rather than the bare <code>Default</code> so the harness measures the canonical AAA-shaped
+    variant. Variant coverage across every shipped state is asserted by a separate visual-rendering
+    harness (<code>scripts/audit-stories.mjs</code>); axe-core in browser-mode smoke-tests the same
+    surface.
   </p>
   <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6 }}>
-    Per-component evidence lives under{' '}
-    <a href="https://github.com/bookedsolidtech/helix/tree/main/.reports/formal-aaa-audit/evidence">
-      <code>.reports/formal-aaa-audit/evidence/</code>
-    </a>
-    . Full self-cert scope and known limits:{' '}
-    <a href="https://helixui.dev/accessibility/self-cert-scope/">Self-Certification Scope</a>.
+    Per-component evidence is regenerated locally under{' '}
+    <code>.reports/formal-aaa-audit/evidence/</code> (gitignored; reproducible via{' '}
+    <code>pnpm aaa:audit</code>) and the committed verdicts ship in{' '}
+    <code>packages/hx-library/aaa-verdicts.json</code>. Full self-cert scope and known limits:{' '}
+    <a href="/?path=/docs/accessibility-self-cert-scope--docs">Self-Certification Scope</a>.
   </p>
 </aside>
 
 <section>
-  <SectionHead title="Coverage at a glance" meta="tokens 3.3.1 · regression-tested in CI" />
+  <SectionHead title="Coverage at a glance" meta="tokens 3.9.0 · regression-tested in CI" />
   <div className="hx-docs-stats">
-    <StatCard num="163" unit="/163" label="Contrast pairings AA+" sub="across 3 modes · 0 sub-AA" />
-    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 scaffolded" />
+    <StatCard
+      num="160"
+      unit="/160"
+      label="Contrast pair instances AA+"
+      sub="across 3 modes · 0 sub-AA"
+    />
+    <StatCard num="100" unit="%" label="P0 components AAA-targeted" sub="VPAT 2.5 v1.0 published" />
     <StatCard num="3" label="Theme modes" sub="light · dark · high-contrast" />
     <StatCard num="0" label="axe-core violations" sub="critical + serious" />
   </div>
@@ -113,9 +119,10 @@ import '@helixui/library/components/hx-icon-button';
     }}
   >
     See <a href="/?path=/docs/accessibility-focus-management--docs">Focus Management</a> for the
-    trap / restore / roving-tabindex contracts and the underlying <code>RovingTabindexController</code>{' '}
-    pattern. See <a href="/?path=/docs/accessibility-forced-colors--docs">Forced Colors</a> for how
-    this same ring delegates to the <code>Highlight</code> system keyword in HC mode.
+    trap / restore / roving-tabindex contracts (roving tabindex is implemented per-component
+    in <code>hx-tabs</code>, <code>hx-menu</code>, <code>hx-radio-group</code>, etc. — no shared
+    controller class). See <a href="/?path=/docs/accessibility-forced-colors--docs">Forced Colors</a>{' '}
+    for how this same ring delegates to the <code>Highlight</code> system keyword in HC mode.
   </p>
 </section>
 
@@ -125,14 +132,14 @@ import '@helixui/library/components/hx-icon-button';
     meta="measured on light surface · WCAG 1.4.3 / 1.4.11"
   />
   <div className="hx-docs-ratio-grid">
-    <RatioCard pair="text-primary on default" ratio={21.0} grade="AAA" />
-    <RatioCard pair="text-secondary on default" ratio={10.9} grade="AAA" />
-    <RatioCard pair="text-muted on default" ratio={7.76} grade="AA" />
-    <RatioCard pair="text-on-primary / primary-500" ratio={5.2} grade="AA" />
+    <RatioCard pair="text-primary on default" ratio={17.88} grade="AAA" />
+    <RatioCard pair="text-secondary on default" ratio={10.93} grade="AAA" />
+    <RatioCard pair="text-muted on default" ratio={10.93} grade="AAA" />
+    <RatioCard pair="text-on-primary / action-primary-bg (primary-700)" ratio={7.03} grade="AAA" />
     <RatioCard pair="on-primary-strong / primary-600" ratio={5.82} grade="AA" />
-    <RatioCard pair="error-text on default" ratio={5.46} grade="AA" />
-    <RatioCard pair="success-text on default" ratio={6.88} grade="AA" />
-    <RatioCard pair="focus-ring · 1.4.11" ratio={5.82} grade="AA-large" />
+    <RatioCard pair="error-text on default" ratio={7.96} grade="AAA" />
+    <RatioCard pair="success-text on default" ratio={10.0} grade="AAA" />
+    <RatioCard pair="focus-ring · 1.4.11 UI" ratio={5.82} grade="AAA" />
   </div>
   <p
     style={{
@@ -158,9 +165,13 @@ import '@helixui/library/components/hx-icon-button';
       lineHeight: 1.6,
     }}
   >
-    Every status signal in HELiX combines color with at least one other channel: an icon, a text
-    label, a shape, or a position. A user with red-green color blindness sees the same information
-    as everyone else.
+    Every HELiX status signal in the curated patterns below combines color with at least one other
+    channel: an icon, a text label, a shape, or a position. A user with red-green color blindness
+    sees the same information as everyone else.{' '}
+    <strong>Authors are responsible for opting into the dual-channel variant</strong> — e.g.{' '}
+    <code>hx-status-indicator</code> defaults to a color dot with <code>show-label="false"</code>;
+    set <code>show-label</code> (and provide a meaningful <code>label</code>) for any status whose
+    meaning is not already conveyed by adjacent text.
   </p>
   <div
     style={{
@@ -300,8 +311,14 @@ import '@helixui/library/components/hx-icon-button';
         ))}
       </div>
     </DocsCard>
-    <DocsCard title="App-level shortcuts" tag="documented + remappable">
+    <DocsCard title="App-level shortcuts" tag="consumer-defined patterns">
       <div style={{ width: '100%', display: 'grid', gap: 6, fontSize: 13 }}>
+        {/*
+          The shortcuts below are illustrative of typical app-level patterns
+          (search slash, vim-style 'go to' chords, command palette). HELiX
+          itself does not register or remap these — they are entirely the
+          consumer app's responsibility to wire and document.
+        */}
         {[
           ['/', 'Focus global search'],
           ['g p', 'Go to patient list'],
@@ -427,7 +444,7 @@ import '@helixui/library/components/hx-icon-button';
   <p style={{ margin: '8px 0 0 0' }}>
     →{' '}
     <a
-      href="https://helixui.dev/accessibility/consumer-obligations/"
+      href="/?path=/docs/accessibility-consumer-obligations--docs"
       style={{ fontWeight: 600, color: 'var(--hx-color-text-link)' }}
     >
       Consumer Obligations — partial-AAA SC contracts

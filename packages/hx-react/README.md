@@ -1,6 +1,6 @@
 # @helixui/react
 
-React wrappers for all 98 HELiX web components. Auto-generated from `custom-elements.json` using [`@lit/react`](https://lit.dev/docs/frameworks/react/) `createComponent()`.
+React wrappers for the HELiX web component library. Auto-generated from `custom-elements.json` using [`@lit/react`](https://lit.dev/docs/frameworks/react/) `createComponent()`. The exact wrapper inventory is the union of CEM declarations and the generator's allow-list; see [Available Components](#available-components) below for the current list.
 
 ## Installation
 
@@ -59,7 +59,7 @@ export default function Page() {
 
 ## Tree-Shaking
 
-Each component is a separate entry point. Importing `HxButton` does not bundle all 98 components:
+Each component is a separate entry point. Importing `HxButton` does not bundle every component:
 
 ```tsx
 // Only HxButton is included in your bundle
@@ -71,7 +71,7 @@ import { HxButton } from '@helixui/react/components/HxButton';
 
 ## TypeScript
 
-All prop types are derived from CEM (`custom-elements.json`) declarations. Props, event handlers, and refs are fully typed:
+All prop types are derived from CEM (`custom-elements.json`) declarations. Props and refs are fully typed; **event callback names** (`onHxClick`, `onHxInput`, etc.) are typed, but their payloads are currently surfaced as `Event` — CEM-specific `CustomEvent<DetailType>` payload typing is queued for the next generator pass:
 
 ```tsx
 import { HxButton, type HxButtonProps } from '@helixui/react';
@@ -96,6 +96,8 @@ This runs `scripts/generate-react-wrappers.ts` which reads the CEM and writes al
 
 ## Available Components
 
-All 98 HELiX components are available:
+The current generated wrapper set (96 wrappers, regenerated from `packages/hx-react/src/index.ts`):
 
-`HxAccordion`, `HxAccordionItem`, `HxActionBar`, `HxAlert`, `HxAvatar`, `HxBadge`, `HxBanner`, `HxBreadcrumb`, `HxBreadcrumbItem`, `HxButton`, `HxButtonGroup`, `HxCard`, `HxCarousel`, `HxCarouselItem`, `HxCheckbox`, `HxCheckboxGroup`, `HxCodeSnippet`, `HxColorPicker`, `HxCombobox`, `HxContainer`, `HxCopyButton`, `HxCounter`, `HxDataTable`, `HxDatePicker`, `HxDialog`, `HxDivider`, `HxDrawer`, `HxDropdown`, `HxFileUpload`, `HxForm`, `HxIcon`, `HxInput`, `HxLabel`, `HxMenu`, `HxMenuItem`, `HxMenuLabel`, `HxNavItem`, `HxNavSection`, `HxNumberInput`, `HxOverflowMenu`, `HxPagination`, `HxPopover`, `HxProgressBar`, `HxProgressRing`, `HxQrCode`, `HxRadio`, `HxRadioButton`, `HxRadioGroup`, `HxRange`, `HxRating`, `HxRelativeTime`, `HxResizeObserver`, `HxSelect`, `HxSideNav`, `HxSkeletonEffect`, `HxSkeletonText`, `HxSlider`, `HxSpinner`, `HxSplitButton`, `HxSplitPanel`, `HxSteps`, `HxStructuredList`, `HxStructuredListBody`, `HxStructuredListHead`, `HxStructuredListRow`, `HxSwitch`, `HxTab`, `HxTabGroup`, `HxTabPanel`, `HxTabs`, `HxTag`, `HxTd`, `HxTextarea`, `HxTextInput`, `HxTh`, `HxTimePicker`, `HxToast`, `HxToastStack`, `HxToggleButton`, `HxTooltip`, `HxTopNav`, `HxTr`, `HxTreeItem`, `HxTreeView`, `HxVisuallyHidden`
+`HxAccordion`, `HxAccordionItem`, `HxActionBar`, `HxAlert`, `HxAvatar`, `HxBadge`, `HxBanner`, `HxBreadcrumb`, `HxButton`, `HxButtonGroup`, `HxCard`, `HxCarousel`, `HxCarouselItem`, `HxCheckbox`, `HxCheckboxGroup`, `HxCodeSnippet`, `HxColorPicker`, `HxCombobox`, `HxContainer`, `HxCopyButton`, `HxCounter`, `HxDataTable`, `HxDatePicker`, `HxDialog`, `HxDivider`, `HxDrawer`, `HxDropdown`, `HxField`, `HxFieldLabel`, `HxFileUpload`, `HxForm`, `HxFormatDate`, `HxGrid`, `HxGridItem`, `HxHelpText`, `HxIcon`, `HxIconButton`, `HxImage`, `HxLink`, `HxList`, `HxListItem`, `HxMenu`, `HxMenuDivider`, `HxMenuItem`, `HxMeter`, `HxNav`, `HxNavItem`, `HxNumberInput`, `HxOverflowMenu`, `HxPagination`, `HxPatientBanner`, `HxPhiField`, `HxPopover`, `HxPopup`, `HxProgressBar`, `HxProgressRing`, `HxProse`, `HxRadio`, `HxRadioGroup`, `HxRating`, `HxSelect`, `HxSideNav`, `HxSkeleton`, `HxSlider`, `HxSpinner`, `HxSplitButton`, `HxSplitPanel`, `HxStack`, `HxStat`, `HxStep`, `HxSteps`, `HxStyleScope`, `HxSwitch`, `HxTab`, `HxTable`, `HxTabPanel`, `HxTabs`, `HxTag`, `HxTbody`, `HxTd`, `HxText`, `HxTextarea`, `HxTextInput`, `HxTfoot`, `HxTh`, `HxThead`, `HxTheme`, `HxTimePicker`, `HxToast`, `HxToastStack`, `HxToggleButton`, `HxTooltip`, `HxTopNav`, `HxTr`, `HxTreeItem`, `HxTreeView`
+
+This list is generated from CEM + the allow-list; consult `packages/hx-react/src/index.ts` for the authoritative re-export block.

@@ -28,7 +28,7 @@ Discarding these attributes by writing a plain `class="my-class"` instead of `{{
 The second form preserves:
 
 - `.contextual-region` — contextual editing overlays
-- RDF attributes for semantic web / schema.org
+- RDF attributes for semantic web / schema.org, **if the contributed RDF module is installed** (RDF was removed from Drupal core in 10.x — these attributes only exist when the contrib module is enabled)
 - `data-history-node-id` — page history tracking
 - Module-added attributes from hooks
 - CSS hooks for theming and Layout Builder
@@ -38,14 +38,15 @@ The second form preserves:
 
 ## Attributes Objects Available by Template Type
 
-| Template | Available Objects |
-|---|---|
-| `node.html.twig` | `attributes`, `title_attributes`, `content_attributes` |
-| `field.html.twig` | `attributes`, `title_attributes`, `item.attributes` |
-| `block.html.twig` | `attributes`, `title_attributes` |
-| `paragraph.html.twig` | `attributes`, `content_attributes` |
-| `views-view.html.twig` | `attributes`, `title_attributes`, `rows_attributes` |
-| `page.html.twig` | `html_attributes`, `body_attributes` |
+| Template               | Available Objects                                                                              |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| `node.html.twig`       | `attributes`, `title_attributes`, `content_attributes`                                         |
+| `field.html.twig`      | `attributes`, `title_attributes`, `item.attributes`                                            |
+| `block.html.twig`      | `attributes`, `title_attributes`                                                               |
+| `paragraph.html.twig`  | `attributes`, `content_attributes`                                                             |
+| `views-view.html.twig` | `attributes`, `title_attributes` (rows is a render variable, not a separate attributes object) |
+| `html.html.twig`       | `html_attributes`, `attributes` (the latter applies to `<body>`)                               |
+| `page.html.twig`       | `attributes` (the page wrapper; the `<html>` / `<body>` attributes live in `html.html.twig`)   |
 
 ---
 
@@ -186,11 +187,13 @@ Access in a Drupal Behavior:
 
   Drupal.behaviors.hxPatientCard = {
     attach(context) {
-      once('helixui:patient-card', 'hx-card[data-entity-bundle="patient"]', context).forEach((card) => {
-        const entityId = card.getAttribute('data-entity-id');
-        const viewMode = card.getAttribute('data-view-mode');
-        // use entityId and viewMode for further initialization
-      });
+      once('helixui:patient-card', 'hx-card[data-entity-bundle="patient"]', context).forEach(
+        (card) => {
+          const entityId = card.getAttribute('data-entity-id');
+          const viewMode = card.getAttribute('data-view-mode');
+          // use entityId and viewMode for further initialization
+        },
+      );
     },
   };
 })(Drupal, once);
@@ -201,23 +204,24 @@ Access in a Drupal Behavior:
 Set accessibility attributes that depend on rendered node data:
 
 ```twig
-{# Accessible label incorporating the node title #}
+{# Accessible label incorporating the node title.
+   hx-card uses `aria-label` when the card is a non-interactive region; it
+   uses its own `hx-label` attribute when the card is interactive
+   (paired with `hx-href`). There is no `accessible-label` attribute. #}
 <hx-card {{
   attributes
-    .setAttribute('accessible-label', 'Patient record for ' ~ label)
+    .setAttribute('aria-label', 'Patient record for ' ~ label)
     .setAttribute('role', 'article')
 }}>
   <span slot="heading">{{ label }}</span>
   {{ content }}
 </hx-card>
 
-{# Live region for alerts #}
-<hx-alert {{
-  attributes
-    .setAttribute('role', 'alert')
-    .setAttribute('aria-live', 'polite')
-    .setAttribute('aria-atomic', 'true')
-}}>
+{# Live region for alerts — let hx-alert manage role/aria-live itself.
+   The component sets role="alert" + aria-live based on `variant`; opening
+   it via `open` is what makes it announce. Do not redeclare those ARIA
+   attributes on the host. #}
+<hx-alert open variant="info" {{ attributes }}>
   {{ content.field_alert_message }}
 </hx-alert>
 ```
@@ -303,16 +307,33 @@ Or remove it explicitly:
 
 ### `attributes.clone()` — Modifying Without Mutating
 
-`attributes` is a mutable object. If you call `.addClass()` directly on it, you modify the original. When you need the original attributes on one element and a modified version on another, clone first:
+`attributes` is a mutable object. If you call `.addClass()` directly on it, you modify the original. Drupal's `Attribute` class doesn't expose a public `clone()` method on the Twig side — copy via a preprocess hook or by reconstructing from `toArray()`:
 
 ```twig
-{# Clone before modifying — original attributes go on <article> #}
-{% set component_attrs = attributes.clone().addClass('patient-card') %}
+{# Reconstruct from toArray() to keep the original attributes untouched. #}
+{% set component_attrs = create_attribute(attributes.toArray()).addClass('patient-card') %}
 
 <article{{ attributes }}>
   {{ title_prefix }}
   {{ title_suffix }}
   <hx-card {{ component_attrs }}>
+    <span slot="heading">{{ label }}</span>
+    {{ content.body }}
+  </hx-card>
+</article>
+```
+
+Or clone in PHP preprocess and pass the copy through as a separate variable:
+
+```php
+function mytheme_preprocess_node(array &$variables): void {
+  $variables['card_attributes'] = clone $variables['attributes'];
+}
+```
+
+```twig
+<article{{ attributes }}>
+  <hx-card {{ card_attributes.addClass('patient-card') }}>
     <span slot="heading">{{ label }}</span>
     {{ content.body }}
   </hx-card>
@@ -419,10 +440,16 @@ This is simpler but loses the semantic `<article>` element. Use it when the comp
       %}
     {% endif %}
 
+    {# Interactive card: pair `hx-href` with `hx-label` so the whole card
+       is the navigation. Don't combine the `actions` slot with the
+       hx-href interactive pattern — that creates an ARIA anti-pattern
+       (action buttons nested inside a card-sized link). Render the
+       department badge and date as informational metadata instead. #}
     <hx-card
       variant="default"
       elevation="raised"
-      href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      hx-href="{{ path('entity.node.canonical', {'node': patient.id}) }}"
+      hx-label="Open patient record for {{ patient.label }}"
       {{ card_attrs }}
     >
       {% if patient.field_photo.entity %}
@@ -430,7 +457,7 @@ This is simpler but loses the semantic `<article>` element. Use it when the comp
           slot="image"
           src="{{ file_url(patient.field_photo.entity.uri.value) }}"
           alt="{{ patient.field_photo.alt }}"
-        >
+        />
       {% endif %}
 
       <div slot="heading">
@@ -453,13 +480,6 @@ This is simpler but loses the semantic `<article>` element. Use it when the comp
           Last visit: {{ patient.field_last_visit.value|date('M j, Y') }}
         </time>
       {% endif %}
-
-      <div slot="actions">
-        <hx-button variant="primary" hx-size="sm">View Record</hx-button>
-        {% if patient.field_allow_messaging.value %}
-          <hx-button variant="ghost" hx-size="sm">Send Message</hx-button>
-        {% endif %}
-      </div>
     </hx-card>
   {% endfor %}
 </div>

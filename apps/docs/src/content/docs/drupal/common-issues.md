@@ -53,7 +53,7 @@ Then `drush cr`.
 ```yaml
 helix-button:
   js:
-    dist/hx-button.js:
+    dist/components/hx-button/index.js:
       preprocess: false
       attributes:
         type: module   # This is required — without it, the file is treated as a classic script
@@ -129,8 +129,10 @@ function mytheme_preprocess_page(array &$variables): void {
 ```javascript
 Drupal.behaviors.helixCard = {
   attach(context) {
-    // context = the replaced DOM subtree on AJAX
-    once('hx-card-events', 'hx-card', context).forEach((card) => {
+    // context = the replaced DOM subtree on AJAX.
+    // Scope to hx-href cards — hx-card only fires hx-click when
+    // it is the interactive variant (i.e. has hx-href).
+    once('hx-card-events', 'hx-card[hx-href]', context).forEach((card) => {
       card.addEventListener('hx-click', handleCardClick);
     });
   },
@@ -211,12 +213,14 @@ hx-button button {
 
 /* Correct — CSS custom properties inherit through Shadow DOM */
 hx-button {
-  --hx-button-bg-primary: red;
-  --hx-button-color-primary: white;
+  --hx-button-bg: var(--hx-color-action-primary-bg);
+  --hx-button-color: var(--hx-color-text-on-primary);
 }
 ```
 
-Check each component's documentation for its exposed `--hx-*` CSS custom properties.
+Check each component's documentation (or its CEM entry) for its exposed `--hx-*` CSS custom
+properties — the component-level tokens (e.g. `--hx-button-bg`) fall back to the semantic action
+tokens (e.g. `--hx-color-action-primary-bg`), which fall back to the primitive palette.
 
 ---
 
@@ -231,7 +235,7 @@ Check each component's documentation for its exposed `--hx-*` CSS custom propert
 ```yaml
 helix-button:
   js:
-    dist/hx-button.js:
+    dist/components/hx-button/index.js:
       preprocess: false  # Opt out of aggregation — required for ALL ES modules
       minified: true
       attributes:

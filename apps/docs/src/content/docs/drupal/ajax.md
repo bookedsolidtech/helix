@@ -50,7 +50,7 @@ Drupal.behaviors.helixCard = {
 };
 ```
 
-After AJAX replaces the region and `attach()` runs again on the full document, existing `hx-card` elements get a second `hx-click` listener.
+After AJAX replaces the region and `attach()` runs again, the broken example above scans the full document via `document.querySelectorAll(…)` and re-binds every existing `hx-card` — including ones already wired in a prior pass. (Drupal's own `InsertCommand` actually scopes behavior attachment to the newly inserted element by passing it as the `context` argument; using `document.querySelectorAll` ignores that scope and double-binds existing elements.)
 
 ### With once() — correct pattern
 
@@ -167,16 +167,20 @@ public function ajaxCallback(array &$form, FormStateInterface $form_state): Ajax
   // Set an hx-alert's variant property via InvokeCommand.
   // InvokeCommand calls a jQuery/DOM method — here we use setAttribute
   // to set component properties from the server.
+  // Drupal's InvokeCommand calls jQuery methods, NOT DOM methods —
+  // use 'attr' (jQuery's attribute setter), not 'setAttribute'.
   $response->addCommand(new InvokeCommand(
     '#status-alert',
-    'setAttribute',
+    'attr',
     ['variant', 'success'],
   ));
 
-  $response->addCommand(new InvokeCommand(
+  // hx-alert exposes a heading attribute and renders its body via the default
+  // slot. Replace the alert's slotted body via ReplaceCommand or render the
+  // full markup server-side rather than trying to mutate slot text via attr.
+  $response->addCommand(new ReplaceCommand(
     '#status-alert',
-    'setAttribute',
-    ['message', 'Form submitted successfully.'],
+    '<hx-alert id="status-alert" open variant="success">Form submitted successfully.</hx-alert>',
   ));
 
   return $response;
@@ -193,9 +197,10 @@ use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\AppendCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 
-// Replace region contents
+// Replace region contents — hx-alert is hidden by default; include `open`
+// (or the alert will not render).
 $response->addCommand(new HtmlCommand('#results', [
-  '#markup' => '<hx-alert variant="success">Saved successfully.</hx-alert>',
+  '#markup' => '<hx-alert open variant="success">Saved successfully.</hx-alert>',
   '#attached' => ['library' => ['mytheme/helix-alert']],
 ]));
 
@@ -246,22 +251,33 @@ When AJAX replaces a region containing a stateful component (expanded accordion,
 ### Preserve state before replacement
 
 ```javascript
+// hx-accordion has no expanded property — expanded state lives on each
+// hx-accordion-item child. Persist a map of item IDs → expanded values.
 Drupal.behaviors.helixStatefulComponents = {
   attach(context) {
     once('helix-state-save', 'hx-accordion[id]', context).forEach((accordion) => {
+      const stateKey = `hx-accordion-${accordion.id}`;
+
       // Save state before AJAX replaces this region
       Drupal.ajax.instances.forEach((instance) => {
         instance.options.beforeSend = function () {
-          const state = { expanded: accordion.expanded };
-          sessionStorage.setItem(`hx-accordion-${accordion.id}`, JSON.stringify(state));
+          const items = accordion.querySelectorAll('hx-accordion-item[id]');
+          const state = {};
+          items.forEach((item) => {
+            state[item.id] = item.expanded;
+          });
+          sessionStorage.setItem(stateKey, JSON.stringify(state));
         };
       });
 
       // Restore state after AJAX replacement
-      const saved = sessionStorage.getItem(`hx-accordion-${accordion.id}`);
+      const saved = sessionStorage.getItem(stateKey);
       if (saved) {
         const state = JSON.parse(saved);
-        accordion.expanded = state.expanded;
+        for (const [id, expanded] of Object.entries(state)) {
+          const item = accordion.querySelector(`hx-accordion-item[id="${id}"]`);
+          if (item) item.expanded = expanded;
+        }
       }
     });
   },
@@ -277,11 +293,12 @@ When the replaced content is logically new (different results, different entity)
 If only the data inside a component needs to change (not the component structure), use `helixSetProperty` or `helixCallMethod` custom commands instead of replacing the DOM node. This preserves focus, scroll position, and component state.
 
 ```php
-// Update the card's heading text without replacing the entire card
-$response->addCommand(new InvokeCommand(
-  '#patient-card',
-  'setAttribute',
-  ['heading', $updated_patient_name],
+// hx-card exposes heading as a SLOT, not an attribute. To update the
+// heading text without replacing the card itself, target the slotted
+// heading element directly via its id/selector and replace its content:
+$response->addCommand(new HtmlCommand(
+  '#patient-card-heading',
+  ['#markup' => $updated_patient_name],
 ));
 ```
 
@@ -345,7 +362,7 @@ DevTools → Network → click the AJAX request → Response:
 ]
 ```
 
-If `attachBehaviors` is not in the command list, Drupal's behavior attachment is handled by the `settings` merge step — behaviors always run after any insert/replace command.
+`attachBehaviors` is not a JSON command. Drupal attaches behaviors automatically inside its `insert` command after DOM insertion (passing the newly-inserted node as `context`); the separate `settings` command only merges `drupalSettings`, it does not trigger attachment. Behaviors always run after the insert command for that response.
 
 ---
 

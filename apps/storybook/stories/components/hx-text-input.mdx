@@ -22,7 +22,7 @@ import auditRaw from '../../../../packages/hx-library/src/components/hx-text-inp
 
 ## Hero scenario — clinical intake form with validation
 
-The most common deployment of `hx-text-input` in healthcare: a clinical intake form where validation errors must be announced **before** the consumer submits, and where the error description is programmatically associated with the field via `aria-describedby`. The MRN field below has a regex-validation error you can see when the field is left empty or blank — the error text is rendered into the `error` slot, the input is marked `aria-invalid="true"`, and screen readers announce the error message inline with the input's accessible name.
+The most common deployment of `hx-text-input` in healthcare: a clinical intake form where validation errors must be announced **before** the consumer submits, and where the error description is programmatically associated with the field via `aria-describedby`. The MRN field below renders its error UI only once the consumer (or an author-supplied validator) sets the `error` attribute or fills the `error` slot — at that point the input flips to `aria-invalid="true"`, the error text is announced inline with the accessible name, and the error border lights up.
 
 <div
   style={{
@@ -43,7 +43,7 @@ label="Patient full name"
 name="patient_name"
 required
 placeholder="Last, First MI"
-helper-text="As it appears on government ID."
+help-text="As it appears on government ID."
 
 > </hx-text-input>
 
@@ -52,9 +52,8 @@ label="Medical record number (MRN)"
 name="mrn"
 required
 pattern="[0-9]{8}"
-inputmode="numeric"
-helper-text="8-digit MRN issued by the EHR."
-error-message="MRN must be exactly 8 digits."
+help-text="8-digit MRN issued by the EHR."
+error="MRN must be exactly 8 digits."
 
 > </hx-text-input>
 
@@ -72,13 +71,13 @@ required
   </div>
 </div>
 
-The contract: `hx-text-input` is form-associated, so `<form>.checkValidity()` will report this MRN field as invalid until it matches the pattern. The `aria-invalid` state, the `error-message` slot, and the focus ring all coordinate to satisfy 3.3.6 Error Prevention (All) and 2.4.13 Focus Appearance simultaneously.
+The contract: `hx-text-input` is form-associated via `ElementInternals`, so `<form>.checkValidity()` reflects native constraint validity (`required`, `pattern`, `minlength`, `maxlength`). Author-driven error messaging via the `error` attribute/slot drives the visible aria-invalid state and the `aria-describedby` wiring; together they satisfy 3.3.6 Error Prevention (All) and 2.4.13 Focus Appearance simultaneously.
 
 ---
 
 ## How to read the badges
 
-The headline AAA card above is rendered automatically by the autodocs template from CEM. The conformance row table below expands each criterion chip into evidence — verdict, threshold, plain-language summary, and spec links — so a healthcare procurement reviewer can verify the cert claim row-by-row without opening the audit file.
+The headline AAA card above is rendered automatically by the autodocs template from CEM. The conformance row table below expands each criterion chip into evidence — verdict, plain-language summary, and spec links — so a healthcare procurement reviewer can verify the cert claim row-by-row without opening the audit file.
 
 `hx-text-input` is a **P0** primitive. AAA cert is mandatory before release.
 
@@ -98,14 +97,15 @@ The headline AAA card above is rendered automatically by the autodocs template f
   tag="hx-text-input"
   obligations={[
     <>
-      Pair every input with a visible <code>&lt;label&gt;</code> (or use the component's{' '}
-      <code>label</code> prop). <code>aria-label</code> alone is permitted but reduces robustness —
-      visible labels survive zoom, voice control, and switch-control acceptance.
+      Pair every input with a visible label — supply the <code>label</code> attribute or slot text
+      into the <code>label</code> slot. When a visible label is impossible (icon-only search, inline
+      filter), set <code>accessible-label</code> for the assistive-tech announcement. Visible labels
+      survive zoom, voice control, and switch-control acceptance and should be the default.
     </>,
     <>
-      Render error text into the <code>error</code> slot or via the <code>error-message</code> prop.
-      The component wires up <code>aria-describedby</code> + <code>aria-invalid</code>{' '}
-      automatically; bypassing the slot loses the assistive-tech association.
+      Render error text via the <code>error</code> attribute or the <code>error</code> slot. The
+      component wires up <code>aria-describedby</code> + <code>aria-invalid</code> automatically;
+      bypassing the slot loses the assistive-tech association.
     </>,
     <>
       Do not strip the focus ring with author CSS. Customize via the <code>--hx-focus-ring-*</code>{' '}
@@ -135,13 +135,13 @@ The headline AAA card above is rendered automatically by the autodocs template f
     name="phone"
     type="tel"
     placeholder="(555) 123-4567"
-    helper-text="Used to confirm appointments."
+    help-text="Used to confirm appointments."
   ></hx-text-input>
 </div>
 
 <SectionHead title="Required + filled" meta="2.4.13 + 1.4.6" />
 
-A required input with a value. The required-indicator and the filled-state border both clear AAA contrast. Focus ring renders on top of either state.
+A required input with a value. The required indicator and the default border state both clear AAA contrast; the focus ring renders on top.
 
 <div style={{ padding: '1rem 0', maxWidth: '360px' }}>
   <hx-text-input
@@ -154,7 +154,7 @@ A required input with a value. The required-indicator and the filled-state borde
 
 <SectionHead title="Error state" meta="3.3.6 Error Prevention" />
 
-`aria-invalid="true"` + error slot text. The error message is programmatically associated with the input via `aria-describedby`, so screen readers announce the error in line with the accessible name. The error border uses `--hx-color-danger-500` against the input surface — clears 7:1 AAA contrast.
+`aria-invalid="true"` + error slot text. The error message is programmatically associated with the input via `aria-describedby`, so screen readers announce the error in line with the accessible name. The error border uses `--hx-color-error-600` and clears the 3:1 1.4.11 Non-text Contrast floor; the error message text clears the 7:1 1.4.6 AAA body-text contrast threshold against the input surface.
 
 <div style={{ padding: '1rem 0', maxWidth: '360px' }}>
   <hx-text-input
@@ -162,7 +162,7 @@ A required input with a value. The required-indicator and the filled-state borde
     name="email"
     type="email"
     value="dr.morgan@example"
-    error-message="Email must include a top-level domain (e.g. .health, .org)."
+    error="Email must include a top-level domain (e.g. .health, .org)."
   ></hx-text-input>
 </div>
 
@@ -187,6 +187,6 @@ Disabled inputs do not receive focus and reject all character input. The accessi
 
 ## Variant gallery
 
-The full enumeration of input types (text, email, tel, url, password, search, date, number), prefix/suffix slots, helper-text + error-text combinations, and brand/theme overrides lives in the `Components/Text Input` story tree. Use it once the conformance contract above is understood.
+The full enumeration of input types (text, email, tel, url, password, search, date, number), prefix/suffix slots, `help-text` + `error` slot combinations, and brand/theme overrides lives in the `Components/Text Input` story tree. Use it once the conformance contract above is understood.
 
 </div>
