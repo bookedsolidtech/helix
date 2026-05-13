@@ -1,6 +1,6 @@
 # WCAG Contrast Report — `@helixui/tokens`
 
-_Generated 2026-05-13T00:49:59.463Z from `@helixui/tokens@3.9.0`._
+_Generated 2026-05-13T00:52:26.745Z from `@helixui/tokens@3.9.0`._
 
 Per-mode pass/fail telemetry for every semantically valid `(text × surface)` pair declared in the contrast matrix. **AA is the published gate** (enforced by `contrast.test.ts`); **AAA is informational** and surfaces here so consumers and auditors can see the actual ceiling each pairing reaches.
 
