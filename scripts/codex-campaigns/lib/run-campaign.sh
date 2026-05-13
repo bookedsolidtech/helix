@@ -73,16 +73,27 @@ if (( RESUME == 1 )) && [[ -s "$FINDINGS" ]]; then
   #   - Docs-fact-check style campaigns emit `tag: "{TARGET}"` (the FULL
   #     relative path) because basenames collide hard (`README.md` × 12,
   #     `overview.md` × 7) and would silently skip un-run siblings.
-  # The skip set therefore matches either the full path OR its basename.
+  # A naive basename fallback (match if either basename OR full path is in
+  # the seen set) fails for docs-fact-check: stale synthetic-failure
+  # records that used basename tags would mark every `README.md` sibling
+  # as "already attempted". The fix scopes the basename match: it only
+  # applies when the seen tag is ITSELF a basename (no `/` in it), so a
+  # docs campaign with full-path tags never matches basename-only.
   SEEN_TAGS="$(jq -r '.tag // empty' "$FINDINGS" | sort -u)"
+  # Split seen tags into two sets: full-path tags vs basename-only tags.
+  FULL_PATH_TAGS="$(echo "$SEEN_TAGS" | grep '/' || true)"
+  BASENAME_TAGS="$(echo "$SEEN_TAGS" | grep -v '/' || true)"
   FILTERED="$(mktemp)"
   while IFS= read -r t; do
-    base="$(basename "$t")"
-    if echo "$SEEN_TAGS" | grep -qxF "$t"; then
+    if [[ -n "$FULL_PATH_TAGS" ]] && echo "$FULL_PATH_TAGS" | grep -qxF "$t"; then
       continue  # matched full path
     fi
-    if echo "$SEEN_TAGS" | grep -qxF "$base"; then
-      continue  # matched basename
+    base="$(basename "$t")"
+    # Basename match is only allowed against basename-only seen tags. This
+    # prevents a stale `README.md` synthetic record from masking all 12
+    # README.md siblings on a docs-fact-check resume.
+    if [[ -n "$BASENAME_TAGS" ]] && echo "$BASENAME_TAGS" | grep -qxF "$base"; then
+      continue  # matched basename in a basename-keyed campaign
     fi
     echo "$t" >> "$FILTERED"
   done < "$TARGET_LIST"

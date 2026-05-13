@@ -36,33 +36,48 @@ done, it writes a ready-to-run project at `./project-name/`.
 
 ## Framework Templates
 
-`create-helix` ships with 16 framework targets. Pass `--template <id>` to
-skip the prompt, or run the CLI without it for the interactive picker:
+`create-helix`'s interactive Q1 picker surfaces a **curated set of
+production-tier templates** by default — the flagship `wc-storybook` factory
+plus the app starters that have shipped beyond stub quality. Twelve more
+framework targets exist but are gated behind `--show-experimental` until
+they reach the same bar. Pass `--template <id>` to skip the prompt, or run
+the CLI without it for the interactive picker:
 
 ```bash
 npx create-helix my-app --template react-next
 # or
-npx create-helix my-app   # prompts you to pick from the 16 targets below.
+npx create-helix my-app                       # interactive picker
 ```
 
-| Template ID    | Name                         | Description                                                                      |
-| -------------- | ---------------------------- | -------------------------------------------------------------------------------- |
-| `wc-storybook` | Design System + Storybook 10 | Component-library + Storybook 10 scaffold (the design-system-author flow)        |
-| `react-next`   | React + Next.js 16           | App Router, SSR-ready, full HELiX integration — **recommended for new projects** |
-| `react-vite`   | React + Vite                 | Lightning fast dev, SPA-first, HELiX with `@lit/react`                           |
-| `remix`        | React Router (Remix)         | Full-stack React with SSR, nested routes                                         |
-| `vue-nuxt`     | Vue + Nuxt 4                 | Full-stack Vue with SSR, native web component support                            |
-| `vue-vite`     | Vue + Vite                   | Lightweight Vue 3 SPA with native web component binding                          |
-| `svelte-kit`   | SvelteKit                    | Svelte 5 + SvelteKit, native custom element support                              |
-| `angular`      | Angular 18                   | Enterprise Angular with `CUSTOM_ELEMENTS_SCHEMA` pre-configured                  |
-| `astro`        | Astro                        | Content-first with islands architecture, zero JS by default                      |
-| `vanilla`      | Vanilla (HTML + CDN)         | No framework, no build step — just HTML and HELiX via CDN                        |
-| `solid-vite`   | Solid.js + Vite              | Fine-grained reactive SPA with native web component support                      |
-| `qwik-vite`    | Qwik + Vite                  | Resumable framework with zero hydration                                          |
-| `lit-vite`     | Lit + Vite                   | Lightweight web components with Google Lit and Vite                              |
-| `preact-vite`  | Preact + Vite                | Fast 3kB React alternative with native web component support                     |
-| `stencil`      | Stencil                      | Compiler for standards-based web components with lazy-loading                    |
-| `ember`        | Ember.js                     | Convention-driven full-stack framework                                           |
+### Production-tier templates (shown by default)
+
+| Template ID    | Name                         | Description                                                                                                                                     |
+| -------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wc-storybook` | Design System + Storybook 10 | **Default** — design-system factory. Lit 3, Storybook 10, brand-storytelling docs, AAA cards, ~99 hx-\* auto-cataloged                          |
+| `react-next`   | React + Next.js 16           | App Router, SSR-ready, full HELiX integration — **recommended for new app projects**                                                            |
+| `react-vite`   | React + Vite                 | Lightning fast dev, SPA-first, HELiX with `@lit/react`                                                                                          |
+| `astro`        | Astro 5                      | Islands + native web components, view transitions, theme toggle (promoted in the v0.8.0 release note; verify on the version you have installed) |
+
+### Experimental templates (run `--show-experimental` to surface)
+
+These templates compile and emit a project skeleton, but their docs / examples / DX polish lag behind the curated production-tier set. Surface them via `npx create-helix --show-experimental` (or `HELIX_SHOW_EXPERIMENTAL=1`):
+
+| Template ID   | Name                 | Status       |
+| ------------- | -------------------- | ------------ |
+| `remix`       | React Router (Remix) | Experimental |
+| `vue-nuxt`    | Vue + Nuxt 4         | Experimental |
+| `vue-vite`    | Vue + Vite           | Experimental |
+| `svelte-kit`  | SvelteKit            | Experimental |
+| `angular`     | Angular 18           | Experimental |
+| `solid-vite`  | Solid.js + Vite      | Experimental |
+| `qwik-vite`   | Qwik + Vite          | Experimental |
+| `lit-vite`    | Lit + Vite           | Experimental |
+| `preact-vite` | Preact + Vite        | Experimental |
+| `stencil`     | Stencil              | Experimental |
+| `ember`       | Ember.js             | Experimental |
+| `vanilla`     | Vanilla (HTML + CDN) | Experimental |
+
+These graduate out of `--show-experimental` as they reach the same bar as the production-tier set.
 
 ## Component Bundles
 
