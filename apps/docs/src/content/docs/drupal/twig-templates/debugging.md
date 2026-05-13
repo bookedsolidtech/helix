@@ -115,22 +115,28 @@ This tells you exactly what variable names Drupal has made available in that tem
 
 ---
 
-## Kint (Devel Module)
+## Kint (Devel + Kint contrib)
 
-The `kint()` function from the Devel module provides an interactive, collapsible tree view of any PHP value. It is far more useful than `dump()` for deeply nested objects like Drupal entities.
+Kint provides an interactive, collapsible tree view of any PHP value. For Drupal 9+, Kint lives in the **standalone `devel_kint_extras`** (or `kint-php/kint` libraries pulled in by Devel); older Devel versions shipped a `kint` submodule directly. Either way, the goal is to expose the `kint()` / `ksm()` Twig functions in your dev environment.
 
 ### Install
 
 ```bash
-composer require drupal/devel
-drush en devel kint -y
+# Drupal 9+ — install the standalone Kint integration
+composer require drupal/devel_kint_extras
+drush en devel devel_kint_extras -y
 drush cr
 ```
+
+If you're maintaining a site on an older Devel branch that still ships a `kint` submodule, `drush en devel kint -y` is the equivalent there.
 
 ### Usage
 
 ```twig
-{# Interactive tree view — expand/collapse in browser #}
+{# Interactive tree view — expand/collapse in browser. The exact function
+   names (kint, ksm, dpm, d, s) depend on which Devel/Kint variant you have
+   installed; check Drupal core's "available Twig debug helpers" by running
+   `drush twig:debug` or inspecting the available filters in DevTools. #}
 {{ kint(node) }}
 
 {# With a descriptive label #}
@@ -171,8 +177,11 @@ drush pmu kint -y
 View the page source and look for the HELiX script tag:
 
 ```html
-<!-- Look for something like this in the <head> or before </body> -->
-<script type="module" src="/libraries/helixui/hx-library.js"></script>
+<!-- Look for something like this in the <head> or before </body>.
+     Paths vary by setup: a Drupal library attachment generates a fingerprinted URL,
+     a CDN load looks like cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js,
+     and a self-hosted libraries/ install resolves to /libraries/helixui/dist/index.js. -->
+<script type="module" src="/libraries/helixui/dist/index.js"></script>
 ```
 
 If the script is missing, the Drupal Libraries API definition is not attaching the library to the page. Check your `mytheme.libraries.yml` and the `#attached` key in the render array.
@@ -226,7 +235,7 @@ Component slot names are case-sensitive and must match the component's documente
 {# Common mistakes #}
 <div slot="header">...</div>    {# Wrong name — should be "heading" #}
 <div slot="Heading">...</div>   {# Wrong case — slot names are lowercase #}
-<div slot="content">...</div>   {# Not a named slot — goes to default slot #}
+<div slot="content">...</div>   {# Not a named slot on hx-card — slot="content" is unrecognized; drop the slot attribute to use the default body slot #}
 ```
 
 ### Check 2: Is the content element actually in the DOM?
@@ -235,7 +244,10 @@ Component slot names are case-sensitive and must match the component's documente
 // In the browser console:
 const card = document.querySelector('hx-card');
 console.log('Heading slot element:', card.querySelector('[slot="heading"]'));
-console.log('Default slot children:', Array.from(card.children).filter(el => !el.slot));
+console.log(
+  'Default slot children:',
+  Array.from(card.children).filter((el) => !el.slot),
+);
 ```
 
 If the element is not in the Light DOM, the Twig template produced no output for that slot. Use `dump()` to verify the Drupal variable.
@@ -251,7 +263,7 @@ If the element is not in the Light DOM, the Twig template produced no output for
 {% endif %}
 ```
 
-An empty render array prints nothing, but an empty `<div slot="image">` still ends up in the DOM and may override the component's fallback content.
+An empty render array prints nothing, but an empty `<div slot="image">` still ends up in the DOM. `hx-card`'s `image` slot doesn't render a fallback when empty — the slot container just collapses to zero content — but an empty assigned node can prevent the slot from being treated as "unset," which matters for selectors and conditional CSS that target the absence of a slot.
 
 ### Check 4: Inspect slot assignment in DevTools
 
@@ -307,13 +319,13 @@ Modern browsers show Shadow DOM trees in the Elements panel by default. Look for
 ```
 hx-card                           ← Your Twig markup element
   #shadow-root (open)             ← Component's internal structure
-    <div part="base" class="card card--featured">
-      <div class="card__header">
+    <div part="card" class="card card--featured">
+      <div part="heading" class="card__heading">
         <slot name="heading">     ← Named slot; shows assigned content
           ↳ <span slot="heading">Patient Name</span>  (Light DOM, assigned)
         </slot>
       </div>
-      <div class="card__body">
+      <div part="body" class="card__body">
         <slot>                    ← Default slot
           ↳ <p>Body content</p>   (Light DOM, assigned)
         </slot>
@@ -341,11 +353,11 @@ console.log('elevation property:', card.elevation);
 
 // Check all slot assignments
 const slots = shadow.querySelectorAll('slot');
-slots.forEach(slot => {
+slots.forEach((slot) => {
   const name = slot.name || '(default)';
   const assigned = slot.assignedElements();
   console.log(`Slot "${name}": ${assigned.length} element(s) assigned`);
-  assigned.forEach(el => console.log('  →', el));
+  assigned.forEach((el) => console.log('  →', el));
 });
 ```
 
@@ -375,7 +387,10 @@ If you suspect a Drupal Behavior is not setting a property correctly:
 ```javascript
 // Manually set the property to test the expected behavior
 const table = document.querySelector('hx-data-table');
-table.columns = [{ key: 'name', label: 'Name' }, { key: 'id', label: 'ID' }];
+table.columns = [
+  { key: 'name', label: 'Name' },
+  { key: 'id', label: 'ID' },
+];
 // Does the component render the columns correctly?
 ```
 
@@ -406,6 +421,9 @@ console.log('Raw data-columns:', raw);
 try {
   const parsed = JSON.parse(raw);
   console.log('Parsed:', parsed);
+  if (!Array.isArray(parsed)) {
+    console.warn('Parsed value is not an array — hx-data-table treats non-array data as empty');
+  }
 } catch (e) {
   console.error('JSON parse error:', e.message);
   console.log('Problematic string:', raw);
@@ -416,7 +434,11 @@ Common causes of JSON parse failures:
 
 - Twig `|escape` double-encoding the JSON (use `|json_encode|escape` in the correct order)
 - Unterminated strings from field values containing unescaped quotes
-- Twig variable was `null`, producing the string `"null"` as the attribute value
+
+Common causes of unexpected parsed shape (parses successfully but `hx-data-table` renders empty):
+
+- Twig variable was `null`, producing the literal string `"null"` (which `JSON.parse` resolves to `null`, not an array)
+- Twig produced an object/scalar where the component expects an array — check `Array.isArray(parsed)` before assigning
 
 ---
 
@@ -519,7 +541,7 @@ ls themes/custom/mytheme/templates/node--patient--card.html.twig
 If a HELiX component is rendered in an AJAX-loaded region but its Drupal Behavior initialization does not run:
 
 1. Verify the Behavior uses `once()` with a `context` parameter — `once('helixui:behavior', 'selector', context)`.
-2. Verify `context` is passed to `attach(context)` and is used as the second argument to `once()`.
+2. Verify `context` is passed to `attach(context)` and is used as the **third** argument to `once(id, selector, context)`.
 3. Check whether `Drupal.attachBehaviors()` is being called on the new content after AJAX injection. Most Drupal AJAX responses call this automatically.
 
 ---

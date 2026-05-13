@@ -11,6 +11,8 @@
   - @helixui/library@4.0.0
   - @helixui/react@4.0.0
 
+  > **Note:** the changesets cascade generated `@helixui/library@4.0.0` and `@helixui/react@4.0.0` entries here. Both are unpublished/deprecated artifacts of the linked-package major-bump cascade; the workspace-current sibling releases are **`@helixui/library@3.9.0`** and **`@helixui/react@3.9.0`**. Treat the runtime requirements as the `^3` ranges of the sibling packages until a real 4.x ships.
+
 ## 0.0.15
 
 ### Patch Changes

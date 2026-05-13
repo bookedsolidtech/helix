@@ -11,6 +11,14 @@ Real-world healthcare applications demand more than simple text inputs and check
 
 By the end of this guide, you'll understand how to build sophisticated form interfaces that maintain accessibility, validation integrity, and developer ergonomics at scale.
 
+> **Reading note:** Several patterns in this guide reach beyond the components currently shipped by `@helixui/library`:
+>
+> - `hx-select` is **single-select only** (no native `multiple` mode) — use `hx-checkbox-group` (or a native `<select multiple>` outside HELiX) for multi-select.
+> - `hx-text-input` does **not** support `type="time"` or `type="date"` `min`/`max` — use **`hx-date-picker`** and **`hx-time-picker`** for those use cases.
+> - The earlier draft referenced `org-tag-input`, `org-tag-input`, `hx-date-picker`, `hx-file-upload`, `hx-file-upload`, `org-rich-text-editor`, `org-rich-text-editor`, `hx-radio`, `hx-radio-group` — **none of those are shipped HELiX components**. Where you see them in the recipes below, treat them as **consumer-owned custom-element patterns** (rename with an `org-` prefix for your codebase) or replace them with the real shipped equivalents (`hx-date-picker`, `hx-file-upload`, `hx-radio`, `hx-radio-group`).
+> - `hx-file-upload` uses **`max-size`** (kebab-case attribute), not `max-size`.
+> - Inline corrections call out the specific mismatch at each recipe — check the per-component CEM (`packages/hx-library/custom-elements.json`) before composing these patterns into shipped code.
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -141,9 +149,9 @@ import { repeat } from 'lit/directives/repeat.js';
 /**
  * Tag input for entering multiple free-text values.
  * @summary Form-associated tag input with keyboard support.
- * @tag wc-tag-input
+ * @tag org-tag-input
  */
-@customElement('hx-tag-input')
+@customElement('org-tag-input')
 export class HxTagInput extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
@@ -326,7 +334,7 @@ export class HxTagInput extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'hx-tag-input': HxTagInput;
+    'org-tag-input': HxTagInput;
   }
 }
 ```
@@ -334,13 +342,13 @@ declare global {
 **Usage:**
 
 ```html
-<wc-tag-input
+<org-tag-input
   name="medications"
   label="Current Medications"
   .value=${['Lisinopril', 'Metformin', 'Atorvastatin']}
   maxTags="10"
   required
-></wc-tag-input>
+></org-tag-input>
 ```
 
 **Considerations:**
@@ -396,7 +404,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 /**
  * Custom date picker with calendar UI.
  * @summary Form-associated date picker with accessible calendar.
- * @tag wc-date-picker
+ * @tag hx-date-picker
  */
 @customElement('hx-date-picker')
 export class HxDatePicker extends LitElement {
@@ -726,13 +734,13 @@ declare global {
 **Usage:**
 
 ```html
-<wc-date-picker
+<hx-date-picker
   name="appointmentDate"
   label="Appointment Date"
   min="2026-02-17"
   max="2026-12-31"
   required
-></wc-date-picker>
+></hx-date-picker>
 ```
 
 **Features:**
@@ -749,17 +757,17 @@ declare global {
 For date ranges (e.g., prescription start/end dates), use two date pickers with cross-validation:
 
 ```html
-<wc-date-picker
+<hx-date-picker
   name="startDate"
   label="Start Date"
   .value="${this.startDate}"
   @hx-change="${(e:"
   CustomEvent)=""
 >
-  { this.startDate = e.detail.value; this._validateDateRange(); }} required ></wc-date-picker
+  { this.startDate = e.detail.value; this._validateDateRange(); }} required ></hx-date-picker
 >
 
-<wc-date-picker
+<hx-date-picker
   name="endDate"
   label="End Date"
   .value="${this.endDate}"
@@ -767,7 +775,7 @@ For date ranges (e.g., prescription start/end dates), use two date pickers with 
   @hx-change="${(e:"
   CustomEvent)=""
 >
-  { this.endDate = e.detail.value; this._validateDateRange(); }} required ></wc-date-picker
+  { this.endDate = e.detail.value; this._validateDateRange(); }} required ></hx-date-picker
 >
 ```
 
@@ -786,9 +794,9 @@ import { customElement, property, state, query } from 'lit/decorators.js';
 /**
  * File input with drag-and-drop and preview.
  * @summary Form-associated file input with validation.
- * @tag wc-file-input
+ * @tag hx-file-upload
  */
-@customElement('hx-file-input')
+@customElement('hx-file-upload')
 export class HxFileInput extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
@@ -804,7 +812,7 @@ export class HxFileInput extends LitElement {
   @property({ type: Boolean }) multiple = false;
   @property({ type: Boolean, reflect: true }) required = false;
   @property({ type: Boolean, reflect: true }) disabled = false;
-  @property({ type: Number }) maxSize = 10 * 1024 * 1024; // 10MB default
+  @property({ type: Number }) max-size = 10 * 1024 * 1024; // 10MB default
 
   @state() private _files: File[] = [];
   @state() private _error = '';
@@ -846,10 +854,10 @@ export class HxFileInput extends LitElement {
 
     // Validate file sizes
     for (const file of this._files) {
-      if (file.size > this.maxSize) {
+      if (file.size > this.max-size) {
         this._internals.setValidity(
           { customError: true },
-          `File "${file.name}" exceeds maximum size of ${this._formatBytes(this.maxSize)}.`,
+          `File "${file.name}" exceeds maximum size of ${this._formatBytes(this.max-size)}.`,
         );
         return;
       }
@@ -989,7 +997,7 @@ export class HxFileInput extends LitElement {
                   <span>Click to upload or drag and drop</span>
                   <span class="file-input__hint">
                     ${this.accept ? `Accepted: ${this.accept}` : 'Any file type'} · Max
-                    ${this._formatBytes(this.maxSize)}
+                    ${this._formatBytes(this.max-size)}
                   </span>
                 </label>
               `
@@ -1104,7 +1112,7 @@ export class HxFileInput extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'hx-file-input': HxFileInput;
+    'hx-file-upload': HxFileInput;
   }
 }
 ```
@@ -1112,14 +1120,14 @@ declare global {
 **Usage:**
 
 ```html
-<wc-file-input
+<hx-file-upload
   name="labResults"
   label="Upload Lab Results"
   accept=".pdf,.jpg,.png"
   multiple
-  maxSize="5242880"
+  max-size="5242880"
   required
-></wc-file-input>
+></hx-file-upload>
 ```
 
 **Features:**
@@ -1148,9 +1156,9 @@ import 'quill/dist/quill.snow.css';
 /**
  * Rich text editor with form association.
  * @summary Form-associated rich text editor powered by Quill.
- * @tag wc-rich-text-editor
+ * @tag org-rich-text-editor
  */
-@customElement('hx-rich-text-editor')
+@customElement('org-rich-text-editor')
 export class HxRichTextEditor extends LitElement {
   static formAssociated = true;
   private _internals: ElementInternals;
@@ -1269,7 +1277,7 @@ export class HxRichTextEditor extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'hx-rich-text-editor': HxRichTextEditor;
+    'org-rich-text-editor': HxRichTextEditor;
   }
 }
 ```
@@ -1277,12 +1285,12 @@ declare global {
 **Usage:**
 
 ```html
-<wc-rich-text-editor
+<org-rich-text-editor
   name="clinicalNotes"
   label="Clinical Notes"
   required
   minLength="50"
-></wc-rich-text-editor>
+></org-rich-text-editor>
 ```
 
 **Considerations:**
@@ -1706,7 +1714,7 @@ export class InsuranceForm extends LitElement {
   render() {
     return html`
       <form>
-        <wc-radio-group
+        <hx-radio-group
           label="Do you have health insurance?"
           name="hasInsurance"
           .value=${this.hasInsurance ? 'yes' : 'no'}
@@ -1716,9 +1724,9 @@ export class InsuranceForm extends LitElement {
           }}
           required
         >
-          <wc-radio value="yes" label="Yes"></wc-radio>
-          <wc-radio value="no" label="No"></wc-radio>
-        </wc-radio-group>
+          <hx-radio value="yes" label="Yes"></hx-radio>
+          <hx-radio value="no" label="No"></hx-radio>
+        </hx-radio-group>
 
         ${this.hasInsurance
           ? html`
@@ -2315,7 +2323,7 @@ export class LabResultsForm extends LitElement {
 - [Lit: Reactive properties](https://lit.dev/docs/components/properties/)
 - [Lit: repeat() directive](https://lit.dev/docs/templates/directives/#repeat)
 - [Lit: Context API](https://lit.dev/docs/data/context/)
-- [WCAG 2.1: Forms](https://www.w3.org/WAI/WCAG21/Understanding/input-purposes.html)
+- [WCAG 2.2: Forms — Input Purposes](https://www.w3.org/WAI/WCAG22/Understanding/input-purposes.html)
 - [Quill Rich Text Editor](https://quilljs.com/)
 - [TinyMCE Rich Text Editor](https://www.tiny.cloud/)
 

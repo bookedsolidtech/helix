@@ -10,6 +10,7 @@ import { EyebrowHeading, SectionHead } from '../_components';
 
 export const SCALE = [
   { token: '0', px: 0 },
+  { token: 'px', px: 1 },
   { token: '0-5', px: 2 },
   { token: '1', px: 4 },
   { token: '1-5', px: 6 },
@@ -22,9 +23,14 @@ export const SCALE = [
   { token: '8', px: 32 },
   { token: '10', px: 40 },
   { token: '12', px: 48 },
+  { token: '14', px: 56 },
   { token: '16', px: 64 },
   { token: '20', px: 80 },
   { token: '24', px: 96 },
+  { token: '32', px: 128 },
+  { token: '40', px: 160 },
+  { token: '48', px: 192 },
+  { token: '64', px: 256 },
 ];
 
 <div className="hx-docs">
@@ -34,15 +40,16 @@ export const SCALE = [
   title="Rhythm. Radius. Elevation."
   lede={
     <>
-      One 4&nbsp;px base, halved at the small end, doubled at the large end. Sixteen stops, seven
-      radii, seven shadow elevations. The same scale powers grid gaps, component padding, and the
-      three density modes — desktop, EHR-dense, and 56-inch ED touchscreens.
+      One 4&nbsp;px base, with finer 1&nbsp;px / 2&nbsp;px / 6&nbsp;px stops for tight UI and
+      coarser 32 → 256&nbsp;px stops for layout-scale spacing. The same scale powers grid gaps,
+      component padding, and the three <code>hx-theme</code> density modes —{' '}
+      <code>comfortable</code> (default), <code>compact</code>, and <code>spacious</code>.
     </>
   }
 />
 
 <section>
-  <SectionHead title="The scale" meta="--hx-space-{0…24}" />
+  <SectionHead title="The scale" meta="--hx-space-{0 · px · 0-5 · 1 · … · 64}" />
   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
     {SCALE.map((s) => (
       <div
@@ -89,11 +96,15 @@ export const SCALE = [
 </section>
 
 <section>
-  <SectionHead title="Density modes" meta="same component · three padding scales" />
+  <SectionHead title="Density modes" meta="same component · three space-token scales" />
   <p className="hx-docs-card-body">
-    A patient list rendered at three densities. Only <code>padding</code> and <code>gap</code>{' '}
-    tokens change — the markup is identical. This is why every component spec lists its density
-    token rather than hard-coding pixels.
+    A patient list rendered at three densities. The markup is identical — what changes is the
+    underlying <code>--hx-space-*</code> token scale (rescaled ~25% down for <code>compact</code>{' '}
+    and ~25% up for <code>spacious</code>). Because density rescales spacing rather than touching
+    individual rules, padding, gap, input height, and on the compact end typography all move
+    together. The demonstration tiles below illustrate the resulting padding deltas; the literal
+    pixel values shown are demo numbers, not the canonical tokens — set <code>density</code> on{' '}
+    <code>hx-theme</code> to apply the real cascade.
   </p>
   <div
     style={{
@@ -104,9 +115,9 @@ export const SCALE = [
     }}
   >
     {[
-      { name: 'Compact', toks: 'space-2 / space-4', pad: 8, gap: 4 },
-      { name: 'Default', toks: 'space-3 / space-5', pad: 12, gap: 8 },
-      { name: 'Touch', toks: 'space-5 / space-6', pad: 20, gap: 16 },
+      { name: 'Compact', toks: '~25% smaller spacing tokens', pad: 8, gap: 4 },
+      { name: 'Comfortable (default)', toks: 'baseline spacing tokens', pad: 12, gap: 8 },
+      { name: 'Spacious', toks: '~25% larger spacing tokens', pad: 20, gap: 16 },
     ].map((mode) => (
       <div key={mode.name} className="hx-docs-card">
         <div className="hx-docs-card-head">
@@ -147,12 +158,14 @@ export const SCALE = [
 </section>
 
 <section>
-  <SectionHead title="Touch target floor" meta="WCAG 2.5.5 — 44px minimum" />
+  <SectionHead title="Touch target floor" meta="WCAG 2.5.5 — 44px Enhanced AAA" />
   <p className="hx-docs-card-body">
     Every interactive host (<code>hx-button</code>, <code>hx-checkbox</code>, <code>hx-switch</code>
-    ,<code> hx-tabs</code>, …) honors <code>--hx-touch-target-min</code> (default <code>44px</code>)
-    on small/medium variants. The compact density variants drop to <code>32px</code> with explicit
-    consumer opt-in for desktop-only EHR scenarios.
+    ,<code> hx-tabs</code>, …) honors <code>--hx-touch-target-min</code> (default{' '}
+    <code>2.75rem</code> /<code> 44px</code>) on every variant — <code>compact</code> density
+    rescales the spacing tokens but does not lower the touch-target floor. WCAG 2.5.5 Target Size
+    (Enhanced AAA) is a P0 cert criterion, so the 44px floor holds across every shipped density
+    mode.
   </p>
 </section>
 

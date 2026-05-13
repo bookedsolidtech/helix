@@ -7,9 +7,9 @@ sidebar:
 
 # Local CI with act
 
-HELiX uses [nektos/act](https://github.com/nektos/act) to run GitHub Actions workflows locally inside Docker containers. This lets you verify your changes pass every quality gate **before** pushing to GitHub — eliminating wasted remote CI cycles.
+HELiX uses [nektos/act](https://github.com/nektos/act) to run GitHub Actions workflows locally inside Docker containers. The local Docker pass via `act` is one piece of the full preflight gate — the canonical "ran the full local quality gate" command is `pnpm run preflight`, which composes lint, format, type-check, build, smart tests, CEM drift, changeset check, and an `act-ci.sh` invocation (Docker-CI parity).
 
-**This is a mandatory quality gate.** Code does not push to GitHub until `act` passes.
+**This is a mandatory quality gate.** Code does not push to GitHub until `pnpm run preflight` passes (which includes the `act` Docker-CI step on machines that have Docker available).
 
 ---
 
@@ -29,7 +29,7 @@ Before running `act`, you need:
    brew install act
    ```
 
-3. **`.actrc`** — already checked into the repo root. Contains performance flags (`--bind`, `--reuse`, `--pull=false`).
+3. **`.actrc`** — already checked into the repo root (use the project's repo-root file; act also reads `~/.actrc` if present, but the repo-root file is the source of truth here). Contains performance flags (`--bind`, `--reuse`, `--pull=false`).
 
 ---
 
@@ -73,6 +73,8 @@ This runs the `act-ci.yml` workflow — a lightweight mirror of the production `
 
 ### Clean stale containers before running
 
+`--clean` removes all `act-*` containers (whether running or stopped) before the run. Normal runs already prune exited containers in passing — use `--clean` when a leaked container is blocking re-runs.
+
 ```bash
 ./scripts/act-ci.sh --clean
 ```
@@ -81,29 +83,33 @@ This runs the `act-ci.yml` workflow — a lightweight mirror of the production `
 
 ## Available Flags
 
-| Flag           | Description                                                                   |
-| -------------- | ----------------------------------------------------------------------------- |
-| `--job <name>` | Run a specific job instead of all gates                                       |
-| `--list`       | Print available job names and exit                                            |
-| `--native`     | Use `linux/arm64` containers (no Rosetta emulation — faster on Apple Silicon) |
-| `--full`       | Run the complete test suite instead of smart tests (changed components only)  |
-| `--batch`      | Run all tests in batches of 10 to avoid Docker OOM                            |
-| `--clean`      | Remove all stale `act-*` containers before running                            |
+| Flag            | Description                                                                   |
+| --------------- | ----------------------------------------------------------------------------- |
+| `--job <name>`  | Run a specific job instead of all gates                                       |
+| `--list`        | Print available job names and exit                                            |
+| `--help` / `-h` | Show usage text and exit                                                      |
+| `--native`      | Use `linux/arm64` containers (no Rosetta emulation — faster on Apple Silicon) |
+| `--full`        | Run the complete test suite instead of smart tests (changed components only)  |
+| `--matrix`      | Run the full Node.js × Playwright matrix test job (`test-full`) — slow        |
+| `--batch`       | Run tests in batches of 10 to avoid Docker OOM                                |
+| `--clean`       | Remove all `act-*` containers before running                                  |
+| `--fast`        | Run the consolidated single-job fast workflow                                 |
 
 ---
 
 ## CI Jobs
 
-The `act-ci.yml` workflow runs these jobs:
+The `act-ci.yml` workflow runs these jobs. The table reflects the **default** subset run by `./scripts/act-ci.sh`; the workflow also defines a `test-full` job that only fires with `--matrix` (`ACT_MATRIX_TESTS` / `ACT_FULL_TESTS`):
 
-| Job             | What it checks                             | Approximate time |
-| --------------- | ------------------------------------------ | ---------------- |
-| `lint`          | ESLint strict                              | ~12s (warm)      |
-| `format`        | Prettier check                             | ~10s (warm)      |
-| `type-check`    | TypeScript strict — no `any`               | ~15s (warm)      |
-| `build`         | Full library build + CEM validation        | ~90s             |
-| `test`          | Vitest browser tests (Playwright/Chromium) | ~120s            |
-| `quality-gates` | Aggregate — ALL above must pass            | ~1s              |
+| Job             | What it checks                              | Approximate time |
+| --------------- | ------------------------------------------- | ---------------- |
+| `lint`          | ESLint strict                               | ~12s (warm)      |
+| `format`        | Prettier check                              | ~10s (warm)      |
+| `type-check`    | TypeScript strict — no `any`                | ~15s (warm)      |
+| `build`         | Full library build + CEM validation         | ~90s             |
+| `test`          | Vitest browser tests (Playwright/Chromium)  | ~120s            |
+| `test-full`     | Full Node × Playwright matrix test (opt-in) | ~10–15min        |
+| `quality-gates` | Aggregate — required jobs must pass         | ~1s              |
 
 Jobs that need Playwright browsers will use a cached volume mount on repeat runs — first run downloads browsers, subsequent runs reuse the cache.
 
@@ -149,7 +155,7 @@ docker info
 
 ### Container startup fails / image not found
 
-act pulls images on first run. Ensure you have network access and `~/.actrc` contains `--pull=false` only after the initial pull. Remove `--pull=false` from `.actrc` temporarily to force a fresh pull:
+act pulls images on first run. Ensure you have network access and the repo-root `.actrc` keeps `--pull=false` only after the initial pull. Remove `--pull=false` from the repo-root `.actrc` temporarily to force a fresh pull:
 
 ```bash
 act pull_request -W .github/workflows/act-ci.yml --pull=always
@@ -200,13 +206,12 @@ The aggregate gate requires **all** jobs to succeed. Check the output for the sp
 
 ## How It Fits in the Push Workflow
 
-act is the final gate before every `git push`:
+`pnpm run preflight` is the canonical pre-push gate; it composes the fast local gates and the `./scripts/act-ci.sh` Docker run into a single command:
 
 ```
 pnpm run format        # fix formatting
-pnpm run preflight     # fast local gates (~30s)
-./scripts/act-ci.sh    # full Docker CI gate (~4min)
-git push               # only after act passes
+pnpm run preflight     # full local CI gate (lint/format/type-check/build/smart tests/CEM/changesets + Docker CI via act-ci.sh)
+git push               # only after preflight passes
 ```
 
-If `act` fails, **fix the errors before pushing**. Do not skip this gate. See [Agent Push Protocol](/contributing/agent-push-protocol) for the complete push sequence.
+If `preflight` fails, **fix the errors before pushing**. Do not skip this gate. See [Build Pipeline](/architecture/build-pipeline/) for the full gate list and the production CI counterpart.

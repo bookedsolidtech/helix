@@ -9,13 +9,23 @@ This document provides a complete implementation guide for **per-component loadi
 
 ## Executive Summary
 
-**The Problem:** Loading all 44 HELiX components on every page costs ~80KB (Brotli), violating performance budgets and penalizing simple pages.
+**The Problem:** Loading the full HELiX bundle on every page ships every shipped `hx-*` component
+to every visitor — see `packages/hx-library/bundle-budgets.json` for the per-component and
+full-bundle CI ceilings. On a simple article page that renders only a handful of components,
+that's a lot of wasted bytes.
 
-**The Solution:** Each component is a separate Drupal library. Pages load only the components they render. Drupal's dependency system handles deduplication and load order.
+**The Solution:** Each component is a separate Drupal library. Pages load only the components
+they render. Drupal's dependency system handles deduplication and load order.
 
-**The Result:** Typical pages load 14-35KB instead of 80KB. Cache invalidation is per-component. The library scales to 100+ components without degrading performance.
+**The Result:** Typical pages ship a fraction of the full bundle. Actual payload depends on
+which components the template uses; the CI per-component budget is 16 KB gzipped (with overrides
+for heavier widgets like `hx-data-table` / `hx-date-picker` / `hx-combobox` — see
+`packages/hx-library/bundle-budgets.json`). Cache invalidation is per-component.
 
-**The Trade-off:** 44 library definitions and PHP preprocess functions instead of one global script tag.
+**The Trade-off:** Many library definitions and PHP preprocess functions instead of one global
+script tag. HELiX supports both strategies — see the
+[CDN guide](/drupal/installation/cdn/) for the full-bundle path and this doc for the
+per-component path; the architecture is not exclusive.
 
 ## Why Per-Component Loading
 
@@ -43,7 +53,7 @@ Traditional JavaScript bundlers tree-shake at build time by analyzing imports. D
 # Only attached libraries are loaded
 {{ attach_library('mytheme/hx.button') }}
 {{ attach_library('mytheme/hx.card') }}
-# hx-modal, hx-accordion, hx-table, and 41 other components are NOT loaded
+# hx-dialog, hx-accordion, hx-table, and 41 other components are NOT loaded
 ```
 
 Drupal's asset resolver:
@@ -164,11 +174,14 @@ Every HELiX integration starts with the runtime library. This is the shared foun
 # mytheme.libraries.yml
 
 # ─────────────────────────────────────────────────────
-# HELiX Runtime — Shared Dependencies
+# HELiX Runtime — Design Tokens (CSS only)
 # ─────────────────────────────────────────────────────
-# The Lit runtime and design tokens. Required by all
-# component libraries. Loaded once per page, cached
-# indefinitely (changes only when Lit version updates).
+# `@helixui/library` does not publish a separate Lit-only
+# runtime bundle. Each per-component module under
+# `dist/components/<tag>/index.js` resolves the Lit
+# runtime and any cross-component code through relative
+# imports into `dist/shared/`, so all you have to vendor
+# alongside the components is the design-token CSS.
 
 hx.runtime:
   version: 3.9.0
@@ -177,15 +190,6 @@ hx.runtime:
       # Design tokens: CSS custom properties for theming
       vendor/helix/tokens.css:
         minified: true
-  js:
-    # Lit core (lit + lit/decorators + lit/directives)
-    # Externalized from component builds
-    vendor/helix/lit-runtime.js:
-      type: module
-      minified: true
-      preprocess: false
-      attributes:
-        crossorigin: anonymous
   dependencies:
     # No dependencies — this is the foundation
 ```
@@ -196,9 +200,19 @@ hx.runtime:
 themes/custom/mytheme/
 └── vendor/
     └── helix/
-        ├── lit-runtime.js      (~16.8KB raw, ~5.8KB Brotli)
-        └── tokens.css          (~2.1KB raw, ~0.5KB Brotli)
+        ├── tokens.css                       (~2.1KB raw, ~0.5KB Brotli)
+        ├── components/
+        │   ├── hx-button/index.js           # entry per tag (Drupal references this)
+        │   └── …                            # one directory per registered element
+        └── shared/                          # resolved by relative imports from components/
+            └── *.js                         # Lit runtime + cross-component chunks
 ```
+
+Copy the entire `node_modules/@helixui/library/dist/` tree (or at minimum the
+`components/` and `shared/` directories) into `vendor/helix/`. Each component's
+`index.js` references its `shared/*.js` neighbors by relative path, so the
+shared chunks load automatically the first time any HELiX component is used on
+the page and are then cached for every subsequent component.
 
 ### Step 2: Per-Component Library Definitions
 
@@ -330,7 +344,11 @@ hx.card:
       preprocess: false
   dependencies:
     - mytheme/hx.runtime
-    - mytheme/hx.button # Cards often have button CTAs in actions slot
+  # hx.card itself does NOT declare hx.button as a Drupal-library
+  # dependency — the generated Drupal libraries map each hx-* tag to
+  # its own module and let the author template attach whichever
+  # companions it actually slots in. Attach hx.button explicitly
+  # in templates that put an <hx-button> inside hx-card's actions slot.
 
 hx.alert:
   version: 3.9.0
@@ -356,10 +374,10 @@ hx.breadcrumb:
 # ─── Organisms ───
 # Organisms compose multiple components
 
-hx.modal:
+hx.dialog:
   version: 3.9.0
   js:
-    vendor/helix/components/hx-modal/index.js:
+    vendor/helix/components/hx-dialog/index.js:
       type: module
       minified: true
       preprocess: false
@@ -446,7 +464,7 @@ hx.group_content:
 hx.group_interactive:
   version: 3.9.0
   dependencies:
-    - mytheme/hx.modal
+    - mytheme/hx.dialog
     - mytheme/hx.accordion
     - mytheme/hx.group_core # Interactive widgets use icons
 
@@ -472,30 +490,39 @@ Templates attach the libraries they need.
 ```twig
 {# node--article--teaser.html.twig #}
 
-{# Attach only what this template uses #}
+{# Attach only what this template uses. hx-card does NOT depend on
+   hx-button in the generated Drupal libraries — attach hx.button
+   explicitly because this template slots an <hx-button> into the
+   actions slot. #}
 {{ attach_library('mytheme/hx.card') }}
-{# hx.card depends on hx.button, so button loads automatically #}
-{# hx.button depends on hx.runtime, so runtime loads automatically #}
-{# Final payload: runtime + button + card = ~9KB Brotli #}
+{{ attach_library('mytheme/hx.button') }}
+{# Both component libraries depend on hx.runtime, which loads
+   automatically once. Final payload is whatever those three modules
+   weigh after CI bundle budgets apply. #}
 
 <article{{ attributes.addClass('node--article--teaser') }}>
   <hx-card
-    heading="{{ label }}"
-    href="{{ url }}"
+    hx-href="{{ url }}"
     variant="{{ node.isPromoted() ? 'featured' : 'default' }}"
   >
+    {# Heading slot expects a semantic heading element, not a
+       host attribute — hx-card has no `heading` attribute. #}
+    <h3 slot="heading">{{ label }}</h3>
+
     {% if content.field_hero_image|render|trim is not empty %}
-      <div slot="media">{{ content.field_hero_image }}</div>
+      <div slot="image">{{ content.field_hero_image }}</div>
     {% endif %}
 
     {{ content.body }}
 
     {% if content.field_tags|render|trim is not empty %}
-      <div slot="meta">{{ content.field_tags }}</div>
+      {# hx-card has no `meta` slot — render tags in the default
+         body slot or in `footer`. #}
+      <div slot="footer">{{ content.field_tags }}</div>
     {% endif %}
 
     <div slot="actions">
-      <hx-button variant="text" href="{{ url }}">
+      <hx-button variant="ghost" href="{{ url }}">
         {{ 'Read More'|t }}
       </hx-button>
     </div>
@@ -879,7 +906,7 @@ graph TD
 
   card[hx.card<br/>1.7KB]
   alert[hx.alert<br/>1.5KB]
-  modal[hx.modal<br/>2.1KB]
+  modal[hx.dialog<br/>2.1KB]
 
   runtime --> button
   runtime --> icon
@@ -955,7 +982,7 @@ function mytheme_preprocess_page(array &$variables): void {
 
   // Load admin-only components for authenticated users
   if ($current_user->isAuthenticated()) {
-    $variables['#attached']['library'][] = 'mytheme/hx.modal';  // For admin actions
+    $variables['#attached']['library'][] = 'mytheme/hx.dialog';  // For admin actions
   }
 }
 ```
@@ -1010,9 +1037,11 @@ Use `<link rel="modulepreload">` to load critical components before they're disc
 <head>
   {# ... other head elements #}
 
-  {# Preload critical components for faster registration #}
-  <link rel="modulepreload" href="{{ base_path ~ directory }}/vendor/helix/lit-runtime.js">
+  {# Preload critical components for faster registration. Each component
+     module relative-imports its shared chunks from vendor/helix/shared/,
+     so the browser preloads the runtime as part of the dependency graph. #}
   <link rel="modulepreload" href="{{ base_path ~ directory }}/vendor/helix/components/hx-button/index.js">
+  <link rel="modulepreload" href="{{ base_path ~ directory }}/vendor/helix/components/hx-icon/index.js">
 
   {{ page.head }}
 </head>
@@ -1020,8 +1049,7 @@ Use `<link rel="modulepreload">` to load critical components before they're disc
 
 **When to preload:**
 
-- Lit runtime (always needed)
-- Components above the fold (header, hero)
+- Components rendered above the fold (header, hero)
 - Components used on most pages (button, icon)
 
 **When NOT to preload:**

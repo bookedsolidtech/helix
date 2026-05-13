@@ -760,7 +760,7 @@ export class HelixPasswordInput extends LitElement {
 Validate one field based on another field's value:
 
 ```typescript
-export class HelixPasswordConfirmInput extends LitElement {
+export class OrgPasswordConfirmInput extends LitElement {
   @property({ type: String })
   value = '';
 
@@ -806,12 +806,12 @@ export class HelixPasswordConfirmInput extends LitElement {
     required
   ></hx-text-input>
 
-  <hx-password-confirm-input
+  <org-password-confirm-input
     id="confirm"
     name="password-confirm"
     label="Confirm Password"
     required
-  ></hx-password-confirm-input>
+  ></org-password-confirm-input>
 
   <button type="submit">Submit</button>
 </form>
@@ -1470,7 +1470,7 @@ The browser's `reportValidity()` automatically:
 
 ### Validation Message Contrast
 
-Ensure error messages meet WCAG 2.1 AA contrast requirements:
+Ensure error messages meet at least WCAG 2.2 AA contrast (4.5:1 for body text); the HELiX cert posture is AAA (7:1) on the P0 surface — see `aaa-verdicts.json`:
 
 ```css
 .field__error {

@@ -70,28 +70,28 @@ fi
 
 # ── Gate 1: Lint ─────────────────────────────────────────────────────────────
 
-echo "▶ [1/9] Lint"
+echo "▶ [1/12] Lint"
 pnpm run lint
 echo "  ✓ Lint passed"
 echo ""
 
 # ── Gate 2: Format check ─────────────────────────────────────────────────────
 
-echo "▶ [2/9] Format check"
+echo "▶ [2/12] Format check"
 pnpm run format:check
 echo "  ✓ Format passed"
 echo ""
 
 # ── Gate 3: Type check ───────────────────────────────────────────────────────
 
-echo "▶ [3/9] Type check"
+echo "▶ [3/12] Type check"
 pnpm run type-check
 echo "  ✓ Type check passed"
 echo ""
 
 # ── Gate 4: Build ────────────────────────────────────────────────────────────
 
-echo "▶ [4/9] Build"
+echo "▶ [4/12] Build"
 pnpm turbo run build --filter='!docs'
 echo "  ✓ Build passed"
 echo ""
@@ -117,7 +117,7 @@ echo ""
 
 # ── Gate 5: Smart tests + coverage ───────────────────────────────────────────
 
-echo "▶ [5/9] Smart tests + coverage"
+echo "▶ [5/12] Smart tests + coverage"
 
 if [ -z "$CHANGED_COMPONENT_SOURCES" ]; then
   echo "  ✓ No component source changes — tests skipped"
@@ -159,7 +159,7 @@ fi
 
 # ── Gate 6: CEM ──────────────────────────────────────────────────────────────
 
-echo "▶ [6/9] CEM"
+echo "▶ [6/12] CEM"
 if [ -n "$LIBRARY_SOURCE_CHANGED" ]; then
   pnpm run cem
   echo "  ✓ CEM generated"
@@ -172,7 +172,7 @@ echo ""
 
 # ── Gate 7: Changeset ────────────────────────────────────────────────────────
 
-echo "▶ [7/9] Changeset"
+echo "▶ [7/12] Changeset"
 
 if [ "${SKIP_CHANGESET:-0}" = "1" ]; then
   echo "  ✓ SKIP_CHANGESET=1 — bypassed"
@@ -253,7 +253,7 @@ echo ""
 # The smart tests in Gate 5 only test changed components — this gate
 # ensures no cross-component regressions slip through.
 
-echo "▶ [8/9] Full test suite"
+echo "▶ [8/12] Full test suite"
 
 if [ "${SKIP_FULL_TESTS:-0}" = "1" ]; then
   echo "  SKIP_FULL_TESTS=1 — full test suite bypassed"
@@ -332,7 +332,7 @@ echo ""
 
 # ── Gate 9: Docker CI (act) ─────────────────────────────────────────────────
 
-echo "▶ [9/9] Docker CI (act)"
+echo "▶ [9/12] Docker CI (act)"
 
 if [ "${SKIP_ACT:-0}" = "1" ]; then
   echo "  ⚠ SKIP_ACT=1 — Docker CI gate bypassed"
@@ -354,7 +354,7 @@ echo ""
 
 # ── Gate 10: AAA cert integrity ──────────────────────────────────────────────
 
-echo "▶ [10/11] AAA cert integrity"
+echo "▶ [10/12] AAA cert integrity"
 
 if node scripts/check-aaa-verdicts.mjs; then
   : # passed (output already printed by the script)
@@ -371,7 +371,7 @@ echo ""
 
 # ── Gate 11: Docs version drift ──────────────────────────────────────────────
 
-echo "▶ [11/11] Docs version drift"
+echo "▶ [11/12] Docs version drift"
 
 if node scripts/check-version-drift.mjs; then
   : # passed (output already printed by the script)
@@ -381,6 +381,27 @@ else
   echo "    At least one doc page references an outdated \`@helixui/*\` version."
   echo "    Update the stale CDN URLs / install commands to the current package"
   echo "    versions, OR set HELIX_ALLOW_VERSION_DRIFT=1 to bypass (emergency only)."
+  exit 1
+fi
+echo ""
+
+# ── Gate 12: Docs claims fact-check ──────────────────────────────────────────
+
+echo "▶ [12/12] Docs claims fact-check"
+
+if node scripts/check-docs-claims.mjs; then
+  : # passed (output already printed by the script)
+else
+  echo ""
+  echo "  ✗ DOCS CLAIMS GATE FAILED — do NOT push."
+  echo "    At least one doc page contains a structural fact-check failure:"
+  echo "      • <hx-*> reference to a component that does not exist in CEM"
+  echo "      • --hx-* CSS custom property with a fabricated namespace"
+  echo "      • @helixui/* package reference that does not exist on npm or in workspace"
+  echo "      • Internal /<slug>/ link that no longer resolves"
+  echo "      • Stale repo reference (github.com/himerus/wc-2026)"
+  echo "      • WCAG 2.1 AA conformance claim (should be 2.2 AAA on P0)"
+  echo "    See \`.reports/docs-fact-check/programmatic-findings.md\` for details."
   exit 1
 fi
 echo ""

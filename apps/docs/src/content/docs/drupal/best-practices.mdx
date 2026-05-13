@@ -97,7 +97,7 @@ For performance-critical pages, load only the components you use.
 ```yaml
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
       type: external
       attributes:
         type: module
@@ -105,7 +105,7 @@ helix-button:
 
 helix-card:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js:
       type: external
       attributes:
         type: module
@@ -177,7 +177,7 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
 
   <div slot="footer">
     <small>{{ node.created.value|date('F j, Y') }}</small>
-    <hx-button size="sm">View Details</hx-button>
+    <hx-button hx-size="sm">View Details</hx-button>
   </div>
 </hx-card>
 ```
@@ -202,11 +202,13 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
    */
   Drupal.behaviors.helixComponents = {
     attach: function (context, settings) {
-      // Use once() to prevent double-initialization
-      once('helix-init', 'hx-card', context).forEach((card) => {
-        // Set up event listeners
-        card.addEventListener('hx-card-click', (e) => {
-          console.log('Card clicked:', e.detail);
+      // Use once() to prevent double-initialization.
+      // Scope to interactive cards — hx-card only emits hx-click in
+      // the hx-href variant, and combining hx-href with slot="actions"
+      // is an ARIA anti-pattern (nested interactive).
+      once('helix-init', 'hx-card[hx-href]', context).forEach((card) => {
+        card.addEventListener('hx-click', (e) => {
+          console.log('Card activated:', e.detail);
         });
       });
 
@@ -222,7 +224,7 @@ Use slots when you need to project complex HTML, multiple elements, or rich cont
       // Clean up on unload
       if (trigger === 'unload') {
         context.querySelectorAll('hx-card').forEach((card) => {
-          card.removeEventListener('hx-card-click', () => {});
+          card.removeEventListener('hx-click', () => {});
         });
       }
     },
@@ -240,7 +242,7 @@ Handle multiple components in a single behavior file:
     attach: function (context) {
       // Cards
       once('hx-card', 'hx-card[hx-href]', context).forEach((card) => {
-        card.addEventListener('hx-card-click', handleCardClick);
+        card.addEventListener('hx-click', handleCardClick);
       });
 
       // Selects
@@ -296,9 +298,19 @@ Handle multiple components in a single behavior file:
   }
 
   function handleFormInvalid(e) {
-    const { field, message } = e.detail;
-    field.setAttribute('error', message);
-    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // hx-form's hx-invalid detail is { errors: Array<{ name, message }> }.
+    // Project each error back onto its field by name.
+    const form = e.currentTarget;
+    for (const { name, message } of e.detail.errors) {
+      const field = form.querySelector(`[name="${name}"]`);
+      if (field) field.setAttribute('error', message);
+    }
+    const first = e.detail.errors[0];
+    if (first) {
+      const target = form.querySelector(`[name="${first.name}"]`);
+      target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target?.focus?.();
+    }
   }
 
   function handleAjaxButton(e) {
@@ -333,25 +345,25 @@ Handle multiple components in a single behavior file:
 
 ### Using HELiX Components in Drupal Forms
 
-Map Drupal Form API elements to HELiX components using the `#attributes` property.
+HELiX components are **autonomous custom elements**, not customized built-ins — `is="hx-*"` on a
+native `<input>`/`<select>`/`<button>` will not upgrade. Render the HELiX tags from a `#theme`
+callback (or directly in a Twig override) so the markup emits `<hx-text-input>`, `<hx-select>`, and
+`<hx-button>` instead of native controls.
 
 ```php
 function mymodule_patient_intake_form($form, &$form_state) {
-  // Attach HELiX library
   $form['#attached']['library'][] = 'your_theme/helix-components';
 
-  // Text input
+  // Text input — #theme rewraps as <hx-text-input>
   $form['patient_name'] = [
     '#type' => 'textfield',
     '#title' => t('Patient Name'),
     '#required' => TRUE,
-    '#attributes' => [
-      'is' => 'hx-text-input',
-      'placeholder' => 'Last, First MI',
-    ],
+    '#theme' => 'hx_text_input',
+    '#placeholder' => 'Last, First MI',
   ];
 
-  // Select
+  // Select — #theme rewraps as <hx-select>
   $form['department'] = [
     '#type' => 'select',
     '#title' => t('Department'),
@@ -361,19 +373,15 @@ function mymodule_patient_intake_form($form, &$form_state) {
       'oncology' => 'Oncology',
     ],
     '#required' => TRUE,
-    '#attributes' => [
-      'is' => 'hx-select',
-    ],
+    '#theme' => 'hx_select',
   ];
 
-  // Submit button
+  // Submit button — #theme rewraps as <hx-button variant="primary">
   $form['actions']['submit'] = [
     '#type' => 'submit',
     '#value' => t('Submit'),
-    '#attributes' => [
-      'is' => 'hx-button',
-      'variant' => 'primary',
-    ],
+    '#theme' => 'hx_button',
+    '#hx_variant' => 'primary',
   ];
 
   return $form;
@@ -503,14 +511,14 @@ form.addEventListener('hx-invalid', (e) => {
 Ensure all interactive components are keyboard-accessible:
 
 ```javascript
-once('keyboard-init', 'hx-card[hx-href]', context).forEach((card) => {
-  // Cards with hx-href are already keyboard-accessible
-  // But ensure Enter key triggers navigation
-  card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      card.click();
-    }
+// hx-card with hx-href is already keyboard-accessible — Enter is the
+// canonical activation key for link semantics, and the component
+// dispatches hx-click on the host. Do NOT add Space activation:
+// Space is reserved for buttons; rebinding it on a link-shaped card
+// contradicts the hx-card keyboard contract and confuses AT users.
+once('helix-card-activate', 'hx-card[hx-href]', context).forEach((card) => {
+  card.addEventListener('hx-click', (e) => {
+    console.log('Card activated:', e.detail);
   });
 });
 ```
@@ -612,7 +620,7 @@ helix-theme:
 
 - **Component API Reference**: See individual component MDX docs in Storybook
 - **Design Tokens**: See `@helixui/library` token documentation
-- **Accessibility Guide**: WCAG 2.1 AA compliance documentation
+- **Accessibility Guide**: WCAG 2.2 AAA P0 / AA baseline compliance documentation (`packages/hx-library/aaa-verdicts.json`)
 
 <Aside type="tip" title="Next Steps">
   Review individual component documentation (hx-card, hx-select, hx-form) in the live
@@ -642,7 +650,7 @@ The remainder of this guide covers patterns required for production deployments 
 # mytheme.libraries.yml — No module dependencies
 helix-components:
   js:
-    dist/cdn/core.js:
+    dist/index.js:
       preprocess: false
       attributes:
         type: module
@@ -682,24 +690,36 @@ function mytheme_preprocess_field__field_cta(&$variables) {
 
 **Component Type Hierarchy:**
 
-| Component Type | Properties         | Slots       | Example                                                     |
-| -------------- | ------------------ | ----------- | ----------------------------------------------------------- |
-| Atoms          | Dominant           | Minimal     | `<hx-button variant="primary">Text</hx-button>`             |
-| Molecules      | Balanced           | Balanced    | `<hx-alert variant="info">{{ content }}</hx-alert>`         |
-| Organisms      | Minimal            | Dominant    | `<hx-card>` with media, heading, body, actions slots        |
-| Templates      | Configuration-only | All content | `<hx-grid>` with named region slots for content composition |
+| Component Type | Properties         | Slots       | Example                                                                   |
+| -------------- | ------------------ | ----------- | ------------------------------------------------------------------------- |
+| Atoms          | Dominant           | Minimal     | `<hx-button variant="primary">Text</hx-button>`                           |
+| Molecules      | Balanced           | Balanced    | `<hx-alert variant="info">{{ content }}</hx-alert>`                       |
+| Organisms      | Minimal            | Dominant    | `<hx-card>` with image, heading, body, and actions slots                  |
+| Templates      | Configuration-only | All content | `<hx-grid>` with a default slot for grid children (no named region slots) |
 
 **Example: hx-card (Organism)**
 
 ```twig
 {# templates/content/node--article--card.html.twig #}
+
+{#
+  hx-card with hx-href turns the entire card into one interactive
+  link (Enter activates, hx-click fires). Do NOT combine hx-href
+  with slot="actions" — that nests another interactive control
+  inside a link and breaks the activation contract. Either render
+  the actions variant (non-interactive card) OR the linked variant
+  (no actions slot), as the conditional below does.
+#}
+
+{% set card_is_interactive = view_mode != 'full' %}
+
 <hx-card
   variant="{{ node.field_card_style.value|default('default') }}"
   elevation="raised"
-  href="{{ url }}"
+  {% if card_is_interactive %}hx-href="{{ url }}"{% endif %}
 >
   {# Slot: Drupal-rendered responsive image #}
-  <div slot="media">
+  <div slot="image">
     {{ content.field_image }}
   </div>
 
@@ -709,14 +729,14 @@ function mytheme_preprocess_field__field_cta(&$variables) {
   {# Default slot: Drupal-rendered body with text format #}
   {{ content.body }}
 
-  {# Slot: Drupal-rendered CTA with link field #}
-  <div slot="actions">
-    {% if content.field_cta_link %}
-      <hx-button variant="text" href="{{ content.field_cta_link.0['#url'] }}">
+  {# Only render actions in the non-interactive variant. #}
+  {% if not card_is_interactive and content.field_cta_link %}
+    <div slot="actions">
+      <hx-button variant="primary" hx-href="{{ content.field_cta_link.0['#url'] }}">
         {{ content.field_cta_link.0['#title'] }}
       </hx-button>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 </hx-card>
 ```
 
@@ -732,13 +752,17 @@ function mytheme_preprocess_field__field_cta(&$variables) {
 **Rule:** Content must be accessible before JavaScript loads.
 
 ```twig
-{# HELiX components use light DOM projection #}
+{# HELiX components use light DOM projection. hx-accordion-item exposes
+   the panel heading via the `trigger` slot and tracks expanded state with
+   the `expanded` attribute (not `heading`/`open`). #}
 <hx-accordion>
-  <hx-accordion-item heading="Section 1" open>
+  <hx-accordion-item id="section-1" expanded>
+    <span slot="trigger">Section 1</span>
     {# This content is visible BEFORE JavaScript loads #}
     <p>{{ content.field_section_1 }}</p>
   </hx-accordion-item>
-  <hx-accordion-item heading="Section 2">
+  <hx-accordion-item id="section-2">
+    <span slot="trigger">Section 2</span>
     <p>{{ content.field_section_2 }}</p>
   </hx-accordion-item>
 </hx-accordion>
@@ -804,7 +828,11 @@ function mytheme_preprocess_node__article(&$variables) {
 
 ## Performance Comparison: Traditional vs. HELiX SDC
 
-The following measurements come from production healthcare site deployments comparing a traditional jQuery-based Drupal theme to an equivalent HELiX SDC implementation.
+The numbers below are illustrative comparisons drawn from local benchmarking of a traditional
+jQuery-based Drupal theme against an equivalent HELiX SDC implementation; treat them as guidance,
+not a published benchmark. The bundle-size guarantees that ship with HELiX itself are enforced by
+the library's bundle budgets (see <code>packages/hx-library/bundle-budgets.json</code>) — those are
+the authoritative numbers to quote in procurement contexts.
 
 ### CSS Payload
 
@@ -873,7 +901,7 @@ The structural comparison below summarizes what changes when adopting HELiX SDC 
 | Card layout & elevation  | 40+ lines CSS                             | Built into `hx-card` Shadow DOM    |
 | Badge styling            | Custom class + 8 CSS rules                | `variant="primary"` attribute      |
 | Avatar + meta layout     | Manual flexbox CSS                        | `hx-avatar` handles it             |
-| Button affordance        | `<a>` with custom styles                  | `hx-button variant="text"`         |
+| Button affordance        | `<a>` with custom styles                  | `hx-button variant="ghost"`        |
 | Dark mode                | Requires separate `[data-theme=dark]` CSS | `--hx-*` tokens flip automatically |
 | High contrast mode       | Likely unsupported                        | Built into every HELiX component   |
 | Custom theme CSS written | ~80 lines                                 | ~5 lines                           |
@@ -887,11 +915,11 @@ For optimal performance, define one library per component and attach conditional
 ```yaml
 # mytheme.libraries.yml
 
-# Core utilities (loaded on every page)
+# Full library bundle (loaded on every page if you don't tree-shake)
 helix-core:
   version: 3.9.0
   js:
-    dist/js/helix-core.js:
+    dist/index.js:
       preprocess: false
       attributes:
         type: module
@@ -900,7 +928,7 @@ helix-core:
 helix-button:
   version: 3.9.0
   js:
-    dist/js/hx-button.js:
+    dist/components/hx-button/index.js:
       preprocess: false
       attributes:
         type: module
@@ -910,7 +938,7 @@ helix-button:
 helix-card:
   version: 3.9.0
   js:
-    dist/js/hx-card.js:
+    dist/components/hx-card/index.js:
       preprocess: false
       attributes:
         type: module
@@ -920,7 +948,7 @@ helix-card:
 helix-data-table:
   version: 3.9.0
   js:
-    dist/js/hx-data-table.js:
+    dist/components/hx-data-table/index.js:
       preprocess: false
       attributes:
         type: module
@@ -1011,7 +1039,7 @@ gzip_types application/javascript text/javascript;
     npm run build
 
     # Check individual component sizes
-    for file in dist/js/hx-*.js; do
+    for file in dist/components/hx-*/index.js; do
       size=$(gzip -c "$file" | wc -c)
       name=$(basename "$file")
 
@@ -1023,7 +1051,7 @@ gzip_types application/javascript text/javascript;
     done
 
     # Check total bundle size
-    total=$(gzip -c dist/cdn/core.js | wc -c)
+    total=$(gzip -c dist/index.js | wc -c)
     if [ "$total" -gt 51200 ]; then
       echo "ERROR: Total bundle is ${total} bytes (limit: 50KB)"
       exit 1
@@ -1032,11 +1060,21 @@ gzip_types application/javascript text/javascript;
     echo "Bundle sizes within limits"
 ```
 
-**HELiX targets:**
+**HELiX bundle budgets (gzipped bytes, enforced in CI):**
 
-- Single component: `<5KB` (minified + gzipped)
-- Full bundle: `<50KB` (minified + gzipped)
-- Typical component: 2-3KB (minified + gzipped)
+Two budget surfaces ship with the library — pick the one your tooling consumes:
+
+- `bundle-budgets.json` — the CI-enforced ceiling: <code>16 KB per component</code>, <code>200 KB
+  full bundle</code>, with per-component overrides for the larger composite widgets
+  (color/date/time pickers, combobox, file upload, slider, side-nav).
+- `.bundle-budget.json` — the aspirational floor used by local tooling: <code>5 KB per
+  component</code>, <code>50 KB full bundle</code>, with smaller per-component overrides for
+  legitimately heavy widgets (data-table, date/time pickers, combobox, file upload, drawer,
+  carousel, etc.).
+
+Typical atoms (button, alert, badge) land around 2–3 KB gzipped; complex widgets land in the
+overrides ranges above. Authoritative numbers always come from the two budget files plus the most
+recent <code>pnpm check:bundle</code> output in the repo.
 
 ---
 
@@ -1115,7 +1153,7 @@ Use SRI hashes for CDN-loaded components.
 **Generate SRI hash:**
 
 ```bash
-curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js | \
+curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js | \
   openssl dgst -sha384 -binary | \
   openssl base64 -A
 ```
@@ -1127,7 +1165,7 @@ curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js | \
 
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       minified: true
       preprocess: false
@@ -1209,7 +1247,7 @@ Follow HIPAA technical safeguards for healthcare data.
     attach(context) {
       // Log when users view patient data components
       once('phi-audit', 'hx-card[data-contains-phi]', context).forEach((card) => {
-        card.addEventListener('hx-card-click', (e) => {
+        card.addEventListener('hx-click', (e) => {
           // Send audit log to Drupal
           fetch('/api/audit-log', {
             method: 'POST',
@@ -1257,7 +1295,7 @@ Pin component library versions in production, use ranges in development.
 helix-components:
   version: 3.9.0 # Explicit version for cache-busting
   js:
-    dist/cdn/core.js:
+    dist/index.js:
       preprocess: false
       attributes:
         type: module
@@ -1396,10 +1434,10 @@ module.exports = {
 
 **Coverage targets:**
 
-- Component unit tests: 100% (HELiX library)
+- Component unit tests: 80%+ blocking floor enforced per-component (lines/branches/functions/statements) per `packages/hx-library/coverage-config.json`; library aspiration is 95%
 - Integration tests: Critical user paths (Drupal + HELiX)
 - Visual regression: Storybook + Percy/Chromatic
-- Accessibility: Automated WCAG 2.1 AA audits
+- Accessibility: Automated WCAG 2.2 audits (axe-core for AA regression + `pnpm aaa:audit` for AAA cert)
 
 ---
 
@@ -1416,7 +1454,7 @@ sites/
 ├── all/
 │   └── themes/
 │       └── helix_base/           # Base theme with HELiX components
-│           ├── dist/js/           # Compiled components
+│           ├── dist/components/   # Compiled components
 │           ├── helix_base.libraries.yml
 │           └── templates/components/
 ├── site1.example.com/
@@ -1470,12 +1508,31 @@ libraries:
 **Design token customization (sites/site1.example.com/themes/site1_theme/css/tokens.css):**
 
 ```css
+/*
+  Override HELiX design tokens for site branding. HELiX exposes ramps
+  (--hx-color-primary-{50…950}) and semantic roles
+  (--hx-color-action-primary-bg) — there is no flat --hx-color-primary
+  / --hx-color-secondary token, no --hx-font-family-base, and no
+  --hx-spacing-unit. Override the canonical names below, or register
+  a brand via HelixBrandRegistry.register() so the entire 22-token
+  primary/secondary ramp set updates atomically.
+*/
 :root {
-  /* Override HELiX design tokens for site branding */
-  --hx-color-primary: #00539f;
-  --hx-color-secondary: #ff6a39;
-  --hx-font-family-base: 'Roboto', sans-serif;
-  --hx-spacing-unit: 8px;
+  /* Primary ramp — override the stops your surfaces actually consume.
+     Repeat for 50…950 in production. */
+  --hx-color-primary-500: #00539f;
+  --hx-color-primary-700: #003872;
+
+  /* Secondary ramp */
+  --hx-color-secondary-500: #ff6a39;
+
+  /* Typography family token (HELiX uses --hx-font-family-sans /
+     --hx-font-family-mono — not -base). */
+  --hx-font-family-sans: 'Roboto', sans-serif;
+
+  /* Spacing scale (--hx-space-1…12 is the canonical name — not
+     --hx-spacing-unit). Override the steps you re-define. */
+  --hx-space-2: 8px;
 }
 ```
 
@@ -1490,41 +1547,42 @@ libraries:
 
 Use semantic versioning and graceful deprecation.
 
-**Breaking change process:**
+**Breaking change process (hypothetical illustration — not a real hx-card API change):**
 
 ```typescript
-// hx-card.ts v2.0.0 - Breaking change example
+// Hypothetical illustration of a deprecation cycle. hx-card has always
+// shipped a `variant` attribute; cardVariant has never been a public
+// hx-card property. Use this pattern when introducing a NEW
+// deprecation in your own components or downstream wrappers.
 
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('hx-card')
-export class HxCard extends LitElement {
-  // DEPRECATED: Old property name (v1.x)
+@customElement('mysite-card')
+export class MysiteCard extends LitElement {
+  // DEPRECATED: Old property name
   @property({ type: String })
   get cardVariant() {
-    console.warn('hx-card: "cardVariant" is deprecated. Use "variant" instead.');
+    console.warn('mysite-card: "cardVariant" is deprecated. Use "variant" instead.');
     return this.variant;
   }
   set cardVariant(value: string) {
     this.variant = value;
   }
 
-  // NEW: Consistent property name (v2.x)
+  // NEW: Consistent property name
   @property({ type: String })
   variant: 'default' | 'featured' | 'compact' = 'default';
-
-  // Component implementation...
 }
 ```
 
 **Automated migration:**
 
 ```bash
-# Find all usages
-grep -r 'cardVariant' web/themes/custom/mytheme/templates/
+# Find all usages of the deprecated attribute
+grep -r 'cardVariant=' web/themes/custom/mytheme/templates/
 
-# Replace with new syntax
+# Rewrite to the new attribute
 find web/themes/custom/mytheme/templates/ -name '*.twig' -exec sed -i 's/cardVariant="/variant="/g' {} +
 ```
 
@@ -1666,7 +1724,7 @@ Instrument component performance in production.
 
 - Migrated 12 jQuery widgets to 8 HELiX components
 - Implemented progressive enhancement (100% no-JS compatibility)
-- Added WCAG 2.1 AA compliance (keyboard nav, screen readers)
+- Added WCAG 2.2 AA compliance with WCAG 2.2 AAA on the P0 surface (keyboard nav, screen readers)
 - Reduced JavaScript bundle from 240KB to 35KB
 
 **Results:**
@@ -1685,9 +1743,13 @@ Instrument component performance in production.
 **Code example (after):**
 
 ```twig
-{# Modern HELiX component #}
-<hx-card href="{{ url }}" variant="patient">
-  <img slot="media" src="{{ patient_photo }}" alt="{{ patient_name }}">
+{# Modern HELiX component. hx-card variants are default | featured |
+   compact; the patient framing is a content choice, not an enum
+   value. hx-href is the interactive-card attribute (NOT native href);
+   the image slot accepts a Drupal-rendered image (NOT a fabricated
+   `media` slot). #}
+<hx-card hx-href="{{ url }}" variant="featured">
+  <img slot="image" src="{{ patient_photo }}" alt="{{ patient_name }}">
   <span slot="heading">{{ patient_name }}</span>
   <dl>
     <dt>MRN:</dt>
@@ -1742,10 +1804,10 @@ Instrument component performance in production.
 
 **Before adding any HELiX component:**
 
-- [ ] Component meets accessibility requirements (WCAG 2.1 AA)
+- [ ] Component meets accessibility requirements (WCAG 2.2 AA baseline; WCAG 2.2 AAA on P0)
 - [ ] Progressive enhancement strategy defined
 - [ ] Bundle size analyzed (`<5KB` per component)
-- [ ] Browser compatibility verified (evergreens + IE11 if required)
+- [ ] Browser compatibility verified against the published minimums (Chrome / Edge 120+, Firefox 120+, Safari 17+, Chrome Android 120+ — see `packages/hx-library/BROWSER_COMPATIBILITY.md`)
 - [ ] Security implications reviewed (CSP, XSS, HIPAA)
 - [ ] Performance impact measured (Lighthouse)
 - [ ] Documentation exists (Storybook + Drupal examples)

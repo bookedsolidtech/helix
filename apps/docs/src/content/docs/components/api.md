@@ -7,41 +7,43 @@ All HELIX components follow consistent API conventions for predictable usage and
 
 ## Naming Conventions
 
-| Type                  | Convention                  | Example                      |
-| --------------------- | --------------------------- | ---------------------------- |
-| Tag name              | `hx-` prefix, kebab-case    | `hx-card`, `hx-button`       |
-| Properties            | camelCase                   | `variant`, `disabled`        |
-| Attributes            | kebab-case (auto-reflected) | `variant`, `disabled`        |
-| Events                | `hx-` prefix                | `hx-click`, `hx-change`      |
-| CSS Parts             | kebab-case                  | `container`, `header-text`   |
-| CSS Custom Properties | `--hx-` prefix              | `--hx-card-padding`          |
-| Slots                 | kebab-case                  | `header`, `actions`          |
+| Type                  | Convention                                | Example                      |
+| --------------------- | ----------------------------------------- | ---------------------------- |
+| Tag name              | `hx-` prefix, kebab-case                  | `hx-card`, `hx-button`       |
+| Properties            | camelCase                                 | `variant`, `disabled`        |
+| Attributes            | kebab-case / lowercase, opt-in reflection | `variant`, `disabled`        |
+| Events                | `hx-` prefix                              | `hx-click`, `hx-change`      |
+| CSS Parts             | kebab-case                                | `card`, `heading`, `actions` |
+| CSS Custom Properties | `--hx-` prefix                            | `--hx-card-padding`          |
+| Slots                 | kebab-case                                | `heading`, `actions`         |
+
+Attribute reflection is opt-in: a property only reflects back to its attribute when the component declares `reflect: true` (or sets the attribute imperatively). Many public properties on HELiX components are intentionally non-reflecting — check each component's CEM entry for the canonical attribute list.
 
 ## Property Types
 
-Components accept these standard property types:
+The examples below illustrate the **patterns** used by HELiX components — each component's CEM entry defines its actual property names, types, and defaults. Use [Storybook](https://storybook.helix.bookedsolid.tech/) or `packages/hx-library/custom-elements.json` as the source of truth for any specific component.
 
 ```typescript
-// String enum (reflected as attribute)
+// String enum, reflected to attribute (e.g. hx-button `variant`)
 @property({ type: String, reflect: true })
-variant: 'default' | 'primary' | 'secondary' = 'default';
+variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'primary';
 
-// Boolean (reflected as attribute)
+// Boolean, reflected to attribute (e.g. `disabled`)
 @property({ type: Boolean, reflect: true })
 disabled = false;
 
-// Number
+// Number (illustrative — actual numeric props like hx-badge `count` use number | undefined)
 @property({ type: Number })
-count = 0;
+count: number | undefined = undefined;
 
-// Complex objects (NOT reflected)
+// Complex object — not exposed as an attribute (illustrative; e.g. hx-nav uses `items: NavItem[]`)
 @property({ attribute: false })
-items: ItemData[] = [];
+items: unknown[] = [];
 ```
 
 ## Event API
 
-All custom events follow this pattern:
+`hx-change`-style value-change events follow this pattern:
 
 ```typescript
 this.dispatchEvent(
@@ -52,6 +54,8 @@ this.dispatchEvent(
   }),
 );
 ```
+
+Other components emit differently-named events with their own `detail` shapes — `hx-click` (with `originalEvent`), `hx-after-close`, `hx-toggle`, `hx-input`, etc. Each component's CEM entry defines the exact event name and detail payload.
 
 The `bubbles: true, composed: true` combination is required so events cross the Shadow DOM boundary and reach Drupal Behaviors attached to the document or a host element.
 

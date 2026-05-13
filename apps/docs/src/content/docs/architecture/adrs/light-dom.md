@@ -50,9 +50,10 @@ The CMS or content editor owns the markup. The component provides **styling and 
 
 Components currently using Light DOM:
 
-- `hx-prose` — wraps WYSIWYG content
-- `hx-form` — wraps Drupal Form API output
-- `hx-container` — layout wrapper for SEO-critical content
+- `hx-prose` — wraps WYSIWYG content; uses `AdoptedStylesheetsController` + `createRenderRoot()` returning the host
+- `hx-form` — runs in two modes (see "Case study: hx-form" below); the dual-mode pattern is the Light-DOM-relevant piece
+
+`hx-container` is **not** a Light DOM component today — it ships with the default Shadow DOM render root. The SEO-content-container case is still a candidate use of Light DOM, but no shipped HELiX component currently implements it.
 
 **Use Light DOM when:**
 
@@ -75,13 +76,14 @@ The `AdoptedStylesheetsController` injects CSS into the document via the Adopted
 ### Controller usage
 
 ```ts
-import { LitElement, html } from 'lit';
+import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { HelixElement } from '../../base/helix-element.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
-import { hxProseScopedCss } from './hx-prose.styles.js';
+import { helixProseScopedCss } from './hx-prose.styles.js';
 
 @customElement('hx-prose')
-export class HxProse extends LitElement {
+export class HelixProse extends HelixElement {
   // Render in Light DOM — no shadow boundary
   override createRenderRoot(): this {
     return this;
@@ -90,7 +92,7 @@ export class HxProse extends LitElement {
   // Inject scoped CSS via adoptedStyleSheets
   private _styles = new AdoptedStylesheetsController(
     this,
-    hxProseScopedCss,
+    helixProseScopedCss,
     document,
   );
 }
@@ -150,7 +152,7 @@ Content editors paste from Word, embed media, create tables, and format text usi
 
 ```twig
 {# In node--article.html.twig #}
-<hx-prose size="base" max-width="720px">
+<hx-prose hx-size="base" max-width="720px">
   {{ content.body }}
 </hx-prose>
 
@@ -175,7 +177,7 @@ hx-prose h2 {
 }
 
 hx-prose .media-embed {
-  border-radius: var(--hx-radius-lg);
+  border-radius: var(--hx-border-radius-lg);
   overflow: hidden;
   margin: var(--hx-space-6) 0;
 }
@@ -187,7 +189,7 @@ hx-prose table {
 }
 
 hx-prose blockquote {
-  border-left: 3px solid var(--hx-color-primary);
+  border-left: 3px solid var(--hx-color-primary-700);
   padding-left: var(--hx-space-4);
   font-style: italic;
 }
@@ -199,10 +201,10 @@ Drupal's Form API generates the `<form>` tag, CSRF tokens, AJAX wrappers, and su
 
 ### Standalone mode (with `action` attribute)
 
-When `action` is set, `hx-form` renders a native `<form>` element. Client-side validation, `hx-submit` events, and direct HTTP submission all work out of the box.
+When `action` is set, `hx-form` renders a native `<form>` and lets the browser handle submission via that action URL. The `hx-submit` event is **not** dispatched in this mode — `hx-form` only dispatches `hx-submit` in the action-less Drupal-wrapped mode where it intercepts the submit for client-side validation.
 
 ```twig
-{# Standalone mode — hx-form renders <form> #}
+{# Standalone mode — hx-form renders <form>, native submit to action URL #}
 <hx-form action="/api/contact" method="post">
   <hx-text-input name="email" type="email" required>
     <span slot="label">Email</span>
@@ -214,21 +216,19 @@ When `action` is set, `hx-form` renders a native `<form>` element. Client-side v
 
 ### Drupal-wrapped mode (no `action`)
 
-When no `action` is set, `hx-form` renders only a `<slot>`. Drupal provides its own `<form>` tag with CSRF tokens and AJAX handlers. The component only injects styling.
+When no `action` is set, `hx-form` renders only a `<slot>` and listens for the inner `<form>`'s submit event. Drupal provides the actual `<form>` tag, CSRF tokens, and submission handling; `hx-form` runs client-side validation, dispatches `hx-submit` with the collected `FormData` when validation passes, and (for reset) dispatches `hx-reset` — it is not a pure styling wrapper.
 
 ```twig
-{# Drupal mode — Drupal provides <form>, hx-form is bare wrapper #}
-{{ attach_library('helix/form') }}
+{# Drupal mode — Drupal provides <form>; hx-form validates + dispatches hx-submit #}
+{{ attach_library('helixui/hx-form') }}
 
 <hx-form>
   {# Drupal's Form API renders the actual <form> tag #}
   {{ content }}
 </hx-form>
-
-{# hx-form only injects styling via adoptedStyleSheets.
-   No <form> is rendered — Drupal owns the form element,
-   CSRF tokens, and submission handling. #}
 ```
+
+The Drupal library key shipped by `@helixui/drupal-starter`'s `helixui.libraries.yml` is `helixui/hx-form` (and `helixui/core` for the base tokens/runtime). Some sites mount the package under a different namespace — adjust the `helixui/` prefix to match the namespace your `helixui.libraries.yml` is attached under.
 
 ## ElementInternals: bridging Shadow and Light DOM forms
 
@@ -237,24 +237,33 @@ Shadow DOM form controls use `ElementInternals` to participate in native `<form>
 **Flow:** `formAssociated = true` → `attachInternals()` → `setFormValue()` → `setValidity()`.
 
 ```ts
-// ElementInternals in HxTextInput
-static formAssociated = true;
+// HelixTextInput uses the FormMixin from packages/hx-library/src/mixins/,
+// which centralises ElementInternals attachment, value/validity reporting,
+// and validation-message wiring across every form-associated HELiX
+// component. The illustrative pattern below shows what FormMixin does on
+// the host's behalf — components do not typically open-code this.
 
-private _internals = this.attachInternals();
+class IllustrativeHelixTextInput extends HelixElement {
+  static formAssociated = true;
 
-override updated(changed: Map<string, unknown>) {
-  if (changed.has('value')) {
-    // Report value to the parent <form>
-    this._internals.setFormValue(this.value);
+  private _internals = this.attachInternals();
 
-    // Report validity state
-    if (this.required && !this.value) {
-      this._internals.setValidity(
-        { valueMissing: true },
-        'This field is required',
-      );
-    } else {
-      this._internals.setValidity({});
+  override updated(changed: Map<string, unknown>) {
+    if (changed.has('value')) {
+      // Report value to the parent <form>
+      this._internals.setFormValue(this.value);
+
+      // Report validity state — FormMixin computes validity flags from
+      // declared constraints (required, minlength, pattern, etc.) and
+      // the active validationMessage convention.
+      if (this.required && !this.value) {
+        this._internals.setValidity(
+          { valueMissing: true },
+          this.requiredMessage || 'This field is required',
+        );
+      } else {
+        this._internals.setValidity({});
+      }
     }
   }
 }
@@ -264,7 +273,7 @@ override updated(changed: Map<string, unknown>) {
 
 - **Native validation.** The Constraint Validation API works across Shadow DOM — `:invalid` pseudo-class, custom messages, and browser-native UI all behave as expected.
 - **FormData integration.** `new FormData(form)` automatically includes values from Shadow DOM controls with `formAssociated = true`.
-- **Drupal compatible.** Drupal behaviours, AJAX handlers, and Form API validation work with hx-* form controls without modification.
+- **Drupal compatible.** Drupal behaviors run against the light-DOM ancestor tree, and most attach without modification when targeting `hx-*` form controls. The `@helixui/drupal-behaviors` package documents the patterns that need a small adapter (e.g. behaviors that previously read `event.target.value` on a native `<input>` need to read from the `hx-input` / `hx-change` event detail instead).
 
 ## Decision matrix
 
@@ -285,7 +294,7 @@ When should you choose Light DOM?
 ### Principles
 
 - **Shadow First.** Every new component starts with Shadow DOM. Only break the boundary when a concrete integration requirement demands it — never for convenience or familiarity with global CSS.
-- **Light When Needed.** CMS WYSIWYG, Drupal forms, and SEO-critical content containers are the three proven cases. Each uses `AdoptedStylesheetsController` for scoped, deduplicated CSS.
+- **Light When Needed.** The two **shipped** cases today are CMS WYSIWYG (`hx-prose`) and dual-mode Drupal Form API integration (`hx-form` when its action-less Drupal mode is used; `hx-form` itself still uses the default Shadow DOM render root). SEO-critical content containers are a candidate Light-DOM use case but are not yet implemented in any shipped component.
 - **Bridge the Gap.** `ElementInternals` lets Shadow DOM controls participate in Light DOM forms. The two strategies are complementary, not competing. Use both in the same form.
 
 ## Consequences

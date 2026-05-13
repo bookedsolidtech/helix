@@ -3,17 +3,17 @@
 **Enterprise Web Component Library** built with [Lit 3.x](https://lit.dev/), TypeScript, and Shadow DOM — designed for healthcare applications where accessibility and reliability are non-negotiable.
 
 [![npm version](https://img.shields.io/npm/v/@helixui/library)](https://www.npmjs.com/package/@helixui/library)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
 ---
 
 ## Installation
 
 ```bash
-npm install @helixui/library
+npm install @helixui/library @helixui/icons @floating-ui/dom
 ```
 
-Design tokens are included automatically as a dependency via `@helixui/tokens`.
+`@helixui/icons` and `@floating-ui/dom` are declared as **peer dependencies** — every consumer must install them. Design tokens (`@helixui/tokens`) and `lit` ship as runtime dependencies and are installed automatically.
 
 ---
 
@@ -43,92 +43,111 @@ import '@helixui/library/components/hx-text-input';
 <hx-alert variant="warning">Please review before submitting.</hx-alert>
 ```
 
-### CDN (placeholder — coming soon)
+### CDN
+
+The published distribution imports `lit` and `@helixui/icons` from bare specifiers, so a CDN load needs an **import map** to resolve them:
 
 ```html
-<script type="module" src="https://cdn.example.com/@helixui/library/dist/index.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
+    }
+  }
+</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js"></script>
 ```
+
+> All four bare specifiers above are required — `dist/index.js` opens with `import { lightTokenCss } from '@helixui/tokens'`, the shared chunks import `lit` / `lit/decorators.js` / `lit/directives/*`, the icon registry pulls `@helixui/icons`, and any popover-positioned component pulls `@floating-ui/dom`. Omit any one of them and the browser will fail to resolve the module before the first component renders.
+
+For production loads, pin the major+minor (e.g. `@3.9`) and pair every CDN URL with an [SRI integrity hash](https://www.srihash.org). See the installation guide in the docs site for the full pattern.
 
 ---
 
 ## Components
 
-73 component directories, 85 custom elements total.
+`packages/hx-library/src/components/` ships **81 component directories** that register **102 custom elements** (some components — `hx-tabs`, `hx-accordion`, `hx-tree-view`, `hx-data-table`, etc. — register multiple related elements like `hx-tab` + `hx-tab-panel`).
 
-| Component | Tag |
-|---|---|
-| Accordion | `<hx-accordion>` |
-| Action Bar | `<hx-action-bar>` |
-| Alert | `<hx-alert>` |
-| Avatar | `<hx-avatar>` |
-| Badge | `<hx-badge>` |
-| Breadcrumb | `<hx-breadcrumb>` |
-| Button | `<hx-button>` |
-| Button Group | `<hx-button-group>` |
-| Card | `<hx-card>` |
-| Carousel | `<hx-carousel>` |
-| Checkbox | `<hx-checkbox>` |
-| Checkbox Group | `<hx-checkbox-group>` |
-| Code Snippet | `<hx-code-snippet>` |
-| Color Picker | `<hx-color-picker>` |
-| Combobox | `<hx-combobox>` |
-| Container | `<hx-container>` |
-| Copy Button | `<hx-copy-button>` |
-| Data Table | `<hx-data-table>` |
-| Date Picker | `<hx-date-picker>` |
-| Dialog | `<hx-dialog>` |
-| Divider | `<hx-divider>` |
-| Drawer | `<hx-drawer>` |
-| Dropdown | `<hx-dropdown>` |
-| Field | `<hx-field>` |
-| Field Label | `<hx-field-label>` |
-| File Upload | `<hx-file-upload>` |
-| Form | `<hx-form>` |
-| Format Date | `<hx-format-date>` |
-| Grid | `<hx-grid>` |
-| Help Text | `<hx-help-text>` |
-| Icon | `<hx-icon>` |
-| Image | `<hx-image>` |
-| Link | `<hx-link>` |
-| List | `<hx-list>` |
-| Menu | `<hx-menu>` |
-| Meter | `<hx-meter>` |
-| Nav | `<hx-nav>` |
-| Number Input | `<hx-number-input>` |
-| Overflow Menu | `<hx-overflow-menu>` |
-| Pagination | `<hx-pagination>` |
-| Popover | `<hx-popover>` |
-| Popup | `<hx-popup>` |
-| Progress Bar | `<hx-progress-bar>` |
-| Progress Ring | `<hx-progress-ring>` |
-| Prose | `<hx-prose>` |
-| Radio Group | `<hx-radio-group>` |
-| Rating | `<hx-rating>` |
-| Select | `<hx-select>` |
-| Side Nav | `<hx-side-nav>` |
-| Skeleton | `<hx-skeleton>` |
-| Slider | `<hx-slider>` |
-| Spinner | `<hx-spinner>` |
-| Split Button | `<hx-split-button>` |
-| Split Panel | `<hx-split-panel>` |
-| Stack | `<hx-stack>` |
+The table below is a curated selection of the most commonly consumed elements; see [`custom-elements.json`](./custom-elements.json) for the authoritative inventory.
+
+| Component        | Tag                     |
+| ---------------- | ----------------------- |
+| Accordion        | `<hx-accordion>`        |
+| Action Bar       | `<hx-action-bar>`       |
+| Alert            | `<hx-alert>`            |
+| Avatar           | `<hx-avatar>`           |
+| Badge            | `<hx-badge>`            |
+| Breadcrumb       | `<hx-breadcrumb>`       |
+| Button           | `<hx-button>`           |
+| Button Group     | `<hx-button-group>`     |
+| Card             | `<hx-card>`             |
+| Carousel         | `<hx-carousel>`         |
+| Checkbox         | `<hx-checkbox>`         |
+| Checkbox Group   | `<hx-checkbox-group>`   |
+| Code Snippet     | `<hx-code-snippet>`     |
+| Color Picker     | `<hx-color-picker>`     |
+| Combobox         | `<hx-combobox>`         |
+| Container        | `<hx-container>`        |
+| Copy Button      | `<hx-copy-button>`      |
+| Data Table       | `<hx-data-table>`       |
+| Date Picker      | `<hx-date-picker>`      |
+| Dialog           | `<hx-dialog>`           |
+| Divider          | `<hx-divider>`          |
+| Drawer           | `<hx-drawer>`           |
+| Dropdown         | `<hx-dropdown>`         |
+| Field            | `<hx-field>`            |
+| Field Label      | `<hx-field-label>`      |
+| File Upload      | `<hx-file-upload>`      |
+| Form             | `<hx-form>`             |
+| Format Date      | `<hx-format-date>`      |
+| Grid             | `<hx-grid>`             |
+| Help Text        | `<hx-help-text>`        |
+| Icon             | `<hx-icon>`             |
+| Image            | `<hx-image>`            |
+| Link             | `<hx-link>`             |
+| List             | `<hx-list>`             |
+| Menu             | `<hx-menu>`             |
+| Meter            | `<hx-meter>`            |
+| Nav              | `<hx-nav>`              |
+| Number Input     | `<hx-number-input>`     |
+| Overflow Menu    | `<hx-overflow-menu>`    |
+| Pagination       | `<hx-pagination>`       |
+| Popover          | `<hx-popover>`          |
+| Popup            | `<hx-popup>`            |
+| Progress Bar     | `<hx-progress-bar>`     |
+| Progress Ring    | `<hx-progress-ring>`    |
+| Prose            | `<hx-prose>`            |
+| Radio Group      | `<hx-radio-group>`      |
+| Rating           | `<hx-rating>`           |
+| Select           | `<hx-select>`           |
+| Side Nav         | `<hx-side-nav>`         |
+| Skeleton         | `<hx-skeleton>`         |
+| Slider           | `<hx-slider>`           |
+| Spinner          | `<hx-spinner>`          |
+| Split Button     | `<hx-split-button>`     |
+| Split Panel      | `<hx-split-panel>`      |
+| Stack            | `<hx-stack>`            |
 | Status Indicator | `<hx-status-indicator>` |
-| Steps | `<hx-steps>` |
-| Structured List | `<hx-structured-list>` |
-| Switch | `<hx-switch>` |
-| Tabs | `<hx-tabs>` |
-| Tag | `<hx-tag>` |
-| Text | `<hx-text>` |
-| Text Input | `<hx-text-input>` |
-| Textarea | `<hx-textarea>` |
-| Theme | `<hx-theme>` |
-| Time Picker | `<hx-time-picker>` |
-| Toast | `<hx-toast>` |
-| Toggle Button | `<hx-toggle-button>` |
-| Tooltip | `<hx-tooltip>` |
-| Top Nav | `<hx-top-nav>` |
-| Tree View | `<hx-tree-view>` |
-| Visually Hidden | `<hx-visually-hidden>` |
+| Steps            | `<hx-steps>`            |
+| Structured List  | `<hx-structured-list>`  |
+| Switch           | `<hx-switch>`           |
+| Tabs             | `<hx-tabs>`             |
+| Tag              | `<hx-tag>`              |
+| Text             | `<hx-text>`             |
+| Text Input       | `<hx-text-input>`       |
+| Textarea         | `<hx-textarea>`         |
+| Theme            | `<hx-theme>`            |
+| Time Picker      | `<hx-time-picker>`      |
+| Toast            | `<hx-toast>`            |
+| Toggle Button    | `<hx-toggle-button>`    |
+| Tooltip          | `<hx-tooltip>`          |
+| Top Nav          | `<hx-top-nav>`          |
+| Tree View        | `<hx-tree-view>`        |
+| Visually Hidden  | `<hx-visually-hidden>`  |
 
 ---
 
@@ -138,10 +157,10 @@ All components consume design tokens from `@helixui/tokens` via CSS custom prope
 
 ```css
 :root {
-  --hx-color-primary: #0057b8;
-  --hx-color-primary-hover: #004a9e;
-  --hx-spacing-md: 1rem;
-  --hx-font-family-base: 'Inter', sans-serif;
+  --hx-color-action-primary-bg: #0057b8;
+  --hx-color-action-primary-bg-hover: #004a9e;
+  --hx-space-4: 1rem;
+  --hx-font-family-sans: 'Inter', sans-serif;
 }
 ```
 
@@ -165,7 +184,8 @@ Components are standard Custom Elements and work in any framework:
 
 Full component docs, API reference, and Storybook playground:
 
-> **Docs site coming soon**
+- **Docs site:** [helixui.dev](https://helixui.dev) (Astro Starlight — prose, integration guides, AAA verdicts)
+- **Storybook:** [storybook.helixui.dev](https://storybook.helixui.dev) (CEM-driven autodocs, every variant, interaction tests)
 
 ---
 
@@ -192,11 +212,13 @@ What that means in practice:
   `.reports/formal-aaa-audit/audit.matrix.md`, and the full machine-readable JSON in
   `.reports/formal-aaa-audit/audit.json`. The slim verdicts snapshot consumed by the docs site
   ships in this package as `aaa-verdicts.json`.
-- **Honest limits.** Where the harness surfaces a real gap, the verdict is published as
+- **Honest limits.** Where the harness surfaces a real gap, the verdict would be published as
   Partially Supports (or Does Not Support) with the evidence prose explaining what's missing.
-  The 3.9.0 release surfaces 2 honest Partial verdicts on WCAG 3.3.6 Error Prevention (All) for
-  `hx-slider` and `hx-file-upload` — both are form-associated inputs that should expose
-  ElementInternals + setValidity but do not yet. These are queued for 3.9.1.
+  The 3.9.0 release surfaces **0 Partial / 0 Fail** verdicts across the 44 P0 components × 11
+  criteria measured — every criterion resolves to Supports or Not Applicable. `hx-slider` and
+  `hx-file-upload` previously surfaced WCAG 3.3.6 Partial verdicts; both have since been
+  remediated with `ElementInternals` + `setValidity`, and `aaa-verdicts.json` records the
+  Supports verdicts with the form-association evidence.
 - **axe-core gap.** axe-core PR #5080 (unmerged) means ElementInternals-attached ARIA on
   form-associated components is not visible to axe's rule engine. The harness uses DOM-level
   fallback assertions where this matters. See `apps/docs/src/content/docs/accessibility/axe-element-internals-gap.mdx`

@@ -9,9 +9,13 @@ This guide covers the end-to-end process for creating production-quality Lit 3.x
 
 Every HELIX component follows this structure:
 
+`hx-example` below is a placeholder tag for illustration — replace with the real `hx-<name>` you are building.
+
 ```typescript
-import { LitElement, html, css } from 'lit';
+// hx-example.ts
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { hxExampleStyles } from './hx-example.styles.js';
 
 /**
  * A description of the component's purpose.
@@ -21,18 +25,11 @@ import { customElement, property } from 'lit/decorators.js';
  *
  * @csspart container - The outer container
  *
- * @fires hx-click - Fired when the component is clicked
+ * @fires {CustomEvent<{ originalEvent: MouseEvent }>} hx-click - Dispatched when the host fires its action.
  */
 @customElement('hx-example')
 export class HxExample extends LitElement {
-  static styles = css`
-    :host {
-      display: block;
-      /* Use design tokens */
-      font-family: var(--hx-font-family-body);
-      color: var(--hx-color-text-primary);
-    }
-  `;
+  static override styles = [hxExampleStyles];
 
   /** The variant of the component */
   @property({ type: String, reflect: true })
@@ -40,14 +37,26 @@ export class HxExample extends LitElement {
 
   render() {
     return html`
-      <div part="container" class="container">
+      <div part="container" class="container" @click=${this.#emitClick}>
         <slot></slot>
         <slot name="actions"></slot>
       </div>
     `;
   }
+
+  #emitClick = (originalEvent: MouseEvent) => {
+    this.dispatchEvent(
+      new CustomEvent('hx-click', {
+        detail: { originalEvent },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  };
 }
 ```
+
+Styles live in a sibling `*.styles.ts` module to keep the component class focused and to play well with the shared style-token cascade — see [Adopted stylesheets](/guides/adopted-stylesheets/).
 
 ## File Structure
 
@@ -73,9 +82,10 @@ src/components/hx-example/
 
 Before marking a component complete:
 
-- [ ] TypeScript strict — zero errors from `npm run type-check`
-- [ ] Tests pass — `npm run test` (80%+ coverage)
-- [ ] Accessibility — WCAG 2.1 AA (axe-core clean)
+- [ ] TypeScript strict — zero errors from `pnpm run type-check`
+- [ ] Tests pass — `pnpm run test:smart` for changed components; CI runs the full matrix
+- [ ] Coverage — meets the blocking threshold in `packages/hx-library/coverage-config.json` (currently 50% lines/branches/functions/statements; aspirational target 95%)
+- [ ] Accessibility — covered by the formal AAA audit (`pnpm aaa:audit`); current cert posture is WCAG 2.2 AAA on the P0 surface (44 P0 components, 376 Supports / 109 Not Applicable / 0 Partial / 0 Fail) plus the CI `a11y-audit` AA regression guard
 - [ ] Storybook — stories for all variants and states
-- [ ] CEM — `npm run cem` generates accurate API manifest
-- [ ] Bundle size — under 5KB min+gz
+- [ ] CEM — `pnpm run cem` generates accurate API manifest
+- [ ] Bundle size — within the per-component budget defined in `bundle-budgets.json` and `.bundle-budget.json` at the repo root (per-component caps with explicit reviewed budgets for complex components, not a blanket 5KB rule); CI enforces via `pnpm run check:bundle`

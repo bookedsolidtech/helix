@@ -33,7 +33,8 @@ return <HxButton onHxClick={handleClick}>Save</HxButton>;
 
 The wrapper also provides:
 
-- **Full TypeScript types** — props, events, and slots are typed without a manual `helix.d.ts`
+- **Typed props and events** — each wrapper exposes the underlying CEM properties as typed React props plus typed `onHx*` callbacks (no manual `helix.d.ts` for the attribute side)
+- **Slot composition** — child elements with `slot="<name>"` are forwarded to the host; the slot _names_ themselves are not encoded in the React prop type
 - **Automatic ref forwarding** — `ref` gives you the underlying `HTMLElement`
 - **React DevTools labels** — component tree shows `<HxButton>` instead of `<hx-button>`
 
@@ -82,26 +83,27 @@ Every wrapper uses the PascalCase version of the tag name:
 
 Every `hx-*` event exposed by a component is available as a typed `on*` prop. The event name is converted from `kebab-case` to `camelCase` with an `on` prefix:
 
-| DOM event | React prop |
-|-----------|-----------|
-| `hx-click` | `onHxClick` |
-| `hx-change` | `onHxChange` |
-| `hx-input` | `onHxInput` |
-| `hx-focus` | `onHxFocus` |
-| `hx-blur` | `onHxBlur` |
-| `hx-open` | `onHxOpen` |
-| `hx-close` | `onHxClose` |
+| DOM event | React prop | Emitting components |
+|-----------|-----------|---------------------|
+| `hx-click` | `onHxClick` | `hx-button`, `hx-card` (when `hx-href`), etc. |
+| `hx-input` | `onHxInput` | `hx-text-input`, `hx-textarea` |
+| `hx-change` | `onHxChange` | `hx-text-input`, `hx-select`, `hx-checkbox`, etc. |
+| `hx-open` | `onHxOpen` | `hx-dialog`, `hx-accordion-item`, etc. |
+| `hx-close` | `onHxClose` | `hx-dialog`, `hx-alert` (after-close), etc. |
+
+The wrapper exposes every event the underlying component declares in its CEM. Components do **not** emit `hx-focus` / `hx-blur` events — use native React `onFocus` / `onBlur` (or DOM `focusin` / `focusout`) for focus handling on `hx-*` elements.
 
 ### Event handler types
 
-Event callbacks receive a `CustomEvent` with a typed `detail` payload:
+Generated `onHx*` props are typed as `(event: Event) => void` to match @lit-labs/react's event-prop signature. Narrow the event inside the handler with a `CustomEvent` cast and your component's `detail` shape (the detail payload is documented in each component's CEM entry):
 
 ```tsx
 import { HxTextInput } from '@helixui/react';
 
 function SearchField() {
-  const handleInput = (e: CustomEvent<{ value: string }>) => {
-    console.log(e.detail.value);
+  const handleInput = (event: Event) => {
+    const { value } = (event as CustomEvent<{ value: string }>).detail;
+    console.log(value);
   };
 
   return (
@@ -137,15 +139,20 @@ import { useRef } from 'react';
 import { HxButton, HxDialog } from '@helixui/react';
 
 function ConfirmDialog() {
-  const dialogRef = useRef<HTMLElement & { show: () => void; hide: () => void }>(null);
+  // hx-dialog exposes show() / showModal() / close() — there is no hide() method.
+  const dialogRef = useRef<HTMLElement & {
+    show: () => void;
+    showModal: () => void;
+    close: () => void;
+  }>(null);
 
-  const open = () => dialogRef.current?.show();
-  const close = () => dialogRef.current?.hide();
+  const open = () => dialogRef.current?.showModal();
+  const close = () => dialogRef.current?.close();
 
   return (
     <>
       <HxButton onHxClick={open}>Open dialog</HxButton>
-      <HxDialog ref={dialogRef} label="Confirm action" onHxClose={close}>
+      <HxDialog ref={dialogRef} heading="Confirm action" modal onHxClose={close}>
         <p>Are you sure?</p>
         <HxButton slot="footer" variant="primary" onHxClick={close}>Confirm</HxButton>
         <HxButton slot="footer" variant="ghost" onHxClick={close}>Cancel</HxButton>
@@ -160,14 +167,14 @@ function ConfirmDialog() {
 Pass slot content using the `slot` attribute on child elements, exactly as you would with raw web components:
 
 ```tsx
-import { HxCard } from '@helixui/react';
+import { HxButton, HxCard } from '@helixui/react';
 
 function PatientCard({ name, id }: { name: string; id: string }) {
   return (
     <HxCard>
-      <span slot="header">{name}</span>
+      <h3 slot="heading">{name}</h3>
       <p>Patient ID: {id}</p>
-      <HxButton slot="footer" variant="ghost" size="sm">
+      <HxButton slot="footer" variant="ghost" hx-size="sm">
         View record
       </HxButton>
     </HxCard>
@@ -193,7 +200,7 @@ ANALYZE=true npm run build
 
 In the bundle map, you should see individual component chunks (e.g., `hx-button.js`, `hx-text-input.js`) rather than a single monolithic `@helixui` chunk.
 
-Each HELiX component is under 5 KB minified + gzipped. The `@helixui/react` wrapper layer adds approximately 1 KB total.
+Per-component sizes vary — small atoms sit under 5 KB min+gz; richer components (combobox, dialog, dropdowns) carry budgeted overages defined in `bundle-budgets.json` at the repo root. Run `node scripts/measure-component-size.js` (in the HELiX monorepo) or `pnpm run check:bundle` to see current numbers.
 
 ## Next.js 15 App Router Integration
 
@@ -367,7 +374,7 @@ export function PatientPortal() {
       <div className="patient-list">
         {filtered.map((patient) => (
           <HxCard key={patient.id}>
-            <span slot="header">{patient.name}</span>
+            <h3 slot="heading">{patient.name}</h3>
             <p>ID: {patient.id}</p>
             <HxBadge variant={patient.status === 'active' ? 'success' : 'neutral'}>
               {patient.status}
@@ -375,7 +382,7 @@ export function PatientPortal() {
             <HxButton
               slot="footer"
               variant="ghost"
-              size="sm"
+              hx-size="sm"
               onHxClick={() => selectPatient(patient)}
             >
               View record
@@ -387,7 +394,7 @@ export function PatientPortal() {
       {selected && (
         <HxDialog
           open={dialogOpen}
-          label={`Record: ${selected.name}`}
+          heading={`Record: ${selected.name}`}
           onHxClose={() => setDialogOpen(false)}
         >
           <dl>

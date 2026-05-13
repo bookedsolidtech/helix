@@ -162,7 +162,7 @@ visually distinct container for presenting related information in clinical dashb
 administrative interfaces.
 
 Cards support three visual variants (`default`, `featured`, `compact`) and three elevation levels (`flat`, `raised`, `floating`).
-When given an `hx-href` attribute, cards become interactive and emit a custom `hx-card-click` event on activation.
+When given an `hx-href` attribute, cards become interactive and emit a custom `hx-click` event on activation.
 
 ### When to Use
 
@@ -179,12 +179,19 @@ When given an `hx-href` attribute, cards become interactive and emit a custom `h
 
 ## Accessibility
 
-The Card component follows WCAG 2.1 AA guidelines and implements proper ARIA patterns:
+The Card component is a **P2** layout primitive — it is not part of the P0 AAA cert surface
+(absent from `aaa-verdicts.json`). The component still ships WCAG 2.2 AA baseline behaviour with
+the patterns below; refer to the formal audit for the canonical cert verdict on any individual
+component.
 
-- **Keyboard navigation** — When `hx-href` is set, the card is keyboard-focusable (`tabindex="0"`) and activates on Enter/Space
-- **Screen reader support** — Interactive cards have `role="link"` and announce their purpose
-- **Focus visible** — Focus ring is clearly visible for keyboard users
-- **Semantic structure** — Uses proper heading hierarchy and ARIA labels where appropriate
+- **Keyboard navigation** — When `hx-href` is set, the card is keyboard-focusable (`tabindex="0"`)
+  and activates on **Enter only** (the canonical activation key for link semantics). Space is
+  reserved for buttons and is not bound by `hx-card`.
+- **Screen reader support** — Interactive cards expose `role="link"` and announce via the
+  `hx-label` attribute (or the slotted heading when no `hx-label` is supplied).
+- **Focus visible** — Focus ring is clearly visible for keyboard users.
+- **Semantic structure** — Slot the heading into `slot="heading"` as a semantic heading element
+  (`<h2>`, `<h3>`, etc.) — using a `<span>` collapses the heading to inline text in the AT tree.
 
 <div className="info-box">
   <p>
@@ -196,11 +203,12 @@ The Card component follows WCAG 2.1 AA guidelines and implements proper ARIA pat
 
 ## Properties
 
-| Property    | Type                                   | Default     | Description                                                          |
-| ----------- | -------------------------------------- | ----------- | -------------------------------------------------------------------- |
-| `variant`   | `'default' \| 'featured' \| 'compact'` | `'default'` | Visual style variant of the card                                     |
-| `elevation` | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Shadow depth of the card                                             |
-| `hx-href`   | `string`                               | `''`        | Optional URL for interactive cards. When set, card becomes clickable |
+| Property    | Type                                   | Default     | Description                                                                              |
+| ----------- | -------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `variant`   | `'default' \| 'featured' \| 'compact'` | `'default'` | Visual style variant of the card                                                         |
+| `elevation` | `'flat' \| 'raised' \| 'floating'`     | `'flat'`    | Shadow depth of the card                                                                 |
+| `hx-href`   | `string \| undefined`                  | `undefined` | Optional URL for interactive cards. When set, the card becomes an Enter-activatable link |
+| `hx-label`  | `string \| undefined`                  | `undefined` | Accessible name for the interactive card (preferred over slotted heading for AT)         |
 
 ## Slots
 
@@ -240,9 +248,9 @@ Style internal card elements using `::part()`:
 
 ## Events
 
-| Event           | Detail            | Description                                                                          |
-| --------------- | ----------------- | ------------------------------------------------------------------------------------ |
-| `hx-card-click` | `{ url: string }` | Fired when an interactive card (with `hx-href`) is clicked or activated via keyboard |
+| Event      | Detail                                   | Description                                                                       |
+| ---------- | ---------------------------------------- | --------------------------------------------------------------------------------- |
+| `hx-click` | `{ href: string, originalEvent: Event }` | Fired when an interactive card (with `hx-href`) is clicked or activated via Enter |
 
 ## Usage Examples
 
@@ -250,7 +258,7 @@ Style internal card elements using `::part()`:
 
 ```html
 <hx-card>
-  <span slot="heading">Patient Summary</span>
+  <h3 slot="heading">Patient Summary</h3>
   <p>Review vitals, lab results, and care plan updates.</p>
 </hx-card>
 ```
@@ -259,7 +267,7 @@ Style internal card elements using `::part()`:
 
 ```html
 <hx-card hx-href="https://ehr.example.com/patient/12345" elevation="raised">
-  <span slot="heading">James Wilson</span>
+  <h3 slot="heading">James Wilson</h3>
   <p>MRN: 00-12345 | DOB: 1958-03-22</p>
 </hx-card>
 ```
@@ -269,14 +277,14 @@ Style internal card elements using `::part()`:
 ```html
 <hx-card variant="featured" elevation="raised">
   <img slot="image" src="/facility-photo.jpg" alt="Main campus entrance" />
-  <span slot="heading">Facility Update</span>
+  <h3 slot="heading">Facility Update</h3>
   <p>The new ambulatory care wing is now open.</p>
   <span slot="footer">
     <small>Posted Feb 10, 2026</small>
-  </span>
+  </h3>
   <span slot="actions">
-    <hx-button size="sm">View Floor Plan</hx-button>
-  </span>
+    <hx-button hx-size="sm">View Floor Plan</hx-button>
+  </h3>
 </hx-card>
 ```
 
@@ -325,7 +333,7 @@ The `hx-card` component integrates seamlessly with Drupal 10/11 through Twig tem
   {% if url %}hx-href="{{ url }}"{% endif %}
 >
   {% if heading %}
-    <span slot="heading">{{ heading }}</span>
+    <h3 slot="heading">{{ heading }}</h3>
   {% endif %}
   {{ content }}
   {% if footer %}
@@ -347,7 +355,7 @@ The `hx-card` component integrates seamlessly with Drupal 10/11 through Twig tem
     />
   {% endif %}
 
-  <span slot="heading">{{ node.label }}</span>
+  <h3 slot="heading">{{ node.label }}</h3>
 
   <div class="card-body">
     {{ content.body }}
@@ -359,7 +367,7 @@ The `hx-card` component integrates seamlessly with Drupal 10/11 through Twig tem
 
   {% if node.url %}
     <div slot="actions">
-      <hx-button size="sm" variant="secondary">Read More</hx-button>
+      <hx-button hx-size="sm" variant="secondary">Read More</hx-button>
     </div>
   {% endif %}
 </hx-card>
@@ -374,7 +382,7 @@ The `hx-card` component integrates seamlessly with Drupal 10/11 through Twig tem
   elevation="raised"
   hx-href="/patient/{{ patient.mrn }}"
 >
-  <span slot="heading">{{ patient.last_name }}, {{ patient.first_name }}</span>
+  <h3 slot="heading">{{ patient.last_name }}, {{ patient.first_name }}</h3>
 
   <div class="patient-details">
     <dl>
@@ -389,7 +397,7 @@ The `hx-card` component integrates seamlessly with Drupal 10/11 through Twig tem
 
   <span slot="footer">
     <small>Last visit: {{ patient.last_visit|date('F j, Y') }}</small>
-  </span>
+  </h3>
 </hx-card>
 ```
 
@@ -400,7 +408,14 @@ Use Drupal.behaviors to initialize card event listeners and handle navigation:
 ```javascript
 /**
  * @file
- * hx-card Drupal behavior.
+ * mysite hx-card event-handling behavior (project-local example).
+ *
+ * The shipped @helixui/drupal-behaviors package does not include an
+ * hxCard behavior — hx-card upgrades from its module import alone.
+ * The pattern below layers consumer event handling on top of the
+ * shipped component. Keep once-keys under a project namespace
+ * (mysite:...) so they never collide with the @helixui package's
+ * hx-* keys.
  */
 
 (function (Drupal, once) {
@@ -409,13 +424,13 @@ Use Drupal.behaviors to initialize card event listeners and handle navigation:
   /**
    * Attach hx-card event listeners.
    */
-  Drupal.behaviors.hxCard = {
+  Drupal.behaviors.mysiteHxCardEvents = {
     attach: function (context, settings) {
       // Initialize all interactive cards (with hx-href attribute)
-      once('hx-card-init', 'hx-card[hx-href]', context).forEach((card) => {
+      once('mysite:hx-card-init', 'hx-card[hx-href]', context).forEach((card) => {
         // Listen for card click events
-        card.addEventListener('hx-card-click', (e) => {
-          const url = e.detail.url;
+        card.addEventListener('hx-click', (e) => {
+          const url = e.detail.href;
 
           // Option 1: Standard navigation
           window.location.href = url;
@@ -431,10 +446,10 @@ Use Drupal.behaviors to initialize card event listeners and handle navigation:
         });
 
         // Optional: Track card interactions for analytics
-        card.addEventListener('hx-card-click', (e) => {
+        card.addEventListener('hx-click', (e) => {
           if (typeof gtag !== 'undefined') {
             gtag('event', 'card_click', {
-              card_url: e.detail.url,
+              card_url: e.detail.href,
               card_variant: card.getAttribute('variant'),
             });
           }
@@ -455,7 +470,7 @@ Use Drupal.behaviors to initialize card event listeners and handle navigation:
       if (trigger === 'unload') {
         // Clean up event listeners on unload
         context.querySelectorAll('hx-card').forEach((card) => {
-          card.removeEventListener('hx-card-click', () => {});
+          card.removeEventListener('hx-click', () => {});
         });
       }
     },
@@ -548,9 +563,9 @@ Render cards in Views using custom field formatters or Twig templates:
       elevation="raised"
       hx-href="{{ row.content['#row']._entity.toUrl().toString() }}"
     >
-      <span slot="heading">
+      <h3 slot="heading">
         {{ row.content['#row']._entity.label }}
-      </span>
+      </h3>
       {{ row.content }}
     </hx-card>
   {% endfor %}
@@ -559,12 +574,8 @@ Render cards in Views using custom field formatters or Twig templates:
 
 ### References
 
-See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensive coverage:
-
-- **ADR-DRUPAL-001**: Property-driven vs slot-driven Twig patterns
-- **ADR-DRUPAL-002**: Event handling and Drupal behaviors best practices
-- **ADR-DRUPAL-003**: Performance optimization for component-heavy pages
-- **ADR-DRUPAL-004**: Accessibility considerations in Drupal context
+See the [Drupal Integration Guide](/drupal/installation/getting-started/) for end-to-end setup,
+behaviors, and Form API patterns.
 
 <div className="info-box">
   <p>
@@ -583,12 +594,15 @@ See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensi
 
 ## Browser Support
 
-HELIX components support all modern browsers:
+`hx-card` ships against the library's published minimums (see
+`packages/hx-library/BROWSER_COMPATIBILITY.md`):
 
-- Chrome/Edge 90+
-- Firefox 90+
-- Safari 14+
+- Chrome / Edge 120+
+- Firefox 120+
+- Safari / Safari iOS 17+
+- Chrome Android 120+
 
-Shadow DOM and Custom Elements are required. No polyfills are provided for IE11.
+Custom Elements v1, Shadow DOM v1, and CSS Custom Properties are required. No polyfills are
+provided for legacy engines.
 
 </div>

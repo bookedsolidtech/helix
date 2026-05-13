@@ -7,6 +7,8 @@ Animations in web components are constrained by shadow DOM in ways that make nai
 
 This guide covers CSS transitions on `:host` and `::part()`, `@keyframes` inside component styles, animating shadow DOM elements versus slotted content, `prefers-reduced-motion` as an accessibility non-negotiable, design token timing variables, `updated()` lifecycle for JavaScript-triggered animations, runtime control via CSS custom properties, composite layer management, and a complete `hx-alert` enter/exit animation implementation.
 
+> **Reading note:** Many of the code samples below — particularly the long `hx-card`, `hx-button`, and `hx-alert` blocks — are **illustrative recipes**, not source excerpts. The shipped components do not currently expose every CSS hook shown here (e.g. `hx-alert` does not expose enter/exit animation custom properties in its public API; some claimed token names are aspirational). Treat the file as a **pattern catalog you can adapt**, and check the per-component CEM and source under `packages/hx-library/src/components/<tag>/` before assuming a specific hook exists.
+
 ---
 
 ## Prerequisites
@@ -513,7 +515,7 @@ export class HelixAlert extends LitElement {
   open = true;
 
   @property({ type: Boolean })
-  closable = false;
+  dismissible = false;
 
   private _isAnimating = false;
 
@@ -572,7 +574,7 @@ export class HelixAlert extends LitElement {
         <div part="message" class="alert__message">
           <slot></slot>
         </div>
-        ${this.closable
+        ${this.dismissible
           ? html`
               <button
                 part="close-button"
@@ -939,7 +941,7 @@ export class HelixAlert extends LitElement {
   variant: AlertVariant = 'info';
 
   @property({ type: Boolean, reflect: true })
-  closable = false;
+  dismissible = false;
 
   @property({ type: Boolean, reflect: true })
   open = true;
@@ -1063,7 +1065,7 @@ export class HelixAlert extends LitElement {
         <div part="message" class="alert__message">
           <slot></slot>
         </div>
-        ${this.closable
+        ${this.dismissible
           ? html`
               <button
                 part="close-button"
@@ -1092,7 +1094,9 @@ Usage:
 <hx-alert variant="success"> Lab results received successfully. </hx-alert>
 
 <!-- Closable — exit animation plays before removal -->
-<hx-alert variant="warning" closable> Patient has a documented penicillin allergy. </hx-alert>
+<hx-alert open variant="warning" dismissible>
+  Patient has a documented penicillin allergy.
+</hx-alert>
 
 <!-- Custom timing via component token -->
 <hx-alert variant="error" style="--hx-alert-enter-duration: 400ms;">
@@ -1100,7 +1104,9 @@ Usage:
 </hx-alert>
 
 <!-- Listen for close event -->
-<hx-alert variant="info" closable id="my-alert"> New protocol updates are available. </hx-alert>
+<hx-alert open variant="info" dismissible id="my-alert">
+  New protocol updates are available.
+</hx-alert>
 <script>
   document.getElementById('my-alert').addEventListener('hx-close', (e) => {
     console.log('Alert dismissed by:', e.detail.reason);
@@ -1166,7 +1172,7 @@ describe('hx-alert animations', () => {
   });
 
   it('dispatches hx-close after exit animation completes', async () => {
-    const el = await fixture<HTMLElement>(html` <hx-alert open closable>Test alert</hx-alert> `);
+    const el = await fixture<HTMLElement>(html` <hx-alert open dismissible>Test alert</hx-alert> `);
 
     const closePromise = new Promise<CustomEvent>((resolve) => {
       el.addEventListener('hx-close', (e) => resolve(e as CustomEvent), { once: true });
@@ -1183,7 +1189,7 @@ describe('hx-alert animations', () => {
 
   it('sets open to false after exit animation', async () => {
     const el = (await fixture<HTMLElement>(html`
-      <hx-alert open closable>Test alert</hx-alert>
+      <hx-alert open dismissible>Test alert</hx-alert>
     `)) as any;
 
     const closeBtn = el.shadowRoot!.querySelector('.alert__close-button') as HTMLButtonElement;
@@ -1221,7 +1227,7 @@ Animations in HELiX components are CSS-first, token-driven, and unconditionally 
 - [Dark Mode & Color Schemes](/components/styling/dark-mode) — `prefers-color-scheme` and token-based theming
 - [Design Token Architecture](/components/styling/tokens) — Complete token reference including timing tokens
 - [Performance Optimization](/components/styling/performance) — Constructable Stylesheets and style recalculation
-- [Accessibility Guide](/components/accessibility/overview) — `prefers-reduced-motion`, ARIA live regions, and focus management
+- [Consumer Accessibility Obligations](/accessibility/consumer-obligations/) — `prefers-reduced-motion`, ARIA live regions, and focus management responsibilities consumers retain
 
 ---
 

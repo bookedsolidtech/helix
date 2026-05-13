@@ -7,9 +7,11 @@ sidebar:
 
 # Custom Validation & Validity Messages
 
-The browser's Constraint Validation API gives every form control — including form-associated custom elements — a standard interface for declaring validity state and communicating error messages to users. HELiX components use this API exclusively. There are no proprietary error-display mechanisms.
+The browser's Constraint Validation API gives every form control — including form-associated custom elements — a standard interface for declaring validity state and communicating error messages to users. HELiX form components are layered **on top of** that platform contract: they expose the native `validity` / `validationMessage` / `checkValidity()` / `reportValidity()` surface **and** an additional HELiX-specific `error` property/attribute that drives the rendered error UI in shadow DOM. Setting `error` displays the message; whether the field is **constraint-invalid** depends on the underlying `setValidity()` call (which native constraints like `required`, `minlength`, etc. drive automatically).
 
 This guide covers the complete `customError` pattern for custom validation rules that go beyond the standard HTML constraints, asynchronous validators, integrating with Drupal Form API validation, and the accessibility requirements for surfacing error messages to all users.
+
+> **Reading note:** Several recipes below reference components that don't ship in `@helixui/library` (`org-patient-id-input`, `org-username-input`) — treat those as **consumer-owned** patterns and rename them with your own prefix. Some attribute names mentioned in earlier drafts (e.g. `error-required`, `error-too-short` on `hx-text-input`) are **not in the canonical CEM** — use the `error` attribute/property with the literal user-facing message instead.
 
 For the foundational concepts — how `setValidity()` works, what each `ValidityState` flag means, and when to use `checkValidity()` vs `reportValidity()` — see [Form Validation Patterns](/components/forms/validation). For how `ElementInternals` is attached and initialized, see [ElementInternals & Form Participation](/components/forms/element-internals).
 
@@ -968,16 +970,19 @@ Vitest browser mode tests should cover the full range of validity states for eve
 
 ```typescript
 import { describe, it, expect, afterEach } from 'vitest';
-import { fixture, html, cleanup } from '@open-wc/testing';
-import type { HelixPatientIdInput } from './hx-patient-id-input.js';
+// HELiX tests use the shared test-utils helpers, not @open-wc/testing
+// (which isn't a workspace dependency). For per-component test fixtures
+// inside the monorepo:
+import { fixture, cleanup } from '../../test-utils.js';
+import type { HelixPatientIdInput } from './org-patient-id-input.js';
 
-describe('hx-patient-id-input validation', () => {
+describe('org-patient-id-input validation', () => {
   afterEach(cleanup);
 
   // Required constraint
   it('is invalid when required and empty', async () => {
     const el = await fixture<HelixPatientIdInput>(
-      html`<hx-patient-id-input required></hx-patient-id-input>`,
+      html`<org-patient-id-input required></org-patient-id-input>`,
     );
 
     expect(el.checkValidity()).toBe(false);
@@ -988,7 +993,7 @@ describe('hx-patient-id-input validation', () => {
   // Custom format constraint
   it('is invalid when value does not match the P-NNNNN format', async () => {
     const el = await fixture<HelixPatientIdInput>(
-      html`<hx-patient-id-input value="12345"></hx-patient-id-input>`,
+      html`<org-patient-id-input value="12345"></org-patient-id-input>`,
     );
 
     expect(el.checkValidity()).toBe(false);
@@ -998,7 +1003,7 @@ describe('hx-patient-id-input validation', () => {
 
   it('is valid when value matches the P-NNNNN format', async () => {
     const el = await fixture<HelixPatientIdInput>(
-      html`<hx-patient-id-input value="P-00441"></hx-patient-id-input>`,
+      html`<org-patient-id-input value="P-00441"></org-patient-id-input>`,
     );
 
     expect(el.checkValidity()).toBe(true);
@@ -1009,7 +1014,7 @@ describe('hx-patient-id-input validation', () => {
   // Validity clearing
   it('clears validity when value becomes valid', async () => {
     const el = await fixture<HelixPatientIdInput>(
-      html`<hx-patient-id-input required value="bad"></hx-patient-id-input>`,
+      html`<org-patient-id-input required value="bad"></org-patient-id-input>`,
     );
 
     expect(el.checkValidity()).toBe(false);
@@ -1024,7 +1029,7 @@ describe('hx-patient-id-input validation', () => {
   it('blocks form submission when invalid', async () => {
     const form = await fixture<HTMLFormElement>(html`
       <form>
-        <hx-patient-id-input name="pid" required></hx-patient-id-input>
+        <org-patient-id-input name="pid" required></org-patient-id-input>
       </form>
     `);
 
@@ -1034,7 +1039,7 @@ describe('hx-patient-id-input validation', () => {
   it('allows form submission when valid', async () => {
     const form = await fixture<HTMLFormElement>(html`
       <form>
-        <hx-patient-id-input name="pid" value="P-00441"></hx-patient-id-input>
+        <org-patient-id-input name="pid" value="P-00441"></org-patient-id-input>
       </form>
     `);
 
@@ -1045,7 +1050,7 @@ describe('hx-patient-id-input validation', () => {
   it('appears in FormData when valid', async () => {
     const form = await fixture<HTMLFormElement>(html`
       <form>
-        <hx-patient-id-input name="pid" value="P-00441"></hx-patient-id-input>
+        <org-patient-id-input name="pid" value="P-00441"></org-patient-id-input>
       </form>
     `);
 
@@ -1056,7 +1061,7 @@ describe('hx-patient-id-input validation', () => {
   // ARIA integration
   it('sets aria-invalid when invalid', async () => {
     const el = await fixture<HelixPatientIdInput>(
-      html`<hx-patient-id-input required></hx-patient-id-input>`,
+      html`<org-patient-id-input required></org-patient-id-input>`,
     );
 
     const input = el.shadowRoot!.querySelector('input')!;
@@ -1076,7 +1081,7 @@ Use `vi.fn()` to mock `fetch` so tests are deterministic and do not hit the netw
 ```typescript
 import { vi, describe, it, expect, afterEach, beforeEach } from 'vitest';
 
-describe('hx-username-input async validation', () => {
+describe('org-username-input async validation', () => {
   beforeEach(() => {
     vi.spyOn(globalThis, 'fetch');
   });
@@ -1092,7 +1097,7 @@ describe('hx-username-input async validation', () => {
     );
 
     const el = await fixture<HelixUsernameInput>(
-      html`<hx-username-input value="alice"></hx-username-input>`,
+      html`<org-username-input value="alice"></org-username-input>`,
     );
 
     // Trigger validation
@@ -1109,7 +1114,7 @@ describe('hx-username-input async validation', () => {
     );
 
     const el = await fixture<HelixUsernameInput>(
-      html`<hx-username-input value="alice"></hx-username-input>`,
+      html`<org-username-input value="alice"></org-username-input>`,
     );
 
     await el.validateUsername('alice');
@@ -1121,7 +1126,7 @@ describe('hx-username-input async validation', () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error('Network failure'));
 
     const el = await fixture<HelixUsernameInput>(
-      html`<hx-username-input value="alice"></hx-username-input>`,
+      html`<org-username-input value="alice"></org-username-input>`,
     );
 
     await el.validateUsername('alice');
@@ -1189,10 +1194,26 @@ Error messages in healthcare applications carry significant weight. A vague or c
 
 ### Internationalisation
 
-If the application supports multiple languages, validation messages must be internationalised. Do not hardcode strings in components:
+If the application supports multiple languages, validation messages must be internationalised. The shipped `hx-text-input` does **not** expose `error-required` / `error-too-short` attributes — it has a single `error` attribute/property that drives the rendered message, and constraint-specific messages are computed by the component's internal `_updateValidity()` against the active constraint (with the literal translated string passed to `setValidity()`'s second argument).
+
+Drupal templates supply the translated string by setting `error` directly, or by computing the message in PHP/preprocess before rendering the template:
+
+```twig
+{% if violation %}
+  <hx-text-input
+    name="{{ element['#name'] }}"
+    required
+    error="{{ violation.message }}"
+  ></hx-text-input>
+{% else %}
+  <hx-text-input name="{{ element['#name'] }}" required></hx-text-input>
+{% endif %}
+```
+
+For a **consumer-built** form control that wants typed-attribute-per-constraint i18n, you can define your own `error-required` / `error-too-short` pattern on top of `LitElement` — but use a non-`hx-` prefix so the contract is clearly yours:
 
 ```typescript
-// Accept messages as properties so Drupal/Twig can supply translated strings
+// Consumer-owned org-text-input that exposes per-constraint i18n attributes.
 @property({ type: String, attribute: 'error-required' })
 errorRequired = 'This field is required.';
 
@@ -1221,17 +1242,6 @@ private _updateValidity(): void {
 }
 ```
 
-In a Twig template, these attributes carry the Drupal-translated string:
-
-```twig
-<hx-text-input
-  name="{{ element['#name'] }}"
-  required
-  error-required="{{ 'This field is required.'|t }}"
-  error-too-short="{{ 'Please enter at least @min characters.'|t({'@min': element['#minlength']}) }}"
-></hx-text-input>
-```
-
 ---
 
 ## References
@@ -1241,9 +1251,9 @@ In a Twig template, these attributes carry the Drupal-translated string:
 - [MDN: ElementInternals.setValidity()](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setValidity)
 - [MDN: HTMLElement.setCustomValidity()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity)
 - [MDN: aria-invalid](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-invalid)
-- [WCAG 2.1 SC 1.3.1 Info and Relationships](https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html)
-- [WCAG 2.1 SC 3.3.1 Error Identification](https://www.w3.org/WAI/WCAG21/Understanding/error-identification.html)
-- [WCAG 2.1 SC 3.3.3 Error Suggestion](https://www.w3.org/WAI/WCAG21/Understanding/error-suggestion.html)
+- [WCAG 2.2 SC 1.3.1 Info and Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html)
+- [WCAG 2.2 SC 3.3.1 Error Identification](https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html)
+- [WCAG 2.2 SC 3.3.3 Error Suggestion](https://www.w3.org/WAI/WCAG22/Understanding/error-suggestion.html)
 - [ElementInternals & Form Participation](/components/forms/element-internals)
 - [Form Validation Patterns](/components/forms/validation)
 - [Form Accessibility](/components/forms/accessibility)

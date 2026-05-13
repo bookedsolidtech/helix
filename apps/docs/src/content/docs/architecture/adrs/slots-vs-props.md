@@ -32,9 +32,9 @@ Every component sits somewhere on a spectrum between these two strategies:
 
 | Strategy | Who controls content | Best for |
 | --- | --- | --- |
-| Property-driven | Component | Atoms with fixed API (Button, Badge, Toggle) |
+| Property-driven | Component | Atoms with fixed API (Button, Badge, Switch) |
 | Hybrid | Component + Drupal | Forms with validation behavior and slotted labels |
-| Slot-driven | Drupal | Organisms with rich content (Card, Hero, Modal) |
+| Slot-driven | Drupal | Organisms with rich content (Card, Dialog, Data Table) |
 
 ## Decision
 
@@ -46,62 +46,68 @@ This approach maximises Drupal's strengths while keeping components powerful and
 
 The same card component, built two ways:
 
-**Property-driven** — component controls all rendering:
+**Property-driven (hypothetical)** — a card component that owned all rendering would expose every content field as a prop. `hx-card` does **not** ship this API — the snippet below is a deliberate anti-pattern for contrast:
 
 ```twig
-{# Component controls ALL rendering #}
+{# ❌ Hypothetical property-driven card — these props don't exist on real hx-card #}
 <hx-card
   title="{{ content.field_title }}"
   description="{{ content.field_body }}"
   image-src="{{ file_url(content.field_image) }}"
   image-alt="{{ content.field_image.alt }}"
   hx-href="{{ url }}"
-  variant="elevated"
+  variant="featured"
 ></hx-card>
 ```
 
 ```ts
-// Perfect in Storybook — all props visible
-export const Default = {
+// In Storybook the hypothetical version would look like this — every value is a control:
+export const HypotheticalPropertyDriven = {
   args: {
     title: 'Article Title',
     description: 'Summary text...',
     imageSrc: '/placeholder.jpg',
-    variant: 'elevated',
+    variant: 'featured',
   },
 };
 ```
 
-**Slot-driven** — Drupal controls all content:
+**Slot-driven (actual `hx-card` API)** — Drupal projects content into named slots; the component owns the chrome:
 
 ```twig
-{# Drupal controls ALL content #}
-<hx-card variant="elevated">
-  <img slot="media"
+{# Drupal controls all content; hx-card exposes variant + elevation + hx-href #}
+<hx-card variant="featured" elevation="raised" hx-href="{{ url }}">
+  <img slot="image"
     src="{{ file_url(content.field_image) }}"
     alt="{{ content.field_image.alt }}" />
   <h3 slot="heading">{{ content.field_title }}</h3>
-  <div slot="body">{{ content.field_body }}</div>
+  {{ content.field_body }}
   <a slot="actions" href="{{ url }}">Read More</a>
 </hx-card>
 ```
 
 ```ts
-// Slots need HTML strings in Storybook
+// Slot-driven Storybook stories use a render function with Lit's html``
+// tagged template — the repo's standard pattern. Slot content can't be
+// driven by Controls directly, but the render function can interpolate args.
+import { html } from 'lit';
+
 export const Default = {
-  args: { variant: 'elevated' },
-  render: (args) => `
-    <hx-card variant="${args.variant}">
-      <img slot="media" ... />
-      <h3 slot="heading">...</h3>
-      <div slot="body">...</div>
-    </hx-card>`,
+  args: { variant: 'featured', elevation: 'raised' },
+  render: (args) => html`
+    <hx-card variant=${args.variant} elevation=${args.elevation}>
+      <img slot="image" src="/placeholder.jpg" alt="Placeholder" />
+      <h3 slot="heading">Article Title</h3>
+      <p>Summary text…</p>
+      <a slot="actions" href="#">Read more</a>
+    </hx-card>
+  `,
 };
 ```
 
 ## Drupal module compatibility
 
-Not every Drupal module works equally well with every strategy. This matrix reflects observed behaviour with the modules HELiX teams use daily.
+Not every Drupal module works equally well with every strategy. The matrix below is implementation guidance distilled from the HELiX Drupal integration packages (`@helixui/drupal-starter`, `@helixui/drupal-behaviors`) rather than a controlled test matrix — verify against your site's stack before treating any cell as a guarantee.
 
 | Drupal module | Property-driven | Slot-driven | Hybrid |
 | --- | --- | --- | --- |
@@ -115,31 +121,30 @@ Not every Drupal module works equally well with every strategy. This matrix refl
 
 The component's complexity determines the right strategy. Simple atoms use properties. Complex organisms use slots. Forms use both.
 
-### Atoms — Property-Driven
+### Atoms — Fixed API, constrained slots
 
-Small, self-contained components with a fixed API. All rendering logic lives in the component.
+Small, self-contained components with a fixed prop API. Some expose at most one or two narrow slots (`prefix`/`suffix` icons, default label content); rendering logic still lives in the component.
 
-- `hx-button`
+- `hx-button` (default + `prefix`/`suffix` slots)
 - `hx-badge`
 - `hx-switch`
 - `hx-tooltip`
 - `hx-spinner`
 - `hx-avatar`
 
-### Organisms — Slot-Driven
+### Organisms — Slot-Driven (or Hybrid)
 
 Complex, content-rich components. Drupal editors need full control over what appears inside.
 
-- `hx-card`
-- `hx-hero`
-- `hx-modal`
-- `hx-navigation`
-- `hx-data-table`
-- `hx-accordion`
+- `hx-card` — slot-driven (`image`, `heading`, default, `footer`, `actions`)
+- `hx-dialog` — slot-driven (header, default body, `footer`)
+- `hx-accordion` / `hx-accordion-item` — slot-driven (`trigger`, default body)
+- `hx-nav`, `hx-top-nav`, `hx-side-nav` — hybrid (props for orientation/labels, slots for nav items)
+- `hx-data-table` — primarily property-driven (rows/columns are bound via props); slots cover toolbar, empty, and loading states
 
 ### Forms — Hybrid
 
-Properties control validation, state, and behaviour. Slots allow custom labels, help text, and error messages.
+Properties control validation, state, and behaviour. Many form controls expose slots for labels, help text, and error overrides — but exceptions exist (e.g. `hx-file-upload` and `hx-radio-group` use props for label/help text rather than slots).
 
 - `hx-text-input`
 - `hx-select`
@@ -154,17 +159,17 @@ Properties control validation, state, and behaviour. Slots allow custom labels, 
 
 - **Let Drupal own content.** Content editors already know how to use Drupal's field system, media library, and WYSIWYG. Slots let them keep using these tools without learning component APIs.
 - **Properties for behaviour.** Use properties for things content editors should not control: variant styles, validation rules, accessibility states, animation settings.
-- **Content-first.** Enterprise organisations need robust content governance. Slot-driven components give editorial teams control while maintaining WCAG accessibility standards.
+- **Content-first.** Enterprise organisations need robust content governance. Slot-driven components give editorial teams control. Each component's accessibility profile is documented in its CEM entry and `AAA-AUDIT.md` — the audited contract guarantees the component's chrome; consumer-supplied slotted markup still has to be semantic (headings in `heading` slots, accessible names on `image` slots, etc.) for the composition to meet WCAG.
 
 ### Negative
 
-- **Storybook stories for slot-driven components require `render()` functions** that emit HTML strings. Controls cannot drive slot content directly.
+- **Storybook stories for slot-driven components require a `render()` function** that projects markup via Lit's `html` tagged template (the repo's standard story pattern). Storybook Controls can drive props passed into the render function, but cannot drive slotted DOM directly.
 - **Mixed strategy components require discipline.** Form components must clearly document which inputs are properties (validation rules) versus slots (label content).
 
 ## Related ADRs
 
 - [Attribute Naming](/architecture/adrs/attribute-naming/) — applies to every property in this ADR.
-- [Light DOM](/architecture/adrs/light-dom/) — explains when slot-driven components should drop the shadow boundary entirely.
+- [Light DOM](/architecture/adrs/light-dom/) — covers the narrow cases (Drupal Form API interop, scoped CSS via Lit controllers) where a slot-driven component drops the shadow boundary entirely; default remains Shadow DOM.
 
 ## References
 

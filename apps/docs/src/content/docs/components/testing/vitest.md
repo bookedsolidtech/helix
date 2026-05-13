@@ -19,7 +19,7 @@ Testing is not optional. In an enterprise healthcare environment, untested code 
 2. **Comprehensive** — Test all properties, events, slots, keyboard interactions, form behavior, and accessibility.
 3. **Isolated** — Each test is independent. Use `afterEach(cleanup)` to prevent test pollution.
 4. **Real Browser** — Tests run in actual Chromium, not a DOM simulator.
-5. **80% Coverage Minimum** — Enforced in CI. No exceptions.
+5. **Per-component coverage gate** — The blocking floor today is 50% (lines/branches/functions/statements per component in `packages/hx-library/coverage-config.json`); 95% remains the aspirational target. A short list of components are temporarily exempted per the config's `exemptions` map.
 
 ## Test Infrastructure
 
@@ -58,7 +58,7 @@ export default defineConfig({
 
 - **Browser mode** — Tests run in real Chromium
 - **Headless** — No visible browser window in CI
-- **Coverage threshold** — 80% minimum enforced
+- **Coverage threshold** — 50% per-component blocking floor (per `coverage-config.json`); 95% aspirational target
 - **Exclusions** — Styles, stories, and index files don't count toward coverage
 
 ### Test File Structure
@@ -92,11 +92,11 @@ async function fixture<T extends HTMLElement>(html: string): Promise<T>;
 
 ```typescript
 import { fixture } from '../../test-utils.js';
-import type { HxButton } from './hx-button.js';
+import type { HelixButton } from './hx-button.js';
 import './index.js';
 
 it('renders with shadow DOM', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
   expect(el.shadowRoot).toBeTruthy();
 });
 ```
@@ -133,7 +133,7 @@ function shadowQuery<T extends Element = Element>(host: HTMLElement, selector: s
 
 ```typescript
 it('exposes "button" CSS part', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
   const btn = shadowQuery(el, '[part="button"]');
   expect(btn).toBeTruthy();
 });
@@ -180,7 +180,7 @@ function shadowQueryAll<T extends Element = Element>(host: HTMLElement, selector
 
 ```typescript
 it('renders multiple option elements', async () => {
-  const el = await fixture<HxSelect>(`
+  const el = await fixture<HelixSelect>(`
     <hx-select>
       <option value="1">One</option>
       <option value="2">Two</option>
@@ -210,14 +210,20 @@ Returns a promise that resolves on the next occurrence of an event.
 **Type signature:**
 
 ```typescript
-function oneEvent<T extends Event = Event>(el: EventTarget, eventName: string): Promise<T>;
+function oneEvent<T extends Event = Event>(
+  el: EventTarget,
+  eventName: string,
+  timeoutMs?: number, // defaults to 5000ms
+): Promise<T>;
+// Resolves on the next matching event; rejects with a timeout error if the
+// event does not fire within `timeoutMs`.
 ```
 
 **Usage:**
 
 ```typescript
 it('dispatches hx-click on click', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
   const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
   const eventPromise = oneEvent(el, 'hx-click');
   btn.click();
@@ -322,7 +328,7 @@ async function checkA11y(
 
 ```typescript
 it('has no axe violations in default state', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click me</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click me</hx-button>');
   const { violations } = await checkA11y(el);
   expect(violations).toEqual([]);
 });
@@ -345,8 +351,8 @@ it('has no axe violations in default state', async () => {
 
 ```typescript
 it('has no axe violations for all variants', async () => {
-  for (const variant of ['primary', 'secondary', 'ghost']) {
-    const el = await fixture<HxButton>(`<hx-button variant="${variant}">Click me</hx-button>`);
+  for (const variant of ['primary', 'secondary', 'tertiary', 'danger', 'ghost', 'outline']) {
+    const el = await fixture<HelixButton>(`<hx-button variant="${variant}">Click me</hx-button>`);
     const { violations } = await checkA11y(el);
     expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
     el.remove();
@@ -384,24 +390,24 @@ Test that the component renders with correct structure and default state.
 ```typescript
 describe('Rendering', () => {
   it('renders with shadow DOM', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     expect(el.shadowRoot).toBeTruthy();
   });
 
   it('exposes "button" CSS part', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery(el, '[part="button"]');
     expect(btn).toBeTruthy();
   });
 
   it('renders native <button> element', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery(el, 'button');
     expect(btn).toBeInstanceOf(HTMLButtonElement);
   });
 
   it('applies default variant=primary class', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery(el, 'button')!;
     expect(btn.classList.contains('button--primary')).toBe(true);
   });
@@ -424,18 +430,18 @@ Test every public property (reflected attributes, reactive state, variants, size
 ```typescript
 describe('Property: variant', () => {
   it('reflects variant attr to host', async () => {
-    const el = await fixture<HxButton>('<hx-button variant="secondary">Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button variant="secondary">Click</hx-button>');
     expect(el.getAttribute('variant')).toBe('secondary');
   });
 
   it('applies secondary class', async () => {
-    const el = await fixture<HxButton>('<hx-button variant="secondary">Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button variant="secondary">Click</hx-button>');
     const btn = shadowQuery(el, 'button')!;
     expect(btn.classList.contains('button--secondary')).toBe(true);
   });
 
   it('applies ghost class', async () => {
-    const el = await fixture<HxButton>('<hx-button variant="ghost">Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button variant="ghost">Click</hx-button>');
     const btn = shadowQuery(el, 'button')!;
     expect(btn.classList.contains('button--ghost')).toBe(true);
   });
@@ -443,19 +449,22 @@ describe('Property: variant', () => {
 
 describe('Property: disabled', () => {
   it('sets native disabled attribute', async () => {
-    const el = await fixture<HxButton>('<hx-button disabled>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
     const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
     expect(btn.disabled).toBe(true);
   });
 
-  it('sets aria-disabled="true"', async () => {
-    const el = await fixture<HxButton>('<hx-button disabled>Click</hx-button>');
-    const btn = shadowQuery(el, 'button')!;
-    expect(btn.getAttribute('aria-disabled')).toBe('true');
+  it('reflects disabled to the native button', async () => {
+    const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
+    const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+    // hx-button intentionally uses the native disabled attribute (and the
+    // implicit ARIA mapping that comes with it); it does NOT set
+    // aria-disabled="true" on the internal button.
+    expect(btn.disabled).toBe(true);
   });
 
   it('applies host opacity 0.5 via disabled attribute', async () => {
-    const el = await fixture<HxButton>('<hx-button disabled>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
     expect(el.hasAttribute('disabled')).toBe(true);
   });
 });
@@ -477,7 +486,7 @@ Test custom events (dispatch, bubbles, composed, detail, disabled suppression).
 ```typescript
 describe('Events', () => {
   it('dispatches hx-click on click', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
     const eventPromise = oneEvent(el, 'hx-click');
     btn.click();
@@ -486,7 +495,7 @@ describe('Events', () => {
   });
 
   it('hx-click bubbles and is composed', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
     const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
     btn.click();
@@ -496,7 +505,7 @@ describe('Events', () => {
   });
 
   it('hx-click detail contains originalEvent', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
     const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
     btn.click();
@@ -505,7 +514,7 @@ describe('Events', () => {
   });
 
   it('does NOT dispatch hx-click when disabled', async () => {
-    const el = await fixture<HxButton>('<hx-button disabled>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
     const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
     let fired = false;
     el.addEventListener('hx-click', () => {
@@ -534,7 +543,7 @@ Test keyboard interaction (Enter, Space, Escape, Arrow keys).
 ```typescript
 describe('Keyboard', () => {
   it('Enter activates native button', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
     const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
     btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
@@ -544,7 +553,7 @@ describe('Keyboard', () => {
   });
 
   it('Space activates native button', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
     const eventPromise = oneEvent<CustomEvent>(el, 'hx-click');
     btn.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
@@ -570,19 +579,19 @@ Test slot content rendering (default slot, named slots, empty state).
 ```typescript
 describe('Slots', () => {
   it('default slot renders text', async () => {
-    const el = await fixture<HxButton>('<hx-button>Hello World</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Hello World</hx-button>');
     expect(el.textContent?.trim()).toBe('Hello World');
   });
 
   it('default slot renders HTML', async () => {
-    const el = await fixture<HxButton>('<hx-button><span class="icon">+</span> Add</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button><span class="icon">+</span> Add</hx-button>');
     const span = el.querySelector('span.icon');
     expect(span).toBeTruthy();
     expect(span?.textContent).toBe('+');
   });
 
   it('prefix slot renders', async () => {
-    const el = await fixture<HxTextInput>(
+    const el = await fixture<HelixTextInput>(
       '<hx-text-input><span slot="prefix">@</span></hx-text-input>',
     );
     const prefix = el.querySelector('[slot="prefix"]');
@@ -615,7 +624,7 @@ describe('Form', () => {
   });
 
   it('has ElementInternals attached', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     expect(el.form).toBe(null); // null when not inside a form
   });
 
@@ -623,20 +632,20 @@ describe('Form', () => {
     const form = document.createElement('form');
     form.innerHTML = '<hx-text-input name="test"></hx-text-input>';
     document.getElementById('test-fixture-container')!.appendChild(form);
-    const el = form.querySelector('hx-text-input') as HxTextInput;
+    const el = form.querySelector('hx-text-input') as HelixTextInput;
     await el.updateComplete;
     expect(el.form).toBe(form);
   });
 
   it('formResetCallback resets value to empty', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input value="hello"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input value="hello"></hx-text-input>');
     el.formResetCallback();
     await el.updateComplete;
     expect(el.value).toBe('');
   });
 
   it('formStateRestoreCallback restores value', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input></hx-text-input>');
     el.formStateRestoreCallback('restored');
     await el.updateComplete;
     expect(el.value).toBe('restored');
@@ -646,7 +655,7 @@ describe('Form', () => {
     const form = document.createElement('form');
     form.innerHTML = '<hx-button type="submit">Submit</hx-button>';
     document.getElementById('test-fixture-container')!.appendChild(form);
-    const el = form.querySelector('hx-button') as HxButton;
+    const el = form.querySelector('hx-button') as HelixButton;
     await el.updateComplete;
 
     let submitted = false;
@@ -680,7 +689,7 @@ Test ARIA attributes, focus management, and axe-core audits.
 ```typescript
 describe('Accessibility', () => {
   it('aria-describedby references error ID when error set', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input error="Bad input"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input error="Bad input"></hx-text-input>');
     const input = shadowQuery<HTMLInputElement>(el, 'input')!;
     const errorDiv = shadowQuery(el, '.field__error')!;
     const describedBy = input.getAttribute('aria-describedby');
@@ -688,7 +697,7 @@ describe('Accessibility', () => {
   });
 
   it('aria-describedby references help text ID when helpText set', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input help-text="Some help"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input help-text="Some help"></hx-text-input>');
     const input = shadowQuery<HTMLInputElement>(el, 'input')!;
     const helpDiv = shadowQuery(el, '.field__help-text')!;
     const describedBy = input.getAttribute('aria-describedby');
@@ -696,7 +705,7 @@ describe('Accessibility', () => {
   });
 
   it('no aria-invalid when no error', async () => {
-    const el = await fixture<HxCheckbox>('<hx-checkbox></hx-checkbox>');
+    const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
     const input = shadowQuery<HTMLInputElement>(el, 'input')!;
     expect(input.hasAttribute('aria-invalid')).toBe(false);
   });
@@ -704,20 +713,20 @@ describe('Accessibility', () => {
 
 describe('Accessibility (axe-core)', () => {
   it('has no axe violations in default state', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click me</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click me</hx-button>');
     const { violations } = await checkA11y(el);
     expect(violations).toEqual([]);
   });
 
   it('has no axe violations when disabled', async () => {
-    const el = await fixture<HxButton>('<hx-button disabled>Click me</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button disabled>Click me</hx-button>');
     const { violations } = await checkA11y(el);
     expect(violations).toEqual([]);
   });
 
   it('has no axe violations for all variants', async () => {
     for (const variant of ['primary', 'secondary', 'ghost']) {
-      const el = await fixture<HxButton>(`<hx-button variant="${variant}">Click me</hx-button>`);
+      const el = await fixture<HelixButton>(`<hx-button variant="${variant}">Click me</hx-button>`);
       const { violations } = await checkA11y(el);
       expect(violations, `variant="${variant}" should have no violations`).toEqual([]);
       el.remove();
@@ -735,13 +744,13 @@ Reactive properties trigger async updates. Always wait for `updateComplete`.
 ```typescript
 describe('Property: value', () => {
   it('syncs value to native input', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input value="hello"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input value="hello"></hx-text-input>');
     const input = shadowQuery<HTMLInputElement>(el, 'input')!;
     expect(input.value).toBe('hello');
   });
 
   it('programmatic value update is reflected', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input></hx-text-input>');
     el.value = 'updated';
     await el.updateComplete; // Wait for Lit to process change
     const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -757,7 +766,7 @@ Public methods like `focus()`, `select()`, `checkValidity()`, `reportValidity()`
 ```typescript
 describe('Methods', () => {
   it('focus() moves focus to native input', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input></hx-text-input>');
     el.focus();
     await new Promise((r) => setTimeout(r, 50)); // Allow focus to settle
     const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -765,7 +774,7 @@ describe('Methods', () => {
   });
 
   it('select() selects text in native input', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input value="hello world"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input value="hello world"></hx-text-input>');
     el.focus();
     el.select();
     await new Promise((r) => setTimeout(r, 50));
@@ -783,29 +792,29 @@ Test `checkValidity()`, `reportValidity()`, `validity`, and `validationMessage`.
 ```typescript
 describe('Validation', () => {
   it('checkValidity returns false when required + empty', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input required></hx-text-input>');
     expect(el.checkValidity()).toBe(false);
   });
 
   it('checkValidity returns true when required + filled', async () => {
-    const el = await fixture<HxTextInput>(
+    const el = await fixture<HelixTextInput>(
       '<hx-text-input required value="filled"></hx-text-input>',
     );
     expect(el.checkValidity()).toBe(true);
   });
 
   it('valueMissing validity flag is set when required + empty', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input required></hx-text-input>');
     expect(el.validity.valueMissing).toBe(true);
   });
 
   it('reportValidity returns false when required + empty', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input required></hx-text-input>');
     expect(el.reportValidity()).toBe(false);
   });
 
   it('validationMessage is set when required + empty', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input required></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input required></hx-text-input>');
     await el.updateComplete;
     expect(el.validationMessage).toBeTruthy();
   });
@@ -819,26 +828,31 @@ Error properties should render error message, set aria-invalid, and hide help te
 ```typescript
 describe('Property: error', () => {
   it('renders error message in role="alert" div', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input error="Required field"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input error="Required field"></hx-text-input>');
     const errorDiv = shadowQuery(el, '[role="alert"]');
     expect(errorDiv).toBeTruthy();
     expect(errorDiv?.textContent?.trim()).toBe('Required field');
   });
 
-  it('error div has aria-live="polite"', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input error="Required"></hx-text-input>');
-    const errorDiv = shadowQuery(el, '.field__error');
-    expect(errorDiv?.getAttribute('aria-live')).toBe('polite');
+  it('error container uses role="alert" (which implies aria-live=assertive)', async () => {
+    const el = await fixture<HelixTextInput>('<hx-text-input error="Required"></hx-text-input>');
+    const errorDiv = shadowQuery(el, '[part="error"]');
+    expect(errorDiv).toBeTruthy();
+    expect(errorDiv?.getAttribute('role')).toBe('alert');
+    // role="alert" implies aria-live="assertive"; the component does not set
+    // a literal aria-live attribute, and adding aria-live="polite" alongside
+    // role="alert" would create a contradictory signal.
+    expect(errorDiv?.hasAttribute('aria-live')).toBe(false);
   });
 
   it('sets aria-invalid="true" on input', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input error="Required"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input error="Required"></hx-text-input>');
     const input = shadowQuery<HTMLInputElement>(el, 'input')!;
     expect(input.getAttribute('aria-invalid')).toBe('true');
   });
 
   it('error hides help text', async () => {
-    const el = await fixture<HxTextInput>(
+    const el = await fixture<HelixTextInput>(
       '<hx-text-input error="Error" help-text="Help"></hx-text-input>',
     );
     const helpText = shadowQuery(el, '.field__help-text');
@@ -854,19 +868,19 @@ Verify all CSS parts are exposed for theming.
 ```typescript
 describe('CSS Parts', () => {
   it('label part exposed', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input label="Test"></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input label="Test"></hx-text-input>');
     const label = shadowQuery(el, '[part="label"]');
     expect(label).toBeTruthy();
   });
 
   it('input-wrapper part exposed', async () => {
-    const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+    const el = await fixture<HelixTextInput>('<hx-text-input></hx-text-input>');
     const wrapper = shadowQuery(el, '[part="input-wrapper"]');
     expect(wrapper).toBeTruthy();
   });
 
   it('error part exposed when error set', async () => {
-    const el = await fixture<HxCheckbox>('<hx-checkbox error="Error msg"></hx-checkbox>');
+    const el = await fixture<HelixCheckbox>('<hx-checkbox error="Error msg"></hx-checkbox>');
     const errorPart = shadowQuery(el, '[part="error"]');
     expect(errorPart).toBeTruthy();
   });
@@ -878,7 +892,7 @@ describe('CSS Parts', () => {
 ```typescript
 describe('Property: indeterminate', () => {
   it('applies indeterminate class when set', async () => {
-    const el = await fixture<HxCheckbox>('<hx-checkbox></hx-checkbox>');
+    const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
     el.indeterminate = true;
     await el.updateComplete;
     const container = shadowQuery(el, '.checkbox');
@@ -886,7 +900,7 @@ describe('Property: indeterminate', () => {
   });
 
   it('clears indeterminate on toggle', async () => {
-    const el = await fixture<HxCheckbox>('<hx-checkbox></hx-checkbox>');
+    const el = await fixture<HelixCheckbox>('<hx-checkbox></hx-checkbox>');
     el.indeterminate = true;
     await el.updateComplete;
     const control = shadowQuery<HTMLElement>(el, '.checkbox__control')!;
@@ -899,13 +913,14 @@ describe('Property: indeterminate', () => {
 
 ## Test Coverage Requirements
 
-**Minimum 80% coverage enforced in CI.** Coverage report generated after every test run.
+**Blocking gate: 50% per-component (lines/branches/functions/statements).** Per-component thresholds and exemptions live in `packages/hx-library/coverage-config.json`. The 95% aspirational target tracks the long-term aim.
 
 ### Running Coverage
 
 ```bash
-# Run tests with coverage
-npm run test:library
+# Run library tests WITH coverage (the workspace test:library script is
+# coverage-off by default for fast loops; opt in via the filtered command)
+pnpm --filter=@helixui/library run test:coverage
 
 # Coverage output appears in terminal:
 # ✓ src/components/hx-button/hx-button.ts (95.12%)
@@ -967,7 +982,7 @@ it('calls form.requestSubmit on type=submit click', async () => {
   const form = document.createElement('form');
   form.innerHTML = '<hx-button type="submit">Submit</hx-button>';
   document.getElementById('test-fixture-container')!.appendChild(form);
-  const el = form.querySelector('hx-button') as HxButton;
+  const el = form.querySelector('hx-button') as HelixButton;
   await el.updateComplete;
 
   let submitted = false;
@@ -992,14 +1007,16 @@ import { vi } from 'vitest';
 
 it('updates after delay', async () => {
   vi.useFakeTimers();
-  const el = await fixture<HxToast>('<hx-toast duration="3000">Message</hx-toast>');
+  // hx-toast uses `open` (boolean) + `duration` (ms) for the auto-dismiss
+  // contract — there is no `visible` property. Assert on `open` instead.
+  const el = await fixture<HelixToast>('<hx-toast open duration="3000">Message</hx-toast>');
 
-  expect(el.visible).toBe(true);
+  expect(el.open).toBe(true);
 
   vi.advanceTimersByTime(3000);
   await el.updateComplete;
 
-  expect(el.visible).toBe(false);
+  expect(el.open).toBe(false);
   vi.useRealTimers();
 });
 ```
@@ -1007,8 +1024,10 @@ it('updates after delay', async () => {
 ### Mocking Observers (ResizeObserver, IntersectionObserver)
 
 ```typescript
+// Pattern only — HELiX does not ship hx-lazy-image. If you're testing a
+// custom consumer-built component that uses IntersectionObserver, mock the
+// constructor the same way:
 it('responds to intersection', async () => {
-  // Mock IntersectionObserver
   const mockObserve = vi.fn();
   const mockDisconnect = vi.fn();
 
@@ -1017,7 +1036,8 @@ it('responds to intersection', async () => {
     disconnect: mockDisconnect,
   })) as unknown as typeof IntersectionObserver;
 
-  const el = await fixture<HxLazyImage>('<hx-lazy-image src="/image.jpg"></hx-lazy-image>');
+  // Replace 'my-lazy-image' with the consumer component you're testing.
+  const el = await fixture<HTMLElement>('<my-lazy-image src="/image.jpg"></my-lazy-image>');
 
   expect(mockObserve).toHaveBeenCalled();
 
@@ -1033,7 +1053,7 @@ it('responds to intersection', async () => {
 ```typescript
 // ❌ BAD: Reads DOM before update completes
 it('programmatic value update is reflected', async () => {
-  const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+  const el = await fixture<HelixTextInput>('<hx-text-input></hx-text-input>');
   el.value = 'updated';
   const input = shadowQuery<HTMLInputElement>(el, 'input')!;
   expect(input.value).toBe('updated'); // FAILS! DOM not updated yet
@@ -1041,7 +1061,7 @@ it('programmatic value update is reflected', async () => {
 
 // ✅ GOOD: Wait for update
 it('programmatic value update is reflected', async () => {
-  const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+  const el = await fixture<HelixTextInput>('<hx-text-input></hx-text-input>');
   el.value = 'updated';
   await el.updateComplete; // Wait for Lit to process change
   const input = shadowQuery<HTMLInputElement>(el, 'input')!;
@@ -1058,7 +1078,7 @@ import { fixture, shadowQuery, oneEvent } from '../../test-utils.js';
 
 describe('hx-button', () => {
   it('test 1', async () => {
-    const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+    const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
     // Test logic...
   });
 
@@ -1083,7 +1103,7 @@ describe('hx-button', () => {
 ```typescript
 // ❌ BAD: Race condition
 it('dispatches hx-click on click', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
   const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
 
   let eventFired = false;
@@ -1097,7 +1117,7 @@ it('dispatches hx-click on click', async () => {
 
 // ✅ GOOD: Use oneEvent()
 it('dispatches hx-click on click', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
   const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
   const eventPromise = oneEvent(el, 'hx-click');
   btn.click();
@@ -1111,14 +1131,14 @@ it('dispatches hx-click on click', async () => {
 ```typescript
 // ❌ BAD: Querying light DOM
 it('renders button', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
   const btn = el.querySelector('button'); // null! Button is in shadow DOM
   expect(btn).toBeTruthy(); // FAILS
 });
 
 // ✅ GOOD: Use shadowQuery
 it('renders button', async () => {
-  const el = await fixture<HxButton>('<hx-button>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
   const btn = shadowQuery(el, 'button'); // Correct!
   expect(btn).toBeTruthy(); // PASSES
 });
@@ -1131,7 +1151,7 @@ Every interactive component must test that events do NOT fire when disabled.
 ```typescript
 // ✅ Required test
 it('does NOT dispatch hx-click when disabled', async () => {
-  const el = await fixture<HxButton>('<hx-button disabled>Click</hx-button>');
+  const el = await fixture<HelixButton>('<hx-button disabled>Click</hx-button>');
   const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
   let fired = false;
   el.addEventListener('hx-click', () => {
@@ -1150,7 +1170,7 @@ it('does NOT dispatch hx-click when disabled', async () => {
 ```typescript
 import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HxButton } from './hx-button.js';
+import type { HelixButton } from './hx-button.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -1203,7 +1223,7 @@ describe('hx-button', () => {
 ```typescript
 import { describe, it, expect, afterEach } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
-import type { HxTextInput } from './hx-text-input.js';
+import type { HelixTextInput } from './hx-text-input.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -1226,7 +1246,8 @@ describe('hx-text-input', () => {
   });
 
   describe('Property: type', () => {
-    // 4 tests: text, email, password, number
+    // 8 tests covering the full hx-text-input type union:
+    // text | email | password | tel | url | search | number | date
   });
 
   describe('Property: required', () => {

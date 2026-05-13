@@ -22,9 +22,12 @@ import '@helixui/library/components/hx-button';
   title="Talk to clinicians clearly. Then get out of the way."
   lede={
     <>
-      Toasts route through <code>surface.{`{success,danger,warning,info}-strong`}</code> with paired
-      text-on-strong tokens — AA holds in light, dark, and high-contrast. Alerts, progress, and
-      skeletons share the same status palette.
+      Toasts paint from the status ramps (
+      <code>{`--hx-color-{success,error,warning,info}-{500,600}`}</code>) and pair with the
+      canonical <code>{`--hx-color-text-on-{role}`}</code> foreground tokens — every shipped pair
+      clears AA in light and dark, with most clearing AAA. Alerts share the same ramp surface.
+      Skeleton loaders use a separate neutral-only token set — they do NOT inherit the status
+      palette.
     </>
   }
 />
@@ -65,7 +68,7 @@ import '@helixui/library/components/hx-button';
       Edits made here will not sync until you bring this window forward. Pick up where you left off,
       or close this tab to release the lock.
       <div slot="actions">
-        <hx-button variant="ghost" size="small">
+        <hx-button variant="ghost" hx-size="sm">
           Take over
         </hx-button>
       </div>
@@ -75,7 +78,7 @@ import '@helixui/library/components/hx-button';
       Order new bloodwork before completing this assessment. The patient's last CBC was drawn on
       April&nbsp;26.
       <div slot="actions">
-        <hx-button variant="ghost" size="small">
+        <hx-button variant="ghost" hx-size="sm">
           Order labs
         </hx-button>
       </div>
@@ -85,7 +88,7 @@ import '@helixui/library/components/hx-button';
       Required field <em>Allergies</em> is empty and chief complaint contains characters not allowed
       in HL7. Fix below and retry.
       <div slot="actions">
-        <hx-button variant="ghost" size="small">
+        <hx-button variant="ghost" hx-size="sm">
           Show errors
         </hx-button>
       </div>
@@ -108,22 +111,22 @@ import '@helixui/library/components/hx-button';
   >
     <DocsCard title="Chart upload" tag="62% · 3 of 5 sections">
       <div style={{ width: '100%' }}>
-        <hx-progress-bar value="62" />
+        <hx-progress-bar value="62" label="Chart upload progress" />
       </div>
     </DocsCard>
     <DocsCard title="Insurance verification" tag="complete">
       <div style={{ width: '100%' }}>
-        <hx-progress-bar variant="success" value="100" />
+        <hx-progress-bar variant="success" value="100" label="Insurance verification complete" />
       </div>
     </DocsCard>
     <DocsCard title="Lab order routing" tag="queued · retrying">
       <div style={{ width: '100%' }}>
-        <hx-progress-bar variant="warning" value="28" />
+        <hx-progress-bar variant="warning" value="28" label="Lab order routing" />
       </div>
     </DocsCard>
     <DocsCard title="Visit status" tag="hx-progress-ring">
       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-        <hx-progress-ring value="62" />
+        <hx-progress-ring value="62" label="Triage progress" />
         <div>
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--hx-color-text-strong)' }}>
             Triage complete

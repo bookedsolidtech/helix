@@ -47,7 +47,7 @@ This is the default. The risk surfaces are:
 </hx-card>
 ```
 
-If `user_submitted_bio` contains `<script>alert(document.cookie)</script>`, that script executes in the page context with full access to Drupal session cookies.
+If `user_submitted_bio` contains `<script>alert(document.cookie)</script>`, that script executes in the authenticated page context. Drupal core sets its session cookies `HttpOnly`, so the script cannot read them directly via `document.cookie` — but it can read non-HttpOnly cookies, issue authenticated requests with the user's session, exfiltrate DOM content, scrape CSRF tokens, and impersonate the user inside the page. XSS is still a session compromise; the HttpOnly flag is one mitigation, not a fix.
 
 ### Safe: `|raw` only on Drupal-rendered content
 
@@ -55,9 +55,10 @@ The `|raw` filter is safe when the value has already passed through Drupal's ren
 
 ```twig
 {# Safe — content.field_body is rendered by Drupal's render pipeline,
-   which applies the body field's text format (e.g., filtered_html). #}
+   which applies the body field's text format (e.g., filtered_html).
+   hx-card has no body slot; body content goes in the default slot. #}
 <hx-card>
-  <div slot="body">
+  <div>
     {{ content.field_body|render|raw }}
   </div>
 </hx-card>
@@ -65,15 +66,27 @@ The `|raw` filter is safe when the value has already passed through Drupal's ren
 
 **Rule:** `|raw` is acceptable only on values that originate from `content.*` render arrays, not on raw field values (`node.field_bio.value`), user-submitted form data, or URL parameters.
 
-### Safe: escaping user-generated rich text
+### Safe: rendering user-generated rich text through a text format
 
-For user-submitted content that must render as HTML (formatted text), pipe through the `check_markup` function or use a text format with appropriate filters:
+For user-submitted content that must render as HTML (formatted text), run it through a Drupal text format. `check_markup()` is a Drupal core PHP function, **not** a Twig filter — apply it in a preprocess hook (or use a `processed_text` render array) and print the rendered safe markup in Twig:
+
+```php
+// mytheme.theme — applies the 'basic_html' text format
+function mytheme_preprocess_node(array &$variables): void {
+  $value = $variables['node']->field_bio->value;
+  $variables['bio_safe'] = [
+    '#type' => 'processed_text',
+    '#text' => $value,
+    '#format' => 'basic_html',
+  ];
+}
+```
 
 ```twig
-{# Applies the 'basic_html' text format — strips disallowed tags #}
+{# hx-card has no body slot; the rendered safe markup goes in the default slot. #}
 <hx-card>
-  <div slot="body">
-    {{ node.field_bio.value|check_markup('basic_html') }}
+  <div>
+    {{ bio_safe }}
   </div>
 </hx-card>
 ```
@@ -83,9 +96,11 @@ For user-submitted content that must render as HTML (formatted text), pipe throu
 When building slot content from an array of user values:
 
 ```twig
-{# Escape each item, then join — |safe_join is safe because items are already escaped #}
+{# Escape each item, then join — |safe_join is safe because items are already escaped.
+   hx-card has no tags slot; render the list in the default slot, or use the
+   real "footer" slot if that placement is intended. #}
 <hx-card>
-  <ul slot="tags">
+  <ul slot="footer">
     {% for tag in node.field_tags %}
       <li>{{ tag.entity.label|escape }}</li>
     {% endfor %}
@@ -171,7 +186,9 @@ Boolean attributes (`required`, `disabled`, `checked`) should be set conditional
 
 ## Drupal's twig_escape_filter
 
-Drupal overrides Twig's default escape strategy with `twig_escape_filter`, which is context-aware. For HTML body context (the default), it applies `Html::escape()`. This converts the five special HTML characters to entities and is safe for all attribute values and text content.
+Drupal overrides Twig's default escape strategy with `twig_escape_filter`, which is context-aware. For HTML body context (the default), it applies `Html::escape()`. This converts the five special HTML characters (`<`, `>`, `"`, `'`, `&`) to entities and prevents HTML tag injection and attribute-context breakout.
+
+It is **not** a complete defense for protocol-bearing attributes — `href`, `src`, `xlink:href`, `formaction`, and similar URL attributes still need scheme allowlisting (`UrlHelper::isValid($url, TRUE)` or an explicit `https?:` check) to reject `javascript:` and `data:` payloads. Entity escaping leaves those schemes intact.
 
 You can call it explicitly via the `|escape` filter or its alias `|e`:
 
@@ -187,13 +204,13 @@ You can call it explicitly via the `|escape` filter or its alias `|e`:
 
 HELiX components handle their own internal rendering inside Shadow DOM. The security boundary is the light DOM — slot content and attribute values that come from your Twig templates.
 
-| Surface | Risk | Defense |
-|---|---|---|
-| Slot text content | Script injection | Twig auto-escaping (default) |
-| Slot HTML content | Tag injection | `check_markup()` or `\|escape` per-item |
-| Attribute string values | Attribute breakout | Twig auto-escaping (default) |
-| Attribute URL values | `javascript:` injection | `UrlHelper::isValid()` + `\|escape` |
-| Attribute boolean values | Incorrect state | Use `{% if %}` conditionals, not user input |
+| Surface                  | Risk                    | Defense                                     |
+| ------------------------ | ----------------------- | ------------------------------------------- |
+| Slot text content        | Script injection        | Twig auto-escaping (default)                |
+| Slot HTML content        | Tag injection           | `check_markup()` or `\|escape` per-item     |
+| Attribute string values  | Attribute breakout      | Twig auto-escaping (default)                |
+| Attribute URL values     | `javascript:` injection | `UrlHelper::isValid()` + `\|escape`         |
+| Attribute boolean values | Incorrect state         | Use `{% if %}` conditionals, not user input |
 
 ---
 
@@ -240,11 +257,24 @@ helix-button:
 
 Get the hash from [https://www.srihash.org](https://www.srihash.org) or jsDelivr's SRI tool.
 
+The per-component module above imports a shared chunk that pulls `lit` from a bare specifier. Ship an import map (or use the bundled aggregate entry, `dist/index.js`) so the browser can resolve `lit` — otherwise the module fails to load even with a valid `integrity` hash:
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
+    }
+  }
+</script>
+```
+
 ---
 
 ## Patterns to Avoid
 
-### Never pass raw user input directly to slot attributes
+### Never pass raw user input directly to component attributes
 
 ```twig
 {# DANGEROUS: user controls the label attribute #}
@@ -253,6 +283,8 @@ Get the hash from [https://www.srihash.org](https://www.srihash.org) or jsDelivr
 {# Safe: label comes from server-controlled content #}
 <hx-text-input label="{{ element['#title']|escape }}">
 ```
+
+(`label` here is hx-text-input's reflected attribute, not a slot — the component also exposes a named `label` slot for rich markup. Either surface, the rule is the same: don't feed it untrusted input.)
 
 ### Never use |raw for field values without text format filtering
 

@@ -25,11 +25,11 @@ Component Tokens  (scoped — --hx-button-bg)
 
 The fastest way to apply a brand is to replace the primary color ramp. Every component that uses `--hx-color-primary-*` updates automatically.
 
-**Before (HELiX default — blue)**:
-All buttons, links, focus rings, and selected states are `#2563eb`.
+**Before (HELiX default — Apex teal)**:
+The shipped default brand is `Apex`, whose primary ramp anchors at `#429797` (primary-500). Buttons, links, focus rings, and selected states draw from that ramp.
 
-**After (your brand — teal)**:
-Same components, same structure, now rendered in your brand color.
+**After (your brand — your teal / blue / whatever)**:
+Same components, same structure, now rendered in your brand color. The recipe below uses a Tailwind-style alternate teal for illustration.
 
 ```css
 /* your-brand-theme.css — load this after the HELiX token stylesheet */
@@ -56,7 +56,8 @@ Same components, same structure, now rendered in your brand color.
 Load this file after the HELiX tokens:
 
 ```html
-<link rel="stylesheet" href="https://cdn.helixui.dev/tokens/latest/tokens.css" />
+<!-- Pin the version you've tested against — see /getting-started/installation/#cdn-no-build-step -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-tokens.css" />
 <link rel="stylesheet" href="/your-brand-theme.css" />
 ```
 
@@ -131,7 +132,7 @@ if (saved) setTheme(saved);
 
 ## Recipe 2: Healthcare Brand Compliance (HIPAA-Friendly Color Contrast)
 
-Healthcare applications have non-negotiable contrast requirements (WCAG 2.1 AA minimum). This recipe configures a high-contrast palette suitable for clinical environments.
+Healthcare applications have non-negotiable contrast requirements (WCAG 2.2 AA minimum; WCAG 2.2 AAA on the canonical P0 surface, per `aaa-verdicts.json`). This recipe configures a high-contrast palette suitable for clinical environments.
 
 **Requirements**:
 - 4.5:1 contrast ratio for normal text
@@ -202,7 +203,7 @@ hx-switch {
 }
 ```
 
-> **Note**: HELiX components are built with WCAG 2.1 AA as the minimum bar. When you override color tokens, the components themselves do not re-validate contrast — that is your responsibility. Always run an accessibility audit (`axe`, browser a11y inspector, or Lighthouse) after applying a custom theme.
+> **Note**: HELiX components ship at WCAG 2.2 AA across the surface and WCAG 2.2 AAA on the P0 components (44 components, 376 Supports / 109 Not Applicable / 0 Partial / 0 Fail per `aaa-verdicts.json`). When you override color tokens, the components themselves do not re-validate contrast — that is your responsibility. Always run an accessibility audit (`axe`, browser a11y inspector, or Lighthouse) after applying a custom theme; for any override that touches a P0-surface token, also re-run `pnpm aaa:audit` locally.
 
 ---
 
@@ -260,7 +261,7 @@ For dashboards, data tables, and admin panels where information density matters,
 ```html
 <div class="data-panel">
   <hx-card>
-    <hx-text-input label="Filter" />
+    <hx-text-input label="Filter"></hx-text-input>
     <!-- All HELiX components here use compact spacing -->
   </hx-card>
 </div>
@@ -346,47 +347,54 @@ Open Storybook and confirm your font loads in buttons, inputs, and text componen
 
 When you need to customize a single component without affecting others, override its **Component tokens** directly on the element or a wrapper class.
 
+`hx-button` re-resolves `--hx-button-bg` inside each variant rule, so a host-level override of `--hx-button-bg` only affects variants that don't have their own internal rule (e.g. `ghost`, `outline`). For the canonical-variant primary/secondary surfaces, target the semantic action token instead, then layer component-level radius/color tokens that the host actually reads:
+
 ```css
-/* Override only hx-button — no other components affected */
-hx-button {
-  --hx-button-bg:            #1a1a2e;  /* dark navy */
-  --hx-button-color:         #e8e8f0;  /* light text */
-  --hx-button-border-radius: 0;        /* sharp corners */
-  --hx-button-padding-x:     var(--hx-space-6);
-  --hx-button-padding-y:     var(--hx-space-3);
-  --hx-button-font-size:     var(--hx-font-size-sm);
-  --hx-button-font-weight:   var(--hx-font-weight-medium);
-  --hx-button-shadow:        none;
+/* Recolor primary buttons via the semantic action token (visible everywhere) */
+hx-button[variant='primary'] {
+  --hx-color-action-primary-bg: #1a1a2e;  /* dark navy */
 }
 
-/* Hover/focus states — target the component token, not internal CSS */
-hx-button:hover {
-  --hx-button-bg: #16213e;
+/* Layer hover/active onto the action chain so internal variant rules pick it up */
+hx-button[variant='primary']:hover {
+  --hx-color-action-primary-bg-hover: #16213e;
+}
+
+/* Color tokens that hx-button DOES read at the host level — use real CEM token names */
+hx-button {
+  --hx-button-color:         #e8e8f0;  /* foreground for ghost / outline variants */
+  --hx-button-border-radius: 0;        /* sharp corners */
+  --hx-button-font-weight:   var(--hx-font-weight-medium);
 }
 ```
 
-**Card component overrides**:
+`hx-button` does not expose `--hx-button-padding-x`, `--hx-button-padding-y`, `--hx-button-font-size`, or `--hx-button-shadow` — those four are fabrications; use the `hx-size` attribute (`sm` / `md` / `lg`) to switch the built-in sizing tokens, or target `::part(button)` for spacing/shadow overrides outside the public token API.
+
+**Card component overrides** (only tokens that `hx-card` actually exposes — `--hx-card-bg`, `--hx-card-color`, `--hx-card-border-color`, `--hx-card-border-radius`, `--hx-card-padding`, `--hx-card-gap`, `--hx-card-image-aspect-ratio`):
 
 ```css
 hx-card {
-  --hx-card-bg:             #fafafa;
-  --hx-card-border:         1px solid var(--hx-color-border-default);
-  --hx-card-border-radius:  var(--hx-border-radius-lg);
-  --hx-card-padding:        var(--hx-space-6);
-  --hx-card-shadow:         var(--hx-shadow-sm);
+  --hx-card-bg:            #fafafa;
+  --hx-card-border-color:  var(--hx-color-border-default);  /* border SHORTHAND not exposed; set color only */
+  --hx-card-border-radius: var(--hx-border-radius-lg);
+  --hx-card-padding:       var(--hx-space-6);
 }
 ```
 
-**Text input overrides**:
+`hx-card` does not expose `--hx-card-border` (border shorthand) or `--hx-card-shadow`; use a wrapper element + native CSS for those.
+
+**Text input overrides** (real `hx-text-input` tokens: `--hx-input-bg`, `--hx-input-color`, `--hx-input-border-color`, `--hx-input-border-radius`, `--hx-input-font-family`, `--hx-input-focus-ring-color`, `--hx-input-error-color`, `--hx-input-label-color`):
 
 ```css
 hx-text-input {
-  --hx-text-input-border-radius: var(--hx-border-radius-sm);
-  --hx-text-input-border-color:  var(--hx-color-neutral-300);
-  --hx-text-input-bg:            var(--hx-color-neutral-50);
-  --hx-text-input-focus-ring:    2px solid var(--hx-color-primary-500);
+  --hx-input-border-radius:    var(--hx-border-radius-sm);
+  --hx-input-border-color:     var(--hx-color-neutral-300);
+  --hx-input-bg:               var(--hx-color-neutral-50);
+  --hx-input-focus-ring-color: var(--hx-color-action-focus-ring);
 }
 ```
+
+`hx-text-input` exposes a `--hx-input-focus-ring-color` (color only, not a full shorthand); see the CEM entry for the canonical token list.
 
 **Finding a component's tokens**: Each component lists its CSS custom properties in the Storybook docs panel under "CSS Custom Properties." You can also find them in the component's JSDoc in the source.
 
@@ -539,16 +547,16 @@ The most commonly overridden tokens, organized by use case:
 | Goal | Token to Override | Tier |
 |---|---|---|
 | Brand primary color | `--hx-color-primary-500` (+ full ramp) | Primitive |
-| Dark mode surfaces | `--hx-color-surface-default/raised/sunken` | Semantic |
+| Dark mode surfaces | `--hx-color-surface-default`, `--hx-color-surface-raised`, `--hx-color-surface-sunken` | Semantic |
 | Body text | `--hx-color-text-primary` | Semantic |
 | Muted/secondary text | `--hx-color-text-secondary`, `--hx-color-text-muted` | Semantic |
 | Focus ring | `--hx-color-border-focus`, `--hx-focus-ring-width` | Semantic |
 | Default font | `--hx-font-family-sans` | Primitive |
 | Button styles | `--hx-button-bg`, `--hx-button-color`, `--hx-button-border-radius` | Component |
-| Card styles | `--hx-card-bg`, `--hx-card-padding`, `--hx-card-shadow` | Component |
+| Card styles | `--hx-card-bg`, `--hx-card-padding`, `--hx-card-border-color` (no `--hx-card-shadow`) | Component |
 | Global spacing | `--hx-space-4` (and scale) | Primitive |
 | Border radius | `--hx-border-radius-md` (and scale) | Primitive |
-| Shadows | `--hx-shadow-sm/md/lg` | Primitive |
+| Shadows | `--hx-shadow-sm`, `--hx-shadow-md`, `--hx-shadow-lg` | Primitive |
 | Error color | `--hx-color-error-500` | Primitive |
 | Success color | `--hx-color-success-500` | Primitive |
 

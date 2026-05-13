@@ -16,14 +16,16 @@ Declaration files contain only type information—no runtime code. They describe
 ### Declaration Files vs. Source Files
 
 ```typescript
-// src/components/hx-button/hx-button.ts (source)
-import { LitElement, html } from 'lit';
+// src/components/hx-button/hx-button.ts (source — simplified)
+import { html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { HelixElement } from '../../base/helix-element.js';
+import { mixinDelegatesAria } from '../../mixins/index.js';
 
 @customElement('hx-button')
-export class HelixButton extends LitElement {
+export class HelixButton extends mixinDelegatesAria(HelixElement) {
   @property({ type: String, reflect: true })
-  variant: 'primary' | 'secondary' | 'ghost' = 'primary';
+  variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'primary';
 
   @property({ type: Boolean, reflect: true })
   disabled = false;
@@ -31,17 +33,25 @@ export class HelixButton extends LitElement {
   render() {
     return html`<button part="button"><slot></slot></button>`;
   }
+  // Private fields, internal state controllers, and reactive
+  // event handlers are also defined on this class — those are
+  // emitted into the .d.ts (see below), they just have no
+  // implementation body in the declaration.
 }
 ```
 
 ```typescript
-// dist/components/hx-button/hx-button.d.ts (generated declaration)
-import { LitElement } from 'lit';
+// dist/components/hx-button/index.d.ts (generated declaration)
+import { HelixElement } from '../../base/helix-element.js';
 
-export declare class HelixButton extends LitElement {
-  variant: 'primary' | 'secondary' | 'ghost';
+export declare class HelixButton extends HelixElement {
+  variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline';
   disabled: boolean;
-  render(): import('lit-html').TemplateResult<1>;
+  // Private fields are emitted with the # prefix so TS knows the
+  // class shape; their type is preserved without an implementation
+  // body. Internal controllers and event handlers similarly retain
+  // their type but no body.
+  render(): unknown;
 }
 
 declare global {
@@ -53,10 +63,10 @@ declare global {
 
 **Key differences:**
 
-- **No implementation details**: Function bodies, private methods, and internal state are omitted
+- **Implementation bodies are stripped**, but the class shape (including private fields with `#`-prefixed names, controllers, and event handlers) is preserved so TypeScript can still type-check consumer code against the full surface.
 - **Explicit `declare` keyword**: Signals to TypeScript this is ambient type information (no runtime code)
-- **Preserved type annotations**: Public API types remain intact (`variant: 'primary' | 'secondary' | 'ghost'`)
-- **Inferred complex types**: Return types like `TemplateResult<1>` are inferred from Lit's type definitions
+- **Preserved type annotations**: Public API types remain intact (`variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'`)
+- **Inferred complex types**: Return types narrow to whatever Lit's type definitions produce (often `unknown` or `TemplateResult` depending on tsconfig).
 
 ---
 
@@ -66,9 +76,11 @@ hx-library uses TypeScript's compiler (`tsc`) via the `vite-plugin-dts` Vite plu
 
 ### TypeScript Compiler Configuration
 
-The `tsconfig.json` enables declaration generation:
+The `tsconfig.json` enables declaration generation. (TypeScript accepts JSONC — JSON with
+comments — in tsconfig files; the comments in the sample below are part of the supported syntax,
+but if you're feeding this snippet to a strict JSON parser strip the comments first.)
 
-```json
+```jsonc
 // packages/hx-library/tsconfig.json
 {
   "extends": "../../tsconfig.base.json",
@@ -225,10 +237,10 @@ TypeScript preserves property types exactly as written in source code:
 ```typescript
 // Source: Union type for variant
 @property({ type: String, reflect: true })
-variant: 'primary' | 'secondary' | 'ghost' = 'primary';
+variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'primary';
 
 // Declaration: Union type preserved (default value omitted)
-variant: 'primary' | 'secondary' | 'ghost';
+variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline';
 ```
 
 **Consumer benefit:**
@@ -238,7 +250,8 @@ import { HelixButton } from '@helixui/library/components/hx-button';
 
 const button = document.createElement('hx-button');
 button.variant = 'primary'; // ✅ Valid
-button.variant = 'danger'; // ❌ Type error: not in union
+button.variant = 'danger'; // ✅ Valid — danger is a real hx-button variant
+button.variant = 'patient'; // ❌ Type error: not in union
 ```
 
 ### Method Signatures
@@ -275,7 +288,7 @@ JSDoc comments from source files are preserved in declarations, powering IDE too
  *
  * @csspart button - The native button element.
  *
- * @cssprop [--hx-button-bg=var(--hx-color-primary-500)] - Button background color.
+ * @cssprop [--hx-button-bg=var(--hx-color-action-primary-bg)] - Button background color (resolves through the semantic action layer to primary-700 on the default Apex brand).
  */
 export declare class HelixButton extends LitElement {
   /**

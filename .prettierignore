@@ -25,6 +25,12 @@ packages/.mcp-wc/
 # Markdown files — documentation, not source code; skip format enforcement
 **/*.md
 
+# MDX files with JS-in-MDX export blocks that prettier-mdx mangles
+# (escapes asterisks inside JS comments → breaks acorn parsing; dedents
+# object-literal keys → Storybook indexer treats them as top-level exports
+# and fails to build). Format these by hand or via an MDX-aware tool.
+apps/storybook/stories/tokens/Shadows.mdx
+
 # Test and story files — type-check is the quality gate here, not formatting
 **/*.test.ts
 **/*.test.tsx

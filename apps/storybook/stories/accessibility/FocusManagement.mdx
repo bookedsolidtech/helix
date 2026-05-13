@@ -30,7 +30,10 @@ import '@helixui/library/components/hx-text-input';
       Every interactive HELiX surface has a focus-ring contract —{' '}
       <strong>2px solid, 2px offset, AAA-graded against the surface beneath</strong>. Modal surfaces
       trap focus while open and restore it to the trigger on close. Roving tabindex keeps groups
-      discoverable without flooding the Tab order. SC 2.4.7, 2.4.11, 2.4.13, 3.2.1.
+      discoverable without flooding the Tab order. The canonical conformance signal lives in{' '}
+      <code>aaa-verdicts.json</code>; this page covers the WCAG criteria most directly relevant to
+      focus authoring — SC 2.4.7 Focus Visible, SC 2.4.12 Focus Not Obscured (Enhanced), SC 2.4.13
+      Focus Appearance, and SC 3.2.1 On Focus.
     </>
   }
 />
@@ -74,13 +77,15 @@ import '@helixui/library/components/hx-text-input';
 </section>
 
 <section>
-  <SectionHead title="The render path" meta=":focus-visible only · never :focus" />
+  <SectionHead title="The render path" meta=":focus-visible on buttons · :focus on field inputs" />
   <p className="hx-docs-card-body">
-    HELiX renders the ring through <code>:focus-visible</code> exclusively — keyboard users see
-    it on Tab, mouse users do not see it on click. This is the WCAG-aligned heuristic the user
-    agent computes, not an author shortcut. Stories on this page can be inspected through the
-    Storybook pseudo-state toolbar to verify the rendered ring; flip{' '}
-    <code>:focus-visible</code> on the buttons below to see the contract live.
+    Interactive buttons and link-like surfaces render the ring through <code>:focus-visible</code>{' '}
+    — keyboard users see it on Tab, mouse users do not see it on click. Form-field components
+    (<code>hx-text-input</code>, <code>hx-textarea</code>, <code>hx-select</code>) render their
+    focus indicator on every focus regardless of pointer source — the wrapped native input is
+    <code> :focus</code>, not <code>:focus-visible</code>, because programmatic and pointer-driven
+    focus on an editable field still need a clear visible indicator. Inspect the stories on this
+    page via the Storybook pseudo-state toolbar to verify the rendered ring.
   </p>
 
 <CodeBlock language="css" filename="hx-button.styles.ts" code={FOCUS_RING_CSS} />
@@ -110,12 +115,13 @@ import '@helixui/library/components/hx-text-input';
 </section>
 
 <section>
-  <SectionHead title="Focus trapping in modal surfaces" meta="dialog · drawer · alert" />
+  <SectionHead title="Focus trapping in modal surfaces" meta="dialog · drawer" />
   <p className="hx-docs-card-body">
     A modal surface owns the user's focus while open: Tab cycles within, Escape dismisses, and
-    the trigger that opened it receives focus when it closes. HELiX's <code>hx-dialog</code>{' '}
-    handles all three behaviours through the platform <code>&lt;dialog&gt;</code> element where
-    available, falling back to the same contract via composed-tree focus traversal.
+    the trigger that opened it receives focus when it closes. <code>hx-dialog</code> implements
+    this contract directly — call <code>showModal()</code> to guarantee the trap and inert
+    backdrop; <code>show()</code> opens non-modal. There is no fallback path to the platform{' '}
+    <code>&lt;dialog&gt;</code> element — focus traversal is handled inside the component.
   </p>
 
 <CodeTabs
@@ -146,13 +152,15 @@ import '@helixui/library/components/hx-text-input';
       first wraps to the last. Focus never escapes to the page beneath.
     </li>
     <li>
-      <strong>Dismiss.</strong> Escape closes the dialog. Click on the backdrop closes only when{' '}
-      <code>dismissOnBackdrop</code> is enabled.
+      <strong>Dismiss.</strong> Escape closes the dialog. Backdrop click dismissal is on by
+      default; set <code>close-on-backdrop="false"</code> to disable it.
     </li>
     <li>
-      <strong>Restore.</strong> The trigger that opened the dialog receives focus on close. If
-      the trigger has been removed from the DOM, focus falls back to <code>document.body</code>{' '}
-      and a live region announces the close.
+      <strong>Restore.</strong> The trigger that opened the dialog receives focus on close.
+      If the trigger has been removed from the DOM, the browser falls back to{' '}
+      <code>document.body</code> — author code is responsible for explicitly retargeting focus
+      when the trigger may be removed mid-flight (e.g. focus a stable ancestor before deleting
+      the row that owned the trigger).
     </li>
   </ol>
 </section>
@@ -163,11 +171,13 @@ import '@helixui/library/components/hx-text-input';
     A group of related controls (tabs, menu items, radio buttons, toolbar buttons) presents a{' '}
     <strong>single Tab stop</strong>. Arrow keys move within; Tab leaves the group. This keeps
     the page's Tab order discoverable instead of flooding the user with N stops per group.
+    Roving tabindex is implemented per-component (no shared controller class); the canonical
+    reference lives in <code>hx-tabs</code>.
   </p>
 
   <CodeBlock
     language="ts"
-    filename="roving-tabindex-controller.ts"
+    filename="hx-tabs roving tabindex contract"
     code={ROVING_TABINDEX_TS}
   />
 </section>
@@ -203,11 +213,13 @@ import '@helixui/library/components/hx-text-input';
         middle.
       </p>
     </DocsCard>
-    <DocsCard title="Toasts with actions" tag="non-modal · still restores">
+    <DocsCard title="Toasts with actions" tag="non-modal · consumer manages focus">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
-        A toast with an action button records the focused element at toast-arrival time. After
-        the action resolves (or the toast dismisses), focus returns to where the user was —
-        their work is not interrupted.
+        <code>hx-toast</code> does not record the previously focused element automatically — toast
+        actions live alongside the user&apos;s work, not above it. If your toast action navigates
+        the user away from their context, restore focus in your action handler before the toast
+        dismisses (e.g. capture <code>document.activeElement</code> at toast-arrival time and call{' '}
+        <code>.focus()</code> on it after the action resolves).
       </p>
     </DocsCard>
   </div>
@@ -223,8 +235,11 @@ import '@helixui/library/components/hx-text-input';
       Removing the user-agent ring without authoring a visible substitute fails SC 2.4.7. Period.
     </li>
     <li>
-      <strong>Trap focus in non-modal widgets.</strong> A non-modal popover must let Tab leave;
-      otherwise it's a keyboard trap (SC 2.1.2).
+      <strong>Watch the trap boundary on popovers.</strong> <code>hx-popover</code> does trap focus
+      while open — that&apos;s deliberate and matches the APG modal-popover pattern.
+      A&nbsp;non-modal dropdown disguised as a popover would be a keyboard trap (SC 2.1.2); if you
+      need a non-trapping dropdown, use <code>hx-dropdown</code> or compose your own with manual
+      focus handling — do not just override the popover&apos;s trap.
     </li>
     <li>
       <strong>Steal focus on render.</strong> A page or component that calls <code>.focus()</code>{' '}

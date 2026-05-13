@@ -32,8 +32,11 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
   </div>
   <p className="hx-docs-card-body" style={{ marginTop: 16, maxWidth: '70ch' }}>
     Measured by the formal AAA harness (<code>pnpm aaa:audit</code>) against each P0
-    component&apos;s Default story and recorded with evidence per (component × criterion) in{' '}
-    <code>.reports/formal-aaa-audit/audit.json</code>. This cert is self-certified by the project
+    component&apos;s audit story — many components use a curated <code>AaaAudit</code> story rather
+    than the bare <code>Default</code> so the harness measures the canonical AAA-shaped variant.
+    Evidence is recorded per (component × criterion) under <code>.reports/formal-aaa-audit/</code>{' '}
+    (gitignored, reproducible via the harness) and the committed verdicts ship in{' '}
+    <code>packages/hx-library/aaa-verdicts.json</code>. This cert is self-certified by the project
     maintainers; it is not third-party attested. For the explicit scope and honest limits, see{' '}
     <a href="https://helix.bookedsolid.tech/accessibility/self-cert-scope/">
       Self-Certification Scope
@@ -61,7 +64,10 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
       <p>
         <a href="https://helix.bookedsolid.tech/framework-integration/">Framework integration</a>{' '}
         covers wrappers and plain-HTML usage. The Drupal-specific path lives at{' '}
-        <a href="https://helix.bookedsolid.tech/drupal/">Drupal integration</a>.
+        <a href="https://helix.bookedsolid.tech/drupal/installation/getting-started/">
+          Drupal integration
+        </a>
+        .
       </p>
     </article>
     <article className="hx-docs-pillar">
@@ -113,8 +119,8 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
       </h3>
       <p>
         Each component ships with autodocs sourced from CEM — properties, attributes, slots, CSS
-        parts, CSS custom properties, events. Use the variant controls to see force-state matrices
-        update live.
+        parts, CSS custom properties, events. Inspect rendered focus / hover / active states via the
+        Storybook pseudo-state toolbar on each story.
       </p>
     </article>
   </div>
@@ -125,8 +131,10 @@ import { EyebrowHeading, SectionHead, StatCard, DocsCard, CodeBlock } from './_c
   <CodeBlock
     language="bash"
     filename="coordinates.sh"
-    code={`# install
-npm i @helixui/library @helixui/icons @helixui/tokens
+    code={`# install — @helixui/library auto-resolves @helixui/tokens + lit
+# (dependencies) and requires @helixui/icons + @floating-ui/dom as
+# peer dependencies, so install those alongside the library:
+npm i @helixui/library @helixui/icons @floating-ui/dom
 
 # repo
 

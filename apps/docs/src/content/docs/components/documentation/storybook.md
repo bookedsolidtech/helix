@@ -1008,11 +1008,6 @@ export const Test: Story = {
 
 ## Next Steps
 
-- [Component Testing](/components/testing/) — Vitest browser mode tests
-- [Custom Elements Manifest](/components/cem/) — CEM generation and JSDoc conventions
-- [Accessibility Testing](/components/accessibility/) — WCAG 2.1 AA compliance
-- [Visual Regression Testing](/ci/visual-regression/) — Chromatic configuration
-
 ## Additional Resources
 
 - [Component Story Format 3.0 Announcement](https://storybook.js.org/blog/component-story-format-3-0)

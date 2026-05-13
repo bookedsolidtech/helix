@@ -17,7 +17,7 @@ axe-core 4.11.x — the engine the formal AAA audit harness runs alongside — d
 exposes via the [`ElementInternals`][mdn-element-internals] API. As a result,
 axe will emit false-positive violations on HELiX form-associated custom
 elements (FACE) for rules that rely on the AT-exposed role/name pair, even
-when the component is in fact correct under WCAG 2.1 AA / 2.2 AAA.
+when the component is in fact correct under WCAG 2.2 AAA (the carry-forward of every 2.1 SC that hasn't changed).
 
 This page is the canonical reference for that gap, the components it affects,
 the project mitigation, and the resolution path.
@@ -25,9 +25,9 @@ the project mitigation, and the resolution path.
 <Aside type="caution" title="Why axe alone is not the cert authority">
   HELiX uses axe-core for fast iteration and Storybook addon feedback, but it is **not** the cert
   authority. The formal AAA audit (`scripts/aaa-formal-audit.mjs`) is — and it sources verdicts from
-  Playwright keyboard / role / name probes that read the live accessibility tree directly, which
-  **does** observe ElementInternals semantics correctly. When axe-core and the formal audit
-  disagree, the formal audit wins.
+  static source checks (decorators, JSDoc, CSS), Playwright-driven DOM and geometry probes,
+  focus-appearance and target-size measurements, axe contrast sweeps, and APG-aligned keyboard
+  contracts. When axe-core and the formal audit disagree, the formal audit wins.
 </Aside>
 
 ## The technical gap
@@ -51,7 +51,7 @@ The fix has been tracked in axe-core for years:
 - [axe-core PR #5080][pr-5080] — partial support landed behind a feature
   flag, still unmerged into a stable 4.x release as of 2026-05.
 - [axe-core issue #4259][issue-4259] — the root tracking issue, opened in
-  2023 and still open against 4.x. Resolution path is axe-core 5.x.
+  2023 and still open. The current upstream milestone is axe-core 4.12.
 - [Westbrook / axe-core-element-internals][westbrook] — community
   patch-set demonstrating that the gap is well-known among web component
   authors and that the workaround is to read `_internals.role` /
@@ -64,7 +64,6 @@ Every HELiX component that opts into FACE
 gap when audited with axe-core alone:
 
 - `hx-button`
-- `hx-button-group`
 - `hx-checkbox`
 - `hx-checkbox-group`
 - `hx-color-picker`
@@ -89,30 +88,37 @@ violations against these components when run via axe-core ≤ 4.11.x.
 
 ## Our mitigation
 
-1. **Formal audit reads the AT tree directly.** `pnpm aaa:audit` (alias for
-   `scripts/aaa-formal-audit.mjs`) sources every per-criterion verdict from
-   Playwright keyboard probes, role / name probes, and live accessibility-tree
-   inspection — it does not delegate to axe for the rules listed above. The
-   formal audit is the cert authority.
+1. **Formal audit uses measured evidence, not axe rule output.** `pnpm aaa:audit`
+   (alias for `scripts/aaa-formal-audit.mjs`) sources every per-criterion
+   verdict from static source checks (decorator + JSDoc + CSS + token-resolution
+   sweeps), Playwright-driven DOM and geometry probes, focus-appearance and
+   target-size measurements, axe contrast sweeps, and APG-aligned keyboard
+   contracts. It does not delegate to axe for the rules listed above. The
+   formal audit is the cert authority. See
+   [Self-certification scope](/accessibility/self-cert-scope/) for what the
+   harness does and does not measure.
 2. **Story-audit harness suppresses the affected rules per-component.**
    `scripts/audit-stories.mjs` disables the affected axe rules for the
    FACE component set so the harness does not emit known false positives.
    Real failures (color-contrast, target-size, label association in the
    light-DOM, etc.) still surface.
-3. **Manual AT verification.** Every P0 component is exercised against
-   NVDA + Firefox, JAWS + Chrome, and VoiceOver + Safari before a release.
-   The AT transcripts are recorded under
-   `.reports/formal-aaa-audit/at-evidence/<component>.md`.
-4. **No host-attribute mirroring.** We deliberately do **not** mirror the
-   ElementInternals state onto host attributes to silence axe. Mirroring
-   would create a divergence path (host attribute and `_internals` state
-   drifting out of sync) and would force consumers to keep both in sync as
-   well — a much larger and more fragile contract than the local axe noise.
+3. **AT smoke runs are tracked separately.** Per the
+   [self-certification scope](/accessibility/self-cert-scope/), assistive-
+   technology smoke runs (NVDA, JAWS, VoiceOver, TalkBack, Orca) are
+   tracked separately from the cert badge — the harness simulates keyboard
+   and inspects DOM but does not drive AT directly.
+4. **Per-component host-attribute mirroring where it helps.** Several FACE
+   components (`hx-select`, `hx-combobox`, others) intentionally mirror role
+   and ARIA state onto host attributes for legacy engines, axe-core
+   compatibility, and CSS / `getAttribute` parity. Components that don't
+   need that fallback rely on `ElementInternals` alone. The choice is
+   per-component, not a blanket policy.
 
 ## Resolution path
 
-When axe-core 5.x ships with full ElementInternals support — or PR #5080 is
-merged into a 4.x branch — we will:
+When upstream lands full ElementInternals support — currently tracked against
+the axe-core 4.12 milestone, with PR #5080 the in-flight implementation — we
+will:
 
 1. Bump `axe-core` in the harness root and verify the previously-suppressed
    rules pass clean against every FACE component.

@@ -3,26 +3,45 @@ title: Testing Events
 description: Comprehensive patterns for testing custom events, event payloads, and event bubbling in Lit web components.
 ---
 
-Every HELIX component dispatches custom events to communicate state changes to consumers. Testing events thoroughly means verifying that events fire with the correct payload, that they bubble correctly across shadow boundaries, that they are suppressed when they should not fire, and that no event listener leaks accumulate over time. This guide covers every event testing pattern used in the HELIX test suite.
+Interactive HELiX components dispatch custom events to communicate state changes to consumers. (Presentational components like `hx-divider`, `hx-stack`, `hx-grid` have no event API.) Testing events thoroughly means verifying that events fire with the correct payload, that they bubble correctly across shadow boundaries, that they are suppressed when they should not fire, and that no event listener leaks accumulate over time. This guide covers every event testing pattern used in the HELIX test suite.
 
 ## The oneEvent Utility
 
-`oneEvent()` from `@helixui/library/test-utils` wraps `addEventListener` in a `Promise` that resolves on the next occurrence of a named event. It is the primary tool for testing async event dispatch.
+`oneEvent()` is an **internal** test helper from `packages/hx-library/src/test-utils.ts`. It is not exported from the published `@helixui/library` npm package — when writing tests in a component file under `packages/hx-library/src/components/<name>/`, import it via the relative path:
+
+```ts
+import { oneEvent } from '../../test-utils.js';
+```
+
+It wraps `addEventListener` in a `Promise` that resolves on the next occurrence of a named event, with a 5-second default timeout to fail fast when an expected event never fires:
 
 ```typescript
 /**
- * Returns a Promise that resolves on the next occurrence of an event on the element.
+ * Returns a Promise that resolves on the next occurrence of an event on the element,
+ * rejecting after `timeoutMs` (default 5000) if the event never fires.
  */
-export function oneEvent<T extends Event = Event>(el: EventTarget, eventName: string): Promise<T> {
-  return new Promise<T>((resolve) => {
-    el.addEventListener(eventName, ((e: Event) => resolve(e as T)) as EventListener, {
-      once: true,
-    });
+export function oneEvent<T extends Event = Event>(
+  el: EventTarget,
+  eventName: string,
+  timeoutMs = 5000,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      el.removeEventListener(eventName, handler as EventListener);
+      reject(new Error(`[oneEvent] Timed out after ${timeoutMs}ms waiting for "${eventName}"`));
+    }, timeoutMs);
+
+    const handler = (e: Event) => {
+      clearTimeout(timer);
+      resolve(e as T);
+    };
+
+    el.addEventListener(eventName, handler as EventListener, { once: true });
   });
 }
 ```
 
-The `{ once: true }` option removes the listener automatically after the first event. This prevents the common mistake of leaving stale listeners attached to test fixtures.
+The `{ once: true }` option removes the listener automatically after the first event. The timeout guarantees tests fail fast instead of hanging when an expected event never fires.
 
 ### Basic Usage
 
@@ -67,7 +86,7 @@ it('hx-click detail contains originalEvent', async () => {
 
 ## Testing Event Payloads
 
-Every HELIX custom event carries a `detail` object. Test that the detail contains the correct values — not just that the event fired.
+Many HELiX custom events carry a `detail` object — for those, test that the detail contains the correct values, not just that the event fired. Some events are `CustomEvent<void>` (no detail payload) — for those, assert the event fired plus `bubbles`/`composed` flags via the event object itself.
 
 ### hx-click: originalEvent
 
@@ -296,46 +315,65 @@ it('Space activates hx-button and dispatches hx-click', async () => {
 For components that handle keyboard events directly (e.g., a custom dropdown), dispatch `KeyboardEvent` on the element and await the expected custom event:
 
 ```typescript
-it('Escape key on hx-select dispatches hx-close', async () => {
-  const el = await fixture<HelixSelect>('<hx-select label="Pick one"></hx-select>');
+it('Escape key on hx-dialog closes the dialog and fires hx-after-close', async () => {
+  const el = await fixture<HelixDialog>('<hx-dialog heading="Confirm"><p>Body</p></hx-dialog>');
 
-  // Open the dropdown first
+  // Open the modal first
+  el.showModal();
+  await el.updateComplete;
+
+  const eventPromise = oneEvent(el, 'hx-after-close');
+  el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true }));
+  await eventPromise;
+
+  expect(el.open).toBe(false);
+});
+```
+
+For `hx-select`, the close-after-Escape signal is the synchronous `open` state flip, not an `hx-close` event — hx-select does not emit `hx-close`. Assert `el.open === false` after dispatching Escape:
+
+```typescript
+it('Escape key on open hx-select sets el.open=false', async () => {
+  const el = await fixture<HelixSelect>('<hx-select label="Pick one"></hx-select>');
   el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   await el.updateComplete;
 
-  const eventPromise = oneEvent(el, 'hx-close');
   el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-  await eventPromise;
+  await el.updateComplete;
 
-  // If we got here without timing out, the event fired
-  expect(true).toBe(true);
+  expect(el.open).toBe(false);
 });
 ```
 
 ## Testing Async Events
 
-Some events fire asynchronously — after a fetch, after a debounce, or after a transition completes. Use `oneEvent()` combined with the action that triggers the async dispatch, and `await` the promise:
+Some events fire asynchronously — after a fetch, after a debounce, or after a transition completes. Use `oneEvent()` combined with the action that triggers the async dispatch, and `await` the promise. `oneEvent` has a 5-second timeout (the 3rd argument) — long-running async transitions should pass an explicit larger value:
 
 ```typescript
-it('hx-loaded fires after async data resolves', async () => {
-  const el = await fixture<HelixDataComponent>(
-    '<hx-async-component src="/api/data"></hx-async-component>',
-  );
+// Example anchored at a real async pattern: hx-skeleton fading out after content loads
+it('hx-skeleton dispatches hx-load-complete after transition', async () => {
+  const el = await fixture<HelixSkeleton>('<hx-skeleton></hx-skeleton>');
 
-  // oneEvent will wait until the event fires, regardless of how long it takes
-  const event = await oneEvent<CustomEvent<{ items: unknown[] }>>(el, 'hx-loaded');
+  // Wait up to 10s for the loaded transition
+  const eventPromise = oneEvent<CustomEvent<void>>(el, 'hx-load-complete', 10000);
 
-  expect(event.detail.items).toBeDefined();
-  expect(Array.isArray(event.detail.items)).toBe(true);
+  el.loaded = true;
+  await el.updateComplete;
+
+  const event = await eventPromise;
+  expect(event.bubbles).toBe(true);
+  expect(event.composed).toBe(true);
 });
 ```
+
+There is no shipped `<org-async-component>` or `HelixDataComponent` — earlier drafts of this page used those as placeholders. Use the real `hx-skeleton.test.ts` or `hx-toast.test.ts` patterns for the canonical async-event template.
 
 For events that have a reasonable timeout bound, wrap `oneEvent()` in a `Promise.race()` against a timeout:
 
 ```typescript
 it('hx-loaded fires within 2 seconds', async () => {
   const el = await fixture<HelixDataComponent>(
-    '<hx-async-component src="/api/data"></hx-async-component>',
+    '<org-async-component src="/api/data"></org-async-component>',
   );
 
   const timeout = new Promise<never>((_, reject) =>
@@ -577,6 +615,6 @@ expect(event.composed).toBe(true);
 
 **Related:**
 
-- [Testing Shadow DOM](/components/testing/shadow-dom) — `shadowQuery`, fixture, cleanup
+- [Vitest Setup](/components/testing/vitest-setup/) — Browser-mode Vitest configuration and shared test utils (`shadowQuery`, `fixture`, `cleanup`)
 - [Testing Form Components](/components/testing/form-testing) — ElementInternals, validation events
 - [Storybook Interaction Tests](/components/documentation/storybook-interaction) — `userEvent` in `play()` functions

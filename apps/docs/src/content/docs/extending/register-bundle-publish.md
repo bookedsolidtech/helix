@@ -95,13 +95,7 @@ export default defineConfig({
     rollupOptions: {
       // Externalize everything @helixui/library provides.
       // Consumers already have these — bundling them doubles the bytes.
-      external: [
-        /^lit/,
-        /^@lit/,
-        /^@helixui\/library/,
-        /^@helixui\/tokens/,
-        /^@floating-ui/,
-      ],
+      external: [/^lit/, /^@lit/, /^@helixui\/library/, /^@helixui\/tokens/, /^@floating-ui/],
       output: {
         // Entry files land at their declared path (components/org-patient-card/index.js).
         entryFileNames: '[name].js',
@@ -135,7 +129,7 @@ Declaration maps (`.d.ts.map` files) let TypeScript editors follow Go-to-Definit
   "version": "0.1.0",
   "description": "Enterprise healthcare web components extending @helixui/library",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": ["./dist/index.js", "./dist/components/*/index.js", "**/*.css"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -149,10 +143,7 @@ Declaration maps (`.d.ts.map` files) let TypeScript editors follow Go-to-Definit
     },
     "./custom-elements.json": "./custom-elements.json"
   },
-  "files": [
-    "dist",
-    "custom-elements.json"
-  ],
+  "files": ["dist", "custom-elements.json"],
   "customElements": "custom-elements.json",
   "scripts": {
     "build": "vite build && npm run cem",
@@ -161,12 +152,12 @@ Declaration maps (`.d.ts.map` files) let TypeScript editors follow Go-to-Definit
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "@helixui/library": ">=1.0.0",
+    "@helixui/library": ">=3.9.0 <4.0.0",
     "lit": ">=3.0.0"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.10.0",
-    "@helixui/library": "^1.0.0",
+    "@helixui/library": "^3.9.0",
     "lit": "^3.0.0",
     "typescript": "^5.0.0",
     "vite": "^6.0.0",
@@ -178,7 +169,7 @@ Declaration maps (`.d.ts.map` files) let TypeScript editors follow Go-to-Definit
 Key fields:
 
 - **`"type": "module"`** — all `.js` files in the package are ES modules, matching HELiX
-- **`"sideEffects": false`** — bundlers can tree-shake unused components completely
+- **`"sideEffects"`** — Custom Element packages **cannot** declare `"sideEffects": false`: every component module calls `customElements.define()` at import time, which is a real side effect. The allow-list above tells bundlers to preserve the registration side effect for `index.js` + per-component entries (and CSS) while still tree-shaking everything else. Matches `@helixui/library`'s own package.json.
 - **`"exports"`** — the subpath map tells Node.js and bundlers how to resolve `@your-org/design-system/components/org-patient-card`
 - **`"customElements"`** — points IDEs and Storybook autodocs to your CEM file
 - **`peerDependencies`** — `@helixui/library` and `lit` are required at runtime but supplied by the consumer; listing them here makes npm warn on version mismatches rather than silently installing a second copy
@@ -190,9 +181,9 @@ Key fields:
 ```json
 {
   "compilerOptions": {
-    "target": "ES2021",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "useDefineForClassFields": false,
     "experimentalDecorators": true,
     "declaration": true,
@@ -201,7 +192,7 @@ Key fields:
     "outDir": "dist",
     "strict": true,
     "skipLibCheck": true,
-    "lib": ["ES2021", "DOM", "DOM.Iterable"]
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["**/*.test.ts", "**/*.stories.ts", "dist"]
@@ -325,28 +316,37 @@ Drupal themes often load HELiX from a CDN and serve extended components from the
 An import map pins bare module specifiers to resolved URLs, preventing duplicate module instances:
 
 ```html
-<!-- In the Drupal theme's html.html.twig, before any <script type="module"> -->
+<!-- In the Drupal theme's html.html.twig, before any <script type="module">.
+     `@helixui/library` imports `@helixui/tokens`, `@helixui/icons`, and
+     `@floating-ui/dom` from bare specifiers — every transitive dep needs
+     an import-map entry, or browsers will fail to resolve them. -->
 <script type="importmap">
-{
-  "imports": {
-    "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
-    "lit/decorators.js": "https://cdn.jsdelivr.net/npm/lit@3/decorators.js",
-    "lit/directives/class-map.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/class-map.js",
-    "lit/directives/if-defined.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/if-defined.js",
-    "@lit/reactive-element": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@2/reactive-element.js",
-    "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@3/lit-html.js",
-    "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
-    "@helixui/library/components/": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/"
+  {
+    "imports": {
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+      "@lit/reactive-element": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@2/reactive-element.js",
+      "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@3/lit-html.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm",
+      "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
+      "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js"
+    }
   }
-}
 </script>
 
 <!-- HELiX from CDN -->
-<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+></script>
 
 <!-- Your extended components from the theme's file system -->
 <script type="module" src="/themes/custom/my-theme/js/dist/index.js"></script>
 ```
+
+> Per-component imports resolve to `dist/components/<tag>/index.js` — bare prefix mappings like `"@helixui/library/components/": "…/dist/components/"` won't work in every browser because the resolved URL omits `/index.js`. Map each component explicitly (or rely on the aggregate `dist/index.js` entry).
 
 Without the import map, `/themes/custom/my-theme/js/dist/index.js` ships a bundled copy of Lit and HELiX classes. The CDN copy loaded earlier registers identical Lit base classes under different module URLs — two different `LitElement` prototypes. Components extending the bundled copy no longer extend the CDN copy, and the `instanceof` checks Lit uses internally break.
 
@@ -356,12 +356,17 @@ For incremental adoption — loading only the components a specific page needs:
 
 ```html
 <script type="importmap">
-{
-  "imports": {
-    "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
-    "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js"
+  {
+    "imports": {
+      "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+      "lit/directives/class-map.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/class-map.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm",
+      "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js"
+    }
   }
-}
 </script>
 
 <script type="module">
@@ -435,12 +440,7 @@ function PatientCardWrapper() {
 import { OrgPatientCard } from '@your-org/react';
 
 function PatientCardWrapper() {
-  return (
-    <OrgPatientCard
-      status="stable"
-      onOrgStatusChange={(e) => console.log(e.detail.status)}
-    />
-  );
+  return <OrgPatientCard status="stable" onOrgStatusChange={(e) => console.log(e.detail.status)} />;
 }
 ```
 
@@ -474,14 +474,24 @@ export default OrgPatientCard;
 
 ```typescript
 // src/components/OrgPatientCard/types.ts
-import type { EventName } from '@lit/react';
-import type { PatientCard, PatientCardStatusChangeDetail } from '@your-org/design-system';
+import type React from 'react';
+import type { PatientCardStatusChangeDetail } from '@your-org/design-system';
 
-export type OrgPatientCardProps = Partial<PatientCard> & {
-  onOrgStatusChange?: (event: CustomEvent<PatientCardStatusChangeDetail>) => void;
+export interface OrgPatientCardProps {
+  variant?: 'default' | 'featured' | 'compact';
+  elevation?: 'flat' | 'raised' | 'floating';
+  status?: 'stable' | 'monitoring' | 'critical' | 'discharged';
+  severity?: 'low' | 'medium' | 'high';
+  mrn?: string;
+  'hx-href'?: string;
+  'hx-label'?: string;
+  className?: string;
   children?: React.ReactNode;
-};
+  onOrgStatusChange?: (event: CustomEvent<PatientCardStatusChangeDetail>) => void;
+}
 ```
+
+Build an explicit interface per component from your CEM rather than `Partial<ElementClass>` — `Partial<>` exposes private fields, lifecycle hooks, and inherited Lit internals as if they were React props, and silently drifts the moment the component's class shape changes. The HELiX generator emits a similar shape per wrapper.
 
 ### Generator script
 
@@ -543,6 +553,20 @@ export default ${componentName};
 
     mkdirSync(`${outputDir}/${componentName}`, { recursive: true });
     writeFileSync(`${outputDir}/${componentName}/${componentName}.tsx`, source);
+
+    // Emit the per-component types.ts + index.ts so the wrapper directory
+    // is self-contained. Production generators (`scripts/generate-react-wrappers.ts`
+    // in @helixui/react) also append each wrapper to a top-level `src/index.ts`
+    // re-export barrel — omitted here for brevity but required for the package
+    // entry to resolve `import { OrgPatientCard } from '@your-org/react'`.
+    writeFileSync(
+      `${outputDir}/${componentName}/types.ts`,
+      `import type React from 'react';\nexport interface ${componentName}Props { children?: React.ReactNode; }\n`,
+    );
+    writeFileSync(
+      `${outputDir}/${componentName}/index.ts`,
+      `export { ${componentName} } from './${componentName}.js';\nexport type { ${componentName}Props } from './types.js';\n`,
+    );
   }
 }
 ```
@@ -564,7 +588,7 @@ Consumer packages should declare `@helixui/library` as a `peerDependency`, not a
 ```json
 {
   "peerDependencies": {
-    "@helixui/library": ">=1.0.0 <2.0.0",
+    "@helixui/library": ">=3.9.0 <4.0.0",
     "lit": ">=3.0.0 <4.0.0"
   }
 }
@@ -576,7 +600,7 @@ When `@helixui/library` is a regular `dependency`, npm may install two copies at
 
 ### Lock the range, not the exact version
 
-Use a range (`>=1.0.0 <2.0.0`) rather than an exact pin (`=1.2.3`). An exact pin means every patch bug fix in HELiX requires your package to publish a new release. A range allows consumers to pick up patch releases without updating your package — which is the correct behavior for stable, semver-compliant packages.
+Use a range (e.g. `>=3.9.0 <4.0.0`) rather than an exact pin (`=3.9.2`). An exact pin means every patch bug fix in HELiX requires your package to publish a new release. A range allows consumers to pick up patch releases without updating your package — which is the correct behavior for stable, semver-compliant packages.
 
 ### Changesets for your own package
 
@@ -605,29 +629,32 @@ Set `"access": "restricted"` for private internal packages. Set `"access": "publ
 
 ### Managing breaking changes across the dependency chain
 
-When HELiX releases a major version, the upgrade path for consumer packages is:
+When HELiX releases a major version, the upgrade path for consumer packages is (illustrated with a hypothetical jump from the current `v3` to a future `v4`):
 
-1. **HELiX publishes `v2.0.0`** — breaking changes documented in CHANGELOG, deprecated APIs removed
-2. **You update your `peerDependencies`** — `"@helixui/library": ">=2.0.0 <3.0.0"`
+1. **HELiX publishes `v4.0.0`** — breaking changes documented in CHANGELOG, deprecated APIs removed
+2. **You update your `peerDependencies`** — `"@helixui/library": ">=4.0.0 <5.0.0"`
 3. **You audit your extended components** — any subclasses that relied on changed public API must be updated
-4. **You publish a new major of your package** — `v2.0.0`, signaling the peer dependency upgrade requirement
-5. **End consumers update both packages** — `@helixui/library@^3` and `@your-org/design-system@^2`
+4. **You publish a new major of your package** — bump your own major, signaling the peer-dependency upgrade requirement
+5. **End consumers update both packages** — `@helixui/library@^4` and `@your-org/design-system@<your-new-major>`
 
-Do not try to maintain compatibility with both HELiX v1 and v2 in a single release. The shared `LitElement` instance requirement makes version straddling unreliable. Use separate major versions.
+Do not try to maintain compatibility with both `@helixui/library@^3` and `@helixui/library@^4` in a single release of your package. The shared `LitElement` instance requirement makes version straddling unreliable. Use separate major versions.
 
 ### Pinning in Drupal projects
 
 For Drupal projects consuming via CDN, pin the CDN URL to the major version:
 
 ```html
-<!-- Pinned to major 1, receives patch + minor updates automatically -->
-<script src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js" type="module"></script>
+<!-- Pinned to major 3, receives patch + minor updates automatically -->
+<script src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js" type="module"></script>
 
 <!-- Pinned to exact version for zero-change deployments in regulated environments -->
-<script src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js" type="module"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+  type="module"
+></script>
 ```
 
-For regulated healthcare environments (SOC 2, HIPAA-adjacent deployments), exact-version CDN pins or self-hosted copies are common — the `@1` floating major tag updates automatically on CDN cache refresh, which may violate change management policies.
+For regulated healthcare environments (SOC 2, HIPAA-adjacent deployments), exact-version CDN pins or self-hosted copies are common — the `@<major>` floating-major tag updates automatically on CDN cache refresh, which may violate change management policies.
 
 ---
 
@@ -648,10 +675,11 @@ ls dist/
 node -e "import('@your-org/design-system').then(m => console.log(Object.keys(m)))"
 node -e "import('@your-org/design-system/components/org-patient-card').then(m => console.log(Object.keys(m)))"
 
-# Verify TypeScript types are resolvable
-npx tsc --noEmit --moduleResolution bundler \
-  --module esnext \
-  -e "import type { PatientCard } from '@your-org/design-system'"
+# Verify TypeScript types are resolvable — tsc has no -e flag, so write the
+# probe to a temp file and type-check that. (Or just run `npm run type-check`.)
+node -e "require('fs').writeFileSync('.types-probe.ts', \"import type { PatientCard } from '@your-org/design-system';\nconst _: PatientCard | undefined = undefined;\n\")"
+npx tsc --noEmit --moduleResolution bundler --module esnext .types-probe.ts
+rm .types-probe.ts
 
 # Check CEM is present and complete
 cat custom-elements.json | \
@@ -683,5 +711,5 @@ If `src/` files appear in the output, your `"files"` field is misconfigured.
 
 - [Composing Higher-Order Components](/extending/compose-higher-order-components) — compound component patterns before committing to a published package
 - [React Integration](/framework-integration/react) — full React wrapper setup for HELiX components
-- [Drupal Integration](/drupal-integration) — Twig templates, Drupal libraries, and behavior patterns
-- [Testing Extended Components](/extending/) — Vitest + axe-core test patterns for consumer packages
+- [Drupal Integration](/drupal/installation/getting-started/) — Twig templates, Drupal libraries, and behavior patterns
+- [Testing Extended Components](/extending/testing-extended-components/) — Vitest + axe-core test patterns for consumer packages

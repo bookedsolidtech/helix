@@ -77,15 +77,17 @@ console.log((el.constructor as typeof HTMLElement & { formAssociated?: boolean }
 
 ---
 
-## attachInternals() in the Constructor
+## attachInternals() — raw platform vs HELiX pattern
 
-`attachInternals()` must be called in the constructor. Calling it at any other lifecycle point throws a `DOMException`.
+The platform contract: `attachInternals()` can only be called once, and the safest place to call it is the constructor. Calling it twice on the same element throws a `DOMException`.
+
+### Raw-platform pattern (Lit without HELiX base classes)
 
 ```typescript
-export class HelixTextInput extends LitElement {
+export class MyTextInput extends LitElement {
   static formAssociated = true;
 
-  // Declare as a non-optional private field — it is always set in the constructor.
+  // Declared as a non-optional private field — set exactly once in the constructor.
   private _internals: ElementInternals;
 
   constructor() {
@@ -95,12 +97,30 @@ export class HelixTextInput extends LitElement {
 }
 ```
 
+### HELiX pattern — inherit from `HelixElement`
+
+Inside `@helixui/library`, form-associated components extend `HelixElement` and apply the `FormMixin`. The base class exposes a **lazy `_internals` accessor** that calls `attachInternals()` on first read, so component subclasses neither declare a private field nor implement a constructor:
+
+```typescript
+import { HelixElement, FormMixin } from '@helixui/library';
+
+export class HelixTextInput extends FormMixin(HelixElement) {
+  static override formAssociated = true;
+
+  // No constructor and no _internals field — the inherited lazy accessor
+  // returns a memoized ElementInternals on first read.
+
+  private _updateValidity() {
+    this._internals.setValidity(this._validityFlags(), this._validationMessage());
+  }
+}
+```
+
 **Rules:**
 
-- Call `super()` before `attachInternals()` — Lit requires it
-- Call it exactly once — calling it again throws
-- Call it in the constructor only — lifecycle methods (`connectedCallback`, `updated`, etc.) are too late
-- Assign it to a private field so all lifecycle methods can reference it
+- Inside HELiX, prefer the inherited lazy accessor — adding your own constructor + private field overrides the base contract and breaks `FormMixin`.
+- The raw-platform constructor pattern still applies to consumer-built form controls outside the HELiX class hierarchy.
+- `attachInternals()` can only be called once per element either way.
 
 `ElementInternals` is defined in TypeScript's built-in DOM types (`lib.dom.d.ts`). No additional imports or `@types` packages are required as long as your `tsconfig.json` includes `"lib": ["ESNext", "DOM"]`.
 
@@ -270,7 +290,7 @@ this._internals.setValidity(
 // Form submission is blocked
 ```
 
-The anchor element is critical. It tells the browser where to visually anchor the validation tooltip when `reportValidity()` is called. Always anchor to the internal focusable element — the native `<input>`, `<select>`, or `<textarea>` inside shadow DOM.
+The anchor element is critical. It tells the browser where to visually anchor the validation tooltip when `reportValidity()` is called. Anchor to whichever element is both **focusable** and represents the canonical recovery surface for the constraint — typically the internal native `<input>` / `<select>` / `<textarea>` inside shadow DOM, but some HELiX host-canonical controls (notably the composite selection controls) intentionally anchor to the **host element itself** because the host is the focusable + announceable surface. Use the host anchor when there is no single internal native focusable to point at.
 
 ### When to call setValidity()
 
@@ -352,7 +372,7 @@ if (!input.validity.valid) {
 
 ## checkValidity() and reportValidity()
 
-Both methods delegate to `ElementInternals`. Expose them on your component as part of the standard form control interface:
+Both methods delegate to `ElementInternals`. Inside HELiX, `FormMixin` exposes them on every form-associated component — they aren't currently surfaced in the per-component CEM `members` list (`custom-elements.json`) because CEM doesn't inherit through mixins, but they are part of the inherited `FormMixin` public surface and behave like the native `<input>` methods. Consumer-built components that extend `LitElement` directly need to delegate them explicitly:
 
 ```typescript
 /** Returns true if the element satisfies all constraints. Dispatches 'invalid' if not. */
@@ -446,10 +466,10 @@ formResetCallback(): void {
 }
 ```
 
-For controls that have a meaningful default value (a pre-selected option, an initial date, etc.), reset to that default rather than to an empty state:
+For controls that should restore a meaningful default value (a pre-selected option, an initial date, etc.), capture the value at connection time and reset to it. The actual reset semantics vary per component — for example, the current `hx-select` source resets to an **empty value** and a null form value rather than the initial HTML value, so consumers depending on the legacy "restore original" pattern need to opt in explicitly:
 
 ```typescript
-// hx-select: reset to the value present in HTML when the element was connected
+// Consumer-built component: capture the default on connection and restore it.
 private _defaultValue = '';
 
 override connectedCallback(): void {
@@ -463,6 +483,8 @@ formResetCallback(): void {
   this._updateValidity();
 }
 ```
+
+`hx-text-input` (and most numeric/string inputs) reset by clearing the value and form state; if you need pre-fill-on-reset semantics, hold the original value in a controlled form wrapper rather than inside the component.
 
 ### formStateRestoreCallback(state, mode)
 
@@ -637,9 +659,9 @@ Controls without a `name` attribute are excluded from `FormData` — this matche
 
 ---
 
-## How hx-text-input Uses ElementInternals
+## How HELiX Form Controls Use ElementInternals
 
-The following is the complete form participation implementation from `packages/hx-library/src/components/hx-text-input/hx-text-input.ts`. This is the canonical pattern for all HELiX form controls.
+The block below is a **simplified illustration** of how form-associated HELiX components participate in `ElementInternals`. The shipped source uses a different architecture — `HelixElement` base + `FormMixin` + inherited lazy `_internals` accessor + `protected _onFormReset`/`_onFormDisabled` hooks — see `packages/hx-library/src/base/HelixElement.ts` and `packages/hx-library/src/mixins/FormMixin.ts` for the actual canonical pattern. Read the example below for the **shape** of platform integration, then read the source for the inherited architecture you'd compose against.
 
 ```typescript
 import { LitElement, html, nothing } from 'lit';
@@ -897,15 +919,16 @@ interface ValidityState {
 
 ### Lifecycle callback types
 
-TypeScript knows about the form participation callbacks because they are part of the `HTMLElement` interface definition when `formAssociated = true` is used. You do not need to declare them with special types — just implement the methods with the correct signatures:
+TypeScript permits these class methods on a `formAssociated = true` component, but the local DOM `lib.dom.d.ts` does not declare them as conditional `HTMLElement` callbacks — you implement them with the correct signatures and the browser invokes them at the right times; the type system simply trusts your shape. Inside HELiX, `HelixElement` exposes equivalent `protected _onForm*` hooks so subclasses don't redefine the platform callbacks themselves:
 
 ```typescript
-// All return void — return values are ignored by the browser
+// All return void — return values are ignored by the browser.
+// `state` may be null on a fresh restore (no value was previously saved).
 formAssociatedCallback(form: HTMLFormElement | null): void { /* ... */ }
 formDisabledCallback(disabled: boolean): void { /* ... */ }
 formResetCallback(): void { /* ... */ }
 formStateRestoreCallback(
-  state: File | string | FormData,
+  state: File | string | FormData | null,
   mode: 'restore' | 'autocomplete'
 ): void { /* ... */ }
 ```
@@ -942,19 +965,19 @@ private _internals: ElementInternals | null = null;
 | Firefox       | 93              |
 | Safari        | 16.4            |
 
-These versions cover all browsers in active support. For organizations that must support Safari 15 or earlier, install the polyfill:
+These versions cover all browsers in active support. `@helixui/library` does **not** bundle `element-internals-polyfill`; consumers who need to support Safari 15 or earlier should install it themselves:
 
 ```bash
 npm install element-internals-polyfill
 ```
 
-Import it once at your application entry point:
-
 ```typescript
+// Import it once at your application entry point — must run before any
+// form-associated custom element is registered.
 import 'element-internals-polyfill';
 ```
 
-The polyfill is transparent — it provides identical API surface and behavior in all browsers including IE11. In HELiX, the polyfill is included in the library's own entry point so consumers do not need to install it separately.
+The polyfill provides a close approximation of the platform API but is **not** a 1:1 replacement — see the [polyfill's own README](https://github.com/WICG/webcomponents/issues/187) for documented limitations (form submission edge cases, focus delegation, IE11 caveats). It is an optional consumer install, not a HELiX runtime dependency.
 
 ---
 
@@ -963,8 +986,11 @@ The polyfill is transparent — it provides identical API surface and behavior i
 ### The minimal form-associated component
 
 ```typescript
-@customElement('hx-custom-input')
-export class HelixCustomInput extends LitElement {
+// Use a non-`hx-` prefix for consumer-built components — `hx-` is reserved
+// for components shipped by @helixui/library. There is no `hx-custom-input`
+// in the library or CEM.
+@customElement('x-custom-input')
+export class XCustomInput extends LitElement {
   static formAssociated = true;
 
   private _internals: ElementInternals;

@@ -157,13 +157,14 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 ## Overview
 
-The `hx-select` component is a styled wrapper around the native `<select>` element, providing consistent
-visual design and behavior across the HELIX design system. It uses the Form-Associated Custom Elements API
-via ElementInternals, ensuring full compatibility with standard HTML forms and validation.
+The `hx-select` component is a form-associated custom combobox built with `ElementInternals`. The
+visible trigger and listbox follow the WAI-ARIA APG combobox pattern; a hidden native `<select>`
+mirrors the chosen value so the field participates in `FormData`, native constraint validity, and
+`requestSubmit()` flows without any author wiring.
 
-The component provides three size variants (`sm`, `md`, `lg`), validation states (required, error), and
-helper elements (label, help text, error messages). All interactive states (hover, focus, disabled) are
-fully styled and accessible.
+The component provides three size variants (`sm`, `md`, `lg`) via `hx-size`, validation states
+(required, error), and helper surfaces (label, help text, error). All interactive states (hover,
+focus, disabled) are fully styled and accessible.
 
 ### When to Use
 
@@ -182,12 +183,12 @@ fully styled and accessible.
 
 ## Accessibility
 
-The Select component follows WCAG 2.1 AA guidelines:
+The Select component meets WCAG 2.2 AAA on the P0 surface (per `aaa-verdicts.json`) and AA baseline:
 
 - **Keyboard navigation** — Full support for arrow keys, Enter, Space, Home, End
 - **Screen reader support** — Proper labels, ARIA attributes, and announcements
 - **Focus visible** — Clear focus ring for keyboard users
-- **Error announcements** — Error messages are associated with the select via `aria-describedby`
+- **Error announcements** — Error messages are exposed through `ElementInternals.ariaDescription` (mirrored into `internals.validationMessage` for native form validity reporting); legacy `aria-describedby` wiring is intentionally stripped to avoid duplicate announcements with the AT-mode bridge
 - **Required field indicator** — Visual and semantic indication of required fields
 
 <div className="info-box">
@@ -223,18 +224,17 @@ The Select component follows WCAG 2.1 AA guidelines:
 
 Override these tokens to theme the select:
 
-| Property                       | Default                       | Description            |
-| ------------------------------ | ----------------------------- | ---------------------- |
-| `--hx-select-bg`               | `var(--hx-color-neutral-0)`   | Background color       |
-| `--hx-select-color`            | `var(--hx-color-neutral-800)` | Text color             |
-| `--hx-select-border-color`     | `var(--hx-color-neutral-300)` | Border color           |
-| `--hx-select-border-radius`    | `var(--hx-border-radius-md)`  | Border radius          |
-| `--hx-select-font-family`      | `var(--hx-font-family-sans)`  | Font family            |
-| `--hx-select-label-color`      | `var(--hx-color-neutral-700)` | Label text color       |
-| `--hx-select-help-text-color`  | `var(--hx-color-neutral-500)` | Help text color        |
-| `--hx-select-error-color`      | `var(--hx-color-error-600)`   | Error text color       |
-| `--hx-select-focus-ring-color` | `var(--hx-color-primary-500)` | Focus ring color       |
-| `--hx-select-chevron-color`    | `var(--hx-color-neutral-400)` | Dropdown chevron color |
+| Property                       | Default                       | Description                                             |
+| ------------------------------ | ----------------------------- | ------------------------------------------------------- |
+| `--hx-select-bg`               | `var(--hx-color-neutral-0)`   | Background color                                        |
+| `--hx-select-color`            | `var(--hx-color-neutral-800)` | Text color                                              |
+| `--hx-select-border-color`     | `var(--hx-color-neutral-300)` | Border color                                            |
+| `--hx-select-border-radius`    | `var(--hx-border-radius-md)`  | Border radius                                           |
+| `--hx-select-font-family`      | `var(--hx-font-family-sans)`  | Font family                                             |
+| `--hx-select-label-color`      | `var(--hx-color-neutral-700)` | Label text color                                        |
+| `--hx-select-error-color`      | `var(--hx-color-error-500)`   | Error text color                                        |
+| `--hx-select-focus-ring-color` | `var(--hx-focus-ring-color)`  | Focus ring color (inherits the global focus ring token) |
+| `--hx-select-chevron-color`    | `var(--hx-color-neutral-500)` | Dropdown chevron color                                  |
 
 ## CSS Parts
 
@@ -261,7 +261,7 @@ The `hx-select` component uses ElementInternals to participate in native form su
 
 - **FormData integration** — The `name` and `value` are included in `FormData` on form submit
 - **Validation** — The `required` attribute triggers native HTML5 validation
-- **Reset support** — The select resets to its initial value when the form is reset
+- **Reset support** — Form reset clears the select's current value (it does not restore the initial `value` attribute; if you need to repopulate the original choice, write the value back in your reset handler)
 
 <div className="warning-box">
   <p>
@@ -455,14 +455,23 @@ The `hx-select` component integrates with Drupal Form API and works in custom Tw
 
 ### Drupal Form API Integration
 
-**Custom form element using hx-select:**
+`hx-select` is an **autonomous custom element**, not a customized built-in — `is="hx-select"` on a
+native `<select>` will not upgrade. Render `<hx-select>` directly from Twig (preferred), or build a
+small `FormElement` plugin / `#theme` template that emits the autonomous tag with `<option>` children.
+The Twig snippet above is the canonical Drupal integration path; the Form API sample below shows
+a custom `#theme` callback that re-emits a Drupal-built `<select>` as `<hx-select>`.
 
 ```php
 /**
- * Custom form with hx-select elements.
+ * Custom form with an hx-select-rendered department field.
+ *
+ * The field is built as a regular Drupal select; the `#theme` callback
+ * (provided by mymodule_theme()) is responsible for emitting
+ * `<hx-select>...</hx-select>` instead of `<select>...</select>` in the
+ * final markup. Drupal's form processing, FAPI validation, and
+ * AJAX integration are unchanged.
  */
 function mymodule_patient_form($form, &$form_state) {
-  // Department select
   $form['department'] = [
     '#type' => 'select',
     '#title' => t('Department'),
@@ -473,31 +482,11 @@ function mymodule_patient_form($form, &$form_state) {
     ],
     '#required' => TRUE,
     '#description' => t('Select the admitting department.'),
-    '#attributes' => [
-      'is' => 'hx-select', // Use web component
-      'hx-size' => 'md',
-    ],
     '#empty_option' => t('- Select department -'),
-  ];
-
-  // Blood type select
-  $form['blood_type'] = [
-    '#type' => 'select',
-    '#title' => t('Blood Type'),
-    '#options' => [
-      'a-pos' => 'A+',
-      'a-neg' => 'A-',
-      'b-pos' => 'B+',
-      'b-neg' => 'B-',
-      'o-pos' => 'O+',
-      'o-neg' => 'O-',
-      'ab-pos' => 'AB+',
-      'ab-neg' => 'AB-',
-    ],
-    '#required' => TRUE,
-    '#attributes' => [
-      'is' => 'hx-select',
-    ],
+    // Theme callback rewraps the select as <hx-select>:
+    '#theme_wrappers' => ['form_element'],
+    '#theme' => 'hx_select',
+    '#attributes' => ['hx-size' => 'md'],
   ];
 
   $form['submit'] = [
@@ -532,60 +521,64 @@ function mymodule_patient_form_validate($form, &$form_state) {
 }
 ```
 
-### Drupal Behaviors for Event Handling
+### Drupal Behaviors for Event Handling (project-local example)
+
+The shipped `@helixui/drupal-behaviors` package does not include an `hxSelect` behavior — `hx-select`
+upgrades from its module import alone. The pattern below is a **project-local** behavior that
+demonstrates how to layer event handling on top of `hx-select`. Pick a project namespace (e.g.
+`mysite:select-init`) so the once keys never collide with the package's `hx-*` keys.
 
 ```javascript
 /**
  * @file
- * hx-select Drupal behavior.
+ * mysite hx-select event-handling behavior (project-local).
  */
 
 (function (Drupal, once) {
   'use strict';
 
-  /**
-   * Attach hx-select event listeners.
-   */
-  Drupal.behaviors.hxSelect = {
+  // Keep listener references so detach can remove the same function.
+  const handlers = new WeakMap();
+
+  Drupal.behaviors.mysiteSelectEvents = {
     attach: function (context, settings) {
-      // Initialize all selects
-      once('hx-select-init', 'hx-select', context).forEach((select) => {
-        // Listen for value changes
-        select.addEventListener('hx-change', (e) => {
+      once('mysite:select-init', 'hx-select', context).forEach((select) => {
+        const onChange = (e) => {
           const { value } = e.detail;
           const name = select.getAttribute('name');
 
-          console.log(`Select ${name} changed to: ${value}`);
-
-          // Example: Conditional field display based on selection
           if (name === 'department') {
             handleDepartmentChange(value, context);
           }
-
-          // Example: Trigger AJAX refresh of dependent field
           if (name === 'insurance_provider') {
             refreshPlanOptions(value);
           }
-        });
-
-        // Optional: Track analytics
-        select.addEventListener('hx-change', (e) => {
           if (typeof gtag !== 'undefined') {
             gtag('event', 'select_change', {
-              field_name: select.getAttribute('name'),
-              selected_value: e.detail.value,
+              field_name: name,
+              selected_value: value,
             });
           }
-        });
+        };
+
+        select.addEventListener('hx-change', onChange);
+        handlers.set(select, onChange);
       });
     },
 
     detach: function (context, settings, trigger) {
-      if (trigger === 'unload') {
-        context.querySelectorAll('hx-select').forEach((select) => {
-          select.removeEventListener('hx-change', () => {});
-        });
-      }
+      if (trigger !== 'unload') return;
+
+      context.querySelectorAll('hx-select').forEach((select) => {
+        const onChange = handlers.get(select);
+        if (onChange) {
+          select.removeEventListener('hx-change', onChange);
+          handlers.delete(select);
+        }
+      });
+
+      // Re-allow attach() to process these elements if they're re-inserted.
+      once.remove('mysite:select-init', context.querySelectorAll('hx-select'));
     },
   };
 
@@ -647,14 +640,28 @@ function mymodule_patient_form_validate($form, &$form_state) {
 Add to `your_theme.libraries.yml`:
 
 ```yaml
-# CDN approach (recommended for production)
+# Per-component CDN load (recommended for production —
+# pulls only the hx-select module + its shared dependencies)
 helix-components:
+  js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-select/index.js:
+      type: external
+      attributes:
+        type: module
+  version: 3.9.0
+  header: true
+```
+
+```yaml
+# Full-bundle CDN load — only use for prototyping or pages that
+# render every component; ships the entire library to every visitor.
+helix-full-bundle:
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
       attributes:
         type: module
-  version: 1.0.0
+  version: 3.9.0
   header: true
 ```
 
@@ -664,7 +671,7 @@ For local development:
 # Local approach
 helix-components-local:
   js:
-    /libraries/helix/dist/index.js:
+    /libraries/helix/dist/components/hx-select/index.js:
       type: file
       attributes:
         type: module
@@ -738,20 +745,17 @@ $form['specialty_wrapper']['specialty'] = [
   '#type' => 'select',
   '#title' => t('Specialty'),
   '#options' => $this->getSpecialtyOptions($form_state->getValue('department')),
-  '#attributes' => [
-    'is' => 'hx-select',
-  ],
+  // As in the FormElement section above: render via a #theme callback
+  // that emits <hx-select>, not by setting `is="hx-select"` on a
+  // native <select> — hx-select is an autonomous custom element.
+  '#theme' => 'hx_select',
 ];
 ```
 
 ### References
 
-See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensive coverage:
-
-- **ADR-DRUPAL-001**: Property-driven vs slot-driven patterns for form elements
-- **ADR-DRUPAL-002**: Event handling in Form API and AJAX contexts
-- **ADR-DRUPAL-003**: Performance optimization for large option lists
-- **ADR-DRUPAL-004**: Accessibility considerations for form validation
+See the [Drupal Integration Guide](/drupal/installation/getting-started/) for end-to-end setup,
+behaviors, and Form API patterns.
 
 <div className="warning-box">
   <p>
@@ -770,12 +774,14 @@ See the [Drupal Integration Guide](#) in the HELIX documentation for comprehensi
 
 ## Browser Support
 
-HELIX components support all modern browsers:
+`hx-select` ships against the library's published minimums (see `packages/hx-library/BROWSER_COMPATIBILITY.md`):
 
-- Chrome/Edge 90+
-- Firefox 90+
-- Safari 14+
+- Chrome / Edge 120+
+- Firefox 120+
+- Safari / Safari iOS 17+
+- Chrome Android 120+
 
-Shadow DOM and Custom Elements are required. No polyfills are provided for IE11.
+Custom Elements v1, Shadow DOM v1, CSS Custom Properties, `ElementInternals`, and CSS `::part()`
+are all required. No polyfills are provided for legacy engines.
 
 </div>

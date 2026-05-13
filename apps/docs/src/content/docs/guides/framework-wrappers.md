@@ -56,7 +56,7 @@ The wrapper package is generated automatically from the [Custom Elements Manifes
 
 ### How It Works
 
-1. **CEM generation** — `pnpm run cem` reads every component's JSDoc annotations (`@property`, `@fires`, `@slot`, `@csspart`) and generates `custom-elements.json`
+1. **CEM generation** — `pnpm run cem` reads each component's source, Lit `@property()`/`@customElement()` decorators, and JSDoc tags (`@fires`, `@slot`, `@csspart`, `@cssprop`), then generates `custom-elements.json`
 2. **Wrapper generation** — The build pipeline reads `custom-elements.json` and uses `@lit/react`'s `createComponent` to produce a typed React wrapper for each component
 3. **Event mapping** — Each `@fires` event in the CEM becomes a typed `on*` prop (e.g., `hx-click` → `onHxClick`)
 4. **Type output** — The generator emits TypeScript declarations so consumers get full IntelliSense
@@ -97,9 +97,23 @@ Both approaches use the same underlying component and produce identical rendered
 - You prefer minimal dependencies and are comfortable with `ref`-based event patterns
 - You are building a server-rendered page where JavaScript is an enhancement
 
+The library is published as ESM with bare dependency imports, so a browser-only setup needs an import map alongside the script tag. See the [Plain HTML / CDN guide](/framework-integration/html) for the full pattern. Short version:
+
 ```html
-<!-- Plain HTML — no build step required -->
-<script type="module" src="https://cdn.helixui.dev/@helixui/library/dist/index.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css" />
+<script type="importmap">
+{
+  "imports": {
+    "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
+    "@helixui/tokens":  "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
+    "@helixui/icons":   "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+    "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
+    "lit":              "https://cdn.jsdelivr.net/npm/lit@3/+esm",
+    "lit/":             "https://cdn.jsdelivr.net/npm/lit@3/"
+  }
+}
+</script>
+<script type="module">import '@helixui/library';</script>
 
 <hx-button variant="primary" id="save-btn">Save</hx-button>
 
@@ -120,6 +134,7 @@ Both approaches use the same underlying component and produce identical rendered
 
 ```tsx
 'use client';
+import { useState } from 'react';
 import { HxButton, HxTextInput } from '@helixui/react';
 
 export function SearchForm({ onSearch }: { onSearch: (query: string) => void }) {
@@ -130,7 +145,9 @@ export function SearchForm({ onSearch }: { onSearch: (query: string) => void }) 
       <HxTextInput
         label="Search"
         value={query}
-        onHxInput={(e) => setQuery(e.detail.value)}
+        onHxInput={(event) =>
+          setQuery((event as CustomEvent<{ value: string }>).detail.value)
+        }
       />
       <HxButton variant="primary" onHxClick={() => onSearch(query)}>
         Search

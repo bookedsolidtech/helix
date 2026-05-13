@@ -1177,7 +1177,6 @@ By applying these techniques, HELiX components deliver enterprise-grade performa
 
 - [Component Styling Fundamentals](/components/styling/fundamentals) — Master Shadow DOM styling basics
 - [Constructable Stylesheets](/components/styling/constructable-stylesheets) — Shared stylesheet performance patterns
-- [Responsive Design Patterns](/components/styling/responsive) — Container queries and responsive strategies
 - [Design Token Architecture](/components/styling/tokens) — Three-tier token system
 
 ---

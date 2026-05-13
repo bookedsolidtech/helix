@@ -5,7 +5,19 @@ sidebar:
   order: 1
 ---
 
-HELiX web components work in any Drupal 10 or 11 site. The library ships as standard ES modules built on Lit, so the only requirement is that your Drupal Libraries API definition loads the script with `attributes: { type: module }`. Everything else — how you source the file — is a choice based on your team's infrastructure and project scale.
+HELiX web components work in any Drupal 10 or 11 site. The library ships as standard ES modules
+built on Lit. Two practical loading patterns work today:
+
+- **Via a CDN that follows the npm import graph** (jsDelivr / unpkg). The CDN proxies the package
+  and resolves the bare `@helixui/tokens` / `lit` imports through the dependency tree, so the
+  browser can pull the full module graph directly. The `<script>` tag loading the entry must use
+  `attributes: { type: module }`.
+- **Via an npm-driven bundler** (Vite, esbuild, Webpack) that resolves the bare specifiers at
+  build time and emits one or more bundled files for Drupal to serve as local assets.
+
+Loading the per-component file (`dist/components/hx-button/index.js`) directly via a `<script>`
+tag will fail because the per-component build still imports a shared chunk via bare specifiers.
+Use the full-bundle entry, an import map, or a bundler.
 
 This guide explains all three approaches, compares them honestly, and walks you through the fastest path to a working component in five minutes.
 
@@ -104,7 +116,7 @@ Open your theme's `mytheme.libraries.yml` and add:
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.9.0
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
       type: external
@@ -113,9 +125,13 @@ helix-components:
       preprocess: false
 ```
 
-**Important:** The `attributes: { type: module }` line is required. HELiX ships as an ES module — without this attribute, browsers will reject the script.
+**Important:** `attributes: { type: module }` is required. HELiX ships as an ES module — without
+this attribute, browsers reject the script.
 
-The correct file path for the Drupal `libraries.yml` `js:` entry is `dist/index.js` (the npm entry point). For CDN-loaded integrations see the [Drupal CDN guide](/drupal/installation/cdn) — 3.0.0 ships `dist/cdn/core.js` plus per-component modules for that path.
+jsDelivr follows the package's npm dependency graph, so the bare `@helixui/tokens` and `lit`
+imports inside `dist/index.js` resolve to their published versions on the same CDN automatically.
+For per-component loading without a build step, supply an import map (see the
+[Drupal CDN guide](/drupal/installation/cdn)) so the browser can resolve the shared chunk.
 
 ### Step 2: Attach the library globally
 
@@ -165,10 +181,11 @@ If the Shadow DOM is present, installation succeeded.
 
 | Package | Version | Purpose |
 |---|---|---|
-| `@helixui/library` | `1.1.2` | Web components (buttons, cards, inputs, etc.) |
-| `@helixui/tokens` | `0.3.4` | Design tokens (colors, spacing, typography) |
+| `@helixui/library` | `3.9.0` | Web components (buttons, cards, inputs, etc.) |
+| `@helixui/tokens` | `3.9.0` | Design tokens (colors, spacing, typography) |
 
-All installation guides on this site use these versions.
+All installation guides on this site use these versions. The workspace publishes both packages in
+lockstep at the same minor release — check the latest tags on npm before pinning a production URL.
 
 ---
 
@@ -178,7 +195,11 @@ All installation guides on this site use these versions.
 |---|---|
 | Full bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js` |
 | CSS bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css` |
-| Single component (example) | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js` |
+| Single component (example, **import map required**) | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js` |
+
+> The single-component URL still imports a shared chunk and bare `lit` specifiers; supply an
+> import map (or use a bundler) before loading per-component modules in the browser. The full
+> bundle URL Just Works because jsDelivr resolves the dependency graph for you.
 
 ---
 

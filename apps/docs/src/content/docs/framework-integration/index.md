@@ -35,10 +35,16 @@ Web components are framework-agnostic by design, but frameworks differ in:
 
 ## Installation
 
-All guides assume the library is installed via npm:
+The raw web component / framework guides (HTML, Angular, Vue, Svelte, Astro, Drupal, Next.js when used without wrappers) install the core library directly:
 
 ```bash
 npm install @helixui/library
 ```
 
-Or loaded via CDN — see the [Plain HTML guide](/framework-integration/html).
+The [React Wrappers guide](/framework-integration/react-wrappers) uses the auto-generated React-specific package, which brings `@helixui/library` in as a dependency:
+
+```bash
+npm install @helixui/react
+```
+
+Or load the core library via CDN — see the [Plain HTML guide](/framework-integration/html).

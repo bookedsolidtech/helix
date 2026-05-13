@@ -43,7 +43,7 @@ export const KeyTable = ({ rows }) => (
 
 <EyebrowHeading
   eyebrow="Accessibility · keyboard contracts"
-  title="Every component has a keyboard contract. We borrowed it from APG."
+  title="Every interactive component has a keyboard contract. We borrowed it from APG."
   lede={
     <>
       The W3C ARIA Authoring Practices Guide (APG) defines the canonical keyboard interaction
@@ -55,10 +55,10 @@ export const KeyTable = ({ rows }) => (
 />
 
 <section>
-  <SectionHead title="At a glance" meta="WCAG 2.1.1, 2.1.2, 2.4.3, 2.4.7, 2.4.13" />
+  <SectionHead title="At a glance" meta="WCAG 2.1.3, 2.4.3, 2.4.7, 2.4.13, 2.5.5 + APG keyboard" />
   <div className="hx-docs-stats">
-    <StatCard num="7" label="Pattern categories" sub="all APG-aligned" />
-    <StatCard num="0" label="Keyboard traps" sub="WCAG 2.1.2 enforced" />
+    <StatCard num="8" label="Pattern categories" sub="APG-aligned + app shortcuts" />
+    <StatCard num="0" label="Keyboard traps" sub="No-keyboard-trap rule enforced in cert" />
     <StatCard num="100" unit="%" label="Tab-reachable" sub="every interactive element" />
     <StatCard num="44" unit="px" label="Hit-target floor" sub="WCAG 2.5.5" />
   </div>
@@ -102,12 +102,16 @@ export const KeyTable = ({ rows }) => (
 </section>
 
 <section>
-  <SectionHead title="Per-category contracts" meta="7 categories · APG aligned" />
+  <SectionHead title="Per-category contracts" meta="8 categories · APG aligned + app shortcuts" />
 
 <h3 style={{ marginTop: 32 }}>Buttons & toggles</h3>
 <p className="hx-docs-card-body">
-  <code>hx-button</code>, <code>hx-icon-button</code>, <code>hx-switch</code>,
-  <code>hx-checkbox</code>. Native HTML semantics — keyboard handled by the user agent.
+  <code>hx-button</code> and <code>hx-icon-button</code> wrap a real native{' '}
+  <code>&lt;button&gt;</code>
+  in their shadow root — keyboard activation (Space / Enter) is handled by the user agent.
+  <code>hx-switch</code> and <code>hx-checkbox</code> implement an APG-style host keydown contract
+  (Space toggles; arrow keys move between group siblings where applicable) — they do not rely on a
+  native input for activation.
 </p>
 <KeyTable
   rows={[
@@ -128,7 +132,7 @@ export const KeyTable = ({ rows }) => (
     ['↑ / ↓', 'Move within the listbox / radio group'],
     ['Home / End', 'Jump to first / last option'],
     ['Enter', 'Activate the focused option (combobox only)'],
-    ['Space', 'Toggle the focused option (radio only)'],
+    ['Space', 'Toggle the focused radio; open/select option in hx-select'],
     ['Esc', 'Close listbox without committing (combobox only)'],
     ['A–Z', 'Type-ahead — focus first option starting with the letter'],
   ]}
@@ -151,7 +155,8 @@ export const KeyTable = ({ rows }) => (
 <h3 style={{ marginTop: 32 }}>Menu / menubar</h3>
 <p className="hx-docs-card-body">
   <code>hx-menu</code>, <code>hx-menu-item</code>, <code>hx-overflow-menu</code>. Roving tabindex;
-  submenu opens with → / Enter, closes with ← / Esc.
+  submenu opens with → (ArrowRight) and closes with ← (ArrowLeft). Enter / Space activate the
+  focused menu item; Esc closes the entire menu.
 </p>
 <KeyTable
   rows={[
@@ -180,8 +185,9 @@ export const KeyTable = ({ rows }) => (
 
 <h3 style={{ marginTop: 32 }}>Disclosure / accordion</h3>
 <p className="hx-docs-card-body">
-  <code>hx-accordion</code>, <code>hx-disclosure</code>. The trigger is a button; the panel is a
-  sibling region. Multiple panels may be open at once unless single-select is enabled.
+  <code>hx-accordion</code> with its <code>hx-accordion-item</code> children. The trigger is a
+  button; the panel is a sibling region. Multiple panels may be open at once unless single-select is
+  enabled.
 </p>
 <KeyTable
   rows={[
@@ -194,12 +200,21 @@ export const KeyTable = ({ rows }) => (
 
 <h3 style={{ marginTop: 32 }}>Form field with popup</h3>
 <p className="hx-docs-card-body">
-  <code>hx-date-picker</code>, <code>hx-time-picker</code>, <code>hx-color-picker</code>. The field
-  stays focusable; the popup is opened with ↓ / Alt + ↓ and dismissed with Esc.
+  Date, time, and color pickers expose popup affordances — each with its own opening contract:
 </p>
+<ul className="hx-docs-card-body" style={{ marginTop: 4, marginLeft: 24 }}>
+  <li>
+    <code>hx-time-picker</code> — field stays focusable; popup opens with <kbd>↓</kbd> /{' '}
+    <kbd>Alt + ↓</kbd>, closes with <kbd>Esc</kbd>
+  </li>
+  <li>
+    <code>hx-date-picker</code>, <code>hx-color-picker</code> — popup opens via the trigger button
+    (mouse or keyboard activate); not bound to <kbd>↓</kbd> on the field surface
+  </li>
+</ul>
 <KeyTable
   rows={[
-    ['↓ / Alt + ↓', 'Open the popup'],
+    ['↓ / Alt + ↓', 'Open the time-picker popup (hx-time-picker only)'],
     ['Esc', 'Close the popup without committing'],
     ['Enter', 'Commit the focused value and close'],
     ['Arrow keys', 'Navigate within the popup grid (date) or scale (time)'],
@@ -209,10 +224,10 @@ export const KeyTable = ({ rows }) => (
 
   <h3 style={{ marginTop: 32 }}>Application shortcuts</h3>
   <p className="hx-docs-card-body">
-    Page-level shortcuts published by the consumer app. Helix's <code>hx-command-menu</code>
-    primitive opens via <kbd>⌘ K</kbd> / <kbd>Ctrl K</kbd> and exposes a registry consumers
-    populate. All shortcuts must be discoverable via a cheat sheet (typically <kbd>?</kbd>) and
-    user-remappable per WCAG 2.1.4.
+    Page-level shortcuts published by the consumer app. HELiX does not ship a built-in command
+    palette today — consumer apps that need <kbd>⌘ K</kbd> / <kbd>Ctrl K</kbd> launchers should
+    wire one into their own scaffold. Whatever pattern you ship, shortcuts must be discoverable
+    via a cheat sheet (typically <kbd>?</kbd>) and user-remappable per WCAG 2.1.4 (Character Key Shortcuts).
   </p>
   <KeyTable
     rows={[
@@ -225,11 +240,13 @@ export const KeyTable = ({ rows }) => (
 </section>
 
 <section>
-  <SectionHead title="The contract in code" meta="hx-tabs roving tabindex pattern" />
+  <SectionHead title="The contract in code" meta="simplified roving-tabindex pattern (illustrative)" />
   <p className="hx-docs-card-body">
-    Below is the canonical roving-tabindex implementation HELiX uses for tablists, menus, and
-    radio groups. The active item carries <code>tabindex="0"</code>; siblings carry
-    <code>tabindex="-1"</code>. Arrow keys shift the active index; Tab leaves the group.
+    Below is a simplified roving-tabindex pattern in the HELiX style — illustrative, not a
+    literal excerpt of <code>hx-tabs.ts</code>. The active item carries <code>tabindex="0"</code>;
+    siblings carry <code>tabindex="-1"</code>. Arrow keys shift the active index; Tab leaves the
+    group. See the real <code>hx-tabs.ts</code> source for the full implementation including
+    home/end, manual-vs-automatic activation, and edge-case handling.
   </p>
 
 <CodeBlock language="ts" filename="hx-tabs.ts" code={TABS_KEYDOWN_TS} />
@@ -278,8 +295,9 @@ export const KeyTable = ({ rows }) => (
     </DocsCard>
     <DocsCard title="W3C APG" tag="external · authoritative">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
-        The patterns here are direct ports of <code>w3c.github.io/aria-practices</code>. Treat APG
-        as the source of truth when adding a new component.
+        The patterns here are direct ports of{' '}
+        <a href="https://www.w3.org/WAI/ARIA/apg/">w3.org/WAI/ARIA/apg/</a>. Treat APG as the source
+        of truth when adding a new component.
       </p>
     </DocsCard>
   </div>

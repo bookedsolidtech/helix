@@ -3,66 +3,77 @@ title: API Reference
 description: Complete API reference for HELIX web components
 ---
 
-The HELIX API reference is auto-generated from the **Custom Elements Manifest** (CEM), which serves as the single source of truth for all component APIs.
+The HELiX component API reference is rendered from the **Custom Elements Manifest** (CEM). The CEM is the single source of truth — every component page in Storybook reads from it.
 
 ## Custom Elements Manifest
 
-The CEM is generated from JSDoc comments in component source code using the `@custom-elements-manifest/analyzer`. Documentation stays in sync with implementation automatically — no manual updates required.
+The CEM is generated from JSDoc comments in component source code by `@custom-elements-manifest/analyzer`. The analyzer reads `packages/hx-library/src/components/**/*.ts` and emits `packages/hx-library/custom-elements.json`. Whenever a component's JSDoc, decorators, or events change, regenerate the CEM:
 
-## Reference Format
+```bash
+pnpm cem
+```
 
-Each component's API reference includes:
+Per Phase D of the docs cleanup epic, the canonical per-component reference is the live **Storybook autodocs** page; the previously-shipped Astro per-component pages were deleted to avoid duplicating the CEM.
 
-| Section            | Description                                                |
-| ------------------ | ---------------------------------------------------------- |
-| **Properties**     | All `@property()` decorated fields with types and defaults |
-| **Attributes**     | HTML attributes with reflection behavior                   |
-| **Methods**        | Public methods available on the element                    |
-| **Events**         | Custom events dispatched by the component                  |
-| **Slots**          | Named and default slots for content projection             |
-| **CSS Parts**      | Shadow DOM parts exposed for external styling              |
-| **CSS Properties** | CSS custom properties for theming                          |
+## What the reference includes per component
 
-## Example Entry
+Drawn directly from the CEM `declaration` block:
+
+| Section                    | CEM source field           |
+| -------------------------- | -------------------------- |
+| **Properties**             | `members` where `kind: 'field'` |
+| **Events**                 | `events`                   |
+| **Slots**                  | `slots`                    |
+| **CSS Parts**              | `cssParts`                 |
+| **CSS Custom Properties**  | `cssProperties`            |
+
+Public methods (`members` where `kind: 'method'`) are documented in JSDoc but Storybook autodocs surfaces them via inline narrative rather than a dedicated table.
+
+## Example: hx-button (excerpt)
 
 ```
 hx-button
 =========
 
-Properties:
-  variant: 'primary' | 'secondary' | 'ghost'  (default: 'primary')
-  size: 'sm' | 'md' | 'lg'                    (default: 'md')
-  disabled: boolean                             (default: false)
+Properties (selected):
+  variant:  'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline'  (default: 'primary')
+  tone:     'neutral' | 'success' | 'warning' | 'danger' | 'info'                   (default: 'neutral')
+  size:     'sm' | 'md' | 'lg'                                                       (default: 'md')
+  loading:  boolean                                                                  (default: false)
+  disabled: boolean                                                                  (default: false)
+  href:     string                                                                   (renders as <a> when set)
 
 Events:
-  hx-click: { originalEvent: MouseEvent }
+  hx-click: { originalEvent: PointerEvent | KeyboardEvent }
 
 Slots:
   (default): Button label content
+  prefix:    Icon or content placed before the label
+  suffix:    Icon or content placed after the label
 
 CSS Parts:
-  button: The inner <button> element
-
-CSS Properties:
-  --hx-button-bg: Background color
-  --hx-button-color: Text color
-  --hx-button-border-radius: Border radius
+  base:  The host-rendered interactive element (<button> or <a> depending on href)
+  label: The wrapper around the default slot
+  prefix, suffix: The named-slot wrappers
 ```
 
-## Generating the Reference
+The full, current API for every component (44 P0 + ancillary) is rendered live in [Storybook](https://storybook.helix.bookedsolid.tech/) under each component's "Docs" tab.
+
+## Regenerating + consuming
 
 ```bash
 # Regenerate CEM from source JSDoc annotations
-npm run cem
+pnpm cem
 ```
 
-The pipeline:
+Pipeline:
 
-1. Component source code JSDoc comments
-2. CEM Analyzer extracts metadata → `custom-elements.json`
-3. Custom Astro plugin renders reference pages
-4. Storybook ArgsTable uses the same CEM data
+1. JSDoc comments + decorators in `packages/hx-library/src/components/**/*.ts`
+2. `@custom-elements-manifest/analyzer` produces `packages/hx-library/custom-elements.json`
+3. `scripts/generate-react-wrappers.ts` emits framework wrappers (typed React props/events for `@helixui/react`)
+4. Storybook autodocs reads the CEM directly via the addon-docs CEM integration
+5. The committed `packages/hx-library/aaa-verdicts.json` snapshot feeds the per-page `<AAAConformanceCard>`
 
 ## Component Catalog
 
-For the complete component list and API documentation, see [Storybook](https://storybook.helix.bookedsolid.tech/).
+For the complete component list and live API documentation, see [Storybook](https://storybook.helix.bookedsolid.tech/).

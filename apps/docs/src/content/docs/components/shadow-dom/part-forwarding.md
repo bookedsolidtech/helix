@@ -353,7 +353,7 @@ For the page to reach the `input` element, each layer must forward explicitly:
 ```css
 hx-patient-form::part(patient-input) {
   font-size: 1rem;
-  min-height: 44px; /* WCAG 2.1 AA minimum touch target */
+  min-height: 44px; /* WCAG 2.2 SC 2.5.5 (Target Size — Enhanced, AAA): ≥44×44 CSS px */
 }
 ```
 
@@ -461,9 +461,6 @@ For HELiX components consumed through Drupal Twig templates, `exportparts` decla
 ## Next Steps
 
 - [CSS Parts API](/components/shadow-dom/parts) — The full `part` attribute and `::part()` selector reference
-- [Open vs Closed Shadow Roots](/components/shadow-dom/open-closed) — Why open mode is required for part forwarding to work
-- [Shadow DOM Architecture](/components/shadow-dom/architecture) — Shadow boundary fundamentals
-- [Advanced Slots](/components/shadow-dom/advanced-slots) — Composition patterns that work alongside part forwarding
 
 ## Sources
 
