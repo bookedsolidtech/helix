@@ -83,17 +83,17 @@ This runs the `act-ci.yml` workflow — a lightweight mirror of the production `
 
 ## Available Flags
 
-| Flag           | Description                                                                   |
-| -------------- | ----------------------------------------------------------------------------- |
-| `--job <name>` | Run a specific job instead of all gates                                       |
-| `--list`       | Print available job names and exit                                            |
-| `--help` / `-h`| Show usage text and exit                                                      |
-| `--native`     | Use `linux/arm64` containers (no Rosetta emulation — faster on Apple Silicon) |
-| `--full`       | Run the complete test suite instead of smart tests (changed components only)  |
-| `--matrix`     | Run the full Node.js × Playwright matrix test job (`test-full`) — slow        |
-| `--batch`      | Run tests in batches of 10 to avoid Docker OOM                                |
-| `--clean`      | Remove all `act-*` containers before running                                  |
-| `--fast`       | Run the consolidated single-job fast workflow                                 |
+| Flag            | Description                                                                   |
+| --------------- | ----------------------------------------------------------------------------- |
+| `--job <name>`  | Run a specific job instead of all gates                                       |
+| `--list`        | Print available job names and exit                                            |
+| `--help` / `-h` | Show usage text and exit                                                      |
+| `--native`      | Use `linux/arm64` containers (no Rosetta emulation — faster on Apple Silicon) |
+| `--full`        | Run the complete test suite instead of smart tests (changed components only)  |
+| `--matrix`      | Run the full Node.js × Playwright matrix test job (`test-full`) — slow        |
+| `--batch`       | Run tests in batches of 10 to avoid Docker OOM                                |
+| `--clean`       | Remove all `act-*` containers before running                                  |
+| `--fast`        | Run the consolidated single-job fast workflow                                 |
 
 ---
 
@@ -101,15 +101,15 @@ This runs the `act-ci.yml` workflow — a lightweight mirror of the production `
 
 The `act-ci.yml` workflow runs these jobs. The table reflects the **default** subset run by `./scripts/act-ci.sh`; the workflow also defines a `test-full` job that only fires with `--matrix` (`ACT_MATRIX_TESTS` / `ACT_FULL_TESTS`):
 
-| Job             | What it checks                                       | Approximate time |
-| --------------- | ---------------------------------------------------- | ---------------- |
-| `lint`          | ESLint strict                                        | ~12s (warm)      |
-| `format`        | Prettier check                                       | ~10s (warm)      |
-| `type-check`    | TypeScript strict — no `any`                         | ~15s (warm)      |
-| `build`         | Full library build + CEM validation                  | ~90s             |
-| `test`          | Vitest browser tests (Playwright/Chromium)           | ~120s            |
-| `test-full`     | Full Node × Playwright matrix test (opt-in)          | ~10–15min        |
-| `quality-gates` | Aggregate — required jobs must pass                  | ~1s              |
+| Job             | What it checks                              | Approximate time |
+| --------------- | ------------------------------------------- | ---------------- |
+| `lint`          | ESLint strict                               | ~12s (warm)      |
+| `format`        | Prettier check                              | ~10s (warm)      |
+| `type-check`    | TypeScript strict — no `any`                | ~15s (warm)      |
+| `build`         | Full library build + CEM validation         | ~90s             |
+| `test`          | Vitest browser tests (Playwright/Chromium)  | ~120s            |
+| `test-full`     | Full Node × Playwright matrix test (opt-in) | ~10–15min        |
+| `quality-gates` | Aggregate — required jobs must pass         | ~1s              |
 
 Jobs that need Playwright browsers will use a cached volume mount on repeat runs — first run downloads browsers, subsequent runs reuse the cache.
 

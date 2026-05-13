@@ -10,16 +10,16 @@ import { tokensByCategory } from '@helixui/tokens';
 
 export const shadowTokens = tokensByCategory['shadow'] ?? [];
 
-// Every use-case below is grounded in an actual *.styles.ts shadow
+// Every use-case below is grounded in an actual \*.styles.ts shadow
 // binding in packages/hx-library/src/components.
 export const shadowUseCases = {
-  none: 'Flat elements with no visual lift. Used for inline or flush elements.',
-  sm: 'Subtle elevation — hx-slider / hx-switch thumbs and hx-tooltip body.',
-  md: 'Moderate depth — hx-card at rest, hx-dropdown / hx-menu / hx-nav / hx-popover surfaces, hx-toast.',
-  lg: 'Hover elevation on hx-card (rest is md, hover lifts to lg).',
-  xl: 'High elevation for modal surfaces — hx-dialog and hx-drawer; also hx-card deep-hover.',
-  '2xl': 'Available token; not currently consumed by any shipped HELiX component. Reserved for consumer custom surfaces.',
-  inner: 'Available token; not currently consumed by any shipped HELiX component. Reserved for consumer pressed/recessed-input patterns.',
+none: 'Flat elements with no visual lift. Used for inline or flush elements.',
+sm: 'Subtle elevation — hx-slider / hx-switch thumbs and hx-tooltip body.',
+md: 'Moderate depth — hx-card at rest, hx-dropdown / hx-menu / hx-nav / hx-popover surfaces, hx-toast.',
+lg: 'Hover elevation on hx-card (rest is md, hover lifts to lg).',
+xl: 'High elevation for modal surfaces — hx-dialog and hx-drawer; also hx-card deep-hover.',
+'2xl': 'Available token; not currently consumed by any shipped HELiX component. Reserved for consumer custom surfaces.',
+inner: 'Available token; not currently consumed by any shipped HELiX component. Reserved for consumer pressed/recessed-input patterns.',
 };
 
 <style>

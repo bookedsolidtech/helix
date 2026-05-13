@@ -106,11 +106,12 @@ export const KeyTable = ({ rows }) => (
 
 <h3 style={{ marginTop: 32 }}>Buttons & toggles</h3>
 <p className="hx-docs-card-body">
-  <code>hx-button</code> and <code>hx-icon-button</code> wrap a real native <code>&lt;button&gt;</code>
+  <code>hx-button</code> and <code>hx-icon-button</code> wrap a real native{' '}
+  <code>&lt;button&gt;</code>
   in their shadow root — keyboard activation (Space / Enter) is handled by the user agent.
-  <code>hx-switch</code> and <code>hx-checkbox</code> implement an APG-style host keydown
-  contract (Space toggles; arrow keys move between group siblings where applicable) — they
-  do not rely on a native input for activation.
+  <code>hx-switch</code> and <code>hx-checkbox</code> implement an APG-style host keydown contract
+  (Space toggles; arrow keys move between group siblings where applicable) — they do not rely on a
+  native input for activation.
 </p>
 <KeyTable
   rows={[
@@ -185,7 +186,8 @@ export const KeyTable = ({ rows }) => (
 <h3 style={{ marginTop: 32 }}>Disclosure / accordion</h3>
 <p className="hx-docs-card-body">
   <code>hx-accordion</code> with its <code>hx-accordion-item</code> children. The trigger is a
-  button; the panel is a sibling region. Multiple panels may be open at once unless single-select is enabled.
+  button; the panel is a sibling region. Multiple panels may be open at once unless single-select is
+  enabled.
 </p>
 <KeyTable
   rows={[
@@ -201,8 +203,14 @@ export const KeyTable = ({ rows }) => (
   Date, time, and color pickers expose popup affordances — each with its own opening contract:
 </p>
 <ul className="hx-docs-card-body" style={{ marginTop: 4, marginLeft: 24 }}>
-  <li><code>hx-time-picker</code> — field stays focusable; popup opens with <kbd>↓</kbd> / <kbd>Alt + ↓</kbd>, closes with <kbd>Esc</kbd></li>
-  <li><code>hx-date-picker</code>, <code>hx-color-picker</code> — popup opens via the trigger button (mouse or keyboard activate); not bound to <kbd>↓</kbd> on the field surface</li>
+  <li>
+    <code>hx-time-picker</code> — field stays focusable; popup opens with <kbd>↓</kbd> /{' '}
+    <kbd>Alt + ↓</kbd>, closes with <kbd>Esc</kbd>
+  </li>
+  <li>
+    <code>hx-date-picker</code>, <code>hx-color-picker</code> — popup opens via the trigger button
+    (mouse or keyboard activate); not bound to <kbd>↓</kbd> on the field surface
+  </li>
 </ul>
 <KeyTable
   rows={[
@@ -287,8 +295,9 @@ export const KeyTable = ({ rows }) => (
     </DocsCard>
     <DocsCard title="W3C APG" tag="external · authoritative">
       <p style={{ margin: 0, fontSize: 13, color: 'var(--hx-color-text-secondary)' }}>
-        The patterns here are direct ports of <a href="https://www.w3.org/WAI/ARIA/apg/">w3.org/WAI/ARIA/apg/</a>.
-        Treat APG as the source of truth when adding a new component.
+        The patterns here are direct ports of{' '}
+        <a href="https://www.w3.org/WAI/ARIA/apg/">w3.org/WAI/ARIA/apg/</a>. Treat APG as the source
+        of truth when adding a new component.
       </p>
     </DocsCard>
   </div>

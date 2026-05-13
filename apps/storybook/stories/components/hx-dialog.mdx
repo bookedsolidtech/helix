@@ -100,11 +100,10 @@ The contract: focus trap, return focus, inert backdrop, Escape dismissal, initia
     <ul className="hx-apg-card-keyboard">
       <li>
         <span className="hx-apg-kbd-desc">
-          <strong>Initial focus</strong> — when the dialog opens, focus moves to the first
-          focusable element inside the dialog (the close button by default, or whatever you
-          slot in first). hx-dialog does not currently honor an <code>autofocus</code>{' '}
-          attribute on slotted children — re-order the slotted content so the desired
-          first-focus target appears first.
+          <strong>Initial focus</strong> — when the dialog opens, focus moves to the first focusable
+          element inside the dialog (the close button by default, or whatever you slot in first).
+          hx-dialog does not currently honor an <code>autofocus</code> attribute on slotted children
+          — re-order the slotted content so the desired first-focus target appears first.
         </span>
       </li>
       <li>
@@ -119,8 +118,8 @@ The contract: focus trap, return focus, inert backdrop, Escape dismissal, initia
         <span className="hx-apg-kbd-desc">
           <strong>Escape dismiss</strong> — <kbd className="hx-apg-kbd">Escape</kbd> closes the
           dialog. To disable backdrop click dismissal (still letting Escape work), set{' '}
-          <code>close-on-backdrop="false"</code>. hx-dialog does not currently expose a switch
-          to disable Escape dismissal.
+          <code>close-on-backdrop="false"</code>. hx-dialog does not currently expose a switch to
+          disable Escape dismissal.
         </span>
       </li>
       <li>
@@ -141,7 +140,8 @@ The contract: focus trap, return focus, inert backdrop, Escape dismissal, initia
       Provide a <code>heading</code> attribute (or render a heading element into the{' '}
       <code>heading</code> slot) — the dialog's accessible name is what screen readers announce on
       open. Without it, the dialog is announced as "dialog" with no context. (hx-dialog also accepts
-      a native <code>aria-label</code> attribute; there is no separate <code>label</code> attribute.)
+      a native <code>aria-label</code> attribute; there is no separate <code>label</code>{' '}
+      attribute.)
     </>,
     <>
       Do not render multiple modal dialogs simultaneously. The APG pattern is

@@ -17,11 +17,11 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
     <>
       Six reference brands ship in HELiX Storybook/docs as demonstration tiles; production consumers
       register their own brands at runtime. Every brand registers a primary &amp; secondary ramp
-      against <code>HelixBrandRegistry</code>;
-      <code> {'<hx-theme brand="…">'}</code> applies it to every component in the subtree. Override{' '}
-      <em>only what makes you, you</em>; the rest of the 22-token semantic tier inherits from the
-      HELiX base. The shipped P0 surface holds WCAG 2.2 AAA verdicts: 44 components, 376 Supports,
-      109 Not Applicable, 0 Partial, 0 Fail (see <code>aaa-verdicts.json</code>).
+      against <code>HelixBrandRegistry</code>;<code> {'<hx-theme brand="…">'}</code> applies it to
+      every component in the subtree. Override <em>only what makes you, you</em>; the rest of the
+      22-token semantic tier inherits from the HELiX base. The shipped P0 surface holds WCAG 2.2 AAA
+      verdicts: 44 components, 376 Supports, 109 Not Applicable, 0 Partial, 0 Fail (see{' '}
+      <code>aaa-verdicts.json</code>).
     </>
   }
 />
@@ -172,11 +172,11 @@ import { EyebrowHeading, SectionHead, CodeBlock, CodeTabs } from '../_components
 // secondary 50→950. Abbreviated below for legibility; in production
 // supply the full 22-key map.
 HelixBrandRegistry.register('meridian', {
-  '--hx-color-primary-50':  '#EFF4FF',
-  '--hx-color-primary-100': '#DCE8FF',
-  // … 9 more primary stops (200 → 950)
-  '--hx-color-secondary-500': '#5B8AFF',
-  // … 10 more secondary stops (50 → 950, excluding 500)
+'--hx-color-primary-50': '#EFF4FF',
+'--hx-color-primary-100': '#DCE8FF',
+// … 9 more primary stops (200 → 950)
+'--hx-color-secondary-500': '#5B8AFF',
+// … 10 more secondary stops (50 → 950, excluding 500)
 });`,
       },
       {
@@ -184,13 +184,14 @@ HelixBrandRegistry.register('meridian', {
         language: 'html',
         filename: 'apply-in-markup.html',
         code: `<hx-theme brand="meridian">
-  <hx-button variant="primary">
-    Schedule visit
-  </hx-button>
+<hx-button variant="primary">
+Schedule visit
+</hx-button>
 </hx-theme>`,
-      },
-    ]}
-  />
+},
+]}
+/>
+
 </section>
 
 <section>

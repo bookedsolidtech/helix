@@ -34,8 +34,8 @@ import '@helixui/library/components/hx-alert';
       the stable override point for consumers; primitive ramps are only overridden by registered
       brand definitions (primary/secondary), and component-tier hooks may be internal,
       variant-shadowed, or only effective in limited states. Every text-on-surface pair is
-      contrast-graded across light, dark, and high-contrast modes. Click any token reference on
-      this page to copy <code>var(--hx-color-…)</code>.
+      contrast-graded across light, dark, and high-contrast modes. Click any token reference on this
+      page to copy <code>var(--hx-color-…)</code>.
     </>
   }
 />
@@ -187,14 +187,13 @@ import '@helixui/library/components/hx-alert';
   <SectionHead title="AAA contrast matrix" meta="every text × surface pair · all 3 modes" />
   <p className="hx-docs-card-body">
     Every shipped text-on-surface pair, graded against the WCAG 2.2 contrast thresholds (SC 1.4.6
-    carries forward from 2.1): body text 7:1 AAA / 4.5:1 AA, large text 4.5:1 AAA / 3:1 AA, and
-    UI / non-text pairs 3:1 (SC 1.4.11). Rendered from{' '}
-    <code>@helixui/tokens/contrast-data</code> (the committed contrast report module imported by
-    Storybook); regenerate via{' '}
+    carries forward from 2.1): body text 7:1 AAA / 4.5:1 AA, large text 4.5:1 AAA / 3:1 AA, and UI /
+    non-text pairs 3:1 (SC 1.4.11). Rendered from <code>@helixui/tokens/contrast-data</code> (the
+    committed contrast report module imported by Storybook); regenerate via{' '}
     <code>pnpm --filter=@helixui/tokens run contrast:report</code>. This view is token contrast
     telemetry — the canonical AAA cert authority is{' '}
-    <code>packages/hx-library/aaa-verdicts.json</code> backed by the formal audit harness
-    (<code>scripts/aaa-formal-audit.mjs</code>).
+    <code>packages/hx-library/aaa-verdicts.json</code> backed by the formal audit harness (
+    <code>scripts/aaa-formal-audit.mjs</code>).
   </p>
   <div style={{ marginTop: 24 }}>
     <ContrastMatrix />
@@ -204,13 +203,13 @@ import '@helixui/library/components/hx-alert';
 <section>
   <SectionHead title="Brand swap" meta="primary + secondary ramps · semantic stays locked" />
   <p className="hx-docs-card-body">
-    Open the <strong>Brand</strong> toolbar at the top of this page. Selecting a brand overrides
-    the primary and secondary ramp stops; every consumer of those ramps reflows, including the
-    live <code>hx-button</code> in the cascade walkthrough — which paints from{' '}
+    Open the <strong>Brand</strong> toolbar at the top of this page. Selecting a brand overrides the
+    primary and secondary ramp stops; every consumer of those ramps reflows, including the live{' '}
+    <code>hx-button</code> in the cascade walkthrough — which paints from{' '}
     <TokenRef token="--hx-color-action-primary-bg" /> (currently resolving to the brand{' '}
-    <code>primary-700</code> stop for AAA contrast on action surfaces). The 22-token brand
-    contract is the primary/secondary ramp set; semantic surface, text, and action tokens stay
-    inherited and recompute from those ramps, so contrast guarantees survive the swap.
+    <code>primary-700</code> stop for AAA contrast on action surfaces). The 22-token brand contract
+    is the primary/secondary ramp set; semantic surface, text, and action tokens stay inherited and
+    recompute from those ramps, so contrast guarantees survive the swap.
   </p>
   <p className="hx-docs-card-body" style={{ marginTop: 16 }}>
     Full brand contract:{' '}
