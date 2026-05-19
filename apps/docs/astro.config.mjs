@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -38,6 +39,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    sitemap(),
     starlight({
       expressiveCode: {
         themes: ['material-theme-palenight'],
