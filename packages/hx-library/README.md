@@ -184,8 +184,8 @@ Components are standard Custom Elements and work in any framework:
 
 Full component docs, API reference, and Storybook playground:
 
-- **Docs site:** [helixui.dev](https://helixui.dev) (Astro Starlight — prose, integration guides, AAA verdicts)
-- **Storybook:** [storybook.helixui.dev](https://storybook.helixui.dev) (CEM-driven autodocs, every variant, interaction tests)
+- **Docs site:** [helix.bookedsolid.tech](https://helix.bookedsolid.tech) (Astro Starlight — prose, integration guides, AAA verdicts)
+- **Storybook:** [storybook.helix.bookedsolid.tech](https://storybook.helix.bookedsolid.tech) (CEM-driven autodocs, every variant, interaction tests)
 
 ---
 

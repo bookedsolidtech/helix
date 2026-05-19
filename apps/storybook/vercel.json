@@ -1,16 +1,5 @@
 {
   "installCommand": "cd ../.. && corepack enable && pnpm install --frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm turbo run build --filter=@helixui/storybook",
-  "outputDirectory": "dist",
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        }
-      ]
-    }
-  ]
+  "outputDirectory": "dist"
 }

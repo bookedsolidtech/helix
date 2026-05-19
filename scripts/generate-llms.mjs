@@ -38,7 +38,7 @@ const OUT_DIR = path.join(REPO_ROOT, 'apps/docs/public');
 const LLMS_TXT = path.join(OUT_DIR, 'llms.txt');
 const LLMS_FULL_TXT = path.join(OUT_DIR, 'llms-full.txt');
 
-const DOCS_BASE = 'https://docs.helix.bookedsolid.tech';
+const DOCS_BASE = 'https://helix.bookedsolid.tech';
 const STORYBOOK_BASE = 'https://storybook.helix.bookedsolid.tech';
 
 const MAX_LLMS_TXT_BYTES = 5 * 1024;
