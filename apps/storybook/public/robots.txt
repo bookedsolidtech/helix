@@ -1,2 +1,8 @@
+# Helix Storybook — public component stories and visual reference
+# https://storybook.helix.bookedsolid.tech
+#
+# Open to crawlers and AI systems. Stories are linked from the docs site
+# at https://helix.bookedsolid.tech for live component examples.
+
 User-agent: *
-Disallow: /
+Allow: /

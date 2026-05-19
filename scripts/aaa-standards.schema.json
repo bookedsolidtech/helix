@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://helixui.dev/schemas/aaa-standards.schema.json",
+  "$id": "https://helix.bookedsolid.tech/schemas/aaa-standards.schema.json",
   "title": "HELiX AAA Standards Reference",
   "description": "Authoritative source-of-truth for the WCAG 2.2 AAA Success Criteria + peer standards (forced-colors, APG keyboard contracts) HELiX components are formally certified against. Every URL is verified live against the upstream W3C/MDN endpoint at the date in `verification.verifiedAt`.",
   "type": "object",

@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://helixui.dev',
+  site: 'https://helix.bookedsolid.tech',
   vite: {
     resolve: {
       alias: {
