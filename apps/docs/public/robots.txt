@@ -6,3 +6,5 @@
 
 User-agent: *
 Allow: /
+
+Sitemap: https://helix.bookedsolid.tech/sitemap-index.xml
