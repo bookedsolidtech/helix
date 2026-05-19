@@ -2,8 +2,7 @@
 # https://helix.bookedsolid.tech
 #
 # Open to crawlers and AI systems. This documentation exists to be found,
-# read, and cited by both humans and AI agents (Claude Code, Codex,
-# ChatGPT, Perplexity, Google AI Overviews).
+# read, and cited by both humans and AI systems.
 
 User-agent: *
 Allow: /
