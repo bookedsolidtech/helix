@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -8,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://helixui.dev',
+  site: 'https://helix.bookedsolid.tech',
   vite: {
     resolve: {
       alias: {
@@ -38,6 +39,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    sitemap(),
     starlight({
       expressiveCode: {
         themes: ['material-theme-palenight'],
