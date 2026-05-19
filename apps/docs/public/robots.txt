@@ -1,2 +1,8 @@
+# Helix — public component library documentation
+# https://helix.bookedsolid.tech
+#
+# Open to crawlers and AI systems. This documentation exists to be found,
+# read, and cited by both humans and AI systems.
+
 User-agent: *
-Disallow: /
+Allow: /
