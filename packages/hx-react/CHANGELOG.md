@@ -1,5 +1,11 @@
 # @helixui/react
 
+## 3.9.2
+
+### Patch Changes
+
+- @helixui/library@3.9.2
+
 ## 3.9.1
 
 ### Patch Changes
