@@ -208,6 +208,18 @@ jobs:
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
+      # `changeset publish` shells out to the global `npm` binary for the
+      # actual registry PUT. Node 22 bundles npm 10.x, which signs provenance
+      # but does NOT support trusted-publishing OIDC auth — the PUT goes out
+      # unauthenticated and the registry returns a misleading
+      # `E404 ... is not in this registry`. Pin npm to 11.5.1 (first version
+      # with working TP-OIDC) before any publish. `--force` is required to get
+      # past Node 22's bundled-npm arborist on the global upgrade.
+      - name: Install npm 11.5.1+ for OIDC trusted publishing
+        run: |
+          npm install -g npm@11.5.1 --force
+          npm --version
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
