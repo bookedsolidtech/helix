@@ -1,5 +1,12 @@
 # @helixui/react-starter
 
+## 0.0.19
+
+### Patch Changes
+
+- @helixui/library@3.9.3
+- @helixui/react@3.9.3
+
 ## 0.0.18
 
 ### Patch Changes
