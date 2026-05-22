@@ -364,12 +364,9 @@ export class HelixCarousel extends HelixElement {
   goTo(index: number): void {
     if (this._slides.length === 0) return;
 
-    let next = index;
-    if (this.loop) {
-      next = ((index % this._slides.length) + this._slides.length) % this._slides.length;
-    } else {
-      next = Math.max(0, Math.min(index, this._maxIndex));
-    }
+    const next = this.loop
+      ? ((index % this._slides.length) + this._slides.length) % this._slides.length
+      : Math.max(0, Math.min(index, this._maxIndex));
 
     if (next === this._currentIndex) return;
 

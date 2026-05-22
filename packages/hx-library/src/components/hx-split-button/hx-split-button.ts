@@ -312,7 +312,7 @@ export class HelixSplitButton extends HelixElement {
     const liveAriaLabel = this.getAttribute('aria-label');
     const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() : '';
 
-    let resolved: string | null = null;
+    let resolved: string | null;
     if (flattenedFromIdrefs) {
       resolved = flattenedFromIdrefs;
     } else if (hostAriaLabel) {
