@@ -126,8 +126,8 @@
     "ts-morph": "^27.0.2",
     "tsx": "^4.21.0",
     "turbo": "^2.3.3",
-    "typescript": "^5.7.2",
-    "typescript-eslint": "^8.0.0"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.4"
   },
   "engines": {
     "node": "^22.0.0 || ^24.0.0"
