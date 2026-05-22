@@ -41,8 +41,8 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "typescript": "^5.7.2",
-    "vite": "^6.2.0",
-    "vite-plugin-dts": "^4.5.4"
+    "vite": "^8.0.13",
+    "vite-plugin-dts": "^5.0.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
