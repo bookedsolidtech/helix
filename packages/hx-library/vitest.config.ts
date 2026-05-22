@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config';
+import { playwright } from '@vitest/browser-playwright';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -29,7 +30,7 @@ export default defineConfig({
   test: {
     browser: {
       enabled: true,
-      provider: 'playwright',
+      provider: playwright(),
       headless: true,
       viewport: { width: 1280, height: 720 },
       instances: [{ browser: 'chromium' }],
