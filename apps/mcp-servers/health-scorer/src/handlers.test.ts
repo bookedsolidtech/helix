@@ -25,8 +25,12 @@ vi.mock('@helixui/mcp-shared', async () => {
 
   return {
     ...actual,
-    SafeFileOperations: vi.fn(() => mockFileOps),
-    GitOperations: vi.fn(() => mockGit),
+    SafeFileOperations: vi.fn(function () {
+      return mockFileOps;
+    }),
+    GitOperations: vi.fn(function () {
+      return mockGit;
+    }),
   };
 });
 
