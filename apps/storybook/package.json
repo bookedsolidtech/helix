@@ -27,6 +27,7 @@
     "@storybook/addon-themes": "^10.3.6",
     "@storybook/addon-vitest": "^10.3.6",
     "@storybook/web-components-vite": "^10.3.6",
+    "@vitest/browser-playwright": "^4.1.6",
     "@vitest/ui": "^4.1.6",
     "lit": "^3.3.2",
     "shiki": "^4.0.2",

@@ -35,11 +35,11 @@
   },
   "dependencies": {
     "@helixui/library": "workspace:*",
-    "@lit/react": "^1.0.6",
-    "react": "^19.2.6"
+    "@lit/react": "^1.0.6"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
+    "react": "^19.2.6",
     "typescript": "^6.0.3",
     "vite": "^8.0.13",
     "vite-plugin-dts": "^5.0.0"
