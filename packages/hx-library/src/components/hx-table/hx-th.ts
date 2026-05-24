@@ -315,7 +315,7 @@ export class HelixTableHeader extends HelixElement {
     // inner sort button's aria-label tracks the columnheader's accessible
     // name. Without this, "Sort by <column>" diverges from the column's
     // actual announced name on engines that support aria-labelledby.
-    let resolved = '';
+    let resolved: string;
     if (hasEffectiveLabelledBy) {
       const flattened = labelEls
         .map((el) => flattenAccName(el))

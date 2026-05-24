@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "twig": "^2.0.0",
-    "vitest": "^3.0.0",
+    "vitest": "^4.1.6",
     "yaml": "^2.7.0"
   },
   "publishConfig": {

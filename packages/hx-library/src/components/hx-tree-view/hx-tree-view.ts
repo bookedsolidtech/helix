@@ -554,7 +554,7 @@ export class HelixTreeView extends HelixElement {
 
     // AccName 1.2 §4.3.1 precedence: consumer aria-labelledby (resolved) >
     // consumer aria-label > `label` property > literal "Tree" (last-resort).
-    let resolved = '';
+    let resolved: string;
     if (hasEffectiveLabelledBy) {
       const flattened =
         labelEls

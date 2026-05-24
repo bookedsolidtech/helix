@@ -51,7 +51,7 @@ const ComponentHealthSchema = z
     tagName: z.string(),
     score: z.number().optional(),
     grade: z.string().optional(),
-    dimensions: z.record(z.number()).optional(),
+    dimensions: z.record(z.string(), z.number()).optional(),
     issues: z.array(z.string()).optional(),
   })
   .transform((data) => ({

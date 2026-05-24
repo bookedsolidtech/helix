@@ -294,7 +294,7 @@ export class HelixProgressBar extends HelixElement {
       refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
     }
 
-    let resolved = '';
+    let resolved: string;
     if (hasEffectiveLabelledBy) {
       const flattened =
         labelEls

@@ -101,7 +101,7 @@ export function registerCemTools(server: Server) {
         const parseResult = AnalyzeCEMArgsSchema.safeParse(args);
         if (!parseResult.success) {
           return createErrorResponse(
-            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+            `Invalid arguments: ${parseResult.error.issues.map((e) => e.message).join(', ')}`,
           );
         }
 
@@ -119,7 +119,7 @@ export function registerCemTools(server: Server) {
         const parseResult = DiffCEMArgsSchema.safeParse(args);
         if (!parseResult.success) {
           return createErrorResponse(
-            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+            `Invalid arguments: ${parseResult.error.issues.map((e) => e.message).join(', ')}`,
           );
         }
 
@@ -152,7 +152,7 @@ export function registerCemTools(server: Server) {
         const parseResult = ValidateCEMArgsSchema.safeParse(args);
         if (!parseResult.success) {
           return createErrorResponse(
-            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+            `Invalid arguments: ${parseResult.error.issues.map((e) => e.message).join(', ')}`,
           );
         }
 

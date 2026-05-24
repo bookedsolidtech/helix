@@ -567,7 +567,7 @@ export class HelixMenu extends HelixElement {
     // The resolved string is cached on `_resolvedAccessibleName` so the
     // fallback render branch (legacy path: AT reads inner div) can mirror
     // the same name without duplicating the precedence ladder.
-    let resolved = '';
+    let resolved: string;
     if (hasEffectiveLabelledBy) {
       const flattened =
         labelEls
