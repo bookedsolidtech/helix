@@ -133,12 +133,11 @@ function collectIdrefSearchRoots(start: Element, roots: Array<Document | ShadowR
   let documentSeen = false;
 
   const walkChain = (entry: Element): void => {
-    let currentNode: Element = entry;
-    let currentRoot: Node | null = currentNode.getRootNode();
+    let currentRoot: Node | null = entry.getRootNode();
 
     // If the entry is itself in document scope and is slotted into a
     // shadow tree, queue the slot for slot-owner-first exploration.
-    const slotFromEntry = (currentNode as HTMLElement).assignedSlot ?? null;
+    const slotFromEntry = (entry as HTMLElement).assignedSlot ?? null;
     if (slotFromEntry && !visitedEntries.has(slotFromEntry)) {
       visitedEntries.add(slotFromEntry);
       slotEntries.push(slotFromEntry);
@@ -155,7 +154,6 @@ function collectIdrefSearchRoots(start: Element, roots: Array<Document | ShadowR
         visitedEntries.add(hostSlot);
         slotEntries.push(hostSlot);
       }
-      currentNode = shadowHost;
       currentRoot = shadowHost.getRootNode();
     }
 

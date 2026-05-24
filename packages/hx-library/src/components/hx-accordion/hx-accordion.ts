@@ -168,7 +168,7 @@ export class HelixAccordion extends HelixElement {
     const currentIndex = enabledItems.indexOf(currentItem);
     if (currentIndex === -1) return;
 
-    let targetIndex = -1;
+    let targetIndex: number;
 
     switch (e.key) {
       case 'ArrowDown':
