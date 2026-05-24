@@ -59,7 +59,8 @@ export class HelixBreadcrumbItem extends HelixElement {
     // inside the parent's own shadow root). Standalone instances
     // leave the host neutral so they don't themselves trip
     // aria-required-parent.
-    if (!this.hasAttribute('role') && this._isInsideBreadcrumb()) {
+    const existingRole = this.getAttribute('role');
+    if ((existingRole === null || existingRole === '') && this._isInsideBreadcrumb()) {
       this.setAttribute('role', 'listitem');
       this._autoSetRole = true;
     }

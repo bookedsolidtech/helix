@@ -119,7 +119,7 @@ const meta = {
         <button role="menuitem">Edit record</button>
         <button role="menuitem">Duplicate</button>
         <button role="menuitem">Archive</button>
-        <button role="menuitem" style="color: var(--hx-color-error-text);">Delete</button>
+        <button role="menuitem">Delete</button>
       </hx-overflow-menu>
     </div>
   `,
@@ -352,7 +352,7 @@ export const ManyItems: Story = {
         <button role="menuitem">Duplicate</button>
         <button role="menuitem">Archive</button>
         <button role="menuitem">Export</button>
-        <button role="menuitem" style="color: var(--hx-color-error-text);">Delete</button>
+        <button role="menuitem">Delete</button>
       </hx-overflow-menu>
     </div>
   `,
@@ -392,7 +392,7 @@ export const PatientRowActions: Story = {
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: var(--hx-color-error-text);">
+              <button role="menuitem">
                 Discharge
               </button>
             </hx-overflow-menu>
@@ -408,7 +408,7 @@ export const PatientRowActions: Story = {
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: var(--hx-color-error-text);">
+              <button role="menuitem">
                 Discharge
               </button>
             </hx-overflow-menu>
@@ -478,7 +478,7 @@ export const WithIconItems: Story = {
         </button>
         <button
           role="menuitem"
-          style="display: flex; align-items: center; gap: 0.5rem; color: var(--hx-color-error-text);"
+          style="display: flex; align-items: center; gap: 0.5rem;"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
