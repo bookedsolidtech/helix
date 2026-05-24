@@ -59,25 +59,51 @@ export class HelixBreadcrumbItem extends HelixElement {
     // inside the parent's own shadow root). Standalone instances
     // leave the host neutral so they don't themselves trip
     // aria-required-parent.
-    if (!this.hasAttribute('role')) {
-      const parentTag = this.parentElement?.tagName.toLowerCase();
-      const rootNode = this.getRootNode();
-      const hostTag =
-        rootNode instanceof ShadowRoot ? rootNode.host.tagName.toLowerCase() : undefined;
-      if (parentTag === 'hx-breadcrumb' || hostTag === 'hx-breadcrumb') {
-        this.setAttribute('role', 'listitem');
-        this._autoSetRole = true;
-      }
+    if (!this.hasAttribute('role') && this._isInsideBreadcrumb()) {
+      this.setAttribute('role', 'listitem');
+      this._autoSetRole = true;
     }
     // Observer attaches AFTER the potential setAttribute so our own
-    // write does not flip the flag. Any subsequent mutation — a
-    // consumer setting role explicitly while the item is still
-    // mounted — releases ownership: disconnectedCallback will then
-    // leave the role alone instead of clobbering the consumer value.
-    this._roleObserver = new MutationObserver(() => {
-      this._autoSetRole = false;
-    });
+    // initial write does not trigger it. Subsequent mutations branch
+    // on intent:
+    //   - role cleared (null/empty) while still inside a breadcrumb →
+    //     framework hydration or accidental clobber; restore listitem
+    //     so the parent list stays well-formed
+    //   - role set to a value other than listitem → consumer override;
+    //     release ownership so disconnectedCallback leaves it alone
+    //   - role still listitem → no-op
+    this._roleObserver = new MutationObserver(() => this._handleRoleMutation());
     this._roleObserver.observe(this, { attributes: true, attributeFilter: ['role'] });
+  }
+
+  /** @internal */
+  private _handleRoleMutation(): void {
+    const current = this.getAttribute('role');
+    if (current === null || current === '') {
+      if (this._isInsideBreadcrumb()) {
+        this.setAttribute('role', 'listitem');
+        this._autoSetRole = true;
+      } else {
+        this._autoSetRole = false;
+      }
+      return;
+    }
+    if (current !== 'listitem') {
+      this._autoSetRole = false;
+    }
+  }
+
+  /** @internal */
+  private _isInsideBreadcrumb(): boolean {
+    const parentTag = this.parentElement?.tagName.toLowerCase();
+    if (parentTag === 'hx-breadcrumb') {
+      return true;
+    }
+    const rootNode = this.getRootNode();
+    if (rootNode instanceof ShadowRoot && rootNode.host.tagName.toLowerCase() === 'hx-breadcrumb') {
+      return true;
+    }
+    return false;
   }
 
   override disconnectedCallback(): void {
