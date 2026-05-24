@@ -37,12 +37,14 @@ export class HelixBreadcrumbItem extends HelixElement {
   /**
    * @internal Tracks whether THIS code set the host's role attribute so
    * disconnectedCallback can clean up without clobbering a consumer-supplied
-   * `role`. Without this flag, a consumer reparenting an hx-breadcrumb-item
-   * out of <hx-breadcrumb> would carry a stale role="listitem" and itself
-   * trip aria-required-parent (the very failure the parent check is
-   * supposed to avoid).
+   * `role`. Flag flips false if anyone (consumer code, framework patch,
+   * SPA hydration) later mutates `role` after our initial application —
+   * the MutationObserver below catches that.
    */
   private _autoSetRole = false;
+
+  /** @internal */
+  private _roleObserver: MutationObserver | null = null;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -67,13 +69,24 @@ export class HelixBreadcrumbItem extends HelixElement {
         this._autoSetRole = true;
       }
     }
+    // Observer attaches AFTER the potential setAttribute so our own
+    // write does not flip the flag. Any subsequent mutation — a
+    // consumer setting role explicitly while the item is still
+    // mounted — releases ownership: disconnectedCallback will then
+    // leave the role alone instead of clobbering the consumer value.
+    this._roleObserver = new MutationObserver(() => {
+      this._autoSetRole = false;
+    });
+    this._roleObserver.observe(this, { attributes: true, attributeFilter: ['role'] });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    // Only remove the role we ourselves added — never touch a consumer's
-    // explicit role. If the next connectedCallback finds the item inside
-    // a breadcrumb again, the role re-applies.
+    this._roleObserver?.disconnect();
+    this._roleObserver = null;
+    // Only remove the role we ourselves added AND that the consumer
+    // never reclaimed via a subsequent mutation. The next
+    // connectedCallback re-evaluates from scratch.
     if (this._autoSetRole) {
       this.removeAttribute('role');
       this._autoSetRole = false;
