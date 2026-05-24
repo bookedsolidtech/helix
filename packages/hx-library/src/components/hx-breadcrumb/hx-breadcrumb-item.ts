@@ -81,11 +81,14 @@ export class HelixBreadcrumbItem extends HelixElement {
   private _handleRoleMutation(): void {
     const current = this.getAttribute('role');
     if (current === null || current === '') {
-      if (this._isInsideBreadcrumb()) {
+      // Only reclaim a transient clear when we previously OWNED the role
+      // — i.e. we set it ourselves at connect time. A consumer-rendered
+      // role='listitem' that a framework briefly clears during
+      // reconciliation is the consumer's contract to maintain; we must
+      // not silently take ownership and then strip their attribute on
+      // the next disconnect.
+      if (this._autoSetRole && this._isInsideBreadcrumb()) {
         this.setAttribute('role', 'listitem');
-        this._autoSetRole = true;
-      } else {
-        this._autoSetRole = false;
       }
       return;
     }
