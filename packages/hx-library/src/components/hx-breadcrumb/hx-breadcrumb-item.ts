@@ -34,6 +34,16 @@ import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
 export class HelixBreadcrumbItem extends HelixElement {
   static override styles = [helixBreadcrumbItemStyles, forcedColorsInteractive];
 
+  /**
+   * @internal Tracks whether THIS code set the host's role attribute so
+   * disconnectedCallback can clean up without clobbering a consumer-supplied
+   * `role`. Without this flag, a consumer reparenting an hx-breadcrumb-item
+   * out of <hx-breadcrumb> would carry a stale role="listitem" and itself
+   * trip aria-required-parent (the very failure the parent check is
+   * supposed to avoid).
+   */
+  private _autoSetRole = false;
+
   override connectedCallback(): void {
     super.connectedCallback();
     // Host carries role="listitem" so the composed-tree walk from
@@ -54,7 +64,19 @@ export class HelixBreadcrumbItem extends HelixElement {
         rootNode instanceof ShadowRoot ? rootNode.host.tagName.toLowerCase() : undefined;
       if (parentTag === 'hx-breadcrumb' || hostTag === 'hx-breadcrumb') {
         this.setAttribute('role', 'listitem');
+        this._autoSetRole = true;
       }
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    // Only remove the role we ourselves added — never touch a consumer's
+    // explicit role. If the next connectedCallback finds the item inside
+    // a breadcrumb again, the role re-applies.
+    if (this._autoSetRole) {
+      this.removeAttribute('role');
+      this._autoSetRole = false;
     }
   }
 

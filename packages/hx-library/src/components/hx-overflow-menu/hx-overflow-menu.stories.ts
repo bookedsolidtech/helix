@@ -119,7 +119,7 @@ const meta = {
         <button role="menuitem">Edit record</button>
         <button role="menuitem">Duplicate</button>
         <button role="menuitem">Archive</button>
-        <button role="menuitem" style="color: light-dark(#7a0e0e, #fc7264);">Delete</button>
+        <button role="menuitem" style="color: light-dark(#7a0e0e, #ffaaaa);">Delete</button>
       </hx-overflow-menu>
     </div>
   `,
@@ -352,7 +352,7 @@ export const ManyItems: Story = {
         <button role="menuitem">Duplicate</button>
         <button role="menuitem">Archive</button>
         <button role="menuitem">Export</button>
-        <button role="menuitem" style="color: light-dark(#7a0e0e, #fc7264);">Delete</button>
+        <button role="menuitem" style="color: light-dark(#7a0e0e, #ffaaaa);">Delete</button>
       </hx-overflow-menu>
     </div>
   `,
@@ -392,7 +392,7 @@ export const PatientRowActions: Story = {
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: light-dark(#7a0e0e, #fc7264);">
+              <button role="menuitem" style="color: light-dark(#7a0e0e, #ffaaaa);">
                 Discharge
               </button>
             </hx-overflow-menu>
@@ -408,7 +408,7 @@ export const PatientRowActions: Story = {
               <button role="menuitem">View record</button>
               <button role="menuitem">Edit record</button>
               <button role="menuitem">Schedule follow-up</button>
-              <button role="menuitem" style="color: light-dark(#7a0e0e, #fc7264);">
+              <button role="menuitem" style="color: light-dark(#7a0e0e, #ffaaaa);">
                 Discharge
               </button>
             </hx-overflow-menu>
@@ -478,7 +478,7 @@ export const WithIconItems: Story = {
         </button>
         <button
           role="menuitem"
-          style="display: flex; align-items: center; gap: 0.5rem; color: light-dark(#7a0e0e, #fc7264);"
+          style="display: flex; align-items: center; gap: 0.5rem; color: light-dark(#7a0e0e, #ffaaaa);"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
