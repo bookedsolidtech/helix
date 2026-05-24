@@ -36,17 +36,16 @@ export class HelixBreadcrumbItem extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    // hx-breadcrumb's shadow root uses `<div role="list">` (PR #1688
-    // audit fix — see hx-breadcrumb.ts render comment). axe-core pierces
-    // the shadow boundary and treats the breadcrumb-item's inner shadow
-    // content as the direct children of the role="list" container, so
-    // setting role="listitem" via ElementInternals on the host does NOT
-    // satisfy aria-required-children — axe still surfaces
-    // `a[tabindex]` / `span[aria-current]` as disallowed children. The
-    // shadow render places `role="listitem"` on the inner
-    // `<span part="item">` wrapper instead (see render() below), so the
-    // composed-tree walk lands on a valid listitem ancestor for every
-    // leaf node.
+    // Host carries role="listitem" so the composed-tree walk from
+    // hx-breadcrumb's <div role="list"> finds a valid listitem child
+    // directly, with no shadow boundary in the way. Newer Chromium AT
+    // tree computation refuses to bridge from the inner span to the
+    // outer list across shadow roots (verified PR #1742 audit). Using
+    // a static attribute (not ElementInternals) so axe sees the role
+    // natively without depending on the host-defined IDL surface.
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'listitem');
+    }
   }
 
   /**
@@ -87,17 +86,16 @@ export class HelixBreadcrumbItem extends HelixElement {
 
   override render() {
     // Per WAI-ARIA APG, the current page item MUST NOT be a navigable link.
-    // aria-current="page" is placed on the inner element (not the listitem host)
-    // for canonical AT announcement ("current page, Patient Records" vs
-    // "current page, list item").
+    // aria-current="page" is placed on the inner element for canonical AT
+    // announcement ("current page, Patient Records").
     //
-    // role="listitem" lives on the inner `<span part="item">` (not the
-    // host) because axe-core pierces the shadow boundary and treats this
-    // wrapper as the direct child of the parent role="list" container. A
-    // host-level internals.role mirror is invisible to axe at this surface
-    // (verified via PR #1688 audit).
+    // role="listitem" lives on the HOST (set in connectedCallback) — the
+    // inner wrapper is purely presentational. This keeps the composed-tree
+    // walk simple: hx-breadcrumb's role="list" finds role="listitem" hosts
+    // as direct children without crossing shadow boundaries to find an
+    // inner ARIA role.
     return html`
-      <span part="item" role="listitem">
+      <span part="item">
         ${this.current
           ? html`<span part="text" aria-current="page"><slot></slot></span>`
           : this.href
