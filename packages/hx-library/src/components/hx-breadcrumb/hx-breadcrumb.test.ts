@@ -778,12 +778,13 @@ describe('hx-breadcrumb', () => {
   // ─── hx-breadcrumb-item: role guard (2) ───
 
   describe('hx-breadcrumb-item: role guard', () => {
-    it('does not pollute light DOM with an explicit role attribute', async () => {
-      // PR #1688 audit fix: items carry role="listitem" via
-      // ElementInternals (host-canonical pattern), NOT via a reflected
-      // attribute. internals.role does not surface in getAttribute('role'),
-      // so the consumer's light-DOM markup stays clean while AT walks the
-      // canonical list semantics through the host's announced surface.
+    it('sets role="listitem" on items inside hx-breadcrumb so axe finds the parent list', async () => {
+      // PR #1742 audit reversal: prior implementation used
+      // ElementInternals.role which AT sees but axe-core does not.
+      // axe walks the light DOM for ARIA parent/child rules and
+      // requires the role to be observable as an attribute.
+      // role="listitem" is set in connectedCallback when the item's
+      // light-DOM parent (or shadow-DOM root host) is hx-breadcrumb.
       const el = await fixture<HelixBreadcrumb>(`
         <hx-breadcrumb>
           <hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>
@@ -793,11 +794,11 @@ describe('hx-breadcrumb', () => {
       await el.updateComplete;
       const items = Array.from(el.querySelectorAll('hx-breadcrumb-item'));
       items.forEach((item) => {
-        expect(item.getAttribute('role')).toBeNull();
+        expect(item.getAttribute('role')).toBe('listitem');
       });
     });
 
-    it('does not set role attribute when used standalone (internals-only mirror)', async () => {
+    it('leaves the host neutral when used standalone so it does not trip aria-required-parent', async () => {
       const el = await fixture<HelixBreadcrumbItem>(
         '<hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>',
       );

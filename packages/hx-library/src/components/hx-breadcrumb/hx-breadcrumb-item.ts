@@ -38,13 +38,23 @@ export class HelixBreadcrumbItem extends HelixElement {
     super.connectedCallback();
     // Host carries role="listitem" so the composed-tree walk from
     // hx-breadcrumb's <div role="list"> finds a valid listitem child
-    // directly, with no shadow boundary in the way. Newer Chromium AT
-    // tree computation refuses to bridge from the inner span to the
-    // outer list across shadow roots (verified PR #1742 audit). Using
-    // a static attribute (not ElementInternals) so axe sees the role
-    // natively without depending on the host-defined IDL surface.
+    // directly, without crossing the shadow boundary into the inner
+    // span. Using a static attribute (not ElementInternals) so axe
+    // sees the role natively. Scoped to instances inside hx-breadcrumb
+    // — either as a light-DOM child of <hx-breadcrumb> (consumer
+    // markup) or as a shadow-DOM child of an <hx-breadcrumb> root
+    // (the collapse-ellipsis path renders an hx-breadcrumb-item
+    // inside the parent's own shadow root). Standalone instances
+    // leave the host neutral so they don't themselves trip
+    // aria-required-parent.
     if (!this.hasAttribute('role')) {
-      this.setAttribute('role', 'listitem');
+      const parentTag = this.parentElement?.tagName.toLowerCase();
+      const rootNode = this.getRootNode();
+      const hostTag =
+        rootNode instanceof ShadowRoot ? rootNode.host.tagName.toLowerCase() : undefined;
+      if (parentTag === 'hx-breadcrumb' || hostTag === 'hx-breadcrumb') {
+        this.setAttribute('role', 'listitem');
+      }
     }
   }
 
