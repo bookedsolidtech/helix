@@ -52,6 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       # ── Resolve package name, version, and workspace dir from the tag ────

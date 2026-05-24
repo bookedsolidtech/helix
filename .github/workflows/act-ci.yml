@@ -26,6 +26,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Setup pnpm
         run: |
           corepack enable
@@ -40,6 +42,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Setup pnpm
         run: |
           corepack enable
@@ -54,6 +58,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Setup pnpm
         run: |
           corepack enable
@@ -68,6 +74,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Setup pnpm
         run: |
           corepack enable
@@ -88,6 +96,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - name: Setup pnpm
         run: |
           corepack enable
@@ -135,6 +145,8 @@ jobs:
           fi
       - if: steps.gate.outputs.run == 'true'
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - if: steps.gate.outputs.run == 'true'
         name: Setup Node ${{ matrix.node-version }} via nvm
         run: |
