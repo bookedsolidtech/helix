@@ -185,15 +185,18 @@ jobs:
     needs: secret-scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # ── Human-in-the-loop release gate ──────────────────────────────────────
-    # The `npm-publish` GitHub Environment enforces required-reviewer approval
-    # before this job runs. Configure in repo Settings → Environments:
-    #   1. Create environment `npm-publish`
-    #   2. Add Jake as a required reviewer (Protection rules → Required reviewers)
-    #   3. Set wait timer to 0 — the gate is a reviewer click, not a delay
-    # Without this environment configured, the job will fail at queue time
-    # with an "environment does not exist" error. See docs/releases/README.md.
+    # ── npm Trusted Publishing (OIDC) ───────────────────────────────────────
+    # The `npm-publish` GitHub Environment scopes the OIDC identity that npm's
+    # Trusted Publisher entries federate against (org=bookedsolidtech,
+    # repo=helix, workflow=publish.yml, env=npm-publish). No long-lived
+    # NPM_TOKEN is used — auth is the GitHub Actions OIDC token via pnpm's
+    # native trusted-publishing support. `id-token: write` below is required
+    # for the runner to mint that token.
     environment: npm-publish
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
       # The publish job runs changesets/action (which pushes the version PR
       # + tags) and an explicit `git fetch origin main` in the manifest step,
@@ -212,6 +215,18 @@ jobs:
           node-version: 22
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
+
+      # `changeset publish` shells out to the global `npm` binary for the
+      # actual registry PUT. Node 22 bundles npm 10.x, which signs provenance
+      # but does NOT support trusted-publishing OIDC auth — the PUT goes out
+      # unauthenticated and the registry returns a misleading
+      # `E404 ... is not in this registry`. Pin npm to 11.5.1 (first version
+      # with working TP-OIDC) before any publish. `--force` is required to get
+      # past Node 22's bundled-npm arborist on the global upgrade.
+      - name: Install npm 11.5.1+ for OIDC trusted publishing
+        run: |
+          npm install -g npm@11.5.1 --force
+          npm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -260,7 +275,9 @@ jobs:
           title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESET_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # NODE_AUTH_TOKEN intentionally removed — auth is OIDC Trusted
+          # Publishing. An empty/legacy NODE_AUTH_TOKEN makes npm attempt
+          # token auth and skip OIDC, so the line is removed entirely.
           NPM_CONFIG_PROVENANCE: 'true'
           # Disable husky pre-push hooks during CI git operations (tag pushes,
           # version bump commits). The hook is designed for developer workflows,

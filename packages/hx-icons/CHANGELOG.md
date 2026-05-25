@@ -1,5 +1,31 @@
 # @helixui/icons
 
+## 1.0.3
+
+### Patch Changes
+
+- 9c5f0ac: chore: pin npm 11.5.1 in publish job for OIDC trusted publishing
+
+  The publish job authenticates to npm via GitHub Actions OIDC token federation
+  (Trusted Publishing), but `changeset publish` delegates the registry PUT to the
+  global `npm` binary. Node 22 bundles npm 10.x, which signs provenance but lacks
+  trusted-publishing OIDC auth, so the PUT went out unauthenticated and the
+  registry returned a misleading `E404 ... is not in this registry`. Pinning npm
+  to 11.5.1 before publish gives `changeset publish` a TP-capable npm. This is an
+  infrastructure-only change with no consumer-facing API impact.
+
+## 1.0.2
+
+### Patch Changes
+
+- b617920: chore: migrate npm publishing to Trusted Publishing (OIDC)
+
+  Removes the long-lived NPM_TOKEN dependency from the publish workflow. The
+  publish job now authenticates to npm via GitHub Actions OIDC token federation
+  (Trusted Publishing), scoped through the `npm-publish` environment. Sigstore
+  provenance attestations are preserved. This is an infrastructure-only change
+  with no consumer-facing API impact.
+
 ## 1.0.1
 
 ### Patch Changes
