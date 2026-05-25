@@ -55,7 +55,7 @@ export default defineConfig({
       },
       title: 'HELiX',
       description:
-        'HTML Element Library for Interactive eXperiences - Enterprise Web Components for Drupal CMS',
+        'HTML Element Library for Interactive eXperiences — Enterprise Web Components for Drupal CMS',
       social: [
         {
           icon: 'github',

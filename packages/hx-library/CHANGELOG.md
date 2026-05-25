@@ -1,5 +1,19 @@
 # @helixui/library
 
+## 3.9.3
+
+### Patch Changes
+
+- Updated dependencies [9c5f0ac]
+  - @helixui/icons@1.0.3
+
+## 3.9.2
+
+### Patch Changes
+
+- Updated dependencies [b617920]
+  - @helixui/icons@1.0.2
+
 ## 3.9.1
 
 ### Patch Changes
