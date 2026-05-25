@@ -1,9 +1,28 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach } from 'vitest';
 import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixLink } from './hx-link.js';
 import './index.js';
 
 afterEach(cleanup);
+
+// Vitest 4 browser-playwright propagates anchor click default actions to real
+// page navigation. Tests that fire `anchor.click()` on an <hx-link href="…">
+// would navigate the test iframe away and crash the whole file ("Cannot
+// connect to the iframe"). Intercepting click in capture phase before the
+// browser dispatches navigation keeps the iframe stable. hx-click fires from
+// the component independently of the default action, so this does not affect
+// any test's actual assertions.
+const preventNavigation = (event: Event): void => {
+  event.preventDefault();
+};
+
+beforeEach(() => {
+  document.addEventListener('click', preventNavigation, true);
+});
+
+afterEach(() => {
+  document.removeEventListener('click', preventNavigation, true);
+});
 
 describe('hx-link', () => {
   // --- Rendering ---
