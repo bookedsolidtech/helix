@@ -195,9 +195,14 @@ jobs:
     # with an "environment does not exist" error. See docs/releases/README.md.
     environment: npm-publish
     steps:
+      # The publish job runs changesets/action (which pushes the version PR
+      # + tags) and an explicit `git fetch origin main` in the manifest step,
+      # both of which need the GITHUB_TOKEN persisted in .git/config. The
+      # supply-chain hardening (persist-credentials: false) applied to every
+      # other checkout step is unsafe here — removing it would crash the
+      # release mid-run with an authentication failure on the private repo.
       - uses: actions/checkout@v6
         with:
-          persist-credentials: false
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
