@@ -34,19 +34,93 @@ import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
 export class HelixBreadcrumbItem extends HelixElement {
   static override styles = [helixBreadcrumbItemStyles, forcedColorsInteractive];
 
+  /**
+   * @internal Tracks whether THIS code set the host's role attribute so
+   * disconnectedCallback can clean up without clobbering a consumer-supplied
+   * `role`. Flag flips false if anyone (consumer code, framework patch,
+   * SPA hydration) later mutates `role` after our initial application —
+   * the MutationObserver below catches that.
+   */
+  private _autoSetRole = false;
+
+  /** @internal */
+  private _roleObserver: MutationObserver | null = null;
+
   override connectedCallback(): void {
     super.connectedCallback();
-    // hx-breadcrumb's shadow root uses `<div role="list">` (PR #1688
-    // audit fix — see hx-breadcrumb.ts render comment). axe-core pierces
-    // the shadow boundary and treats the breadcrumb-item's inner shadow
-    // content as the direct children of the role="list" container, so
-    // setting role="listitem" via ElementInternals on the host does NOT
-    // satisfy aria-required-children — axe still surfaces
-    // `a[tabindex]` / `span[aria-current]` as disallowed children. The
-    // shadow render places `role="listitem"` on the inner
-    // `<span part="item">` wrapper instead (see render() below), so the
-    // composed-tree walk lands on a valid listitem ancestor for every
-    // leaf node.
+    // Host carries role="listitem" so the composed-tree walk from
+    // hx-breadcrumb's <div role="list"> finds a valid listitem child
+    // directly, without crossing the shadow boundary into the inner
+    // span. Using a static attribute (not ElementInternals) so axe
+    // sees the role natively. Scoped to instances inside hx-breadcrumb
+    // — either as a light-DOM child of <hx-breadcrumb> (consumer
+    // markup) or as a shadow-DOM child of an <hx-breadcrumb> root
+    // (the collapse-ellipsis path renders an hx-breadcrumb-item
+    // inside the parent's own shadow root). Standalone instances
+    // leave the host neutral so they don't themselves trip
+    // aria-required-parent.
+    const existingRole = this.getAttribute('role');
+    if ((existingRole === null || existingRole === '') && this._isInsideBreadcrumb()) {
+      this.setAttribute('role', 'listitem');
+      this._autoSetRole = true;
+    }
+    // Observer attaches AFTER the potential setAttribute so our own
+    // initial write does not trigger it. Subsequent mutations branch
+    // on intent:
+    //   - role cleared (null/empty) while still inside a breadcrumb →
+    //     framework hydration or accidental clobber; restore listitem
+    //     so the parent list stays well-formed
+    //   - role set to a value other than listitem → consumer override;
+    //     release ownership so disconnectedCallback leaves it alone
+    //   - role still listitem → no-op
+    this._roleObserver = new MutationObserver(() => this._handleRoleMutation());
+    this._roleObserver.observe(this, { attributes: true, attributeFilter: ['role'] });
+  }
+
+  /** @internal */
+  private _handleRoleMutation(): void {
+    const current = this.getAttribute('role');
+    if (current === null || current === '') {
+      // Only reclaim a transient clear when we previously OWNED the role
+      // — i.e. we set it ourselves at connect time. A consumer-rendered
+      // role='listitem' that a framework briefly clears during
+      // reconciliation is the consumer's contract to maintain; we must
+      // not silently take ownership and then strip their attribute on
+      // the next disconnect.
+      if (this._autoSetRole && this._isInsideBreadcrumb()) {
+        this.setAttribute('role', 'listitem');
+      }
+      return;
+    }
+    if (current !== 'listitem') {
+      this._autoSetRole = false;
+    }
+  }
+
+  /** @internal */
+  private _isInsideBreadcrumb(): boolean {
+    const parentTag = this.parentElement?.tagName.toLowerCase();
+    if (parentTag === 'hx-breadcrumb') {
+      return true;
+    }
+    const rootNode = this.getRootNode();
+    if (rootNode instanceof ShadowRoot && rootNode.host.tagName.toLowerCase() === 'hx-breadcrumb') {
+      return true;
+    }
+    return false;
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._roleObserver?.disconnect();
+    this._roleObserver = null;
+    // Only remove the role we ourselves added AND that the consumer
+    // never reclaimed via a subsequent mutation. The next
+    // connectedCallback re-evaluates from scratch.
+    if (this._autoSetRole) {
+      this.removeAttribute('role');
+      this._autoSetRole = false;
+    }
   }
 
   /**
@@ -87,17 +161,16 @@ export class HelixBreadcrumbItem extends HelixElement {
 
   override render() {
     // Per WAI-ARIA APG, the current page item MUST NOT be a navigable link.
-    // aria-current="page" is placed on the inner element (not the listitem host)
-    // for canonical AT announcement ("current page, Patient Records" vs
-    // "current page, list item").
+    // aria-current="page" is placed on the inner element for canonical AT
+    // announcement ("current page, Patient Records").
     //
-    // role="listitem" lives on the inner `<span part="item">` (not the
-    // host) because axe-core pierces the shadow boundary and treats this
-    // wrapper as the direct child of the parent role="list" container. A
-    // host-level internals.role mirror is invisible to axe at this surface
-    // (verified via PR #1688 audit).
+    // role="listitem" lives on the HOST (set in connectedCallback) — the
+    // inner wrapper is purely presentational. This keeps the composed-tree
+    // walk simple: hx-breadcrumb's role="list" finds role="listitem" hosts
+    // as direct children without crossing shadow boundaries to find an
+    // inner ARIA role.
     return html`
-      <span part="item" role="listitem">
+      <span part="item">
         ${this.current
           ? html`<span part="text" aria-current="page"><slot></slot></span>`
           : this.href

@@ -56,12 +56,16 @@ vi.mock('@helixui/mcp-shared', async () => {
 
   return {
     ...actual,
-    SafeFileOperations: vi.fn(() => mockFileOps),
+    SafeFileOperations: vi.fn(function () {
+      return mockFileOps;
+    }),
   };
 });
 
 vi.mock('ts-morph', () => ({
-  Project: vi.fn(() => mockProject),
+  Project: vi.fn(function () {
+    return mockProject;
+  }),
   DiagnosticCategory: {
     Error: 1,
     Warning: 0,

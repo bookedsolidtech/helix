@@ -43,7 +43,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - uses: pnpm/action-setup@v4
 
@@ -196,7 +198,13 @@ jobs:
       pull-requests: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      # The publish job runs changesets/action (which pushes the version PR
+      # + tags) and an explicit `git fetch origin main` in the manifest step,
+      # both of which need the GITHUB_TOKEN persisted in .git/config. The
+      # supply-chain hardening (persist-credentials: false) applied to every
+      # other checkout step is unsafe here — removing it would crash the
+      # release mid-run with an authentication failure on the private repo.
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

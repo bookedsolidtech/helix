@@ -106,7 +106,7 @@ export function registerHealthTools(server: Server) {
         const parseResult = ScoreComponentArgsSchema.safeParse(args);
         if (!parseResult.success) {
           return createErrorResponse(
-            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+            `Invalid arguments: ${parseResult.error.issues.map((e) => e.message).join(', ')}`,
           );
         }
 
@@ -133,7 +133,7 @@ export function registerHealthTools(server: Server) {
         const parseResult = GetHealthTrendArgsSchema.safeParse(args);
         if (!parseResult.success) {
           return createErrorResponse(
-            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+            `Invalid arguments: ${parseResult.error.issues.map((e) => e.message).join(', ')}`,
           );
         }
 
@@ -151,7 +151,7 @@ export function registerHealthTools(server: Server) {
         const parseResult = GetHealthDiffArgsSchema.safeParse(args);
         if (!parseResult.success) {
           return createErrorResponse(
-            `Invalid arguments: ${parseResult.error.errors.map((e) => e.message).join(', ')}`,
+            `Invalid arguments: ${parseResult.error.issues.map((e) => e.message).join(', ')}`,
           );
         }
 

@@ -317,7 +317,7 @@ export class HelixRating extends FormMixin(HelixElement) {
   /** @internal */
   private _handleKeydown(e: KeyboardEvent): void {
     if (this.readonly || this.disabled) return;
-    let next: number | null = null;
+    let next: number | null;
 
     switch (e.key) {
       case 'ArrowRight':

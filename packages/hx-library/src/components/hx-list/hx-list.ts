@@ -183,7 +183,7 @@ export class HelixList extends HelixElement {
       refsInternals.ariaLabelledByElements = hasEffectiveLabelledBy ? labelEls : null;
     }
 
-    let resolved = '';
+    let resolved: string;
     if (hasEffectiveLabelledBy) {
       const flattened =
         labelEls
@@ -237,7 +237,7 @@ export class HelixList extends HelixElement {
     const focused = this.querySelector<HelixListItem>('hx-list-item:focus');
     const currentIndex = focused ? items.indexOf(focused) : -1;
 
-    let nextIndex = currentIndex;
+    let nextIndex: number;
 
     switch (e.key) {
       case 'ArrowDown':

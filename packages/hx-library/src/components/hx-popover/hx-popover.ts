@@ -387,7 +387,7 @@ export class HelixPopover extends HelixElement {
     const liveAriaLabel = this.getAttribute('aria-label');
     const hostAriaLabel = liveAriaLabel !== null ? liveAriaLabel.trim() : '';
 
-    let resolved = '';
+    let resolved: string;
     if (flattenedFromIdrefs) {
       resolved = flattenedFromIdrefs;
     } else if (hostAriaLabel) {
