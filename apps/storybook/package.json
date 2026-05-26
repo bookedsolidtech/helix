@@ -30,7 +30,7 @@
     "@vitest/browser-playwright": "^4.1.6",
     "@vitest/ui": "^4.1.6",
     "lit": "^3.3.2",
-    "shiki": "^4.0.2",
+    "shiki": "^4.1.0",
     "storybook": "^10.3.6",
     "storybook-addon-pseudo-states": "^10.3.6",
     "vite": "^6.2.0",
