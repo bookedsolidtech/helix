@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-29T16:11:49.301Z",
-  "sourceAuditRunAt": "2026-05-29T16:10:21.479Z",
+  "generatedAt": "2026-05-29T17:07:56.616Z",
+  "sourceAuditRunAt": "2026-05-29T17:06:20.921Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -80,8 +80,8 @@
         "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-alert) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -126,8 +126,8 @@
         "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-banner) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <div>.banner: 9.61:1 (fg rgb(6, 65, 114), bg rgb(239, 246, 254))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -173,7 +173,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-breadcrumb) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-breadcrumb) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -265,7 +265,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-button-group) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-button-group) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -311,7 +311,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-checkbox) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-checkbox) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -357,7 +357,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-checkbox-group) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-checkbox-group) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -402,8 +402,8 @@
         "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-clinical-status) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -495,7 +495,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-combobox) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-combobox) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -503,7 +503,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.trigger (inner shadow part of <hx-combobox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.trigger (inner shadow part of <hx-combobox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -541,7 +541,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-copy-button) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-copy-button) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -587,7 +587,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-date-picker) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-date-picker) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -595,7 +595,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-date-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-date-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -632,8 +632,8 @@
         "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-dialog) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <div>.dialog: 17.88:1 (fg rgb(13, 24, 37), bg rgb(255, 255, 255))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -678,8 +678,8 @@
         "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-drawer) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <div>.panel: 17.88:1 (fg rgb(13, 24, 37), bg rgb(255, 255, 255))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -725,7 +725,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-dropdown) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-dropdown) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -816,8 +816,8 @@
         "evidence": "@aria-pattern=\"label\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-field-label) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <body>.sb-main-padded: 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -909,7 +909,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-form) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-form) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -954,8 +954,8 @@
         "evidence": "@aria-pattern=\"label\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-help-text) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1004,8 +1004,8 @@
         "evidence": "WCAG 1.4.11 Non-text Contrast: 1 hx-icon sample(s) measured; min ratio 21.00:1 (≥3:1 required)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-icon) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1051,7 +1051,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-icon-button) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-icon-button) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1096,8 +1096,8 @@
         "evidence": "@aria-pattern=\"menu\" — all required key groups referenced (ArrowDown, ArrowUp, Escape)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-menu) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <div>.base: 15.27:1 (fg rgb(13, 24, 37), bg rgb(235, 238, 233))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1189,7 +1189,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-number-input) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-number-input) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1197,7 +1197,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-number-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-number-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1373,7 +1373,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-radio-group) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-radio-group) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1419,7 +1419,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-rating) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-rating) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1464,8 +1464,8 @@
         "evidence": "@aria-pattern=\"combobox\" — all required key groups referenced (ArrowDown, ArrowUp, Escape, Enter)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-select) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <button>.trigger: 14.32:1 (fg rgb(32, 43, 57), bg rgb(255, 255, 255))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1473,7 +1473,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <button>.trigger (inner shadow part of <hx-select>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <button>.trigger (inner shadow part of <hx-select>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1510,8 +1510,8 @@
         "evidence": "@aria-pattern=\"navigation\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-side-nav) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <nav>.nav: 17.88:1 (fg rgb(255, 255, 255), bg rgb(13, 24, 37))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1557,7 +1557,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-slider) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-slider) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1649,7 +1649,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-switch) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-switch) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1695,7 +1695,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-tabs) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-tabs) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1741,7 +1741,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-text-input) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-text-input) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1749,7 +1749,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-text-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-text-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1787,7 +1787,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-textarea) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-textarea) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1795,7 +1795,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.textarea-wrapper (inner shadow part of <hx-textarea>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.textarea-wrapper (inner shadow part of <hx-textarea>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1833,7 +1833,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-time-picker) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-time-picker) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1841,7 +1841,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.field__combobox (inner shadow part of <hx-time-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.field__combobox (inner shadow part of <hx-time-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1878,8 +1878,8 @@
         "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-toast) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <div>.base: 17.88:1 (fg rgb(255, 255, 255), bg rgb(13, 24, 37))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1924,8 +1924,8 @@
         "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Component target (hx-toggle-button) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "verdict": "Supports",
+        "evidence": "Component-owned focus/text surface <button>.button: 7.03:1 (fg rgb(255, 255, 255), bg rgb(15, 99, 99))."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -2017,7 +2017,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Component target (hx-top-nav) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
+        "evidence": "Component target (hx-top-nav) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
