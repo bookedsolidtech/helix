@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-29T17:30:29.669Z",
+  "generatedAt": "2026-05-29T17:55:49.123Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.9.1",
   "tokensVersion": "3.9.1",
@@ -16520,10 +16520,7 @@
           "2.3.3",
           "3.2.5",
           "forced-colors",
-          "apg-keyboard",
-          "1.4.6",
-          "2.4.12",
-          "2.4.13"
+          "apg-keyboard"
         ],
         "auditUrl": "src/components/hx-popover/AAA-AUDIT.md"
       },
