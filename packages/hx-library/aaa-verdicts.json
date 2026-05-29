@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-29T21:45:50.789Z",
-  "sourceAuditRunAt": "2026-05-29T21:44:20.851Z",
+  "generatedAt": "2026-05-29T23:51:38.308Z",
+  "sourceAuditRunAt": "2026-05-29T23:50:10.213Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -43,7 +43,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button> (inner shadow part of <hx-action-bar>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button> (inner shadow part of <hx-action-bar>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -89,7 +89,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -135,7 +135,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -181,7 +181,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <a>.link (inner shadow part of <hx-breadcrumb>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <a>.link (inner shadow part of <hx-breadcrumb>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -227,7 +227,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -273,7 +273,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-button-group>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-button-group>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -319,7 +319,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <span>.checkbox (inner shadow part of <hx-checkbox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <span>.checkbox (inner shadow part of <hx-checkbox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -365,7 +365,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"group\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"group\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -411,7 +411,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -457,7 +457,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.trigger (inner shadow part of <hx-color-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.trigger (inner shadow part of <hx-color-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -503,7 +503,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.trigger (inner shadow part of <hx-combobox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.trigger (inner shadow part of <hx-combobox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -549,7 +549,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-copy-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-copy-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.57:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -595,7 +595,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-date-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-date-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -641,7 +641,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-dialog>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-dialog>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -687,7 +687,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-drawer>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-drawer>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -733,7 +733,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-dropdown>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-dropdown>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -779,7 +779,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -825,7 +825,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -871,7 +871,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <div>.dropzone (inner shadow part of <hx-file-upload>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <div>.dropzone (inner shadow part of <hx-file-upload>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -917,7 +917,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"form\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"form\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -963,7 +963,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"label\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1013,7 +1013,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"none\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"none\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1059,7 +1059,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-icon-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-icon-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.57:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1105,7 +1105,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <div>.base (inner shadow part of <hx-menu>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <div>.base (inner shadow part of <hx-menu>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 4.97:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1151,7 +1151,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <a>.link (inner shadow part of <hx-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <a>.link (inner shadow part of <hx-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 3.07:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1197,7 +1197,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-number-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-number-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1243,7 +1243,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-overflow-menu>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-overflow-menu>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1289,7 +1289,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <div>.body (the focused element itself) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <div>.body (the focused element itself) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1335,7 +1335,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"none\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"none\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1381,7 +1381,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <span>.radio (inner shadow part of <hx-radio-group>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <span>.radio (inner shadow part of <hx-radio-group>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1427,7 +1427,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <span>.symbol (inner shadow part of <hx-rating>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <span>.symbol (inner shadow part of <hx-rating>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.57:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1473,7 +1473,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <button>.trigger (inner shadow part of <hx-select>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <button>.trigger (inner shadow part of <hx-select>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1519,7 +1519,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.toggle (inner shadow part of <hx-side-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.toggle (inner shadow part of <hx-side-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 3.07:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1565,7 +1565,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px\" on <span>.thumb (inner shadow part of <hx-slider>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px\" on <span>.thumb (inner shadow part of <hx-slider>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1611,7 +1611,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-split-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-split-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1657,7 +1657,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.track (inner shadow part of <hx-switch>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.track (inner shadow part of <hx-switch>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1703,7 +1703,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <hx-tab> (inner shadow part of <hx-tabs>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <hx-tab> (inner shadow part of <hx-tabs>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1749,7 +1749,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-text-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-text-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1795,7 +1795,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.textarea-wrapper (inner shadow part of <hx-textarea>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.textarea-wrapper (inner shadow part of <hx-textarea>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1841,7 +1841,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.field__combobox (inner shadow part of <hx-time-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px\" on <div>.field__combobox (inner shadow part of <hx-time-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1887,7 +1887,7 @@
       },
       "2.4.13": {
         "verdict": "Not Applicable",
-        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply."
+        "evidence": "@aria-pattern=\"alert\" is a non-interactive role per WAI-ARIA 1.2; the host cannot receive keyboard focus by design, so WCAG 2.4.13 Focus Appearance does not apply. (Phase 4 Tier 3 Task 5 — formal AAA re-cert.)"
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1933,7 +1933,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-toggle-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-toggle-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1979,7 +1979,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <button> (inner shadow part of <hx-tooltip>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <button> (inner shadow part of <hx-tooltip>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -2025,7 +2025,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <a> (inner shadow part of <hx-top-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <a> (inner shadow part of <hx-top-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline). Effective ring contrast vs adjacent background 5.82:1 (>=3:1 OK)."
       },
       "2.5.5": {
         "verdict": "Supports",
