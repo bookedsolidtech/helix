@@ -1820,8 +1820,7 @@ async function runBrowserChecks(componentName, page) {
       // genuinely closed/hidden. NOTE: popover-class overlays are handled by
       // POPOVER_CONTAINERS above (their resolved surface is a non-actionable
       // container panel), so they never reach this branch.
-      const hasResolvedSurface =
-        measurements.rect.width >= 2 && measurements.rect.height >= 2;
+      const hasResolvedSurface = measurements.rect.width >= 2 && measurements.rect.height >= 2;
       if (hasResolvedSurface) {
         // Name the element that owns the resolved focus surface for evidence.
         // When the Tab-tagged target was the 0×0 host, the rect was resolved
@@ -1839,7 +1838,9 @@ async function runBrowserChecks(componentName, page) {
           width: measurements.rect.width,
           height: measurements.rect.height,
           target: measurements.targetIsHost
-            ? measurements.focusIndicatorTag || measurements.outlineSourceTag || measurements.targetTag
+            ? measurements.focusIndicatorTag ||
+              measurements.outlineSourceTag ||
+              measurements.targetTag
             : measurements.targetTag,
           verdict:
             measurements.rect.width >= 44 && measurements.rect.height >= 44
