@@ -828,6 +828,92 @@ async function runBrowserChecks(componentName, page) {
       return { ...result, error: targetInfo.error };
     }
 
+    // Settle the unfocused baseline before snapshotting. Several stories
+    // autofocus their control on mount (e.g. Text Input Default focuses the
+    // inner <input> on render). We blurred to the sentinel above, but the
+    // focus-ring box-shadow/outline animates back to its resting state over a
+    // CSS transition (~150ms). Snapshotting immediately captures the ring
+    // mid-decay (e.g. spread still at 2px), which would poison the focus-state
+    // diff (the ring would look "already present" unfocused → no gain on
+    // focus → false Does-Not-Support). Wait past the transition so the
+    // baseline is the true unfocused appearance.
+    await page.waitForTimeout(250);
+
+    // 2.4.13 Focus Appearance — UNFOCUSED snapshot (pre-focus baseline).
+    //
+    // The focus indicator for many HELiX components is NOT painted on the
+    // element that receives DOM focus. The host (or inner native control)
+    // takes Tab focus, but the visible ring is rendered on a different
+    // shadow-DOM part via `:host(:focus-visible) .innerPart { outline: ... }`
+    // (e.g. hx-checkbox .checkbox__box, hx-switch .switch__track,
+    // hx-toggle-button .button) or a box-shadow ring (hx-select
+    // .field__trigger). The focused host itself sets `outline: none`, and CSS
+    // computes outline-width for `outline-style: none` as the `medium` default
+    // = 3px. Naively measuring the focused element therefore reads a bogus
+    // "3px none" outline that is not a real indicator.
+    //
+    // To find the element that ACTUALLY paints the ring we use a focus-state
+    // diff: snapshot every candidate element's outline/box-shadow while the
+    // component is unfocused, then (after the real Tab focus) re-measure and
+    // pick the element whose outline/box-shadow became a visible >=2px ring ON
+    // FOCUS. This is robust against static borders (unchanged across the diff)
+    // and against the `medium`/3px `style:none` default (also unchanged).
+    //
+    // We tag each candidate with a stable data-aaa-focus-id so the after-focus
+    // pass can correlate elements across page.evaluate boundaries.
+    const preFocusSnapshot = await page.evaluate((tag) => {
+      const host =
+        document.querySelector(`[data-aaa-audit-target="1"]`)?.closest(tag) ||
+        document.querySelector(tag);
+      const target = document.querySelector(`[data-aaa-audit-target="1"]`) || host;
+      if (!host && !target) return { byId: {} };
+      // Collect the target, the host, and every element reachable through the
+      // host's shadow tree AND any slotted children's shadow trees — the same
+      // surface area the after-focus search will inspect.
+      const collect = (root, sink) => {
+        if (!root) return;
+        for (const el of root.querySelectorAll('*')) sink.push(el);
+        for (const slot of root.querySelectorAll('slot')) {
+          let assigned = [];
+          try {
+            assigned = slot.assignedElements({ flatten: true }) || [];
+          } catch {
+            assigned = [];
+          }
+          for (const a of assigned) {
+            sink.push(a);
+            if (a.shadowRoot) collect(a.shadowRoot, sink);
+            try {
+              for (const c of a.querySelectorAll('*')) sink.push(c);
+            } catch {
+              /* ignore */
+            }
+          }
+        }
+      };
+      const els = [];
+      if (target) els.push(target);
+      if (host && host !== target) els.push(host);
+      if (host && host.shadowRoot) collect(host.shadowRoot, els);
+      const byId = {};
+      let n = 0;
+      const seen = new Set();
+      for (const el of els) {
+        if (!el || el.nodeType !== 1 || seen.has(el)) continue;
+        seen.add(el);
+        const id = `f${n++}`;
+        el.setAttribute('data-aaa-focus-id', id);
+        const cs = window.getComputedStyle(el);
+        byId[id] = {
+          outlineWidth: cs.outlineWidth || '0px',
+          outlineStyle: cs.outlineStyle || 'none',
+          outlineColor: cs.outlineColor || '',
+          boxShadow: cs.boxShadow || 'none',
+        };
+      }
+      return { byId };
+    }, componentName);
+
     // Real Tab-key walk: press Tab up to MAX_TAB times, after each press
     // check if the deepest active element across shadow boundaries is our
     // tagged target. This is what activates :focus-visible — the user-agent
@@ -875,7 +961,7 @@ async function runBrowserChecks(componentName, page) {
     // Now measure — the target is keyboard-focused (or we fell back to
     // programmatic focus only if the Tab walk failed to reach it).
     const measurements = await page.evaluate(
-      async ({ tag, didTab }) => {
+      async ({ tag, didTab, preSnapshot }) => {
         const target =
           document.querySelector(`[data-aaa-audit-target="1"]`) || document.querySelector(tag);
         if (!target) return { error: `no <${tag}> in story` };
@@ -893,18 +979,191 @@ async function runBrowserChecks(componentName, page) {
         // Resolve the deepest active element across shadow boundaries. With
         // `delegatesFocus: true`, Tab onto the host moves real focus to an
         // inner control; document.activeElement returns the host but the
-        // :focus-visible outline lives on the inner part. Measure styles on
-        // whichever element actually owns the focus pseudo-state.
+        // :focus-visible outline lives on the inner part. We start measuring
+        // from whichever element actually owns the focus pseudo-state, then
+        // refine via the focus-state diff below.
         let activeDeep = document.activeElement;
         while (activeDeep && activeDeep.shadowRoot && activeDeep.shadowRoot.activeElement) {
           activeDeep = activeDeep.shadowRoot.activeElement;
         }
-        // The element we measure outline on: prefer the deepest active element
-        // if it is inside our target's subtree (host or shadow descendant);
-        // otherwise fall back to the target itself.
+
+        // --- 2.4.13 focus-indicator resolution via focus-state DIFF ----------
+        //
+        // The focused element is NOT necessarily the element that paints the
+        // ring. We must measure the element whose outline / box-shadow actually
+        // CHANGED into a visible >=2px indicator on focus. Comparing against the
+        // unfocused baseline (preSnapshot) makes this robust:
+        //   - a host that sets `outline: none` reads outline-width = `medium`
+        //     (3px) both unfocused and focused → NO diff → not the indicator
+        //     (kills the bogus "outline 3px (under 2px threshold)" false-fail);
+        //   - a static border / always-on box-shadow is identical in both
+        //     states → NO diff → never mistaken for a focus ring;
+        //   - the inner part that goes 0px/none → 2px solid (or gains a >=2px
+        //     box-shadow ring) ON focus IS the indicator and is selected.
+        //
+        // A box-shadow value is a "visible focus ring" only when it isn't
+        // 'none', has at least one >=2px pixel dimension, and its color isn't
+        // fully transparent. The earlier heuristic accepted any `\d+px`
+        // substring, which matched the computed default
+        // "oklab(0 0 0 / 0) 0px 0px 0px 0px" (browser placeholder for "no
+        // shadow"); reject those.
+        const isVisibleFocusShadow = (raw) => {
+          if (!raw || raw === 'none') return false;
+          if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
+          if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+          if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+          if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
+          if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+          const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
+            parseFloat(m[1]),
+          );
+          if (pxValues.length === 0) return false;
+          return pxValues.some((v) => Math.abs(v) >= 2);
+        };
+        // Split a multi-layer box-shadow value into its comma-separated layers
+        // WITHOUT splitting on commas inside color functions (rgba(), oklch(),
+        // color(...)). Returns trimmed layer strings.
+        const splitShadowLayers = (raw) => {
+          if (!raw || raw === 'none') return [];
+          const out = [];
+          let depth = 0;
+          let cur = '';
+          for (const ch of raw) {
+            if (ch === '(') depth++;
+            else if (ch === ')') depth--;
+            if (ch === ',' && depth === 0) {
+              out.push(cur.trim());
+              cur = '';
+            } else {
+              cur += ch;
+            }
+          }
+          if (cur.trim()) out.push(cur.trim());
+          return out;
+        };
+        // A focus-ring box-shadow is "gained on focus" when the focused value
+        // contains a visible ring LAYER that the unfocused baseline did not.
+        // This is stronger than comparing whole-string visibility: components
+        // like hx-slider keep a static drop-shadow layer
+        // ("rgba(0,0,0,0.05) 0px 1px 2px 0px") at rest and ADD a teal ring
+        // layer ("rgb(15,112,120) 0px 0px 0px 2px") on focus — the whole
+        // string is "visible" in both states, but the ring layer is new.
+        const shadowRingGained = (before, after) => {
+          if (!isVisibleFocusShadow(after)) return false;
+          const beforeLayers = new Set(splitShadowLayers(before));
+          const afterLayers = splitShadowLayers(after);
+          // A newly-added layer that is itself a visible ring → gained.
+          return afterLayers.some(
+            (layer) => !beforeLayers.has(layer) && isVisibleFocusShadow(layer),
+          );
+        };
+        // An outline is a "visible focus outline" only when style isn't `none`
+        // (regardless of the computed `medium`/3px width that the UA reports
+        // for outline-style:none) AND its rendered width is >=2px.
+        const isVisibleFocusOutline = (widthPx, style) => style !== 'none' && widthPx >= 2;
+
+        // Re-collect the same candidate surface area as the pre-focus snapshot
+        // (host + its shadow tree + slotted children's shadow + light trees),
+        // so every snapshotted element can be re-measured in the focused state.
+        const collectFocusCandidates = (root, sink) => {
+          if (!root) return;
+          for (const el of root.querySelectorAll('*')) sink.push(el);
+          for (const slot of root.querySelectorAll('slot')) {
+            let assigned = [];
+            try {
+              assigned = slot.assignedElements({ flatten: true }) || [];
+            } catch {
+              assigned = [];
+            }
+            for (const a of assigned) {
+              sink.push(a);
+              if (a.shadowRoot) collectFocusCandidates(a.shadowRoot, sink);
+              try {
+                for (const c of a.querySelectorAll('*')) sink.push(c);
+              } catch {
+                /* ignore */
+              }
+            }
+          }
+        };
+        const candidates = [];
+        if (target) candidates.push(target);
+        if (host && host !== target) candidates.push(host);
+        if (host && host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
+
+        // For each candidate, decide whether it became a focus indicator on
+        // focus (diff vs. preSnapshot keyed by data-aaa-focus-id).
+        const diffWinners = [];
+        const seenCand = new Set();
+        for (const el of candidates) {
+          if (!el || el.nodeType !== 1 || seenCand.has(el)) continue;
+          seenCand.add(el);
+          const cs = window.getComputedStyle(el);
+          const wNow = parseFloat(cs.outlineWidth || '0');
+          const styleNow = cs.outlineStyle || 'none';
+          const shadowNow = cs.boxShadow || 'none';
+          const outlineVisibleNow = isVisibleFocusOutline(wNow, styleNow);
+          const shadowVisibleNow = isVisibleFocusShadow(shadowNow);
+          if (!outlineVisibleNow && !shadowVisibleNow) continue;
+
+          // Compare against the unfocused baseline.
+          const id = el.getAttribute && el.getAttribute('data-aaa-focus-id');
+          const prev = (id && preSnapshot && preSnapshot[id]) || null;
+          // When a baseline exists, an indicator is "gained" only if it was not
+          // already visible unfocused. The layer-aware shadow check counts a
+          // ring LAYER added on focus even when an unrelated static shadow
+          // layer was already present at rest (e.g. hx-slider thumb keeps a
+          // drop-shadow and adds the teal ring). When no baseline was captured
+          // (element appeared only after focus), its visible indicator counts
+          // as gained — it did not exist unfocused.
+          const outlineVisibleBefore = prev
+            ? isVisibleFocusOutline(
+                parseFloat(prev.outlineWidth || '0'),
+                prev.outlineStyle || 'none',
+              )
+            : false;
+          const outlineGained = outlineVisibleNow && !outlineVisibleBefore;
+          const shadowGained = prev
+            ? shadowVisibleNow && shadowRingGained(prev.boxShadow, shadowNow)
+            : shadowVisibleNow;
+          if (!outlineGained && !shadowGained) continue;
+
+          // The indicator must be actually visible (not on a display:none /
+          // 0×0 part).
+          const r = el.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2 || cs.visibility === 'hidden' || cs.display === 'none') {
+            continue;
+          }
+          diffWinners.push({
+            el,
+            kind: outlineGained ? 'outline' : 'box-shadow',
+            outlineWidthPx: wNow,
+            outlineStyle: styleNow,
+            outlineColor: cs.outlineColor,
+            outlineOffsetPx: parseFloat(cs.outlineOffset || '0'),
+            boxShadow: shadowNow,
+          });
+        }
+
+        // Pick the 2.4.13 focus-indicator element from the diff winners.
+        // Prefer the deepest active element if it is itself a diff winner (the
+        // ring on the focused control); otherwise the first winner in tree
+        // order (a host shadow part). This drives ONLY the 2.4.13 verdict.
+        let focusIndicator = null;
+        if (diffWinners.length > 0) {
+          focusIndicator = diffWinners.find((w) => w.el === activeDeep) || diffWinners[0];
+        }
+
+        // `outlineSource` is the element used for the 1.4.6 contrast, 2.4.12
+        // focus-obscured hit-test, and rect fallback. It is resolved
+        // INDEPENDENTLY of the 2.4.13 diff so this change does not perturb the
+        // other criteria's measurements: start at the target, prefer the
+        // deepest active element if it lives inside the component subtree, and
+        // (only when that element renders no outline of its own) walk the
+        // shadow tree for the first element painting a ring — mirroring the
+        // pre-existing resolution.
         let outlineSource = target;
         if (activeDeep && activeDeep !== target) {
-          // Walk up from activeDeep to confirm it's inside our component subtree.
           let cur = activeDeep;
           let inside = false;
           while (cur) {
@@ -917,93 +1176,17 @@ async function runBrowserChecks(componentName, page) {
           }
           if (inside) outlineSource = activeDeep;
         }
-
-        // If the resolved outlineSource has NO outline, it does not necessarily
-        // mean the component lacks a focus indicator. Many HELiX components
-        // render the focus ring on a sibling inside the shadow root (e.g.
-        // hx-checkbox draws outline on .checkbox__box, NOT on the focused host;
-        // hx-switch draws outline on .switch__track sibling-of-input). Walk
-        // the shadow descendants of the host once and pick the first descendant
-        // currently rendering an outline >=2px or a thick box-shadow — that is
-        // the actual focus indicator the user sees. Only do this when the
-        // primary outlineSource has no own outline (so we never over-report
-        // a passing host).
         const ownOutlineWidth = parseFloat(
           window.getComputedStyle(outlineSource).outlineWidth || '0',
         );
         if (ownOutlineWidth < 2) {
-          // Walk the host's shadow tree AND the shadow trees of any slotted
-          // children. Group components like hx-checkbox-group and hx-radio-group
-          // host only a <slot> in their own shadow root; the focus-ring is
-          // painted on a part inside the slotted child's shadow root (e.g.
-          // <hx-checkbox>::shadow .checkbox__box). Without traversing slot
-          // assignments, the harness records 0px outline on the slot itself
-          // and reports a Does-Not-Support 2.4.13 false-fail.
-          const collectFocusCandidates = (root, sink) => {
-            if (!root) return;
-            const all = root.querySelectorAll('*');
-            for (const el of all) sink.push(el);
-            // For each <slot>, recurse into the shadow trees of assigned elements
-            // and harvest their light DOM children too.
-            const slots = root.querySelectorAll('slot');
-            for (const slot of slots) {
-              // assignedElements with flatten:true follows slot fallback chains
-              // when the slot is empty.
-              let assigned = [];
-              try {
-                assigned = slot.assignedElements({ flatten: true }) || [];
-              } catch {
-                assigned = [];
-              }
-              for (const a of assigned) {
-                sink.push(a);
-                if (a.shadowRoot) collectFocusCandidates(a.shadowRoot, sink);
-                // Also harvest the assigned element's light DOM descendants —
-                // some patterns render focus indicators directly on light DOM
-                // children rather than in shadow.
-                try {
-                  const lightChildren = a.querySelectorAll('*');
-                  for (const c of lightChildren) sink.push(c);
-                } catch {
-                  /* ignore */
-                }
-              }
-            }
-          };
-          // A box-shadow value is "visible as a focus indicator" only when:
-          //   - it isn't 'none', AND
-          //   - at least one of (offset-x, offset-y, blur, spread) is >=2px, AND
-          //   - the color isn't fully transparent (alpha 0 / oklab .../0 / rgba(...,0))
-          // The previous heuristic accepted ANY `\d+px` substring, which matched
-          // computed defaults like "oklab(0 0 0 / 0) 0px 0px 0px 0px" — the
-          // browser's default placeholder for "no shadow" on elements that have
-          // a focus-visible rule defined elsewhere in the cascade but not
-          // currently matching. Reject those.
-          const isVisibleFocusShadow = (raw) => {
-            if (!raw || raw === 'none') return false;
-            // Reject fully-transparent color tokens.
-            if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
-            if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-            if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-            if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
-            if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-            // Require at least one non-zero pixel dimension.
-            const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
-              parseFloat(m[1]),
-            );
-            if (pxValues.length === 0) return false;
-            return pxValues.some((v) => Math.abs(v) >= 2);
-          };
-          const candidates = [];
-          if (host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
           for (const el of candidates) {
+            if (!el || el.nodeType !== 1 || el === outlineSource) continue;
             const cs = window.getComputedStyle(el);
             const w = parseFloat(cs.outlineWidth || '0');
             const okOutline = w >= 2 && cs.outlineStyle !== 'none';
             const okShadow = isVisibleFocusShadow(cs.boxShadow);
             if (okOutline || okShadow) {
-              // Confirm the element is currently visible (focus indicators
-              // on display:none parts do not count).
               const r = el.getBoundingClientRect();
               if (
                 r.width >= 2 &&
@@ -1119,6 +1302,84 @@ async function runBrowserChecks(componentName, page) {
         });
         const isCovered = !allPointsClear;
 
+        // 2.4.13 requires the focus indicator to have >=3:1 contrast against
+        // the adjacent (unfocused) colour it covers. Best-effort automated
+        // computation: resolve the ring colour vs. the background colour of the
+        // indicator element's nearest opaque ancestor surface. Colour parsing
+        // is limited to rgb()/rgba() (what getComputedStyle returns for
+        // resolved colours in Chromium); oklch()/named tokens that don't
+        // resolve to rgb are reported but flagged for manual verification.
+        let ringContrast = null;
+        let ringContrastNote = null;
+        if (focusIndicator) {
+          const parseRgb = (c) => {
+            if (!c) return null;
+            const m = c.match(
+              /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?\s*\)/i,
+            );
+            if (!m) return null;
+            const a = m[4] === undefined ? 1 : parseFloat(m[4]);
+            return { r: +m[1], g: +m[2], b: +m[3], a };
+          };
+          // WCAG relative luminance (sRGB).
+          const luminance = ({ r, g, b }) => {
+            const ch = [r, g, b].map((v) => {
+              const s = v / 255;
+              return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+          };
+          // Ring colour: outline-color for outline rings; first colour token of
+          // the box-shadow for shadow rings.
+          let ringColorStr = focusIndicator.outlineColor;
+          if (focusIndicator.kind === 'box-shadow') {
+            const cm = (focusIndicator.boxShadow || '').match(/rgba?\([^)]*\)/i);
+            ringColorStr = cm ? cm[0] : focusIndicator.outlineColor;
+          }
+          // Adjacent background — the colour the ring sits AGAINST. For an
+          // `outline` ring with a positive `outline-offset`, the ring is painted
+          // OUTSIDE the element's border box, so the adjacent colour is the
+          // surface BEHIND/AROUND the element (its parent/page), NOT the
+          // element's own fill. Sampling the indicator's own background here
+          // produced false-low ratios (e.g. teal ring on a teal-filled switch
+          // track reading 1.21:1). Start the walk from the parent for offset
+          // outline rings; box-shadow rings (and zero/negative-offset outlines
+          // that paint over the element) sit on the element's own surface.
+          const offsetRing =
+            focusIndicator.kind === 'outline' && (focusIndicator.outlineOffsetPx || 0) > 0;
+          let bgEl = offsetRing
+            ? focusIndicator.el.parentElement || focusIndicator.el.getRootNode()?.host || null
+            : focusIndicator.el;
+          let adjBg = null;
+          let hops = 0;
+          while (bgEl && hops < 8) {
+            const c = parseRgb(window.getComputedStyle(bgEl).backgroundColor);
+            if (c && c.a > 0) {
+              adjBg = c;
+              break;
+            }
+            bgEl = bgEl.parentElement || bgEl.getRootNode()?.host || null;
+            hops++;
+          }
+          const ringRgb = parseRgb(ringColorStr);
+          if (offsetRing && !adjBg) {
+            // The surface behind an offset ring is transparent all the way up
+            // (consumer page controls it) — we cannot resolve the true adjacent
+            // colour from within the component. Defer to manual verification
+            // rather than emit a misleading ratio.
+            ringContrastNote =
+              `offset outline ring (offset ${focusIndicator.outlineOffsetPx}px) sits on the consumer page surface, ` +
+              `which is transparent within the component — adjacent contrast cannot be auto-measured; verify >=3:1 manually`;
+          } else if (ringRgb && adjBg && ringRgb.a > 0) {
+            const l1 = luminance(ringRgb);
+            const l2 = luminance(adjBg);
+            ringContrast = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+          } else {
+            ringContrastNote =
+              'ring colour or adjacent background did not resolve to rgb() (likely oklch token) — verify >=3:1 manually';
+          }
+        }
+
         return {
           rect: { width: rect.width, height: rect.height, top: rect.top, left: rect.left },
           hostHidden,
@@ -1137,9 +1398,30 @@ async function runBrowserChecks(componentName, page) {
           outlineSourceHasOwnText: hasOwnTextContent,
           focusedViaKeyboard: didTab,
           tabPresses: undefined, // populated outside evaluate scope
+          // Focus-state DIFF result (2.4.13): which element became a visible
+          // ring on focus, and how.
+          focusIndicatorFound: !!focusIndicator,
+          focusIndicatorKind: focusIndicator ? focusIndicator.kind : null,
+          focusIndicatorTag:
+            focusIndicator && focusIndicator.el.tagName
+              ? focusIndicator.el.tagName.toLowerCase()
+              : null,
+          focusIndicatorPart:
+            focusIndicator && focusIndicator.el.getAttribute
+              ? focusIndicator.el.getAttribute('part') ||
+                focusIndicator.el.getAttribute('class') ||
+                null
+              : null,
+          focusIndicatorOutlineWidthPx: focusIndicator ? focusIndicator.outlineWidthPx : null,
+          focusIndicatorOutlineStyle: focusIndicator ? focusIndicator.outlineStyle : null,
+          focusIndicatorOutlineColor: focusIndicator ? focusIndicator.outlineColor : null,
+          focusIndicatorBoxShadow: focusIndicator ? focusIndicator.boxShadow : null,
+          focusIndicatorIsTarget: focusIndicator ? focusIndicator.el === target : false,
+          ringContrast,
+          ringContrastNote,
         };
       },
-      { tag: componentName, didTab: tabbed },
+      { tag: componentName, didTab: tabbed, preSnapshot: preFocusSnapshot?.byId || {} },
     );
 
     // Annotate measurement with the actual Tab-press count we recorded
@@ -1210,66 +1492,88 @@ async function runBrowserChecks(componentName, page) {
       };
     }
 
-    // 2.4.13 Focus Appearance — outline width >= 2px OR box-shadow focus ring.
-    // Many components use box-shadow as the focus indicator (a11y-equivalent
-    // when contrast >= 3:1 and >= 2px effective thickness). We accept either.
-    // Measurement was taken AFTER a real Tab-key walk (Tier-1-Task-1) so
-    // :focus-visible heuristics are active in the page exactly as they are
-    // for a sighted keyboard user.
-    const hasOutline = measurements.outlineWidthPx >= 2 && measurements.outlineStyle !== 'none';
-    // Detect a "thick enough" box-shadow — heuristic: spread-radius or
-    // multi-layer shadow with a non-transparent color and a non-zero
-    // blur or spread. The previous heuristic accepted ANY `\d+px` substring,
-    // which matched the computed-style default "oklab(0 0 0 / 0) 0px 0px 0px 0px"
-    // (browser placeholder for "no shadow"). Reject those by requiring at
-    // least one non-zero pixel dimension AND a non-transparent color.
-    const isVisibleShadow = (raw) => {
-      if (!raw || raw === 'none' || /^none$/i.test(raw)) return false;
-      if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
-      if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-      if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-      if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
-      if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-      const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
-        parseFloat(m[1]),
-      );
-      if (pxValues.length === 0) return false;
-      return pxValues.some((v) => Math.abs(v) >= 2);
-    };
-    const boxShadowSuggestsFocusRing = isVisibleShadow(measurements.boxShadow);
-    const outlineSourceNote = measurements.outlineSourceIsTarget
-      ? `<${measurements.targetTag}>`
-      : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> — focus ring rendered on inner part)`;
+    // 2.4.13 Focus Appearance — driven by the focus-state DIFF.
+    //
+    // The verdict is NOT derived from the raw computed outline of the focused
+    // element (which reads the bogus `medium`/3px default for elements that set
+    // `outline: none`). Instead, `measurements.focusIndicatorFound` reports
+    // whether ANY element in the focused subtree gained a real >=2px outline OR
+    // a visible >=2px box-shadow ring ON focus (vs. the unfocused baseline).
+    // That element — named below — is the actual indicator the user sees.
+    //
+    // Critically: a focused element whose only "outline" is the 3px `medium`
+    // default for `outline-style: none` does NOT count as a diff winner (its
+    // outline is identical unfocused and focused, and style:none is rejected),
+    // so the old `outlineWidthPx > 0 → Partially "under 2px threshold"`
+    // fallthrough can no longer fire on a style:none host.
     const focusModeNote = measurements.focusedViaKeyboard
-      ? `keyboard-focused via Tab×${measurements.tabPresses} on ${outlineSourceNote}`
-      : `Tab walk did not reach target after ${measurements.tabPresses} presses; fell back to programmatic focus on ${outlineSourceNote}`;
+      ? `keyboard-focused via Tab×${measurements.tabPresses}`
+      : `Tab walk did not reach target after ${measurements.tabPresses} presses; fell back to programmatic focus`;
+    // Name the element that paints the ring (tag + part/class) for the evidence.
+    const ringElementNote = measurements.focusIndicatorFound
+      ? (() => {
+          const tag = measurements.focusIndicatorTag || '?';
+          const part = measurements.focusIndicatorPart
+            ? `.${String(measurements.focusIndicatorPart).split(/\s+/)[0]}`
+            : '';
+          const where = measurements.focusIndicatorIsTarget
+            ? `<${tag}>${part} (the focused element itself)`
+            : `<${tag}>${part} (inner shadow part of <${measurements.targetTag}>)`;
+          return where;
+        })()
+      : null;
+    // Ring-contrast clause (WCAG 2.4.13 requires >=3:1 vs adjacent colour).
+    const contrastClause = (() => {
+      if (!measurements.focusIndicatorFound) return '';
+      if (typeof measurements.ringContrast === 'number') {
+        const ratio = measurements.ringContrast.toFixed(2);
+        return measurements.ringContrast >= 3
+          ? ` Ring contrast vs adjacent background ${ratio}:1 (>=3:1 OK).`
+          : ` Ring contrast vs adjacent background ${ratio}:1 (UNDER 3:1 — verify manually / flag).`;
+      }
+      return ` ${measurements.ringContrastNote || 'Ring contrast not auto-computed — verify >=3:1 manually.'}`;
+    })();
     let outlineVerdict;
     let outlineEvidence;
-    if (hasOutline) {
+    if (measurements.focusIndicatorFound) {
       outlineVerdict = VERDICT.SUPPORTS;
-      outlineEvidence = `computed outline ${measurements.outlineWidthPx}px ${measurements.outlineStyle} ${measurements.outlineColor} (${focusModeNote})`;
-    } else if (boxShadowSuggestsFocusRing) {
-      outlineVerdict = VERDICT.SUPPORTS;
-      outlineEvidence = `box-shadow focus indicator: ${measurements.boxShadow} (${focusModeNote}). Verify >=2px effective thickness + 3:1 contrast manually.`;
-    } else if (measurements.outlineWidthPx > 0) {
-      outlineVerdict = VERDICT.PARTIALLY;
-      outlineEvidence = `outline ${measurements.outlineWidthPx}px (under 2px threshold) (${focusModeNote})`;
+      if (measurements.focusIndicatorKind === 'outline') {
+        outlineEvidence =
+          `${measurements.focusIndicatorOutlineWidthPx}px ${measurements.focusIndicatorOutlineStyle} ` +
+          `${measurements.focusIndicatorOutlineColor} on ${ringElementNote} ` +
+          `(${focusModeNote}; gained on focus vs unfocused baseline).${contrastClause}`;
+      } else {
+        outlineEvidence =
+          `box-shadow focus ring "${measurements.focusIndicatorBoxShadow}" on ${ringElementNote} ` +
+          `(${focusModeNote}; gained on focus vs unfocused baseline; >=2px effective thickness).${contrastClause}`;
+      }
     } else if (!measurements.focusedViaKeyboard) {
       // We never reached the target with real Tab — :focus-visible may be
       // stripped by user-agent for programmatic focus on some elements.
       outlineVerdict = VERDICT.PARTIALLY;
-      outlineEvidence = `No focus indicator detected; ${focusModeNote}. Manual keyboard verification needed (story may have no path to component via Tab).`;
+      outlineEvidence = `No focus indicator detected via focus-state diff; ${focusModeNote} on <${measurements.targetTag}>. Manual keyboard verification needed (story may have no path to component via Tab).`;
     } else {
-      // Tab walk DID reach the target, no outline, no box-shadow — this is
-      // a real fail per WCAG 2.4.13.
+      // Tab walk DID reach the target, but NO element in the focused subtree
+      // gained a >=2px outline or box-shadow ring on focus — a real fail.
       outlineVerdict = VERDICT.DOES_NOT;
-      outlineEvidence = `${focusModeNote}; computed outline 0px and no box-shadow focus indicator. WCAG 2.4.13 requires a visible focus indicator >=2px.`;
+      outlineEvidence = `${focusModeNote} on <${measurements.targetTag}>; no element in the focused subtree gained a >=2px outline or box-shadow ring on focus (diff vs unfocused baseline). WCAG 2.4.13 requires a visible focus indicator >=2px.`;
     }
     result.focusOutline = {
-      widthPx: measurements.outlineWidthPx,
-      color: measurements.outlineColor,
-      style: measurements.outlineStyle,
-      boxShadow: measurements.boxShadow,
+      widthPx: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorOutlineWidthPx
+        : measurements.outlineWidthPx,
+      color: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorOutlineColor
+        : measurements.outlineColor,
+      style: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorOutlineStyle
+        : measurements.outlineStyle,
+      boxShadow: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorBoxShadow
+        : measurements.boxShadow,
+      indicatorKind: measurements.focusIndicatorKind,
+      indicatorElement: ringElementNote,
+      ringContrast: measurements.ringContrast,
       focusedViaKeyboard: measurements.focusedViaKeyboard,
       tabPresses: measurements.tabPresses,
       verdict: outlineVerdict,
