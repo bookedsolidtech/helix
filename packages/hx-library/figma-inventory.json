@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-13T02:10:28.065Z",
+  "generatedAt": "2026-05-29T14:41:29.986Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.9.1",
   "tokensVersion": "3.9.1",
@@ -3880,13 +3880,13 @@
         {
           "description": "Size of previous/next navigation buttons.",
           "name": "--hx-carousel-nav-btn-size",
-          "default": "2.5rem",
+          "default": "2.75rem",
           "figmaBinding": {
             "target": null,
             "layerSelector": "root",
             "semanticToken": null,
             "fallbackPrimitive": null,
-            "literalFallback": "2.5rem"
+            "literalFallback": "2.75rem"
           }
         },
         {
@@ -3913,7 +3913,7 @@
         },
         {
           "description": "Size token.",
-          "name": "--hx-size-10",
+          "name": "--hx-size-11",
           "figmaBinding": null
         },
         {
@@ -12522,7 +12522,7 @@
         },
         {
           "description": "Size token.",
-          "name": "--hx-size-10",
+          "name": "--hx-size-11",
           "figmaBinding": null
         },
         {
@@ -15669,7 +15669,7 @@
         },
         {
           "description": "Size token.",
-          "name": "--hx-size-10",
+          "name": "--hx-size-11",
           "figmaBinding": null
         },
         {

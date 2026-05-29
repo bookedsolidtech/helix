@@ -47,7 +47,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @cssprop [--hx-touch-target-min] - Minimum touch target size.
  * @cssprop [--hx-font-size-sm] - Font size.
  * @cssprop [--hx-space-2] - Spacing token.
- * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-size-11] - Size token.
  * @cssprop [--hx-font-size-md] - Font size.
  * @cssprop [--hx-space-3] - Spacing token.
  * @cssprop [--hx-size-12] - Size token.

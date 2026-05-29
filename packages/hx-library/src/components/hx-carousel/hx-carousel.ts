@@ -78,11 +78,11 @@ const _svgPause = html`<hx-icon
  *
  * @cssprop [--hx-carousel-gap=0px] - Gap between slides.
  * @cssprop [--hx-carousel-slide-width=100%] - Width override for each slide.
- * @cssprop [--hx-carousel-nav-btn-size=2.5rem] - Size of previous/next navigation buttons.
+ * @cssprop [--hx-carousel-nav-btn-size=2.75rem] - Size of previous/next navigation buttons.
  * @cssprop [--hx-carousel-pagination-dot-size=0.5rem] - Size of pagination dots.
  * @cssprop [--hx-space-3] - Spacing token.
  * @cssprop [--hx-space-2] - Spacing token.
- * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-size-11] - Size token.
  * @cssprop [--hx-touch-target-min] - Minimum touch target size.
  * @cssprop [--hx-border-width-thin] - Width.
  * @cssprop [--hx-color-neutral-200] - Color.

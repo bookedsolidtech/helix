@@ -35,8 +35,8 @@ export const helixCarouselStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
-    height: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
+    width: var(--hx-carousel-nav-btn-size, var(--hx-size-11, 2.75rem));
+    height: var(--hx-carousel-nav-btn-size, var(--hx-size-11, 2.75rem));
     /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);

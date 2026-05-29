@@ -86,7 +86,7 @@ const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
  * @cssprop [--hx-size-8] - Size token.
  * @cssprop [--hx-size-touch-target] - Size token.
  * @cssprop [--hx-font-size-sm] - Font size.
- * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-size-11] - Size token.
  * @cssprop [--hx-font-size-md] - Font size.
  * @cssprop [--hx-size-12] - Size token.
  * @cssprop [--hx-font-size-lg] - Font size.
