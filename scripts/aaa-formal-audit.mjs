@@ -797,6 +797,33 @@ async function runBrowserChecks(componentName, page) {
       const host = document.querySelector(tag);
       if (!host) return { error: `no <${tag}> in story` };
       const root = host.shadowRoot || host;
+
+      // Codex round-5 — hx-popover OWN-PANEL scope (1.4.6 / 2.4.13 / 2.4.12).
+      //
+      // hx-popover's `_show()` programmatically focuses its own `[part="body"]`
+      // panel whenever the slotted content contains a focusable element (WCAG
+      // 2.4.3 focus management). That panel is a surface the COMPONENT owns: it
+      // declares its own background + text color + `:focus-visible` outline in
+      // hx-popover.styles.ts. The audit must measure THAT panel — not tab-walk
+      // onto a slotted consumer control (which would certify consumer content)
+      // and not blanket-N/A (which would let panel regressions escape). Pin the
+      // target to `[part="body"]` so every downstream measurement (1.4.6
+      // contrast, 2.4.13 ring, 2.4.12 obscured) lands on the popover's own
+      // panel. Scoped to hx-popover only.
+      if (tag === 'hx-popover' && host.shadowRoot) {
+        const panel = host.shadowRoot.querySelector('[part="body"]');
+        if (panel) {
+          panel.setAttribute('data-aaa-audit-target', '1');
+          const pr = panel.getBoundingClientRect();
+          return {
+            targetTag: 'div',
+            targetPart: 'body',
+            targetIsHost: false,
+            hostHidden: pr.width < 2 || pr.height < 2,
+          };
+        }
+      }
+
       const allCandidates = [
         host,
         ...root.querySelectorAll(
@@ -945,6 +972,51 @@ async function runBrowserChecks(componentName, page) {
       if (reached) {
         tabbed = true;
         break;
+      }
+    }
+
+    // Codex round-5 — hx-popover OWN-PANEL focus (1.4.6 / 2.4.13 / 2.4.12).
+    //
+    // The popover's `[part="body"]` panel is `tabindex="-1"`, so the Tab walk
+    // above cannot land on it — but that is exactly the surface the component
+    // focuses itself on open (`_show()` calls `bodyEl.focus()` when slotted
+    // content is focusable). The Tab presses above already set the user-agent's
+    // last-interaction modality to keyboard, so focusing the panel now resolves
+    // `:focus-visible` (the same heuristic the harness relies on for
+    // delegatesFocus controls) and paints the panel's own focus ring. We focus
+    // the tagged panel and mark the focus as keyboard-driven so the 2.4.13
+    // verdict measures the panel's REAL `:focus-visible` outline rather than
+    // routing to the programmatic-fallback Partial. Scoped to hx-popover.
+    if (componentName === 'hx-popover') {
+      const focused = await page.evaluate(() => {
+        // The tagged panel lives INSIDE the popover shadow root, so the
+        // top-level document.querySelector cannot see it — reach it through the
+        // host's shadowRoot. The Tab walk above may have parked focus on a
+        // slotted consumer control; explicitly move focus onto the popover's
+        // OWN [part="body"] panel so all downstream measurements (1.4.6 / 2.4.13
+        // / 2.4.12) read the panel surface, not the consumer control.
+        const host = document.querySelector('hx-popover');
+        const panel =
+          host && host.shadowRoot
+            ? host.shadowRoot.querySelector('[data-aaa-audit-target="1"], [part="body"]')
+            : null;
+        if (!panel) return false;
+        const active = document.activeElement;
+        if (active && active !== panel && active !== document.body) {
+          try {
+            active.blur();
+          } catch {}
+        }
+        panel.focus();
+        // Resolve the deepest active element across shadow boundaries.
+        let deep = document.activeElement;
+        while (deep && deep.shadowRoot && deep.shadowRoot.activeElement) {
+          deep = deep.shadowRoot.activeElement;
+        }
+        return deep === panel;
+      });
+      if (focused) {
+        tabbed = true;
       }
     }
 
@@ -2248,59 +2320,28 @@ async function auditComponent(name, browser) {
           };
         }
 
-        // Codex round-4 — popover-container delegated-obligation N/A
-        // (1.4.6 Contrast, 2.4.12 Focus Not Obscured, 2.4.13 Focus Appearance).
+        // Codex round-5 — REVERSED the round-4 blanket popover-container N/A
+        // for 1.4.6 / 2.4.13 / 2.4.12.
         //
-        // `hx-popover` is a transparent positioning CONTAINER. Its host paints
-        // no own background (`display:contents`, 0×0 bbox) and renders NO
-        // keyboard-operable control of its own — unlike `hx-dialog` /
-        // `hx-drawer`, which render an own `[part="close-button"]` the audit
-        // legitimately certifies. The popover's `[part="body"]` panel carries
-        // `role="dialog"` + `tabindex="-1"` only as a focus-MANAGEMENT target
-        // (a non-operable container that receives focus on open purely so the
-        // subsequent Tab lands inside it); the only keyboard-OPERABLE focusable
-        // elements in real usage are CONSUMER-supplied (the slotted anchor and
-        // any controls the consumer places in the body).
+        // Round-4 forced `hx-popover` to Not Applicable on these three criteria
+        // on the theory that the popover is a transparent passthrough wrapper
+        // that owns no surface. Inspection of hx-popover.styles.ts proved that
+        // wrong: the `[part="body"]` panel declares its OWN non-transparent
+        // background (`--hx-popover-bg` → `--hx-color-surface-default`), its OWN
+        // text color (`--hx-popover-color` → `--hx-color-text-primary`), and its
+        // OWN `:focus-visible` outline. `_show()` programmatically focuses that
+        // panel whenever the slotted content is focusable (WCAG 2.4.3). The
+        // component therefore owns the focused surface, and a blanket N/A would
+        // let regressions in the panel's own bg/text/ring escape the audit.
         //
-        // Both 2.4.13 Focus Appearance and 2.4.12 Focus Not Obscured share the
-        // identical normative preamble — they apply only when a user interface
-        // component "receives keyboard focus" and, per the 2.4.13 Understanding,
-        // "it is only when the element with focus is operable by keyboard that
-        // this success criterion applies"
-        // (https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html;
-        //  https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html).
-        // The popover owns no such control, so BOTH are Not Applicable to the
-        // wrapper — the obligation rides on the consumer's focused control (and
-        // is audited on it). Likewise 1.4.6 Contrast (Enhanced) is a
-        // text/images-of-text obligation; the panel renders no own text (body
-        // text is consumer-supplied slotted content) and the host is
-        // transparent, so the 1.4.6 obligation sits with the consumer's content
-        // over its chosen surface tokens.
-        //
-        // This is the SAME container reasoning the harness already applies to
-        // mark 2.5.5 Target Size N/A for popover containers — applied
-        // consistently across every focus/contrast criterion the wrapper does
-        // not own. Scoped to `hx-popover` only (the in-scope component); peer
-        // containers resolve these criteria via their own existing routes and
-        // are not touched here. N/A here is a principled normative verdict, NOT
-        // a skip to dodge measurement: there is genuinely no popover-owned
-        // keyboard-operable surface to measure (hx-dialog/hx-drawer DO own one
-        // and are correctly left as real Supports measurements).
-        const POPOVER_CONTAINER_DELEGATED_FOCUS = new Set(['hx-popover']);
-        if (POPOVER_CONTAINER_DELEGATED_FOCUS.has(name)) {
-          result.verdicts['2.4.13'] = {
-            verdict: VERDICT.NOT_APPLICABLE,
-            evidence: `Popover-container component — host is a transparent positioning wrapper (display:contents, 0×0 bbox) with no keyboard-operable control of its own. The [part="body"] panel is a tabindex="-1" focus-management container (role="dialog"), not a UI component operable by keyboard; the only operable focusable elements are consumer-supplied (slotted anchor + body controls). WCAG 2.4.13 Focus Appearance applies only when the focused element is operable by keyboard (https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html), so the obligation is on the consumer's controls, not the wrapper — consistent with the 2.5.5 popover-container N/A. (Unlike hx-dialog/hx-drawer, hx-popover has no built-in close-button to certify.)`,
-          };
-          result.verdicts['2.4.12'] = {
-            verdict: VERDICT.NOT_APPLICABLE,
-            evidence: `Popover-container component — same wrapper reasoning as 2.4.13. WCAG 2.4.12 Focus Not Obscured (Enhanced) applies "when a user interface component receives keyboard focus" (https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html). hx-popover's host and its tabindex="-1" [part="body"] panel are not keyboard-operable components; the components that receive keyboard focus are consumer-supplied (slotted anchor + body controls), and the not-obscured obligation is audited on those controls, not the wrapper. Consistent with the 2.5.5 / 2.4.13 popover-container N/A.`,
-          };
-          result.verdicts['1.4.6'] = {
-            verdict: VERDICT.NOT_APPLICABLE,
-            evidence: `Popover-container component — the [part="body"] panel renders no own text (body content is consumer-supplied slotted content) and the host is transparent. WCAG 1.4.6 Contrast (Enhanced) is a text/images-of-text obligation; for a positioning wrapper the obligation belongs to the consumer's slotted content over its chosen surface tokens, not the wrapper. Mirrors the 2.5.5 popover-container N/A. Manual: verify documented surface-token combinations meet 7:1.`,
-          };
-        }
+        // The fix lives upstream in runBrowserChecks: the target resolver pins
+        // `hx-popover` to its own `[part="body"]` panel and the panel is focused
+        // under keyboard modality, so 1.4.6 (panel text vs panel bg), 2.4.13
+        // (panel `:focus-visible` ring ≥3:1), and 2.4.12 (panel obscured-check)
+        // are all MEASURED on the popover's own surface — not on a slotted
+        // consumer control and not waved through as N/A. No override is applied
+        // here; the measured verdicts from runBrowserChecks stand. hx-dialog /
+        // hx-drawer continue to measure their own `[part="close-button"]`.
       }
     } finally {
       await page.close();

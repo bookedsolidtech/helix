@@ -151,43 +151,32 @@ export const Default: Story = {
  * host bounding box. This export sets `open` and paints the popover body so
  * the harness lands on the visible component rather than a 0×0 host.
  *
- * IMPORTANT — this fixture deliberately slots NO focusable control inside the
- * popover body. `hx-popover` is a transparent positioning CONTAINER: its host
- * declares no widget role, paints no own background, and renders no
- * keyboard-operable control of its own. The only operable focusable elements
- * in any real usage are CONSUMER-supplied — the slotted anchor trigger and
- * whatever controls the consumer places in the body. The `[part="body"]`
- * dialog panel carries `role="dialog"` + `tabindex="-1"` purely as a focus
- * *management* target (focus is moved there on open only when interactive
- * content is present, per WCAG 2.4.3); it is a non-operable container, not a
- * UI component operable by keyboard.
+ * MEASURES THE POPOVER'S OWN PANEL (Codex round-5). `hx-popover` does own a
+ * surface: its `[part="body"]` panel declares its own non-transparent
+ * background, its own text color, and its own `:focus-visible` outline in
+ * hx-popover.styles.ts. `_show()` programmatically focuses that panel whenever
+ * the slotted content contains a focusable element (WCAG 2.4.3 focus
+ * management). This fixture therefore slots a focusable control inside the body
+ * so `_show()` moves focus onto `[part="body"]`, and the audit harness pins its
+ * target to `[part="body"]` (see runBrowserChecks). The result is that 1.4.6
+ * Contrast (Enhanced), 2.4.13 Focus Appearance, and 2.4.12 Focus Not Obscured
+ * are MEASURED on the popover's own panel surface — its own bg/text/ring — not
+ * on the slotted consumer control and not waved through as Not Applicable.
  *
- * Per the shared 2.4.12 / 2.4.13 normative preamble (the criterion applies
- * only when a user interface component "receives keyboard focus", and per the
- * 2.4.13 Understanding "it is only when the element with focus is operable by
- * keyboard that this success criterion applies"), the popover's Focus
- * Appearance (2.4.13), Focus Not Obscured (2.4.12), and text Contrast (1.4.6)
- * obligations belong to the consumer's slotted content, NOT to the wrapper —
- * exactly the reasoning the harness already applies to mark 2.5.5 Target Size
- * N/A for popover containers. The harness records 1.4.6 / 2.4.12 / 2.4.13 as a
- * principled popover-container N/A for `hx-popover`; this story must NOT slot a
- * consumer `<button>`, or the audit would certify the consumer's control
- * (its background, its focus ring) instead of asserting the popover.
- *
- * Unlike `hx-dialog` / `hx-drawer`, `hx-popover` has no built-in
- * `[part="close-button"]`, so there is no component-owned operable control to
- * measure — which is precisely why N/A (not Supports against an own control)
- * is the correct verdict here.
+ * The slotted control exists only to satisfy the `_show()` interactive-content
+ * gate; the harness deliberately does NOT certify it — it retargets to the
+ * panel so panel regressions (a transparent bg, a missing ring, a low-contrast
+ * text token) are caught. Unlike `hx-dialog` / `hx-drawer`, `hx-popover` has no
+ * built-in `[part="close-button"]`, so its OWN measurable surface is the panel
+ * itself.
  */
 export const AAAAuditOpen: Story = {
   render: () => html`
     <div style="padding: 6rem; display: flex; justify-content: center; align-items: center;">
       <hx-popover open label="Patient actions">
         <button slot="anchor">Open Popover</button>
-        <p style="margin: 0;">
-          AAA-audit fixture — open informational popover surface (no slotted controls; the
-          popover's own panel is a non-operable focus-management container).
-        </p>
+        <p style="margin: 0;">AAA-audit fixture — open popover panel (its own surface).</p>
+        <button type="button">Panel action</button>
       </hx-popover>
     </div>
   `,
