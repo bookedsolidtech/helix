@@ -24,9 +24,11 @@ input[type='number'] {
   font-size: var(--wc-font-size-md, 1rem);
   color: var(--wc-input-color, var(--wc-color-neutral-800, #212529));
   line-height: var(--wc-line-height-normal, 1.5);
-  /* 44px (2.75rem) default honours the WCAG 2.5.5 target-size floor; stays on
-     the --wc-* override hook so this legacy stylesheet's theming API is intact. */
-  min-height: var(--wc-size-10, 2.75rem);
+  /* Honour the --wc-size-10 override hook but floor at 44px (2.75rem) so the
+     WCAG 2.5.5 target-size minimum holds even when a consumer sets --wc-size-10
+     to its 40px semantic value. Literal floor keeps this legacy stylesheet in
+     the --wc-* namespace (these tokens are undefined-by-default consumer hooks). */
+  min-height: max(var(--wc-size-10, 2.5rem), 2.75rem);
   transition:
     border-color var(--wc-transition-fast, 150ms ease),
     box-shadow var(--wc-transition-fast, 150ms ease);
