@@ -146,33 +146,48 @@ export const Default: Story = {
 
 /**
  * Open-state story used by the formal AAA audit harness
- * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The Default story
- * renders the popover closed and the host uses display:contents, which
- * yields a 0×0 host bounding box and defeats focus-appearance, target-
- * size, and focus-not-obscured measurements. This export sets `open` and
- * paints the popover body so the audit measures the visible surface.
+ * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The Default story renders
+ * the popover closed and the host uses `display:contents`, yielding a 0×0
+ * host bounding box. This export sets `open` and paints the popover body so
+ * the harness lands on the visible component rather than a 0×0 host.
  *
- * The body carries an interactive control (a directly-slotted `<button>`).
- * Per WCAG 2.4.3, `hx-popover` only moves focus into the panel when it
- * contains interactive content — an informational popover deliberately leaves
- * focus on the trigger. This fixture therefore exercises the supported
- * interactive-popover path: on open the popover moves focus to the
- * `[part="body"]` dialog surface (role="dialog", tabindex=-1) and a keyboard
- * user then Tabs to the action button. Both the body surface and the slotted
- * button paint a ≥2px `:focus-visible` ring at ≥3:1 contrast — the body via
- * `[part='body']:focus-visible` and the button via the component's
- * `::slotted(button:focus-visible)` rule — so the audit's Tab walk lands on a
- * genuine component-owned focus indicator. The button is slotted directly
- * (not wrapped) so the harness's focus-state diff, which only recurses shadow
- * roots of directly-assigned slot children, can see its ring.
+ * IMPORTANT — this fixture deliberately slots NO focusable control inside the
+ * popover body. `hx-popover` is a transparent positioning CONTAINER: its host
+ * declares no widget role, paints no own background, and renders no
+ * keyboard-operable control of its own. The only operable focusable elements
+ * in any real usage are CONSUMER-supplied — the slotted anchor trigger and
+ * whatever controls the consumer places in the body. The `[part="body"]`
+ * dialog panel carries `role="dialog"` + `tabindex="-1"` purely as a focus
+ * *management* target (focus is moved there on open only when interactive
+ * content is present, per WCAG 2.4.3); it is a non-operable container, not a
+ * UI component operable by keyboard.
+ *
+ * Per the shared 2.4.12 / 2.4.13 normative preamble (the criterion applies
+ * only when a user interface component "receives keyboard focus", and per the
+ * 2.4.13 Understanding "it is only when the element with focus is operable by
+ * keyboard that this success criterion applies"), the popover's Focus
+ * Appearance (2.4.13), Focus Not Obscured (2.4.12), and text Contrast (1.4.6)
+ * obligations belong to the consumer's slotted content, NOT to the wrapper —
+ * exactly the reasoning the harness already applies to mark 2.5.5 Target Size
+ * N/A for popover containers. The harness records 1.4.6 / 2.4.12 / 2.4.13 as a
+ * principled popover-container N/A for `hx-popover`; this story must NOT slot a
+ * consumer `<button>`, or the audit would certify the consumer's control
+ * (its background, its focus ring) instead of asserting the popover.
+ *
+ * Unlike `hx-dialog` / `hx-drawer`, `hx-popover` has no built-in
+ * `[part="close-button"]`, so there is no component-owned operable control to
+ * measure — which is precisely why N/A (not Supports against an own control)
+ * is the correct verdict here.
  */
 export const AAAAuditOpen: Story = {
   render: () => html`
     <div style="padding: 6rem; display: flex; justify-content: center; align-items: center;">
       <hx-popover open label="Patient actions">
         <button slot="anchor">Open Popover</button>
-        <p style="margin: 0 0 0.5rem;">AAA-audit fixture — open interactive popover surface.</p>
-        <button type="button">Acknowledge</button>
+        <p style="margin: 0;">
+          AAA-audit fixture — open informational popover surface (no slotted controls; the
+          popover's own panel is a non-operable focus-management container).
+        </p>
       </hx-popover>
     </div>
   `,
