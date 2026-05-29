@@ -986,47 +986,64 @@ async function runBrowserChecks(componentName, page) {
       }
     }
 
-    // Codex round-5 — hx-popover OWN-PANEL focus (1.4.6 / 2.4.13 / 2.4.12).
+    // hx-popover OWN-PANEL focus (1.4.6 / 2.4.13 / 2.4.12) — VERIFIED, not forced.
     //
     // The popover's `[part="body"]` panel is `tabindex="-1"`, so the Tab walk
-    // above cannot land on it — but that is exactly the surface the component
-    // focuses itself on open (`_show()` calls `bodyEl.focus()` when slotted
-    // content is focusable). The Tab presses above already set the user-agent's
-    // last-interaction modality to keyboard, so focusing the panel now resolves
-    // `:focus-visible` (the same heuristic the harness relies on for
-    // delegatesFocus controls) and paints the panel's own focus ring. We focus
-    // the tagged panel and mark the focus as keyboard-driven so the 2.4.13
-    // verdict measures the panel's REAL `:focus-visible` outline rather than
-    // routing to the programmatic-fallback Partial. Scoped to hx-popover.
+    // above cannot land on it. But `[part="body"]` is exactly the surface the
+    // COMPONENT focuses itself on open: `_show()` calls `bodyEl.focus()` when the
+    // slotted content contains a focusable element (WCAG 2.4.3 focus management),
+    // which the AAAAuditOpen fixture guarantees by slotting a `<button>`.
+    //
+    // We must NOT fake this focus by calling `panel.focus()` ourselves — that
+    // would report a keyboard-reached pass for 1.4.6 / 2.4.12 / 2.4.13 even if
+    // `_show()` regressed and stopped focusing the panel (a false positive). The
+    // sentinel reset + Tab walk above already moved focus OFF the panel (the
+    // genuine on-mount focus from `firstUpdated()` is lost), and the Tab presses
+    // set the user-agent's last-interaction modality to keyboard.
+    //
+    // Instead we re-exercise the component's OWN open cycle and READ where focus
+    // lands. Toggling the public `open` property false→true drives the genuine
+    // `updated()` → `_hide()` / `_show()` lifecycle; `_show()` (only if its
+    // interactive-content gate still passes) moves focus to `[part="body"]`. We
+    // then resolve `document.activeElement` (shadow-aware) and accept the focus
+    // as keyboard-reached ONLY when the COMPONENT genuinely parked it on (or
+    // within) the panel. If `_show()` did not move focus into the panel, we leave
+    // `tabbed` false so the measurement path flags focus as programmatic-only —
+    // a real `_show()` regression is therefore detectable rather than masked.
     if (componentName === 'hx-popover') {
-      const focused = await page.evaluate(() => {
-        // The tagged panel lives INSIDE the popover shadow root, so the
-        // top-level document.querySelector cannot see it — reach it through the
-        // host's shadowRoot. The Tab walk above may have parked focus on a
-        // slotted consumer control; explicitly move focus onto the popover's
-        // OWN [part="body"] panel so all downstream measurements (1.4.6 / 2.4.13
-        // / 2.4.12) read the panel surface, not the consumer control.
+      const focusedByComponent = await page.evaluate(async () => {
         const host = document.querySelector('hx-popover');
-        const panel =
-          host && host.shadowRoot
-            ? host.shadowRoot.querySelector('[data-aaa-audit-target="1"], [part="body"]')
-            : null;
-        if (!panel) return false;
-        const active = document.activeElement;
-        if (active && active !== panel && active !== document.body) {
-          try {
-            active.blur();
-          } catch {}
+        if (!host || !host.shadowRoot) return false;
+        // Drive the component's own open lifecycle so _show() — not the harness —
+        // moves focus. Re-running _show() after the Tab walk also means the
+        // keyboard modality flag is already set, so the panel's :focus-visible
+        // ring resolves exactly as it would for a keyboard user.
+        try {
+          host.open = false;
+          await host.updateComplete;
+          await new Promise((r) => setTimeout(r, 30));
+          host.open = true;
+          await host.updateComplete;
+          // _show() awaits updateComplete then focuses; allow a couple of frames
+          // for the focus() call inside _show() to take effect.
+          await new Promise((r) => setTimeout(r, 60));
+        } catch {
+          return false;
         }
-        panel.focus();
-        // Resolve the deepest active element across shadow boundaries.
+        const panel = host.shadowRoot.querySelector('[data-aaa-audit-target="1"], [part="body"]');
+        if (!panel) return false;
+        // Resolve the deepest active element across shadow boundaries and verify
+        // the COMPONENT placed focus on (or within) its own panel.
         let deep = document.activeElement;
         while (deep && deep.shadowRoot && deep.shadowRoot.activeElement) {
           deep = deep.shadowRoot.activeElement;
         }
-        return deep === panel;
+        return deep === panel || panel.contains(deep);
       });
-      if (focused) {
+      if (focusedByComponent) {
+        // The component genuinely moved focus to its own panel — treat it as
+        // keyboard-reached (legitimate per 2.4.3) so 1.4.6 / 2.4.13 / 2.4.12 are
+        // measured on the real, currently-focused panel surface.
         tabbed = true;
       }
     }
