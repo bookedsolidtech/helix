@@ -77,7 +77,7 @@ export const helixComboboxStyles = css`
   .field__input {
     flex: 1;
     min-width: 0;
-    min-height: var(--hx-input-height-md, var(--hx-size-10, 2.5rem));
+    min-height: var(--hx-input-height-md, var(--hx-size-11, 2.75rem));
     border: none;
     background: transparent;
     outline: none;
