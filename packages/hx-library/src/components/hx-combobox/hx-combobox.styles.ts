@@ -70,7 +70,7 @@ export const helixComboboxStyles = css`
     min-width: 0;
     min-height: max(
       var(--hx-input-height-md, var(--hx-size-10, 2.5rem)),
-      var(--hx-size-touch-target, 2.75rem)
+      var(--hx-touch-target-min, 2.75rem)
     );
     border: none;
     background: transparent;

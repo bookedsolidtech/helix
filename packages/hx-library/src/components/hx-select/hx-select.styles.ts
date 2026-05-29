@@ -98,7 +98,7 @@ export const helixSelectStyles = css`
     width: 100%;
     min-height: max(
       var(--hx-input-height-md, var(--hx-size-10, 2.5rem)),
-      var(--hx-size-touch-target, 2.75rem)
+      var(--hx-touch-target-min, 2.75rem)
     );
     border: var(--hx-border-width-thin, 1px) solid var(--_border-color);
     border-radius: var(--_border-radius);
