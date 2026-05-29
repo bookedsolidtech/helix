@@ -19,7 +19,10 @@ select {
   font-size: var(--hx-font-size-md, 1rem);
   color: var(--hx-select-color, var(--hx-color-neutral-800, #212529));
   line-height: var(--hx-line-height-normal, 1.5);
-  min-height: var(--hx-input-height-md, var(--hx-size-11, 2.75rem));
+  min-height: max(
+    var(--hx-input-height-md, var(--hx-size-10, 2.5rem)),
+    var(--hx-size-touch-target, 2.75rem)
+  );
   cursor: pointer;
   transition:
     border-color var(--hx-transition-fast, 150ms ease),

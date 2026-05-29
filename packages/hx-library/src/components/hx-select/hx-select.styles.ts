@@ -96,7 +96,10 @@ export const helixSelectStyles = css`
     justify-content: space-between;
     gap: var(--hx-space-2, 0.5rem);
     width: 100%;
-    min-height: var(--hx-input-height-md, var(--hx-size-11, 2.75rem));
+    min-height: max(
+      var(--hx-input-height-md, var(--hx-size-10, 2.5rem)),
+      var(--hx-size-touch-target, 2.75rem)
+    );
     border: var(--hx-border-width-thin, 1px) solid var(--_border-color);
     border-radius: var(--_border-radius);
     background-color: var(--_bg);
