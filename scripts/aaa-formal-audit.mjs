@@ -889,10 +889,21 @@ async function runBrowserChecks(componentName, page) {
     // We tag each candidate with a stable data-aaa-focus-id so the after-focus
     // pass can correlate elements across page.evaluate boundaries.
     const preFocusSnapshot = await page.evaluate((tag) => {
-      const host =
-        document.querySelector(`[data-aaa-audit-target="1"]`)?.closest(tag) ||
-        document.querySelector(tag);
-      const target = document.querySelector(`[data-aaa-audit-target="1"]`) || host;
+      // Resolve the tagged audit target. For most components the target is
+      // either the host or a shadow-internal control that document-level
+      // querySelector reaches via the focus walk below. hx-popover is the one
+      // case where the target is a tabindex=-1 SHADOW-internal node
+      // ([part="body"]) that a top-level document.querySelector CANNOT see — so
+      // for it (only) we re-resolve the tagged panel through host.shadowRoot.
+      // All other components keep their original document-level resolution
+      // (and host fallback) byte-for-byte.
+      const docTagged = document.querySelector(`[data-aaa-audit-target="1"]`);
+      const host = docTagged?.closest(tag) || document.querySelector(tag);
+      const shadowTagged =
+        tag === 'hx-popover' && host && host.shadowRoot
+          ? host.shadowRoot.querySelector(`[data-aaa-audit-target="1"]`)
+          : null;
+      const target = docTagged || shadowTagged || host;
       if (!host && !target) return { byId: {} };
       // Collect the target, the host, and every element reachable through the
       // host's shadow tree AND any slotted children's shadow trees — the same
@@ -1034,10 +1045,23 @@ async function runBrowserChecks(componentName, page) {
     // programmatic focus only if the Tab walk failed to reach it).
     const measurements = await page.evaluate(
       async ({ tag, didTab, preSnapshot }) => {
-        const target =
-          document.querySelector(`[data-aaa-audit-target="1"]`) || document.querySelector(tag);
+        // Resolve the tagged audit target. hx-popover tags a tabindex=-1
+        // SHADOW-internal node ([part="body"]) that a top-level
+        // document.querySelector CANNOT see — for it (only) re-resolve the
+        // tagged panel through host.shadowRoot so every downstream measurement
+        // (1.4.6 contrast, 2.4.13 ring, 2.4.12 obscured hit-test, rect
+        // fallback) lands on the panel surface the component owns rather than
+        // silently collapsing onto the display:contents host. All other
+        // components keep their original document-level resolution byte-for-byte.
+        const docTagged = document.querySelector(`[data-aaa-audit-target="1"]`);
+        const resolvedHost = document.querySelector(tag);
+        const shadowTagged =
+          tag === 'hx-popover' && resolvedHost && resolvedHost.shadowRoot
+            ? resolvedHost.shadowRoot.querySelector(`[data-aaa-audit-target="1"]`)
+            : null;
+        const target = docTagged || shadowTagged || resolvedHost;
         if (!target) return { error: `no <${tag}> in story` };
-        const host = document.querySelector(tag) || target;
+        const host = resolvedHost || target;
 
         // If the Tab walk did not reach the target, fall back to programmatic
         // focus so the rest of the measurements still land — but we'll mark

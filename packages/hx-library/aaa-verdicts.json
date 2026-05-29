@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-29T18:15:39.216Z",
-  "sourceAuditRunAt": "2026-05-29T18:14:11.142Z",
+  "generatedAt": "2026-05-29T18:33:54.914Z",
+  "sourceAuditRunAt": "2026-05-29T18:32:26.622Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -1289,7 +1289,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "2px solid rgb(15, 112, 120) on <div>.body (inner shadow part of <hx-popover>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
+        "evidence": "2px solid rgb(15, 112, 120) on <div>.body (the focused element itself) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
