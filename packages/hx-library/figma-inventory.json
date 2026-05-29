@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-29T18:50:58.671Z",
+  "generatedAt": "2026-05-29T19:44:50.974Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.9.1",
   "tokensVersion": "3.9.1",
@@ -6863,7 +6863,7 @@
         },
         {
           "description": "Minimum 44px touch-target floor (WCAG 2.5.5).",
-          "name": "--hx-size-touch-target",
+          "name": "--hx-touch-target-min",
           "figmaBinding": null
         },
         {
@@ -15666,7 +15666,7 @@
         },
         {
           "description": "Size token.",
-          "name": "--hx-size-touch-target",
+          "name": "--hx-touch-target-min",
           "figmaBinding": null
         },
         {
@@ -18762,7 +18762,7 @@
         },
         {
           "description": "Minimum 44px touch-target floor (WCAG 2.5.5).",
-          "name": "--hx-size-touch-target",
+          "name": "--hx-touch-target-min",
           "figmaBinding": null
         },
         {
