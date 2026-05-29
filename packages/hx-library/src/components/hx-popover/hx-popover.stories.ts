@@ -151,13 +151,28 @@ export const Default: Story = {
  * yields a 0×0 host bounding box and defeats focus-appearance, target-
  * size, and focus-not-obscured measurements. This export sets `open` and
  * paints the popover body so the audit measures the visible surface.
+ *
+ * The body carries an interactive control (a directly-slotted `<button>`).
+ * Per WCAG 2.4.3, `hx-popover` only moves focus into the panel when it
+ * contains interactive content — an informational popover deliberately leaves
+ * focus on the trigger. This fixture therefore exercises the supported
+ * interactive-popover path: on open the popover moves focus to the
+ * `[part="body"]` dialog surface (role="dialog", tabindex=-1) and a keyboard
+ * user then Tabs to the action button. Both the body surface and the slotted
+ * button paint a ≥2px `:focus-visible` ring at ≥3:1 contrast — the body via
+ * `[part='body']:focus-visible` and the button via the component's
+ * `::slotted(button:focus-visible)` rule — so the audit's Tab walk lands on a
+ * genuine component-owned focus indicator. The button is slotted directly
+ * (not wrapped) so the harness's focus-state diff, which only recurses shadow
+ * roots of directly-assigned slot children, can see its ring.
  */
 export const AAAAuditOpen: Story = {
   render: () => html`
     <div style="padding: 6rem; display: flex; justify-content: center; align-items: center;">
-      <hx-popover open>
+      <hx-popover open label="Patient actions">
         <button slot="anchor">Open Popover</button>
-        <p style="margin: 0;">AAA-audit fixture — open popover surface.</p>
+        <p style="margin: 0 0 0.5rem;">AAA-audit fixture — open interactive popover surface.</p>
+        <button type="button">Acknowledge</button>
       </hx-popover>
     </div>
   `,

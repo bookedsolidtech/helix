@@ -672,7 +672,7 @@ async function loadStorybookIndex() {
  * Storybook docs.
  */
 const STORY_OVERRIDES = {
-  'hx-dialog': 'ModalOpen',
+  'hx-dialog': 'AAAAuditOpen',
   'hx-drawer': 'AAAAuditOpen',
   'hx-popover': 'AAAAuditOpen',
   // Banner Default has dismissible=false (no focusable surface). Route the

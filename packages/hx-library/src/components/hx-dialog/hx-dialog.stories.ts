@@ -165,6 +165,34 @@ export const ModalOpen: Story = {
   },
 };
 
+/**
+ * Open-state fixture used by the formal AAA audit harness
+ * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The Default story renders
+ * the dialog closed; the host uses `display: contents`, so its bounding box
+ * is 0×0 and focus-appearance / focus-not-obscured cannot be measured.
+ *
+ * This fixture opens a modal dialog that contains NO slotted focusable
+ * controls. Per WCAG 2.4.3, `hx-dialog` then moves initial focus to its own
+ * built-in `[part="close-button"]` (the documented `_getFocusableElements`
+ * fallback). That close button is a real 44×44 control inside the focus
+ * trap, paints a ≥2px `:focus-visible` ring at ≥3:1 contrast, and is the
+ * element a keyboard user lands on when this dialog opens — exactly the
+ * focus target the audit must verify. (The richer `ModalOpen` story focuses
+ * a slotted consumer button first, which uses the consumer's own focus ring
+ * rather than the component-owned indicator, so it is unsuitable as the cert
+ * surface.)
+ */
+export const AAAAuditOpen: Story = {
+  render: () => html`
+    <hx-dialog open modal heading="AAA Audit — Focus Appearance">
+      <p style="margin: 0; font-size: 0.875rem;">
+        Informational modal with no slotted controls. Initial focus moves to the built-in close
+        button so the audit measures the component-owned focus ring.
+      </p>
+    </hx-dialog>
+  `,
+};
+
 // ════════════════════════════════════════════════════════════════════════════
 // 3. NON-MODAL — Open non-modal dialog
 // ════════════════════════════════════════════════════════════════════════════
