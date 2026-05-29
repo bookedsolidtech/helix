@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-29T17:54:43.980Z",
-  "sourceAuditRunAt": "2026-05-29T17:53:15.932Z",
+  "generatedAt": "2026-05-29T18:15:39.216Z",
+  "sourceAuditRunAt": "2026-05-29T18:14:11.142Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -1280,16 +1280,16 @@
         "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
       },
       "1.4.6": {
-        "verdict": "Not Applicable",
-        "evidence": "Popover-container component — the [part=\"body\"] panel renders no own text (body content is consumer-supplied slotted content) and the host is transparent."
+        "verdict": "Supports",
+        "evidence": "17.88:1 (fg rgb(13, 24, 37), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
       },
       "2.4.12": {
-        "verdict": "Not Applicable",
-        "evidence": "Popover-container component — same wrapper reasoning as 2.4.13. WCAG 2.4.12 Focus Not Obscured (Enhanced) applies \"when a user interface component receives keyboard focus\" (https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html)."
+        "verdict": "Supports",
+        "evidence": "No element covers the focused target center."
       },
       "2.4.13": {
-        "verdict": "Not Applicable",
-        "evidence": "Popover-container component — host is a transparent positioning wrapper (display:contents, 0×0 bbox) with no keyboard-operable control of its own."
+        "verdict": "Supports",
+        "evidence": "2px solid rgb(15, 112, 120) on <div>.body (inner shadow part of <hx-popover>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
