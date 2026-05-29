@@ -55,16 +55,16 @@ export const helixOverflowMenuStyles = css`
   .trigger--sm {
     width: var(--hx-size-8, 2rem);
     height: var(--hx-size-8, 2rem);
-    min-width: var(--hx-touch-target-min, 2.75rem);
-    min-height: var(--hx-touch-target-min, 2.75rem);
+    min-width: var(--hx-size-touch-target, 2.75rem);
+    min-height: var(--hx-size-touch-target, 2.75rem);
     font-size: var(--hx-font-size-sm, 0.875rem);
   }
 
   .trigger--md {
     width: var(--hx-size-11, 2.75rem);
     height: var(--hx-size-11, 2.75rem);
-    min-width: var(--hx-touch-target-min, 2.75rem);
-    min-height: var(--hx-touch-target-min, 2.75rem);
+    min-width: var(--hx-size-touch-target, 2.75rem);
+    min-height: var(--hx-size-touch-target, 2.75rem);
     font-size: var(--hx-font-size-md, 1rem);
   }
 

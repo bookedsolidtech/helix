@@ -84,7 +84,7 @@ const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
  * @cssprop [--hx-focus-ring-offset] - CSS custom property.
  * @cssprop [--hx-color-neutral-100] - Color.
  * @cssprop [--hx-size-8] - Size token.
- * @cssprop [--hx-touch-target-min] - Size token.
+ * @cssprop [--hx-size-touch-target] - Size token.
  * @cssprop [--hx-font-size-sm] - Font size.
  * @cssprop [--hx-size-11] - Size token.
  * @cssprop [--hx-font-size-md] - Font size.
