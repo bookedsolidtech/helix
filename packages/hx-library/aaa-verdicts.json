@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-29T19:48:02.624Z",
-  "sourceAuditRunAt": "2026-05-29T19:46:34.768Z",
+  "generatedAt": "2026-05-29T20:08:39.550Z",
+  "sourceAuditRunAt": "2026-05-29T20:07:09.751Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -644,8 +644,8 @@
         "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-dialog>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
-        "verdict": "Not Applicable",
-        "evidence": "Host <hx-dialog> has 0x0 bounding box in default story (component likely closed/hidden)."
+        "verdict": "Supports",
+        "evidence": "Overlay host <hx-dialog> uses display:contents (0×0 host bbox); measured the resolved open-state target <button>[part=\"close-button\"] 44.0x44.0 px (component-owned control inside the opened overlay, same shadow-aware target as the 2.4.13/2.4.12 passes)."
       }
     },
     "hx-drawer": {
@@ -690,8 +690,8 @@
         "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-drawer>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
-        "verdict": "Not Applicable",
-        "evidence": "Host <hx-drawer> has 0x0 bounding box in default story (component likely closed/hidden)."
+        "verdict": "Supports",
+        "evidence": "Overlay host <hx-drawer> uses display:contents (0×0 host bbox); measured the resolved open-state target <button>[part=\"close-button\"] 44.0x44.0 px (component-owned control inside the opened overlay, same shadow-aware target as the 2.4.13/2.4.12 passes)."
       }
     },
     "hx-dropdown": {
@@ -1293,7 +1293,7 @@
       },
       "2.5.5": {
         "verdict": "Not Applicable",
-        "evidence": "Host <hx-popover> has 0x0 bounding box in default story (component likely closed/hidden)."
+        "evidence": "Popover-container component — host wraps a slotted trigger and a floating panel."
       }
     },
     "hx-popup": {

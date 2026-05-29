@@ -1774,7 +1774,14 @@ async function runBrowserChecks(componentName, page) {
     // both of which already meet the 44×44 AAA bar in their own audit
     // row). The 2.5.5 obligation here is on the CONSUMER, not the
     // component. Mark Not Applicable with an explicit consumer note.
-    const POPOVER_CONTAINERS = new Set(['hx-dropdown', 'hx-tooltip', 'hx-popup']);
+    //
+    // hx-popover is included here: its resolved audit target is the
+    // component-owned `[part="body"]` panel — a non-actionable CONTAINER, not
+    // a click target. The 2.5.5 obligation falls on the consumer-supplied
+    // trigger and on any actionable controls the consumer slots into the
+    // panel, neither of which the component sizes. This keeps popover's 2.5.5
+    // verdict consistent with its other container-N/A rationales (round-4/5).
+    const POPOVER_CONTAINERS = new Set(['hx-dropdown', 'hx-tooltip', 'hx-popup', 'hx-popover']);
     // WCAG 2.5.5 user-agent control exception — components whose interactive
     // target is rendered and sized by the user agent (native <input
     // type="range"> thumb, native rating star widgets) are exempt because
@@ -1798,13 +1805,59 @@ async function runBrowserChecks(componentName, page) {
         evidence: `User-agent-controlled target — component delegates to a native <input type="range"> whose thumb is sized by the platform (typically 16-20px). WCAG 2.5.5 user-agent exception (https://www.w3.org/TR/WCAG22/#target-size-enhanced) applies: target sized by the user agent is exempt. Host bbox ${measurements.rect.width.toFixed(1)}x${measurements.rect.height.toFixed(1)} px reflects the entire slider track, not the actionable thumb. Equivalent input methods (Arrow keys, Home/End, PageUp/PageDown, mouse wheel) clear the spirit of 2.5.5 for keyboard users.`,
       };
     } else if (measurements.hostHidden) {
-      result.targetSize = {
-        width: 0,
-        height: 0,
-        target: measurements.targetTag,
-        verdict: VERDICT.NOT_APPLICABLE,
-        evidence: `Host <${componentName}> has 0x0 bounding box in default story (component likely closed/hidden). Manual measurement required for opened state.`,
-      };
+      // Overlay components (hx-dialog, hx-drawer) use `:host { display:
+      // contents }`, so the host bbox is 0×0 even when the open panel is
+      // painted fixed-position elsewhere. When the open-state story override
+      // (STORY_OVERRIDES) has driven the overlay open, the measurement pass
+      // resolves a REAL, visible surface INSIDE the component via the same
+      // shadow-root-aware outlineSource fallback the 2.4.13 / 2.4.12 passes use
+      // (measurements.rect is reassigned to that focus surface — e.g. the
+      // dialog/drawer `[part="close-button"]`, 44×44 — when the tagged target's
+      // own rect is degenerate; see the rect fallback in runBrowserChecks).
+      // Measure THAT resolved rect for 2.5.5 rather than short-circuiting to Not
+      // Applicable on the degenerate host bbox. Only fall back to N/A when no
+      // real surface resolved (rect still degenerate) — i.e. the overlay is
+      // genuinely closed/hidden. NOTE: popover-class overlays are handled by
+      // POPOVER_CONTAINERS above (their resolved surface is a non-actionable
+      // container panel), so they never reach this branch.
+      const hasResolvedSurface =
+        measurements.rect.width >= 2 && measurements.rect.height >= 2;
+      if (hasResolvedSurface) {
+        // Name the element that owns the resolved focus surface for evidence.
+        // When the Tab-tagged target was the 0×0 host, the rect was resolved
+        // from the focus-indicator element (the actual control the user lands
+        // on); prefer its tag/part label over the degenerate host tag.
+        const resolvedLabel = (() => {
+          if (!measurements.targetIsHost) return `<${measurements.targetTag}>`;
+          const tag = measurements.focusIndicatorTag || measurements.outlineSourceTag || 'element';
+          const part = measurements.focusIndicatorPart
+            ? `[part="${String(measurements.focusIndicatorPart).split(/\s+/)[0]}"]`
+            : '';
+          return `<${tag}>${part}`;
+        })();
+        result.targetSize = {
+          width: measurements.rect.width,
+          height: measurements.rect.height,
+          target: measurements.targetIsHost
+            ? measurements.focusIndicatorTag || measurements.outlineSourceTag || measurements.targetTag
+            : measurements.targetTag,
+          verdict:
+            measurements.rect.width >= 44 && measurements.rect.height >= 44
+              ? VERDICT.SUPPORTS
+              : measurements.rect.width >= 24 && measurements.rect.height >= 24
+                ? VERDICT.PARTIALLY
+                : VERDICT.DOES_NOT,
+          evidence: `Overlay host <${componentName}> uses display:contents (0×0 host bbox); measured the resolved open-state target ${resolvedLabel} ${measurements.rect.width.toFixed(1)}x${measurements.rect.height.toFixed(1)} px (component-owned control inside the opened overlay, same shadow-aware target as the 2.4.13/2.4.12 passes).`,
+        };
+      } else {
+        result.targetSize = {
+          width: 0,
+          height: 0,
+          target: measurements.targetTag,
+          verdict: VERDICT.NOT_APPLICABLE,
+          evidence: `Host <${componentName}> has 0x0 bounding box in default story (component likely closed/hidden). Manual measurement required for opened state.`,
+        };
+      }
     } else {
       result.targetSize = {
         width: measurements.rect.width,

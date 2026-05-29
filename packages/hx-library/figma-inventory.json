@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-29T19:44:50.974Z",
+  "generatedAt": "2026-05-29T20:09:30.536Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.9.1",
   "tokensVersion": "3.9.1",
@@ -9408,7 +9408,8 @@
           "apg-keyboard",
           "1.4.6",
           "2.4.12",
-          "2.4.13"
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-dialog/AAA-AUDIT.md"
       },
@@ -10109,7 +10110,8 @@
           "apg-keyboard",
           "1.4.6",
           "2.4.12",
-          "2.4.13"
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-drawer/AAA-AUDIT.md"
       },
