@@ -45,13 +45,9 @@ export const helixComboboxStyles = css`
   }
   .field__input-wrapper:focus-within {
     border-color: var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
+    /* Opaque solid ring (WCAG 2.4.13 >=3:1) — follows the wrapper border-radius */
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #0f7078))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+      var(--hx-combobox-focus-ring-color, var(--hx-focus-ring-color, #0f7078));
   }
   .field--error .field__input-wrapper {
     border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #e5493e));
@@ -59,12 +55,7 @@ export const helixComboboxStyles = css`
   .field--error .field__input-wrapper:focus-within {
     border-color: var(--hx-combobox-error-color, var(--hx-color-error-500, #e5493e));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-combobox-error-color, var(--hx-color-error-500, #e5493e))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+      var(--hx-combobox-error-color, var(--hx-color-error-500, #e5493e));
   }
   .field__prefix,
   .field__suffix {

@@ -53,13 +53,9 @@ input[type='search']:focus,
 input[type='number']:focus {
   outline: none;
   border-color: var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
+  /* Opaque solid ring (WCAG 2.4.13 >=3:1) — follows the input border-radius */
   box-shadow: 0 0 0 var(--wc-focus-ring-width, 2px)
-    color-mix(
-      in srgb,
-      var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb))
-        calc(var(--wc-focus-ring-opacity, 0.25) * 100%),
-      transparent
-    );
+    var(--wc-input-focus-ring-color, var(--wc-focus-ring-color, #2563eb));
 }
 
 /* ─── Disabled State ─── */

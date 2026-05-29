@@ -121,12 +121,8 @@ export const helixSelectStyles = css`
   :host(:focus-visible) .field__trigger,
   .field__trigger:focus-visible {
     border-color: var(--_focus-ring-color);
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--_focus-ring-color) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+    /* Opaque solid ring (WCAG 2.4.13 >=3:1) — follows the trigger border-radius */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) var(--_focus-ring-color);
   }
 
   .field__trigger[aria-disabled='true'] {
@@ -190,12 +186,7 @@ export const helixSelectStyles = css`
   :host(:focus-visible) .field--error .field__trigger,
   .field--error .field__trigger:focus-visible {
     border-color: var(--_error-color);
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--_error-color) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) var(--_error-color);
   }
 
   .field__listbox {

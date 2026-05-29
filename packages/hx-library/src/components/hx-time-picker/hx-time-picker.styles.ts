@@ -46,13 +46,9 @@ export const helixTimePickerStyles = css`
   }
   .field__combobox:focus-within {
     border-color: var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color));
+    /* Opaque solid ring (WCAG 2.4.13 >=3:1) — follows the wrapper border-radius */
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+      var(--hx-time-picker-focus-ring-color, var(--hx-focus-ring-color));
   }
   .field--error .field__combobox {
     border-color: var(--hx-time-picker-error-color, var(--hx-color-error-500, #e5493e));
@@ -60,12 +56,7 @@ export const helixTimePickerStyles = css`
   .field--error .field__combobox:focus-within {
     border-color: var(--hx-time-picker-error-color, var(--hx-color-error-500, #e5493e));
     box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--hx-time-picker-error-color, var(--hx-color-error-500, #e5493e))
-          calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+      var(--hx-time-picker-error-color, var(--hx-color-error-500, #e5493e));
   }
   .field__input {
     flex: 1;
