@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-29T17:07:56.616Z",
-  "sourceAuditRunAt": "2026-05-29T17:06:20.921Z",
+  "generatedAt": "2026-05-29T17:26:50.694Z",
+  "sourceAuditRunAt": "2026-05-29T17:25:19.026Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -80,8 +80,8 @@
         "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-alert) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -402,8 +402,8 @@
         "evidence": "@aria-pattern=\"alert\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-clinical-status) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -816,8 +816,8 @@
         "evidence": "@aria-pattern=\"label\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "Component-owned focus/text surface <body>.sb-main-padded: 21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255))."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-field-label) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -954,8 +954,8 @@
         "evidence": "@aria-pattern=\"label\" requires no specific key set (alert / textbox)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-help-text) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1004,8 +1004,8 @@
         "evidence": "WCAG 1.4.11 Non-text Contrast: 1 hx-icon sample(s) measured; min ratio 21.00:1 (≥3:1 required)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "Component-owned focus/text surface <button>: 18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239))."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-icon) is transparent (bg=rgba(0, 0, 0, 0)) and owns no non-transparent text surface; foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",

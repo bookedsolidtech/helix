@@ -1528,10 +1528,40 @@ async function runBrowserChecks(componentName, page) {
           // belongs to the consumer page, not the component.
           const ownedAncestors = [];
           if (focusIndicator && focusIndicator.el) ownedAncestors.push(focusIndicator.el);
+          // CONTAINMENT GATE: only walk `activeDeep`'s ancestors when the
+          // focused node ACTUALLY lives inside this component's subtree — its
+          // shadow tree, the host itself, or light DOM assigned to one of the
+          // host's slots (flattened tree). For NON-focusable components the Tab
+          // walk never reaches them and `target.focus()` no-ops, so
+          // `activeDeep` is still whatever page element holds focus (Storybook
+          // `<body>.sb-main-padded` chrome). Walking that node's ancestors
+          // would climb into PAGE chrome and mis-report the page background as
+          // a component-owned 1.4.6 surface. When focus never entered the
+          // component, skip the ancestor walk entirely so 1.4.6 stays Not
+          // Applicable — the correct verdict for a non-focusable component.
+          // Shadow-piercing containment: climb via assignedSlot (slotted light
+          // DOM) → parentNode (shadow children / light DOM) → shadow-root host,
+          // confirming the chain reaches `host` (or `target`). Mirrors the
+          // outlineSource `inside` walk above.
+          let focusInsideComponent = false;
           if (activeDeep) {
             let cur = activeDeep;
             let guard = 0;
+            while (cur && guard < 32) {
+              guard++;
+              if (cur === host || cur === target) {
+                focusInsideComponent = true;
+                break;
+              }
+              cur = cur.assignedSlot || cur.parentNode || cur.host || null;
+              if (cur && cur.nodeType !== 1 && cur.host) cur = cur.host;
+            }
+          }
+          if (activeDeep && focusInsideComponent) {
+            let cur = activeDeep;
+            let guard = 0;
             while (cur && guard < 12) {
+              guard++;
               ownedAncestors.push(cur);
               if (cur === host) break; // do not cross above the component host
               // Climb within the shadow tree: parentNode handles shadow

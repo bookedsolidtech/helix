@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-29T17:10:26.509Z",
+  "generatedAt": "2026-05-29T17:30:29.669Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.9.1",
   "tokensVersion": "3.9.1",
@@ -1077,7 +1077,6 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
-          "1.4.6",
           "2.4.12"
         ],
         "auditUrl": "src/components/hx-alert/AAA-AUDIT.md"
@@ -5365,7 +5364,6 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
-          "1.4.6",
           "2.4.12"
         ],
         "auditUrl": "src/components/hx-clinical-status/AAA-AUDIT.md"
@@ -10889,7 +10887,6 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
-          "1.4.6",
           "2.4.12"
         ],
         "auditUrl": "src/components/hx-field-label/AAA-AUDIT.md"
@@ -12092,7 +12089,6 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
-          "1.4.6",
           "2.4.12"
         ],
         "auditUrl": "src/components/hx-help-text/AAA-AUDIT.md"
@@ -12249,7 +12245,6 @@
           "forced-colors",
           "apg-keyboard",
           "non-text-contrast-icon",
-          "1.4.6",
           "2.4.12"
         ],
         "auditUrl": "src/components/hx-icon/AAA-AUDIT.md"
