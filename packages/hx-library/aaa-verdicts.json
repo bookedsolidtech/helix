@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-05-10T20:28:11.924Z",
-  "sourceAuditRunAt": "2026-05-10T20:26:54.143Z",
+  "generatedAt": "2026-05-29T16:11:49.301Z",
+  "sourceAuditRunAt": "2026-05-29T16:10:21.479Z",
   "standards": "WCAG 2.2 AAA",
   "standardsSource": "https://www.w3.org/TR/WCAG22/",
   "components": {
@@ -43,7 +43,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-action-bar> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button> (inner shadow part of <hx-action-bar>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -181,7 +181,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <a> (shadow descendant of <hx-breadcrumb> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <a>.link (inner shadow part of <hx-breadcrumb>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -227,7 +227,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-button> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -273,7 +273,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-button-group> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-button-group>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -311,7 +311,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-checkbox) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -319,7 +319,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-checkbox> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <span>.checkbox (inner shadow part of <hx-checkbox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -357,7 +357,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-checkbox-group) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -457,7 +457,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-color-picker> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.trigger (inner shadow part of <hx-color-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -495,7 +495,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-combobox) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -503,7 +503,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-combobox> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.trigger (inner shadow part of <hx-combobox>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -549,7 +549,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-copy-button> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-copy-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -587,7 +587,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-date-picker) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -595,7 +595,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-date-picker> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-date-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -632,8 +632,8 @@
         "evidence": "@aria-pattern=\"dialog\" — all required key groups referenced (Escape, Tab)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "17.88:1 (fg rgb(13, 24, 37), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-dialog) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -641,7 +641,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.1) 0px 8px 10px -6px (Tab walk did not reach target after 80 presses; fell back to programmatic focus on <div> (shadow descendant of <hx-dialog> — focus ring rendered on inner part))."
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-dialog>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -687,7 +687,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×2 on <button> (shadow descendant of <hx-drawer> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.close-button (inner shadow part of <hx-drawer>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -733,7 +733,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-dropdown> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-dropdown>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -871,7 +871,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-file-upload> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <div>.dropzone (inner shadow part of <hx-file-upload>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1059,7 +1059,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-icon-button> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-icon-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1096,8 +1096,8 @@
         "evidence": "@aria-pattern=\"menu\" — all required key groups referenced (ArrowDown, ArrowUp, Escape)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "21.00:1 (fg rgb(0, 0, 0), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-menu) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1105,7 +1105,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-menu> — focus ring rendered on inner part))."
+        "evidence": "2px solid rgb(15, 112, 120) on <div>.base (inner shadow part of <hx-menu>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1151,7 +1151,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <a> (shadow descendant of <hx-nav> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <a>.link (inner shadow part of <hx-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1189,7 +1189,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-number-input) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1197,7 +1197,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-number-input> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-number-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1243,7 +1243,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-overflow-menu> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-overflow-menu>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1281,7 +1281,7 @@
       },
       "1.4.6": {
         "verdict": "Supports",
-        "evidence": "17.88:1 (fg rgb(13, 24, 37), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+        "evidence": "18.26:1 (fg rgb(0, 0, 0), bg rgb(239, 239, 239)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1289,7 +1289,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px (Tab walk did not reach target after 80 presses; fell back to programmatic focus on <div> (shadow descendant of <hx-popover> — focus ring rendered on inner part))."
+        "evidence": "2px solid rgb(15, 112, 120) on <button> (inner shadow part of <hx-popover>) (keyboard-focused via Tab×2; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1373,7 +1373,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-radio-group) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1381,7 +1381,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-radio-group> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <span>.radio (inner shadow part of <hx-radio-group>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1427,7 +1427,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-rating> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <span>.symbol (inner shadow part of <hx-rating>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1464,8 +1464,8 @@
         "evidence": "@aria-pattern=\"combobox\" — all required key groups referenced (ArrowDown, ArrowUp, Escape, Enter)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "14.32:1 (fg rgb(32, 43, 57), bg rgb(255, 255, 255)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-select) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1473,7 +1473,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-select> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <button>.trigger (inner shadow part of <hx-select>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1519,7 +1519,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-side-nav> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.toggle (inner shadow part of <hx-side-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1557,7 +1557,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <span> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-slider) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1565,7 +1565,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: rgb(15, 112, 120) 0px 0px 0px 2px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px (keyboard-focused via Tab×1 on <span> (shadow descendant of <hx-slider> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"rgb(15, 112, 120) 0px 0px 0px 2px, rgba(0, 0, 0, 0.05) 0px 1px 2px 0px\" on <span>.thumb (inner shadow part of <hx-slider>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -1611,7 +1611,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-split-button> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-split-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1649,7 +1649,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <button> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-switch) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1657,7 +1657,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-switch> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.track (inner shadow part of <hx-switch>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1703,7 +1703,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <hx-tab> (shadow descendant of <hx-tabs> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <hx-tab> (inner shadow part of <hx-tabs>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1741,7 +1741,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-text-input) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1749,7 +1749,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-text-input> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.input-wrapper (inner shadow part of <hx-text-input>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1787,7 +1787,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-textarea) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1795,7 +1795,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-textarea> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.textarea-wrapper (inner shadow part of <hx-textarea>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1833,7 +1833,7 @@
       },
       "1.4.6": {
         "verdict": "Not Applicable",
-        "evidence": "Focus-paint surface <div> renders no own text content; WCAG 1.4.6 applies only to text and images of text."
+        "evidence": "Component target (hx-time-picker) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1841,7 +1841,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "box-shadow focus indicator: color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px (keyboard-focused via Tab×1 on <div> (shadow descendant of <hx-time-picker> — focus ring rendered on inner part))."
+        "evidence": "box-shadow focus ring \"color(srgb 0.0588235 0.439216 0.470588 / 0.25) 0px 0px 0px 2px\" on <div>.field__combobox (inner shadow part of <hx-time-picker>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline; >=2px effective thickness)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1924,8 +1924,8 @@
         "evidence": "@aria-pattern=\"button\" — component renders a native element that provides the canonical keyboard contract via the user agent (no custom handler required)."
       },
       "1.4.6": {
-        "verdict": "Supports",
-        "evidence": "7.03:1 (fg rgb(255, 255, 255), bg rgb(15, 99, 99)); axe color-contrast-enhanced sweep: 0 violations across full story DOM."
+        "verdict": "Not Applicable",
+        "evidence": "Component target (hx-toggle-button) is transparent (bg=rgba(0, 0, 0, 0)); foreground contrast inherits the consumer page background."
       },
       "2.4.12": {
         "verdict": "Supports",
@@ -1933,7 +1933,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-toggle-button> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button>.button (inner shadow part of <hx-toggle-button>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
@@ -1979,7 +1979,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <button> (shadow descendant of <hx-tooltip> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <button> (inner shadow part of <hx-tooltip>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Not Applicable",
@@ -2025,7 +2025,7 @@
       },
       "2.4.13": {
         "verdict": "Supports",
-        "evidence": "computed outline 2px solid rgb(15, 112, 120) (keyboard-focused via Tab×1 on <a> (shadow descendant of <hx-top-nav> — focus ring rendered on inner part))"
+        "evidence": "2px solid rgb(15, 112, 120) on <a> (inner shadow part of <hx-top-nav>) (keyboard-focused via Tab×1; gained on focus vs unfocused baseline)."
       },
       "2.5.5": {
         "verdict": "Supports",
