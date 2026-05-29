@@ -1311,15 +1311,84 @@ async function runBrowserChecks(componentName, page) {
         // resolve to rgb are reported but flagged for manual verification.
         let ringContrast = null;
         let ringContrastNote = null;
+        let ringEffectiveAlpha = null;
         if (focusIndicator) {
-          const parseRgb = (c) => {
+          // Parse the colour formats Chromium emits for resolved focus rings:
+          //   • rgb()/rgba()                       — sRGB 0-255, optional alpha
+          //   • color(srgb r g b [/ a])            — sRGB 0-1, optional alpha
+          //   • oklch(L C H [/ a])                 — OKLCH, converted to sRGB
+          //   • color-mix(in srgb, <c> N%, transparent) — defensive: some UAs
+          //     leave a translucent halo un-resolved; treat the N% as alpha.
+          // Returns { r, g, b, a } with r/g/b in 0-255.
+          const clamp255 = (v) => Math.max(0, Math.min(255, v));
+          const srgbLinToGamma = (v) =>
+            v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+          const oklchToSrgb = (L, C, H) => {
+            // OKLCH → OKLab → linear sRGB → gamma sRGB (Björn Ottosson).
+            const hr = (H * Math.PI) / 180;
+            const a = C * Math.cos(hr);
+            const b = C * Math.sin(hr);
+            const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+            const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+            const s_ = L - 0.0894841775 * a - 1.291485548 * b;
+            const l = l_ * l_ * l_;
+            const m = m_ * m_ * m_;
+            const s = s_ * s_ * s_;
+            const lr = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+            const lg = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+            const lb = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+            return {
+              r: clamp255(srgbLinToGamma(lr) * 255),
+              g: clamp255(srgbLinToGamma(lg) * 255),
+              b: clamp255(srgbLinToGamma(lb) * 255),
+            };
+          };
+          const parseColor = (c) => {
             if (!c) return null;
-            const m = c.match(
-              /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?\s*\)/i,
+            const s = c.trim();
+            // rgb()/rgba()
+            let m = s.match(
+              /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/i,
             );
-            if (!m) return null;
-            const a = m[4] === undefined ? 1 : parseFloat(m[4]);
-            return { r: +m[1], g: +m[2], b: +m[3], a };
+            if (m) {
+              return {
+                r: +m[1],
+                g: +m[2],
+                b: +m[3],
+                a: m[4] === undefined ? 1 : parseFloat(m[4]),
+              };
+            }
+            // color(srgb r g b [/ a]) — components are 0-1.
+            m = s.match(
+              /color\(\s*srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/i,
+            );
+            if (m) {
+              return {
+                r: clamp255(parseFloat(m[1]) * 255),
+                g: clamp255(parseFloat(m[2]) * 255),
+                b: clamp255(parseFloat(m[3]) * 255),
+                a: m[4] === undefined ? 1 : parseFloat(m[4]),
+              };
+            }
+            // oklch(L C H [/ a]) — L may be a percentage.
+            m = s.match(/oklch\(\s*([\d.]+%?)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/i);
+            if (m) {
+              const L = m[1].endsWith('%') ? parseFloat(m[1]) / 100 : parseFloat(m[1]);
+              const rgb = oklchToSrgb(L, parseFloat(m[2]), parseFloat(m[3]));
+              return { ...rgb, a: m[4] === undefined ? 1 : parseFloat(m[4]) };
+            }
+            // color-mix(in srgb, <c> N%, transparent) — defensive fallback. The
+            // un-resolved translucent halo: the N% of <c> over transparent is an
+            // alpha-N% version of <c>. Resolve <c> recursively, fold N% into a.
+            m = s.match(/color-mix\(\s*in\s+srgb\s*,\s*(.+?)\s+([\d.]+)%\s*,\s*transparent\s*\)/i);
+            if (m) {
+              const base = parseColor(m[1]);
+              if (base) {
+                return { r: base.r, g: base.g, b: base.b, a: base.a * (parseFloat(m[2]) / 100) };
+              }
+            }
+            if (s === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
+            return null;
           };
           // WCAG relative luminance (sRGB).
           const luminance = ({ r, g, b }) => {
@@ -1329,11 +1398,23 @@ async function runBrowserChecks(componentName, page) {
             });
             return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
           };
+          // Source-over alpha compositing: fg (with alpha) over an opaque bg.
+          const composite = (fg, bg) => ({
+            r: fg.a * fg.r + (1 - fg.a) * bg.r,
+            g: fg.a * fg.g + (1 - fg.a) * bg.g,
+            b: fg.a * fg.b + (1 - fg.a) * bg.b,
+          });
           // Ring colour: outline-color for outline rings; first colour token of
-          // the box-shadow for shadow rings.
+          // the box-shadow for shadow rings. Capture color()/oklch()/rgba()
+          // forms, not just rgba(), so translucent halos resolve correctly.
           let ringColorStr = focusIndicator.outlineColor;
           if (focusIndicator.kind === 'box-shadow') {
-            const cm = (focusIndicator.boxShadow || '').match(/rgba?\([^)]*\)/i);
+            const bs = focusIndicator.boxShadow || '';
+            const cm =
+              bs.match(/color\(\s*srgb[^)]*\)/i) ||
+              bs.match(/oklch\([^)]*\)/i) ||
+              bs.match(/color-mix\([^)]*\)/i) ||
+              bs.match(/rgba?\([^)]*\)/i);
             ringColorStr = cm ? cm[0] : focusIndicator.outlineColor;
           }
           // Adjacent background — the colour the ring sits AGAINST. For an
@@ -1353,7 +1434,7 @@ async function runBrowserChecks(componentName, page) {
           let adjBg = null;
           let hops = 0;
           while (bgEl && hops < 8) {
-            const c = parseRgb(window.getComputedStyle(bgEl).backgroundColor);
+            const c = parseColor(window.getComputedStyle(bgEl).backgroundColor);
             if (c && c.a > 0) {
               adjBg = c;
               break;
@@ -1361,7 +1442,7 @@ async function runBrowserChecks(componentName, page) {
             bgEl = bgEl.parentElement || bgEl.getRootNode()?.host || null;
             hops++;
           }
-          const ringRgb = parseRgb(ringColorStr);
+          const ringRgb = parseColor(ringColorStr);
           if (offsetRing && !adjBg) {
             // The surface behind an offset ring is transparent all the way up
             // (consumer page controls it) — we cannot resolve the true adjacent
@@ -1371,12 +1452,131 @@ async function runBrowserChecks(componentName, page) {
               `offset outline ring (offset ${focusIndicator.outlineOffsetPx}px) sits on the consumer page surface, ` +
               `which is transparent within the component — adjacent contrast cannot be auto-measured; verify >=3:1 manually`;
           } else if (ringRgb && adjBg && ringRgb.a > 0) {
-            const l1 = luminance(ringRgb);
+            ringEffectiveAlpha = ringRgb.a;
+            // WCAG 2.4.13 contrast is about how much the indicator shifts the
+            // colour it sits on. A translucent ring (alpha < 1) does NOT paint
+            // its raw colour — it paints the COMPOSITE of (ring over backdrop).
+            // Score that composited colour vs. the same backdrop, so a 25%-alpha
+            // halo over white reads its true ~1.3:1, not the opaque teal ~5.8:1.
+            const effectiveRing = ringRgb.a < 1 ? composite(ringRgb, adjBg) : ringRgb;
+            const l1 = luminance(effectiveRing);
             const l2 = luminance(adjBg);
             ringContrast = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
           } else {
             ringContrastNote =
-              'ring colour or adjacent background did not resolve to rgb() (likely oklch token) — verify >=3:1 manually';
+              'ring colour or adjacent background did not resolve to a known colour format — verify >=3:1 manually';
+          }
+        }
+
+        // 1.4.6 surface-ownership probe. When the primary 1.4.6 sample
+        // (outlineSource) is transparent — common when outlineSource resolves
+        // to the transparent host — the component may still OWN a
+        // non-transparent focus/text surface inside its OWN shadow tree (e.g.
+        // hx-menu `.menu`, hx-select `.field__trigger`, hx-dialog `.dialog`).
+        // Marking 1.4.6 Not Applicable in that case drops real AAA coverage.
+        // CRITICAL: the surface MUST be component-owned — never an ancestor in
+        // the consumer page (the Storybook `<body>` white chrome is NOT the
+        // component's surface). Restrict the search to the host's shadow tree
+        // (and the host itself); never walk up past the host into light DOM.
+        //
+        // Text-bearing test that accounts for slotted light-DOM content. A
+        // component surface (e.g. hx-menu `.base`, hx-toggle-button `.button`)
+        // frequently renders its text via a <slot> projecting light-DOM
+        // children (menu items, the button label). That text visually sits on
+        // the surface's background and inherits the surface's `color`, so the
+        // surface IS a 1.4.6 text surface even though its own childNodes hold
+        // no text. Check: direct text nodes, innerText, OR a descendant <slot>
+        // with assigned text-bearing nodes.
+        const elementHasOwnText = (el) => {
+          if (!el) return false;
+          for (const node of el.childNodes || []) {
+            if (node.nodeType === 3 && (node.textContent || '').trim().length > 0) return true;
+          }
+          try {
+            if (typeof el.innerText === 'string' && el.innerText.trim().length > 0) return true;
+          } catch {
+            /* ignore */
+          }
+          const slots = el.querySelectorAll ? el.querySelectorAll('slot') : [];
+          for (const slot of slots) {
+            let assigned = [];
+            try {
+              assigned = slot.assignedNodes({ flatten: true }) || [];
+            } catch {
+              assigned = [];
+            }
+            for (const a of assigned) {
+              if ((a.textContent || '').trim().length > 0) return true;
+            }
+          }
+          return false;
+        };
+        const isOpaqueBg = (c) =>
+          !!c &&
+          c !== 'transparent' &&
+          !/rgba?\([^,]+,[^,]+,[^,]+,\s*0(\.0+)?\s*\)/.test(c) &&
+          !/\/\s*0(?:\.0+)?\s*\)/.test(c);
+        let ownedSurface = null;
+        {
+          // Candidate surfaces, in priority order, all component-owned:
+          //   1. the ring-painting focus indicator (a verified shadow part),
+          //   2. shadow-tree ancestors of the focused element up to (and
+          //      including) the host — NEVER beyond the host into the page,
+          //   3. the host's shadow-tree elements that contain the focused
+          //      element (covers the menu/listbox panel `.menu`/`.base`).
+          // Stop the upward walk at the host: an opaque surface above the host
+          // belongs to the consumer page, not the component.
+          const ownedAncestors = [];
+          if (focusIndicator && focusIndicator.el) ownedAncestors.push(focusIndicator.el);
+          if (activeDeep) {
+            let cur = activeDeep;
+            let guard = 0;
+            while (cur && guard < 12) {
+              ownedAncestors.push(cur);
+              if (cur === host) break; // do not cross above the component host
+              // Climb within the shadow tree: parentNode handles shadow
+              // children; when we hit a shadow root, hop to its host (still
+              // inside the component if that host === our component host).
+              const parent = cur.parentNode;
+              if (parent && parent.nodeType === 11 /* DOCUMENT_FRAGMENT (shadow root) */) {
+                cur = parent.host || null;
+              } else {
+                cur = parent;
+              }
+            }
+          }
+          // De-dupe while preserving order.
+          const seen = new Set();
+          const candidates = ownedAncestors.filter((el) => {
+            if (!el || el.nodeType !== 1 || seen.has(el)) return false;
+            seen.add(el);
+            return true;
+          });
+          for (const el of candidates) {
+            const cs = window.getComputedStyle(el);
+            if (!isOpaqueBg(cs.backgroundColor)) continue;
+            // The surface must render text that sits on this opaque background
+            // (its own text, or slotted text projected into it). Otherwise it
+            // is a 1.4.11 non-text surface (e.g. hx-switch track) and 1.4.6 is
+            // Not Applicable. The foreground is the SURFACE's own computed
+            // `color` — that is the colour the on-surface text (including
+            // slotted labels/menu items) inherits and the user actually sees
+            // against this fill (black on hx-menu `.base`, white on
+            // hx-toggle-button `.button`). Reading an unrelated focused
+            // element's colour (e.g. the inherited body black) would be a
+            // category error.
+            if (!elementHasOwnText(el)) continue;
+            const surfaceBg = cs.backgroundColor;
+            const surfaceFg = cs.color;
+            ownedSurface = {
+              tag: el.tagName ? el.tagName.toLowerCase() : null,
+              part: el.getAttribute
+                ? el.getAttribute('part') || el.getAttribute('class') || null
+                : null,
+              bg: surfaceBg,
+              fg: surfaceFg,
+            };
+            break;
           }
         }
 
@@ -1390,6 +1590,7 @@ async function runBrowserChecks(componentName, page) {
           hasFocusBoxShadow,
           bgColor,
           color,
+          ownedSurface,
           isCovered,
           targetTag: target.tagName.toLowerCase(),
           targetIsHost: target === host,
@@ -1419,6 +1620,7 @@ async function runBrowserChecks(componentName, page) {
           focusIndicatorIsTarget: focusIndicator ? focusIndicator.el === target : false,
           ringContrast,
           ringContrastNote,
+          ringEffectiveAlpha,
         };
       },
       { tag: componentName, didTab: tabbed, preSnapshot: preFocusSnapshot?.byId || {} },
@@ -1523,20 +1725,37 @@ async function runBrowserChecks(componentName, page) {
         })()
       : null;
     // Ring-contrast clause (WCAG 2.4.13 requires >=3:1 vs adjacent colour).
+    // For a translucent ring the reported ratio is the COMPOSITED effective
+    // colour vs. its backdrop (alpha folded in), not the opaque token colour.
+    const alphaNote =
+      typeof measurements.ringEffectiveAlpha === 'number' && measurements.ringEffectiveAlpha < 1
+        ? ` (ring alpha ${measurements.ringEffectiveAlpha}; composited over backdrop)`
+        : '';
     const contrastClause = (() => {
       if (!measurements.focusIndicatorFound) return '';
       if (typeof measurements.ringContrast === 'number') {
         const ratio = measurements.ringContrast.toFixed(2);
         return measurements.ringContrast >= 3
-          ? ` Ring contrast vs adjacent background ${ratio}:1 (>=3:1 OK).`
-          : ` Ring contrast vs adjacent background ${ratio}:1 (UNDER 3:1 — verify manually / flag).`;
+          ? ` Effective ring contrast vs adjacent background ${ratio}:1${alphaNote} (>=3:1 OK).`
+          : ` Effective ring contrast vs adjacent background ${ratio}:1${alphaNote} (UNDER 3:1 — fails WCAG 2.4.13 contrast).`;
       }
       return ` ${measurements.ringContrastNote || 'Ring contrast not auto-computed — verify >=3:1 manually.'}`;
     })();
     let outlineVerdict;
     let outlineEvidence;
     if (measurements.focusIndicatorFound) {
-      outlineVerdict = VERDICT.SUPPORTS;
+      // WCAG 2.4.13 requires BOTH the >=2px-area indicator AND >=3:1 contrast
+      // between the indicator's effective (composited) colour and the colour it
+      // sits against. The diff already guarantees the >=2px area. Gate Supports
+      // on measured contrast: a detected ring with effective contrast < 3:1
+      // (e.g. a 25%-alpha translucent halo that composites to ~1.3:1) is a real
+      // partial failure, NOT a pass. When contrast could not be auto-measured
+      // (e.g. offset ring on a consumer-controlled transparent page surface),
+      // keep Supports for the area requirement and flag the contrast for manual
+      // verification rather than emit a false fail.
+      const ringMeasured = typeof measurements.ringContrast === 'number';
+      const ringMeetsContrast = ringMeasured && measurements.ringContrast >= 3;
+      outlineVerdict = ringMeasured && !ringMeetsContrast ? VERDICT.PARTIALLY : VERDICT.SUPPORTS;
       if (measurements.focusIndicatorKind === 'outline') {
         outlineEvidence =
           `${measurements.focusIndicatorOutlineWidthPx}px ${measurements.focusIndicatorOutlineStyle} ` +
@@ -1574,6 +1793,7 @@ async function runBrowserChecks(componentName, page) {
       indicatorKind: measurements.focusIndicatorKind,
       indicatorElement: ringElementNote,
       ringContrast: measurements.ringContrast,
+      ringEffectiveAlpha: measurements.ringEffectiveAlpha,
       focusedViaKeyboard: measurements.focusedViaKeyboard,
       tabPresses: measurements.tabPresses,
       verdict: outlineVerdict,
@@ -1594,18 +1814,51 @@ async function runBrowserChecks(componentName, page) {
     // background is a category error. Route to Not Applicable when the
     // outline-source has no rendered text content.
     const hasNoOwnText = measurements.outlineSourceHasOwnText === false;
-    if (isTransparentBg) {
-      // Component (host or inner control) is transparent — foreground inherits
-      // the consumer page background. Per WCAG 2.2 1.4.6, the contrast
-      // obligation belongs to the page that places this text, not to the
-      // component shell. This is correct behaviour for surface-token-driven
-      // design systems.
+    // Surface-ownership override (WCAG 1.4.6): when the primary sample is
+    // transparent, the component may still own a non-transparent focus/text
+    // surface deeper in its shadow tree (hx-menu `.base`, hx-select
+    // `.field__trigger`, hx-dialog `.dialog`, hx-toggle-button `.button`).
+    // Marking such components Not Applicable drops real AAA coverage — the
+    // component DOES paint text on a surface it owns. When an owned surface was
+    // detected, measure text-vs-own-background there and verdict on the real
+    // number. N/A is reserved for genuinely transparent / text-free surfaces.
+    const ownedSurface =
+      measurements.ownedSurface && measurements.ownedSurface.bg ? measurements.ownedSurface : null;
+    if (isTransparentBg && ownedSurface) {
+      const ratio = contrastRatio(ownedSurface.fg, ownedSurface.bg);
+      const ownedRatio = ratio === null ? null : Number(ratio.toFixed(2));
+      const surfaceName = `<${ownedSurface.tag || '?'}>${
+        ownedSurface.part ? `.${String(ownedSurface.part).split(/\s+/)[0]}` : ''
+      }`;
+      result.contrast = {
+        fg: ownedSurface.fg,
+        bg: ownedSurface.bg,
+        ratio: ownedRatio,
+        verdict:
+          ratio === null
+            ? VERDICT.PARTIALLY
+            : ratio >= 7.0
+              ? VERDICT.SUPPORTS
+              : ratio >= 4.5
+                ? VERDICT.PARTIALLY
+                : VERDICT.DOES_NOT,
+        evidence:
+          ratio === null
+            ? `Component-owned focus/text surface ${surfaceName} has a non-transparent own background but contrast could not be computed (fg=${ownedSurface.fg}, bg=${ownedSurface.bg}).`
+            : `Component-owned focus/text surface ${surfaceName}: ${ratio.toFixed(2)}:1 (fg ${ownedSurface.fg}, bg ${ownedSurface.bg}). Host is transparent but this surface is component-owned, so 1.4.6 is measured here, not Not Applicable.`,
+      };
+    } else if (isTransparentBg) {
+      // Component (host or inner control) is transparent and owns no
+      // non-transparent text surface — foreground inherits the consumer page
+      // background. Per WCAG 2.2 1.4.6, the contrast obligation belongs to the
+      // page that places this text, not to the component shell. This is correct
+      // behaviour for surface-token-driven design systems.
       result.contrast = {
         fg: measurements.color,
         bg: measurements.bgColor,
         ratio: null,
         verdict: VERDICT.NOT_APPLICABLE,
-        evidence: `Component target (${measurements.targetTag}) is transparent (bg=${measurements.bgColor}); foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.`,
+        evidence: `Component target (${measurements.targetTag}) is transparent (bg=${measurements.bgColor}) and owns no non-transparent text surface; foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.`,
       };
     } else if (hasNoOwnText) {
       // No text content on the focus-paint surface — this is a 1.4.11
