@@ -1,6 +1,6 @@
 {
   "name": "@helixui/react",
-  "version": "3.9.1",
+  "version": "3.10.0",
   "description": "React wrappers for HELiX web components",
   "type": "module",
   "sideEffects": false,
@@ -35,7 +35,8 @@
   },
   "dependencies": {
     "@helixui/library": "workspace:*",
-    "@lit/react": "^1.0.6"
+    "@lit/react": "^1.0.6",
+    "react": ">=18.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

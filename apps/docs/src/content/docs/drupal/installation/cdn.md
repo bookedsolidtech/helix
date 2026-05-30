@@ -497,8 +497,8 @@ Download the local copy to include in your theme:
 ```bash
 cd web/themes/custom/mytheme/libraries/helix
 npm pack @helixui/library@3.9.0
-tar -xf helixui-library-3.0.0.tgz --strip-components=1 package/dist
-rm helixui-library-3.0.0.tgz
+tar -xf helixui-library-3.9.0.tgz --strip-components=1 package/dist
+rm helixui-library-3.9.0.tgz
 ```
 
 ---
