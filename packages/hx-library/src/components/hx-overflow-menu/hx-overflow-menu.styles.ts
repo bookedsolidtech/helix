@@ -61,8 +61,11 @@ export const helixOverflowMenuStyles = css`
   }
 
   .trigger--md {
-    width: var(--hx-size-10, 2.5rem);
-    height: var(--hx-size-10, 2.5rem);
+    /* WCAG 2.5.5 (healthcare mandate): md trigger resolves through max() so the
+       documented --hx-size-10 semantic token is honored but floored at
+       --hx-size-touch-target (44px), always rendering >= 44x44px. */
+    width: max(var(--hx-size-10, 2.5rem), var(--hx-size-touch-target, 2.75rem));
+    height: max(var(--hx-size-10, 2.5rem), var(--hx-size-touch-target, 2.75rem));
     min-width: var(--hx-size-touch-target, 2.75rem);
     min-height: var(--hx-size-touch-target, 2.75rem);
     font-size: var(--hx-font-size-md, 1rem);
