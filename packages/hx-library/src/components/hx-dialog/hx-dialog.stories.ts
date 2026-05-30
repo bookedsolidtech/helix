@@ -165,6 +165,50 @@ export const ModalOpen: Story = {
   },
 };
 
+/**
+ * Open-state fixture used by the formal AAA audit harness
+ * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The Default story renders
+ * the dialog closed; the host uses `display: contents`, so its bounding box
+ * is 0×0 and focus-appearance / focus-not-obscured cannot be measured.
+ *
+ * This fixture opens a modal dialog that contains NO slotted focusable
+ * controls. Per WCAG 2.4.3, `hx-dialog` then moves initial focus to its own
+ * built-in `[part="close-button"]` (the documented `_getFocusableElements`
+ * fallback). That close button is a real 44×44 control inside the focus
+ * trap, paints a ≥2px `:focus-visible` ring at ≥3:1 contrast, and is the
+ * element a keyboard user lands on when this dialog opens — exactly the
+ * focus target the audit must verify. (The richer `ModalOpen` story focuses
+ * a slotted consumer button first, which uses the consumer's own focus ring
+ * rather than the component-owned indicator, so it is unsuitable as the cert
+ * surface.)
+ */
+export const AAAAuditOpen: Story = {
+  render: () => html`
+    <hx-dialog open modal heading="AAA Audit — Focus Appearance">
+      <p style="margin: 0; font-size: 0.875rem;">
+        Informational modal with no slotted controls. Initial focus moves to the built-in close
+        button so the audit measures the component-owned focus ring.
+      </p>
+    </hx-dialog>
+  `,
+  // Lock the harness contract: the formal AAA audit treats this fixture as the
+  // source of truth for dialog focus behavior. Assert that the dialog is open,
+  // owns a built-in [part="close-button"], and that initial focus lands on that
+  // close button when no slotted focusables exist — exactly the surface the
+  // 2.4.13 / 2.4.12 probes measure. If any of these regress, the story fails
+  // loudly rather than silently auditing the wrong element.
+  play: async ({ canvasElement }) => {
+    const dialog = canvasElement.querySelector('hx-dialog');
+    await expect(dialog).toBeTruthy();
+    await expect(dialog?.hasAttribute('open')).toBe(true);
+    const closeButton = dialog?.shadowRoot?.querySelector('[part~="close-button"]');
+    await expect(closeButton).toBeTruthy();
+    // No slotted focusables → WCAG 2.4.3 fallback moves initial focus to the
+    // component-owned close button (focused within the dialog's shadow root).
+    await expect(dialog?.shadowRoot?.activeElement).toBe(closeButton);
+  },
+};
+
 // ════════════════════════════════════════════════════════════════════════════
 // 3. NON-MODAL — Open non-modal dialog
 // ════════════════════════════════════════════════════════════════════════════

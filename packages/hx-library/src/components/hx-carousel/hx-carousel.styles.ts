@@ -35,9 +35,18 @@ export const helixCarouselStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
-    height: var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem));
-    /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target */
+    /* WCAG 2.5.5 (healthcare mandate): nav button resolves through max() so the
+       documented --hx-carousel-nav-btn-size / --hx-size-10 chain is honored but
+       floored at --hx-touch-target-min (44px), always rendering >= 44x44px. */
+    width: max(
+      var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem)),
+      var(--hx-touch-target-min, 2.75rem)
+    );
+    height: max(
+      var(--hx-carousel-nav-btn-size, var(--hx-size-10, 2.5rem)),
+      var(--hx-touch-target-min, 2.75rem)
+    );
+    /* Defense-in-depth floor (harmless alongside max()). */
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
     border: var(--hx-border-width-thin, 1px) solid

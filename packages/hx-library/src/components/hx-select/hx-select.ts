@@ -138,6 +138,7 @@ export interface HxSelectChangeDetail {
  * @cssprop [--hx-space-2] - Spacing token.
  * @cssprop [--hx-input-height-md] - Height.
  * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-touch-target-min] - Minimum 44px touch-target floor (WCAG 2.5.5).
  * @cssprop [--hx-border-width-thin] - Width.
  * @cssprop [--hx-font-size-md] - Font size.
  * @cssprop [--hx-space-3] - Spacing token.

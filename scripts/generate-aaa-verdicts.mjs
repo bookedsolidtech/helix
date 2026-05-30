@@ -34,6 +34,16 @@
  * AAA-AUDIT.md. The card surfaces the short form; the audit link in the
  * card header opens the long form.
  *
+ * EXCEPTION — 2.4.13 Focus Appearance: the harness appends a measured
+ * ring-contrast clause (e.g. "… Effective ring contrast vs adjacent background
+ * 5.82:1 (>=3:1 OK).") — or a manual-verification note — as a SECOND sentence
+ * after the indicator description. WCAG 2.4.13 requires BOTH a >=2px indicator
+ * AND >=3:1 contrast, so that clause is load-bearing evidence, not prose. First-
+ * sentence truncation drops it, leaving the committed snapshot a strict prefix
+ * of the harness output (which review tooling flags as a stale/mismatched
+ * snapshot). For 2.4.13 we therefore keep the full evidence so the committed
+ * cert is self-describing and matches the harness byte-for-byte.
+ *
  * Usage:
  *   node scripts/generate-aaa-verdicts.mjs
  *     [--audit <path>]   default: .reports/formal-aaa-audit/audit.json
@@ -61,6 +71,15 @@ const OUTPUT_PATH = resolve(REPO_ROOT, getArg('--output', 'packages/hx-library/a
 function log(...args) {
   if (!QUIET) console.log('[generate-aaa-verdicts]', ...args);
 }
+
+/**
+ * Criteria whose evidence must be kept in FULL (no first-sentence truncation)
+ * because a later sentence carries load-bearing measured data. 2.4.13 appends a
+ * ring-contrast clause / manual-verification note that the contrast half of the
+ * SC depends on; truncating it makes the committed snapshot a stale prefix of
+ * the harness output.
+ */
+const FULL_EVIDENCE_CRITERIA = new Set(['2.4.13']);
 
 /**
  * Trim a multi-sentence evidence string down to the first sentence so the
@@ -109,7 +128,13 @@ function main() {
     for (const [criterionId, payload] of Object.entries(verdicts)) {
       if (!payload || typeof payload !== 'object') continue;
       const verdict = typeof payload.verdict === 'string' ? payload.verdict : 'Unknown';
-      const evidence = firstSentence(payload.evidence ?? '');
+      // Keep the full evidence for criteria that carry measured data in a later
+      // sentence (e.g. 2.4.13's ring-contrast clause); truncate everything else
+      // to the first sentence to keep the snapshot lean.
+      const rawEvidence = typeof payload.evidence === 'string' ? payload.evidence.trim() : '';
+      const evidence = FULL_EVIDENCE_CRITERIA.has(criterionId)
+        ? rawEvidence
+        : firstSentence(rawEvidence);
       slim[criterionId] = { verdict, evidence };
     }
     components[result.component] = slim;

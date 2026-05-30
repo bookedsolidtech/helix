@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-20T03:40:40.577Z",
+  "generatedAt": "2026-05-30T11:36:50.919Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.9.3",
   "tokensVersion": "3.9.1",
@@ -2295,6 +2295,7 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
+          "1.4.6",
           "2.4.12"
         ],
         "auditUrl": "src/components/hx-banner/AAA-AUDIT.md"
@@ -6861,6 +6862,11 @@
           "figmaBinding": null
         },
         {
+          "description": "Minimum 44px touch-target floor (WCAG 2.5.5).",
+          "name": "--hx-touch-target-min",
+          "figmaBinding": null
+        },
+        {
           "description": "Font size.",
           "name": "--hx-font-size-md",
           "figmaBinding": null
@@ -9402,7 +9408,8 @@
           "apg-keyboard",
           "1.4.6",
           "2.4.12",
-          "2.4.13"
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-dialog/AAA-AUDIT.md"
       },
@@ -10101,8 +10108,10 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
+          "1.4.6",
           "2.4.12",
-          "2.4.13"
+          "2.4.13",
+          "2.5.5"
         ],
         "auditUrl": "src/components/hx-drawer/AAA-AUDIT.md"
       },
@@ -18754,6 +18763,11 @@
           "figmaBinding": null
         },
         {
+          "description": "Minimum 44px touch-target floor (WCAG 2.5.5).",
+          "name": "--hx-touch-target-min",
+          "figmaBinding": null
+        },
+        {
           "description": "Width.",
           "name": "--hx-border-width-thin",
           "figmaBinding": null
@@ -19148,6 +19162,7 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
+          "1.4.6",
           "2.4.12",
           "2.4.13",
           "2.5.5"
@@ -27020,6 +27035,7 @@
           "3.2.5",
           "forced-colors",
           "apg-keyboard",
+          "1.4.6",
           "2.4.12"
         ],
         "auditUrl": "src/components/hx-toast/AAA-AUDIT.md"
