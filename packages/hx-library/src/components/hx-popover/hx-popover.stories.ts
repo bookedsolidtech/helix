@@ -180,6 +180,23 @@ export const AAAAuditOpen: Story = {
       </hx-popover>
     </div>
   `,
+  // Lock the harness contract: the formal AAA audit retargets to the popover's
+  // own [part="body"] panel and relies on this fixture providing (1) a labeled
+  // panel — the resolved aria-label the audit names — and (2) a focusable
+  // slotted control so _show() moves focus onto the panel. If either regresses
+  // the audit would still run, but on the wrong surface/path; assert both here
+  // so the story fails loudly instead.
+  play: async ({ canvasElement }) => {
+    const popover = canvasElement.querySelector('hx-popover');
+    await expect(popover).toBeTruthy();
+    const panel = popover?.shadowRoot?.querySelector('[part~="body"]');
+    await expect(panel).toBeTruthy();
+    await expect(panel?.getAttribute('aria-label')).toBe('Patient actions');
+    // A focusable slotted control must exist so _show() can move focus onto the
+    // panel (the surface the harness measures for 2.4.13 / 2.4.12).
+    const slottedButton = popover?.querySelector('button[type="button"]');
+    await expect(slottedButton).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────

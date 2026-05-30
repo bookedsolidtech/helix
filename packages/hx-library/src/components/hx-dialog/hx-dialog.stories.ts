@@ -191,6 +191,22 @@ export const AAAAuditOpen: Story = {
       </p>
     </hx-dialog>
   `,
+  // Lock the harness contract: the formal AAA audit treats this fixture as the
+  // source of truth for dialog focus behavior. Assert that the dialog is open,
+  // owns a built-in [part="close-button"], and that initial focus lands on that
+  // close button when no slotted focusables exist — exactly the surface the
+  // 2.4.13 / 2.4.12 probes measure. If any of these regress, the story fails
+  // loudly rather than silently auditing the wrong element.
+  play: async ({ canvasElement }) => {
+    const dialog = canvasElement.querySelector('hx-dialog');
+    await expect(dialog).toBeTruthy();
+    await expect(dialog?.hasAttribute('open')).toBe(true);
+    const closeButton = dialog?.shadowRoot?.querySelector('[part~="close-button"]');
+    await expect(closeButton).toBeTruthy();
+    // No slotted focusables → WCAG 2.4.3 fallback moves initial focus to the
+    // component-owned close button (focused within the dialog's shadow root).
+    await expect(dialog?.shadowRoot?.activeElement).toBe(closeButton);
+  },
 };
 
 // ════════════════════════════════════════════════════════════════════════════
