@@ -120,12 +120,8 @@ export const helixTextInputStyles = css`
   :host([focused]) .field__input-wrapper,
   :host([focused-visible]) .field__input-wrapper {
     border-color: var(--_text-input-border-color-focus);
-    box-shadow: 0 0 0 var(--_text-input-focus-ring-width)
-      color-mix(
-        in srgb,
-        var(--_text-input-border-color-focus) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+    /* Opaque solid ring (WCAG 2.4.13 >=3:1) — follows the wrapper border-radius */
+    box-shadow: 0 0 0 var(--_text-input-focus-ring-width) var(--_text-input-border-color-focus);
   }
 
   * {
@@ -180,12 +176,7 @@ export const helixTextInputStyles = css`
 
   .field__input-wrapper:focus-within {
     border-color: var(--_text-input-border-color-focus);
-    box-shadow: 0 0 0 var(--_text-input-focus-ring-width)
-      color-mix(
-        in srgb,
-        var(--_text-input-border-color-focus) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+    box-shadow: 0 0 0 var(--_text-input-focus-ring-width) var(--_text-input-border-color-focus);
   }
 
   /* ─── Error State ─── */
@@ -196,12 +187,7 @@ export const helixTextInputStyles = css`
 
   .field--error .field__input-wrapper:focus-within {
     border-color: var(--_text-input-border-color-invalid);
-    box-shadow: 0 0 0 var(--_text-input-focus-ring-width)
-      color-mix(
-        in srgb,
-        var(--_text-input-border-color-invalid) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+    box-shadow: 0 0 0 var(--_text-input-focus-ring-width) var(--_text-input-border-color-invalid);
   }
 
   /* ─── Slots (Prefix / Suffix) ─── */
