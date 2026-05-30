@@ -1255,6 +1255,10 @@ async function runBrowserChecks(componentName, page) {
             outlineColor: cs.outlineColor,
             outlineOffsetPx: parseFloat(cs.outlineOffset || '0'),
             boxShadow: shadowNow,
+            // The unfocused baseline box-shadow, so 2.4.13 contrast can isolate
+            // the LAYER gained on focus (the ring) from any static drop-shadow
+            // layer the control already painted at rest (e.g. hx-slider thumb).
+            prevBoxShadow: (prev && prev.boxShadow) || 'none',
           });
         }
 
@@ -1517,17 +1521,34 @@ async function runBrowserChecks(componentName, page) {
             g: fg.a * fg.g + (1 - fg.a) * bg.g,
             b: fg.a * fg.b + (1 - fg.a) * bg.b,
           });
-          // Ring colour: outline-color for outline rings; first colour token of
-          // the box-shadow for shadow rings. Capture color()/oklch()/rgba()
-          // forms, not just rgba(), so translucent halos resolve correctly.
+          // Ring colour: outline-color for outline rings; colour token of the
+          // box-shadow for shadow rings. Capture color()/oklch()/rgba() forms,
+          // not just rgba(), so translucent halos resolve correctly.
+          //
+          // For a box-shadow ring, do NOT blindly grab the first colour token
+          // of the whole computed shadow string. Controls that keep a static
+          // drop-shadow layer at rest and ADD the focus ring as a LATER layer
+          // (e.g. hx-slider thumb: "rgba(0,0,0,0.05) 0 1px 2px" baseline +
+          // "rgb(15,112,120) 0 0 0 2px" ring on focus) would otherwise score
+          // the drop-shadow's near-transparent black instead of the teal ring.
+          // Isolate the layer GAINED on focus (present in the focused value,
+          // absent from the unfocused baseline, and itself a visible ring) and
+          // read its colour; fall back to whole-string first-match only when
+          // the gained layer can't be determined.
           let ringColorStr = focusIndicator.outlineColor;
           if (focusIndicator.kind === 'box-shadow') {
-            const bs = focusIndicator.boxShadow || '';
-            const cm =
-              bs.match(/color\(\s*srgb[^)]*\)/i) ||
-              bs.match(/oklch\([^)]*\)/i) ||
-              bs.match(/color-mix\([^)]*\)/i) ||
-              bs.match(/rgba?\([^)]*\)/i);
+            const matchRingColor = (s) =>
+              s.match(/color\(\s*srgb[^)]*\)/i) ||
+              s.match(/oklch\([^)]*\)/i) ||
+              s.match(/color-mix\([^)]*\)/i) ||
+              s.match(/rgba?\([^)]*\)/i);
+            const fullShadow = focusIndicator.boxShadow || '';
+            const beforeLayers = new Set(splitShadowLayers(focusIndicator.prevBoxShadow || 'none'));
+            const gainedLayer = splitShadowLayers(fullShadow).find(
+              (layer) => !beforeLayers.has(layer) && isVisibleFocusShadow(layer),
+            );
+            const source = gainedLayer || fullShadow;
+            const cm = matchRingColor(source) || (gainedLayer && matchRingColor(fullShadow));
             ringColorStr = cm ? cm[0] : focusIndicator.outlineColor;
           }
           // Adjacent background — the colour the ring sits AGAINST. For an
@@ -2021,28 +2042,91 @@ async function runBrowserChecks(componentName, page) {
     // number. N/A is reserved for genuinely transparent / text-free surfaces.
     const ownedSurface =
       measurements.ownedSurface && measurements.ownedSurface.bg ? measurements.ownedSurface : null;
+    // Phase 4 Tier 3 harness extension (3.8.0): the single focused/owned
+    // sample misses AAA contrast failures elsewhere in the story DOM (caption
+    // text, sample-composition labels, dim primitive-tier color-pinned spans).
+    // axe-core walks every text node and applies the WCAG 1.4.6 7:1 floor — run
+    // its `color-contrast-enhanced` rule across the full story so deeper child
+    // text tokens are audited even when the primary sample passes. Shared by
+    // both the owned-surface branch (transparent host that still paints text on
+    // a surface it owns) and the opaque-target branch, so transparent overlay
+    // components (dialog/popover/menu/select) don't skip the broader sweep.
+    const runEnhancedContrastSweep = async () => {
+      let axeViolations = [];
+      try {
+        const axeResult = await new AxeBuilder({ page })
+          .withRules(['color-contrast-enhanced'])
+          .analyze();
+        axeViolations = (axeResult.violations || []).filter(
+          (v) => v.id === 'color-contrast-enhanced',
+        );
+      } catch (axeErr) {
+        // Non-fatal — the primary sample still carries the headline verdict.
+        // Record the axe error in the evidence so reviewers know the broader
+        // sweep was attempted.
+        axeViolations = [];
+        result.contrastAxeError = axeErr instanceof Error ? axeErr.message : String(axeErr);
+      }
+      const axeNodeCount = axeViolations.reduce(
+        (sum, v) => sum + (Array.isArray(v.nodes) ? v.nodes.length : 0),
+        0,
+      );
+      const axeSamples = [];
+      for (const v of axeViolations) {
+        for (const n of (v.nodes || []).slice(0, 5)) {
+          axeSamples.push({
+            target: Array.isArray(n.target) ? n.target.join(' ') : String(n.target ?? ''),
+            failureSummary: n.failureSummary || '',
+            html: typeof n.html === 'string' ? n.html.slice(0, 240) : '',
+          });
+        }
+      }
+      result.contrastAxe = {
+        rule: 'color-contrast-enhanced',
+        violationCount: axeNodeCount,
+        samples: axeSamples,
+      };
+      return axeNodeCount;
+    };
     if (isTransparentBg && ownedSurface) {
       const ratio = contrastRatio(ownedSurface.fg, ownedSurface.bg);
       const ownedRatio = ratio === null ? null : Number(ratio.toFixed(2));
       const surfaceName = `<${ownedSurface.tag || '?'}>${
         ownedSurface.part ? `.${String(ownedSurface.part).split(/\s+/)[0]}` : ''
       }`;
+      // Owned-surface sample verdict (the component-owned focus/text surface).
+      const ownedVerdict =
+        ratio === null
+          ? VERDICT.PARTIALLY
+          : ratio >= 7.0
+            ? VERDICT.SUPPORTS
+            : ratio >= 4.5
+              ? VERDICT.PARTIALLY
+              : VERDICT.DOES_NOT;
+      const ownedEvidence =
+        ratio === null
+          ? `Component-owned focus/text surface ${surfaceName} has a non-transparent own background but contrast could not be computed (fg=${ownedSurface.fg}, bg=${ownedSurface.bg}).`
+          : `Component-owned focus/text surface ${surfaceName}: ${ratio.toFixed(2)}:1 (fg ${ownedSurface.fg}, bg ${ownedSurface.bg}). Host is transparent but this surface is component-owned, so 1.4.6 is measured here, not Not Applicable.`;
+      // Run the broader story-wide sweep too: deeper child text tokens inside a
+      // transparent overlay component (dialog/popover/menu) must still be held
+      // to AAA 7:1. Any axe violation downgrades a passing owned-surface sample
+      // to at least Partially Supports; an already-failing owned sample keeps
+      // its stronger signal.
+      const axeNodeCount = await runEnhancedContrastSweep();
+      let mergedVerdict = ownedVerdict;
+      if (axeNodeCount > 0 && mergedVerdict === VERDICT.SUPPORTS) {
+        mergedVerdict = VERDICT.PARTIALLY;
+      }
+      const mergedEvidence =
+        axeNodeCount === 0
+          ? `${ownedEvidence}; axe color-contrast-enhanced sweep: 0 violations across full story DOM.`
+          : `${ownedEvidence}; axe color-contrast-enhanced sweep: ${axeNodeCount} text node(s) fail AAA 7:1 within the story (see contrastAxe.samples).`;
       result.contrast = {
         fg: ownedSurface.fg,
         bg: ownedSurface.bg,
         ratio: ownedRatio,
-        verdict:
-          ratio === null
-            ? VERDICT.PARTIALLY
-            : ratio >= 7.0
-              ? VERDICT.SUPPORTS
-              : ratio >= 4.5
-                ? VERDICT.PARTIALLY
-                : VERDICT.DOES_NOT,
-        evidence:
-          ratio === null
-            ? `Component-owned focus/text surface ${surfaceName} has a non-transparent own background but contrast could not be computed (fg=${ownedSurface.fg}, bg=${ownedSurface.bg}).`
-            : `Component-owned focus/text surface ${surfaceName}: ${ratio.toFixed(2)}:1 (fg ${ownedSurface.fg}, bg ${ownedSurface.bg}). Host is transparent but this surface is component-owned, so 1.4.6 is measured here, not Not Applicable.`,
+        verdict: mergedVerdict,
+        evidence: mergedEvidence,
       };
     } else if (isTransparentBg) {
       // Component (host or inner control) is transparent and owns no
@@ -2087,46 +2171,14 @@ async function runBrowserChecks(componentName, page) {
           ? `Could not compute contrast (fg=${measurements.color}, bg=${measurements.bgColor}).`
           : `${ratio.toFixed(2)}:1 (fg ${measurements.color}, bg ${measurements.bgColor})`;
 
-      // Phase 4 Tier 3 harness extension (3.8.0): the focused-target
-      // sample alone misses AAA contrast failures elsewhere in the
-      // story DOM (caption text, sample composition labels, dim
-      // primitive-tier color-pinned spans). axe-core walks every
-      // text node and applies the WCAG 1.4.6 7:1 floor — run its
-      // `color-contrast-enhanced` rule on the full story and downgrade
-      // the 1.4.6 verdict if any text node fails. This closes the gap
-      // that allowed 6 hx-* components (action-bar, breadcrumb,
-      // button-group, form, overflow-menu, tabs) to ship 473/473
-      // formal-audit-clean while CI's a11y-audit.js fan-out caught
-      // them at AAA-strict.
-      let axeViolations = [];
-      try {
-        const axeResult = await new AxeBuilder({ page })
-          .withRules(['color-contrast-enhanced'])
-          .analyze();
-        axeViolations = (axeResult.violations || []).filter(
-          (v) => v.id === 'color-contrast-enhanced',
-        );
-      } catch (axeErr) {
-        // Non-fatal — the focused-target sample still carries the
-        // primary verdict. Record the axe error in the evidence so
-        // reviewers know the broader sweep was attempted.
-        axeViolations = [];
-        result.contrastAxeError = axeErr instanceof Error ? axeErr.message : String(axeErr);
-      }
-      const axeNodeCount = axeViolations.reduce(
-        (sum, v) => sum + (Array.isArray(v.nodes) ? v.nodes.length : 0),
-        0,
-      );
-      const axeSamples = [];
-      for (const v of axeViolations) {
-        for (const n of (v.nodes || []).slice(0, 5)) {
-          axeSamples.push({
-            target: Array.isArray(n.target) ? n.target.join(' ') : String(n.target ?? ''),
-            failureSummary: n.failureSummary || '',
-            html: typeof n.html === 'string' ? n.html.slice(0, 240) : '',
-          });
-        }
-      }
+      // Broader story-wide sweep (shared with the owned-surface branch): the
+      // focused-target sample alone misses AAA contrast failures elsewhere in
+      // the story DOM (caption text, sample composition labels, dim
+      // primitive-tier color-pinned spans). This closes the gap that allowed 6
+      // hx-* components (action-bar, breadcrumb, button-group, form,
+      // overflow-menu, tabs) to ship 473/473 formal-audit-clean while CI's
+      // a11y-audit.js fan-out caught them at AAA-strict.
+      const axeNodeCount = await runEnhancedContrastSweep();
 
       // Merge: any axe AAA contrast violation downgrades the verdict
       // to at least Partially Supports. If the focused-target sample
@@ -2146,11 +2198,6 @@ async function runBrowserChecks(componentName, page) {
         ratio: targetRatio,
         verdict: mergedVerdict,
         evidence: mergedEvidence,
-      };
-      result.contrastAxe = {
-        rule: 'color-contrast-enhanced',
-        violationCount: axeNodeCount,
-        samples: axeSamples,
       };
     }
 
