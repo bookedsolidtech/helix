@@ -672,7 +672,7 @@ async function loadStorybookIndex() {
  * Storybook docs.
  */
 const STORY_OVERRIDES = {
-  'hx-dialog': 'ModalOpen',
+  'hx-dialog': 'AAAAuditOpen',
   'hx-drawer': 'AAAAuditOpen',
   'hx-popover': 'AAAAuditOpen',
   // Banner Default has dismissible=false (no focusable surface). Route the
@@ -797,6 +797,33 @@ async function runBrowserChecks(componentName, page) {
       const host = document.querySelector(tag);
       if (!host) return { error: `no <${tag}> in story` };
       const root = host.shadowRoot || host;
+
+      // Codex round-5 — hx-popover OWN-PANEL scope (1.4.6 / 2.4.13 / 2.4.12).
+      //
+      // hx-popover's `_show()` programmatically focuses its own `[part="body"]`
+      // panel whenever the slotted content contains a focusable element (WCAG
+      // 2.4.3 focus management). That panel is a surface the COMPONENT owns: it
+      // declares its own background + text color + `:focus-visible` outline in
+      // hx-popover.styles.ts. The audit must measure THAT panel — not tab-walk
+      // onto a slotted consumer control (which would certify consumer content)
+      // and not blanket-N/A (which would let panel regressions escape). Pin the
+      // target to `[part="body"]` so every downstream measurement (1.4.6
+      // contrast, 2.4.13 ring, 2.4.12 obscured) lands on the popover's own
+      // panel. Scoped to hx-popover only.
+      if (tag === 'hx-popover' && host.shadowRoot) {
+        const panel = host.shadowRoot.querySelector('[part="body"]');
+        if (panel) {
+          panel.setAttribute('data-aaa-audit-target', '1');
+          const pr = panel.getBoundingClientRect();
+          return {
+            targetTag: 'div',
+            targetPart: 'body',
+            targetIsHost: false,
+            hostHidden: pr.width < 2 || pr.height < 2,
+          };
+        }
+      }
+
       const allCandidates = [
         host,
         ...root.querySelectorAll(
@@ -827,6 +854,103 @@ async function runBrowserChecks(componentName, page) {
     if (targetInfo.error) {
       return { ...result, error: targetInfo.error };
     }
+
+    // Settle the unfocused baseline before snapshotting. Several stories
+    // autofocus their control on mount (e.g. Text Input Default focuses the
+    // inner <input> on render). We blurred to the sentinel above, but the
+    // focus-ring box-shadow/outline animates back to its resting state over a
+    // CSS transition (~150ms). Snapshotting immediately captures the ring
+    // mid-decay (e.g. spread still at 2px), which would poison the focus-state
+    // diff (the ring would look "already present" unfocused → no gain on
+    // focus → false Does-Not-Support). Wait past the transition so the
+    // baseline is the true unfocused appearance.
+    await page.waitForTimeout(250);
+
+    // 2.4.13 Focus Appearance — UNFOCUSED snapshot (pre-focus baseline).
+    //
+    // The focus indicator for many HELiX components is NOT painted on the
+    // element that receives DOM focus. The host (or inner native control)
+    // takes Tab focus, but the visible ring is rendered on a different
+    // shadow-DOM part via `:host(:focus-visible) .innerPart { outline: ... }`
+    // (e.g. hx-checkbox .checkbox__box, hx-switch .switch__track,
+    // hx-toggle-button .button) or a box-shadow ring (hx-select
+    // .field__trigger). The focused host itself sets `outline: none`, and CSS
+    // computes outline-width for `outline-style: none` as the `medium` default
+    // = 3px. Naively measuring the focused element therefore reads a bogus
+    // "3px none" outline that is not a real indicator.
+    //
+    // To find the element that ACTUALLY paints the ring we use a focus-state
+    // diff: snapshot every candidate element's outline/box-shadow while the
+    // component is unfocused, then (after the real Tab focus) re-measure and
+    // pick the element whose outline/box-shadow became a visible >=2px ring ON
+    // FOCUS. This is robust against static borders (unchanged across the diff)
+    // and against the `medium`/3px `style:none` default (also unchanged).
+    //
+    // We tag each candidate with a stable data-aaa-focus-id so the after-focus
+    // pass can correlate elements across page.evaluate boundaries.
+    const preFocusSnapshot = await page.evaluate((tag) => {
+      // Resolve the tagged audit target. For most components the target is
+      // either the host or a shadow-internal control that document-level
+      // querySelector reaches via the focus walk below. hx-popover is the one
+      // case where the target is a tabindex=-1 SHADOW-internal node
+      // ([part="body"]) that a top-level document.querySelector CANNOT see — so
+      // for it (only) we re-resolve the tagged panel through host.shadowRoot.
+      // All other components keep their original document-level resolution
+      // (and host fallback) byte-for-byte.
+      const docTagged = document.querySelector(`[data-aaa-audit-target="1"]`);
+      const host = docTagged?.closest(tag) || document.querySelector(tag);
+      const shadowTagged =
+        tag === 'hx-popover' && host && host.shadowRoot
+          ? host.shadowRoot.querySelector(`[data-aaa-audit-target="1"]`)
+          : null;
+      const target = docTagged || shadowTagged || host;
+      if (!host && !target) return { byId: {} };
+      // Collect the target, the host, and every element reachable through the
+      // host's shadow tree AND any slotted children's shadow trees — the same
+      // surface area the after-focus search will inspect.
+      const collect = (root, sink) => {
+        if (!root) return;
+        for (const el of root.querySelectorAll('*')) sink.push(el);
+        for (const slot of root.querySelectorAll('slot')) {
+          let assigned = [];
+          try {
+            assigned = slot.assignedElements({ flatten: true }) || [];
+          } catch {
+            assigned = [];
+          }
+          for (const a of assigned) {
+            sink.push(a);
+            if (a.shadowRoot) collect(a.shadowRoot, sink);
+            try {
+              for (const c of a.querySelectorAll('*')) sink.push(c);
+            } catch {
+              /* ignore */
+            }
+          }
+        }
+      };
+      const els = [];
+      if (target) els.push(target);
+      if (host && host !== target) els.push(host);
+      if (host && host.shadowRoot) collect(host.shadowRoot, els);
+      const byId = {};
+      let n = 0;
+      const seen = new Set();
+      for (const el of els) {
+        if (!el || el.nodeType !== 1 || seen.has(el)) continue;
+        seen.add(el);
+        const id = `f${n++}`;
+        el.setAttribute('data-aaa-focus-id', id);
+        const cs = window.getComputedStyle(el);
+        byId[id] = {
+          outlineWidth: cs.outlineWidth || '0px',
+          outlineStyle: cs.outlineStyle || 'none',
+          outlineColor: cs.outlineColor || '',
+          boxShadow: cs.boxShadow || 'none',
+        };
+      }
+      return { byId };
+    }, componentName);
 
     // Real Tab-key walk: press Tab up to MAX_TAB times, after each press
     // check if the deepest active element across shadow boundaries is our
@@ -862,6 +986,68 @@ async function runBrowserChecks(componentName, page) {
       }
     }
 
+    // hx-popover OWN-PANEL focus (1.4.6 / 2.4.13 / 2.4.12) — VERIFIED, not forced.
+    //
+    // The popover's `[part="body"]` panel is `tabindex="-1"`, so the Tab walk
+    // above cannot land on it. But `[part="body"]` is exactly the surface the
+    // COMPONENT focuses itself on open: `_show()` calls `bodyEl.focus()` when the
+    // slotted content contains a focusable element (WCAG 2.4.3 focus management),
+    // which the AAAAuditOpen fixture guarantees by slotting a `<button>`.
+    //
+    // We must NOT fake this focus by calling `panel.focus()` ourselves — that
+    // would report a keyboard-reached pass for 1.4.6 / 2.4.12 / 2.4.13 even if
+    // `_show()` regressed and stopped focusing the panel (a false positive). The
+    // sentinel reset + Tab walk above already moved focus OFF the panel (the
+    // genuine on-mount focus from `firstUpdated()` is lost), and the Tab presses
+    // set the user-agent's last-interaction modality to keyboard.
+    //
+    // Instead we re-exercise the component's OWN open cycle and READ where focus
+    // lands. Toggling the public `open` property false→true drives the genuine
+    // `updated()` → `_hide()` / `_show()` lifecycle; `_show()` (only if its
+    // interactive-content gate still passes) moves focus to `[part="body"]`. We
+    // then resolve `document.activeElement` (shadow-aware) and accept the focus
+    // as keyboard-reached ONLY when the COMPONENT genuinely parked it on (or
+    // within) the panel. If `_show()` did not move focus into the panel, we leave
+    // `tabbed` false so the measurement path flags focus as programmatic-only —
+    // a real `_show()` regression is therefore detectable rather than masked.
+    if (componentName === 'hx-popover') {
+      const focusedByComponent = await page.evaluate(async () => {
+        const host = document.querySelector('hx-popover');
+        if (!host || !host.shadowRoot) return false;
+        // Drive the component's own open lifecycle so _show() — not the harness —
+        // moves focus. Re-running _show() after the Tab walk also means the
+        // keyboard modality flag is already set, so the panel's :focus-visible
+        // ring resolves exactly as it would for a keyboard user.
+        try {
+          host.open = false;
+          await host.updateComplete;
+          await new Promise((r) => setTimeout(r, 30));
+          host.open = true;
+          await host.updateComplete;
+          // _show() awaits updateComplete then focuses; allow a couple of frames
+          // for the focus() call inside _show() to take effect.
+          await new Promise((r) => setTimeout(r, 60));
+        } catch {
+          return false;
+        }
+        const panel = host.shadowRoot.querySelector('[data-aaa-audit-target="1"], [part="body"]');
+        if (!panel) return false;
+        // Resolve the deepest active element across shadow boundaries and verify
+        // the COMPONENT placed focus on (or within) its own panel.
+        let deep = document.activeElement;
+        while (deep && deep.shadowRoot && deep.shadowRoot.activeElement) {
+          deep = deep.shadowRoot.activeElement;
+        }
+        return deep === panel || panel.contains(deep);
+      });
+      if (focusedByComponent) {
+        // The component genuinely moved focus to its own panel — treat it as
+        // keyboard-reached (legitimate per 2.4.3) so 1.4.6 / 2.4.13 / 2.4.12 are
+        // measured on the real, currently-focused panel surface.
+        tabbed = true;
+      }
+    }
+
     // Give the browser time to fully render the focus ring before measuring.
     // Several HELiX components use CSS transitions on the focus-ring box-shadow
     // (opacity 0 → 1, spread 0 → 2px) for visual polish — the shadow takes
@@ -875,11 +1061,24 @@ async function runBrowserChecks(componentName, page) {
     // Now measure — the target is keyboard-focused (or we fell back to
     // programmatic focus only if the Tab walk failed to reach it).
     const measurements = await page.evaluate(
-      async ({ tag, didTab }) => {
-        const target =
-          document.querySelector(`[data-aaa-audit-target="1"]`) || document.querySelector(tag);
+      async ({ tag, didTab, preSnapshot }) => {
+        // Resolve the tagged audit target. hx-popover tags a tabindex=-1
+        // SHADOW-internal node ([part="body"]) that a top-level
+        // document.querySelector CANNOT see — for it (only) re-resolve the
+        // tagged panel through host.shadowRoot so every downstream measurement
+        // (1.4.6 contrast, 2.4.13 ring, 2.4.12 obscured hit-test, rect
+        // fallback) lands on the panel surface the component owns rather than
+        // silently collapsing onto the display:contents host. All other
+        // components keep their original document-level resolution byte-for-byte.
+        const docTagged = document.querySelector(`[data-aaa-audit-target="1"]`);
+        const resolvedHost = document.querySelector(tag);
+        const shadowTagged =
+          tag === 'hx-popover' && resolvedHost && resolvedHost.shadowRoot
+            ? resolvedHost.shadowRoot.querySelector(`[data-aaa-audit-target="1"]`)
+            : null;
+        const target = docTagged || shadowTagged || resolvedHost;
         if (!target) return { error: `no <${tag}> in story` };
-        const host = document.querySelector(tag) || target;
+        const host = resolvedHost || target;
 
         // If the Tab walk did not reach the target, fall back to programmatic
         // focus so the rest of the measurements still land — but we'll mark
@@ -893,18 +1092,195 @@ async function runBrowserChecks(componentName, page) {
         // Resolve the deepest active element across shadow boundaries. With
         // `delegatesFocus: true`, Tab onto the host moves real focus to an
         // inner control; document.activeElement returns the host but the
-        // :focus-visible outline lives on the inner part. Measure styles on
-        // whichever element actually owns the focus pseudo-state.
+        // :focus-visible outline lives on the inner part. We start measuring
+        // from whichever element actually owns the focus pseudo-state, then
+        // refine via the focus-state diff below.
         let activeDeep = document.activeElement;
         while (activeDeep && activeDeep.shadowRoot && activeDeep.shadowRoot.activeElement) {
           activeDeep = activeDeep.shadowRoot.activeElement;
         }
-        // The element we measure outline on: prefer the deepest active element
-        // if it is inside our target's subtree (host or shadow descendant);
-        // otherwise fall back to the target itself.
+
+        // --- 2.4.13 focus-indicator resolution via focus-state DIFF ----------
+        //
+        // The focused element is NOT necessarily the element that paints the
+        // ring. We must measure the element whose outline / box-shadow actually
+        // CHANGED into a visible >=2px indicator on focus. Comparing against the
+        // unfocused baseline (preSnapshot) makes this robust:
+        //   - a host that sets `outline: none` reads outline-width = `medium`
+        //     (3px) both unfocused and focused → NO diff → not the indicator
+        //     (kills the bogus "outline 3px (under 2px threshold)" false-fail);
+        //   - a static border / always-on box-shadow is identical in both
+        //     states → NO diff → never mistaken for a focus ring;
+        //   - the inner part that goes 0px/none → 2px solid (or gains a >=2px
+        //     box-shadow ring) ON focus IS the indicator and is selected.
+        //
+        // A box-shadow value is a "visible focus ring" only when it isn't
+        // 'none', has at least one >=2px pixel dimension, and its color isn't
+        // fully transparent. The earlier heuristic accepted any `\d+px`
+        // substring, which matched the computed default
+        // "oklab(0 0 0 / 0) 0px 0px 0px 0px" (browser placeholder for "no
+        // shadow"); reject those.
+        const isVisibleFocusShadow = (raw) => {
+          if (!raw || raw === 'none') return false;
+          if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
+          if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+          if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+          if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
+          if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
+          const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
+            parseFloat(m[1]),
+          );
+          if (pxValues.length === 0) return false;
+          return pxValues.some((v) => Math.abs(v) >= 2);
+        };
+        // Split a multi-layer box-shadow value into its comma-separated layers
+        // WITHOUT splitting on commas inside color functions (rgba(), oklch(),
+        // color(...)). Returns trimmed layer strings.
+        const splitShadowLayers = (raw) => {
+          if (!raw || raw === 'none') return [];
+          const out = [];
+          let depth = 0;
+          let cur = '';
+          for (const ch of raw) {
+            if (ch === '(') depth++;
+            else if (ch === ')') depth--;
+            if (ch === ',' && depth === 0) {
+              out.push(cur.trim());
+              cur = '';
+            } else {
+              cur += ch;
+            }
+          }
+          if (cur.trim()) out.push(cur.trim());
+          return out;
+        };
+        // A focus-ring box-shadow is "gained on focus" when the focused value
+        // contains a visible ring LAYER that the unfocused baseline did not.
+        // This is stronger than comparing whole-string visibility: components
+        // like hx-slider keep a static drop-shadow layer
+        // ("rgba(0,0,0,0.05) 0px 1px 2px 0px") at rest and ADD a teal ring
+        // layer ("rgb(15,112,120) 0px 0px 0px 2px") on focus — the whole
+        // string is "visible" in both states, but the ring layer is new.
+        const shadowRingGained = (before, after) => {
+          if (!isVisibleFocusShadow(after)) return false;
+          const beforeLayers = new Set(splitShadowLayers(before));
+          const afterLayers = splitShadowLayers(after);
+          // A newly-added layer that is itself a visible ring → gained.
+          return afterLayers.some(
+            (layer) => !beforeLayers.has(layer) && isVisibleFocusShadow(layer),
+          );
+        };
+        // An outline is a "visible focus outline" only when style isn't `none`
+        // (regardless of the computed `medium`/3px width that the UA reports
+        // for outline-style:none) AND its rendered width is >=2px.
+        const isVisibleFocusOutline = (widthPx, style) => style !== 'none' && widthPx >= 2;
+
+        // Re-collect the same candidate surface area as the pre-focus snapshot
+        // (host + its shadow tree + slotted children's shadow + light trees),
+        // so every snapshotted element can be re-measured in the focused state.
+        const collectFocusCandidates = (root, sink) => {
+          if (!root) return;
+          for (const el of root.querySelectorAll('*')) sink.push(el);
+          for (const slot of root.querySelectorAll('slot')) {
+            let assigned = [];
+            try {
+              assigned = slot.assignedElements({ flatten: true }) || [];
+            } catch {
+              assigned = [];
+            }
+            for (const a of assigned) {
+              sink.push(a);
+              if (a.shadowRoot) collectFocusCandidates(a.shadowRoot, sink);
+              try {
+                for (const c of a.querySelectorAll('*')) sink.push(c);
+              } catch {
+                /* ignore */
+              }
+            }
+          }
+        };
+        const candidates = [];
+        if (target) candidates.push(target);
+        if (host && host !== target) candidates.push(host);
+        if (host && host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
+
+        // For each candidate, decide whether it became a focus indicator on
+        // focus (diff vs. preSnapshot keyed by data-aaa-focus-id).
+        const diffWinners = [];
+        const seenCand = new Set();
+        for (const el of candidates) {
+          if (!el || el.nodeType !== 1 || seenCand.has(el)) continue;
+          seenCand.add(el);
+          const cs = window.getComputedStyle(el);
+          const wNow = parseFloat(cs.outlineWidth || '0');
+          const styleNow = cs.outlineStyle || 'none';
+          const shadowNow = cs.boxShadow || 'none';
+          const outlineVisibleNow = isVisibleFocusOutline(wNow, styleNow);
+          const shadowVisibleNow = isVisibleFocusShadow(shadowNow);
+          if (!outlineVisibleNow && !shadowVisibleNow) continue;
+
+          // Compare against the unfocused baseline.
+          const id = el.getAttribute && el.getAttribute('data-aaa-focus-id');
+          const prev = (id && preSnapshot && preSnapshot[id]) || null;
+          // When a baseline exists, an indicator is "gained" only if it was not
+          // already visible unfocused. The layer-aware shadow check counts a
+          // ring LAYER added on focus even when an unrelated static shadow
+          // layer was already present at rest (e.g. hx-slider thumb keeps a
+          // drop-shadow and adds the teal ring). When no baseline was captured
+          // (element appeared only after focus), its visible indicator counts
+          // as gained — it did not exist unfocused.
+          const outlineVisibleBefore = prev
+            ? isVisibleFocusOutline(
+                parseFloat(prev.outlineWidth || '0'),
+                prev.outlineStyle || 'none',
+              )
+            : false;
+          const outlineGained = outlineVisibleNow && !outlineVisibleBefore;
+          const shadowGained = prev
+            ? shadowVisibleNow && shadowRingGained(prev.boxShadow, shadowNow)
+            : shadowVisibleNow;
+          if (!outlineGained && !shadowGained) continue;
+
+          // The indicator must be actually visible (not on a display:none /
+          // 0×0 part).
+          const r = el.getBoundingClientRect();
+          if (r.width < 2 || r.height < 2 || cs.visibility === 'hidden' || cs.display === 'none') {
+            continue;
+          }
+          diffWinners.push({
+            el,
+            kind: outlineGained ? 'outline' : 'box-shadow',
+            outlineWidthPx: wNow,
+            outlineStyle: styleNow,
+            outlineColor: cs.outlineColor,
+            outlineOffsetPx: parseFloat(cs.outlineOffset || '0'),
+            boxShadow: shadowNow,
+            // The unfocused baseline box-shadow, so 2.4.13 contrast can isolate
+            // the LAYER gained on focus (the ring) from any static drop-shadow
+            // layer the control already painted at rest (e.g. hx-slider thumb).
+            prevBoxShadow: (prev && prev.boxShadow) || 'none',
+          });
+        }
+
+        // Pick the 2.4.13 focus-indicator element from the diff winners.
+        // Prefer the deepest active element if it is itself a diff winner (the
+        // ring on the focused control); otherwise the first winner in tree
+        // order (a host shadow part). This drives ONLY the 2.4.13 verdict.
+        let focusIndicator = null;
+        if (diffWinners.length > 0) {
+          focusIndicator = diffWinners.find((w) => w.el === activeDeep) || diffWinners[0];
+        }
+
+        // `outlineSource` is the element used for the 1.4.6 contrast, 2.4.12
+        // focus-obscured hit-test, and rect fallback. It is resolved
+        // INDEPENDENTLY of the 2.4.13 diff so this change does not perturb the
+        // other criteria's measurements: start at the target, prefer the
+        // deepest active element if it lives inside the component subtree, and
+        // (only when that element renders no outline of its own) walk the
+        // shadow tree for the first element painting a ring — mirroring the
+        // pre-existing resolution.
         let outlineSource = target;
         if (activeDeep && activeDeep !== target) {
-          // Walk up from activeDeep to confirm it's inside our component subtree.
           let cur = activeDeep;
           let inside = false;
           while (cur) {
@@ -917,93 +1293,17 @@ async function runBrowserChecks(componentName, page) {
           }
           if (inside) outlineSource = activeDeep;
         }
-
-        // If the resolved outlineSource has NO outline, it does not necessarily
-        // mean the component lacks a focus indicator. Many HELiX components
-        // render the focus ring on a sibling inside the shadow root (e.g.
-        // hx-checkbox draws outline on .checkbox__box, NOT on the focused host;
-        // hx-switch draws outline on .switch__track sibling-of-input). Walk
-        // the shadow descendants of the host once and pick the first descendant
-        // currently rendering an outline >=2px or a thick box-shadow — that is
-        // the actual focus indicator the user sees. Only do this when the
-        // primary outlineSource has no own outline (so we never over-report
-        // a passing host).
         const ownOutlineWidth = parseFloat(
           window.getComputedStyle(outlineSource).outlineWidth || '0',
         );
         if (ownOutlineWidth < 2) {
-          // Walk the host's shadow tree AND the shadow trees of any slotted
-          // children. Group components like hx-checkbox-group and hx-radio-group
-          // host only a <slot> in their own shadow root; the focus-ring is
-          // painted on a part inside the slotted child's shadow root (e.g.
-          // <hx-checkbox>::shadow .checkbox__box). Without traversing slot
-          // assignments, the harness records 0px outline on the slot itself
-          // and reports a Does-Not-Support 2.4.13 false-fail.
-          const collectFocusCandidates = (root, sink) => {
-            if (!root) return;
-            const all = root.querySelectorAll('*');
-            for (const el of all) sink.push(el);
-            // For each <slot>, recurse into the shadow trees of assigned elements
-            // and harvest their light DOM children too.
-            const slots = root.querySelectorAll('slot');
-            for (const slot of slots) {
-              // assignedElements with flatten:true follows slot fallback chains
-              // when the slot is empty.
-              let assigned = [];
-              try {
-                assigned = slot.assignedElements({ flatten: true }) || [];
-              } catch {
-                assigned = [];
-              }
-              for (const a of assigned) {
-                sink.push(a);
-                if (a.shadowRoot) collectFocusCandidates(a.shadowRoot, sink);
-                // Also harvest the assigned element's light DOM descendants —
-                // some patterns render focus indicators directly on light DOM
-                // children rather than in shadow.
-                try {
-                  const lightChildren = a.querySelectorAll('*');
-                  for (const c of lightChildren) sink.push(c);
-                } catch {
-                  /* ignore */
-                }
-              }
-            }
-          };
-          // A box-shadow value is "visible as a focus indicator" only when:
-          //   - it isn't 'none', AND
-          //   - at least one of (offset-x, offset-y, blur, spread) is >=2px, AND
-          //   - the color isn't fully transparent (alpha 0 / oklab .../0 / rgba(...,0))
-          // The previous heuristic accepted ANY `\d+px` substring, which matched
-          // computed defaults like "oklab(0 0 0 / 0) 0px 0px 0px 0px" — the
-          // browser's default placeholder for "no shadow" on elements that have
-          // a focus-visible rule defined elsewhere in the cascade but not
-          // currently matching. Reject those.
-          const isVisibleFocusShadow = (raw) => {
-            if (!raw || raw === 'none') return false;
-            // Reject fully-transparent color tokens.
-            if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
-            if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-            if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-            if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
-            if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-            // Require at least one non-zero pixel dimension.
-            const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
-              parseFloat(m[1]),
-            );
-            if (pxValues.length === 0) return false;
-            return pxValues.some((v) => Math.abs(v) >= 2);
-          };
-          const candidates = [];
-          if (host.shadowRoot) collectFocusCandidates(host.shadowRoot, candidates);
           for (const el of candidates) {
+            if (!el || el.nodeType !== 1 || el === outlineSource) continue;
             const cs = window.getComputedStyle(el);
             const w = parseFloat(cs.outlineWidth || '0');
             const okOutline = w >= 2 && cs.outlineStyle !== 'none';
             const okShadow = isVisibleFocusShadow(cs.boxShadow);
             if (okOutline || okShadow) {
-              // Confirm the element is currently visible (focus indicators
-              // on display:none parts do not count).
               const r = el.getBoundingClientRect();
               if (
                 r.width >= 2 &&
@@ -1119,6 +1419,331 @@ async function runBrowserChecks(componentName, page) {
         });
         const isCovered = !allPointsClear;
 
+        // 2.4.13 requires the focus indicator to have >=3:1 contrast against
+        // the adjacent (unfocused) colour it covers. Best-effort automated
+        // computation: resolve the ring colour vs. the background colour of the
+        // indicator element's nearest opaque ancestor surface. Colour parsing
+        // is limited to rgb()/rgba() (what getComputedStyle returns for
+        // resolved colours in Chromium); oklch()/named tokens that don't
+        // resolve to rgb are reported but flagged for manual verification.
+        let ringContrast = null;
+        let ringContrastNote = null;
+        let ringEffectiveAlpha = null;
+        if (focusIndicator) {
+          // Parse the colour formats Chromium emits for resolved focus rings:
+          //   • rgb()/rgba()                       — sRGB 0-255, optional alpha
+          //   • color(srgb r g b [/ a])            — sRGB 0-1, optional alpha
+          //   • oklch(L C H [/ a])                 — OKLCH, converted to sRGB
+          //   • color-mix(in srgb, <c> N%, transparent) — defensive: some UAs
+          //     leave a translucent halo un-resolved; treat the N% as alpha.
+          // Returns { r, g, b, a } with r/g/b in 0-255.
+          const clamp255 = (v) => Math.max(0, Math.min(255, v));
+          const srgbLinToGamma = (v) =>
+            v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+          const oklchToSrgb = (L, C, H) => {
+            // OKLCH → OKLab → linear sRGB → gamma sRGB (Björn Ottosson).
+            const hr = (H * Math.PI) / 180;
+            const a = C * Math.cos(hr);
+            const b = C * Math.sin(hr);
+            const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+            const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+            const s_ = L - 0.0894841775 * a - 1.291485548 * b;
+            const l = l_ * l_ * l_;
+            const m = m_ * m_ * m_;
+            const s = s_ * s_ * s_;
+            const lr = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+            const lg = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+            const lb = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+            return {
+              r: clamp255(srgbLinToGamma(lr) * 255),
+              g: clamp255(srgbLinToGamma(lg) * 255),
+              b: clamp255(srgbLinToGamma(lb) * 255),
+            };
+          };
+          const parseColor = (c) => {
+            if (!c) return null;
+            const s = c.trim();
+            // rgb()/rgba()
+            let m = s.match(
+              /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/i,
+            );
+            if (m) {
+              return {
+                r: +m[1],
+                g: +m[2],
+                b: +m[3],
+                a: m[4] === undefined ? 1 : parseFloat(m[4]),
+              };
+            }
+            // color(srgb r g b [/ a]) — components are 0-1.
+            m = s.match(
+              /color\(\s*srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/i,
+            );
+            if (m) {
+              return {
+                r: clamp255(parseFloat(m[1]) * 255),
+                g: clamp255(parseFloat(m[2]) * 255),
+                b: clamp255(parseFloat(m[3]) * 255),
+                a: m[4] === undefined ? 1 : parseFloat(m[4]),
+              };
+            }
+            // oklch(L C H [/ a]) — L may be a percentage.
+            m = s.match(/oklch\(\s*([\d.]+%?)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/i);
+            if (m) {
+              const L = m[1].endsWith('%') ? parseFloat(m[1]) / 100 : parseFloat(m[1]);
+              const rgb = oklchToSrgb(L, parseFloat(m[2]), parseFloat(m[3]));
+              return { ...rgb, a: m[4] === undefined ? 1 : parseFloat(m[4]) };
+            }
+            // color-mix(in srgb, <c> N%, transparent) — defensive fallback. The
+            // un-resolved translucent halo: the N% of <c> over transparent is an
+            // alpha-N% version of <c>. Resolve <c> recursively, fold N% into a.
+            m = s.match(/color-mix\(\s*in\s+srgb\s*,\s*(.+?)\s+([\d.]+)%\s*,\s*transparent\s*\)/i);
+            if (m) {
+              const base = parseColor(m[1]);
+              if (base) {
+                return { r: base.r, g: base.g, b: base.b, a: base.a * (parseFloat(m[2]) / 100) };
+              }
+            }
+            if (s === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
+            return null;
+          };
+          // WCAG relative luminance (sRGB).
+          const luminance = ({ r, g, b }) => {
+            const ch = [r, g, b].map((v) => {
+              const s = v / 255;
+              return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+          };
+          // Source-over alpha compositing: fg (with alpha) over an opaque bg.
+          const composite = (fg, bg) => ({
+            r: fg.a * fg.r + (1 - fg.a) * bg.r,
+            g: fg.a * fg.g + (1 - fg.a) * bg.g,
+            b: fg.a * fg.b + (1 - fg.a) * bg.b,
+          });
+          // Ring colour: outline-color for outline rings; colour token of the
+          // box-shadow for shadow rings. Capture color()/oklch()/rgba() forms,
+          // not just rgba(), so translucent halos resolve correctly.
+          //
+          // For a box-shadow ring, do NOT blindly grab the first colour token
+          // of the whole computed shadow string. Controls that keep a static
+          // drop-shadow layer at rest and ADD the focus ring as a LATER layer
+          // (e.g. hx-slider thumb: "rgba(0,0,0,0.05) 0 1px 2px" baseline +
+          // "rgb(15,112,120) 0 0 0 2px" ring on focus) would otherwise score
+          // the drop-shadow's near-transparent black instead of the teal ring.
+          // Isolate the layer GAINED on focus (present in the focused value,
+          // absent from the unfocused baseline, and itself a visible ring) and
+          // read its colour; fall back to whole-string first-match only when
+          // the gained layer can't be determined.
+          let ringColorStr = focusIndicator.outlineColor;
+          if (focusIndicator.kind === 'box-shadow') {
+            const matchRingColor = (s) =>
+              s.match(/color\(\s*srgb[^)]*\)/i) ||
+              s.match(/oklch\([^)]*\)/i) ||
+              s.match(/color-mix\([^)]*\)/i) ||
+              s.match(/rgba?\([^)]*\)/i);
+            const fullShadow = focusIndicator.boxShadow || '';
+            const beforeLayers = new Set(splitShadowLayers(focusIndicator.prevBoxShadow || 'none'));
+            const gainedLayer = splitShadowLayers(fullShadow).find(
+              (layer) => !beforeLayers.has(layer) && isVisibleFocusShadow(layer),
+            );
+            const source = gainedLayer || fullShadow;
+            const cm = matchRingColor(source) || (gainedLayer && matchRingColor(fullShadow));
+            ringColorStr = cm ? cm[0] : focusIndicator.outlineColor;
+          }
+          // Adjacent background — the colour the ring sits AGAINST. For an
+          // `outline` ring with a positive `outline-offset`, the ring is painted
+          // OUTSIDE the element's border box, so the adjacent colour is the
+          // surface BEHIND/AROUND the element (its parent/page), NOT the
+          // element's own fill. Sampling the indicator's own background here
+          // produced false-low ratios (e.g. teal ring on a teal-filled switch
+          // track reading 1.21:1). Start the walk from the parent for offset
+          // outline rings; box-shadow rings (and zero/negative-offset outlines
+          // that paint over the element) sit on the element's own surface.
+          const offsetRing =
+            focusIndicator.kind === 'outline' && (focusIndicator.outlineOffsetPx || 0) > 0;
+          let bgEl = offsetRing
+            ? focusIndicator.el.parentElement || focusIndicator.el.getRootNode()?.host || null
+            : focusIndicator.el;
+          let adjBg = null;
+          let hops = 0;
+          while (bgEl && hops < 8) {
+            const c = parseColor(window.getComputedStyle(bgEl).backgroundColor);
+            if (c && c.a > 0) {
+              adjBg = c;
+              break;
+            }
+            bgEl = bgEl.parentElement || bgEl.getRootNode()?.host || null;
+            hops++;
+          }
+          const ringRgb = parseColor(ringColorStr);
+          if (offsetRing && !adjBg) {
+            // The surface behind an offset ring is transparent all the way up
+            // (consumer page controls it) — we cannot resolve the true adjacent
+            // colour from within the component. Defer to manual verification
+            // rather than emit a misleading ratio.
+            ringContrastNote =
+              `offset outline ring (offset ${focusIndicator.outlineOffsetPx}px) sits on the consumer page surface, ` +
+              `which is transparent within the component — adjacent contrast cannot be auto-measured; verify >=3:1 manually`;
+          } else if (ringRgb && adjBg && ringRgb.a > 0) {
+            ringEffectiveAlpha = ringRgb.a;
+            // WCAG 2.4.13 contrast is about how much the indicator shifts the
+            // colour it sits on. A translucent ring (alpha < 1) does NOT paint
+            // its raw colour — it paints the COMPOSITE of (ring over backdrop).
+            // Score that composited colour vs. the same backdrop, so a 25%-alpha
+            // halo over white reads its true ~1.3:1, not the opaque teal ~5.8:1.
+            const effectiveRing = ringRgb.a < 1 ? composite(ringRgb, adjBg) : ringRgb;
+            const l1 = luminance(effectiveRing);
+            const l2 = luminance(adjBg);
+            ringContrast = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+          } else {
+            ringContrastNote =
+              'ring colour or adjacent background did not resolve to a known colour format — verify >=3:1 manually';
+          }
+        }
+
+        // 1.4.6 surface-ownership probe. When the primary 1.4.6 sample
+        // (outlineSource) is transparent — common when outlineSource resolves
+        // to the transparent host — the component may still OWN a
+        // non-transparent focus/text surface inside its OWN shadow tree (e.g.
+        // hx-menu `.menu`, hx-select `.field__trigger`, hx-dialog `.dialog`).
+        // Marking 1.4.6 Not Applicable in that case drops real AAA coverage.
+        // CRITICAL: the surface MUST be component-owned — never an ancestor in
+        // the consumer page (the Storybook `<body>` white chrome is NOT the
+        // component's surface). Restrict the search to the host's shadow tree
+        // (and the host itself); never walk up past the host into light DOM.
+        //
+        // Text-bearing test that accounts for slotted light-DOM content. A
+        // component surface (e.g. hx-menu `.base`, hx-toggle-button `.button`)
+        // frequently renders its text via a <slot> projecting light-DOM
+        // children (menu items, the button label). That text visually sits on
+        // the surface's background and inherits the surface's `color`, so the
+        // surface IS a 1.4.6 text surface even though its own childNodes hold
+        // no text. Check: direct text nodes, innerText, OR a descendant <slot>
+        // with assigned text-bearing nodes.
+        const elementHasOwnText = (el) => {
+          if (!el) return false;
+          for (const node of el.childNodes || []) {
+            if (node.nodeType === 3 && (node.textContent || '').trim().length > 0) return true;
+          }
+          try {
+            if (typeof el.innerText === 'string' && el.innerText.trim().length > 0) return true;
+          } catch {
+            /* ignore */
+          }
+          const slots = el.querySelectorAll ? el.querySelectorAll('slot') : [];
+          for (const slot of slots) {
+            let assigned = [];
+            try {
+              assigned = slot.assignedNodes({ flatten: true }) || [];
+            } catch {
+              assigned = [];
+            }
+            for (const a of assigned) {
+              if ((a.textContent || '').trim().length > 0) return true;
+            }
+          }
+          return false;
+        };
+        const isOpaqueBg = (c) =>
+          !!c &&
+          c !== 'transparent' &&
+          !/rgba?\([^,]+,[^,]+,[^,]+,\s*0(\.0+)?\s*\)/.test(c) &&
+          !/\/\s*0(?:\.0+)?\s*\)/.test(c);
+        let ownedSurface = null;
+        {
+          // Candidate surfaces, in priority order, all component-owned:
+          //   1. the ring-painting focus indicator (a verified shadow part),
+          //   2. shadow-tree ancestors of the focused element up to (and
+          //      including) the host — NEVER beyond the host into the page,
+          //   3. the host's shadow-tree elements that contain the focused
+          //      element (covers the menu/listbox panel `.menu`/`.base`).
+          // Stop the upward walk at the host: an opaque surface above the host
+          // belongs to the consumer page, not the component.
+          const ownedAncestors = [];
+          if (focusIndicator && focusIndicator.el) ownedAncestors.push(focusIndicator.el);
+          // CONTAINMENT GATE: only walk `activeDeep`'s ancestors when the
+          // focused node ACTUALLY lives inside this component's subtree — its
+          // shadow tree, the host itself, or light DOM assigned to one of the
+          // host's slots (flattened tree). For NON-focusable components the Tab
+          // walk never reaches them and `target.focus()` no-ops, so
+          // `activeDeep` is still whatever page element holds focus (Storybook
+          // `<body>.sb-main-padded` chrome). Walking that node's ancestors
+          // would climb into PAGE chrome and mis-report the page background as
+          // a component-owned 1.4.6 surface. When focus never entered the
+          // component, skip the ancestor walk entirely so 1.4.6 stays Not
+          // Applicable — the correct verdict for a non-focusable component.
+          // Shadow-piercing containment: climb via assignedSlot (slotted light
+          // DOM) → parentNode (shadow children / light DOM) → shadow-root host,
+          // confirming the chain reaches `host` (or `target`). Mirrors the
+          // outlineSource `inside` walk above.
+          let focusInsideComponent = false;
+          if (activeDeep) {
+            let cur = activeDeep;
+            let guard = 0;
+            while (cur && guard < 32) {
+              guard++;
+              if (cur === host || cur === target) {
+                focusInsideComponent = true;
+                break;
+              }
+              cur = cur.assignedSlot || cur.parentNode || cur.host || null;
+              if (cur && cur.nodeType !== 1 && cur.host) cur = cur.host;
+            }
+          }
+          if (activeDeep && focusInsideComponent) {
+            let cur = activeDeep;
+            let guard = 0;
+            while (cur && guard < 12) {
+              guard++;
+              ownedAncestors.push(cur);
+              if (cur === host) break; // do not cross above the component host
+              // Climb within the shadow tree: parentNode handles shadow
+              // children; when we hit a shadow root, hop to its host (still
+              // inside the component if that host === our component host).
+              const parent = cur.parentNode;
+              if (parent && parent.nodeType === 11 /* DOCUMENT_FRAGMENT (shadow root) */) {
+                cur = parent.host || null;
+              } else {
+                cur = parent;
+              }
+            }
+          }
+          // De-dupe while preserving order.
+          const seen = new Set();
+          const candidates = ownedAncestors.filter((el) => {
+            if (!el || el.nodeType !== 1 || seen.has(el)) return false;
+            seen.add(el);
+            return true;
+          });
+          for (const el of candidates) {
+            const cs = window.getComputedStyle(el);
+            if (!isOpaqueBg(cs.backgroundColor)) continue;
+            // The surface must render text that sits on this opaque background
+            // (its own text, or slotted text projected into it). Otherwise it
+            // is a 1.4.11 non-text surface (e.g. hx-switch track) and 1.4.6 is
+            // Not Applicable. The foreground is the SURFACE's own computed
+            // `color` — that is the colour the on-surface text (including
+            // slotted labels/menu items) inherits and the user actually sees
+            // against this fill (black on hx-menu `.base`, white on
+            // hx-toggle-button `.button`). Reading an unrelated focused
+            // element's colour (e.g. the inherited body black) would be a
+            // category error.
+            if (!elementHasOwnText(el)) continue;
+            const surfaceBg = cs.backgroundColor;
+            const surfaceFg = cs.color;
+            ownedSurface = {
+              tag: el.tagName ? el.tagName.toLowerCase() : null,
+              part: el.getAttribute
+                ? el.getAttribute('part') || el.getAttribute('class') || null
+                : null,
+              bg: surfaceBg,
+              fg: surfaceFg,
+            };
+            break;
+          }
+        }
+
         return {
           rect: { width: rect.width, height: rect.height, top: rect.top, left: rect.left },
           hostHidden,
@@ -1129,6 +1754,7 @@ async function runBrowserChecks(componentName, page) {
           hasFocusBoxShadow,
           bgColor,
           color,
+          ownedSurface,
           isCovered,
           targetTag: target.tagName.toLowerCase(),
           targetIsHost: target === host,
@@ -1137,9 +1763,31 @@ async function runBrowserChecks(componentName, page) {
           outlineSourceHasOwnText: hasOwnTextContent,
           focusedViaKeyboard: didTab,
           tabPresses: undefined, // populated outside evaluate scope
+          // Focus-state DIFF result (2.4.13): which element became a visible
+          // ring on focus, and how.
+          focusIndicatorFound: !!focusIndicator,
+          focusIndicatorKind: focusIndicator ? focusIndicator.kind : null,
+          focusIndicatorTag:
+            focusIndicator && focusIndicator.el.tagName
+              ? focusIndicator.el.tagName.toLowerCase()
+              : null,
+          focusIndicatorPart:
+            focusIndicator && focusIndicator.el.getAttribute
+              ? focusIndicator.el.getAttribute('part') ||
+                focusIndicator.el.getAttribute('class') ||
+                null
+              : null,
+          focusIndicatorOutlineWidthPx: focusIndicator ? focusIndicator.outlineWidthPx : null,
+          focusIndicatorOutlineStyle: focusIndicator ? focusIndicator.outlineStyle : null,
+          focusIndicatorOutlineColor: focusIndicator ? focusIndicator.outlineColor : null,
+          focusIndicatorBoxShadow: focusIndicator ? focusIndicator.boxShadow : null,
+          focusIndicatorIsTarget: focusIndicator ? focusIndicator.el === target : false,
+          ringContrast,
+          ringContrastNote,
+          ringEffectiveAlpha,
         };
       },
-      { tag: componentName, didTab: tabbed },
+      { tag: componentName, didTab: tabbed, preSnapshot: preFocusSnapshot?.byId || {} },
     );
 
     // Annotate measurement with the actual Tab-press count we recorded
@@ -1164,7 +1812,14 @@ async function runBrowserChecks(componentName, page) {
     // both of which already meet the 44×44 AAA bar in their own audit
     // row). The 2.5.5 obligation here is on the CONSUMER, not the
     // component. Mark Not Applicable with an explicit consumer note.
-    const POPOVER_CONTAINERS = new Set(['hx-dropdown', 'hx-tooltip', 'hx-popup']);
+    //
+    // hx-popover is included here: its resolved audit target is the
+    // component-owned `[part="body"]` panel — a non-actionable CONTAINER, not
+    // a click target. The 2.5.5 obligation falls on the consumer-supplied
+    // trigger and on any actionable controls the consumer slots into the
+    // panel, neither of which the component sizes. This keeps popover's 2.5.5
+    // verdict consistent with its other container-N/A rationales (round-4/5).
+    const POPOVER_CONTAINERS = new Set(['hx-dropdown', 'hx-tooltip', 'hx-popup', 'hx-popover']);
     // WCAG 2.5.5 user-agent control exception — components whose interactive
     // target is rendered and sized by the user agent (native <input
     // type="range"> thumb, native rating star widgets) are exempt because
@@ -1188,13 +1843,60 @@ async function runBrowserChecks(componentName, page) {
         evidence: `User-agent-controlled target — component delegates to a native <input type="range"> whose thumb is sized by the platform (typically 16-20px). WCAG 2.5.5 user-agent exception (https://www.w3.org/TR/WCAG22/#target-size-enhanced) applies: target sized by the user agent is exempt. Host bbox ${measurements.rect.width.toFixed(1)}x${measurements.rect.height.toFixed(1)} px reflects the entire slider track, not the actionable thumb. Equivalent input methods (Arrow keys, Home/End, PageUp/PageDown, mouse wheel) clear the spirit of 2.5.5 for keyboard users.`,
       };
     } else if (measurements.hostHidden) {
-      result.targetSize = {
-        width: 0,
-        height: 0,
-        target: measurements.targetTag,
-        verdict: VERDICT.NOT_APPLICABLE,
-        evidence: `Host <${componentName}> has 0x0 bounding box in default story (component likely closed/hidden). Manual measurement required for opened state.`,
-      };
+      // Overlay components (hx-dialog, hx-drawer) use `:host { display:
+      // contents }`, so the host bbox is 0×0 even when the open panel is
+      // painted fixed-position elsewhere. When the open-state story override
+      // (STORY_OVERRIDES) has driven the overlay open, the measurement pass
+      // resolves a REAL, visible surface INSIDE the component via the same
+      // shadow-root-aware outlineSource fallback the 2.4.13 / 2.4.12 passes use
+      // (measurements.rect is reassigned to that focus surface — e.g. the
+      // dialog/drawer `[part="close-button"]`, 44×44 — when the tagged target's
+      // own rect is degenerate; see the rect fallback in runBrowserChecks).
+      // Measure THAT resolved rect for 2.5.5 rather than short-circuiting to Not
+      // Applicable on the degenerate host bbox. Only fall back to N/A when no
+      // real surface resolved (rect still degenerate) — i.e. the overlay is
+      // genuinely closed/hidden. NOTE: popover-class overlays are handled by
+      // POPOVER_CONTAINERS above (their resolved surface is a non-actionable
+      // container panel), so they never reach this branch.
+      const hasResolvedSurface = measurements.rect.width >= 2 && measurements.rect.height >= 2;
+      if (hasResolvedSurface) {
+        // Name the element that owns the resolved focus surface for evidence.
+        // When the Tab-tagged target was the 0×0 host, the rect was resolved
+        // from the focus-indicator element (the actual control the user lands
+        // on); prefer its tag/part label over the degenerate host tag.
+        const resolvedLabel = (() => {
+          if (!measurements.targetIsHost) return `<${measurements.targetTag}>`;
+          const tag = measurements.focusIndicatorTag || measurements.outlineSourceTag || 'element';
+          const part = measurements.focusIndicatorPart
+            ? `[part="${String(measurements.focusIndicatorPart).split(/\s+/)[0]}"]`
+            : '';
+          return `<${tag}>${part}`;
+        })();
+        result.targetSize = {
+          width: measurements.rect.width,
+          height: measurements.rect.height,
+          target: measurements.targetIsHost
+            ? measurements.focusIndicatorTag ||
+              measurements.outlineSourceTag ||
+              measurements.targetTag
+            : measurements.targetTag,
+          verdict:
+            measurements.rect.width >= 44 && measurements.rect.height >= 44
+              ? VERDICT.SUPPORTS
+              : measurements.rect.width >= 24 && measurements.rect.height >= 24
+                ? VERDICT.PARTIALLY
+                : VERDICT.DOES_NOT,
+          evidence: `Overlay host <${componentName}> uses display:contents (0×0 host bbox); measured the resolved open-state target ${resolvedLabel} ${measurements.rect.width.toFixed(1)}x${measurements.rect.height.toFixed(1)} px (component-owned control inside the opened overlay, same shadow-aware target as the 2.4.13/2.4.12 passes).`,
+        };
+      } else {
+        result.targetSize = {
+          width: 0,
+          height: 0,
+          target: measurements.targetTag,
+          verdict: VERDICT.NOT_APPLICABLE,
+          evidence: `Host <${componentName}> has 0x0 bounding box in default story (component likely closed/hidden). Manual measurement required for opened state.`,
+        };
+      }
     } else {
       result.targetSize = {
         width: measurements.rect.width,
@@ -1210,66 +1912,106 @@ async function runBrowserChecks(componentName, page) {
       };
     }
 
-    // 2.4.13 Focus Appearance — outline width >= 2px OR box-shadow focus ring.
-    // Many components use box-shadow as the focus indicator (a11y-equivalent
-    // when contrast >= 3:1 and >= 2px effective thickness). We accept either.
-    // Measurement was taken AFTER a real Tab-key walk (Tier-1-Task-1) so
-    // :focus-visible heuristics are active in the page exactly as they are
-    // for a sighted keyboard user.
-    const hasOutline = measurements.outlineWidthPx >= 2 && measurements.outlineStyle !== 'none';
-    // Detect a "thick enough" box-shadow — heuristic: spread-radius or
-    // multi-layer shadow with a non-transparent color and a non-zero
-    // blur or spread. The previous heuristic accepted ANY `\d+px` substring,
-    // which matched the computed-style default "oklab(0 0 0 / 0) 0px 0px 0px 0px"
-    // (browser placeholder for "no shadow"). Reject those by requiring at
-    // least one non-zero pixel dimension AND a non-transparent color.
-    const isVisibleShadow = (raw) => {
-      if (!raw || raw === 'none' || /^none$/i.test(raw)) return false;
-      if (/\brgba?\([^)]*,\s*0\s*\)/.test(raw)) return false;
-      if (/\boklab\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-      if (/\boklch\([^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-      if (/\bhsla?\([^)]*,\s*0(?:\.0+)?%?\s*\)/.test(raw)) return false;
-      if (/\bcolor\(\s*[^)]*\/\s*0(?:\.0+)?\s*\)/.test(raw)) return false;
-      const pxValues = Array.from(raw.matchAll(/(-?\d+(?:\.\d+)?)\s*px/g)).map((m) =>
-        parseFloat(m[1]),
-      );
-      if (pxValues.length === 0) return false;
-      return pxValues.some((v) => Math.abs(v) >= 2);
-    };
-    const boxShadowSuggestsFocusRing = isVisibleShadow(measurements.boxShadow);
-    const outlineSourceNote = measurements.outlineSourceIsTarget
-      ? `<${measurements.targetTag}>`
-      : `<${measurements.outlineSourceTag}> (shadow descendant of <${measurements.targetTag}> — focus ring rendered on inner part)`;
+    // 2.4.13 Focus Appearance — driven by the focus-state DIFF.
+    //
+    // The verdict is NOT derived from the raw computed outline of the focused
+    // element (which reads the bogus `medium`/3px default for elements that set
+    // `outline: none`). Instead, `measurements.focusIndicatorFound` reports
+    // whether ANY element in the focused subtree gained a real >=2px outline OR
+    // a visible >=2px box-shadow ring ON focus (vs. the unfocused baseline).
+    // That element — named below — is the actual indicator the user sees.
+    //
+    // Critically: a focused element whose only "outline" is the 3px `medium`
+    // default for `outline-style: none` does NOT count as a diff winner (its
+    // outline is identical unfocused and focused, and style:none is rejected),
+    // so the old `outlineWidthPx > 0 → Partially "under 2px threshold"`
+    // fallthrough can no longer fire on a style:none host.
     const focusModeNote = measurements.focusedViaKeyboard
-      ? `keyboard-focused via Tab×${measurements.tabPresses} on ${outlineSourceNote}`
-      : `Tab walk did not reach target after ${measurements.tabPresses} presses; fell back to programmatic focus on ${outlineSourceNote}`;
+      ? `keyboard-focused via Tab×${measurements.tabPresses}`
+      : `Tab walk did not reach target after ${measurements.tabPresses} presses; fell back to programmatic focus`;
+    // Name the element that paints the ring (tag + part/class) for the evidence.
+    const ringElementNote = measurements.focusIndicatorFound
+      ? (() => {
+          const tag = measurements.focusIndicatorTag || '?';
+          const part = measurements.focusIndicatorPart
+            ? `.${String(measurements.focusIndicatorPart).split(/\s+/)[0]}`
+            : '';
+          const where = measurements.focusIndicatorIsTarget
+            ? `<${tag}>${part} (the focused element itself)`
+            : `<${tag}>${part} (inner shadow part of <${measurements.targetTag}>)`;
+          return where;
+        })()
+      : null;
+    // Ring-contrast clause (WCAG 2.4.13 requires >=3:1 vs adjacent colour).
+    // For a translucent ring the reported ratio is the COMPOSITED effective
+    // colour vs. its backdrop (alpha folded in), not the opaque token colour.
+    const alphaNote =
+      typeof measurements.ringEffectiveAlpha === 'number' && measurements.ringEffectiveAlpha < 1
+        ? ` (ring alpha ${measurements.ringEffectiveAlpha}; composited over backdrop)`
+        : '';
+    const contrastClause = (() => {
+      if (!measurements.focusIndicatorFound) return '';
+      if (typeof measurements.ringContrast === 'number') {
+        const ratio = measurements.ringContrast.toFixed(2);
+        return measurements.ringContrast >= 3
+          ? ` Effective ring contrast vs adjacent background ${ratio}:1${alphaNote} (>=3:1 OK).`
+          : ` Effective ring contrast vs adjacent background ${ratio}:1${alphaNote} (UNDER 3:1 — fails WCAG 2.4.13 contrast).`;
+      }
+      return ` ${measurements.ringContrastNote || 'Ring contrast not auto-computed — verify >=3:1 manually.'}`;
+    })();
     let outlineVerdict;
     let outlineEvidence;
-    if (hasOutline) {
-      outlineVerdict = VERDICT.SUPPORTS;
-      outlineEvidence = `computed outline ${measurements.outlineWidthPx}px ${measurements.outlineStyle} ${measurements.outlineColor} (${focusModeNote})`;
-    } else if (boxShadowSuggestsFocusRing) {
-      outlineVerdict = VERDICT.SUPPORTS;
-      outlineEvidence = `box-shadow focus indicator: ${measurements.boxShadow} (${focusModeNote}). Verify >=2px effective thickness + 3:1 contrast manually.`;
-    } else if (measurements.outlineWidthPx > 0) {
-      outlineVerdict = VERDICT.PARTIALLY;
-      outlineEvidence = `outline ${measurements.outlineWidthPx}px (under 2px threshold) (${focusModeNote})`;
+    if (measurements.focusIndicatorFound) {
+      // WCAG 2.4.13 requires BOTH the >=2px-area indicator AND >=3:1 contrast
+      // between the indicator's effective (composited) colour and the colour it
+      // sits against. The diff already guarantees the >=2px area. Gate Supports
+      // on measured contrast: a detected ring with effective contrast < 3:1
+      // (e.g. a 25%-alpha translucent halo that composites to ~1.3:1) is a real
+      // partial failure, NOT a pass. When contrast could not be auto-measured
+      // (e.g. offset ring on a consumer-controlled transparent page surface),
+      // keep Supports for the area requirement and flag the contrast for manual
+      // verification rather than emit a false fail.
+      const ringMeasured = typeof measurements.ringContrast === 'number';
+      const ringMeetsContrast = ringMeasured && measurements.ringContrast >= 3;
+      outlineVerdict = ringMeasured && !ringMeetsContrast ? VERDICT.PARTIALLY : VERDICT.SUPPORTS;
+      if (measurements.focusIndicatorKind === 'outline') {
+        outlineEvidence =
+          `${measurements.focusIndicatorOutlineWidthPx}px ${measurements.focusIndicatorOutlineStyle} ` +
+          `${measurements.focusIndicatorOutlineColor} on ${ringElementNote} ` +
+          `(${focusModeNote}; gained on focus vs unfocused baseline).${contrastClause}`;
+      } else {
+        outlineEvidence =
+          `box-shadow focus ring "${measurements.focusIndicatorBoxShadow}" on ${ringElementNote} ` +
+          `(${focusModeNote}; gained on focus vs unfocused baseline; >=2px effective thickness).${contrastClause}`;
+      }
     } else if (!measurements.focusedViaKeyboard) {
       // We never reached the target with real Tab — :focus-visible may be
       // stripped by user-agent for programmatic focus on some elements.
       outlineVerdict = VERDICT.PARTIALLY;
-      outlineEvidence = `No focus indicator detected; ${focusModeNote}. Manual keyboard verification needed (story may have no path to component via Tab).`;
+      outlineEvidence = `No focus indicator detected via focus-state diff; ${focusModeNote} on <${measurements.targetTag}>. Manual keyboard verification needed (story may have no path to component via Tab).`;
     } else {
-      // Tab walk DID reach the target, no outline, no box-shadow — this is
-      // a real fail per WCAG 2.4.13.
+      // Tab walk DID reach the target, but NO element in the focused subtree
+      // gained a >=2px outline or box-shadow ring on focus — a real fail.
       outlineVerdict = VERDICT.DOES_NOT;
-      outlineEvidence = `${focusModeNote}; computed outline 0px and no box-shadow focus indicator. WCAG 2.4.13 requires a visible focus indicator >=2px.`;
+      outlineEvidence = `${focusModeNote} on <${measurements.targetTag}>; no element in the focused subtree gained a >=2px outline or box-shadow ring on focus (diff vs unfocused baseline). WCAG 2.4.13 requires a visible focus indicator >=2px.`;
     }
     result.focusOutline = {
-      widthPx: measurements.outlineWidthPx,
-      color: measurements.outlineColor,
-      style: measurements.outlineStyle,
-      boxShadow: measurements.boxShadow,
+      widthPx: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorOutlineWidthPx
+        : measurements.outlineWidthPx,
+      color: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorOutlineColor
+        : measurements.outlineColor,
+      style: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorOutlineStyle
+        : measurements.outlineStyle,
+      boxShadow: measurements.focusIndicatorFound
+        ? measurements.focusIndicatorBoxShadow
+        : measurements.boxShadow,
+      indicatorKind: measurements.focusIndicatorKind,
+      indicatorElement: ringElementNote,
+      ringContrast: measurements.ringContrast,
+      ringEffectiveAlpha: measurements.ringEffectiveAlpha,
       focusedViaKeyboard: measurements.focusedViaKeyboard,
       tabPresses: measurements.tabPresses,
       verdict: outlineVerdict,
@@ -1290,18 +2032,114 @@ async function runBrowserChecks(componentName, page) {
     // background is a category error. Route to Not Applicable when the
     // outline-source has no rendered text content.
     const hasNoOwnText = measurements.outlineSourceHasOwnText === false;
-    if (isTransparentBg) {
-      // Component (host or inner control) is transparent — foreground inherits
-      // the consumer page background. Per WCAG 2.2 1.4.6, the contrast
-      // obligation belongs to the page that places this text, not to the
-      // component shell. This is correct behaviour for surface-token-driven
-      // design systems.
+    // Surface-ownership override (WCAG 1.4.6): when the primary sample is
+    // transparent, the component may still own a non-transparent focus/text
+    // surface deeper in its shadow tree (hx-menu `.base`, hx-select
+    // `.field__trigger`, hx-dialog `.dialog`, hx-toggle-button `.button`).
+    // Marking such components Not Applicable drops real AAA coverage — the
+    // component DOES paint text on a surface it owns. When an owned surface was
+    // detected, measure text-vs-own-background there and verdict on the real
+    // number. N/A is reserved for genuinely transparent / text-free surfaces.
+    const ownedSurface =
+      measurements.ownedSurface && measurements.ownedSurface.bg ? measurements.ownedSurface : null;
+    // Phase 4 Tier 3 harness extension (3.8.0): the single focused/owned
+    // sample misses AAA contrast failures elsewhere in the story DOM (caption
+    // text, sample-composition labels, dim primitive-tier color-pinned spans).
+    // axe-core walks every text node and applies the WCAG 1.4.6 7:1 floor — run
+    // its `color-contrast-enhanced` rule across the full story so deeper child
+    // text tokens are audited even when the primary sample passes. Shared by
+    // both the owned-surface branch (transparent host that still paints text on
+    // a surface it owns) and the opaque-target branch, so transparent overlay
+    // components (dialog/popover/menu/select) don't skip the broader sweep.
+    const runEnhancedContrastSweep = async () => {
+      let axeViolations = [];
+      try {
+        const axeResult = await new AxeBuilder({ page })
+          .withRules(['color-contrast-enhanced'])
+          .analyze();
+        axeViolations = (axeResult.violations || []).filter(
+          (v) => v.id === 'color-contrast-enhanced',
+        );
+      } catch (axeErr) {
+        // Non-fatal — the primary sample still carries the headline verdict.
+        // Record the axe error in the evidence so reviewers know the broader
+        // sweep was attempted.
+        axeViolations = [];
+        result.contrastAxeError = axeErr instanceof Error ? axeErr.message : String(axeErr);
+      }
+      const axeNodeCount = axeViolations.reduce(
+        (sum, v) => sum + (Array.isArray(v.nodes) ? v.nodes.length : 0),
+        0,
+      );
+      const axeSamples = [];
+      for (const v of axeViolations) {
+        for (const n of (v.nodes || []).slice(0, 5)) {
+          axeSamples.push({
+            target: Array.isArray(n.target) ? n.target.join(' ') : String(n.target ?? ''),
+            failureSummary: n.failureSummary || '',
+            html: typeof n.html === 'string' ? n.html.slice(0, 240) : '',
+          });
+        }
+      }
+      result.contrastAxe = {
+        rule: 'color-contrast-enhanced',
+        violationCount: axeNodeCount,
+        samples: axeSamples,
+      };
+      return axeNodeCount;
+    };
+    if (isTransparentBg && ownedSurface) {
+      const ratio = contrastRatio(ownedSurface.fg, ownedSurface.bg);
+      const ownedRatio = ratio === null ? null : Number(ratio.toFixed(2));
+      const surfaceName = `<${ownedSurface.tag || '?'}>${
+        ownedSurface.part ? `.${String(ownedSurface.part).split(/\s+/)[0]}` : ''
+      }`;
+      // Owned-surface sample verdict (the component-owned focus/text surface).
+      const ownedVerdict =
+        ratio === null
+          ? VERDICT.PARTIALLY
+          : ratio >= 7.0
+            ? VERDICT.SUPPORTS
+            : ratio >= 4.5
+              ? VERDICT.PARTIALLY
+              : VERDICT.DOES_NOT;
+      const ownedEvidence =
+        ratio === null
+          ? `Component-owned focus/text surface ${surfaceName} has a non-transparent own background but contrast could not be computed (fg=${ownedSurface.fg}, bg=${ownedSurface.bg}).`
+          : `Component-owned focus/text surface ${surfaceName}: ${ratio.toFixed(2)}:1 (fg ${ownedSurface.fg}, bg ${ownedSurface.bg}). Host is transparent but this surface is component-owned, so 1.4.6 is measured here, not Not Applicable.`;
+      // Run the broader story-wide sweep too: deeper child text tokens inside a
+      // transparent overlay component (dialog/popover/menu) must still be held
+      // to AAA 7:1. Any axe violation downgrades a passing owned-surface sample
+      // to at least Partially Supports; an already-failing owned sample keeps
+      // its stronger signal.
+      const axeNodeCount = await runEnhancedContrastSweep();
+      let mergedVerdict = ownedVerdict;
+      if (axeNodeCount > 0 && mergedVerdict === VERDICT.SUPPORTS) {
+        mergedVerdict = VERDICT.PARTIALLY;
+      }
+      const mergedEvidence =
+        axeNodeCount === 0
+          ? `${ownedEvidence}; axe color-contrast-enhanced sweep: 0 violations across full story DOM.`
+          : `${ownedEvidence}; axe color-contrast-enhanced sweep: ${axeNodeCount} text node(s) fail AAA 7:1 within the story (see contrastAxe.samples).`;
+      result.contrast = {
+        fg: ownedSurface.fg,
+        bg: ownedSurface.bg,
+        ratio: ownedRatio,
+        verdict: mergedVerdict,
+        evidence: mergedEvidence,
+      };
+    } else if (isTransparentBg) {
+      // Component (host or inner control) is transparent and owns no
+      // non-transparent text surface — foreground inherits the consumer page
+      // background. Per WCAG 2.2 1.4.6, the contrast obligation belongs to the
+      // page that places this text, not to the component shell. This is correct
+      // behaviour for surface-token-driven design systems.
       result.contrast = {
         fg: measurements.color,
         bg: measurements.bgColor,
         ratio: null,
         verdict: VERDICT.NOT_APPLICABLE,
-        evidence: `Component target (${measurements.targetTag}) is transparent (bg=${measurements.bgColor}); foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.`,
+        evidence: `Component target (${measurements.targetTag}) is transparent (bg=${measurements.bgColor}) and owns no non-transparent text surface; foreground contrast inherits the consumer page background. No component-level contrast obligation. Manual: verify that documented surface-token combinations meet 7:1.`,
       };
     } else if (hasNoOwnText) {
       // No text content on the focus-paint surface — this is a 1.4.11
@@ -1333,46 +2171,14 @@ async function runBrowserChecks(componentName, page) {
           ? `Could not compute contrast (fg=${measurements.color}, bg=${measurements.bgColor}).`
           : `${ratio.toFixed(2)}:1 (fg ${measurements.color}, bg ${measurements.bgColor})`;
 
-      // Phase 4 Tier 3 harness extension (3.8.0): the focused-target
-      // sample alone misses AAA contrast failures elsewhere in the
-      // story DOM (caption text, sample composition labels, dim
-      // primitive-tier color-pinned spans). axe-core walks every
-      // text node and applies the WCAG 1.4.6 7:1 floor — run its
-      // `color-contrast-enhanced` rule on the full story and downgrade
-      // the 1.4.6 verdict if any text node fails. This closes the gap
-      // that allowed 6 hx-* components (action-bar, breadcrumb,
-      // button-group, form, overflow-menu, tabs) to ship 473/473
-      // formal-audit-clean while CI's a11y-audit.js fan-out caught
-      // them at AAA-strict.
-      let axeViolations = [];
-      try {
-        const axeResult = await new AxeBuilder({ page })
-          .withRules(['color-contrast-enhanced'])
-          .analyze();
-        axeViolations = (axeResult.violations || []).filter(
-          (v) => v.id === 'color-contrast-enhanced',
-        );
-      } catch (axeErr) {
-        // Non-fatal — the focused-target sample still carries the
-        // primary verdict. Record the axe error in the evidence so
-        // reviewers know the broader sweep was attempted.
-        axeViolations = [];
-        result.contrastAxeError = axeErr instanceof Error ? axeErr.message : String(axeErr);
-      }
-      const axeNodeCount = axeViolations.reduce(
-        (sum, v) => sum + (Array.isArray(v.nodes) ? v.nodes.length : 0),
-        0,
-      );
-      const axeSamples = [];
-      for (const v of axeViolations) {
-        for (const n of (v.nodes || []).slice(0, 5)) {
-          axeSamples.push({
-            target: Array.isArray(n.target) ? n.target.join(' ') : String(n.target ?? ''),
-            failureSummary: n.failureSummary || '',
-            html: typeof n.html === 'string' ? n.html.slice(0, 240) : '',
-          });
-        }
-      }
+      // Broader story-wide sweep (shared with the owned-surface branch): the
+      // focused-target sample alone misses AAA contrast failures elsewhere in
+      // the story DOM (caption text, sample composition labels, dim
+      // primitive-tier color-pinned spans). This closes the gap that allowed 6
+      // hx-* components (action-bar, breadcrumb, button-group, form,
+      // overflow-menu, tabs) to ship 473/473 formal-audit-clean while CI's
+      // a11y-audit.js fan-out caught them at AAA-strict.
+      const axeNodeCount = await runEnhancedContrastSweep();
 
       // Merge: any axe AAA contrast violation downgrades the verdict
       // to at least Partially Supports. If the focused-target sample
@@ -1392,11 +2198,6 @@ async function runBrowserChecks(componentName, page) {
         ratio: targetRatio,
         verdict: mergedVerdict,
         evidence: mergedEvidence,
-      };
-      result.contrastAxe = {
-        rule: 'color-contrast-enhanced',
-        violationCount: axeNodeCount,
-        samples: axeSamples,
       };
     }
 
@@ -1660,6 +2461,29 @@ async function auditComponent(name, browser) {
             evidence: `@aria-pattern="${declaredPattern}" is a non-interactive role; WCAG 2.5.5 Target Size only applies to pointer-input targets. (Phase 4 Tier 3 Task 5.)`,
           };
         }
+
+        // Codex round-5 — REVERSED the round-4 blanket popover-container N/A
+        // for 1.4.6 / 2.4.13 / 2.4.12.
+        //
+        // Round-4 forced `hx-popover` to Not Applicable on these three criteria
+        // on the theory that the popover is a transparent passthrough wrapper
+        // that owns no surface. Inspection of hx-popover.styles.ts proved that
+        // wrong: the `[part="body"]` panel declares its OWN non-transparent
+        // background (`--hx-popover-bg` → `--hx-color-surface-default`), its OWN
+        // text color (`--hx-popover-color` → `--hx-color-text-primary`), and its
+        // OWN `:focus-visible` outline. `_show()` programmatically focuses that
+        // panel whenever the slotted content is focusable (WCAG 2.4.3). The
+        // component therefore owns the focused surface, and a blanket N/A would
+        // let regressions in the panel's own bg/text/ring escape the audit.
+        //
+        // The fix lives upstream in runBrowserChecks: the target resolver pins
+        // `hx-popover` to its own `[part="body"]` panel and the panel is focused
+        // under keyboard modality, so 1.4.6 (panel text vs panel bg), 2.4.13
+        // (panel `:focus-visible` ring ≥3:1), and 2.4.12 (panel obscured-check)
+        // are all MEASURED on the popover's own surface — not on a slotted
+        // consumer control and not waved through as N/A. No override is applied
+        // here; the measured verdicts from runBrowserChecks stand. hx-dialog /
+        // hx-drawer continue to measure their own `[part="close-button"]`.
       }
     } finally {
       await page.close();

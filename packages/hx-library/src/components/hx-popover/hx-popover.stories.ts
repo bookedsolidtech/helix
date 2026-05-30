@@ -146,21 +146,57 @@ export const Default: Story = {
 
 /**
  * Open-state story used by the formal AAA audit harness
- * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The Default story
- * renders the popover closed and the host uses display:contents, which
- * yields a 0×0 host bounding box and defeats focus-appearance, target-
- * size, and focus-not-obscured measurements. This export sets `open` and
- * paints the popover body so the audit measures the visible surface.
+ * (scripts/aaa-formal-audit.mjs STORY_OVERRIDES). The Default story renders
+ * the popover closed and the host uses `display:contents`, yielding a 0×0
+ * host bounding box. This export sets `open` and paints the popover body so
+ * the harness lands on the visible component rather than a 0×0 host.
+ *
+ * MEASURES THE POPOVER'S OWN PANEL (Codex round-5). `hx-popover` does own a
+ * surface: its `[part="body"]` panel declares its own non-transparent
+ * background, its own text color, and its own `:focus-visible` outline in
+ * hx-popover.styles.ts. `_show()` programmatically focuses that panel whenever
+ * the slotted content contains a focusable element (WCAG 2.4.3 focus
+ * management). This fixture therefore slots a focusable control inside the body
+ * so `_show()` moves focus onto `[part="body"]`, and the audit harness pins its
+ * target to `[part="body"]` (see runBrowserChecks). The result is that 1.4.6
+ * Contrast (Enhanced), 2.4.13 Focus Appearance, and 2.4.12 Focus Not Obscured
+ * are MEASURED on the popover's own panel surface — its own bg/text/ring — not
+ * on the slotted consumer control and not waved through as Not Applicable.
+ *
+ * The slotted control exists only to satisfy the `_show()` interactive-content
+ * gate; the harness deliberately does NOT certify it — it retargets to the
+ * panel so panel regressions (a transparent bg, a missing ring, a low-contrast
+ * text token) are caught. Unlike `hx-dialog` / `hx-drawer`, `hx-popover` has no
+ * built-in `[part="close-button"]`, so its OWN measurable surface is the panel
+ * itself.
  */
 export const AAAAuditOpen: Story = {
   render: () => html`
     <div style="padding: 6rem; display: flex; justify-content: center; align-items: center;">
-      <hx-popover open>
+      <hx-popover open label="Patient actions">
         <button slot="anchor">Open Popover</button>
-        <p style="margin: 0;">AAA-audit fixture — open popover surface.</p>
+        <p style="margin: 0;">AAA-audit fixture — open popover panel (its own surface).</p>
+        <button type="button">Panel action</button>
       </hx-popover>
     </div>
   `,
+  // Lock the harness contract: the formal AAA audit retargets to the popover's
+  // own [part="body"] panel and relies on this fixture providing (1) a labeled
+  // panel — the resolved aria-label the audit names — and (2) a focusable
+  // slotted control so _show() moves focus onto the panel. If either regresses
+  // the audit would still run, but on the wrong surface/path; assert both here
+  // so the story fails loudly instead.
+  play: async ({ canvasElement }) => {
+    const popover = canvasElement.querySelector('hx-popover');
+    await expect(popover).toBeTruthy();
+    const panel = popover?.shadowRoot?.querySelector('[part~="body"]');
+    await expect(panel).toBeTruthy();
+    await expect(panel?.getAttribute('aria-label')).toBe('Patient actions');
+    // A focusable slotted control must exist so _show() can move focus onto the
+    // panel (the surface the harness measures for 2.4.13 / 2.4.12).
+    const slottedButton = popover?.querySelector('button[type="button"]');
+    await expect(slottedButton).toBeTruthy();
+  },
 };
 
 // ─────────────────────────────────────────────────
