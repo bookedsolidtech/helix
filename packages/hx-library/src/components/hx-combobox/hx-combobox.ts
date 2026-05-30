@@ -151,6 +151,7 @@ export interface HxComboboxDetail {
  * @cssprop [--hx-color-neutral-500] - Color.
  * @cssprop [--hx-input-height-md] - Height.
  * @cssprop [--hx-size-10] - Size token.
+ * @cssprop [--hx-touch-target-min] - Minimum 44px touch-target floor (WCAG 2.5.5).
  * @cssprop [--hx-font-size-md] - Font size.
  * @cssprop [--hx-color-neutral-800] - Color.
  * @cssprop [--hx-space-3] - Spacing token.

@@ -42,9 +42,15 @@ export const helixIconButtonStyles = css`
 
   /* ─── Size Variants ─── */
 
-  /* WCAG 2.5.5 (healthcare mandate): minimum 44x44px touch target for all sizes.
-     min-width/min-height override the explicit size tokens when they fall below
-     the 2.75rem (44px) threshold, preserving the visual icon size via font-size. */
+  /* WCAG 2.5.5 (Enhanced) AAA: minimum 44x44px touch target for all sizes.
+     The md (default) size resolves through max(): the per-component
+     --hx-icon-button-size hook (falling back to the documented --hx-size-10
+     semantic token) is floored at --hx-touch-target-min (44px), so the control
+     always renders at least 44px while still honoring a consumer's
+     --hx-size-10 / --hx-icon-button-size override above the floor. The
+     min-width/min-height floor (--hx-touch-target-min) is defense-in-depth:
+     it keeps any consumer --hx-icon-button-size override at or above 44px and
+     lifts the sm size's 2rem token up to the threshold. */
 
   .button--sm {
     padding: var(--hx-space-1, 0.25rem);
@@ -57,8 +63,14 @@ export const helixIconButtonStyles = css`
 
   .button--md {
     padding: var(--hx-space-2, 0.5rem);
-    width: var(--hx-icon-button-size, var(--hx-size-10, 2.5rem));
-    height: var(--hx-icon-button-size, var(--hx-size-10, 2.5rem));
+    width: max(
+      var(--hx-icon-button-size, var(--hx-size-10, 2.5rem)),
+      var(--hx-touch-target-min, 2.75rem)
+    );
+    height: max(
+      var(--hx-icon-button-size, var(--hx-size-10, 2.5rem)),
+      var(--hx-touch-target-min, 2.75rem)
+    );
     min-width: var(--hx-touch-target-min, 2.75rem);
     min-height: var(--hx-touch-target-min, 2.75rem);
     font-size: var(--hx-font-size-md, 1rem);

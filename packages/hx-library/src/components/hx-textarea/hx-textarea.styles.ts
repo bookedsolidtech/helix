@@ -100,12 +100,8 @@ export const helixTextareaStyles = css`
 
   .field__textarea-wrapper:focus-within {
     border-color: var(--_textarea-border-color-focus);
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--_textarea-border-color-focus) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+    /* Opaque solid ring (WCAG 2.4.13 >=3:1) — follows the wrapper border-radius */
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) var(--_textarea-border-color-focus);
   }
 
   /* --- Error State --- */
@@ -116,12 +112,7 @@ export const helixTextareaStyles = css`
 
   .field--error .field__textarea-wrapper:focus-within {
     border-color: var(--_textarea-border-color-invalid);
-    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px)
-      color-mix(
-        in srgb,
-        var(--_textarea-border-color-invalid) calc(var(--hx-focus-ring-opacity, 0.25) * 100%),
-        transparent
-      );
+    box-shadow: 0 0 0 var(--hx-focus-ring-width, 2px) var(--_textarea-border-color-invalid);
   }
 
   /* --- Native Textarea --- */
