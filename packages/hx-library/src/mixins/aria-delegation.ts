@@ -59,7 +59,11 @@ const ARIA_ATTRIBUTES = [
   'role',
 ] as const;
 
-/** Union type of all intercepted ARIA attribute names. */
+/**
+ * Union type of all intercepted ARIA attribute names.
+ *
+ * @public
+ */
 export type AriaAttribute = (typeof ARIA_ATTRIBUTES)[number];
 
 // TypeScript mixin constraint: constructors must accept `any[]`.
@@ -70,6 +74,12 @@ type LitElementConstructor = new (...args: any[]) => LitElement;
  * The public interface added to any class by `mixinDelegatesAria`.
  * JS property accessors for all intercepted ARIA attributes, reading from
  * `data-aria-*` storage rather than `aria-*` attributes on the host.
+ *
+ * Consumers building a custom HELiX component on top of `HelixElement` can use
+ * this interface to obtain typed access to the delegated ARIA accessors, e.g.
+ * `(this as unknown as AriaDelegationMixinInterface).ariaExpanded`.
+ *
+ * @public
  */
 
 export interface AriaDelegationMixinInterface {
@@ -141,16 +151,32 @@ export interface AriaDelegationMixinInterface {
  * - The host element no longer has `aria-*` attributes visible in the a11y tree
  * - Components read ARIA values via property accessors and apply them to inner elements
  *
- * @example
+ * @public
+ *
+ * @remarks
+ * This is the canonical "Track-2" extension primitive for consumers authoring a
+ * custom HELiX component from `HelixElement`. Apply it the same way the
+ * first-party components do — `mixinDelegatesAria(HelixElement)` — to get
+ * host-level ARIA delegation while keeping `HelixElement`'s form-participation
+ * and `ElementInternals` infrastructure. The mixin operates on any `LitElement`
+ * subclass and adds no dependency beyond `lit`, so the returned class is safe to
+ * `@customElement`-register and extend further.
+ *
+ * @example Track-2 — a custom HELiX component built on `HelixElement`:
  * ```ts
- * class HxButton extends mixinDelegatesAria(LitElement) {
+ * import { HelixElement, mixinDelegatesAria } from '@helixui/library';
+ * import { html, nothing } from 'lit';
+ * import { customElement } from 'lit/decorators.js';
+ *
+ * \@customElement('tw-thing')
+ * class TwThing extends mixinDelegatesAria(HelixElement) {
  *   render() {
  *     return html`<button aria-label=${this.ariaLabel ?? nothing}></button>`;
  *   }
  * }
  * ```
  *
- * @param Base - A LitElement subclass constructor
+ * @param Base - A LitElement subclass constructor (e.g. `HelixElement`)
  * @returns A new constructor extending Base with ARIA delegation behaviour
  */
 export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T {
