@@ -53,19 +53,21 @@ const PUBLIC_API = {
     types: [],
   },
   './mixins/index.js': {
-    // mixinDelegatesAria is public as of 3.x: it is the canonical Track-2
-    // extension primitive for consumers authoring a custom HELiX component on
+    // mixinDelegatesAria is public as of 3.x: it is the Track-2 extension
+    // primitive for consumers authoring a custom HELiX component on
     // `HelixElement` (`class TwThing extends mixinDelegatesAria(HelixElement) {}`).
     // It depends only on `lit` and adds no internal entanglement, so it is safe
-    // to expose. AriaDelegationMixinInterface/AriaAttribute are the supporting
-    // public types for typed access to the delegated accessors.
+    // to expose. The canonical, SSR-safe authoring entry point is the
+    // side-effect-free `@helixui/library/authoring` subpath (src/authoring.ts);
+    // this root re-export exists for parity with FocusMixin/FormMixin.
+    //
+    // AriaDelegationMixinInterface and AriaAttribute remain @internal: the
+    // mixin's runtime accessor names (from ariaAttrToProp) do not match the
+    // interface for hyphen-free ARIA attributes, so exposing the interface would
+    // promise property names absent at runtime. See the TODO in
+    // src/mixins/aria-delegation.ts.
     values: ['FocusMixin', 'FormMixin', 'mixinDelegatesAria'],
-    types: [
-      'FocusMixinInterface',
-      'FormMixinInterface',
-      'AriaDelegationMixinInterface',
-      'AriaAttribute',
-    ],
+    types: ['FocusMixinInterface', 'FormMixinInterface'],
   },
   './controllers/helix-audit-controller.js': {
     // HelixAuditController is the public HIPAA audit-trail controller.

@@ -12,6 +12,10 @@ function discoverEntryPoints() {
   const componentsDir = resolve(__dirname, 'src/components');
   const entries: Record<string, string> = {
     index: resolve(__dirname, 'src/index.ts'),
+    // Side-effect-free Track-2 authoring surface (@helixui/library/authoring).
+    // Kept as its own entry so SSR/Node consumers can import HelixElement and
+    // the authoring mixins without pulling in component registration.
+    authoring: resolve(__dirname, 'src/authoring.ts'),
   };
 
   if (!existsSync(componentsDir)) return entries;
