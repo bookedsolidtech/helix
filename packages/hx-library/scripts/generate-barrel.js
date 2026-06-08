@@ -34,9 +34,9 @@ const outputFile = join(rootDir, 'src', 'index.ts');
 // Every top-level symbol re-exported from the barrel must be listed here.
 // Adding a new public symbol: append to the relevant module group.
 // Removing a public symbol: delete it here; the generator will omit it.
-// Keep internal helpers (id-counter reset, aria delegation mixin,
-// style-registry utilities, etc.) OUT of this list. Consumers that
-// need them must use a deep import path — that contract is intentional.
+// Keep internal helpers (id-counter reset, style-registry utilities, etc.)
+// OUT of this list. Consumers that need them must use a deep import path —
+// that contract is intentional.
 /** @type {Record<string, { values: string[]; types: string[] }>} */
 const PUBLIC_API = {
   './utilities/document-token-adoption.js': {
@@ -53,10 +53,19 @@ const PUBLIC_API = {
     types: [],
   },
   './mixins/index.js': {
-    // mixinDelegatesAria, AriaDelegationMixinInterface, AriaAttribute are
-    // internal implementation details consumed only by first-party components.
-    values: ['FocusMixin', 'FormMixin'],
-    types: ['FocusMixinInterface', 'FormMixinInterface'],
+    // mixinDelegatesAria is public as of 3.x: it is the canonical Track-2
+    // extension primitive for consumers authoring a custom HELiX component on
+    // `HelixElement` (`class TwThing extends mixinDelegatesAria(HelixElement) {}`).
+    // It depends only on `lit` and adds no internal entanglement, so it is safe
+    // to expose. AriaDelegationMixinInterface/AriaAttribute are the supporting
+    // public types for typed access to the delegated accessors.
+    values: ['FocusMixin', 'FormMixin', 'mixinDelegatesAria'],
+    types: [
+      'FocusMixinInterface',
+      'FormMixinInterface',
+      'AriaDelegationMixinInterface',
+      'AriaAttribute',
+    ],
   },
   './controllers/helix-audit-controller.js': {
     // HelixAuditController is the public HIPAA audit-trail controller.
@@ -247,8 +256,8 @@ const output = `/**
  * Run \`npm run generate:barrel\` to regenerate.
  *
  * Public-API surface is gated by an allowlist in scripts/generate-barrel.js.
- * Internals (resetIdCounter, mixinDelegatesAria, etc.)
- * are intentionally excluded and must be imported via deep paths if needed.
+ * Internals (resetIdCounter, etc.) are intentionally excluded and must be
+ * imported via deep paths if needed.
  */
 
 // ─── Document-level token adoption ──────────────────────────────────────────
