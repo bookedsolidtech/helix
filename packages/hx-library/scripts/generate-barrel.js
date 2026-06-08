@@ -61,13 +61,18 @@ const PUBLIC_API = {
     // side-effect-free `@helixui/library/authoring` subpath (src/authoring.ts);
     // this root re-export exists for parity with FocusMixin/FormMixin.
     //
-    // AriaDelegationMixinInterface and AriaAttribute remain @internal: the
-    // mixin's runtime accessor names (from ariaAttrToProp) do not match the
-    // interface for hyphen-free ARIA attributes, so exposing the interface would
-    // promise property names absent at runtime. See the TODO in
-    // src/mixins/aria-delegation.ts.
+    // AriaDelegationMixinInterface + AriaAttribute are public: the mixin's
+    // generated accessors use the canonical ARIAMixin IDL property names
+    // (sourced from ARIA_ATTR_TO_IDL_PROP in src/mixins/aria-delegation.ts and
+    // locked to the interface by a compile-time drift guard), so the interface
+    // now matches the runtime exactly.
     values: ['FocusMixin', 'FormMixin', 'mixinDelegatesAria'],
-    types: ['FocusMixinInterface', 'FormMixinInterface'],
+    types: [
+      'FocusMixinInterface',
+      'FormMixinInterface',
+      'AriaDelegationMixinInterface',
+      'AriaAttribute',
+    ],
   },
   './controllers/helix-audit-controller.js': {
     // HelixAuditController is the public HIPAA audit-trail controller.
