@@ -15,12 +15,13 @@
  * surfaces a consumer actually imports from**:
  *  - Track-1 imports the concrete component `HelixButton` from the package root
  *    (`../index.js`) — components live on the root.
- *  - Track-2 imports `HelixElement` + `mixinDelegatesAria` from the canonical,
- *    SSR-safe authoring subpath (`../authoring.js` → `@helixui/library/authoring`).
+ *  - Track-2 imports `HelixElement`, `mixinDelegatesAria`, and the public
+ *    `AriaDelegationMixinInterface` from the canonical, SSR-safe authoring
+ *    subpath (`../authoring.js` → `@helixui/library/authoring`).
  *
  * It deliberately imports from those public barrels — not deep module paths —
- * so it regresses if `HelixButton`, `HelixElement`, or `mixinDelegatesAria`
- * ever drops out of the public API.
+ * so it regresses if `HelixButton`, `HelixElement`, `mixinDelegatesAria`, or
+ * `AriaDelegationMixinInterface` ever drops out of the public API.
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { html, nothing } from 'lit';
@@ -33,7 +34,11 @@ import { fixture, shadowQuery, oneEvent, cleanup } from '../test-utils.js';
 import { HelixButton } from '../index.js';
 
 // Track-2 surface: the canonical, side-effect-free authoring entry point.
-import { HelixElement, mixinDelegatesAria } from '../authoring.js';
+import {
+  HelixElement,
+  mixinDelegatesAria,
+  type AriaDelegationMixinInterface,
+} from '../authoring.js';
 
 // ─── Track-1 — extend a concrete HELiX component ─────────────────────────────
 
@@ -148,6 +153,25 @@ describe('HelixElement consumer extensibility', () => {
       // The `ariaLabel` accessor (correctly typed by Lit/native typings) reads
       // the delegated value — this is the access pattern consumers use.
       expect(el.ariaLabel).toBe('Patient name');
+    });
+
+    it('exposes canonical IDL accessors via the public AriaDelegationMixinInterface', async () => {
+      const el = await fixture<DemoEl>('<demo-el>Field</demo-el>');
+      // The public interface (re-exported from @helixui/library/authoring) is
+      // typed with the canonical ARIAMixin IDL names and matches the runtime
+      // accessor names exactly — including hyphen-free attributes whose casing
+      // cannot be derived algorithmically.
+      const aria = el as unknown as AriaDelegationMixinInterface;
+      aria.ariaColCount = '12';
+      aria.ariaDescribedBy = 'desc-1';
+      await el.updateComplete;
+
+      expect(el.getAttribute('data-aria-colcount')).toBe('12');
+      expect(el.getAttribute('data-aria-describedby')).toBe('desc-1');
+      expect(aria.ariaColCount).toBe('12');
+      expect(aria.ariaDescribedBy).toBe('desc-1');
+      // The wrong-cased names must never appear on the element.
+      expect('ariaColcount' in el).toBe(false);
     });
 
     it('forwards the delegated ARIA value to the inner control on render', async () => {
