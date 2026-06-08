@@ -16,6 +16,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./authoring": {
+      "types": "./dist/authoring.d.ts",
+      "import": "./dist/authoring.js"
+    },
     "./components/*": {
       "types": "./dist/components/*/index.d.ts",
       "import": "./dist/components/*/index.js"
@@ -42,6 +46,10 @@
     "dist/index.js.map",
     "dist/index.d.ts",
     "dist/index.d.ts.map",
+    "dist/authoring.js",
+    "dist/authoring.js.map",
+    "dist/authoring.d.ts",
+    "dist/authoring.d.ts.map",
     "dist/form-test-utils.d.ts",
     "dist/form-test-utils.d.ts.map",
     "dist/base/**",
