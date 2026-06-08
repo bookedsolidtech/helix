@@ -33,6 +33,7 @@ export { HelixElement } from './base/helix-element.js';
 // Authoring mixins — import only `lit` / `lit/decorators.js` / the base class.
 // None of these register a custom element.
 export { mixinDelegatesAria } from './mixins/aria-delegation.js';
+export type { AriaDelegationMixinInterface, AriaAttribute } from './mixins/aria-delegation.js';
 export { FocusMixin } from './mixins/FocusMixin.js';
 export type { FocusMixinInterface } from './mixins/FocusMixin.js';
 export { FormMixin } from './mixins/FormMixin.js';

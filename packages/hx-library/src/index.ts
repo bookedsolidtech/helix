@@ -25,7 +25,7 @@ export { HelixElement, createIdCounter } from './base/index.js';
 
 // ─── Mixins ───────────────────────────────────────────────────────────────────
 export { FocusMixin, FormMixin, mixinDelegatesAria } from './mixins/index.js';
-export type { FocusMixinInterface, FormMixinInterface } from './mixins/index.js';
+export type { FocusMixinInterface, FormMixinInterface, AriaDelegationMixinInterface, AriaAttribute } from './mixins/index.js';
 
 // ─── HIPAA audit-trail controller ───────────────────────────────────────────
 export { HelixAuditController } from './controllers/helix-audit-controller.js';
