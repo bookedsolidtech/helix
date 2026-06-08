@@ -11,26 +11,29 @@
  *   brand-new custom HELiX component:
  *     `class DemoEl extends mixinDelegatesAria(HelixElement) {}`
  *
- * This suite proves both patterns work end-to-end **using only the public
- * `@helixui/library` root export surface** (`../index.js`). It deliberately
- * imports from the package barrel — not deep module paths — so it regresses if
- * `mixinDelegatesAria`, `HelixElement`, `HelixButton`, or
- * `AriaDelegationMixinInterface` ever drops out of the public API.
+ * This suite proves both patterns work end-to-end **using the public export
+ * surfaces a consumer actually imports from**:
+ *  - Track-1 imports the concrete component `HelixButton` from the package root
+ *    (`../index.js`) — components live on the root.
+ *  - Track-2 imports `HelixElement` + `mixinDelegatesAria` from the canonical,
+ *    SSR-safe authoring subpath (`../authoring.js` → `@helixui/library/authoring`).
+ *
+ * It deliberately imports from those public barrels — not deep module paths —
+ * so it regresses if `HelixButton`, `HelixElement`, or `mixinDelegatesAria`
+ * ever drops out of the public API.
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { fixture, shadowQuery, oneEvent, cleanup } from '../test-utils.js';
 
-// Public root export surface — the exact entry point a consumer imports from.
-// Importing the root barrel also runs each component module's
-// `@customElement` side effect, so `hx-button` (and the rest) are registered.
-import {
-  HelixElement,
-  HelixButton,
-  mixinDelegatesAria,
-  type AriaDelegationMixinInterface,
-} from '../index.js';
+// Track-1 surface: the concrete component is exported from the package root.
+// Importing the root barrel also runs each component module's `@customElement`
+// side effect, so `hx-button` (and the rest) are registered.
+import { HelixButton } from '../index.js';
+
+// Track-2 surface: the canonical, side-effect-free authoring entry point.
+import { HelixElement, mixinDelegatesAria } from '../authoring.js';
 
 // ─── Track-1 — extend a concrete HELiX component ─────────────────────────────
 
@@ -47,9 +50,10 @@ class DemoButton extends HelixButton {}
 
 /**
  * The proven Track-2 pattern: a consumer authors a brand-new custom HELiX
- * component from `HelixElement` and the publicly-exported `mixinDelegatesAria`.
- * This must yield both working host-ARIA delegation (from the mixin) and form
- * participation (from `HelixElement` + `ElementInternals`).
+ * component from `HelixElement` and the publicly-exported `mixinDelegatesAria`
+ * (imported from `@helixui/library/authoring`). This must yield both working
+ * host-ARIA delegation (from the mixin) and form participation (from
+ * `HelixElement` + `ElementInternals`).
  */
 @customElement('demo-el')
 class DemoEl extends mixinDelegatesAria(HelixElement) {
@@ -141,8 +145,9 @@ describe('HelixElement consumer extensibility', () => {
       // double-announcement.
       expect(el.hasAttribute('aria-label')).toBe(false);
       expect(el.getAttribute('data-aria-label')).toBe('Patient name');
-      // Typed accessor from the public interface reads the delegated value.
-      expect((el as unknown as AriaDelegationMixinInterface).ariaLabel).toBe('Patient name');
+      // The `ariaLabel` accessor (correctly typed by Lit/native typings) reads
+      // the delegated value — this is the access pattern consumers use.
+      expect(el.ariaLabel).toBe('Patient name');
     });
 
     it('forwards the delegated ARIA value to the inner control on render', async () => {
