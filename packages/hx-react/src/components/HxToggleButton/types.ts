@@ -16,7 +16,7 @@ export interface HxToggleButtonProps {
 Reflected as an attribute so CSS selectors like `:host([pressed])` work. */
   pressed?: boolean;
   /** Visual style variant of the button. */
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'outline';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'outline' | 'danger';
   /** Size of the button. */
   size?: 'sm' | 'md' | 'lg';
   /** Whether the button is disabled. Prevents all interaction and form actions. */

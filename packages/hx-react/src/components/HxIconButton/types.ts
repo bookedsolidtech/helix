@@ -17,7 +17,7 @@ export interface HxIconButtonProps {
 and a console warning is emitted to alert developers during authoring. */
   label?: string;
   /** Visual style variant of the button. */
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline';
   /** Size of the button. */
   size?: 'sm' | 'md' | 'lg';
   /** The type attribute for the underlying button element.

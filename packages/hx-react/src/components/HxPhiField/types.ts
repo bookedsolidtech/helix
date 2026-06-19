@@ -32,8 +32,33 @@ Set to 0 to disable auto-hide. Defaults to 60 seconds. */
   autoHideDelay?: number;
   /** When set, disables all interaction with the field and prevents reveal. */
   disabled?: boolean;
+  /** Opt-in fail-closed DETECTOR for PHI exposed via the `data` HTML attribute
+(FS-029). Defaults to `false`, which preserves the existing best-effort
+silent-rescue behavior and is fully backward compatible.
+
+**This is a detector, not a cure.** By the time `connectedCallback` runs,
+a server-rendered page has already serialized the raw PHI into the HTML
+sent over the wire — the leak happened server-side and cannot be undone
+client-side. Stripping the attribute here only cleans up the *live* DOM.
+
+When `strict` is `true` and a `data` attribute is detected, the component
+still strips the attribute first (so PHI leaves the live DOM), then fails
+LOUDLY instead of silently: it dispatches an `hx-phi-access` event with
+`action: 'attribute-exposure-refused'` for the audit trail, and — in
+development/test/CI builds (`import.meta.env.DEV`) — logs a `console.error`
+so the SSR misconfiguration surfaces during testing rather than shipping
+unnoticed. It does NOT throw: an exception from `connectedCallback` is
+reported as an uncaught browser error and aborts the callback, which would
+destabilise a live field. Production builds emit nothing to the console (the
+`import.meta.env.DEV` branch is tree-shaken away), so an opted-in app still
+degrades to the audit-event signal rather than logging for end users.
+
+Its value is surfacing the defect (an upstream SSR `data` attribute) before
+it reaches production — not preventing the server-side serialization, which
+already occurred. */
+  strict?: boolean;
 
   // Event callbacks
-  /** Fired on reveal, hide, auto-hide, clipboard-clear, and clipboard-clear-failed actions. Contains audit metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow boundaries for application-level audit listeners. */
+  /** Fired on reveal, hide, auto-hide, clipboard-clear, clipboard-clear-failed, and attribute-exposure-refused actions. Contains audit metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow boundaries for application-level audit listeners. */
   onHxPhiAccess?: (event: Event) => void;
 }

@@ -17,4 +17,19 @@ export interface HxProseProps {
   /** Maximum content width. When set, overrides the --hx-prose-max-width token.
 Accepts any valid CSS width value (e.g., '640px', '80ch', '100%'). */
   maxWidth?: string;
+  /** Opt-in HTML sanitization of slotted content. Default `false` to preserve the
+historical non-breaking behavior of trusting upstream-sanitized CMS markup.
+
+When `true`, every top-level slotted element's `outerHTML` is run through the
+configured `sanitizer` (or the conservative built-in allowlist when none is set)
+on connect and whenever the light-DOM subtree mutates, and unsafe content is
+replaced in place. */
+  sanitize?: boolean;
+  /** Optional custom sanitizer. When provided AND `sanitize` is `true`, this function
+fully owns the sanitization policy and the built-in allowlist is bypassed. Wire in
+a hardened library here (e.g. `(html) => DOMPurify.sanitize(html)`).
+
+`attribute: false` because a function cannot be expressed as an HTML attribute;
+it must be assigned via property (`el.sanitizer = fn`). */
+  sanitizer?: string | undefined;
 }
