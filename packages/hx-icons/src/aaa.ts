@@ -60,10 +60,13 @@ export interface IconLibraryAaaVerdict {
 }
 
 /**
- * Hardcoded verdicts for the libraries shipped by `@helixui/icons`. Both
- * built-ins are `paintMode: 'fill'` solid silhouettes painted with
- * `fill="currentColor"`, which is the easiest paint strategy to clear all
- * three dimensions cleanly.
+ * Hardcoded verdicts for the libraries shipped by `@helixui/icons`. The fill
+ * built-ins (`helix`, `fa-free`) are `paintMode: 'fill'` solid silhouettes
+ * painted with `fill="currentColor"` — the easiest paint strategy to clear all
+ * three dimensions cleanly. The stroke built-ins (`feather`, `lucide`) are
+ * `paintMode: 'stroke'`; their contrast/optical-sizing verdicts depend on the
+ * render size and `--hx-icon-stroke-width` and are left `'unknown'` until a
+ * formal audit measures them (see below).
  *
  * Source of truth for these verdicts:
  *   - Phase 4 formal audit (`pnpm aaa:audit --component hx-icon`)
@@ -82,6 +85,23 @@ const BUILTIN_VERDICTS: Record<string, IconLibraryAaaVerdict> = {
     contrast: 'pass',
     forcedColors: 'pass',
     opticalSizing: 'pass',
+  },
+  // Stroke-paint libraries. `forcedColors` is structurally 'pass' — every glyph
+  // paints with `currentColor` (→ CanvasText under forced-colors) and hardcodes
+  // no color. `contrast` and `opticalSizing` are 'unknown' pending a formal
+  // `pnpm aaa:audit` pass: at the default 2px stroke / 24px render size they are
+  // expected to clear 3:1, but a thin `--hx-icon-stroke-width` override or a
+  // sub-minimum render size can drop a stroke glyph below non-text contrast, so
+  // we do not claim a measured 'pass' here.
+  feather: {
+    contrast: 'unknown',
+    forcedColors: 'pass',
+    opticalSizing: 'unknown',
+  },
+  lucide: {
+    contrast: 'unknown',
+    forcedColors: 'pass',
+    opticalSizing: 'unknown',
   },
 };
 

@@ -1,6 +1,6 @@
 /**
- * Tree-shake export generator for the bundled `helix` and `fa-free`
- * libraries.
+ * Tree-shake export generator for the bundled `helix`, `fa-free`, `feather`,
+ * and `lucide` libraries.
  *
  * Emits one ES module per icon (with companion `.d.ts`) containing a
  * single named export holding the inlined, sanitized SVG markup.
@@ -13,6 +13,8 @@
  *   dist/tree-shake/helix/index.js + .d.ts
  *   dist/tree-shake/fa-free/solid/<name>.js + .d.ts
  *   dist/tree-shake/fa-free/solid/index.js + .d.ts
+ *   dist/tree-shake/feather/<name>.js + .d.ts (+ index)
+ *   dist/tree-shake/lucide/<name>.js + .d.ts (+ index)
  *
  * We emit `.js`+`.d.ts` directly rather than `.ts` so the generator
  * isn't dependent on `tsc` running afterwards over `dist/` — `tsc`
@@ -36,11 +38,16 @@ import { fileURLToPath } from 'node:url';
 
 import { parseHTML } from 'linkedom';
 
+import { assignIdentifiers } from './tree-shake-identifiers.js';
+import { sanitizeTree } from './svg-sanitize.js';
+
 const here = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(here, '..');
 const distDir = resolve(packageRoot, 'dist');
 const helixSrcDir = resolve(packageRoot, 'src/libraries/helix-glyphs');
 const faSrcDir = resolve(packageRoot, 'node_modules/@fortawesome/fontawesome-free/svgs/solid');
+const featherSrcDir = resolve(packageRoot, 'node_modules/feather-icons/dist/icons');
+const lucideSrcDir = resolve(packageRoot, 'node_modules/lucide-static/icons');
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -52,39 +59,10 @@ interface Glyph {
 }
 
 /**
- * Convert kebab-case to a JS-safe camelCase identifier. Names that
- * start with a digit are prefixed with `_` so they remain valid
- * identifiers. FA Free has files like `0.svg` and `360-degrees.svg`
- * that hit this case.
- */
-function toIdentifier(kebab: string): string {
-  const camel = kebab.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
-  return /^[0-9]/.test(camel) ? `_${camel}` : camel;
-}
-
-function sanitizeAttrs(el: Element): void {
-  const removeIfPresent = ['id', 'class', 'style', 'fill', 'stroke'];
-  for (const attr of removeIfPresent) {
-    el.removeAttribute(attr);
-  }
-  const attrNames = el.getAttributeNames();
-  for (const name of attrNames) {
-    if (name.startsWith('aria-')) el.removeAttribute(name);
-  }
-}
-
-function sanitizeTree(root: Element): void {
-  sanitizeAttrs(root);
-  for (const child of Array.from(root.children)) {
-    sanitizeTree(child as Element);
-  }
-}
-
-/**
  * Read + sanitize one source SVG file into the inlined string we will
  * embed in the generated TS module. Returns `null` on parse failure.
  */
-function loadGlyph(filePath: string, id: string): Glyph | null {
+function loadGlyph(filePath: string, id: string, paintMode: 'fill' | 'stroke'): Glyph | null {
   let raw: string;
   try {
     raw = readFileSync(filePath, 'utf8');
@@ -118,9 +96,23 @@ function loadGlyph(filePath: string, id: string): Glyph | null {
     return null;
   }
 
-  // Re-emit a clean, minimal <svg>. xmlns is explicit so this string
-  // can be assigned to innerHTML in any host without namespace fixup.
-  const svgText = `<svg xmlns="${SVG_NS}" viewBox="${viewBox}">${inner}</svg>`;
+  // Re-emit a clean, minimal <svg>. xmlns is explicit so this string can be
+  // assigned to innerHTML in any host without namespace fixup. Stroke libraries
+  // keep their rendering semantics on the ROOT <svg> (fill:none, stroke:
+  // currentColor, the library's own caps/joins) — which we dropped above — so
+  // re-apply them on the emitted wrapper; otherwise the standalone string renders
+  // blank. Caps/joins are read from the source rather than hard-coded, so each
+  // library keeps its own line style.
+  let strokeAttrs = '';
+  if (paintMode === 'stroke') {
+    const cap = svg.getAttribute('stroke-linecap');
+    const join = svg.getAttribute('stroke-linejoin');
+    strokeAttrs =
+      ' fill="none" stroke="currentColor" stroke-width="2"' +
+      (cap ? ` stroke-linecap="${cap}"` : '') +
+      (join ? ` stroke-linejoin="${join}"` : '');
+  }
+  const svgText = `<svg xmlns="${SVG_NS}" viewBox="${viewBox}"${strokeAttrs}>${inner}</svg>`;
   return { id, svg: svgText };
 }
 
@@ -138,12 +130,19 @@ function escapeTemplate(s: string): string {
  *   <outDir>/<glyph.id>.ts          — single named export per glyph
  *   <outDir>/index.ts               — re-exports for the whole group
  */
-function emitGroup(label: string, srcDir: string, outDir: string): number {
+function emitGroup(
+  label: string,
+  srcDir: string,
+  outDir: string,
+  paintMode: 'fill' | 'stroke' = 'fill',
+): number {
   let entries: string[];
   try {
     entries = readdirSync(srcDir).filter((f) => f.endsWith('.svg'));
   } catch (err) {
-    throw new Error(`[tree-shake] cannot read ${srcDir}: ${(err as Error).message}`);
+    throw new Error(`[tree-shake] cannot read ${srcDir}: ${(err as Error).message}`, {
+      cause: err,
+    });
   }
 
   mkdirSync(outDir, { recursive: true });
@@ -151,13 +150,18 @@ function emitGroup(label: string, srcDir: string, outDir: string): number {
   const glyphs: Glyph[] = [];
   for (const entry of entries) {
     const id = entry.replace(/\.svg$/, '');
-    const glyph = loadGlyph(join(srcDir, entry), id);
+    const glyph = loadGlyph(join(srcDir, entry), id, paintMode);
     if (glyph) glyphs.push(glyph);
   }
   glyphs.sort((a, b) => a.id.localeCompare(b.id));
 
+  // Assign a unique export identifier per glyph (camelCase for non-colliding
+  // ids; injective underscore fallback for collisions). See assignIdentifiers.
+  const idents = assignIdentifiers(glyphs.map((g) => g.id));
+  const identFor = (id: string): string => idents.get(id) as string;
+
   for (const glyph of glyphs) {
-    const ident = toIdentifier(glyph.id);
+    const ident = identFor(glyph.id);
     const js = `/** Inlined SVG for the \`${glyph.id}\` icon. Generated; do not edit. */\nexport const ${ident} = \`${escapeTemplate(glyph.svg)}\`;\n`;
     const dts = `/** Inlined SVG for the \`${glyph.id}\` icon. Generated; do not edit. */\nexport declare const ${ident}: string;\n`;
     writeFileSync(join(outDir, `${glyph.id}.js`), js, 'utf8');
@@ -166,11 +170,11 @@ function emitGroup(label: string, srcDir: string, outDir: string): number {
 
   const indexJs =
     `/** Re-exports every icon in the ${label} library. Generated; do not edit. */\n` +
-    glyphs.map((g) => `export { ${toIdentifier(g.id)} } from './${g.id}.js';`).join('\n') +
+    glyphs.map((g) => `export { ${identFor(g.id)} } from './${g.id}.js';`).join('\n') +
     '\n';
   const indexDts =
     `/** Re-exports every icon in the ${label} library. Generated; do not edit. */\n` +
-    glyphs.map((g) => `export { ${toIdentifier(g.id)} } from './${g.id}.js';`).join('\n') +
+    glyphs.map((g) => `export { ${identFor(g.id)} } from './${g.id}.js';`).join('\n') +
     '\n';
   writeFileSync(join(outDir, 'index.js'), indexJs, 'utf8');
   writeFileSync(join(outDir, 'index.d.ts'), indexDts, 'utf8');
@@ -183,5 +187,20 @@ mkdirSync(distDir, { recursive: true });
 
 const helixCount = emitGroup('helix', helixSrcDir, resolve(distDir, 'tree-shake/helix'));
 const faCount = emitGroup('fa-free/solid', faSrcDir, resolve(distDir, 'tree-shake/fa-free/solid'));
+const featherCount = emitGroup(
+  'feather',
+  featherSrcDir,
+  resolve(distDir, 'tree-shake/feather'),
+  'stroke',
+);
+const lucideCount = emitGroup(
+  'lucide',
+  lucideSrcDir,
+  resolve(distDir, 'tree-shake/lucide'),
+  'stroke',
+);
 
-console.log(`[tree-shake] done. helix=${helixCount}, fa-free/solid=${faCount}`);
+console.log(
+  `[tree-shake] done. helix=${helixCount}, fa-free/solid=${faCount}, ` +
+    `feather=${featherCount}, lucide=${lucideCount}`,
+);

@@ -20,6 +20,24 @@ describe('iconLibraryAaaVerdict', () => {
     });
   });
 
+  it('returns the canonical verdict for the feather library', () => {
+    const v = iconLibraryAaaVerdict('feather');
+    expect(v).toEqual({
+      contrast: 'unknown',
+      forcedColors: 'pass',
+      opticalSizing: 'unknown',
+    });
+  });
+
+  it('returns the canonical verdict for the lucide library', () => {
+    const v = iconLibraryAaaVerdict('lucide');
+    expect(v).toEqual({
+      contrast: 'unknown',
+      forcedColors: 'pass',
+      opticalSizing: 'unknown',
+    });
+  });
+
   it('returns undefined for unknown libraries (no evidence on file)', () => {
     expect(iconLibraryAaaVerdict('not-a-real-library')).toBeUndefined();
     expect(iconLibraryAaaVerdict('')).toBeUndefined();
@@ -31,7 +49,10 @@ describe('iconLibraryAaaVerdict', () => {
     // if the verdicts diverge.
     const helix = iconLibraryAaaVerdict('helix');
     const faFree = iconLibraryAaaVerdict('fa-free');
+    const feather = iconLibraryAaaVerdict('feather');
+    const lucide = iconLibraryAaaVerdict('lucide');
     expect(helix).not.toBe(faFree);
+    expect(feather).not.toBe(lucide);
   });
 
   it('verdict states are typed to the canonical three-state union', () => {
