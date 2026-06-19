@@ -44,6 +44,17 @@ export interface FocusMixinInterface {
  * }
  * ```
  *
+ * ### Collision safety
+ *
+ * All of the mixin's internal state and event handlers are declared as
+ * ECMAScript `#private` fields. `#private` names are lexically scoped to this
+ * class body, so they cannot clash with a same-named member on a subclass — a
+ * component is free to define its own `_handleKeyDown`/`_handlePointerDown`
+ * (e.g. for arrow-key stepping) without the mixin shadowing it or vice-versa.
+ * The only shared members are the deliberate extension points: `_focusableNode`
+ * (protected, overridable) and the `focused` / `focusedVisible` reflected
+ * properties.
+ *
  * @param superClass - A Lit element constructor to mix into
  * @returns A new class with focus management capabilities
  *
@@ -71,7 +82,7 @@ export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => 
     focusedVisible = false;
 
     /** @internal — whether a `focus()` call was queued before first render */
-    private _focusPending = false;
+    #focusPending = false;
 
     /**
      * @internal — tracks whether the most recent interaction toward this
@@ -80,7 +91,7 @@ export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => 
      * Set to false on `pointerdown` so that the subsequent `focusin` can
      * determine it is not keyboard-initiated.
      */
-    private _lastInteractionWasPointer = false;
+    #lastInteractionWasPointer = false;
 
     /**
      * Returns the inner focusable element that `focus()` and `blur()` will
@@ -103,7 +114,7 @@ export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => 
       if (node !== null) {
         node.focus(options);
       } else {
-        this._focusPending = true;
+        this.#focusPending = true;
       }
     }
 
@@ -114,18 +125,18 @@ export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => 
 
     override connectedCallback(): void {
       super.connectedCallback();
-      this.addEventListener('focusin', this._handleFocusIn);
-      this.addEventListener('focusout', this._handleFocusOut);
-      this.addEventListener('pointerdown', this._handlePointerDown);
-      this.addEventListener('keydown', this._handleKeyDown);
+      this.addEventListener('focusin', this.#handleFocusIn);
+      this.addEventListener('focusout', this.#handleFocusOut);
+      this.addEventListener('pointerdown', this.#handlePointerDown);
+      this.addEventListener('keydown', this.#handleKeyDown);
     }
 
     override disconnectedCallback(): void {
       super.disconnectedCallback();
-      this.removeEventListener('focusin', this._handleFocusIn);
-      this.removeEventListener('focusout', this._handleFocusOut);
-      this.removeEventListener('pointerdown', this._handlePointerDown);
-      this.removeEventListener('keydown', this._handleKeyDown);
+      this.removeEventListener('focusin', this.#handleFocusIn);
+      this.removeEventListener('focusout', this.#handleFocusOut);
+      this.removeEventListener('pointerdown', this.#handlePointerDown);
+      this.removeEventListener('keydown', this.#handleKeyDown);
     }
 
     override firstUpdated(changedProperties: PropertyValues): void {
@@ -137,8 +148,8 @@ export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => 
       }
 
       // Flush any focus() call that arrived before the shadow DOM was stamped
-      if (this._focusPending) {
-        this._focusPending = false;
+      if (this.#focusPending) {
+        this.#focusPending = false;
         this.focus();
       }
     }
@@ -146,26 +157,26 @@ export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => 
     // ─── Private Event Handlers ────────────────────────────────────────────────
 
     /** @internal */
-    private _handleFocusIn = (): void => {
+    #handleFocusIn = (): void => {
       this.focused = true;
       // focusedVisible is true only when focus arrived via keyboard
-      this.focusedVisible = !this._lastInteractionWasPointer;
+      this.focusedVisible = !this.#lastInteractionWasPointer;
     };
 
     /** @internal */
-    private _handleFocusOut = (): void => {
+    #handleFocusOut = (): void => {
       this.focused = false;
       this.focusedVisible = false;
       // Reset for the next interaction cycle
-      this._lastInteractionWasPointer = false;
+      this.#lastInteractionWasPointer = false;
     };
 
     /**
      * Marks the next focusin as pointer-initiated.
      * @internal
      */
-    private _handlePointerDown = (): void => {
-      this._lastInteractionWasPointer = true;
+    #handlePointerDown = (): void => {
+      this.#lastInteractionWasPointer = true;
     };
 
     /**
@@ -174,11 +185,11 @@ export const FocusMixin = <T extends Constructor<LitElement>>(superClass: T) => 
      * fired on this element.
      *
      * This fires BEFORE `focusin` so the flag is in the correct state when
-     * `_handleFocusIn` runs.
+     * `#handleFocusIn` runs.
      * @internal
      */
-    private _handleKeyDown = (): void => {
-      this._lastInteractionWasPointer = false;
+    #handleKeyDown = (): void => {
+      this.#lastInteractionWasPointer = false;
     };
   }
 

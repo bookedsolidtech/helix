@@ -432,6 +432,91 @@ describe('hx-phi-field', () => {
     });
   });
 
+  // ─── Clipboard Auto-Clear Timer Reset ───
+
+  describe('Clipboard Auto-Clear Timer Reset', () => {
+    /**
+     * Matches both `clipboard-clear` (writeText resolved) and
+     * `clipboard-clear-failed` (writeText rejected / API unavailable). Either way
+     * the auto-clear FIRED — the timing assertion is independent of whether the
+     * browser honored navigator.clipboard.writeText under the current activation.
+     */
+    const isClipboardClearAudit = (e: CustomEvent<PhiAccessEventDetail>): boolean =>
+      e.detail.action === 'clipboard-clear' || e.detail.action === 'clipboard-clear-failed';
+
+    it('resets the clipboard-clear timer on a new copy so the full window applies to the latest copy', async () => {
+      // Regression guard: a copy late in a prior reveal's clear window must
+      // restart the timer (cancel + reschedule). Otherwise PHI placed on the
+      // clipboard by the latest copy would be cleared early, inheriting only the
+      // remaining time from the original reveal rather than the full timeout.
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixPhiField>(
+          '<hx-phi-field field-type="ssn" field-id="copy-reset" clipboard-timeout="1000"></hx-phi-field>',
+        );
+        el.data = '123-45-6789';
+        await el.updateComplete;
+
+        // Reveal — schedules the clipboard-clear timer (1000ms window).
+        const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+        toggle?.click();
+        await el.updateComplete;
+
+        const events: CustomEvent<PhiAccessEventDetail>[] = [];
+        el.addEventListener('hx-phi-access', (e) => {
+          events.push(e as CustomEvent<PhiAccessEventDetail>);
+        });
+
+        // Advance 800ms into the original window, then copy. The copy must reset
+        // the timer so a fresh 1000ms window starts from THIS point. The async
+        // timer advance flushes the microtask queue between callbacks so the
+        // `navigator.clipboard.writeText().then()` audit dispatch is observable.
+        await vi.advanceTimersByTimeAsync(800);
+        const container = shadowQuery(el, '.phi-field');
+        container?.dispatchEvent(new ClipboardEvent('copy', { bubbles: true, cancelable: true }));
+
+        // At the original deadline (200ms more = 1000ms total) the clear must NOT
+        // have fired — the copy reset it.
+        await vi.advanceTimersByTimeAsync(300);
+        expect(events.filter(isClipboardClearAudit)).toHaveLength(0);
+
+        // A full window after the copy (1000ms from the copy) the clear fires.
+        await vi.advanceTimersByTimeAsync(800);
+        expect(events.filter(isClipboardClearAudit).length).toBeGreaterThanOrEqual(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not schedule a clipboard-clear timer on a copy while masked', async () => {
+      // A masked copy is prevented (no PHI reaches the clipboard), so it must not
+      // start or reset the auto-clear timer.
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixPhiField>(
+          '<hx-phi-field field-type="ssn" field-id="masked-copy" clipboard-timeout="1000"></hx-phi-field>',
+        );
+        el.data = '123-45-6789';
+        await el.updateComplete;
+
+        const events: CustomEvent<PhiAccessEventDetail>[] = [];
+        el.addEventListener('hx-phi-access', (e) => {
+          events.push(e as CustomEvent<PhiAccessEventDetail>);
+        });
+
+        // Field is masked by default — dispatch a copy and advance well past the
+        // timeout. No clipboard-clear audit event should ever fire.
+        const container = shadowQuery(el, '.phi-field');
+        container?.dispatchEvent(new ClipboardEvent('copy', { bubbles: true, cancelable: true }));
+        vi.advanceTimersByTime(2000);
+
+        expect(events.filter(isClipboardClearAudit)).toHaveLength(0);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
   // ─── Accessibility ───
 
   describe('Accessibility', () => {

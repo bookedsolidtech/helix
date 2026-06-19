@@ -1,10 +1,10 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
-import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
@@ -80,7 +80,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @clinical-context none
  */
 @customElement('hx-icon-button')
-export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
+export class HelixIconButton extends FocusMixin(mixinDelegatesAria(HelixElement)) {
   static override styles = [helixIconButtonStyles, forcedColorsInteractive];
 
   /**
@@ -159,6 +159,24 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
 
   protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
+  }
+
+  // ─── FocusMixin integration ───
+
+  /**
+   * The inner natively-focusable element. Resolves to the `<button>` in button
+   * mode or the `<a>` in href/anchor mode — only one is ever rendered.
+   * @internal
+   */
+  @query('.button')
+  private _focusEl?: HTMLElement;
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._focusEl ?? null;
   }
 
   // ─── Event Handling ───

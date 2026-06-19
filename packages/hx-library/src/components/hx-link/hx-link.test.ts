@@ -267,8 +267,8 @@ describe('hx-link', () => {
 
   // --- Accessibility (axe-core) ---
 
-  // TODO(icons-epic): vitest browser-mode deadlock confirmed via binary
-  // search — the entire `Accessibility (axe-core)` block (5 checkA11y
+  // TODO(icons-epic / 4.0 backlog): vitest browser-mode deadlock confirmed via
+  // binary search — the entire `Accessibility (axe-core)` block (5 checkA11y
   // calls against various variants/states) hangs vitest at runtime.
   // Skipping the block lets the other 50+ tests complete in seconds.
   // The previously-skipped `Enter activates link click` test was a red
@@ -276,7 +276,13 @@ describe('hx-link', () => {
   // hx-link DOM after Phase 5a's hx-icon migration. The component's
   // a11y is covered at the cert level by scripts/aaa-formal-audit.mjs
   // and the existing aaa-allowlist (hx-link clears 7:1 contrast,
-  // forced-colors, role/label correctness). Restore once the
+  // forced-colors, role/label correctness).
+  //
+  // Un-skip attempted during the FocusMixin adoption pass and reverted: the
+  // hang is a vitest+Playwright × hx-icon-shadow-root harness race, not an
+  // hx-link a11y defect, so it cannot be cleared without an out-of-scope
+  // (and non-additive) change to the test harness or the hx-icon render path.
+  // Tracked for the 4.0 backlog under the icons epic. Restore once the
   // axe + hx-icon-shadow-root interaction race is diagnosed.
   describe.skip('Accessibility (axe-core)', () => {
     it('has no axe violations in default state', async () => {
@@ -515,6 +521,42 @@ describe('hx-link', () => {
       );
       await el.updateComplete;
       expect(shadowQuery(el, '.sr-only')).toBeNull();
+    });
+  });
+
+  // --- FocusMixin delegation ---
+
+  describe('FocusMixin', () => {
+    it('focus() delegates to the inner <a> when enabled', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page">Link</hx-link>');
+      el.focus();
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(el.shadowRoot?.activeElement).toBe(anchor);
+    });
+
+    it('focus() delegates to the inner <span role="link"> when disabled', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page" disabled>Link</hx-link>');
+      el.focus();
+      await el.updateComplete;
+      const span = shadowQuery<HTMLSpanElement>(el, 'span.link')!;
+      expect(el.shadowRoot?.activeElement).toBe(span);
+    });
+
+    it('blur() removes focus from the inner element', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page">Link</hx-link>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="/page">Link</hx-link>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.hasAttribute('focused')).toBe(true);
     });
   });
 });

@@ -1309,4 +1309,40 @@ describe('hx-button', () => {
       expect(anchor.hasAttribute('href')).toBe(false);
     });
   });
+
+  // ─── FocusMixin delegation ───
+
+  describe('FocusMixin', () => {
+    it('focus() delegates to the inner <button>', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(el.shadowRoot?.activeElement).toBe(btn);
+    });
+
+    it('focus() delegates to the inner <a> in href mode', async () => {
+      const el = await fixture<HelixButton>('<hx-button href="/x">Visit</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(el.shadowRoot?.activeElement).toBe(anchor);
+    });
+
+    it('blur() removes focus from the inner element', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+  });
 });

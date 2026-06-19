@@ -1118,4 +1118,33 @@ describe('hx-file-upload', () => {
       expect(event.detail.files).toHaveLength(1);
     });
   });
+
+  // ─── FocusMixin integration ───
+
+  describe('FocusMixin integration', () => {
+    it('focus() delegates to the focusable dropzone', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      el.focus();
+      await el.updateComplete;
+      const dropzone = shadowQuery<HTMLElement>(el, '[part="dropzone"]')!;
+      expect(el.shadowRoot?.activeElement).toBe(dropzone);
+    });
+
+    it('blur() removes focus from the dropzone', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload></hx-file-upload>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.focused).toBe(true);
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+  });
 });

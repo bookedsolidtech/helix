@@ -50,6 +50,12 @@ import { devWarn, devError } from '../../utils/dev-warn.js';
  *   actions. Contains audit metadata only — never raw PHI. Dispatched with
  *   `composed: true` to cross shadow boundaries for application-level audit listeners.
  *
+ * @note The `hx-phi-access` audit event crosses a trust boundary (`composed: true`
+ *   escapes the shadow root to reach host-application listeners). Its `detail` carries
+ *   audit metadata ONLY — `fieldId`, `action`, `timestamp`, `fieldType` — and NEVER the
+ *   raw PHI value. This separation is a deliberate HIPAA security boundary; consumers
+ *   re-dispatching this event must not enrich the detail with the `data` value.
+ *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
  * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#0D1825)] - Value text color.
  * @cssprop [--hx-phi-field-masked-color=var(--hx-color-neutral-500,#66787B)] - Masked value text color.
@@ -542,7 +548,15 @@ export class HelixPhiField extends HelixElement {
   private _handleCopy(e: ClipboardEvent): void {
     if (this._masked) {
       e.preventDefault();
+      return;
     }
+    // An allowed copy places the freshest PHI on the clipboard. Reset the
+    // clipboard-clear timer (cancel + restart) so the FULL clearTimeout window
+    // applies to THIS copy. Without the reset, a copy late in a prior reveal's
+    // window would inherit only the remaining time, clearing PHI from the
+    // clipboard sooner than the configured timeout. `_scheduleClipboardClear`
+    // already cancels any pending timer before starting a fresh one.
+    this._scheduleClipboardClear();
   }
 
   /** @internal */

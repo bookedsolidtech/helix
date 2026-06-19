@@ -7,6 +7,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import '../hx-icon/hx-icon.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FocusMixin } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixNumberInputStyles } from './hx-number-input.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
@@ -109,7 +110,7 @@ export interface HxNumberInputDetail {
  * @clinical-context none
  */
 @customElement('hx-number-input')
-export class HelixNumberInput extends FormMixin(HelixElement) {
+export class HelixNumberInput extends FocusMixin(FormMixin(HelixElement)) {
   static override styles = [helixNumberInputStyles, forcedColorsField];
 
   // ─── Form Association ───
@@ -248,6 +249,16 @@ export class HelixNumberInput extends FormMixin(HelixElement) {
   @query('.field__input')
   private _input: HTMLInputElement | undefined;
 
+  // ─── FocusMixin integration ───
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._input ?? null;
+  }
+
   // ─── Internal State ───
 
   /** @internal */
@@ -310,7 +321,9 @@ export class HelixNumberInput extends FormMixin(HelixElement) {
 
   // ─── Lifecycle ───
 
-  override firstUpdated(): void {
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    // FocusMixin uses firstUpdated for autofocus + queued focus() flush; run it first.
+    super.firstUpdated(changedProperties);
     this._defaultValue = this.value;
     if (!this.label && !this._hasLabelSlot) {
       devWarn(
@@ -582,10 +595,9 @@ export class HelixNumberInput extends FormMixin(HelixElement) {
 
   // ─── Public Methods ───
 
-  /** Moves focus to the input element. */
-  override focus(options?: FocusOptions): void {
-    this._input?.focus(options);
-  }
+  // focus()/blur() are provided by FocusMixin, delegating to _focusableNode
+  // (the inner <input>). The prior bespoke focus() override did the same thing,
+  // so it was removed in favour of the shared mixin path.
 
   /** Selects all text in the input. */
   select(): void {

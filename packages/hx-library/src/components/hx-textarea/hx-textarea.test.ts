@@ -977,4 +977,33 @@ describe('hx-textarea', () => {
       expect(el.value).toBe('');
     });
   });
+
+  // ─── FocusMixin integration ───
+
+  describe('FocusMixin integration', () => {
+    it('focus() delegates to the inner <textarea>', async () => {
+      const el = await fixture<HxTextarea>('<hx-textarea label="Notes"></hx-textarea>');
+      el.focus();
+      await el.updateComplete;
+      const textarea = shadowQuery<HTMLTextAreaElement>(el, 'textarea')!;
+      expect(el.shadowRoot?.activeElement).toBe(textarea);
+    });
+
+    it('blur() removes focus from the inner <textarea>', async () => {
+      const el = await fixture<HxTextarea>('<hx-textarea label="Notes"></hx-textarea>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HxTextarea>('<hx-textarea label="Notes"></hx-textarea>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.focused).toBe(true);
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+  });
 });

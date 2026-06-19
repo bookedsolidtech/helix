@@ -1,8 +1,9 @@
 import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
+import { FocusMixin } from '../../mixins/index.js';
 import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 
@@ -91,7 +92,7 @@ const VALID_SIZES = new Set(['sm', 'md', 'lg']);
  * @clinical-context none
  */
 @customElement('hx-copy-button')
-export class HelixCopyButton extends HelixElement {
+export class HelixCopyButton extends FocusMixin(HelixElement) {
   static override styles = [helixCopyButtonStyles, forcedColorsInteractive];
 
   // ─── Public Properties ───
@@ -172,6 +173,20 @@ export class HelixCopyButton extends HelixElement {
   /** Timeout handle used to revert the copied state. */
   /** @internal */
   private _feedbackTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ─── FocusMixin integration ───
+
+  /** The inner native `<button>` element. @internal */
+  @query('.button')
+  private _focusEl?: HTMLElement;
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._focusEl ?? null;
+  }
 
   // ─── Lifecycle ───
 

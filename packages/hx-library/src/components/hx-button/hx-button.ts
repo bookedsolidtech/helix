@@ -1,10 +1,10 @@
 import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
-import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
 
@@ -96,7 +96,7 @@ export interface HxButtonClickDetail {
  * @clinical-context none
  */
 @customElement('hx-button')
-export class HelixButton extends mixinDelegatesAria(HelixElement) {
+export class HelixButton extends FocusMixin(mixinDelegatesAria(HelixElement)) {
   // 3.2.1: forced-colors deference is owned by the bespoke @media block in
   // hx-button.styles.ts (covers loading/disabled/focus, not just the base).
   // Do NOT also compose forcedColorsInteractive here — the mixin's docstring
@@ -235,6 +235,24 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
       this.getAttribute('aria-label')?.trim() ||
       ''
     );
+  }
+
+  // ─── FocusMixin integration ───
+
+  /**
+   * The inner natively-focusable element. Resolves to the `<button>` in button
+   * mode or the `<a>` in href/anchor mode — only one is ever rendered.
+   * @internal
+   */
+  @query('.button')
+  private _focusEl?: HTMLElement;
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._focusEl ?? null;
   }
 
   // ─── Form API ───

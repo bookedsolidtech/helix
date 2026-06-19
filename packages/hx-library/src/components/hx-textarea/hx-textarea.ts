@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FocusMixin } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixTextareaStyles } from './hx-textarea.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
@@ -100,7 +101,7 @@ export interface HxTextareaDetail {
  * @clinical-context none
  */
 @customElement('hx-textarea')
-export class HelixTextarea extends FormMixin(HelixElement) {
+export class HelixTextarea extends FocusMixin(FormMixin(HelixElement)) {
   static override styles = [helixTextareaStyles, forcedColorsField];
 
   // ─── Form Association ───
@@ -238,6 +239,16 @@ export class HelixTextarea extends FormMixin(HelixElement) {
   /** @internal */
   @query('.field__textarea')
   private _textarea: HTMLTextAreaElement | undefined;
+
+  // ─── FocusMixin integration ───
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._textarea ?? null;
+  }
 
   // ─── Slot Tracking ───
 
@@ -430,10 +441,9 @@ export class HelixTextarea extends FormMixin(HelixElement) {
 
   // ─── Public Methods ───
 
-  /** Moves focus to the textarea element. */
-  override focus(options?: FocusOptions): void {
-    this._textarea?.focus(options);
-  }
+  // focus()/blur() are provided by FocusMixin, delegating to _focusableNode
+  // (the inner <textarea>). The prior bespoke focus() override did the same
+  // thing, so it was removed in favour of the shared mixin path.
 
   /** Selects all text in the textarea. */
   select(): void {

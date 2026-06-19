@@ -1,11 +1,11 @@
 import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
-import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { helixLinkStyles } from './hx-link.styles.js';
 import { forcedColorsLink } from '../../styles/forced-colors.js';
 
@@ -64,7 +64,7 @@ export type LinkVariant = 'default' | 'subtle' | 'danger';
  * @cssprop [--hx-color-neutral-400] - Color.
  */
 @customElement('hx-link')
-export class HelixLink extends mixinDelegatesAria(HelixElement) {
+export class HelixLink extends FocusMixin(mixinDelegatesAria(HelixElement)) {
   static override styles = [helixLinkStyles, forcedColorsLink];
 
   /**
@@ -123,6 +123,25 @@ export class HelixLink extends mixinDelegatesAria(HelixElement) {
    */
   @property({ type: String, attribute: 'external-label' })
   externalLabel: string = '(opens in new tab)';
+
+  // --- FocusMixin integration ---
+
+  /**
+   * The inner focusable element. Resolves to the `<a>` in enabled state or the
+   * `<span role="link" tabindex="0">` in disabled state — only one is ever
+   * rendered, and both are keyboard-focusable.
+   * @internal
+   */
+  @query('.link')
+  private _focusEl?: HTMLElement;
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._focusEl ?? null;
+  }
 
   // --- Event Handling ---
 

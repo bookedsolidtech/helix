@@ -737,4 +737,42 @@ describe('hx-icon-button', () => {
       expect(anchor.getAttribute('aria-busy')).toBe('true');
     });
   });
+
+  // ─── FocusMixin delegation ───
+
+  describe('FocusMixin', () => {
+    it('focus() delegates to the inner <button>', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      el.focus();
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(el.shadowRoot?.activeElement).toBe(btn);
+    });
+
+    it('focus() delegates to the inner <a> in href mode', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="/x"></hx-icon-button>',
+      );
+      el.focus();
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(el.shadowRoot?.activeElement).toBe(anchor);
+    });
+
+    it('blur() removes focus from the inner element', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+  });
 });

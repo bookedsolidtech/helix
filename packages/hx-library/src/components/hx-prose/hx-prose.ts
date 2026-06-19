@@ -1,4 +1,5 @@
 import { html, type PropertyValues } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';

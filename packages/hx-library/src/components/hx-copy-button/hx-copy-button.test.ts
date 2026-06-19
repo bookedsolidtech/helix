@@ -566,4 +566,32 @@ describe('hx-copy-button', () => {
       }
     });
   });
+
+  // ─── FocusMixin delegation ───
+
+  describe('FocusMixin', () => {
+    it('focus() delegates to the inner <button>', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button></hx-copy-button>');
+      el.focus();
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(el.shadowRoot?.activeElement).toBe(btn);
+    });
+
+    it('blur() removes focus from the inner element', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button></hx-copy-button>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button></hx-copy-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+  });
 });
