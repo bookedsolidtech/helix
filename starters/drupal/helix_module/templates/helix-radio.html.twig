@@ -45,5 +45,6 @@
   value="{{ _value }}"
   {% if _checked %}checked{% endif %}
   {% if _disabled %}disabled{% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
+  {% if attributes %}{{ attributes }}{% endif %}
 ></hx-radio>

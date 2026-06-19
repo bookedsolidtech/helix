@@ -20,3 +20,23 @@ export function devWarn(component: string, message: string): void {
     console.warn(`[${component}] ${message}`);
   }
 }
+
+/**
+ * Development-only error utility for HELiX components.
+ *
+ * Identical tree-shaking semantics to {@link devWarn}, but emits at
+ * `console.error` severity for defects a developer must not ship — without
+ * throwing. Throwing from a custom-element lifecycle callback (e.g.
+ * `connectedCallback`) is reported by the browser as an *uncaught* exception
+ * rather than propagating to the insertion site, and aborts the rest of the
+ * callback; `devError` surfaces the failure loudly while leaving the element
+ * in a stable state.
+ *
+ * @param component - The component tag name used as the log prefix (e.g. `'hx-phi-field'`).
+ * @param message   - Human-readable error message for the developer.
+ */
+export function devError(component: string, message: string): void {
+  if (import.meta.env.DEV === true) {
+    console.error(`[${component}] ${message}`);
+  }
+}

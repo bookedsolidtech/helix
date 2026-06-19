@@ -64,7 +64,8 @@
   {% if pulse %}pulse{% endif %}
   {% if count is not null %}count="{{ count }}"{% endif %}
   {% if count is not null and max is defined %}max="{{ max }}"{% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
+  {% if attributes %}{{ attributes }}{% endif %}
 >
   {%- if label and count is null %}{{ label }}{% endif -%}
 </hx-badge>

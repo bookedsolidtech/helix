@@ -932,6 +932,126 @@ describe('hx-phi-field', () => {
     });
   });
 
+  // ─── FS-029: Opt-in Strict Mode (fail-closed detector) ───
+
+  describe('FS-029: Opt-in Strict Mode', () => {
+    it('defaults to non-strict: rescues the data attribute and warns (backward compatible)', async () => {
+      // Spy on console.warn — devWarn routes through it in dev/test builds.
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = document.createElement('hx-phi-field') as HelixPhiField;
+        el.setAttribute('field-type', 'ssn');
+        el.setAttribute('data', '123-45-6789');
+        // No `strict` attribute — the default silent-rescue path must run.
+        document.body.appendChild(el);
+        await el.updateComplete;
+
+        expect(el.strict).toBe(false);
+        // Value rescued into the JS property, attribute stripped from the DOM.
+        expect(el.data).toBe('123-45-6789');
+        expect(el.hasAttribute('data')).toBe(false);
+        // Dev warning surfaced.
+        expect(warnSpy).toHaveBeenCalledTimes(1);
+        el.remove();
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('strict + data attribute: refuses (logs error), strips the attribute, does NOT rescue', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        const el = document.createElement('hx-phi-field') as HelixPhiField;
+        el.setAttribute('field-type', 'ssn');
+        el.setAttribute('strict', '');
+        el.setAttribute('data', '123-45-6789');
+
+        // connectedCallback runs synchronously inside appendChild. Strict mode
+        // must NOT throw — an exception from a lifecycle callback is reported as
+        // an uncaught browser error and would destabilise the field. In dev/test
+        // (import.meta.env.DEV === true) it surfaces loudly via console.error.
+        expect(() => document.body.appendChild(el)).not.toThrow();
+
+        expect(errorSpy).toHaveBeenCalledTimes(1);
+        expect(String(errorSpy.mock.calls[0]?.[0])).toMatch(/strict mode/i);
+        // Attribute stripped FIRST so PHI left the live DOM; value NOT rescued.
+        expect(el.hasAttribute('data')).toBe(false);
+        expect(el.data).toBe('');
+        el.remove();
+      } finally {
+        errorSpy.mockRestore();
+      }
+    });
+
+    it('strict + data attribute: dispatches hx-phi-access with action="attribute-exposure-refused" (no raw PHI in detail)', () => {
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('field-id', 'strict-refuse');
+      el.setAttribute('strict', '');
+      el.setAttribute('data', '123-45-6789');
+
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      // Listen on document — the event is composed/bubbles and fires during
+      // connectedCallback, before we can attach a listener on the element.
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        // Strict mode refuses without throwing, so the audit event lands cleanly.
+        expect(() => document.body.appendChild(el)).not.toThrow();
+
+        const refusedEvents = events.filter(
+          (e) => e.detail.action === 'attribute-exposure-refused',
+        );
+        expect(refusedEvents).toHaveLength(1);
+        expect(refusedEvents[0]?.detail.fieldId).toBe('strict-refuse');
+        expect(refusedEvents[0]?.detail.fieldType).toBe('ssn');
+        // Raw PHI must never appear in the audit detail — HIPAA boundary.
+        const detailStr = JSON.stringify(refusedEvents[0]?.detail);
+        expect(detailStr).not.toContain('123-45-6789');
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
+        el.remove();
+      }
+    });
+
+    it('strict + NO data attribute: no-op (no throw, no refusal event)', async () => {
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('strict', '');
+      // No `data` attribute set — the FS-029 block must not engage at all.
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        expect(() => document.body.appendChild(el)).not.toThrow();
+        await el.updateComplete;
+
+        expect(el.strict).toBe(true);
+        const refusedEvents = events.filter(
+          (e) => e.detail.action === 'attribute-exposure-refused',
+        );
+        expect(refusedEvents).toHaveLength(0);
+        // Field still works as a normal masked field via the JS property.
+        el.data = '123-45-6789';
+        await el.updateComplete;
+        const value = shadowQuery(el, '.phi-field__value--masked');
+        expect(value?.textContent?.trim()).toBe('***-**-6789');
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        el.remove();
+      }
+    });
+  });
+
   // ─── Visibility Change Audit Pollution ───
 
   describe('Visibility Change Audit Pollution', () => {

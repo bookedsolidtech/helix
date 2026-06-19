@@ -50,7 +50,8 @@
   {% if placement is defined and placement %}placement="{{ placement }}"{% endif %}
   {% if show_delay is defined %}show-delay="{{ show_delay }}"{% endif %}
   {% if hide_delay is defined %}hide-delay="{{ hide_delay }}"{% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
+  {% if attributes %}{{ attributes }}{% endif %}
 >
   {%- block trigger -%}
     <button

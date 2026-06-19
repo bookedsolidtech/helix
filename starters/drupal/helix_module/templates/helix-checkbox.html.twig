@@ -71,5 +71,6 @@
   {% if _help_text %}help-text="{{ _help_text }}"{% endif %}
   hx-size="{{ _size }}"
   {% if _aria_label %}aria-label="{{ _aria_label }}"{% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
+  {% if attributes %}{{ attributes }}{% endif %}
 ></hx-checkbox>

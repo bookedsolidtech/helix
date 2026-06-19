@@ -6,7 +6,7 @@ import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
-import { devWarn } from '../../utils/dev-warn.js';
+import { devWarn, devError } from '../../utils/dev-warn.js';
 
 /**
  * HIPAA-compliant field component for rendering masked Protected Health Information (PHI).
@@ -46,9 +46,9 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @csspart toggle - The reveal/hide toggle button.
  *
  * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide,
- *   auto-hide, clipboard-clear, and clipboard-clear-failed actions. Contains audit
- *   metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow
- *   boundaries for application-level audit listeners.
+ *   auto-hide, clipboard-clear, clipboard-clear-failed, and attribute-exposure-refused
+ *   actions. Contains audit metadata only — never raw PHI. Dispatched with
+ *   `composed: true` to cross shadow boundaries for application-level audit listeners.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
  * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#0D1825)] - Value text color.
@@ -132,6 +132,38 @@ export class HelixPhiField extends HelixElement {
   @property({ type: Boolean, reflect: true })
   disabled: boolean = false;
 
+  /**
+   * Opt-in fail-closed DETECTOR for PHI exposed via the `data` HTML attribute
+   * (FS-029). Defaults to `false`, which preserves the existing best-effort
+   * silent-rescue behavior and is fully backward compatible.
+   *
+   * **This is a detector, not a cure.** By the time `connectedCallback` runs,
+   * a server-rendered page has already serialized the raw PHI into the HTML
+   * sent over the wire — the leak happened server-side and cannot be undone
+   * client-side. Stripping the attribute here only cleans up the *live* DOM.
+   *
+   * When `strict` is `true` and a `data` attribute is detected, the component
+   * still strips the attribute first (so PHI leaves the live DOM), then fails
+   * LOUDLY instead of silently: it dispatches an `hx-phi-access` event with
+   * `action: 'attribute-exposure-refused'` for the audit trail, and — in
+   * development/test/CI builds (`import.meta.env.DEV`) — logs a `console.error`
+   * so the SSR misconfiguration surfaces during testing rather than shipping
+   * unnoticed. It does NOT throw: an exception from `connectedCallback` is
+   * reported as an uncaught browser error and aborts the callback, which would
+   * destabilise a live field. Production builds emit nothing to the console (the
+   * `import.meta.env.DEV` branch is tree-shaken away), so an opted-in app still
+   * degrades to the audit-event signal rather than logging for end users.
+   *
+   * Its value is surfacing the defect (an upstream SSR `data` attribute) before
+   * it reaches production — not preventing the server-side serialization, which
+   * already occurred.
+   *
+   * @attr strict
+   * @reflect
+   */
+  @property({ type: Boolean, reflect: true })
+  strict: boolean = false;
+
   // ─── Internal State ───
 
   /** @internal */
@@ -175,6 +207,46 @@ export class HelixPhiField extends HelixElement {
     // into the JS-only property and then immediately remove the attribute so
     // that no PHI is ever left exposed in the DOM tree or HTML source.
     if (this.hasAttribute('data')) {
+      // Opt-in strict mode is a fail-closed DETECTOR (see the `strict` property
+      // docs). The server-side SSR leak has ALREADY happened by the time this
+      // runs — strict cannot undo it. Its only job is to surface the defect
+      // LOUDLY (audit event + dev/test console.error) instead of silently
+      // rescuing. We strip the attribute FIRST so the raw PHI leaves the live
+      // DOM before anything else runs.
+      if (this.strict) {
+        // PHI leaves the live DOM regardless of the strict outcome below.
+        this.removeAttribute('data');
+        // Audit-trail signal in every environment (prod included): the SSR
+        // misconfiguration was detected and the exposure refused. No raw PHI
+        // is ever placed in the event detail — only audit metadata.
+        this.dispatchEvent(
+          new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              fieldId: this.fieldId || this.id || '',
+              action: 'attribute-exposure-refused',
+              timestamp: new Date().toISOString(),
+              fieldType: this.fieldType,
+            },
+          }),
+        );
+        // Fail LOUDLY in dev/test/CI so the SSR misconfiguration cannot ship
+        // unnoticed. We use console.error (via devError), NOT throw: an
+        // exception thrown from connectedCallback is reported by the browser as
+        // an *uncaught* error rather than propagating to the insertion site, and
+        // it aborts the rest of the callback — destabilising a live PHI field.
+        // `import.meta.env.DEV` is statically `false` in production builds, so
+        // the log is tree-shaken away and an opted-in production app degrades to
+        // the audit-event signal above.
+        devError(
+          'hx-phi-field',
+          'strict mode: PHI was set via the `data` HTML attribute. ' +
+            'This exposes sensitive data in the server-rendered HTML source (HIPAA risk). ' +
+            'The raw value was NOT rescued. Use the `data` JS property (element.data = "...") instead.',
+        );
+        return;
+      }
       devWarn(
         'hx-phi-field',
         'Setting PHI via the `data` HTML attribute is not supported and exposes sensitive data in the DOM source. Use the `data` JS property (element.data = "...") instead.',
@@ -571,8 +643,20 @@ export interface PhiAccessEventDetail {
    *   provide). The clipboard MAY still contain PHI. HIPAA audit consumers
    *   should treat this as an actionable event — prompt the user to manually
    *   clear their clipboard, flag the session, or escalate per policy.
+   * - `attribute-exposure-refused`: opt-in `strict` mode detected PHI set via the
+   *   `data` HTML attribute (an FS-029 SSR misconfiguration) and refused to rescue
+   *   it. The live-DOM attribute has been stripped, but the raw value was ALREADY
+   *   serialized into the server-rendered HTML before JavaScript ran — this event
+   *   signals that an upstream SSR defect leaked PHI on the wire. Treat as an
+   *   actionable audit event and fix the source so PHI is set as a JS property.
    */
-  action: 'reveal' | 'hide' | 'auto-hide' | 'clipboard-clear' | 'clipboard-clear-failed';
+  action:
+    | 'reveal'
+    | 'hide'
+    | 'auto-hide'
+    | 'clipboard-clear'
+    | 'clipboard-clear-failed'
+    | 'attribute-exposure-refused';
   /** ISO 8601 timestamp of the access event. */
   timestamp: string;
   /** The category of PHI this field contains. */

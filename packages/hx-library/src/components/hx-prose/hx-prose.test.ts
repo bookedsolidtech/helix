@@ -403,4 +403,100 @@ describe('hx-prose', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Sanitization (opt-in security) ───
+
+  describe('Sanitization (opt-in)', () => {
+    it('sanitize defaults to false (non-breaking)', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p>Text</p></hx-prose>');
+      expect(el.sanitize).toBe(false);
+    });
+
+    it('default (sanitize off) leaves dangerous content untouched', async () => {
+      // Trust-upstream default must preserve existing behavior verbatim.
+      const el = await fixture<HelixProse>(
+        '<hx-prose><div class="raw"><img src="x" onerror="alert(1)"><a href="javascript:alert(1)">link</a></div></hx-prose>',
+      );
+      const img = el.querySelector('img');
+      const link = el.querySelector('a');
+      expect(img?.getAttribute('onerror')).toBe('alert(1)');
+      expect(link?.getAttribute('href')).toBe('javascript:alert(1)');
+    });
+
+    it('sanitize on removes <script> elements', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><div><p>Safe</p><script>window.__pwned = true;</script></div></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('script')).toBeNull();
+      expect(el.querySelector('p')?.textContent).toBe('Safe');
+    });
+
+    it('sanitize on strips on* event-handler attributes', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="x" onerror="alert(1)"></hx-prose>',
+      );
+      await el.updateComplete;
+      const img = el.querySelector('img');
+      expect(img).toBeTruthy();
+      expect(img?.hasAttribute('onerror')).toBe(false);
+    });
+
+    it('sanitize on neutralizes javascript: href', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><a href="javascript:alert(1)">click</a></hx-prose>',
+      );
+      await el.updateComplete;
+      const link = el.querySelector('a');
+      expect(link).toBeTruthy();
+      expect(link?.hasAttribute('href')).toBe(false);
+    });
+
+    it('sanitize on strips iframe/object/embed', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><div><iframe src="evil.html"></iframe><object data="x"></object><embed src="x"></div></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('iframe')).toBeNull();
+      expect(el.querySelector('object')).toBeNull();
+      expect(el.querySelector('embed')).toBeNull();
+    });
+
+    it('sanitize on preserves safe markup unchanged', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><h2>Title</h2><p><a href="https://example.com">safe</a></p></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('h2')?.textContent).toBe('Title');
+      expect(el.querySelector('a')?.getAttribute('href')).toBe('https://example.com');
+    });
+
+    it('a custom sanitizer is invoked and its output replaces content', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p id="orig">original</p></hx-prose>');
+      let called = false;
+      el.sanitizer = (html: string) => {
+        called = true;
+        // Prove the custom policy fully owns the output: swap the content.
+        return html.replace('original', 'cleaned');
+      };
+      el.sanitize = true;
+      await el.updateComplete;
+      expect(called).toBe(true);
+      expect(el.querySelector('p')?.textContent).toBe('cleaned');
+    });
+
+    it('sanitizes content injected after connect via MutationObserver', async () => {
+      const el = await fixture<HelixProse>('<hx-prose sanitize><p>Initial</p></hx-prose>');
+      await el.updateComplete;
+      // Simulate a late CMS/client-side injection of unsafe markup.
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = '<a href="javascript:alert(1)">late</a>';
+      el.appendChild(wrapper);
+      // MutationObserver callbacks fire on a microtask; wait a tick.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const link = el.querySelector('a');
+      expect(link).toBeTruthy();
+      expect(link?.hasAttribute('href')).toBe(false);
+    });
+  });
 });

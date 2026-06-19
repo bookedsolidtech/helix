@@ -19,6 +19,13 @@ import { helixProseScopedCss } from './hx-prose.styles.js';
  * @tag hx-prose
  *
  * @slot - Default slot for rich text content (headings, paragraphs, lists, tables, etc.).
+ *   SECURITY: By default hx-prose renders its slotted markup verbatim and performs NO
+ *   sanitization — it trusts that the upstream CMS/Markdown pipeline has already sanitized
+ *   the HTML. This is the documented, non-breaking default. If the content source is not
+ *   fully trusted, set the boolean `sanitize` attribute to enable a conservative built-in
+ *   allowlist (strips `<script>`/`<style>`/`<iframe>`/`<object>`/`<embed>`/`<foreignObject>`,
+ *   `on*` event-handler attributes, and `javascript:`/`data:` URLs in `href`/`src`), or supply
+ *   a stricter `sanitizer` function property (e.g. DOMPurify) to fully own the policy.
  *
  * @cssprop [--hx-prose-max-width=720px] - Maximum content width.
  * @cssprop [--hx-prose-font-size=var(--hx-font-size-base)] - Base font size.
@@ -59,6 +66,48 @@ export class HelixProse extends HelixElement {
   @property({ type: String, reflect: true, attribute: 'max-width' })
   maxWidth = '';
 
+  /**
+   * Opt-in HTML sanitization of slotted content. Default `false` to preserve the
+   * historical non-breaking behavior of trusting upstream-sanitized CMS markup.
+   *
+   * When `true`, every top-level slotted element's `outerHTML` is run through the
+   * configured `sanitizer` (or the conservative built-in allowlist when none is set)
+   * on connect and whenever the light-DOM subtree mutates, and unsafe content is
+   * replaced in place.
+   * @attr sanitize
+   */
+  @property({ type: Boolean })
+  sanitize = false;
+
+  /**
+   * Optional custom sanitizer. When provided AND `sanitize` is `true`, this function
+   * fully owns the sanitization policy and the built-in allowlist is bypassed. Wire in
+   * a hardened library here (e.g. `(html) => DOMPurify.sanitize(html)`).
+   *
+   * `attribute: false` because a function cannot be expressed as an HTML attribute;
+   * it must be assigned via property (`el.sanitizer = fn`).
+   */
+  @property({ attribute: false })
+  sanitizer?: (html: string) => string;
+
+  // ─── Internal ───
+
+  /**
+   * Observes the light-DOM subtree so that content injected after connect (CMS
+   * hydration, client-side renders) is re-sanitized. Only active while `sanitize`
+   * is `true`. `slotchange` does not fire for light-DOM children, so a
+   * MutationObserver is the correct primitive here.
+   * @internal
+   */
+  private _sanitizeObserver: MutationObserver | undefined;
+
+  /**
+   * Re-entrancy guard: rewriting `outerHTML` during sanitization triggers the
+   * MutationObserver again. This flag suppresses that recursive pass.
+   * @internal
+   */
+  private _isSanitizing = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
@@ -73,6 +122,18 @@ export class HelixProse extends HelixElement {
     this.style.display = 'block';
     this._applyMaxWidth();
     this._applySize();
+    // Opt-in security pass. Sanitize already-present content and start watching
+    // for future light-DOM mutations. No-op when `sanitize` is false (default).
+    if (this.sanitize) {
+      this._sanitizeSlottedContent();
+      this._startSanitizeObserver();
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    // Always tear down the observer to avoid a leak if the node is reattached.
+    this._stopSanitizeObserver();
   }
 
   override updated(changedProperties: PropertyValues<this>): void {
@@ -81,6 +142,15 @@ export class HelixProse extends HelixElement {
     }
     if (changedProperties.has('size')) {
       this._applySize();
+    }
+    // React to runtime toggling of the `sanitize` property (e.g. `el.sanitize = true`).
+    if (changedProperties.has('sanitize')) {
+      if (this.sanitize) {
+        this._sanitizeSlottedContent();
+        this._startSanitizeObserver();
+      } else {
+        this._stopSanitizeObserver();
+      }
     }
   }
 
@@ -109,6 +179,135 @@ export class HelixProse extends HelixElement {
     } else {
       this.style.removeProperty('--hx-prose-font-size');
     }
+  }
+
+  // ─── Sanitization (opt-in) ───
+
+  /** @internal */
+  private _startSanitizeObserver(): void {
+    if (this._sanitizeObserver) {
+      return;
+    }
+    this._sanitizeObserver = new MutationObserver(() => {
+      // Ignore the mutations our own sanitization rewrite generates.
+      if (this._isSanitizing) {
+        return;
+      }
+      this._sanitizeSlottedContent();
+    });
+    // Watch the full subtree: nodes, attributes, and characterData can all carry
+    // injected attack vectors (e.g. an `onerror` added to an existing <img>).
+    this._sanitizeObserver.observe(this, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
+    });
+  }
+
+  /** @internal */
+  private _stopSanitizeObserver(): void {
+    this._sanitizeObserver?.disconnect();
+    this._sanitizeObserver = undefined;
+  }
+
+  /**
+   * Runs each top-level slotted element through the active sanitizer and replaces
+   * it in place when the sanitized markup differs. Element nodes only — text nodes
+   * carry no executable markup and are left untouched.
+   * @internal
+   */
+  private _sanitizeSlottedContent(): void {
+    // Re-entrancy guard: replacing outerHTML mutates the subtree the observer watches.
+    this._isSanitizing = true;
+    try {
+      const sanitizeFn = this.sanitizer ?? ((markup: string) => this._builtInSanitize(markup));
+      // Snapshot first: replacing outerHTML mutates the live children collection.
+      const elements = Array.from(this.children);
+      for (const child of elements) {
+        const original = child.outerHTML;
+        const cleaned = sanitizeFn(original);
+        if (cleaned !== original) {
+          // outerHTML assignment swaps the node for the parsed-clean equivalent.
+          child.outerHTML = cleaned;
+        }
+      }
+    } finally {
+      this._isSanitizing = false;
+    }
+  }
+
+  /**
+   * Conservative built-in allowlist sanitizer used when no custom `sanitizer` is set.
+   * Parses the markup in an inert document (no scripts execute, no resources load),
+   * strips dangerous elements/attributes, then serializes back to a string.
+   *
+   * This is a defense-in-depth backstop, NOT a replacement for a hardened library
+   * like DOMPurify. Consumers handling fully untrusted input should inject a vetted
+   * sanitizer via the `sanitizer` property.
+   * @internal
+   */
+  private _builtInSanitize(markup: string): string {
+    // Inert parsing context: <template> content is not rendered and its scripts/
+    // resource-bearing elements never execute or fetch.
+    const template = document.createElement('template');
+    template.innerHTML = markup;
+
+    const DANGEROUS_ELEMENTS = ['script', 'style', 'iframe', 'object', 'embed', 'foreignObject'];
+    const URL_ATTRS = ['href', 'src'];
+
+    const walk = (root: ParentNode): void => {
+      // Static snapshot — we mutate the tree (removeChild) while iterating.
+      const els = Array.from(root.querySelectorAll('*'));
+      for (const el of els) {
+        // Drop disallowed elements wholesale.
+        if (DANGEROUS_ELEMENTS.includes(el.localName)) {
+          el.remove();
+          continue;
+        }
+        for (const attr of Array.from(el.attributes)) {
+          const name = attr.name.toLowerCase();
+          const value = attr.value;
+          // Strip inline event handlers (onclick, onerror, onload, …).
+          if (name.startsWith('on')) {
+            el.removeAttribute(attr.name);
+            continue;
+          }
+          // Neutralize dangerous URL schemes in navigational/resource attributes.
+          if (URL_ATTRS.includes(name) && this._hasUnsafeUrlScheme(value)) {
+            el.removeAttribute(attr.name);
+          }
+        }
+      }
+    };
+
+    walk(template.content);
+    return this._serializeTemplate(template);
+  }
+
+  /**
+   * Returns true when a URL attribute value uses a `javascript:` or `data:` scheme,
+   * tolerating leading/trailing whitespace, control chars, and case variations the
+   * browser would otherwise strip before navigating.
+   * @internal
+   */
+  private _hasUnsafeUrlScheme(value: string): boolean {
+    // Browsers ignore leading ASCII control chars + whitespace when resolving a URL
+    // scheme, so strip them (\u0000-\u0020) before testing to defeat
+    // `java\tscript:`-style bypasses, then lowercase for case-insensitive matching.
+    // eslint-disable-next-line no-control-regex -- control chars are the bypass vector
+    const normalized = value.replace(/[\u0000-\u0020]+/g, '').toLowerCase();
+    return normalized.startsWith('javascript:') || normalized.startsWith('data:');
+  }
+
+  /**
+   * Serializes a <template>'s parsed content back to an HTML string.
+   * @internal
+   */
+  private _serializeTemplate(template: HTMLTemplateElement): string {
+    const container = document.createElement('div');
+    container.appendChild(template.content.cloneNode(true));
+    return container.innerHTML;
   }
 
   // ─── Render ───

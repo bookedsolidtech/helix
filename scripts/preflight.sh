@@ -82,6 +82,84 @@ pnpm run format:check
 echo "  ✓ Format passed"
 echo ""
 
+# ── Gate 2.5: Drupal CDN Subresource Integrity (SRI) ─────────────────────────
+# External jsDelivr assets in *.libraries.yml MUST carry an `integrity` key.
+# Without SRI, a poisoned/compromised CDN response executes arbitrary code in
+# every consuming Drupal site (supply-chain attack). This gate scans every
+# `type: external` jsDelivr entry and fails if any one lacks `integrity`, so a
+# future edit that adds an un-hashed CDN asset (or drops a hash on upgrade) is
+# caught locally instead of shipping a silent security regression.
+#
+# Why a bash scan and not a YAML parser: the repo's preflight runtime cannot
+# assume a YAML lib is installed, and the structural signal we need is simple
+# and line-oriented — a jsDelivr URL line that opens an `external` asset block
+# without an `integrity:` key before the next asset/section boundary.
+
+echo "▶ [2.5/12] Drupal CDN Subresource Integrity (SRI)"
+
+SRI_VIOLATIONS=0
+# Find every *.libraries.yml tracked in the repo (Drupal library definitions).
+while IFS= read -r libfile; do
+  [ -n "$libfile" ] || continue
+  # awk walks each file block-by-block: when it sees a jsDelivr URL key line
+  # whose nested mapping carries `type: external`, it requires an `integrity:`
+  # key within the same indented block. A block ends at the next line indented
+  # at or below the URL key's own indentation.
+  MISSING=$(awk '
+    function indent(s,   i) { i=0; while (substr(s,i+1,1)==" ") i++; return i }
+    /cdn\.jsdelivr\.net.*:[[:space:]]*$/ {
+      url_line = $0; url_indent = indent($0)
+      # Capture the trimmed URL for reporting.
+      u = $0; sub(/^[[:space:]]+/, "", u); sub(/:[[:space:]]*$/, "", u)
+      has_external = 0; has_integrity = 0
+      # Scan the nested block belonging to this URL key.
+      while ((getline nl) > 0) {
+        if (nl ~ /^[[:space:]]*$/) continue
+        ni = indent(nl)
+        if (ni <= url_indent) {
+          # Block ended — emit if it was external without integrity, then
+          # re-process this boundary line as a potential next URL key.
+          if (has_external && !has_integrity) print u
+          if (nl ~ /cdn\.jsdelivr\.net.*:[[:space:]]*$/) {
+            url_indent = ni
+            u = nl; sub(/^[[:space:]]+/, "", u); sub(/:[[:space:]]*$/, "", u)
+            has_external = 0; has_integrity = 0
+            continue
+          }
+          next_handled = 1
+          break
+        }
+        if (nl ~ /type:[[:space:]]*external/) has_external = 1
+        if (nl ~ /integrity:/) has_integrity = 1
+      }
+      # EOF reached while still inside the block.
+      if (!next_handled && has_external && !has_integrity) print u
+      next_handled = 0
+    }
+  ' "$libfile")
+
+  if [ -n "$MISSING" ]; then
+    echo "  ✗ $libfile — external jsDelivr asset(s) missing \`integrity\`:"
+    echo "$MISSING" | sed 's/^/      /'
+    SRI_VIOLATIONS=$((SRI_VIOLATIONS + 1))
+  fi
+done < <(git ls-files '*.libraries.yml')
+
+if [ "$SRI_VIOLATIONS" -gt 0 ]; then
+  echo ""
+  echo "  ✗ SRI GATE FAILED — do NOT push."
+  echo "    Every \`type: external\` jsDelivr asset must declare an \`integrity\`"
+  echo "    (sha384) attribute. Compute it against the pinned version:"
+  echo "      curl -sL <jsdelivr-url> | openssl dgst -sha384 -binary | openssl base64 -A"
+  echo "    then add under the asset's \`attributes:\` map:"
+  echo "      attributes:"
+  echo "        crossorigin: anonymous"
+  echo "        integrity: 'sha384-<hash>'"
+  exit 1
+fi
+echo "  ✓ All external jsDelivr library assets carry SRI integrity"
+echo ""
+
 # ── Gate 3: Type check ───────────────────────────────────────────────────────
 
 echo "▶ [3/12] Type check"

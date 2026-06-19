@@ -91,3 +91,40 @@ Expose a normalised helix_help_text variable for sub-templates. if
 Expose helix_required flag for label rendering. $variables['helix_required'] =
 !empty($element['#required']); // Expose the field type so sub-templates can conditionally apply
 HELiX // component wrappers. $variables['helix_input_type'] = $element['#type'] ?? NULL; }
+
+/**
+ * Implements hook_preprocess_HOOK() for all HELiX component theme hooks.
+ *
+ * SECURITY: hook_theme() declares 'attributes' => [] as a plain PHP array, and
+ * the element-specific preprocess functions above never normalise it. A plain
+ * array printed via the Twig loop {% for key, val in attributes %} emits the
+ * KEY verbatim — Twig auto-escapes the value but NOT the attribute name, so a
+ * caller-controlled #attributes key such as 'onmouseover=alert(1) x' could
+ * break out of the tag (stored/reflected XSS). Wrapping the array in a Drupal
+ * Attribute object makes {{ attributes }} render through Drupal's attribute
+ * sanitiser, which validates/escapes names AND values. The templates print
+ * {{ attributes }} instead of looping raw keys, preserving the legitimate
+ * attribute-passthrough contract while closing the injection vector.
+ *
+ * Runs for every HELiX theme hook (helix_*) regardless of whether the data
+ * arrived via Form API preprocessing or a direct {% include %}/render array.
+ *
+ * @param array $variables
+ *   Variables available to the template.
+ * @param string $hook
+ *   The name of the theme hook being rendered.
+ */
+function helix_module_preprocess(array &$variables, string $hook): void {
+  // Scope to HELiX component hooks only; leave core/other hooks untouched.
+  if (!str_starts_with($hook, 'helix_')) {
+    return;
+  }
+  // Normalise the passthrough attribute bag to an Attribute object so the
+  // template can safely print {{ attributes }} (escapes names and values).
+  if (isset($variables['attributes']) && !$variables['attributes'] instanceof \Drupal\Core\Template\Attribute) {
+    $variables['attributes'] = new \Drupal\Core\Template\Attribute(is_array($variables['attributes']) ? $variables['attributes'] : []);
+  }
+  elseif (!isset($variables['attributes'])) {
+    $variables['attributes'] = new \Drupal\Core\Template\Attribute();
+  }
+}

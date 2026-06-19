@@ -57,7 +57,8 @@
   {% if name %}name="{{ name }}"{% endif %}
   {% if value %}value="{{ value }}"{% endif %}
   {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
+  {% if attributes %}{{ attributes }}{% endif %}
 >
   {%- set prefix_content %}{% block prefix %}{% endblock %}{% endset -%}
   {%- if prefix_content %}<span slot="prefix">{{ prefix_content }}</span>{% endif -%}

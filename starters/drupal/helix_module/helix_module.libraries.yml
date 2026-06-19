@@ -1,24 +1,44 @@
 # Full library — loads all components via barrel import.
 # For per-component loading, use the CDN libraries or create component-specific entries.
 helix:
-  version: 2.1.2
+  version: 3.10.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@2.1.2/dist/index.js:
+    # External CDN asset MUST carry Subresource Integrity (SRI) — without it a
+    # compromised/poisoned jsDelivr response would execute arbitrary JS in the
+    # consuming Drupal site. The sha384 below is computed against the exact
+    # bytes published at @3.10.0; Drupal emits integrity + crossorigin onto the
+    # <script> tag so the browser hard-fails on any mismatch. Bump BOTH the
+    # version pin AND the hash together on every upgrade.
+    # Hash recompute (must match published artifact byte-for-byte):
+    #   curl -sL https://cdn.jsdelivr.net/npm/@helixui/library@3.10.0/dist/index.js \
+    #     | openssl dgst -sha384 -binary | openssl base64 -A
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.10.0/dist/index.js:
       type: external
       attributes:
         type: module
+        crossorigin: anonymous
+        integrity: 'sha384-XKQMru5yImdqAb5tI6VwKxqBBLa3n7ETV10JBPg97M5b/pGRmDI6nJtXon/EE5aI'
     js/helix.behaviors.js:
       weight: 10
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@2.1.2/dist/css/helix-tokens.css:
+      # External CDN stylesheet — same SRI mandate as the JS entry above.
+      # Hash recompute:
+      #   curl -sL https://cdn.jsdelivr.net/npm/@helixui/library@3.10.0/dist/css/helix-tokens.css \
+      #     | openssl dgst -sha384 -binary | openssl base64 -A
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.10.0/dist/css/helix-tokens.css:
         type: external
+        attributes:
+          crossorigin: anonymous
+          integrity: 'sha384-Aq5TXefkH8DzRcOY/kGpV35eZ3JeRRHEqm2baA+3BUeWHrjBDFD35gNg68PRakUQ'
   dependencies:
     - core/drupal
     - core/once
 
 helix-local:
-  version: 2.1.2
+  # Locally-bundled assets (relative paths, served by Drupal itself) — no SRI
+  # needed since there is no third-party CDN in the trust path.
+  version: 3.10.0
   js:
     dist/index.js:
       attributes:

@@ -56,7 +56,8 @@
     hx-href="{{ href }}"
     {% if aria_label %}hx-label="{{ aria_label }}"{% endif %}
   {% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
+  {% if attributes %}{{ attributes }}{% endif %}
 >
   {% if image is defined and image %}
     <img slot="image" src="{{ image.src }}" alt="{{ image.alt|default('') }}">
