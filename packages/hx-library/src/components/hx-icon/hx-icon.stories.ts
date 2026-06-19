@@ -454,6 +454,51 @@ export const LibraryFaFree: Story = {
   `,
 };
 
+// Representative subset of the bundled `feather` library (287 glyphs, MIT).
+// Feather is a stroke/outline set; these names cover the common UI categories
+// so the gallery demonstrates the stroke-paint look without rendering all 287.
+const FEATHER_SAMPLE = [
+  'activity',
+  'home',
+  'settings',
+  'heart',
+  'search',
+  'bell',
+  'calendar',
+  'check',
+  'clock',
+  'edit',
+  'eye',
+  'file',
+  'mail',
+  'star',
+  'trash-2',
+  'user',
+];
+
+// Representative subset of the bundled `lucide` library (~1986 glyphs, ISC).
+// Lucide is a stroke/outline set (a community fork of Feather); the shared
+// base names below render identically against the lucide sprite so the two
+// galleries read as a like-for-like comparison.
+const LUCIDE_SAMPLE = [
+  'activity',
+  'home',
+  'settings',
+  'heart',
+  'search',
+  'bell',
+  'calendar',
+  'check',
+  'clock',
+  'pencil',
+  'eye',
+  'file',
+  'mail',
+  'star',
+  'trash-2',
+  'user',
+];
+
 // ════════════════════════════════════════════════════════════════════════════
 // 10. CUSTOM LIBRARY
 // ════════════════════════════════════════════════════════════════════════════
@@ -513,6 +558,122 @@ export const KeyboardNavigation: Story = {
         This component is presentational. It exposes no interactive keyboard targets of its own.
         Screen readers will encounter it in the reading order and announce its content.
       </p>
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 11. LIBRARY: FEATHER
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Representative slice of the bundled `feather` library (Feather Icons, MIT).
+ * The full set ships 287 glyphs at `@helixui/icons/dist/feather.svg`; this story
+ * shows a curated 16-glyph sample. Unlike `helix`/`fa-free` (fill libraries),
+ * Feather is registered with `paintMode: 'stroke'`, so `<hx-icon>` renders the
+ * geometry with `fill: none; stroke: currentColor` and the round line caps/joins
+ * that give outline icons their look. The stroke width is driven by the
+ * `--hx-icon-stroke-width` token (default `2`) — see the
+ * `Library: feather (stroke-width)` story for an override. Use the controls panel
+ * on the Default story with `library="feather"` to render any Feather name.
+ */
+export const LibraryFeather: Story = {
+  name: 'Library: feather',
+  render: () => html`
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem; padding: 1rem;"
+    >
+      ${FEATHER_SAMPLE.map(
+        (name) => html`
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--hx-color-border-default, #e5e7eb); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-surface-default, #ffffff);"
+          >
+            <hx-icon library="feather" name=${name} hx-size="lg" label=${name}></hx-icon>
+            <code
+              style="font-size: 0.75rem; color: var(--hx-color-text-secondary, #6b7280); text-align: center; word-break: break-word;"
+              >${name}</code
+            >
+          </div>
+        `,
+      )}
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 12. LIBRARY: FEATHER — STROKE-WIDTH TOKEN
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Demonstrates the `--hx-icon-stroke-width` token on a stroke-paint library.
+ * The token only takes effect for libraries registered with `paintMode: 'stroke'`
+ * (`feather`, `lucide`); fill libraries ignore it. Each tile sets the token via an
+ * inline style on the host so consumers can see the visual weight shift from a
+ * hairline `1` through the default `2` up to a heavy `3`. Override it at any
+ * cascade level (`:root`, a wrapper, or the element) to tune outline weight to a
+ * brand or density target.
+ */
+export const LibraryFeatherStrokeWidth: Story = {
+  name: 'Library: feather (stroke-width)',
+  render: () => html`
+    <div style="display: flex; align-items: flex-end; gap: 2.5rem; flex-wrap: wrap; padding: 1rem;">
+      ${[
+        { width: '1', label: 'thin (1)' },
+        { width: '2', label: 'default (2)' },
+        { width: '3', label: 'heavy (3)' },
+      ].map(
+        ({ width, label }) => html`
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+            <hx-icon
+              library="feather"
+              name="activity"
+              hx-size="xl"
+              label="Activity, stroke width ${width}"
+              style="--hx-icon-stroke-width: ${width};"
+            ></hx-icon>
+            <code style="font-size: 0.75rem; color: var(--hx-color-text-secondary, #6b7280);"
+              >${label}</code
+            >
+          </div>
+        `,
+      )}
+    </div>
+  `,
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 13. LIBRARY: LUCIDE
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Representative slice of the bundled `lucide` library (Lucide Icons, ISC).
+ * The full set ships ~1986 glyphs at `@helixui/icons/dist/lucide.svg`; this story
+ * shows a curated 16-glyph sample. Lucide is a community fork of Feather and is
+ * likewise registered with `paintMode: 'stroke'`, so the glyphs render with
+ * `fill: none; stroke: currentColor`. The shared base names mirror the Feather
+ * gallery so the two read as a like-for-like comparison; the
+ * `--hx-icon-stroke-width` token applies here identically. Use the controls panel
+ * on the Default story with `library="lucide"` to render any Lucide name.
+ */
+export const LibraryLucide: Story = {
+  name: 'Library: lucide',
+  render: () => html`
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem; padding: 1rem;"
+    >
+      ${LUCIDE_SAMPLE.map(
+        (name) => html`
+          <div
+            style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 1px solid var(--hx-color-border-default, #e5e7eb); border-radius: var(--hx-border-radius-md, 0.375rem); background: var(--hx-color-surface-default, #ffffff);"
+          >
+            <hx-icon library="lucide" name=${name} hx-size="lg" label=${name}></hx-icon>
+            <code
+              style="font-size: 0.75rem; color: var(--hx-color-text-secondary, #6b7280); text-align: center; word-break: break-word;"
+              >${name}</code
+            >
+          </div>
+        `,
+      )}
     </div>
   `,
 };

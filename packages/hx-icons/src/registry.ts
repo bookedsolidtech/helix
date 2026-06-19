@@ -29,6 +29,12 @@ export type {
  * to a SPECIFIC version so future icon releases don't silently change
  * what existing consumers fetch.
  *
+ * **Maintainers:** this pin tracks the version that ships the CURRENT sprite
+ * set and MUST be bumped to the release version whenever a sprite is added or
+ * changed — otherwise the new sprite 404s for default-CDN consumers. It is set
+ * to the version this code is published as (e.g. the `feather`/`lucide` sprites
+ * land in 1.1.0, so the pin is 1.1.0).
+ *
  * **Healthcare consumers behind firewalls or strict CSPs MUST override
  * with `setBasePath()` at app bootstrap.** The console warning below
  * surfaces the first resolution attempt against this default so
@@ -46,7 +52,7 @@ export type {
  *   - Air-gapped enterprise: serve from a same-origin static asset
  *     server and `setBasePath('https://internal.example.com/...')`
  */
-const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist';
+const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist';
 let _hasWarnedDefaultBasePath = false;
 
 /** Module-level singleton map of registered libraries. */
