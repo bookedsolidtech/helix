@@ -275,6 +275,10 @@ export class HelixFileUpload extends FocusMixin(FormMixin(mixinDelegatesAria(Hel
    * @internal
    */
   protected get _focusableNode(): HTMLElement | null {
+    // The dropzone is a <div role="button" tabindex="0"> — when disabled it is
+    // faux-disabled and remains programmatically focusable, so guard here to
+    // keep focus() from landing on an intentionally-inactive control.
+    if (this.disabled) return null;
     return this._dropzone ?? null;
   }
 

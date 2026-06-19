@@ -800,5 +800,23 @@ describe('hx-icon-button', () => {
       await el.updateComplete;
       expect(el.hasAttribute('focused')).toBe(true);
     });
+
+    it('focus() is a no-op when disabled (anchor mode stays inert)', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" href="/x" disabled></hx-icon-button>',
+      );
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('focus() is a no-op when loading', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" loading></hx-icon-button>',
+      );
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
   });
 });

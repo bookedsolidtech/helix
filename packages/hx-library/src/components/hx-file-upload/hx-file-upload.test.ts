@@ -1146,5 +1146,12 @@ describe('hx-file-upload', () => {
       expect(el.focused).toBe(true);
       expect(el.hasAttribute('focused')).toBe(true);
     });
+
+    it('focus() is a no-op when disabled (faux-disabled dropzone stays inert)', async () => {
+      const el = await fixture<HelixFileUpload>('<hx-file-upload disabled></hx-file-upload>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
   });
 });

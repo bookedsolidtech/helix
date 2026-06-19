@@ -1352,5 +1352,21 @@ describe('hx-button', () => {
       await el.updateComplete;
       expect(el.hasAttribute('focused')).toBe(true);
     });
+
+    it('focus() is a no-op when disabled (anchor mode stays inert)', async () => {
+      // A disabled <a tabindex="-1"> is still programmatically focusable; the
+      // _focusableNode guard must keep focus() from landing on it.
+      const el = await fixture<HelixButton>('<hx-button href="/x" disabled>Visit</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('focus() is a no-op when loading', async () => {
+      const el = await fixture<HelixButton>('<hx-button loading>Saving</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
   });
 });

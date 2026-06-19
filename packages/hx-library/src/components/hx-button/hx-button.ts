@@ -253,6 +253,12 @@ export class HelixButton extends FocusMixin(mixinDelegatesAria(HelixElement)) {
    * @internal
    */
   protected get _focusableNode(): HTMLElement | null {
+    // A disabled or loading button is inert. In anchor mode the inner node is an
+    // <a tabindex="-1">, which — unlike a native disabled <button> — is still
+    // programmatically focusable, so guard here to keep focus() (autofocus,
+    // focus-first-invalid, etc.) from landing on a control the consumer
+    // intentionally made inactive.
+    if (this.disabled || this.loading) return null;
     return this._focusEl ?? null;
   }
 

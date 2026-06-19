@@ -498,5 +498,32 @@ describe('hx-prose', () => {
       expect(link).toBeTruthy();
       expect(link?.hasAttribute('href')).toBe(false);
     });
+
+    it('sanitize on neutralizes javascript: in SVG xlink:href', async () => {
+      // SVG <a xlink:href> is URL-bearing like href/src; the built-in pass must
+      // strip a javascript: scheme there too, not just on HTML href/src.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><svg viewBox="0 0 1 1"><a xlink:href="javascript:alert(1)"><rect width="1" height="1" /></a></svg></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.innerHTML.toLowerCase()).not.toContain('javascript:');
+    });
+
+    it('re-sanitizes the initial payload when a custom sanitizer is attached late', async () => {
+      // Common pattern: `<hx-prose sanitize>` in markup, then
+      // `el.sanitizer = DOMPurify.sanitize` from JS. The custom policy must
+      // re-process the ALREADY-sanitized initial content, not just future
+      // mutations — otherwise it never protects the initial SSR/CMS payload.
+      const el = await fixture<HelixProse>('<hx-prose sanitize><p>original</p></hx-prose>');
+      await el.updateComplete;
+      let called = false;
+      el.sanitizer = (html: string) => {
+        called = true;
+        return html.replace('original', 'cleaned');
+      };
+      await el.updateComplete;
+      expect(called).toBe(true);
+      expect(el.querySelector('p')?.textContent).toBe('cleaned');
+    });
   });
 });

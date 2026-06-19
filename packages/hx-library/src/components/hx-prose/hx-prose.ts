@@ -153,6 +153,15 @@ export class HelixProse extends HelixElement {
         this._stopSanitizeObserver();
       }
     }
+    // A late-bound custom sanitizer is a common pattern: `<hx-prose sanitize>` in
+    // markup, then `el.sanitizer = DOMPurify.sanitize` from JS. connectedCallback
+    // already sanitized the initial payload with the weaker built-in policy, so we
+    // must re-process the existing content under the new policy when `sanitizer`
+    // changes while sanitization is active — otherwise the custom policy never
+    // protects the initial SSR/CMS payload.
+    if (changedProperties.has('sanitizer') && this.sanitize) {
+      this._sanitizeSlottedContent();
+    }
   }
 
   // ─── Private ───
@@ -255,7 +264,10 @@ export class HelixProse extends HelixElement {
     template.innerHTML = markup;
 
     const DANGEROUS_ELEMENTS = ['script', 'style', 'iframe', 'object', 'embed', 'foreignObject'];
-    const URL_ATTRS = ['href', 'src'];
+    // `xlink:href` (and any namespaced `*:href`) is URL-bearing on SVG <a>/<use>
+    // and carries the same javascript:/data: risk as `href`/`src` — hx-icon
+    // treats it as dangerous for the same reason.
+    const URL_ATTRS = ['href', 'src', 'xlink:href'];
 
     const walk = (root: ParentNode): void => {
       // Static snapshot — we mutate the tree (removeChild) while iterating.
@@ -275,7 +287,12 @@ export class HelixProse extends HelixElement {
             continue;
           }
           // Neutralize dangerous URL schemes in navigational/resource attributes.
-          if (URL_ATTRS.includes(name) && this._hasUnsafeUrlScheme(value)) {
+          // `name.endsWith(':href')` catches any namespaced href (e.g. xlink:href)
+          // beyond the explicit allowlist.
+          if (
+            (URL_ATTRS.includes(name) || name.endsWith(':href')) &&
+            this._hasUnsafeUrlScheme(value)
+          ) {
             el.removeAttribute(attr.name);
           }
         }
