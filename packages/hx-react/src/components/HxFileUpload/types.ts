@@ -44,7 +44,7 @@ Accepts both `accessible-label` and the standard `aria-label` HTML attribute.
 `accessible-label` takes precedence when both are set. */
   accessibleLabel?: string;
   /** Generates upload progress description for screen readers. */
-  labelUploadProgress?: string;
+  labelUploadProgress?: (name: string, progress: number) => string;
   /** Screen reader announcement when file drag detected. Override for i18n. */
   labelDragDetected?: string;
   /** Returns a read-only copy of the currently selected files. */

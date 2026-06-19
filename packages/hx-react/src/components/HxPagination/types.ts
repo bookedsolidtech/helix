@@ -40,9 +40,9 @@ export interface HxPaginationProps {
   /** Accessible label for the "Last page" navigation button. */
   lastPageLabel?: string;
   /** Function to format the page navigation announcement. Override for i18n. */
-  labelPageMessage?: string;
+  labelPageMessage?: (current: number, total: number) => string;
   /** Function to format page button aria-labels. Override for i18n. */
-  labelPageButton?: string;
+  labelPageButton?: (page: number) => string;
 
   // Event callbacks
   /** Fired when the user navigates to a new page. */

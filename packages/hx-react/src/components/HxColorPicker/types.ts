@@ -64,7 +64,7 @@ and joins the host's announced description channel via a live alert. */
   error?: string | undefined;
   /** Generates the accessible label for the trigger button when no other
 naming source is provided. */
-  labelTrigger?: string;
+  labelTrigger?: (color: string) => string;
 
   // Event callbacks
   /** Dispatched while dragging sliders or grid. */

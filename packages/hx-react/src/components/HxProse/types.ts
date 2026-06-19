@@ -31,5 +31,5 @@ a hardened library here (e.g. `(html) => DOMPurify.sanitize(html)`).
 
 `attribute: false` because a function cannot be expressed as an HTML attribute;
 it must be assigned via property (`el.sanitizer = fn`). */
-  sanitizer?: string | undefined;
+  sanitizer?: (html: string) => string;
 }

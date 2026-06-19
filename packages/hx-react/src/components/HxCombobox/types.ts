@@ -53,7 +53,7 @@ host's `internals.ariaLabel` on the modern path. */
   /** Validation message shown when the field is required but empty. */
   labelRequired?: string;
   /** Generates the accessible label for multi-select chip remove buttons. */
-  labelRemoveOption?: string;
+  labelRemoveOption?: (label: string) => string;
 
   // Event callbacks
   /** Dispatched when the listbox opens. */

@@ -30,9 +30,9 @@ export interface HxRatingProps {
   required?: boolean;
   /** Generates the accessible label for individual star elements.
 Handles singular/plural automatically. */
-  labelStar?: string;
+  labelStar?: (count: number) => string;
   /** Generates the aria-valuetext for the composite rating widget. */
-  labelValueText?: string;
+  labelValueText?: (value: number, max: number) => string;
 
   // Event callbacks
   /** Dispatched when the rating value changes. */

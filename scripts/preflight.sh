@@ -101,41 +101,45 @@ SRI_VIOLATIONS=0
 # Find every *.libraries.yml tracked in the repo (Drupal library definitions).
 while IFS= read -r libfile; do
   [ -n "$libfile" ] || continue
-  # awk walks each file block-by-block: when it sees a jsDelivr URL key line
-  # whose nested mapping carries `type: external`, it requires an `integrity:`
-  # key within the same indented block. A block ends at the next line indented
-  # at or below the URL key's own indentation.
+  # awk state machine: strips trailing #comments, then for every jsDelivr URL used
+  # as a mapping KEY requires `integrity` when the mapping is `type: external`. It
+  # handles BOTH block-style (nested mapping on following indented lines) AND
+  # flow-style (inline `{ type: external, integrity: … }` on the same line). The URL
+  # is extracted by its own pattern (the path has no colons) so the colon in
+  # `https://` never confuses key detection. A block ends at the next line indented
+  # at or below the URL key's indentation.
   MISSING=$(awk '
     function indent(s,   i) { i=0; while (substr(s,i+1,1)==" ") i++; return i }
-    /cdn\.jsdelivr\.net.*:[[:space:]]*$/ {
-      url_line = $0; url_indent = indent($0)
-      # Capture the trimmed URL for reporting.
-      u = $0; sub(/^[[:space:]]+/, "", u); sub(/:[[:space:]]*$/, "", u)
-      has_external = 0; has_integrity = 0
-      # Scan the nested block belonging to this URL key.
-      while ((getline nl) > 0) {
-        if (nl ~ /^[[:space:]]*$/) continue
-        ni = indent(nl)
-        if (ni <= url_indent) {
-          # Block ended — emit if it was external without integrity, then
-          # re-process this boundary line as a potential next URL key.
-          if (has_external && !has_integrity) print u
-          if (nl ~ /cdn\.jsdelivr\.net.*:[[:space:]]*$/) {
-            url_indent = ni
-            u = nl; sub(/^[[:space:]]+/, "", u); sub(/:[[:space:]]*$/, "", u)
-            has_external = 0; has_integrity = 0
-            continue
-          }
-          next_handled = 1
-          break
-        }
-        if (nl ~ /type:[[:space:]]*external/) has_external = 1
-        if (nl ~ /integrity:/) has_integrity = 1
-      }
-      # EOF reached while still inside the block.
-      if (!next_handled && has_external && !has_integrity) print u
-      next_handled = 0
+    function url_of(s) {
+      if (match(s, /https?:\/\/cdn\.jsdelivr\.net[^[:space:]:{]*/)) return substr(s, RSTART, RLENGTH)
+      return ""
     }
+    function close_block() {
+      if (open && b_ext && !b_int) print b_url
+      open = 0; b_ext = 0; b_int = 0
+    }
+    {
+      s = $0; sub(/[[:space:]]*#.*$/, "", s)       # drop trailing comment
+      if (s ~ /^[[:space:]]*$/) next                # skip blank / comment-only
+      ind = indent(s)
+      if (open && ind <= b_indent) close_block()    # left the current block
+      # A jsDelivr URL used as a mapping key: line ends with ":" (block) or
+      # ":" followed by an inline "{ … }" flow mapping.
+      if (s ~ /cdn\.jsdelivr\.net/ && s ~ /:[[:space:]]*(\{.*\})?[[:space:]]*$/) {
+        u = url_of(s)
+        if (s ~ /:[[:space:]]*\{/) {                 # flow-style: whole mapping inline
+          if (s ~ /type:[[:space:]]*external/ && s !~ /integrity/) print u
+        } else {                                     # block-style: scan following lines
+          open = 1; b_indent = ind; b_url = u; b_ext = 0; b_int = 0
+        }
+        next
+      }
+      if (open) {
+        if (s ~ /type:[[:space:]]*external/) b_ext = 1
+        if (s ~ /integrity/) b_int = 1
+      }
+    }
+    END { close_block() }
   ' "$libfile")
 
   if [ -n "$MISSING" ]; then
