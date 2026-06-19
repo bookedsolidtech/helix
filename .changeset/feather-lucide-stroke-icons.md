@@ -11,9 +11,10 @@ stroke-paint icon libraries in `@helixui/icons`, shipped as CDN sprite sheets
 (`@helixui/icons/tree-shake/feather/*`, `.../lucide/*`).
 
 `<hx-icon>` now reflects the resolved library's `paintMode` onto the rendered SVG and
-paints stroke libraries with `fill: none; stroke: currentColor` and rounded caps/joins,
-with stroke width driven by the existing `--hx-icon-stroke-width` token. Fill libraries
-(`helix`, `fa-free`) are unchanged.
+paints stroke libraries with `fill: none; stroke: currentColor`, with stroke width
+driven by the existing `--hx-icon-stroke-width` token. Line caps and joins are not
+imposed by the component — each glyph carries its own caps/joins in its library's
+source geometry. Fill libraries (`helix`, `fa-free`) are unchanged.
 
 ```html
 <hx-icon library="feather" name="activity" label="Activity"></hx-icon>
