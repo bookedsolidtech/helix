@@ -6,6 +6,7 @@ import { HelixElement } from '../../base/index.js';
 import { FocusMixin } from '../../mixins/index.js';
 import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /** Minimum allowed value for feedbackDuration (ms). */
 const MIN_FEEDBACK_DURATION = 300;
@@ -189,6 +190,16 @@ export class HelixCopyButton extends FocusMixin(HelixElement) {
   }
 
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0). super chains
+    // through FocusMixin.
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-copy-button', (v) => {
+      this.size = v;
+    });
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();

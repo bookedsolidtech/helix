@@ -153,6 +153,23 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-bg: var(--hx-color-surface-raised, #f5f8f3);
   }
 
+  /*
+   * Danger: solid error fill + on-error text. Mirrors hx-icon-button /
+   * hx-button danger token choices. on-error is tuned for error-500;
+   * hover deepens to error-600 and pins fg at neutral-0 (6.47:1 on
+   * error-600) because on-error drops below AA on the darker fill.
+   */
+  .button--danger {
+    --hx-toggle-button-bg: var(--hx-color-error-500, #e5493e);
+    --hx-toggle-button-color: var(--hx-color-text-on-error, #ffffff);
+    --hx-toggle-button-border-color: transparent;
+  }
+
+  .button--danger:hover {
+    --hx-toggle-button-bg: var(--hx-color-error-600, #c92a2a);
+    --hx-toggle-button-color: var(--hx-color-neutral-0, #ffffff);
+  }
+
   /* ─── Pressed State ─── */
 
   /*
@@ -226,6 +243,20 @@ export const helixToggleButtonStyles = css`
     --hx-toggle-button-border-color: var(--hx-color-text-muted, #4a5362);
     box-shadow: inset 0 0 0 var(--hx-toggle-button-pressed-ring-width, 1px)
       var(--hx-color-neutral-500, #66787b);
+  }
+
+  /*
+   * Danger pressed: deepen to error-600 and pin fg at neutral-0 (6.47:1 on
+   * error-600) so the pressed state reads clearly while clearing AA. Mirrors
+   * the primary pressed treatment (deepen fill + neutral-0 text).
+   */
+  .button--danger.button--pressed {
+    --hx-toggle-button-bg: var(--hx-toggle-button-pressed-bg, var(--hx-color-error-600, #c92a2a));
+    --hx-toggle-button-color: var(
+      --hx-toggle-button-pressed-color,
+      var(--hx-color-neutral-0, #ffffff)
+    );
+    --hx-toggle-button-border-color: transparent;
   }
 
   /* ─── Disabled ─── */

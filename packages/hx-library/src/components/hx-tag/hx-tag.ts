@@ -6,6 +6,7 @@ import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixTagStyles } from './hx-tag.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /**
  * A compact label for categorization, filtering, and selection.
@@ -136,6 +137,17 @@ export class HelixTag extends HelixElement {
 
   /** @internal Whether the suffix slot has assigned content. */
   @state() private _hasSuffix = false;
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-tag', (v) => {
+      this.size = v;
+    });
+  }
 
   // ─── Event Handling ───
 

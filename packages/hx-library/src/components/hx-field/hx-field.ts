@@ -5,6 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { helixFieldStyles } from './hx-field.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /** Native form control tag names that can receive ARIA attributes. */
 const FORM_CONTROL_TAGS = new Set(['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON']);
@@ -289,6 +290,11 @@ export class HelixField extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-field', (v) => {
+      this.size = v;
+    });
     this._ensureA11yDescEl();
   }
 

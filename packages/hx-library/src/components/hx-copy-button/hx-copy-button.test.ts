@@ -180,6 +180,20 @@ describe('hx-copy-button', () => {
       const el = await fixture<HelixCopyButton>('<hx-copy-button hx-size="sm"></hx-copy-button>');
       expect(el.getAttribute('hx-size')).toBe('sm');
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button size="lg"></hx-copy-button>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixCopyButton>(
+        '<hx-copy-button size="sm" hx-size="lg"></hx-copy-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Events (5) ───

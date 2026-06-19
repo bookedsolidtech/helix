@@ -135,6 +135,18 @@ describe('hx-switch', () => {
       const container = shadowQuery(el, '.switch');
       expect(container?.classList.contains('switch--lg')).toBe(true);
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch size="lg"></hx-switch>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HxSwitch>('<hx-switch size="sm" hx-size="lg"></hx-switch>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // --- Property: label (3) ---
@@ -809,9 +821,7 @@ describe('hx-switch', () => {
       // wrapper is hidden and dropped from the describedby chain — AT must
       // not announce stale guidance ahead of the validation error. This test
       // verifies the help-only state still announces help.
-      const el = await fixture<HxSwitch>(
-        '<hx-switch label="Toggle" help-text="Help"></hx-switch>',
-      );
+      const el = await fixture<HxSwitch>('<hx-switch label="Toggle" help-text="Help"></hx-switch>');
       // Codex round-1 finding #1: the host is the canonical announced surface.
       // The describedBy chain is exposed through `internals.ariaDescribedByElements`
       // (when supported) rather than via an attribute on the inner control.

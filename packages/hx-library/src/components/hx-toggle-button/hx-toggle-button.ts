@@ -12,6 +12,7 @@ import {
   supportsIdrefElementReferences,
   type AriaIdrefMirrorHandle,
 } from '../../utils/aria-idref.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /** Detail for the hx-toggle event dispatched by hx-toggle-button. */
 export interface HxToggleDetail {
@@ -130,7 +131,7 @@ export class HelixToggleButton extends HelixElement {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'outline' = 'secondary';
+  variant: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'outline' | 'danger' = 'secondary';
 
   /**
    * Size of the button.
@@ -242,6 +243,11 @@ export class HelixToggleButton extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-toggle-button', (v) => {
+      this.size = v;
+    });
     // Detect platform support for IDL element references. Codex round-2
     // finding #2: drives the render-time branch between modern (host
     // announced) and fallback (inner button announced) paths.

@@ -244,6 +244,22 @@ describe('hx-progress-bar', () => {
       const wrapper = shadowQuery(el, '.progress-bar')!;
       expect(wrapper.classList.contains('progress-bar--lg')).toBe(true);
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" size="lg"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar value="50" size="sm" hx-size="lg"></hx-progress-bar>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Slots (1) ───
@@ -467,9 +483,7 @@ describe('hx-progress-bar', () => {
       );
       await el.updateComplete;
       const srSpans = shadowQueryAll(el, '.sr-only');
-      const variantSpan = srSpans.find((s) =>
-        s.classList.contains('progress-bar__variant-label'),
-      );
+      const variantSpan = srSpans.find((s) => s.classList.contains('progress-bar__variant-label'));
       expect(variantSpan).toBeTruthy();
       expect(variantSpan?.textContent).toBe('Success');
     });
@@ -541,7 +555,9 @@ describe('hx-progress-bar', () => {
 
   describe('Property: description', () => {
     it('defaults to empty string', async () => {
-      const el = await fixture<HelixProgressBar>('<hx-progress-bar label="Loading"></hx-progress-bar>');
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Loading"></hx-progress-bar>',
+      );
       expect(el.description).toBe('');
     });
 
@@ -564,7 +580,9 @@ describe('hx-progress-bar', () => {
     });
 
     it('does not render description sr-only span when description is empty', async () => {
-      const el = await fixture<HelixProgressBar>('<hx-progress-bar label="Loading"></hx-progress-bar>');
+      const el = await fixture<HelixProgressBar>(
+        '<hx-progress-bar label="Loading"></hx-progress-bar>',
+      );
       await el.updateComplete;
       // Only the aria-live sr-only div exists; the description-specific span should not exist
       const descSpans = shadowQueryAll(el, '.sr-only');

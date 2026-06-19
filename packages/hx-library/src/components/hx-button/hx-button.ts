@@ -7,6 +7,7 @@ import { HelixElement } from '../../base/index.js';
 import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /** Detail for the hx-click event dispatched by hx-button. */
 export interface HxButtonClickDetail {
@@ -275,6 +276,16 @@ export class HelixButton extends FocusMixin(mixinDelegatesAria(HelixElement)) {
 
   // Prevents double-warn on browsers that fire slotchange for empty initial slots.
   private _emptySlotWarnEmitted = false;
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0). super chains
+    // through FocusMixin.
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-button', (v) => {
+      this.size = v;
+    });
+  }
 
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);

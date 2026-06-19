@@ -7,6 +7,7 @@ import { HelixElement } from '../../base/index.js';
 import { helixAvatarStyles } from './hx-avatar.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /**
  * A user avatar component that displays an image, initials, or a fallback icon.
@@ -120,6 +121,15 @@ export class HelixAvatar extends HelixElement {
   private _hasBadgeSlot = false;
 
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'xs' | 'sm' | 'md' | 'lg' | 'xl'>(this, 'hx-avatar', (v) => {
+      this.size = v;
+    });
+  }
 
   // P1-A / P2-B: Use willUpdate() instead of updated() for property validation
   // and derived state. willUpdate() runs before render() and does not schedule

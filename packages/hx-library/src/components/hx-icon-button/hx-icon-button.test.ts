@@ -124,6 +124,16 @@ describe('hx-icon-button', () => {
       expect(btn).toBeTruthy();
       expect(btn?.classList.contains('button--ghost')).toBe(true);
     });
+
+    it('reflects variant="outline" to host and renders', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" variant="outline"></hx-icon-button>',
+      );
+      expect(el.getAttribute('variant')).toBe('outline');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--outline')).toBe(true);
+    });
   });
 
   // ─── Property: size (3) ───
@@ -152,6 +162,22 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery(el, 'button');
       expect(btn).toBeTruthy();
       expect(btn?.classList.contains('button--lg')).toBe(true);
+    });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" size="lg"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" size="sm" hx-size="lg"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 
@@ -581,7 +607,9 @@ describe('hx-icon-button', () => {
       );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       let fired = false;
-      el.addEventListener('hx-click', () => { fired = true; });
+      el.addEventListener('hx-click', () => {
+        fired = true;
+      });
       anchor.click();
       await el.updateComplete;
       expect(fired).toBe(false);
@@ -597,9 +625,7 @@ describe('hx-icon-button', () => {
         const el = await fixture<HelixIconButton>('<hx-icon-button></hx-icon-button>');
         await el.updateComplete;
         const relevantCalls = spy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('label'),
+          (call) => typeof call[0] === 'string' && call[0].includes('label'),
         );
         expect(relevantCalls.length).toBeGreaterThan(0);
       } finally {

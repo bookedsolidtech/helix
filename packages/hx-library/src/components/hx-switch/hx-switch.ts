@@ -13,6 +13,7 @@ import {
   supportsIdrefElementReferences,
   type AriaIdrefMirrorHandle,
 } from '../../utils/aria-idref.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 const _nextSwitchId = createIdCounter('hx-switch');
 
@@ -241,6 +242,11 @@ export class HelixSwitch extends FormMixin(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-switch', (v) => {
+      this.size = v;
+    });
     // Detect platform support for IDL element references. Codex round-2
     // finding #2: drives the render-time branch.
     this._supportsIdrefRefs = supportsIdrefElementReferences(this._internals);

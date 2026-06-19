@@ -120,6 +120,22 @@ describe('hx-overflow-menu', () => {
       const btn = shadowQuery(el, '[part~="button"]');
       expect(btn?.classList.contains('trigger--lg')).toBe(true);
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu size="lg"></hx-overflow-menu>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixOverflowMenu>(
+        '<hx-overflow-menu size="sm" hx-size="lg"></hx-overflow-menu>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Property: disabled (3) ───

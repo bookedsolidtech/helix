@@ -173,6 +173,18 @@ describe('hx-avatar', () => {
       const el = await fixture<HelixAvatar>('<hx-avatar hx-size="lg"></hx-avatar>');
       expect(el.getAttribute('hx-size')).toBe('lg');
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar size="lg"></hx-avatar>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixAvatar>('<hx-avatar size="sm" hx-size="lg"></hx-avatar>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Property: shape (3) ───

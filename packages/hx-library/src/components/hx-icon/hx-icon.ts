@@ -7,6 +7,7 @@ import type { IconLibrary, IconPaintMode } from '@helixui/icons';
 import { HelixElement } from '../../base/index.js';
 import { helixIconStyles } from './hx-icon.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /**
  * An icon component that resolves through the `@helixui/icons` registry,
@@ -238,6 +239,11 @@ export class HelixIcon extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'xs' | 'sm' | 'md' | 'lg' | 'xl'>(this, 'hx-icon', (v) => {
+      this.size = v;
+    });
     if (typeof globalThis.addEventListener === 'function') {
       globalThis.addEventListener('helixicon-library-registered', this._onLibraryRegistered);
       globalThis.addEventListener('helixicon-base-path-changed', this._onBasePathChanged);

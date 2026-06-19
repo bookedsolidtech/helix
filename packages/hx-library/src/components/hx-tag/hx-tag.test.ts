@@ -105,6 +105,18 @@ describe('hx-tag', () => {
       const base = shadowQuery(el, '[part="base"]')!;
       expect(base.classList.contains('tag--lg')).toBe(true);
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HxTag>('<hx-tag size="lg">L</hx-tag>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HxTag>('<hx-tag size="sm" hx-size="lg">L</hx-tag>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Property: pill ───
@@ -467,9 +479,7 @@ describe('hx-tag', () => {
     });
 
     it('remove button aria-label uses only text node content, not element nodes', async () => {
-      const el = await fixture<HxTag>(
-        '<hx-tag removable><span>text via element</span></hx-tag>',
-      );
+      const el = await fixture<HxTag>('<hx-tag removable><span>text via element</span></hx-tag>');
       await el.updateComplete;
       // The span is an element node, not a text node — _defaultSlotText should be empty
       const btn = shadowQuery(el, '[part="remove-button"]');

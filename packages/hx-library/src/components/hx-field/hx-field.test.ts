@@ -235,6 +235,18 @@ describe('hx-field', () => {
       expect(field?.classList.contains('field--size-md')).toBe(false);
       expect(field?.classList.contains('field--size-lg')).toBe(false);
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixField>('<hx-field size="lg"></hx-field>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixField>('<hx-field size="sm" hx-size="lg"></hx-field>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Slots (5) ───

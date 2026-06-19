@@ -8,6 +8,7 @@ import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /**
  * An icon-only button component for compact, accessible actions.
@@ -97,7 +98,7 @@ export class HelixIconButton extends FocusMixin(mixinDelegatesAria(HelixElement)
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' = 'ghost';
+  variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'ghost';
 
   /**
    * Size of the button.
@@ -177,6 +178,18 @@ export class HelixIconButton extends FocusMixin(mixinDelegatesAria(HelixElement)
    */
   protected get _focusableNode(): HTMLElement | null {
     return this._focusEl ?? null;
+  }
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0). super chains
+    // through FocusMixin.
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-icon-button', (v) => {
+      this.size = v;
+    });
   }
 
   // ─── Event Handling ───
