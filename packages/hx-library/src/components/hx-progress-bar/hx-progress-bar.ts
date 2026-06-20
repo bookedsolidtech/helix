@@ -14,6 +14,7 @@ import {
   type AriaIdrefMirrorHandle,
 } from '../../utils/aria-idref.js';
 import { flattenAccName } from '../../utils/aria-flatten.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 const _nextProgressBarId = createIdCounter('hx-progress-bar');
 
@@ -185,6 +186,11 @@ export class HelixProgressBar extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-progress-bar', (v) => {
+      this.size = v;
+    });
     const ctor = this.constructor as typeof HelixProgressBar;
     this._supportsIdrefRefs =
       ctor.__testSupportsIdrefRefsOverride !== null

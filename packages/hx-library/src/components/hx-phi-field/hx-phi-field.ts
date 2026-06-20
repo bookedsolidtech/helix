@@ -1,4 +1,4 @@
-import { html, type TemplateResult } from 'lit';
+import { html, type TemplateResult, type PropertyValues } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -6,7 +6,7 @@ import '../hx-icon/hx-icon.js';
 import { HelixElement } from '../../base/index.js';
 import { helixPhiFieldStyles } from './hx-phi-field.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
-import { devWarn } from '../../utils/dev-warn.js';
+import { devWarn, devError } from '../../utils/dev-warn.js';
 
 /**
  * HIPAA-compliant field component for rendering masked Protected Health Information (PHI).
@@ -46,9 +46,15 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @csspart toggle - The reveal/hide toggle button.
  *
  * @fires {CustomEvent<PhiAccessEventDetail>} hx-phi-access - Fired on reveal, hide,
- *   auto-hide, clipboard-clear, and clipboard-clear-failed actions. Contains audit
- *   metadata only — never raw PHI. Dispatched with `composed: true` to cross shadow
- *   boundaries for application-level audit listeners.
+ *   auto-hide, clipboard-clear, clipboard-clear-failed, and attribute-exposure-refused
+ *   actions. Contains audit metadata only — never raw PHI. Dispatched with
+ *   `composed: true` to cross shadow boundaries for application-level audit listeners.
+ *
+ * @note The `hx-phi-access` audit event crosses a trust boundary (`composed: true`
+ *   escapes the shadow root to reach host-application listeners). Its `detail` carries
+ *   audit metadata ONLY — `fieldId`, `action`, `timestamp`, `fieldType` — and NEVER the
+ *   raw PHI value. This separation is a deliberate HIPAA security boundary; consumers
+ *   re-dispatching this event must not enrich the detail with the `data` value.
  *
  * @cssprop [--hx-phi-field-font-family=var(--hx-font-family-mono,monospace)] - Font family for the masked value.
  * @cssprop [--hx-phi-field-value-color=var(--hx-color-neutral-900,#0D1825)] - Value text color.
@@ -132,6 +138,43 @@ export class HelixPhiField extends HelixElement {
   @property({ type: Boolean, reflect: true })
   disabled: boolean = false;
 
+  /**
+   * Opt-in fail-closed DETECTOR for PHI exposed via the `data` HTML attribute
+   * (FS-029). Defaults to `false`, which preserves the existing best-effort
+   * silent-rescue behavior and is fully backward compatible.
+   *
+   * **This is a detector, not a cure.** By the time `connectedCallback` runs,
+   * a server-rendered page has already serialized the raw PHI into the HTML
+   * sent over the wire — the leak happened server-side and cannot be undone
+   * client-side. Stripping the attribute here only cleans up the *live* DOM.
+   *
+   * When `strict` is `true` and a `data` attribute is detected, the component
+   * still strips the attribute first (so PHI leaves the live DOM), then fails
+   * LOUDLY instead of silently: it dispatches an `hx-phi-access` event with
+   * `action: 'attribute-exposure-refused'` for the audit trail, and — in
+   * development/test/CI builds (`import.meta.env.DEV`) — logs a `console.error`
+   * so the SSR misconfiguration surfaces during testing rather than shipping
+   * unnoticed. It does NOT throw: an exception from `connectedCallback` is
+   * reported as an uncaught browser error and aborts the callback, which would
+   * destabilise a live field. Production builds emit nothing to the console (the
+   * `import.meta.env.DEV` branch is tree-shaken away), so an opted-in app still
+   * degrades to the audit-event signal rather than logging for end users.
+   *
+   * Detection covers BOTH the initial markup at connect AND post-connect writes
+   * (a hydration pass or client framework calling `setAttribute('data', …)` after
+   * the element is live) via a MutationObserver — `data` is `attribute: false`, so
+   * Lit's `attributeChangedCallback` never fires for it.
+   *
+   * Its value is surfacing the defect (an upstream SSR `data` attribute) before
+   * it reaches production — not preventing the server-side serialization, which
+   * already occurred.
+   *
+   * @attr strict
+   * @reflect
+   */
+  @property({ type: Boolean, reflect: true })
+  strict: boolean = false;
+
   // ─── Internal State ───
 
   /** @internal */
@@ -142,6 +185,9 @@ export class HelixPhiField extends HelixElement {
 
   /** @internal Timer ID for auto-re-mask after reveal. */
   private _autoHideTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** @internal Strict-mode observer for post-connect `data` attribute writes. */
+  private _strictDataObserver: MutationObserver | undefined;
 
   // ─── Lifecycle ───
 
@@ -161,6 +207,23 @@ export class HelixPhiField extends HelixElement {
     this._resetAutoHideTimer();
   };
 
+  /**
+   * SYNCHRONOUS strict-mode guard for `data` attribute writes. Refusing here — before
+   * the value ever lands in the DOM — closes the window the async MutationObserver
+   * leaves open (raw PHI readable for one microtask after `setAttribute('data', …)`).
+   * The observer remains as a backstop for non-setAttribute write paths
+   * (`setAttributeNS`, `setAttributeNode`) and for SSR markup parsed before upgrade.
+   */
+  override setAttribute(qualifiedName: string, value: string): void {
+    if (this.strict && qualifiedName === 'data') {
+      // Do NOT call super — the attribute never lands. _refuseDataAttribute() still
+      // dispatches the audit event + dev log (its removeAttribute is a no-op here).
+      this._refuseDataAttribute();
+      return;
+    }
+    super.setAttribute(qualifiedName, value);
+  }
+
   override connectedCallback(): void {
     super.connectedCallback();
     // Enforce HIPAA compliance: prevent browser autofill on the host element
@@ -175,6 +238,18 @@ export class HelixPhiField extends HelixElement {
     // into the JS-only property and then immediately remove the attribute so
     // that no PHI is ever left exposed in the DOM tree or HTML source.
     if (this.hasAttribute('data')) {
+      // Opt-in strict mode is a fail-closed DETECTOR (see the `strict` property
+      // docs). The server-side SSR leak has ALREADY happened by the time this
+      // runs — strict cannot undo it. Its only job is to surface the defect
+      // LOUDLY (audit event + dev/test console.error) instead of silently
+      // rescuing. We strip the attribute FIRST so the raw PHI leaves the live
+      // DOM before anything else runs.
+      if (this.strict) {
+        this._refuseDataAttribute();
+        // Also catch post-connect writes (hydration / client frameworks) below.
+        this._startStrictDataObserver();
+        return;
+      }
       devWarn(
         'hx-phi-field',
         'Setting PHI via the `data` HTML attribute is not supported and exposes sensitive data in the DOM source. Use the `data` JS property (element.data = "...") instead.',
@@ -187,13 +262,92 @@ export class HelixPhiField extends HelixElement {
       }
       this.removeAttribute('data');
     }
+    // Strict mode must also catch a `data` attribute written AFTER connect (a
+    // client framework or hydration pass) — even when the initial markup had
+    // none. Idempotent if already started in the with-data branch above.
+    if (this.strict) {
+      this._startStrictDataObserver();
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._cancelClipboardTimer();
     this._cancelAutoHideTimer();
+    this._strictDataObserver?.disconnect();
+    this._strictDataObserver = undefined;
     document.removeEventListener('visibilitychange', this._boundHandleVisibilityChange);
+  }
+
+  override updated(changed: PropertyValues<this>): void {
+    super.updated(changed);
+    // `strict` is a reactive, reflected property — it can be toggled after connect
+    // (a wrapper or hydration pass). The observer is only armed in connectedCallback,
+    // so mirror start/stop here on every change to `strict`.
+    if (changed.has('strict')) {
+      if (this.strict) {
+        // Catch a `data` attribute that was already present when strict turned on.
+        if (this.hasAttribute('data')) {
+          this._refuseDataAttribute();
+        }
+        this._startStrictDataObserver();
+      } else {
+        this._strictDataObserver?.disconnect();
+        this._strictDataObserver = undefined;
+      }
+    }
+  }
+
+  /**
+   * Strips a `data` HTML attribute (so raw PHI leaves the live DOM), dispatches the
+   * `attribute-exposure-refused` audit event (metadata only, never raw PHI), and —
+   * in dev/test builds — logs loudly. Shared by strict mode at connect time and by
+   * the post-connect attribute observer. Never throws (an exception from a lifecycle
+   * callback would destabilise a live field).
+   * @internal
+   */
+  private _refuseDataAttribute(): void {
+    // PHI leaves the live DOM first, regardless of anything below.
+    this.removeAttribute('data');
+    this.dispatchEvent(
+      new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          fieldId: this.fieldId || this.id || '',
+          action: 'attribute-exposure-refused',
+          timestamp: new Date().toISOString(),
+          fieldType: this.fieldType,
+        },
+      }),
+    );
+    devError(
+      'hx-phi-field',
+      'strict mode: PHI was set via the `data` HTML attribute. ' +
+        'This exposes sensitive data in the server-rendered HTML source (HIPAA risk). ' +
+        'The raw value was NOT rescued. Use the `data` JS property (element.data = "...") instead.',
+    );
+  }
+
+  /**
+   * Observes post-connect writes to the `data` HTML attribute under strict mode.
+   * `data` is `attribute: false`, so Lit's `attributeChangedCallback` never fires
+   * for it — a MutationObserver is the only way to catch a late `setAttribute('data', …)`
+   * from hydration or a client framework. Idempotent.
+   * @internal
+   */
+  private _startStrictDataObserver(): void {
+    if (this._strictDataObserver) {
+      return;
+    }
+    this._strictDataObserver = new MutationObserver(() => {
+      // _refuseDataAttribute() itself removes the attribute, which fires another
+      // record; the hasAttribute guard makes that re-entry a harmless no-op.
+      if (this.hasAttribute('data')) {
+        this._refuseDataAttribute();
+      }
+    });
+    this._strictDataObserver.observe(this, { attributes: true, attributeFilter: ['data'] });
   }
 
   // ─── Private Helpers ───
@@ -470,7 +624,15 @@ export class HelixPhiField extends HelixElement {
   private _handleCopy(e: ClipboardEvent): void {
     if (this._masked) {
       e.preventDefault();
+      return;
     }
+    // An allowed copy places the freshest PHI on the clipboard. Reset the
+    // clipboard-clear timer (cancel + restart) so the FULL clearTimeout window
+    // applies to THIS copy. Without the reset, a copy late in a prior reveal's
+    // window would inherit only the remaining time, clearing PHI from the
+    // clipboard sooner than the configured timeout. `_scheduleClipboardClear`
+    // already cancels any pending timer before starting a fresh one.
+    this._scheduleClipboardClear();
   }
 
   /** @internal */
@@ -571,8 +733,20 @@ export interface PhiAccessEventDetail {
    *   provide). The clipboard MAY still contain PHI. HIPAA audit consumers
    *   should treat this as an actionable event — prompt the user to manually
    *   clear their clipboard, flag the session, or escalate per policy.
+   * - `attribute-exposure-refused`: opt-in `strict` mode detected PHI set via the
+   *   `data` HTML attribute (an FS-029 SSR misconfiguration) and refused to rescue
+   *   it. The live-DOM attribute has been stripped, but the raw value was ALREADY
+   *   serialized into the server-rendered HTML before JavaScript ran — this event
+   *   signals that an upstream SSR defect leaked PHI on the wire. Treat as an
+   *   actionable audit event and fix the source so PHI is set as a JS property.
    */
-  action: 'reveal' | 'hide' | 'auto-hide' | 'clipboard-clear' | 'clipboard-clear-failed';
+  action:
+    | 'reveal'
+    | 'hide'
+    | 'auto-hide'
+    | 'clipboard-clear'
+    | 'clipboard-clear-failed'
+    | 'attribute-exposure-refused';
   /** ISO 8601 timestamp of the access event. */
   timestamp: string;
   /** The category of PHI this field contains. */

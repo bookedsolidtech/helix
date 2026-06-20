@@ -1110,4 +1110,33 @@ describe('hx-number-input', () => {
       expect(el.requiredMessage).toBe('Enter a quantity.');
     });
   });
+
+  // ─── FocusMixin integration ───
+
+  describe('FocusMixin integration', () => {
+    it('focus() delegates to the inner <input>', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      el.focus();
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input')!;
+      expect(el.shadowRoot?.activeElement).toBe(input);
+    });
+
+    it('blur() removes focus from the inner <input>', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixNumberInput>('<hx-number-input label="Qty"></hx-number-input>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.focused).toBe(true);
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+  });
 });

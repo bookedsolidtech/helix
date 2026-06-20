@@ -180,6 +180,20 @@ describe('hx-copy-button', () => {
       const el = await fixture<HelixCopyButton>('<hx-copy-button hx-size="sm"></hx-copy-button>');
       expect(el.getAttribute('hx-size')).toBe('sm');
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button size="lg"></hx-copy-button>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixCopyButton>(
+        '<hx-copy-button size="sm" hx-size="lg"></hx-copy-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Events (5) ───
@@ -564,6 +578,34 @@ describe('hx-copy-button', () => {
         expect(violations, `size="${size}" should have no axe violations`).toEqual([]);
         el.remove();
       }
+    });
+  });
+
+  // ─── FocusMixin delegation ───
+
+  describe('FocusMixin', () => {
+    it('focus() delegates to the inner <button>', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button></hx-copy-button>');
+      el.focus();
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(el.shadowRoot?.activeElement).toBe(btn);
+    });
+
+    it('blur() removes focus from the inner element', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button></hx-copy-button>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixCopyButton>('<hx-copy-button></hx-copy-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.hasAttribute('focused')).toBe(true);
     });
   });
 });

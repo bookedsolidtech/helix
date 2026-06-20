@@ -1,72 +1,124 @@
-import { describe, it } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { fixture, cleanup } from '../../test-utils.js';
+import { HelixBrandRegistry, REQUIRED_SEMANTIC_TOKENS } from '@helixui/tokens';
+import type { HelixTheme } from './hx-theme.js';
+import './index.js';
 
-// hx-theme — replaceSync() failure-mode hardening contract (3.3.0)
+// hx-theme — replaceSync() application hardening (3.3.0)
 //
-// Status: design-phase placeholders. The 12 it.todo() cases below pin the
-// integration-level contract from REPLACESYNC_HARDENING_CONTRACT.md. They
-// flip to real assertions once Jake signs off on Path A (fail-fast at
-// registration) + defense-in-depth try/catch.
+// REPLACESYNC_HARDENING_CONTRACT.md proposes Path A (per-value CSS validation
+// at registration time) plus a defense-in-depth try/catch around
+// `replaceSync()` with a "validator false-negative" console.error and a
+// last-good-state retention guard. Neither ships in 3.x: `HelixBrandRegistry`
+// validates only PRESENCE of REQUIRED_SEMANTIC_TOKENS (no value-format
+// validator — that lands in @helixui/tokens later, per this file's header),
+// and `hx-theme._applyEffectiveTheme()` calls `replaceSync()` directly with no
+// surrounding try/catch and no test hook to force a failure. The malformed-
+// value rejection cases (oklch(invalid), 12pxx, null byte, unbalanced parens)
+// and the forced-throw / false-negative cases were removed rather than left as
+// permanent no-ops — they pin a validator and a catch that do not exist yet.
 //
-// Validator-level cases (~45 covering all 15 value categories: color-hex,
-// color-oklch, color-rgb, color-hsl, color-named, length, unitless-number,
-// duration, easing, font-family, font-weight, var-reference, shadow,
-// gradient, identifier, plus structural rejections) live in
-// packages/hx-tokens/src/__tests__/css-value-validator.test.ts when the
-// validator lands. This file is the runtime-integration test stub.
+// What ships and is pinned here: valid brands register and apply across
+// themes/density without throwing, and the registry's presence-validation
+// throw does not partially pollute the registry.
 
-describe('hx-theme replaceSync hardening contract (3.3.0)', () => {
-  // ─── Registration-time validation (Path A — fail fast) ───────────────────
-  describe('Registration-time validation', () => {
-    it.todo(
-      'Case 1 — register brand with all 22 required colors valid (hex format): registration succeeds; isRegistered() returns true',
-    );
-    it.todo(
-      'Case 2 — register brand with one malformed color value ("oklch(invalid)"): registration throws Error with brandName + tokenName + truncated value snippet; isRegistered() returns false',
-    );
-    it.todo(
-      'Case 3 — register brand with one malformed non-color token ("--hx-border-radius-md": "12pxx"): registration throws',
-    );
-    it.todo(
-      'Case 4 — register brand with embedded null byte in any token value: registration throws (structural rejection)',
-    );
-    it.todo(
-      'Case 5 — register brand with unbalanced parens in shadow token ("0 1px 3px rgba(0,0,0,0.1"): registration throws',
-    );
+/** Builds a brand whose 22 required colors are all valid hex. */
+function buildValidBrand(primary500 = '#003DA5'): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const token of REQUIRED_SEMANTIC_TOKENS) map[token] = '#000000';
+  map['--hx-color-primary-500'] = primary500;
+  return map;
+}
+
+afterEach(() => {
+  cleanup();
+  HelixBrandRegistry._clear();
+});
+
+describe('hx-theme replaceSync application hardening (3.3.0)', () => {
+  // ─── Registration of valid brands ────────────────────────────────────────
+  describe('Registration (presence validation)', () => {
+    it('register a brand with all 22 required colors succeeds; isRegistered() is true', () => {
+      HelixBrandRegistry.register('valid-brand', buildValidBrand());
+      expect(HelixBrandRegistry.isRegistered('valid-brand')).toBe(true);
+    });
+
+    it('register a brand missing a required color throws; isRegistered() stays false', () => {
+      const incomplete = buildValidBrand();
+      delete incomplete['--hx-color-primary-500'];
+      expect(() => HelixBrandRegistry.register('incomplete', incomplete)).toThrowError(
+        /required semantic tokens/i,
+      );
+      expect(HelixBrandRegistry.isRegistered('incomplete')).toBe(false);
+    });
   });
 
-  // ─── Application-time happy path ─────────────────────────────────────────
-  describe('Application-time happy path (validated brands never throw)', () => {
-    it.todo(
-      'Case 6 — apply registered (validated) brand under theme="light": replaceSync() does not throw; sheet applies; no console output',
-    );
-    it.todo(
-      'Case 7 — apply registered brand under theme="high-contrast": replaceSync() does not throw; HC-suppressed sheet applies; info advisory fires once per (brand, theme) tuple',
-    );
-    it.todo(
-      'Case 8 — apply density change with valid tokens: density sheet replaceSync() does not throw',
-    );
+  // ─── Application happy path ───────────────────────────────────────────────
+  describe('Application happy path (valid brands never throw)', () => {
+    it('applying a registered brand under theme="light" does not throw and applies the sheet', async () => {
+      HelixBrandRegistry.register('apply-light', buildValidBrand('#CC0000'));
+      const el = await fixture<HelixTheme>(
+        '<hx-theme theme="light" brand="apply-light">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(
+        getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim().toLowerCase(),
+      ).toBe('#cc0000');
+    });
+
+    it('applying a registered brand under theme="high-contrast" does not throw; info advisory fires once', async () => {
+      HelixBrandRegistry.register('apply-hc', buildValidBrand());
+      const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+      const el = await fixture<HelixTheme>(
+        '<hx-theme theme="high-contrast" brand="apply-hc">Content</hx-theme>',
+      );
+      await el.updateComplete;
+      expect(infoSpy).toHaveBeenCalledTimes(1);
+      infoSpy.mockRestore();
+    });
+
+    it('applying a density change with a valid brand does not throw', async () => {
+      HelixBrandRegistry.register('apply-density', buildValidBrand('#0000CC'));
+      const el = await fixture<HelixTheme>('<hx-theme brand="apply-density">Content</hx-theme>');
+      await el.updateComplete;
+
+      el.density = 'compact';
+      await el.updateComplete;
+      // Density override applied without disturbing the brand color sheet.
+      expect(getComputedStyle(el).getPropertyValue('--hx-space-4').trim()).toBe('0.75rem');
+      expect(
+        getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim().toLowerCase(),
+      ).toBe('#0000cc');
+    });
   });
 
-  // ─── Defense-in-depth try/catch (validator false-negative path) ──────────
-  describe('Defense-in-depth try/catch around replaceSync', () => {
-    it.todo(
-      'Case 9 — force malformed CSS into themeSheet.replaceSync() via test hook: console.error fires with "validator false-negative — please report" wording; sheet retained at last-good state; component renders with previous theme',
-    );
-    it.todo(
-      'Case 10 — re-registration with valid token map after a previously-rejected attempt: succeeds; brand applies; previous failed registration left no partial state in registry',
-    );
-  });
+  // ─── Registry state invariants ───────────────────────────────────────────
+  describe('Registry state invariants', () => {
+    it('a presence-validation throw does not partially store the brand', () => {
+      const incomplete = buildValidBrand();
+      delete incomplete['--hx-color-secondary-950'];
+      expect(() => HelixBrandRegistry.register('partial', incomplete)).toThrow();
+      expect(HelixBrandRegistry.isRegistered('partial')).toBe(false);
+      expect(HelixBrandRegistry.getBrandTokens('partial')).toBeUndefined();
 
-  // ─── State invariants ────────────────────────────────────────────────────
-  describe('State invariants', () => {
-    it.todo(
-      'Validation throw does not pollute registry: failed register() does not partially-store the brand; isRegistered() returns false after a throw; subsequent register() of a different brand succeeds normally',
-    );
-    it.todo(
-      'Defense-in-depth try/catch does not loop: a replaceSync() failure does not retrigger reconcile (no infinite recursion); the next reconcile event proceeds normally with whatever input the brand state currently has',
-    );
-    it.todo(
-      'Advisory state ordering invariant: when replaceSync() throws (forced via test hook), _lastBrandAdvisoryKey is NOT mutated before replaceSync() returns successfully; pending info/warn logs are NOT emitted on the failed call; the next successful reconcile emits the advisory transition relative to the previous (still-correct) state',
-    );
+      // A subsequent registration of a different, valid brand succeeds normally
+      // — the failed attempt left no corrupt state behind.
+      HelixBrandRegistry.register('recovered', buildValidBrand('#123456'));
+      expect(HelixBrandRegistry.isRegistered('recovered')).toBe(true);
+    });
+
+    it('re-registration after a rejected attempt with a valid map succeeds and applies', async () => {
+      const bad = buildValidBrand();
+      delete bad['--hx-color-primary-700'];
+      expect(() => HelixBrandRegistry.register('retry', bad)).toThrow();
+      expect(HelixBrandRegistry.isRegistered('retry')).toBe(false);
+
+      HelixBrandRegistry.register('retry', buildValidBrand('#CC0000'));
+      const el = await fixture<HelixTheme>('<hx-theme brand="retry">Content</hx-theme>');
+      await el.updateComplete;
+      expect(
+        getComputedStyle(el).getPropertyValue('--hx-color-primary-500').trim().toLowerCase(),
+      ).toBe('#cc0000');
+    });
   });
 });

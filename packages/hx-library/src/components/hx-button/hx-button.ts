@@ -1,12 +1,13 @@
 import { html, nothing, type TemplateResult, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
-import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { helixButtonStyles } from './hx-button.styles.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /** Detail for the hx-click event dispatched by hx-button. */
 export interface HxButtonClickDetail {
@@ -96,7 +97,7 @@ export interface HxButtonClickDetail {
  * @clinical-context none
  */
 @customElement('hx-button')
-export class HelixButton extends mixinDelegatesAria(HelixElement) {
+export class HelixButton extends FocusMixin(mixinDelegatesAria(HelixElement)) {
   // 3.2.1: forced-colors deference is owned by the bespoke @media block in
   // hx-button.styles.ts (covers loading/disabled/focus, not just the base).
   // Do NOT also compose forcedColorsInteractive here — the mixin's docstring
@@ -237,6 +238,30 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
     );
   }
 
+  // ─── FocusMixin integration ───
+
+  /**
+   * The inner natively-focusable element. Resolves to the `<button>` in button
+   * mode or the `<a>` in href/anchor mode — only one is ever rendered.
+   * @internal
+   */
+  @query('.button')
+  private _focusEl?: HTMLElement;
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    // A disabled or loading button is inert. In anchor mode the inner node is an
+    // <a tabindex="-1">, which — unlike a native disabled <button> — is still
+    // programmatically focusable, so guard here to keep focus() (autofocus,
+    // focus-first-invalid, etc.) from landing on a control the consumer
+    // intentionally made inactive.
+    if (this.disabled || this.loading) return null;
+    return this._focusEl ?? null;
+  }
+
   // ─── Form API ───
 
   protected override _onFormDisabled(disabled: boolean): void {
@@ -257,6 +282,16 @@ export class HelixButton extends mixinDelegatesAria(HelixElement) {
 
   // Prevents double-warn on browsers that fire slotchange for empty initial slots.
   private _emptySlotWarnEmitted = false;
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0). super chains
+    // through FocusMixin.
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-button', (v) => {
+      this.size = v;
+    });
+  }
 
   override firstUpdated(changedProperties: PropertyValues<this>): void {
     super.firstUpdated(changedProperties);

@@ -1,4 +1,5 @@
 import { html, nothing } from 'lit';
+import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';

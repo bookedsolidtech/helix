@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-30T12:32:05.468Z",
+  "generatedAt": "2026-06-19T22:59:15.156Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -12283,7 +12283,8 @@
             "secondary",
             "tertiary",
             "danger",
-            "ghost"
+            "ghost",
+            "outline"
           ],
           "default": "ghost"
         },
@@ -17425,6 +17426,17 @@
             "lg"
           ],
           "default": "base"
+        },
+        {
+          "figmaAxisName": "sanitize",
+          "cemAttribute": "sanitize",
+          "cemFieldName": "sanitize",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ],
       "textProperties": [
@@ -17441,7 +17453,7 @@
           "cemSlot": null,
           "type": "instance-swap",
           "default": "Label",
-          "description": "Default slot for rich text content (headings, paragraphs, lists, tables, etc.)."
+          "description": "Default slot for rich text content (headings, paragraphs, lists, tables, etc.). SECURITY: By default hx-prose renders its slotted markup verbatim and performs NO sanitization — it trusts that the upstream CMS/Markdown pipeline has already sanitized the HTML. This is the documented, non-breaking default. If the content source is not fully trusted, set the boolean `sanitize` attribute to enable a conservative built-in allowlist (strips `<script>`/`<style>`/`<iframe>`/`<object>`/`<embed>`/`<foreignObject>`, `on*` event-handler attributes, and `javascript:`/`data:` URLs in `href`/`src`), or supply a stricter `sanitizer` function property (e.g. DOMPurify) to fully own the policy."
         }
       ],
       "cssParts": [],
@@ -27165,7 +27177,8 @@
             "secondary",
             "tertiary",
             "ghost",
-            "outline"
+            "outline",
+            "danger"
           ],
           "default": "secondary"
         },

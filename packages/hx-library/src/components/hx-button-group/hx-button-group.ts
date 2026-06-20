@@ -6,6 +6,7 @@ import { HelixElement } from '../../base/index.js';
 import { helixButtonGroupStyles } from './hx-button-group.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /**
  * A container component that groups related hx-button elements into a cohesive
@@ -258,6 +259,11 @@ export class HelixButtonGroup extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-button-group', (v) => {
+      this.size = v;
+    });
     this.addEventListener('keydown', this._handleKeydown);
     // Capture any consumer-set aria-label BEFORE the `label` property writes
     // overwrite it. This snapshot wins back the host attribute when `label`

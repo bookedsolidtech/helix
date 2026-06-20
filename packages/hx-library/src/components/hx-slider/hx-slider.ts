@@ -6,6 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { live } from 'lit/directives/live.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
+import { FocusMixin } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixSliderStyles } from './hx-slider.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
@@ -121,7 +122,7 @@ export interface HxSliderDetail {
  * @clinical-context none
  */
 @customElement('hx-slider')
-export class HelixSlider extends FormMixin(HelixElement) {
+export class HelixSlider extends FocusMixin(FormMixin(HelixElement)) {
   static override styles = [helixSliderStyles, forcedColorsInteractive];
 
   // ─── Form Association ───
@@ -240,6 +241,18 @@ export class HelixSlider extends FormMixin(HelixElement) {
   @query('.slider__input')
   private _input: HTMLInputElement | undefined;
 
+  // ─── FocusMixin integration ───
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation. The
+   * `part="thumb"` overlay is `aria-hidden` and not focusable — the native
+   * `<input type="range">` is the real focus target.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._input ?? null;
+  }
+
   // ─── Unique IDs ───
 
   /** Unique ID for the native range input element. */
@@ -303,7 +316,9 @@ export class HelixSlider extends FormMixin(HelixElement) {
     }
   }
 
-  override firstUpdated(): void {
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    // FocusMixin uses firstUpdated for autofocus + queued focus() flush; run it first.
+    super.firstUpdated(changedProperties);
     // Capture the initial value for form reset (before any user interaction)
     this._defaultValue = this.value;
     // Enable fill transition after initial render to suppress animation on mount
@@ -449,10 +464,9 @@ export class HelixSlider extends FormMixin(HelixElement) {
 
   // ─── Public Methods ───
 
-  /** Moves focus to the native range input. */
-  override focus(options?: FocusOptions): void {
-    this._input?.focus(options);
-  }
+  // focus()/blur() are provided by FocusMixin, delegating to _focusableNode
+  // (the native range <input>). The prior bespoke focus() override did the same
+  // thing, so it was removed in favour of the shared mixin path.
 
   // ─── Slot Handlers ───
 

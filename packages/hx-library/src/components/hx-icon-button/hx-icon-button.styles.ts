@@ -144,6 +144,19 @@ export const helixIconButtonStyles = css`
     --hx-icon-button-bg: var(--hx-color-surface-raised, #f5f8f3);
   }
 
+  /* Outline: transparent fill + strong neutral border + primary text.
+     Mirrors hx-toggle-button's outline variant token choices for a
+     consistent outline treatment across the button family. */
+  .button--outline {
+    --hx-icon-button-bg: transparent;
+    --hx-icon-button-color: var(--hx-color-text-primary, #0d1825);
+    --hx-icon-button-border-color: var(--hx-color-border-strong, #66787b);
+  }
+
+  .button--outline:hover {
+    --hx-icon-button-bg: var(--hx-color-surface-raised, #f5f8f3);
+  }
+
   /* ─── Icon Container ─── */
 
   .icon {

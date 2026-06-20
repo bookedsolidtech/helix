@@ -24,7 +24,14 @@
     name       (string)  Form field name for ElementInternals participation.
     value      (string)  Form field value submitted with name.
     aria_label (string)  Accessible name for icon-only buttons.
-    attributes (object)  Additional HTML attributes spread onto the element.
+    attributes (Attribute|map)
+                         Additional HTML attributes — either a Drupal Attribute object
+                         (the render-array / Form-API path) or a plain map for a direct
+                         {% include %}, e.g. attributes: {'data-test': 'x'}. Both are
+                         iterated safely: only well-formed attribute NAMES are emitted
+                         (closing the attribute-name injection the original raw
+                         key/value loop allowed), while legitimate attributes such as
+                         `style` (for --hx-* theming) pass through unchanged.
 
   Usage — direct include:
     {% include 'helix-button.html.twig' with {
@@ -57,7 +64,14 @@
   {% if name %}name="{{ name }}"{% endif %}
   {% if value %}value="{{ value }}"{% endif %}
   {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-  {% for key, val in attributes|default({}) %}{{ key }}="{{ val }}" {% endfor %}
+  {# SECURITY: `attributes` may be a Drupal Attribute object (render-array / Form-API
+     path) or a plain map (direct {% include %}). Iterate either and emit only
+     well-formed attribute NAMES — this closes the attribute-name injection the
+     original raw `{{ key }}` loop allowed (Twig escapes the value, not the name)
+     while PRESERVING every legitimate attribute, including `style` for --hx-* theming
+     and `formaction` on form buttons (these are developer-controlled here, not
+     untrusted input). See helix_module.theme.inc. #}
+  {% for attr_name, attr_value in attributes|default({}) %}{% if attr_name matches '/^[a-zA-Z][a-zA-Z0-9:_.-]*$/' %}{{ attr_name }}="{{ attr_value }}" {% endif %}{% endfor %}
 >
   {%- set prefix_content %}{% block prefix %}{% endblock %}{% endset -%}
   {%- if prefix_content %}<span slot="prefix">{{ prefix_content }}</span>{% endif -%}

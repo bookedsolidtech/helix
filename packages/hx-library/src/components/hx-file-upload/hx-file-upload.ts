@@ -6,7 +6,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import '../hx-icon/hx-icon.js';
-import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { FormMixin } from '../../mixins/FormMixin.js';
 import { helixFileUploadStyles } from './hx-file-upload.styles.js';
 import { forcedColorsField } from '../../styles/forced-colors.js';
@@ -118,7 +118,7 @@ export interface HxFileErrorDetail {
  * @clinical-context none
  */
 @customElement('hx-file-upload')
-export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement)) {
+export class HelixFileUpload extends FocusMixin(FormMixin(mixinDelegatesAria(HelixElement))) {
   static override styles = [helixFileUploadStyles, forcedColorsField];
 
   // ─── Form Association ───
@@ -256,6 +256,31 @@ export class HelixFileUpload extends FormMixin(mixinDelegatesAria(HelixElement))
   /** Reference to the hidden native file input element used to open the OS file picker. @internal */
   @query('.file-input')
   private _fileInput: HTMLInputElement | null | undefined;
+
+  /**
+   * Reference to the focusable dropzone (a `role="button"` div with
+   * `tabindex="0"`). The native file input is `tabindex="-1"`/`aria-hidden`,
+   * so the dropzone — not the input — is the keyboard focus target.
+   * @internal
+   */
+  @query('.dropzone')
+  private _dropzone: HTMLElement | null | undefined;
+
+  // ─── FocusMixin integration ───
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation. Focus
+   * lands on the dropzone, mirroring keyboard tab order; the host itself
+   * carries no tabindex, so this is purely additive.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    // The dropzone is a <div role="button" tabindex="0"> — when disabled it is
+    // faux-disabled and remains programmatically focusable, so guard here to
+    // keep focus() from landing on an intentionally-inactive control.
+    if (this.disabled) return null;
+    return this._dropzone ?? null;
+  }
 
   // ─── Stable IDs ───
 

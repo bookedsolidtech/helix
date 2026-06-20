@@ -174,6 +174,20 @@ describe('hx-icon', () => {
       await el.updateComplete;
       expect(el.getAttribute('hx-size')).toBe('xl');
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon name="check" size="lg"></hx-icon>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixIcon>(
+        '<hx-icon name="check" size="sm" hx-size="lg"></hx-icon>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Accessibility (10) ───
@@ -635,9 +649,7 @@ describe('hx-icon', () => {
 
   describe('spriteUrl without name renders nothing', () => {
     it('renders nothing when sprite-url is set but name is empty', async () => {
-      const el = await fixture<HelixIcon>(
-        '<hx-icon sprite-url="/icons/sprite.svg"></hx-icon>',
-      );
+      const el = await fixture<HelixIcon>('<hx-icon sprite-url="/icons/sprite.svg"></hx-icon>');
       await el.updateComplete;
       const svgPart = shadowQuery(el, '[part="svg"]');
       expect(svgPart).toBeNull();

@@ -189,6 +189,28 @@ function sanitizeType(typeText: string | undefined): string {
     return `(${innerSanitized})[]`;
   }
 
+  // Function/callback types like `(html: string) => string`. The union split below
+  // would tear the signature at its `=>` / `|` boundaries and collapse it to `string`,
+  // producing a wrapper prop that rejects every valid value. Preserve the signature
+  // verbatim when it is SIMPLE (no generics/object literals) and every annotated type
+  // is a known-safe builtin; drop a trailing optional `| undefined`/`| null` since the
+  // generated `?` already encodes optionality. Anything more exotic falls back to the
+  // prior `string` behavior so the generated code still compiles.
+  if (normalized.includes('=>')) {
+    const fnType = normalized.replace(/\s*\|\s*(?:undefined|null)\s*$/, '').trim();
+    const annotatedTypes = [...fnType.matchAll(/(?::|=>)\s*([\w.]+(?:\[\])?)/g)].map(
+      (m) => m[1] ?? '',
+    );
+    if (
+      !/[<{]/.test(fnType) &&
+      annotatedTypes.length > 0 &&
+      annotatedTypes.every(isKnownSafeType)
+    ) {
+      return fnType;
+    }
+    return 'string';
+  }
+
   // Split union type into tokens, sanitize each, rejoin
   const unionParts = normalized.split('|').map((part) => part.trim());
 

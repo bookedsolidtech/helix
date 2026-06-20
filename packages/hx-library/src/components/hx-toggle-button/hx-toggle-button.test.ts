@@ -192,6 +192,15 @@ describe('hx-toggle-button', () => {
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--outline')).toBe(true);
     });
+
+    it('reflects variant="danger" to host and renders', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button variant="danger">Toggle</hx-toggle-button>',
+      );
+      expect(el.getAttribute('variant')).toBe('danger');
+      const btn = shadowQuery(el, 'button')!;
+      expect(btn.classList.contains('button--danger')).toBe(true);
+    });
   });
 
   // ─── Property: size (3) ───
@@ -217,6 +226,22 @@ describe('hx-toggle-button', () => {
       );
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--lg')).toBe(true);
+    });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button size="lg">Toggle</hx-toggle-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixToggleButton>(
+        '<hx-toggle-button size="sm" hx-size="lg">Toggle</hx-toggle-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 

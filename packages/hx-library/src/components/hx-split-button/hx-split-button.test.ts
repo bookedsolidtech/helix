@@ -140,6 +140,22 @@ describe('hx-split-button', () => {
       const container = shadowQuery(el, '.split-button');
       expect(container?.classList.contains('split-button--lg')).toBe(true);
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button size="lg">Save</hx-split-button>
+      `);
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixSplitButton>(`
+        <hx-split-button size="sm" hx-size="lg">Save</hx-split-button>
+      `);
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Property: disabled ───

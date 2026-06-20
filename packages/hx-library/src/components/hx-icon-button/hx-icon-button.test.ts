@@ -124,6 +124,16 @@ describe('hx-icon-button', () => {
       expect(btn).toBeTruthy();
       expect(btn?.classList.contains('button--ghost')).toBe(true);
     });
+
+    it('reflects variant="outline" to host and renders', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" variant="outline"></hx-icon-button>',
+      );
+      expect(el.getAttribute('variant')).toBe('outline');
+      const btn = shadowQuery(el, 'button');
+      expect(btn).toBeTruthy();
+      expect(btn?.classList.contains('button--outline')).toBe(true);
+    });
   });
 
   // ─── Property: size (3) ───
@@ -152,6 +162,22 @@ describe('hx-icon-button', () => {
       const btn = shadowQuery(el, 'button');
       expect(btn).toBeTruthy();
       expect(btn?.classList.contains('button--lg')).toBe(true);
+    });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" size="lg"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" size="sm" hx-size="lg"></hx-icon-button>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
     });
   });
 
@@ -581,7 +607,9 @@ describe('hx-icon-button', () => {
       );
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       let fired = false;
-      el.addEventListener('hx-click', () => { fired = true; });
+      el.addEventListener('hx-click', () => {
+        fired = true;
+      });
       anchor.click();
       await el.updateComplete;
       expect(fired).toBe(false);
@@ -597,9 +625,7 @@ describe('hx-icon-button', () => {
         const el = await fixture<HelixIconButton>('<hx-icon-button></hx-icon-button>');
         await el.updateComplete;
         const relevantCalls = spy.mock.calls.filter(
-          (call) =>
-            typeof call[0] === 'string' &&
-            call[0].includes('label'),
+          (call) => typeof call[0] === 'string' && call[0].includes('label'),
         );
         expect(relevantCalls.length).toBeGreaterThan(0);
       } finally {
@@ -735,6 +761,62 @@ describe('hx-icon-button', () => {
       expect(anchor.hasAttribute('href')).toBe(false);
       expect(anchor.getAttribute('tabindex')).toBe('-1');
       expect(anchor.getAttribute('aria-busy')).toBe('true');
+    });
+  });
+
+  // ─── FocusMixin delegation ───
+
+  describe('FocusMixin', () => {
+    it('focus() delegates to the inner <button>', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      el.focus();
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(el.shadowRoot?.activeElement).toBe(btn);
+    });
+
+    it('focus() delegates to the inner <a> in href mode', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit" href="/x"></hx-icon-button>',
+      );
+      el.focus();
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(el.shadowRoot?.activeElement).toBe(anchor);
+    });
+
+    it('blur() removes focus from the inner element', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Close"></hx-icon-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+
+    it('focus() is a no-op when disabled (anchor mode stays inert)', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" href="/x" disabled></hx-icon-button>',
+      );
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('focus() is a no-op when loading', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Close" loading></hx-icon-button>',
+      );
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
     });
   });
 });

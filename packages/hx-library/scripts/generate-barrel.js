@@ -53,10 +53,16 @@ const PUBLIC_API = {
     types: [],
   },
   './mixins/index.js': {
-    // mixinDelegatesAria, AriaDelegationMixinInterface, AriaAttribute are
-    // internal implementation details consumed only by first-party components.
-    values: ['FocusMixin', 'FormMixin'],
-    types: ['FocusMixinInterface', 'FormMixinInterface'],
+    // FocusMixin, FormMixin, and mixinDelegatesAria are public so downstream
+    // consumers can extend HELiX elements (wrapper components, custom controls)
+    // with the same focus/form/ARIA-delegation behavior the library uses.
+    values: ['FocusMixin', 'FormMixin', 'mixinDelegatesAria'],
+    types: [
+      'FocusMixinInterface',
+      'FormMixinInterface',
+      'AriaDelegationMixinInterface',
+      'AriaAttribute',
+    ],
   },
   './controllers/helix-audit-controller.js': {
     // HelixAuditController is the public HIPAA audit-trail controller.

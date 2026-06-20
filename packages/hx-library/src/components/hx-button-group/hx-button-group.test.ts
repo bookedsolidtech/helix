@@ -141,6 +141,20 @@ describe('hx-button-group', () => {
       const computed = getComputedStyle(el);
       expect(computed.getPropertyValue('--hx-button-group-size').trim()).toBe('lg');
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixButtonGroup>('<hx-button-group size="lg"></hx-button-group>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixButtonGroup>(
+        '<hx-button-group size="sm" hx-size="lg"></hx-button-group>',
+      );
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── CSS: Single Button (1) ───

@@ -99,6 +99,18 @@ describe('hx-button', () => {
       const btn = shadowQuery(el, 'button')!;
       expect(btn.classList.contains('button--lg')).toBe(true);
     });
+
+    it('maps legacy `size` attribute to size when `hx-size` is absent', async () => {
+      const el = await fixture<HelixButton>('<hx-button size="lg">Click</hx-button>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
+
+    it('`hx-size` wins when both `size` and `hx-size` are set', async () => {
+      const el = await fixture<HelixButton>('<hx-button size="sm" hx-size="lg">Click</hx-button>');
+      await el.updateComplete;
+      expect(el.size).toBe('lg');
+    });
   });
 
   // ─── Property: disabled (4) ───
@@ -871,7 +883,9 @@ describe('hx-button', () => {
     it('all sizes meet AAA target size 44x44', async () => {
       const sizes = ['sm', 'md', 'lg'] as const;
       for (const size of sizes) {
-        const el = await fixture<HelixButton>(`<hx-button hx-size="${size}">AAA ${size}</hx-button>`);
+        const el = await fixture<HelixButton>(
+          `<hx-button hx-size="${size}">AAA ${size}</hx-button>`,
+        );
         const { violations } = await checkA11y(el, AAA_RULES_OPT);
         expect(violations, `size=${size} AAA violations`).toEqual([]);
       }
@@ -1007,7 +1021,9 @@ describe('hx-button', () => {
     const cssSource = (el: HelixButton): string => {
       const styles = (el.constructor as typeof HelixButton).styles;
       const list = Array.isArray(styles) ? styles : [styles];
-      return list.map((s) => (s ? String((s as { cssText?: string }).cssText ?? s) : '')).join('\n');
+      return list
+        .map((s) => (s ? String((s as { cssText?: string }).cssText ?? s) : ''))
+        .join('\n');
     };
 
     const resolveSemantic = async (token: string): Promise<string> => {
@@ -1027,9 +1043,7 @@ describe('hx-button', () => {
       expect(css).toMatch(
         /\.button--secondary:hover\s*\{[^}]*--hx-color-action-secondary-bg-hover/,
       );
-      expect(css).not.toMatch(
-        /\.button--secondary:hover\s*\{[^}]*--hx-color-surface-raised/,
-      );
+      expect(css).not.toMatch(/\.button--secondary:hover\s*\{[^}]*--hx-color-surface-raised/);
     });
 
     it('ghost :hover rule references --hx-color-action-ghost-bg-hover', async () => {
@@ -1047,9 +1061,7 @@ describe('hx-button', () => {
     });
 
     it('action.ghost.bg-hover resolves to primary-50 (#EBF8F8)', async () => {
-      expect(await resolveSemantic('--hx-color-action-ghost-bg-hover')).toBe(
-        'rgb(235, 248, 248)',
-      );
+      expect(await resolveSemantic('--hx-color-action-ghost-bg-hover')).toBe('rgb(235, 248, 248)');
     });
 
     // ─── Variant :active token binding (3.2.1 round-6 regression net) ───
@@ -1256,9 +1268,7 @@ describe('hx-button', () => {
 
   describe('ARIA Group 8 — consumer ARIA projection through mixinDelegatesAria', () => {
     it('projects aria-pressed onto the inner <button> for toggle-button consumers', async () => {
-      const el = await fixture<HelixButton>(
-        '<hx-button aria-pressed="true">Toggle</hx-button>',
-      );
+      const el = await fixture<HelixButton>('<hx-button aria-pressed="true">Toggle</hx-button>');
       await el.updateComplete;
       const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
       expect(btn.getAttribute('aria-pressed')).toBe('true');
@@ -1298,15 +1308,65 @@ describe('hx-button', () => {
 
   describe('ARIA Group 8 — loading anchor tabindex consistency', () => {
     it('sets tabindex="-1" on the anchor when loading (parity with disabled)', async () => {
-      const el = await fixture<HelixButton>(
-        '<hx-button href="/x" loading>Saving…</hx-button>',
-      );
+      const el = await fixture<HelixButton>('<hx-button href="/x" loading>Saving…</hx-button>');
       await el.updateComplete;
       const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
       expect(anchor.getAttribute('tabindex')).toBe('-1');
       expect(anchor.getAttribute('aria-busy')).toBe('true');
       // href must be omitted when loading so Enter does not navigate.
       expect(anchor.hasAttribute('href')).toBe(false);
+    });
+  });
+
+  // ─── FocusMixin delegation ───
+
+  describe('FocusMixin', () => {
+    it('focus() delegates to the inner <button>', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      const btn = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      expect(el.shadowRoot?.activeElement).toBe(btn);
+    });
+
+    it('focus() delegates to the inner <a> in href mode', async () => {
+      const el = await fixture<HelixButton>('<hx-button href="/x">Visit</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      const anchor = shadowQuery<HTMLAnchorElement>(el, 'a')!;
+      expect(el.shadowRoot?.activeElement).toBe(anchor);
+    });
+
+    it('blur() removes focus from the inner element', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Click</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+
+    it('focus() is a no-op when disabled (anchor mode stays inert)', async () => {
+      // A disabled <a tabindex="-1"> is still programmatically focusable; the
+      // _focusableNode guard must keep focus() from landing on it.
+      const el = await fixture<HelixButton>('<hx-button href="/x" disabled>Visit</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('focus() is a no-op when loading', async () => {
+      const el = await fixture<HelixButton>('<hx-button loading>Saving</hx-button>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
     });
   });
 });

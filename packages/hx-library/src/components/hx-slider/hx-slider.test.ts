@@ -888,4 +888,33 @@ describe('hx-slider', () => {
       expect(el.value).toBe(100);
     });
   });
+
+  // ─── FocusMixin integration ───
+
+  describe('FocusMixin integration', () => {
+    it('focus() delegates to the native range <input>', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume"></hx-slider>');
+      el.focus();
+      await el.updateComplete;
+      const input = shadowQuery<HTMLInputElement>(el, 'input[type="range"]')!;
+      expect(el.shadowRoot?.activeElement).toBe(input);
+    });
+
+    it('blur() removes focus from the native range <input>', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume"></hx-slider>');
+      el.focus();
+      await el.updateComplete;
+      el.blur();
+      await el.updateComplete;
+      expect(el.shadowRoot?.activeElement).toBeNull();
+    });
+
+    it('reflects the focused attribute on focusin', async () => {
+      const el = await fixture<HelixSlider>('<hx-slider label="Volume"></hx-slider>');
+      el.focus();
+      await el.updateComplete;
+      expect(el.focused).toBe(true);
+      expect(el.hasAttribute('focused')).toBe(true);
+    });
+  });
 });

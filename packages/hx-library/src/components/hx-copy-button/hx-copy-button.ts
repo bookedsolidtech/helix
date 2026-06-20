@@ -1,10 +1,12 @@
 import { html, nothing } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { HelixElement } from '../../base/index.js';
+import { FocusMixin } from '../../mixins/index.js';
 import { helixCopyButtonStyles } from './hx-copy-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /** Minimum allowed value for feedbackDuration (ms). */
 const MIN_FEEDBACK_DURATION = 300;
@@ -91,7 +93,7 @@ const VALID_SIZES = new Set(['sm', 'md', 'lg']);
  * @clinical-context none
  */
 @customElement('hx-copy-button')
-export class HelixCopyButton extends HelixElement {
+export class HelixCopyButton extends FocusMixin(HelixElement) {
   static override styles = [helixCopyButtonStyles, forcedColorsInteractive];
 
   // ─── Public Properties ───
@@ -173,7 +175,31 @@ export class HelixCopyButton extends HelixElement {
   /** @internal */
   private _feedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // ─── FocusMixin integration ───
+
+  /** The inner native `<button>` element. @internal */
+  @query('.button')
+  private _focusEl?: HTMLElement;
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    return this._focusEl ?? null;
+  }
+
   // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0). super chains
+    // through FocusMixin.
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-copy-button', (v) => {
+      this.size = v;
+    });
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();

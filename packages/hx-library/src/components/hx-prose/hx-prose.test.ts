@@ -403,4 +403,194 @@ describe('hx-prose', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── Sanitization (opt-in security) ───
+
+  describe('Sanitization (opt-in)', () => {
+    it('sanitize defaults to false (non-breaking)', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p>Text</p></hx-prose>');
+      expect(el.sanitize).toBe(false);
+    });
+
+    it('default (sanitize off) leaves dangerous content untouched', async () => {
+      // Trust-upstream default must preserve existing behavior verbatim.
+      const el = await fixture<HelixProse>(
+        '<hx-prose><div class="raw"><img src="x" onerror="alert(1)"><a href="javascript:alert(1)">link</a></div></hx-prose>',
+      );
+      const img = el.querySelector('img');
+      const link = el.querySelector('a');
+      expect(img?.getAttribute('onerror')).toBe('alert(1)');
+      expect(link?.getAttribute('href')).toBe('javascript:alert(1)');
+    });
+
+    it('sanitize on removes <script> elements', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><div><p>Safe</p><script>window.__pwned = true;</script></div></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('script')).toBeNull();
+      expect(el.querySelector('p')?.textContent).toBe('Safe');
+    });
+
+    it('sanitize on strips on* event-handler attributes', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="x" onerror="alert(1)"></hx-prose>',
+      );
+      await el.updateComplete;
+      const img = el.querySelector('img');
+      expect(img).toBeTruthy();
+      expect(img?.hasAttribute('onerror')).toBe(false);
+    });
+
+    it('sanitize on neutralizes javascript: href', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><a href="javascript:alert(1)">click</a></hx-prose>',
+      );
+      await el.updateComplete;
+      const link = el.querySelector('a');
+      expect(link).toBeTruthy();
+      expect(link?.hasAttribute('href')).toBe(false);
+    });
+
+    it('sanitize on strips iframe/object/embed', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><div><iframe src="evil.html"></iframe><object data="x"></object><embed src="x"></div></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('iframe')).toBeNull();
+      expect(el.querySelector('object')).toBeNull();
+      expect(el.querySelector('embed')).toBeNull();
+    });
+
+    it('sanitize on preserves safe markup unchanged', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><h2>Title</h2><p><a href="https://example.com">safe</a></p></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('h2')?.textContent).toBe('Title');
+      expect(el.querySelector('a')?.getAttribute('href')).toBe('https://example.com');
+    });
+
+    it('a custom sanitizer is invoked and its output replaces content', async () => {
+      const el = await fixture<HelixProse>('<hx-prose><p id="orig">original</p></hx-prose>');
+      let called = false;
+      el.sanitizer = (html: string) => {
+        called = true;
+        // Prove the custom policy fully owns the output: swap the content.
+        return html.replace('original', 'cleaned');
+      };
+      el.sanitize = true;
+      await el.updateComplete;
+      expect(called).toBe(true);
+      expect(el.querySelector('p')?.textContent).toBe('cleaned');
+    });
+
+    it('sanitizes content injected after connect via MutationObserver', async () => {
+      const el = await fixture<HelixProse>('<hx-prose sanitize><p>Initial</p></hx-prose>');
+      await el.updateComplete;
+      // Simulate a late CMS/client-side injection of unsafe markup.
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = '<a href="javascript:alert(1)">late</a>';
+      el.appendChild(wrapper);
+      // MutationObserver callbacks fire on a microtask; wait a tick.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const link = el.querySelector('a');
+      expect(link).toBeTruthy();
+      expect(link?.hasAttribute('href')).toBe(false);
+    });
+
+    it('sanitize on neutralizes javascript: in SVG xlink:href', async () => {
+      // SVG <a xlink:href> is URL-bearing like href/src; the built-in pass must
+      // strip a javascript: scheme there too, not just on HTML href/src.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><svg viewBox="0 0 1 1"><a xlink:href="javascript:alert(1)"><rect width="1" height="1" /></a></svg></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.innerHTML.toLowerCase()).not.toContain('javascript:');
+    });
+
+    it('re-sanitizes the initial payload when a custom sanitizer is attached late', async () => {
+      // Common pattern: `<hx-prose sanitize>` in markup, then
+      // `el.sanitizer = DOMPurify.sanitize` from JS. The custom policy must
+      // re-process the ALREADY-sanitized initial content, not just future
+      // mutations — otherwise it never protects the initial SSR/CMS payload.
+      const el = await fixture<HelixProse>('<hx-prose sanitize><p>original</p></hx-prose>');
+      await el.updateComplete;
+      let called = false;
+      el.sanitizer = (html: string) => {
+        called = true;
+        return html.replace('original', 'cleaned');
+      };
+      await el.updateComplete;
+      expect(called).toBe(true);
+      expect(el.querySelector('p')?.textContent).toBe('cleaned');
+    });
+
+    it('sanitize on neutralizes javascript: in formaction/action', async () => {
+      // formaction/action fire a URL on form submission — same javascript: risk as href.
+      // `type="button"` keeps the test button from submitting and navigating the
+      // browser-mode test iframe; the sanitizer strips formaction/action regardless.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><form action="javascript:alert(1)"><button type="button" formaction="javascript:alert(2)">go</button></form></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.innerHTML.toLowerCase()).not.toContain('javascript:');
+    });
+
+    it('sanitize on strips SVG SMIL animation elements (<animate>/<set>)', async () => {
+      // SMIL can rewrite xlink:href to a javascript: URL at runtime, defeating the
+      // static URL-scheme check; the elements themselves must be removed.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><svg viewBox="0 0 1 1"><a><animate attributeName="xlink:href" to="javascript:alert(1)" begin="0s" /><set attributeName="href" to="javascript:alert(2)" /><rect width="1" height="1" /></a></svg></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('animate')).toBeNull();
+      expect(el.querySelector('set')).toBeNull();
+      expect(el.innerHTML.toLowerCase()).not.toContain('javascript:');
+    });
+
+    it('sanitize on strips inline style attributes (CSS-injection backstop)', async () => {
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><p style="background:url(https://attacker.example/?leak)">x</p></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('p')?.hasAttribute('style')).toBe(false);
+    });
+
+    it('a non-idempotent custom sanitizer does not loop (observer detached during rewrite)', async () => {
+      // A sanitizer that mutates on every call would re-trigger the MutationObserver
+      // forever if the observer were live during the rewrite. The detach makes it
+      // converge: it runs a bounded number of times, not unbounded.
+      const el = await fixture<HelixProse>('<hx-prose sanitize><p>x</p></hx-prose>');
+      await el.updateComplete;
+      let calls = 0;
+      // Always returns DIFFERENT markup (appends a comment) so cleaned !== original
+      // on every pass — the worst case for re-entrancy.
+      el.sanitizer = (html: string) => {
+        calls += 1;
+        return `${html}<!--n${calls}-->`;
+      };
+      await el.updateComplete;
+      // Let any queued observer microtasks drain.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      // Without the detach this would be unbounded; with it, it does not run away.
+      expect(calls).toBeLessThan(10);
+    });
+
+    it('sanitize on strips document-level link/base/meta elements', async () => {
+      // These head-level elements (which in the wild load attacker CSS, rewrite
+      // relative URLs, or drive a refresh redirect) are dropped wholesale by tag
+      // name. Inert content is used so the live-DOM meta-refresh / base cannot
+      // navigate the browser-mode test iframe before the sanitizer runs.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><div><link rel="stylesheet" href="data:text/css," /><base target="_blank" /><meta name="description" content="x" /><p>safe</p></div></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('link')).toBeNull();
+      expect(el.querySelector('base')).toBeNull();
+      expect(el.querySelector('meta')).toBeNull();
+      expect(el.querySelector('p')?.textContent).toBe('safe');
+    });
+  });
 });

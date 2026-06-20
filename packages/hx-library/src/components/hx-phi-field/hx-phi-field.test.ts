@@ -432,6 +432,91 @@ describe('hx-phi-field', () => {
     });
   });
 
+  // ─── Clipboard Auto-Clear Timer Reset ───
+
+  describe('Clipboard Auto-Clear Timer Reset', () => {
+    /**
+     * Matches both `clipboard-clear` (writeText resolved) and
+     * `clipboard-clear-failed` (writeText rejected / API unavailable). Either way
+     * the auto-clear FIRED — the timing assertion is independent of whether the
+     * browser honored navigator.clipboard.writeText under the current activation.
+     */
+    const isClipboardClearAudit = (e: CustomEvent<PhiAccessEventDetail>): boolean =>
+      e.detail.action === 'clipboard-clear' || e.detail.action === 'clipboard-clear-failed';
+
+    it('resets the clipboard-clear timer on a new copy so the full window applies to the latest copy', async () => {
+      // Regression guard: a copy late in a prior reveal's clear window must
+      // restart the timer (cancel + reschedule). Otherwise PHI placed on the
+      // clipboard by the latest copy would be cleared early, inheriting only the
+      // remaining time from the original reveal rather than the full timeout.
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixPhiField>(
+          '<hx-phi-field field-type="ssn" field-id="copy-reset" clipboard-timeout="1000"></hx-phi-field>',
+        );
+        el.data = '123-45-6789';
+        await el.updateComplete;
+
+        // Reveal — schedules the clipboard-clear timer (1000ms window).
+        const toggle = shadowQuery<HTMLButtonElement>(el, '[part="toggle"]');
+        toggle?.click();
+        await el.updateComplete;
+
+        const events: CustomEvent<PhiAccessEventDetail>[] = [];
+        el.addEventListener('hx-phi-access', (e) => {
+          events.push(e as CustomEvent<PhiAccessEventDetail>);
+        });
+
+        // Advance 800ms into the original window, then copy. The copy must reset
+        // the timer so a fresh 1000ms window starts from THIS point. The async
+        // timer advance flushes the microtask queue between callbacks so the
+        // `navigator.clipboard.writeText().then()` audit dispatch is observable.
+        await vi.advanceTimersByTimeAsync(800);
+        const container = shadowQuery(el, '.phi-field');
+        container?.dispatchEvent(new ClipboardEvent('copy', { bubbles: true, cancelable: true }));
+
+        // At the original deadline (200ms more = 1000ms total) the clear must NOT
+        // have fired — the copy reset it.
+        await vi.advanceTimersByTimeAsync(300);
+        expect(events.filter(isClipboardClearAudit)).toHaveLength(0);
+
+        // A full window after the copy (1000ms from the copy) the clear fires.
+        await vi.advanceTimersByTimeAsync(800);
+        expect(events.filter(isClipboardClearAudit).length).toBeGreaterThanOrEqual(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('does not schedule a clipboard-clear timer on a copy while masked', async () => {
+      // A masked copy is prevented (no PHI reaches the clipboard), so it must not
+      // start or reset the auto-clear timer.
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixPhiField>(
+          '<hx-phi-field field-type="ssn" field-id="masked-copy" clipboard-timeout="1000"></hx-phi-field>',
+        );
+        el.data = '123-45-6789';
+        await el.updateComplete;
+
+        const events: CustomEvent<PhiAccessEventDetail>[] = [];
+        el.addEventListener('hx-phi-access', (e) => {
+          events.push(e as CustomEvent<PhiAccessEventDetail>);
+        });
+
+        // Field is masked by default — dispatch a copy and advance well past the
+        // timeout. No clipboard-clear audit event should ever fire.
+        const container = shadowQuery(el, '.phi-field');
+        container?.dispatchEvent(new ClipboardEvent('copy', { bubbles: true, cancelable: true }));
+        vi.advanceTimersByTime(2000);
+
+        expect(events.filter(isClipboardClearAudit)).toHaveLength(0);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
   // ─── Accessibility ───
 
   describe('Accessibility', () => {
@@ -929,6 +1014,246 @@ describe('hx-phi-field', () => {
       await el.updateComplete;
       expect(el.outerHTML).not.toContain('123-45-6789');
       el.remove();
+    });
+  });
+
+  // ─── FS-029: Opt-in Strict Mode (fail-closed detector) ───
+
+  describe('FS-029: Opt-in Strict Mode', () => {
+    it('defaults to non-strict: rescues the data attribute and warns (backward compatible)', async () => {
+      // Spy on console.warn — devWarn routes through it in dev/test builds.
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        const el = document.createElement('hx-phi-field') as HelixPhiField;
+        el.setAttribute('field-type', 'ssn');
+        el.setAttribute('data', '123-45-6789');
+        // No `strict` attribute — the default silent-rescue path must run.
+        document.body.appendChild(el);
+        await el.updateComplete;
+
+        expect(el.strict).toBe(false);
+        // Value rescued into the JS property, attribute stripped from the DOM.
+        expect(el.data).toBe('123-45-6789');
+        expect(el.hasAttribute('data')).toBe(false);
+        // Dev warning surfaced.
+        expect(warnSpy).toHaveBeenCalledTimes(1);
+        el.remove();
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
+
+    it('strict + data attribute: refuses (logs error), strips the attribute, does NOT rescue', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        const el = document.createElement('hx-phi-field') as HelixPhiField;
+        el.setAttribute('field-type', 'ssn');
+        el.setAttribute('strict', '');
+        el.setAttribute('data', '123-45-6789');
+
+        // connectedCallback runs synchronously inside appendChild. Strict mode
+        // must NOT throw — an exception from a lifecycle callback is reported as
+        // an uncaught browser error and would destabilise the field. In dev/test
+        // (import.meta.env.DEV === true) it surfaces loudly via console.error.
+        expect(() => document.body.appendChild(el)).not.toThrow();
+
+        expect(errorSpy).toHaveBeenCalledTimes(1);
+        expect(String(errorSpy.mock.calls[0]?.[0])).toMatch(/strict mode/i);
+        // Attribute stripped FIRST so PHI left the live DOM; value NOT rescued.
+        expect(el.hasAttribute('data')).toBe(false);
+        expect(el.data).toBe('');
+        el.remove();
+      } finally {
+        errorSpy.mockRestore();
+      }
+    });
+
+    it('strict + data attribute at connect (SSR markup): dispatches hx-phi-access with action="attribute-exposure-refused" (no raw PHI in detail)', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      // Attach first — the refusal event bubbles during connectedCallback inside the
+      // fixture's append.
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        // SSR markup: `data` is present in the PARSED HTML at upgrade time (fixture
+        // uses innerHTML, not setAttribute), so the refusal happens in
+        // connectedCallback — the synchronous setAttribute override only intercepts the
+        // programmatic post-connect path.
+        const el = await fixture<HelixPhiField>(
+          '<hx-phi-field field-type="ssn" field-id="strict-refuse" strict data="123-45-6789"></hx-phi-field>',
+        );
+
+        const refusedEvents = events.filter(
+          (e) => e.detail.action === 'attribute-exposure-refused',
+        );
+        expect(refusedEvents).toHaveLength(1);
+        expect(refusedEvents[0]?.detail.fieldId).toBe('strict-refuse');
+        expect(refusedEvents[0]?.detail.fieldType).toBe('ssn');
+        expect(el.hasAttribute('data')).toBe(false);
+        // Raw PHI must never appear in the audit detail — HIPAA boundary.
+        const detailStr = JSON.stringify(refusedEvents[0]?.detail);
+        expect(detailStr).not.toContain('123-45-6789');
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
+      }
+    });
+
+    it('strict + NO data attribute: no-op (no throw, no refusal event)', async () => {
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('strict', '');
+      // No `data` attribute set — the FS-029 block must not engage at all.
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        expect(() => document.body.appendChild(el)).not.toThrow();
+        await el.updateComplete;
+
+        expect(el.strict).toBe(true);
+        const refusedEvents = events.filter(
+          (e) => e.detail.action === 'attribute-exposure-refused',
+        );
+        expect(refusedEvents).toHaveLength(0);
+        // Field still works as a normal masked field via the JS property.
+        el.data = '123-45-6789';
+        await el.updateComplete;
+        const value = shadowQuery(el, '.phi-field__value--masked');
+        expect(value?.textContent?.trim()).toBe('***-**-6789');
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        el.remove();
+      }
+    });
+
+    it('strict + post-connect `data` attribute write: refuses (strips + audit event)', async () => {
+      // A hydration pass or client framework can `setAttribute('data', phi)` AFTER
+      // connect. `data` is attribute:false so attributeChangedCallback never fires;
+      // the strict-mode MutationObserver must still strip it and refuse.
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('field-id', 'post-connect');
+      el.setAttribute('strict', '');
+      // Connect with NO data attribute — the observer must still arm.
+      document.body.appendChild(el);
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.setAttribute('data', '123-45-6789');
+        // MutationObserver callbacks fire on a microtask.
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(el.hasAttribute('data')).toBe(false);
+        const refused = events.filter((e) => e.detail.action === 'attribute-exposure-refused');
+        expect(refused.length).toBeGreaterThanOrEqual(1);
+        expect(refused[0]?.detail.fieldId).toBe('post-connect');
+        expect(JSON.stringify(refused[0]?.detail)).not.toContain('123-45-6789');
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
+        el.remove();
+      }
+    });
+
+    it('strict toggled ON after connect: arms the observer + refuses a later data write', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      // NOT strict at connect.
+      document.body.appendChild(el);
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.strict = true;
+        await el.updateComplete;
+        el.setAttribute('data', '123-45-6789');
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(el.hasAttribute('data')).toBe(false);
+        expect(events.some((e) => e.detail.action === 'attribute-exposure-refused')).toBe(true);
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
+        el.remove();
+      }
+    });
+
+    it('strict toggled OFF after connect: stops refusing post-connect data writes', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('strict', '');
+      document.body.appendChild(el);
+      await el.updateComplete;
+      el.strict = false;
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.setAttribute('data', '123-45-6789');
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        // Observer detached when strict was disabled — no refusal from the observer path.
+        expect(events.some((e) => e.detail.action === 'attribute-exposure-refused')).toBe(false);
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        warnSpy.mockRestore();
+        el.remove();
+      }
+    });
+
+    it('strict + setAttribute("data") is refused SYNCHRONOUSLY (PHI never lands)', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('field-id', 'sync-refuse');
+      el.setAttribute('strict', '');
+      document.body.appendChild(el);
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.setAttribute('data', '123-45-6789');
+        // No await: the setAttribute override refuses synchronously, so the value
+        // must already be absent — there is no microtask window for sync code to read.
+        expect(el.hasAttribute('data')).toBe(false);
+        expect(el.getAttribute('data')).toBeNull();
+        expect(events.some((e) => e.detail.action === 'attribute-exposure-refused')).toBe(true);
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
+        el.remove();
+      }
     });
   });
 

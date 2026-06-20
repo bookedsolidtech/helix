@@ -1,13 +1,14 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import '../../utilities/document-token-adoption.js';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
-import { mixinDelegatesAria } from '../../mixins/index.js';
+import { FocusMixin, mixinDelegatesAria } from '../../mixins/index.js';
 import { helixIconButtonStyles } from './hx-icon-button.styles.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 /**
  * An icon-only button component for compact, accessible actions.
@@ -80,7 +81,7 @@ import { devWarn } from '../../utils/dev-warn.js';
  * @clinical-context none
  */
 @customElement('hx-icon-button')
-export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
+export class HelixIconButton extends FocusMixin(mixinDelegatesAria(HelixElement)) {
   static override styles = [helixIconButtonStyles, forcedColorsInteractive];
 
   /**
@@ -97,7 +98,7 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
    * @attr variant
    */
   @property({ type: String, reflect: true })
-  variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' = 'ghost';
+  variant: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost' | 'outline' = 'ghost';
 
   /**
    * Size of the button.
@@ -159,6 +160,41 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
 
   protected override _onFormDisabled(disabled: boolean): void {
     this.disabled = disabled;
+  }
+
+  // ─── FocusMixin integration ───
+
+  /**
+   * The inner natively-focusable element. Resolves to the `<button>` in button
+   * mode or the `<a>` in href/anchor mode — only one is ever rendered.
+   * @internal
+   */
+  @query('.button')
+  private _focusEl?: HTMLElement;
+
+  /**
+   * Declares the inner focusable element for FocusMixin delegation.
+   * @internal
+   */
+  protected get _focusableNode(): HTMLElement | null {
+    // A disabled or loading icon button is inert. In anchor mode the inner node
+    // is an <a tabindex="-1">, which — unlike a native disabled <button> — is
+    // still programmatically focusable, so guard here to keep focus() from
+    // landing on a control the consumer intentionally made inactive.
+    if (this.disabled || this.loading) return null;
+    return this._focusEl ?? null;
+  }
+
+  // ─── Lifecycle ───
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0). super chains
+    // through FocusMixin.
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-icon-button', (v) => {
+      this.size = v;
+    });
   }
 
   // ─── Event Handling ───

@@ -16,6 +16,7 @@ import {
   resolveIdrefTokens,
   type AriaIdrefMirrorHandle,
 } from '../../utils/aria-idref.js';
+import { applyLegacySizeAlias } from '../../utils/apply-legacy-size-alias.js';
 
 const _nextOverflowMenuId = createIdCounter('hx-overflow-menu');
 
@@ -234,6 +235,11 @@ export class HelixOverflowMenu extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    // Backward compat: forward the legacy unprefixed `size` attribute to the
+    // `hx-size`-mapped property (3.x shim, removed in 4.0).
+    applyLegacySizeAlias<'sm' | 'md' | 'lg'>(this, 'hx-overflow-menu', (v) => {
+      this.size = v;
+    });
     document.addEventListener('click', this._handleDocumentClick, true);
     this.addEventListener('keydown', this._handleKeydown);
     this._syncResolvedTriggerLabel();
