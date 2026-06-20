@@ -528,8 +528,10 @@ describe('hx-prose', () => {
 
     it('sanitize on neutralizes javascript: in formaction/action', async () => {
       // formaction/action fire a URL on form submission — same javascript: risk as href.
+      // `type="button"` keeps the test button from submitting and navigating the
+      // browser-mode test iframe; the sanitizer strips formaction/action regardless.
       const el = await fixture<HelixProse>(
-        '<hx-prose sanitize><form action="javascript:alert(1)"><button formaction="javascript:alert(2)">go</button></form></hx-prose>',
+        '<hx-prose sanitize><form action="javascript:alert(1)"><button type="button" formaction="javascript:alert(2)">go</button></form></hx-prose>',
       );
       await el.updateComplete;
       expect(el.innerHTML.toLowerCase()).not.toContain('javascript:');
@@ -577,10 +579,12 @@ describe('hx-prose', () => {
     });
 
     it('sanitize on strips document-level link/base/meta elements', async () => {
-      // Even with a safe https: scheme these load attacker CSS / rewrite relative
-      // URLs / drive a redirect, so they are dropped wholesale.
+      // These head-level elements (which in the wild load attacker CSS, rewrite
+      // relative URLs, or drive a refresh redirect) are dropped wholesale by tag
+      // name. Inert content is used so the live-DOM meta-refresh / base cannot
+      // navigate the browser-mode test iframe before the sanitizer runs.
       const el = await fixture<HelixProse>(
-        '<hx-prose sanitize><div><link rel="stylesheet" href="https://attacker.example/evil.css" /><base href="https://attacker.example/" /><meta http-equiv="refresh" content="0;url=https://attacker.example/" /><p>safe</p></div></hx-prose>',
+        '<hx-prose sanitize><div><link rel="stylesheet" href="data:text/css," /><base target="_blank" /><meta name="description" content="x" /><p>safe</p></div></hx-prose>',
       );
       await el.updateComplete;
       expect(el.querySelector('link')).toBeNull();
