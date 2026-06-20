@@ -575,5 +575,18 @@ describe('hx-prose', () => {
       // Without the detach this would be unbounded; with it, it does not run away.
       expect(calls).toBeLessThan(10);
     });
+
+    it('sanitize on strips document-level link/base/meta elements', async () => {
+      // Even with a safe https: scheme these load attacker CSS / rewrite relative
+      // URLs / drive a redirect, so they are dropped wholesale.
+      const el = await fixture<HelixProse>(
+        '<hx-prose sanitize><div><link rel="stylesheet" href="https://attacker.example/evil.css" /><base href="https://attacker.example/" /><meta http-equiv="refresh" content="0;url=https://attacker.example/" /><p>safe</p></div></hx-prose>',
+      );
+      await el.updateComplete;
+      expect(el.querySelector('link')).toBeNull();
+      expect(el.querySelector('base')).toBeNull();
+      expect(el.querySelector('meta')).toBeNull();
+      expect(el.querySelector('p')?.textContent).toBe('safe');
+    });
   });
 });

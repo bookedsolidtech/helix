@@ -297,6 +297,13 @@ export class HelixProse extends HelixElement {
       'object',
       'embed',
       'foreignobject',
+      // Document-level metadata/resource elements have no place in prose content and
+      // load attacker-controlled resources or alter URL resolution even with a safe
+      // (https:) scheme: <link rel="stylesheet"> fetches CSS, <base href> rewrites
+      // every relative URL on the page, <meta http-equiv="refresh"> drives a redirect.
+      'link',
+      'base',
+      'meta',
       // SVG SMIL animation elements can rewrite a URL-bearing attribute at runtime
       // (e.g. <animate attributeName="xlink:href" to="javascript:…">), defeating the
       // static URL-scheme check below — hx-icon strips these for the same reason.
