@@ -1171,6 +1171,63 @@ describe('hx-phi-field', () => {
         el.remove();
       }
     });
+
+    it('strict toggled ON after connect: arms the observer + refuses a later data write', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      // NOT strict at connect.
+      document.body.appendChild(el);
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.strict = true;
+        await el.updateComplete;
+        el.setAttribute('data', '123-45-6789');
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(el.hasAttribute('data')).toBe(false);
+        expect(events.some((e) => e.detail.action === 'attribute-exposure-refused')).toBe(true);
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
+        el.remove();
+      }
+    });
+
+    it('strict toggled OFF after connect: stops refusing post-connect data writes', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('strict', '');
+      document.body.appendChild(el);
+      await el.updateComplete;
+      el.strict = false;
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.setAttribute('data', '123-45-6789');
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        // Observer detached when strict was disabled — no refusal from the observer path.
+        expect(events.some((e) => e.detail.action === 'attribute-exposure-refused')).toBe(false);
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        warnSpy.mockRestore();
+        el.remove();
+      }
+    });
   });
 
   // ─── Visibility Change Audit Pollution ───

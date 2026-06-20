@@ -129,8 +129,12 @@
   orientation="{{ orientation|default('horizontal') }}"
   hx-size="{{ size|default('md') }}"
   accessible-label="{{ aria_label|default('Progress steps') }}"
-  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
-  {% if attributes %}{{ attributes }}{% endif %}
+  {# SECURITY: `attributes` may be a Drupal Attribute object (render-array / Form-API
+     path) or a plain map (direct {% include %}). Iterate either and emit only
+     validly-named, non-event-handler attributes — this closes the attribute-name
+     injection the original raw `{{ key }}` loop allowed (Twig escapes values, not
+     names) while keeping direct-include attribute maps working. See helix_module.theme.inc. #}
+  {% for attr_name, attr_value in attributes|default({}) %}{% if attr_name matches '/^[a-zA-Z][a-zA-Z0-9:_.-]*$/' and not (attr_name|lower starts with 'on') and attr_name|lower not in ['style', 'formaction', 'action', 'srcdoc'] %}{{ attr_name }}="{{ attr_value }}" {% endif %}{% endfor %}
 >
   {% for step in steps|default([]) %}
     <hx-step

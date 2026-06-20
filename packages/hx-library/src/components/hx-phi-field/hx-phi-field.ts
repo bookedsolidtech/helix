@@ -1,4 +1,4 @@
-import { html, type TemplateResult } from 'lit';
+import { html, type TemplateResult, type PropertyValues } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
@@ -260,6 +260,25 @@ export class HelixPhiField extends HelixElement {
     this._strictDataObserver?.disconnect();
     this._strictDataObserver = undefined;
     document.removeEventListener('visibilitychange', this._boundHandleVisibilityChange);
+  }
+
+  override updated(changed: PropertyValues<this>): void {
+    super.updated(changed);
+    // `strict` is a reactive, reflected property — it can be toggled after connect
+    // (a wrapper or hydration pass). The observer is only armed in connectedCallback,
+    // so mirror start/stop here on every change to `strict`.
+    if (changed.has('strict')) {
+      if (this.strict) {
+        // Catch a `data` attribute that was already present when strict turned on.
+        if (this.hasAttribute('data')) {
+          this._refuseDataAttribute();
+        }
+        this._startStrictDataObserver();
+      } else {
+        this._strictDataObserver?.disconnect();
+        this._strictDataObserver = undefined;
+      }
+    }
   }
 
   /**

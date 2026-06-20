@@ -24,16 +24,13 @@
     name       (string)  Form field name for ElementInternals participation.
     value      (string)  Form field value submitted with name.
     aria_label (string)  Accessible name for icon-only buttons.
-    attributes (Attribute)
-                         Drupal Attribute object for additional HTML attributes,
-                         consistent with the rest of the HELiX template suite. The
-                         Form API / render-array path wraps this automatically
-                         (helix_module_preprocess); printing `{{ attributes }}`
-                         escapes attribute NAMES and values, closing the
-                         attribute-name injection the previous raw key/value loop
-                         allowed. For a direct {% include %} that needs DYNAMIC
-                         attributes, pass a built object rather than a plain map:
-                           attributes: create_attribute({'data-test': 'x'})
+    attributes (Attribute|map)
+                         Additional HTML attributes — either a Drupal Attribute object
+                         (the render-array / Form-API path) or a plain map for a direct
+                         {% include %}, e.g. attributes: {'data-test': 'x'}. Both are
+                         iterated safely: only validly-named, non-event-handler
+                         attributes are emitted, closing the attribute-name injection
+                         the original raw key/value loop allowed.
 
   Usage — direct include:
     {% include 'helix-button.html.twig' with {
@@ -66,8 +63,12 @@
   {% if name %}name="{{ name }}"{% endif %}
   {% if value %}value="{{ value }}"{% endif %}
   {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
-  {# Attributes is a Drupal Attribute object (wrapped in helix_module_preprocess); printing it escapes attribute names AND values. See SECURITY note in helix_module.theme.inc. #}
-  {% if attributes %}{{ attributes }}{% endif %}
+  {# SECURITY: `attributes` may be a Drupal Attribute object (render-array / Form-API
+     path) or a plain map (direct {% include %}). Iterate either and emit only
+     validly-named, non-event-handler attributes — this closes the attribute-name
+     injection the original raw `{{ key }}` loop allowed (Twig escapes values, not
+     names) while keeping direct-include attribute maps working. See helix_module.theme.inc. #}
+  {% for attr_name, attr_value in attributes|default({}) %}{% if attr_name matches '/^[a-zA-Z][a-zA-Z0-9:_.-]*$/' and not (attr_name|lower starts with 'on') and attr_name|lower not in ['style', 'formaction', 'action', 'srcdoc'] %}{{ attr_name }}="{{ attr_value }}" {% endif %}{% endfor %}
 >
   {%- set prefix_content %}{% block prefix %}{% endblock %}{% endset -%}
   {%- if prefix_content %}<span slot="prefix">{{ prefix_content }}</span>{% endif -%}
