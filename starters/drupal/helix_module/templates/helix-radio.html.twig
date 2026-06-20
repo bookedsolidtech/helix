@@ -47,8 +47,10 @@
   {% if _disabled %}disabled{% endif %}
   {# SECURITY: `attributes` may be a Drupal Attribute object (render-array / Form-API
      path) or a plain map (direct {% include %}). Iterate either and emit only
-     validly-named, non-event-handler attributes — this closes the attribute-name
-     injection the original raw `{{ key }}` loop allowed (Twig escapes values, not
-     names) while keeping direct-include attribute maps working. See helix_module.theme.inc. #}
-  {% for attr_name, attr_value in attributes|default({}) %}{% if attr_name matches '/^[a-zA-Z][a-zA-Z0-9:_.-]*$/' and not (attr_name|lower starts with 'on') and attr_name|lower not in ['style', 'formaction', 'action', 'srcdoc'] %}{{ attr_name }}="{{ attr_value }}" {% endif %}{% endfor %}
+     well-formed attribute NAMES — this closes the attribute-name injection the
+     original raw `{{ key }}` loop allowed (Twig escapes the value, not the name)
+     while PRESERVING every legitimate attribute, including `style` for --hx-* theming
+     and `formaction` on form buttons (these are developer-controlled here, not
+     untrusted input). See helix_module.theme.inc. #}
+  {% for attr_name, attr_value in attributes|default({}) %}{% if attr_name matches '/^[a-zA-Z][a-zA-Z0-9:_.-]*$/' %}{{ attr_name }}="{{ attr_value }}" {% endif %}{% endfor %}
 ></hx-radio>
