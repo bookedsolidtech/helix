@@ -207,6 +207,23 @@ export class HelixPhiField extends HelixElement {
     this._resetAutoHideTimer();
   };
 
+  /**
+   * SYNCHRONOUS strict-mode guard for `data` attribute writes. Refusing here — before
+   * the value ever lands in the DOM — closes the window the async MutationObserver
+   * leaves open (raw PHI readable for one microtask after `setAttribute('data', …)`).
+   * The observer remains as a backstop for non-setAttribute write paths
+   * (`setAttributeNS`, `setAttributeNode`) and for SSR markup parsed before upgrade.
+   */
+  override setAttribute(qualifiedName: string, value: string): void {
+    if (this.strict && qualifiedName === 'data') {
+      // Do NOT call super — the attribute never lands. _refuseDataAttribute() still
+      // dispatches the audit event + dev log (its removeAttribute is a no-op here).
+      this._refuseDataAttribute();
+      return;
+    }
+    super.setAttribute(qualifiedName, value);
+  }
+
   override connectedCallback(): void {
     super.connectedCallback();
     // Enforce HIPAA compliance: prevent browser autofill on the host element

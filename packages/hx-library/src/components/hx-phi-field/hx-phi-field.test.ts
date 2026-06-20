@@ -1068,25 +1068,24 @@ describe('hx-phi-field', () => {
       }
     });
 
-    it('strict + data attribute: dispatches hx-phi-access with action="attribute-exposure-refused" (no raw PHI in detail)', () => {
-      const el = document.createElement('hx-phi-field') as HelixPhiField;
-      el.setAttribute('field-type', 'ssn');
-      el.setAttribute('field-id', 'strict-refuse');
-      el.setAttribute('strict', '');
-      el.setAttribute('data', '123-45-6789');
-
+    it('strict + data attribute at connect (SSR markup): dispatches hx-phi-access with action="attribute-exposure-refused" (no raw PHI in detail)', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const events: CustomEvent<PhiAccessEventDetail>[] = [];
-      // Listen on document — the event is composed/bubbles and fires during
-      // connectedCallback, before we can attach a listener on the element.
       const handler = (e: Event): void => {
         events.push(e as CustomEvent<PhiAccessEventDetail>);
       };
+      // Attach first — the refusal event bubbles during connectedCallback inside the
+      // fixture's append.
       document.addEventListener('hx-phi-access', handler);
 
       try {
-        // Strict mode refuses without throwing, so the audit event lands cleanly.
-        expect(() => document.body.appendChild(el)).not.toThrow();
+        // SSR markup: `data` is present in the PARSED HTML at upgrade time (fixture
+        // uses innerHTML, not setAttribute), so the refusal happens in
+        // connectedCallback — the synchronous setAttribute override only intercepts the
+        // programmatic post-connect path.
+        const el = await fixture<HelixPhiField>(
+          '<hx-phi-field field-type="ssn" field-id="strict-refuse" strict data="123-45-6789"></hx-phi-field>',
+        );
 
         const refusedEvents = events.filter(
           (e) => e.detail.action === 'attribute-exposure-refused',
@@ -1094,13 +1093,13 @@ describe('hx-phi-field', () => {
         expect(refusedEvents).toHaveLength(1);
         expect(refusedEvents[0]?.detail.fieldId).toBe('strict-refuse');
         expect(refusedEvents[0]?.detail.fieldType).toBe('ssn');
+        expect(el.hasAttribute('data')).toBe(false);
         // Raw PHI must never appear in the audit detail — HIPAA boundary.
         const detailStr = JSON.stringify(refusedEvents[0]?.detail);
         expect(detailStr).not.toContain('123-45-6789');
       } finally {
         document.removeEventListener('hx-phi-access', handler);
         errorSpy.mockRestore();
-        el.remove();
       }
     });
 
@@ -1225,6 +1224,34 @@ describe('hx-phi-field', () => {
       } finally {
         document.removeEventListener('hx-phi-access', handler);
         warnSpy.mockRestore();
+        el.remove();
+      }
+    });
+
+    it('strict + setAttribute("data") is refused SYNCHRONOUSLY (PHI never lands)', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('field-id', 'sync-refuse');
+      el.setAttribute('strict', '');
+      document.body.appendChild(el);
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.setAttribute('data', '123-45-6789');
+        // No await: the setAttribute override refuses synchronously, so the value
+        // must already be absent — there is no microtask window for sync code to read.
+        expect(el.hasAttribute('data')).toBe(false);
+        expect(el.getAttribute('data')).toBeNull();
+        expect(events.some((e) => e.detail.action === 'attribute-exposure-refused')).toBe(true);
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
         el.remove();
       }
     });

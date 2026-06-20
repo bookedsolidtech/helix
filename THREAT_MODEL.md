@@ -166,10 +166,20 @@ in:
 
 - **`sanitize` (boolean attribute).** Enables a conservative built-in allowlist
   that strips `<script>`/`<style>`/`<iframe>`/`<object>`/`<embed>`/
-  `<foreignObject>`, `on*` event-handler attributes, and `javascript:`/`data:`
-  URLs in `href`/`src`. A `MutationObserver` re-sanitizes content injected after
-  connect (CMS hydration, client-side renders), with a re-entrancy guard so the
-  rewrite does not loop.
+  `<foreignObject>`, document-level `<link>`/`<base>`/`<meta>`, SVG SMIL animation
+  elements (`<animate>`/`<set>`/…), `on*` event-handler and inline `style`
+  attributes, and `javascript:`/`data:` URLs in `href`/`src`/`xlink:href`/
+  `formaction`/`action`. A `MutationObserver` re-sanitizes content injected after
+  connect (CMS hydration, client-side renders), with a re-entrancy guard (the
+  observer detaches during the rewrite) so a non-idempotent custom sanitizer cannot
+  loop.
+  - ⚠️ **Client-side limitation.** `sanitize` runs when the component upgrades and
+    on subsequent mutations — it is effective for content injected *after* load, but
+    it **cannot** prevent dangerous markup in the **initial server-rendered / static
+    HTML** from executing during the browser's parse (inline `<script>`, `<img
+    onerror>` fire before any component JS exists). This is inherent to client-side
+    sanitization. **SSR/CMS payloads must be sanitized on the server**; treat
+    `sanitize` as defense-in-depth for dynamically-injected content.
 - **`sanitizer` (function property).** When provided alongside `sanitize`, this
   function fully owns the policy and the built-in allowlist is bypassed — wire in
   a hardened library (e.g. `el.sanitizer = (html) => DOMPurify.sanitize(html)`).

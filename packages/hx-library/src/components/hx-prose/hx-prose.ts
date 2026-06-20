@@ -25,8 +25,19 @@ import { helixProseScopedCss } from './hx-prose.styles.js';
  *   the HTML. This is the documented, non-breaking default. If the content source is not
  *   fully trusted, set the boolean `sanitize` attribute to enable a conservative built-in
  *   allowlist (strips `<script>`/`<style>`/`<iframe>`/`<object>`/`<embed>`/`<foreignObject>`,
- *   `on*` event-handler attributes, and `javascript:`/`data:` URLs in `href`/`src`), or supply
- *   a stricter `sanitizer` function property (e.g. DOMPurify) to fully own the policy.
+ *   document-level `<link>`/`<base>`/`<meta>`, SVG SMIL animation elements, `on*` event-handler
+ *   and `style` attributes, and `javascript:`/`data:` URLs in `href`/`src`/`xlink:href`/
+ *   `formaction`/`action`), or supply a stricter `sanitizer` function property (e.g. DOMPurify)
+ *   to fully own the policy.
+ *
+ *   ⚠️ CLIENT-SIDE BACKSTOP ONLY — NOT a substitute for server-side sanitization. `sanitize`
+ *   runs when the component upgrades (connectedCallback) and on subsequent light-DOM mutations.
+ *   It effectively cleans content injected AFTER load (the MutationObserver path), but it CANNOT
+ *   prevent execution of dangerous markup present in the INITIAL server-rendered / static HTML:
+ *   an inline `<script>` or a fast-firing `<img onerror>` in the original payload runs during the
+ *   browser's HTML parse, before any component JS exists. For SSR/CMS content, sanitize on the
+ *   SERVER before the HTML reaches the browser; treat this flag as defense-in-depth for
+ *   dynamically-injected content, not as protection for the initial server-rendered payload.
  *
  * @cssprop [--hx-prose-max-width=720px] - Maximum content width.
  * @cssprop [--hx-prose-font-size=var(--hx-font-size-base)] - Base font size.
@@ -75,6 +86,11 @@ export class HelixProse extends HelixElement {
    * configured `sanitizer` (or the conservative built-in allowlist when none is set)
    * on connect and whenever the light-DOM subtree mutates, and unsafe content is
    * replaced in place.
+   *
+   * ⚠️ This is a CLIENT-SIDE backstop for dynamically-injected content. It runs after
+   * the browser has parsed the initial light DOM, so it CANNOT stop dangerous markup in
+   * server-rendered / static HTML from executing on parse (inline `<script>`, `<img
+   * onerror>`). Sanitize SSR/CMS payloads on the server; see the `@slot` security note.
    * @attr sanitize
    */
   @property({ type: Boolean })
