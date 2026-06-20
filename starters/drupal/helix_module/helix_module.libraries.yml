@@ -5,13 +5,16 @@ helix:
   js:
     # External CDN asset MUST carry Subresource Integrity (SRI) — without it a
     # compromised/poisoned jsDelivr response would execute arbitrary JS in the
-    # consuming Drupal site. The sha384 below is computed against the exact
-    # bytes published at @3.10.0; Drupal emits integrity + crossorigin onto the
-    # <script> tag so the browser hard-fails on any mismatch. Bump BOTH the
+    # consuming Drupal site. The sha384 below pins the exact bytes jsDelivr SERVES
+    # for the PUBLISHED npm release @3.10.0; Drupal emits integrity + crossorigin
+    # onto the <script> tag so the browser hard-fails on any mismatch. Bump BOTH the
     # version pin AND the hash together on every upgrade.
-    # Hash recompute (must match published artifact byte-for-byte):
+    # NOTE: this must match the PUBLISHED CDN bytes, NOT a local `dist/` rebuild —
+    # `packages/hx-library/dist/` is a gitignored build artifact whose bytes differ
+    # from the npm/CDN release. Recompute against the CDN, not the local file:
     #   curl -sL https://cdn.jsdelivr.net/npm/@helixui/library@3.10.0/dist/index.js \
     #     | openssl dgst -sha384 -binary | openssl base64 -A
+    #   (verified 2026-06-19: CDN returns HTTP 200 and this exact sha384.)
     https://cdn.jsdelivr.net/npm/@helixui/library@3.10.0/dist/index.js:
       type: external
       attributes:
