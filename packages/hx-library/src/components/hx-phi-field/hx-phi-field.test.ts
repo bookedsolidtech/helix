@@ -1135,6 +1135,42 @@ describe('hx-phi-field', () => {
         el.remove();
       }
     });
+
+    it('strict + post-connect `data` attribute write: refuses (strips + audit event)', async () => {
+      // A hydration pass or client framework can `setAttribute('data', phi)` AFTER
+      // connect. `data` is attribute:false so attributeChangedCallback never fires;
+      // the strict-mode MutationObserver must still strip it and refuse.
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const el = document.createElement('hx-phi-field') as HelixPhiField;
+      el.setAttribute('field-type', 'ssn');
+      el.setAttribute('field-id', 'post-connect');
+      el.setAttribute('strict', '');
+      // Connect with NO data attribute — the observer must still arm.
+      document.body.appendChild(el);
+      await el.updateComplete;
+
+      const events: CustomEvent<PhiAccessEventDetail>[] = [];
+      const handler = (e: Event): void => {
+        events.push(e as CustomEvent<PhiAccessEventDetail>);
+      };
+      document.addEventListener('hx-phi-access', handler);
+
+      try {
+        el.setAttribute('data', '123-45-6789');
+        // MutationObserver callbacks fire on a microtask.
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(el.hasAttribute('data')).toBe(false);
+        const refused = events.filter((e) => e.detail.action === 'attribute-exposure-refused');
+        expect(refused.length).toBeGreaterThanOrEqual(1);
+        expect(refused[0]?.detail.fieldId).toBe('post-connect');
+        expect(JSON.stringify(refused[0]?.detail)).not.toContain('123-45-6789');
+      } finally {
+        document.removeEventListener('hx-phi-access', handler);
+        errorSpy.mockRestore();
+        el.remove();
+      }
+    });
   });
 
   // ─── Visibility Change Audit Pollution ───

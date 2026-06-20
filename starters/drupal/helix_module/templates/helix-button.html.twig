@@ -24,7 +24,16 @@
     name       (string)  Form field name for ElementInternals participation.
     value      (string)  Form field value submitted with name.
     aria_label (string)  Accessible name for icon-only buttons.
-    attributes (object)  Additional HTML attributes spread onto the element.
+    attributes (Attribute)
+                         Drupal Attribute object for additional HTML attributes,
+                         consistent with the rest of the HELiX template suite. The
+                         Form API / render-array path wraps this automatically
+                         (helix_module_preprocess); printing `{{ attributes }}`
+                         escapes attribute NAMES and values, closing the
+                         attribute-name injection the previous raw key/value loop
+                         allowed. For a direct {% include %} that needs DYNAMIC
+                         attributes, pass a built object rather than a plain map:
+                           attributes: create_attribute({'data-test': 'x'})
 
   Usage — direct include:
     {% include 'helix-button.html.twig' with {

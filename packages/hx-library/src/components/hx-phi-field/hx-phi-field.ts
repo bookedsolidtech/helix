@@ -160,6 +160,11 @@ export class HelixPhiField extends HelixElement {
    * `import.meta.env.DEV` branch is tree-shaken away), so an opted-in app still
    * degrades to the audit-event signal rather than logging for end users.
    *
+   * Detection covers BOTH the initial markup at connect AND post-connect writes
+   * (a hydration pass or client framework calling `setAttribute('data', …)` after
+   * the element is live) via a MutationObserver — `data` is `attribute: false`, so
+   * Lit's `attributeChangedCallback` never fires for it.
+   *
    * Its value is surfacing the defect (an upstream SSR `data` attribute) before
    * it reaches production — not preventing the server-side serialization, which
    * already occurred.
@@ -180,6 +185,9 @@ export class HelixPhiField extends HelixElement {
 
   /** @internal Timer ID for auto-re-mask after reveal. */
   private _autoHideTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** @internal Strict-mode observer for post-connect `data` attribute writes. */
+  private _strictDataObserver: MutationObserver | undefined;
 
   // ─── Lifecycle ───
 
@@ -220,37 +228,9 @@ export class HelixPhiField extends HelixElement {
       // rescuing. We strip the attribute FIRST so the raw PHI leaves the live
       // DOM before anything else runs.
       if (this.strict) {
-        // PHI leaves the live DOM regardless of the strict outcome below.
-        this.removeAttribute('data');
-        // Audit-trail signal in every environment (prod included): the SSR
-        // misconfiguration was detected and the exposure refused. No raw PHI
-        // is ever placed in the event detail — only audit metadata.
-        this.dispatchEvent(
-          new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
-            bubbles: true,
-            composed: true,
-            detail: {
-              fieldId: this.fieldId || this.id || '',
-              action: 'attribute-exposure-refused',
-              timestamp: new Date().toISOString(),
-              fieldType: this.fieldType,
-            },
-          }),
-        );
-        // Fail LOUDLY in dev/test/CI so the SSR misconfiguration cannot ship
-        // unnoticed. We use console.error (via devError), NOT throw: an
-        // exception thrown from connectedCallback is reported by the browser as
-        // an *uncaught* error rather than propagating to the insertion site, and
-        // it aborts the rest of the callback — destabilising a live PHI field.
-        // `import.meta.env.DEV` is statically `false` in production builds, so
-        // the log is tree-shaken away and an opted-in production app degrades to
-        // the audit-event signal above.
-        devError(
-          'hx-phi-field',
-          'strict mode: PHI was set via the `data` HTML attribute. ' +
-            'This exposes sensitive data in the server-rendered HTML source (HIPAA risk). ' +
-            'The raw value was NOT rescued. Use the `data` JS property (element.data = "...") instead.',
-        );
+        this._refuseDataAttribute();
+        // Also catch post-connect writes (hydration / client frameworks) below.
+        this._startStrictDataObserver();
         return;
       }
       devWarn(
@@ -265,13 +245,73 @@ export class HelixPhiField extends HelixElement {
       }
       this.removeAttribute('data');
     }
+    // Strict mode must also catch a `data` attribute written AFTER connect (a
+    // client framework or hydration pass) — even when the initial markup had
+    // none. Idempotent if already started in the with-data branch above.
+    if (this.strict) {
+      this._startStrictDataObserver();
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._cancelClipboardTimer();
     this._cancelAutoHideTimer();
+    this._strictDataObserver?.disconnect();
+    this._strictDataObserver = undefined;
     document.removeEventListener('visibilitychange', this._boundHandleVisibilityChange);
+  }
+
+  /**
+   * Strips a `data` HTML attribute (so raw PHI leaves the live DOM), dispatches the
+   * `attribute-exposure-refused` audit event (metadata only, never raw PHI), and —
+   * in dev/test builds — logs loudly. Shared by strict mode at connect time and by
+   * the post-connect attribute observer. Never throws (an exception from a lifecycle
+   * callback would destabilise a live field).
+   * @internal
+   */
+  private _refuseDataAttribute(): void {
+    // PHI leaves the live DOM first, regardless of anything below.
+    this.removeAttribute('data');
+    this.dispatchEvent(
+      new CustomEvent<PhiAccessEventDetail>('hx-phi-access', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          fieldId: this.fieldId || this.id || '',
+          action: 'attribute-exposure-refused',
+          timestamp: new Date().toISOString(),
+          fieldType: this.fieldType,
+        },
+      }),
+    );
+    devError(
+      'hx-phi-field',
+      'strict mode: PHI was set via the `data` HTML attribute. ' +
+        'This exposes sensitive data in the server-rendered HTML source (HIPAA risk). ' +
+        'The raw value was NOT rescued. Use the `data` JS property (element.data = "...") instead.',
+    );
+  }
+
+  /**
+   * Observes post-connect writes to the `data` HTML attribute under strict mode.
+   * `data` is `attribute: false`, so Lit's `attributeChangedCallback` never fires
+   * for it — a MutationObserver is the only way to catch a late `setAttribute('data', …)`
+   * from hydration or a client framework. Idempotent.
+   * @internal
+   */
+  private _startStrictDataObserver(): void {
+    if (this._strictDataObserver) {
+      return;
+    }
+    this._strictDataObserver = new MutationObserver(() => {
+      // _refuseDataAttribute() itself removes the attribute, which fires another
+      // record; the hasAttribute guard makes that re-entry a harmless no-op.
+      if (this.hasAttribute('data')) {
+        this._refuseDataAttribute();
+      }
+    });
+    this._strictDataObserver.observe(this, { attributes: true, attributeFilter: ['data'] });
   }
 
   // ─── Private Helpers ───
