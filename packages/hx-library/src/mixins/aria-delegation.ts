@@ -1,66 +1,96 @@
 import type { LitElement } from 'lit';
 
 /**
- * All standard ARIA attributes intercepted by this mixin.
- * Extend as needed, but keep the list minimal.
+ * Canonical map from each intercepted WAI-ARIA content attribute to its
+ * **ARIAMixin IDL property name** (the exact name browsers expose natively as
+ * `element.ariaColCount`, `element.ariaDescribedBy`, etc.).
+ *
+ * These IDL names CANNOT be derived algorithmically from the kebab-case
+ * attribute: the internal capitalization (`ariaColCount`, `ariaDescribedBy`,
+ * `ariaBrailleRoleDescription`, `ariaRowIndex`, …) does not correspond to
+ * hyphen boundaries in the attribute (`aria-colcount`, `aria-describedby`, …).
+ * A static table is therefore the source of truth. The values match the
+ * ARIAMixin interface in TS `lib.dom` for every attribute it covers; the eight
+ * relationship attributes that `lib.dom` only types as element-reference
+ * properties (`aria-activedescendant`, `aria-controls`, `aria-describedby`,
+ * `aria-details`, `aria-errormessage`, `aria-flowto`, `aria-labelledby`,
+ * `aria-owns`) use their standard ARIA IDL string-reflection names.
+ *
+ * Source: WAI-ARIA / ARIA IDL reflection (https://www.w3.org/TR/wai-aria/) and
+ * the ARIAMixin interface as reflected in TypeScript `lib.dom.d.ts`.
+ *
+ * To intercept a new ARIA attribute, add a `'aria-*': 'ariaXxx'` entry here —
+ * `ARIA_ATTRIBUTES`, the union type, and the generated accessors all derive
+ * from this map, so they cannot drift.
  */
-const ARIA_ATTRIBUTES = [
-  'aria-activedescendant',
-  'aria-atomic',
-  'aria-autocomplete',
-  'aria-braillelabel',
-  'aria-brailleroledescription',
-  'aria-busy',
-  'aria-checked',
-  'aria-colcount',
-  'aria-colindex',
-  'aria-colindextext',
-  'aria-colspan',
-  'aria-controls',
-  'aria-current',
-  'aria-describedby',
-  'aria-description',
-  'aria-details',
-  'aria-disabled',
-  'aria-errormessage',
-  'aria-expanded',
-  'aria-flowto',
-  'aria-haspopup',
-  'aria-hidden',
-  'aria-invalid',
-  'aria-keyshortcuts',
-  'aria-label',
-  'aria-labelledby',
-  'aria-level',
-  'aria-live',
-  'aria-modal',
-  'aria-multiline',
-  'aria-multiselectable',
-  'aria-orientation',
-  'aria-owns',
-  'aria-placeholder',
-  'aria-posinset',
-  'aria-pressed',
-  'aria-readonly',
-  'aria-relevant',
-  'aria-required',
-  'aria-roledescription',
-  'aria-rowcount',
-  'aria-rowindex',
-  'aria-rowindextext',
-  'aria-rowspan',
-  'aria-selected',
-  'aria-setsize',
-  'aria-sort',
-  'aria-valuemax',
-  'aria-valuemin',
-  'aria-valuenow',
-  'aria-valuetext',
-  'role',
-] as const;
+const ARIA_ATTR_TO_IDL_PROP = {
+  'aria-activedescendant': 'ariaActiveDescendant',
+  'aria-atomic': 'ariaAtomic',
+  'aria-autocomplete': 'ariaAutoComplete',
+  'aria-braillelabel': 'ariaBrailleLabel',
+  'aria-brailleroledescription': 'ariaBrailleRoleDescription',
+  'aria-busy': 'ariaBusy',
+  'aria-checked': 'ariaChecked',
+  'aria-colcount': 'ariaColCount',
+  'aria-colindex': 'ariaColIndex',
+  'aria-colindextext': 'ariaColIndexText',
+  'aria-colspan': 'ariaColSpan',
+  'aria-controls': 'ariaControls',
+  'aria-current': 'ariaCurrent',
+  'aria-describedby': 'ariaDescribedBy',
+  'aria-description': 'ariaDescription',
+  'aria-details': 'ariaDetails',
+  'aria-disabled': 'ariaDisabled',
+  'aria-errormessage': 'ariaErrorMessage',
+  'aria-expanded': 'ariaExpanded',
+  'aria-flowto': 'ariaFlowTo',
+  'aria-haspopup': 'ariaHasPopup',
+  'aria-hidden': 'ariaHidden',
+  'aria-invalid': 'ariaInvalid',
+  'aria-keyshortcuts': 'ariaKeyShortcuts',
+  'aria-label': 'ariaLabel',
+  'aria-labelledby': 'ariaLabelledBy',
+  'aria-level': 'ariaLevel',
+  'aria-live': 'ariaLive',
+  'aria-modal': 'ariaModal',
+  'aria-multiline': 'ariaMultiLine',
+  'aria-multiselectable': 'ariaMultiSelectable',
+  'aria-orientation': 'ariaOrientation',
+  'aria-owns': 'ariaOwns',
+  'aria-placeholder': 'ariaPlaceholder',
+  'aria-posinset': 'ariaPosInSet',
+  'aria-pressed': 'ariaPressed',
+  'aria-readonly': 'ariaReadOnly',
+  'aria-relevant': 'ariaRelevant',
+  'aria-required': 'ariaRequired',
+  'aria-roledescription': 'ariaRoleDescription',
+  'aria-rowcount': 'ariaRowCount',
+  'aria-rowindex': 'ariaRowIndex',
+  'aria-rowindextext': 'ariaRowIndexText',
+  'aria-rowspan': 'ariaRowSpan',
+  'aria-selected': 'ariaSelected',
+  'aria-setsize': 'ariaSetSize',
+  'aria-sort': 'ariaSort',
+  'aria-valuemax': 'ariaValueMax',
+  'aria-valuemin': 'ariaValueMin',
+  'aria-valuenow': 'ariaValueNow',
+  'aria-valuetext': 'ariaValueText',
+  role: 'role',
+} as const satisfies Record<string, string>;
 
-/** Union type of all intercepted ARIA attribute names. */
-export type AriaAttribute = (typeof ARIA_ATTRIBUTES)[number];
+/**
+ * All standard ARIA attributes (plus `role`) intercepted by this mixin.
+ * Derived from the canonical map so the two cannot diverge.
+ */
+const ARIA_ATTRIBUTES = Object.keys(ARIA_ATTR_TO_IDL_PROP) as readonly AriaAttribute[];
+
+/**
+ * Union type of all intercepted ARIA attribute names (the content-attribute,
+ * kebab-case form — e.g. `'aria-label'`, `'role'`).
+ *
+ * @public
+ */
+export type AriaAttribute = keyof typeof ARIA_ATTR_TO_IDL_PROP;
 
 // TypeScript mixin constraint: constructors must accept `any[]`.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,6 +100,15 @@ type LitElementConstructor = new (...args: any[]) => LitElement;
  * The public interface added to any class by `mixinDelegatesAria`.
  * JS property accessors for all intercepted ARIA attributes, reading from
  * `data-aria-*` storage rather than `aria-*` attributes on the host.
+ *
+ * Every accessor name is the canonical **ARIAMixin IDL property name** (the
+ * same name browsers expose natively, e.g. `ariaColCount`, `ariaDescribedBy`),
+ * sourced from {@link ARIA_ATTR_TO_IDL_PROP}. The generated runtime accessors
+ * therefore match this interface exactly, so consumers building a custom HELiX
+ * component on `HelixElement` can obtain typed access, e.g.
+ * `(this as unknown as AriaDelegationMixinInterface).ariaExpanded`.
+ *
+ * @public
  */
 
 export interface AriaDelegationMixinInterface {
@@ -127,6 +166,25 @@ export interface AriaDelegationMixinInterface {
   role: string | null;
 }
 
+// ─── Compile-time drift guard ────────────────────────────────────────────────
+// Lock ARIA_ATTR_TO_IDL_PROP and AriaDelegationMixinInterface together so the
+// generated accessor names (map values) can never silently diverge from the
+// public interface keys. If you add/rename an entry in one, the other must
+// match or the build fails here.
+type IdlPropName = (typeof ARIA_ATTR_TO_IDL_PROP)[keyof typeof ARIA_ATTR_TO_IDL_PROP];
+type InterfaceKey = keyof AriaDelegationMixinInterface;
+
+// Every IDL property name produced by the map must be a key of the interface…
+type _AssertMapValuesAreInterfaceKeys = IdlPropName extends InterfaceKey ? true : never;
+// …and every interface key must be produced by the map (no orphan members).
+type _AssertInterfaceKeysAreMapValues = InterfaceKey extends IdlPropName ? true : never;
+
+const _ariaMapMatchesInterface: [
+  _AssertMapValuesAreInterfaceKeys,
+  _AssertInterfaceKeysAreMapValues,
+] = [true, true];
+void _ariaMapMatchesInterface;
+
 /**
  * Mixin that delegates ARIA attributes from the host element to data-aria-* storage,
  * preventing Shadow DOM double-announcement by screen readers.
@@ -141,16 +199,45 @@ export interface AriaDelegationMixinInterface {
  * - The host element no longer has `aria-*` attributes visible in the a11y tree
  * - Components read ARIA values via property accessors and apply them to inner elements
  *
- * @example
+ * @public
+ *
+ * @remarks
+ * This is the canonical "Track-2" extension primitive for consumers authoring a
+ * custom HELiX component from `HelixElement`. Apply it the same way the
+ * first-party components do — `mixinDelegatesAria(HelixElement)` — to get
+ * host-level ARIA delegation while keeping `HelixElement`'s form-participation
+ * and `ElementInternals` infrastructure. The mixin operates on any `LitElement`
+ * subclass and adds no dependency beyond `lit`, so the returned class is safe to
+ * `@customElement`-register and extend further.
+ *
+ * Import it from the side-effect-free `@helixui/library/authoring` subpath so
+ * the Track-2 authoring path stays SSR/Node-safe (the root export eagerly
+ * registers every component via `customElements.define`).
+ *
+ * The generated accessors use the canonical ARIAMixin IDL property names, so
+ * `this.ariaLabel` (and the rest) are correctly typed via Lit/native typings.
+ * For ARIA accessors not present in older `lib.dom` typings, cast through the
+ * public {@link AriaDelegationMixinInterface} for typed access, e.g.
+ * `(this as unknown as AriaDelegationMixinInterface).ariaColCount`.
+ *
+ * @example Track-2 — a custom HELiX component built on `HelixElement`:
  * ```ts
- * class HxButton extends mixinDelegatesAria(LitElement) {
+ * import { HelixElement, mixinDelegatesAria } from '@helixui/library/authoring';
+ * import { html, nothing } from 'lit';
+ * import { customElement } from 'lit/decorators.js';
+ *
+ * \@customElement('tw-thing')
+ * class TwThing extends mixinDelegatesAria(HelixElement) {
  *   render() {
+ *     // `this.ariaLabel` is provided by Lit/native typings and is correctly
+ *     // typed — read delegated ARIA via the native accessor or apply it to an
+ *     // inner element.
  *     return html`<button aria-label=${this.ariaLabel ?? nothing}></button>`;
  *   }
  * }
  * ```
  *
- * @param Base - A LitElement subclass constructor
+ * @param Base - A LitElement subclass constructor (e.g. `HelixElement`)
  * @returns A new constructor extending Base with ARIA delegation behaviour
  */
 export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T {
@@ -205,10 +292,12 @@ export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T 
     }
   }
 
-  // Add JS property accessors for each ARIA attribute, reading from data-aria-*
+  // Add JS property accessors for each ARIA attribute, reading from data-aria-*.
+  // The accessor name is the canonical ARIAMixin IDL property name (e.g.
+  // 'aria-colcount' → 'ariaColCount'), so the generated accessors match BOTH
+  // AriaDelegationMixinInterface AND the native ARIAMixin properties.
   for (const attr of ARIA_ATTRIBUTES) {
-    // Convert 'aria-label' → 'ariaLabel', 'role' → 'role'
-    const propName: string = attr === 'role' ? 'role' : ariaAttrToProp(attr);
+    const propName: string = ARIA_ATTR_TO_IDL_PROP[attr];
     const dataAttr = `data-${attr}`;
 
     Object.defineProperty(AriaDelegationMixin.prototype, propName, {
@@ -238,18 +327,4 @@ export function mixinDelegatesAria<T extends LitElementConstructor>(Base: T): T 
   // instance members are added at runtime via Object.defineProperty above; callers
   // that need the typed accessors should cast the instance or use the interface directly.
   return AriaDelegationMixin as unknown as T;
-}
-
-/**
- * Converts 'aria-label' → 'ariaLabel', 'aria-busy' → 'ariaBusy', etc.
- * Removes the 'aria-' prefix, capitalizes the first letter of the remainder,
- * then camelCases any additional hyphen-separated segments.
- */
-function ariaAttrToProp(attr: string): string {
-  const rest = attr.replace(/^aria-/, '');
-  return (
-    'aria' +
-    rest.charAt(0).toUpperCase() +
-    rest.slice(1).replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())
-  );
 }
