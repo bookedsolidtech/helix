@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -204,7 +204,7 @@ jobs:
       # supply-chain hardening (persist-credentials: false) applied to every
       # other checkout step is unsafe here — removing it would crash the
       # release mid-run with an authentication failure on the private repo.
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
