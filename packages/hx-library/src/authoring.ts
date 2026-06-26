@@ -38,3 +38,20 @@ export { FocusMixin } from './mixins/FocusMixin.js';
 export type { FocusMixinInterface } from './mixins/FocusMixin.js';
 export { FormMixin } from './mixins/FormMixin.js';
 export type { FormMixinInterface } from './mixins/FormMixin.js';
+
+// Light-DOM style utilities — the primitives a Track-2 author reaches for when
+// a custom HELiX component needs to style slotted (light-DOM) content. Both are
+// **import-time** SSR-safe and register no custom element, so they belong on
+// this side-effect-free subpath:
+//
+//  - `injectLightStyles` guards every DOM access behind a
+//    `typeof document === 'undefined'` check (a runtime no-op under SSR).
+//  - `AdoptedStylesheetsController`'s only module-scope work is allocating
+//    static caches (`Map`/`WeakMap`); its `document` reference lives in a
+//    constructor default parameter, which is evaluated at construction, not at
+//    module evaluation.
+//
+// Both are DOM-runtime utilities: they require a real document/shadow root when
+// actually *invoked* in the browser. Import them here, call them at runtime.
+export { injectLightStyles } from './utilities/injectLightStyles.js';
+export { AdoptedStylesheetsController } from './controllers/adopted-stylesheets.js';

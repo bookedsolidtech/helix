@@ -58,6 +58,34 @@ describe('@helixui/library/authoring — SSR/Node import safety', () => {
     expect(typeof mod.FormMixin).toBe('function');
   });
 
+  it('exports the light-DOM style utilities', async () => {
+    const mod = await import('../../src/authoring.js');
+    // injectLightStyles — light-DOM style injection helper.
+    expect(typeof mod.injectLightStyles).toBe('function');
+    // AdoptedStylesheetsController — adopted-stylesheets ReactiveController class.
+    expect(typeof mod.AdoptedStylesheetsController).toBe('function');
+  });
+
+  it('injectLightStyles is a no-op (does not throw) without a DOM', async () => {
+    const { injectLightStyles } = await import('../../src/authoring.js');
+    // In a no-DOM context the helper must short-circuit on the
+    // `typeof document === 'undefined'` guard and return without touching the
+    // DOM. Calling it proves the runtime SSR no-op, not just import safety.
+    expect(typeof (globalThis as { document?: unknown }).document).toBe('undefined');
+    expect(() => injectLightStyles('hx-ssr-probe', 'p { color: red; }')).not.toThrow();
+    expect(injectLightStyles('hx-ssr-probe', 'p { color: red; }')).toBeUndefined();
+  });
+
+  it('AdoptedStylesheetsController class is import-safe without a DOM', async () => {
+    const { AdoptedStylesheetsController } = await import('../../src/authoring.js');
+    // The class definition must not touch `document` at module/definition time —
+    // its `document` reference lives in a constructor default parameter, which
+    // is only evaluated when an instance is constructed (in the browser). Merely
+    // resolving the class here must succeed with no DOM present.
+    expect(typeof AdoptedStylesheetsController).toBe('function');
+    expect(typeof (globalThis as { document?: unknown }).document).toBe('undefined');
+  });
+
   it('does NOT register any hx-* component as an import side effect', async () => {
     await import('../../src/authoring.js');
     // The regression guard: the authoring barrel must not pull in any component
