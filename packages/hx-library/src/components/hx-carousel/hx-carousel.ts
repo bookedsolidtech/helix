@@ -227,12 +227,25 @@ export class HelixCarousel extends HelixElement {
   @state() private _liveText = '';
   /** @internal */
   @state() private _livePolite = true;
+  /**
+   * Geometry-measured maximum navigation index, used only when a custom
+   * `--hx-carousel-slide-width` is in play. `null` falls back to the
+   * slidesPerPage-based bound, keeping the default model byte-identical.
+   * @internal
+   */
+  @state() private _measuredMaxIndex: number | null = null;
 
   /**
    * Reference to the active autoplay interval timer, or null when stopped.
    * @internal
    */
   private _autoplayTimer: ReturnType<typeof setInterval> | null = null;
+  /**
+   * Observes viewport and slide-size changes so the measured navigation bound
+   * stays correct for custom slide widths and the gap. Null until connected.
+   * @internal
+   */
+  private _resizeObserver: ResizeObserver | null = null;
   /**
    * Whether the user has requested reduced motion via the OS media preference.
    * @internal
@@ -293,6 +306,12 @@ export class HelixCarousel extends HelixElement {
       this._mql.addEventListener('change', this._handleMotionChange);
     }
 
+    // Keep the measured navigation bound fresh as the viewport or slides resize.
+    // Guard for SSR / older runtimes where ResizeObserver is unavailable.
+    if (typeof ResizeObserver !== 'undefined') {
+      this._resizeObserver = new ResizeObserver(() => this._recomputeBounds());
+    }
+
     this.addEventListener('mouseenter', this._handleMouseEnter);
     this.addEventListener('mouseleave', this._handleMouseLeave);
     this.addEventListener('focusin', this._handleFocusIn);
@@ -304,6 +323,8 @@ export class HelixCarousel extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._mql?.removeEventListener('change', this._handleMotionChange);
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = null;
     this._stopAutoplay();
     this.removeEventListener('mouseenter', this._handleMouseEnter);
     this.removeEventListener('mouseleave', this._handleMouseLeave);
@@ -351,6 +372,81 @@ export class HelixCarousel extends HelixElement {
     if (this._currentIndex >= items.length) {
       this._currentIndex = Math.max(0, items.length - 1);
     }
+
+    // Observe the host (catches viewport resizes) and each slide (catches
+    // slide-size changes, e.g. a runtime --hx-carousel-slide-width override),
+    // then measure synchronously so the bound is correct after updateComplete.
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver.observe(this);
+      items.forEach((item) => this._resizeObserver?.observe(item));
+    }
+    this._recomputeBounds();
+  }
+
+  /**
+   * Whether a consumer has set the public `--hx-carousel-slide-width` hook,
+   * resolved from the first slide (the hook inherits from the host).
+   * @internal
+   */
+  private _hasCustomSlideWidth(): boolean {
+    const first = this._slides[0];
+    if (!first) return false;
+    return getComputedStyle(first).getPropertyValue('--hx-carousel-slide-width').trim() !== '';
+  }
+
+  /**
+   * Recomputes the geometry-measured navigation bound.
+   *
+   * When no custom `--hx-carousel-slide-width` is in play, the measured bound is
+   * cleared (`null`) and `_maxIndex` falls back to `slides.length - slidesPerPage`
+   * — byte-identical to the legacy behavior for any gap (the gap-aware computed
+   * width makes `slidesPerPage` slides + their gaps fill the viewport exactly, so
+   * the slidesPerPage-based bound stays exact). When a custom width is set, the
+   * bound is derived from the rendered per-slide outer extent and the viewport so
+   * navigation reaches the last slide without overshooting into blank space.
+   * Slide-size reads are transform-immune (translate does not change box size), so
+   * no transition settling is required here.
+   * @internal
+   */
+  private _recomputeBounds(): void {
+    const slides = this._slides;
+    if (slides.length === 0 || !this._hasCustomSlideWidth()) {
+      this._measuredMaxIndex = null;
+      return;
+    }
+
+    const track = this.shadowRoot?.querySelector<HTMLElement>('.track');
+    const viewport = this.shadowRoot?.querySelector<HTMLElement>('[part="slide-viewport"]');
+    const first = slides[0];
+    if (!track || !viewport || !first) {
+      this._measuredMaxIndex = null;
+      return;
+    }
+
+    const horizontal = this.orientation === 'horizontal';
+    const rect = first.getBoundingClientRect();
+    const slideSize = horizontal ? rect.width : rect.height;
+    const cs = getComputedStyle(track);
+    const gap = parseFloat(horizontal ? cs.columnGap : cs.rowGap) || 0;
+    const viewportSize = horizontal ? viewport.clientWidth : viewport.clientHeight;
+    const step = slideSize + gap;
+    if (step <= 0) {
+      this._measuredMaxIndex = null;
+      return;
+    }
+
+    // Content extent of equal-width slides plus inter-slide gaps. Largest index
+    // whose translate (index * step) does not scroll past the trailing content
+    // edge. Epsilon absorbs sub-pixel noise so exact fits don't round down.
+    const content = slides.length * slideSize + (slides.length - 1) * gap;
+    const rawMax = Math.floor((content - viewportSize) / step + 1e-6);
+    const max = Math.min(Math.max(rawMax, 0), slides.length - 1);
+    this._measuredMaxIndex = max;
+
+    if (this._currentIndex > max) {
+      this._currentIndex = max;
+    }
   }
 
   /** @internal */
@@ -361,10 +457,17 @@ export class HelixCarousel extends HelixElement {
   // ─── Navigation ───
 
   /**
-   * Maximum valid slide index accounting for the number of slides visible per page.
+   * Maximum valid slide index.
+   *
+   * Defaults to the slidesPerPage-based bound. When a custom
+   * `--hx-carousel-slide-width` is active, the geometry-measured bound takes over
+   * so navigation reflects the real per-slide extent (see `_recomputeBounds`).
    * @internal
    */
   private get _maxIndex(): number {
+    if (this._measuredMaxIndex !== null) {
+      return this._measuredMaxIndex;
+    }
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }
 

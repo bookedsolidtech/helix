@@ -1666,4 +1666,94 @@ describe('hx-carousel', () => {
       expect(getComputedStyle(track).columnGap).toBe('16px');
     });
   });
+
+  // ─── Navigation bounds are aware of custom slide widths ───
+
+  describe('Navigation bounds (custom slide widths)', () => {
+    const fourSlides = (style = '') => `
+      <hx-carousel slides-per-page="2" style="display: block; width: 400px;${style}">
+        <hx-carousel-item>1</hx-carousel-item>
+        <hx-carousel-item>2</hx-carousel-item>
+        <hx-carousel-item>3</hx-carousel-item>
+        <hx-carousel-item>4</hx-carousel-item>
+      </hx-carousel>
+    `;
+
+    /** Cancel the in-flight transition so geometry reads are final. */
+    function settle(track: HTMLElement): void {
+      track.style.transition = 'none';
+      void track.getBoundingClientRect();
+    }
+
+    it('default (no custom width): measured bound is inactive, _maxIndex = slides.length - slidesPerPage — zero drift', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides());
+      await el.updateComplete;
+
+      expect(el['_measuredMaxIndex']).toBeNull();
+      expect(el['_maxIndex']).toBe(2); // 4 - 2, unchanged from the legacy formula
+
+      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
+      expect(prev.disabled).toBe(true); // at index 0
+      expect(next.disabled).toBe(false);
+
+      el.next(); // 0 -> 1
+      el.next(); // 1 -> 2 (max)
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+      expect(next.disabled).toBe(true); // cannot advance past the legacy max
+      expect(prev.disabled).toBe(false);
+    });
+
+    it('narrow custom width (150px in 400px host): bound stops before any trailing blank', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await el.updateComplete;
+
+      // content = 4*150 = 600, viewport = 400, step = 150 -> floor((600-400)/150) = 1.
+      expect(el['_maxIndex']).toBe(1);
+
+      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
+      expect(prev.disabled).toBe(true); // index 0
+      expect(next.disabled).toBe(false);
+
+      el.next(); // 0 -> 1 (max)
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(1);
+      expect(next.disabled).toBe(true);
+      expect(prev.disabled).toBe(false);
+
+      el.next(); // blocked — would overshoot into blank space
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(1);
+
+      // The trailing slide's right edge reaches/exceeds the viewport's: no blank.
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      const lastRight = slides[slides.length - 1].getBoundingClientRect().right;
+      expect(lastRight).toBeGreaterThanOrEqual(vp.getBoundingClientRect().right - 1);
+    });
+
+    it('wide custom width (400px in 400px host): navigation can reach the last slide', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 400px;'));
+      await el.updateComplete;
+
+      // content = 1600, viewport = 400, step = 400 -> floor((1600-400)/400) = 3.
+      // The legacy slidesPerPage bound (4 - 2 = 2) would strand the last slide.
+      expect(el['_maxIndex']).toBe(3);
+
+      el.next(); // 0 -> 1
+      el.next(); // 1 -> 2
+      el.next(); // 2 -> 3 (last)
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
+      expect(next.disabled).toBe(true); // at the last slide
+      expect(prev.disabled).toBe(false);
+    });
+  });
 });
