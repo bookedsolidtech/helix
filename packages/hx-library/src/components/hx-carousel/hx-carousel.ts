@@ -706,13 +706,17 @@ export class HelixCarousel extends HelixElement {
    *
    * Gated to stay cheap for pure-default horizontal carousels: vertical always
    * re-derives (its main axis is height, which the gap affects), horizontal only
-   * when a `--hx-carousel-slide-width` is present. A pure-default horizontal
-   * carousel pays a single property read and no measurement. Called once per
-   * navigation path (never doubled).
+   * when a `--hx-carousel-slide-width` is present OR the carousel is currently in
+   * measured mode. The latter lets it turn OFF: if the custom width is removed and
+   * the default width yields equivalent geometry (no box resize → no
+   * ResizeObserver fire), `_recomputeBounds` re-evaluates `_hasCustomSlideWidth()`
+   * (now false) and resets `_measuredNav`. A pure-default horizontal carousel
+   * (never measured, no custom width) still pays a single property read and no
+   * measurement. Called once per navigation path (never doubled).
    * @internal
    */
   private _refreshMeasuredBounds(): void {
-    if (this.orientation !== 'horizontal' || this._hasCustomSlideWidth()) {
+    if (this.orientation !== 'horizontal' || this._hasCustomSlideWidth() || this._measuredNav) {
       // Derive only — the following _navigateTo applies + emits the single event.
       this._recomputeBounds(false);
     }

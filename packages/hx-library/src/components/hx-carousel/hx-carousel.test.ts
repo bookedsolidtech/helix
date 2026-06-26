@@ -2405,6 +2405,42 @@ describe('hx-carousel', () => {
       expect(el['_currentIndex']).toBe(4);
     });
 
+    it('removing a custom slide width resets measured mode on the next navigation (no resize needed)', async () => {
+      // 6 slides at calc(50% - 8px) = 192px + 16px gap, spp=2 -> measured (exact-fill).
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+          <hx-carousel-item>6</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(4);
+      // Measured pagination: _maxIndex + 1 = 5 dots.
+      expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(5);
+
+      // Remove the custom width. The default computed width is calc((100% - 16px)/2)
+      // = 192px = identical geometry, so NO box resizes (the ResizeObserver does
+      // not fire) — only the lazy on-navigation refresh can reset the mode.
+      el.style.removeProperty('--hx-carousel-slide-width');
+      expect(el['_measuredNav']).toBe(true); // still stale before navigation
+
+      // Navigation re-derives: _hasCustomSlideWidth() is now false, so measured
+      // mode resets to the default/legacy model even without a resize.
+      el.goTo(1);
+      await el.updateComplete;
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(4); // legacy n - slidesPerPage = 6 - 2
+      expect(el['_currentIndex']).toBe(1);
+      // Default pagination: one dot per slide = 6 (reverted from the measured 5).
+      expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(6);
+    });
+
     it('measured pagination renders one dot per reachable index (no unreachable trailing dot)', async () => {
       // Uniform exact-fill 6 slides (192px + 16px gap), 400px viewport -> _maxIndex 4.
       const el = await fixture<HelixCarousel>(`
