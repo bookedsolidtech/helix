@@ -2197,6 +2197,80 @@ describe('hx-carousel', () => {
       settle(track);
       expect(trackTranslate(track)).toBeCloseTo(-416, 0); // index 2 * (192 + 16)
     });
+
+    // Let the ResizeObserver deliver (it fires after layout, before paint).
+    function nextFrame(): Promise<void> {
+      return new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      });
+    }
+
+    it('reactive bounds: a runtime gap change flipping exact-fill -> peek re-enables Next with no navigation', async () => {
+      const el = await fixture<HelixCarousel>(
+        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;'),
+      );
+      await flush(el);
+
+      // Exact-fill -> legacy. Navigate to the page bound where Next is disabled.
+      expect(el['_measuredNav']).toBe(false);
+      el.goTo(2);
+      await el.updateComplete;
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
+      expect(el['_maxIndex']).toBe(2);
+      expect(next.disabled).toBe(true);
+
+      // Shrink the gap into a genuine peek. Resizes no laid-out box; do NOT
+      // navigate or resize the host — only the gap sentinel changes size.
+      el.style.setProperty('--hx-carousel-gap', '0px');
+      await nextFrame(); // ResizeObserver delivers -> _recomputeBounds runs
+      await el.updateComplete;
+
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(3);
+      expect(el['_canGoNext']).toBe(true);
+      expect(next.disabled).toBe(false); // re-enabled reactively, no navigation
+    });
+
+    it('emits hx-slide-change exactly once when a recompute clamps the active index; none on init or no-op', async () => {
+      const events: number[] = [];
+      // Build manually so the listener is attached before the element connects,
+      // proving initial setup emits nothing.
+      const el = document.createElement('hx-carousel') as HelixCarousel;
+      el.setAttribute('slides-per-page', '2');
+      el.style.cssText =
+        'display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 0px;';
+      el.innerHTML = `
+        <hx-carousel-item>1</hx-carousel-item>
+        <hx-carousel-item>2</hx-carousel-item>
+        <hx-carousel-item>3</hx-carousel-item>
+        <hx-carousel-item>4</hx-carousel-item>`;
+      el.addEventListener('hx-slide-change', (e) =>
+        events.push((e as CustomEvent<{ index: number }>).detail.index),
+      );
+      document.getElementById('test-fixture-container')!.appendChild(el);
+      await el.updateComplete;
+      await el.updateComplete;
+
+      expect(el['_measuredNav']).toBe(true);
+      expect(events).toEqual([]); // no event during initial setup
+
+      el.goTo(3);
+      await el.updateComplete;
+      expect(events).toEqual([3]); // the navigation event
+      events.length = 0;
+
+      // Responsive flip to exact-fill (resizes no box); recompute clamps 3 -> 2.
+      el.style.setProperty('--hx-carousel-gap', '16px');
+      el['_recomputeBounds']();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+      expect(events).toEqual([2]); // exactly one clamp event with the clamped index
+
+      events.length = 0;
+      el['_recomputeBounds'](); // no index change
+      await el.updateComplete;
+      expect(events).toEqual([]); // none on a no-op recompute
+    });
   });
 
   // ─── Vertical: measured block-axis navigation ───

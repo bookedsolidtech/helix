@@ -261,6 +261,13 @@ export class HelixCarousel extends HelixElement {
    */
   private _resizeObserver: ResizeObserver | null = null;
   /**
+   * Becomes true after the first render/sync completes. Gates the
+   * `hx-slide-change` emitted when a recompute clamps the active index, so the
+   * event never fires during initial setup.
+   * @internal
+   */
+  private _initialized = false;
+  /**
    * Whether the user has requested reduced motion via the OS media preference.
    * @internal
    */
@@ -352,6 +359,9 @@ export class HelixCarousel extends HelixElement {
     if (this.autoplay && !this._reducedMotion) {
       this._startAutoplay();
     }
+    // Initial setup is complete; clamps from here on are real, post-init
+    // corrections that should emit hx-slide-change.
+    this._initialized = true;
   }
 
   // ─── Slide Management ───
@@ -387,13 +397,25 @@ export class HelixCarousel extends HelixElement {
       this._currentIndex = Math.max(0, items.length - 1);
     }
 
-    // Observe the host (catches viewport resizes) and each slide (catches
-    // slide-size changes, e.g. a runtime --hx-carousel-slide-width override),
-    // then measure synchronously so the bound is correct after updateComplete.
+    // The gap sentinel's width = (slides - 1) * --hx-carousel-gap, so observing
+    // it lets a pure gap change (which resizes no laid-out box) fire the
+    // ResizeObserver and reactively re-derive the bounds. Count is exposed as a
+    // private custom property the sentinel's CSS multiplies by the gap.
+    this.style.setProperty('--_hx-carousel-gap-count', String(Math.max(0, items.length - 1)));
+
+    // Observe the host (viewport resizes), each slide (slide-size changes, e.g. a
+    // runtime --hx-carousel-slide-width override), the track (content-sized on the
+    // block axis → vertical row-gap changes), and the gap sentinel (gap changes on
+    // either axis). Then measure synchronously so the bound is correct after
+    // updateComplete.
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
       this._resizeObserver.observe(this);
       items.forEach((item) => this._resizeObserver?.observe(item));
+      const track = this.shadowRoot?.querySelector<HTMLElement>('.track');
+      if (track) this._resizeObserver.observe(track);
+      const sentinel = this.shadowRoot?.querySelector<HTMLElement>('.gap-sentinel');
+      if (sentinel) this._resizeObserver.observe(sentinel);
     }
     this._recomputeBounds();
   }
@@ -432,7 +454,32 @@ export class HelixCarousel extends HelixElement {
     const clamped = Math.max(0, Math.min(this._currentIndex, max));
     if (clamped !== this._currentIndex) {
       this._currentIndex = clamped;
+      // A post-init clamp (responsive mode flip or resize narrowing the bound)
+      // is a real active-index change — notify hosts syncing thumbnails /
+      // counters / analytics. Suppressed during initial setup.
+      if (this._initialized) {
+        this._emitSlideChange(clamped);
+      }
     }
+  }
+
+  /**
+   * Updates the ARIA live text and dispatches the `hx-slide-change` event for the
+   * given (already-applied) active index. Single source of the event so a clamp
+   * and a navigation emit identical detail.
+   * @internal
+   */
+  private _emitSlideChange(index: number): void {
+    this._liveText = this.labelSlideOf(index + 1, this._slides.length);
+    const slide = this._slides[index];
+    if (!slide) return;
+    this.dispatchEvent(
+      new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
+        bubbles: true,
+        composed: true,
+        detail: { index, slide },
+      }),
+    );
   }
 
   /**
@@ -574,16 +621,7 @@ export class HelixCarousel extends HelixElement {
     if (next === this._currentIndex) return;
 
     this._currentIndex = next;
-    this._liveText = this.labelSlideOf(next + 1, this._slides.length);
-    const slide = this._slides[next];
-    if (!slide) return;
-    this.dispatchEvent(
-      new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
-        bubbles: true,
-        composed: true,
-        detail: { index: next, slide },
-      }),
-    );
+    this._emitSlideChange(next);
   }
 
   next(): void {
@@ -1051,6 +1089,7 @@ export class HelixCarousel extends HelixElement {
               <slot @slotchange=${this._handleSlotChange}></slot>
             </div>
           </div>
+          <div class="gap-sentinel" aria-hidden="true"></div>
         </div>
         ${this._renderPagination()}
       </div>

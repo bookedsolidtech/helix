@@ -146,6 +146,24 @@ export const helixCarouselStyles = css`
     flex-direction: column;
   }
 
+  /* ─── Gap sentinel ─────────────────────────────────────────────
+     An out-of-flow, invisible probe whose width tracks the total inter-slide
+     gap extent ((slides - 1) * --hx-carousel-gap). A runtime --hx-carousel-gap
+     change resizes no laid-out box (the track is viewport-constrained and the
+     slides keep their size), so the ResizeObserver would never fire; observing
+     this sentinel makes a pure gap change resize an observed box, which
+     re-derives the navigation bounds reactively (no navigation required). The
+     constant 1px base keeps the box non-zero so the observer always reports it. */
+  .gap-sentinel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(1px + var(--_hx-carousel-gap-count, 0) * var(--hx-carousel-gap, 0px));
+    height: 1px;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   /* ─── Pagination ─── */
 
   .pagination {
