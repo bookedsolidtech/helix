@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-06-26T11:59:27.560Z",
+  "generatedAt": "2026-06-26T12:49:27.389Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -3855,7 +3855,7 @@
       ],
       "cssProperties": [
         {
-          "description": "Gap between slides.",
+          "description": "Gap between slides on the track. Defaults to 0 (flush slides).",
           "name": "--hx-carousel-gap",
           "default": "0px",
           "figmaBinding": {
@@ -3867,16 +3867,9 @@
           }
         },
         {
-          "description": "Width override for each slide.",
+          "description": "Width override for each slide. Defaults to the per-page width computed from slides-per-page (100% / slides-per-page).",
           "name": "--hx-carousel-slide-width",
-          "default": "100%",
-          "figmaBinding": {
-            "target": null,
-            "layerSelector": "root",
-            "semanticToken": null,
-            "fallbackPrimitive": null,
-            "literalFallback": "100%"
-          }
+          "figmaBinding": null
         },
         {
           "description": "Size of previous/next navigation buttons.",
@@ -24076,7 +24069,7 @@
       "figmaComponentName": "hx-tag",
       "figmaPagePlacement": "4a",
       "description": "A compact label for categorization, filtering, and selection.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -24138,7 +24131,14 @@
           "default": "false"
         }
       ],
-      "textProperties": [],
+      "textProperties": [
+        {
+          "figmaPropertyName": "labelRemove",
+          "cemAttribute": "label-remove",
+          "type": "text",
+          "defaultValue": ""
+        }
+      ],
       "slots": [
         {
           "figmaPropertyName": "content",
@@ -24474,7 +24474,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -25035,6 +25037,18 @@
           "cemAttribute": "required-message",
           "type": "text",
           "defaultValue": "This field is required."
+        },
+        {
+          "figmaPropertyName": "minlengthMessage",
+          "cemAttribute": "minlength-message",
+          "type": "text",
+          "defaultValue": ""
+        },
+        {
+          "figmaPropertyName": "maxlengthMessage",
+          "cemAttribute": "maxlength-message",
+          "type": "text",
+          "defaultValue": ""
         }
       ],
       "slots": [
