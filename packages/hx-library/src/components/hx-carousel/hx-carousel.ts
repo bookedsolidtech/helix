@@ -651,14 +651,19 @@ export class HelixCarousel extends HelixElement {
     this._singlePage = false;
     this._measuredMaxScroll = maxScroll;
 
-    // The bound is the FIRST index whose offset reaches maxScroll: indices beyond
-    // it would all clamp to the same translate (visually identical), so excluding
-    // them removes duplicate no-op end states while keeping every distinct
-    // position reachable. (Uniform exact-fill -> the legacy page bound; mixed
-    // widths -> n-1.) Fallback to n-1 when no offset reaches maxScroll, e.g. a
-    // single slide wider than the viewport.
-    const reachIndex = offsets.findIndex((o) => o >= maxScroll - EPS);
-    this._measuredMaxIndex = reachIndex === -1 ? slides.length - 1 : reachIndex;
+    // Unified bound = max(pageBound, reachIndex):
+    //   - pageBound = max(0, slides - slidesPerPage): the legacy page bound. For
+    //     1-up this is n-1 (every slide reachable, as the docs promise); for 2-up
+    //     exact-fill it is n-2 (excludes the truly-redundant trailing page).
+    //   - reachIndex = the first index whose offset reaches maxScroll (or n-1 if
+    //     none, e.g. a single slide wider than the viewport): handles mixed widths
+    //     where a distinct-offset slide sits beyond the page bound.
+    // The max keeps every distinct/last-slide position reachable while excluding
+    // only the trailing page that would clamp to the same translate. Always <= n-1.
+    const pageBound = Math.max(0, slides.length - this.slidesPerPage);
+    const firstReach = offsets.findIndex((o) => o >= maxScroll - EPS);
+    const reachIndex = firstReach === -1 ? slides.length - 1 : firstReach;
+    this._measuredMaxIndex = Math.max(pageBound, reachIndex);
   }
 
   /** @internal */
@@ -720,28 +725,36 @@ export class HelixCarousel extends HelixElement {
   }
 
   /**
-   * Applies a slide selection: clamps to `_maxIndex` (or wraps when looping),
-   * updates the live region, and dispatches `hx-slide-change`. Assumes bounds are
-   * already fresh — callers run `_refreshMeasuredBounds()` first, so this is not
-   * re-measured here (keeps a single recompute per navigation).
+   * Applies a slide selection: updates the live region and dispatches
+   * `hx-slide-change`. Assumes bounds are already fresh — callers run
+   * `_refreshMeasuredBounds()` first, so this is not re-measured here.
+   *
+   * `wrap` distinguishes RELATIVE navigation (`next`/`previous`/autoplay advance),
+   * which wraps over the reachable range `[0, _maxIndex]` in loop mode, from
+   * ABSOLUTE navigation (`goTo`/`Home`/`End`/pagination dots), which always CLAMPS
+   * to `[0, _maxIndex]` — even in loop mode, so e.g. `End` lands on the last
+   * reachable index instead of wrapping `slides.length - 1` back to 0.
    * @internal
    */
-  private _navigateTo(index: number): void {
+  private _navigateTo(index: number, wrap = false): void {
     if (this._slides.length === 0) return;
 
-    // A single static page has nothing to scroll: collapse every target to 0,
-    // overriding loop wrapping so no unreachable slide can be selected.
-    // Loop wraps over the REACHABLE range, not the raw slide count: in
-    // measured-nav mode indices beyond `_maxIndex` clamp to the same translate
-    // (duplicate end states), so wrapping must use `_maxIndex + 1` so `next` from
-    // `_maxIndex` → 0 and `previous` from 0 → `_maxIndex`. Default mode wraps over
-    // the full slide count (unchanged).
-    const wrapCount = this._measuredNav ? this._maxIndex + 1 : this._slides.length;
-    const next = this._singlePage
-      ? 0
-      : this.loop
-        ? ((index % wrapCount) + wrapCount) % wrapCount
-        : Math.max(0, Math.min(index, this._maxIndex));
+    let next: number;
+    if (this._singlePage) {
+      // A single static page has nothing to scroll — collapse every target to 0.
+      next = 0;
+    } else if (this.loop && wrap) {
+      // Relative loop wrap over the REACHABLE range, not the raw slide count: in
+      // measured-nav mode indices beyond `_maxIndex` clamp to the same translate
+      // (duplicate end states), so wrapping uses `_maxIndex + 1` so `next` from
+      // `_maxIndex` → 0 and `previous` from 0 → `_maxIndex`. Default mode wraps
+      // over the full slide count (unchanged).
+      const wrapCount = this._measuredNav ? this._maxIndex + 1 : this._slides.length;
+      next = ((index % wrapCount) + wrapCount) % wrapCount;
+    } else {
+      // Absolute clamp (goTo/Home/End/dots, and non-loop relative moves).
+      next = Math.max(0, Math.min(index, this._maxIndex));
+    }
 
     if (next === this._currentIndex) return;
 
@@ -762,7 +775,7 @@ export class HelixCarousel extends HelixElement {
       return;
     }
     this._livePolite = true;
-    this._navigateTo(nextIndex);
+    this._navigateTo(nextIndex, true); // relative -> loop-wraps over [0, _maxIndex]
   }
 
   previous(): void {
@@ -772,7 +785,7 @@ export class HelixCarousel extends HelixElement {
       return;
     }
     this._livePolite = true;
-    this._navigateTo(prevIndex);
+    this._navigateTo(prevIndex, true); // relative -> loop-wraps over [0, _maxIndex]
   }
 
   // ─── Autoplay ───
@@ -789,7 +802,8 @@ export class HelixCarousel extends HelixElement {
     // _navigateTo (not goTo) avoids a second redundant recompute this tick.
     this._refreshMeasuredBounds();
     if (this.loop || this._currentIndex < this._maxIndex) {
-      this._navigateTo(this._currentIndex + this.slidesPerMove);
+      // Relative advance -> loop-wraps over [0, _maxIndex] (clamps when not looping).
+      this._navigateTo(this._currentIndex + this.slidesPerMove, true);
     } else {
       this._navigateTo(0);
     }
