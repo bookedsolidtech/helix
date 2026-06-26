@@ -65,7 +65,7 @@ const _svgPause = html`<hx-icon
  * @slot next-button - Custom next navigation button.
  * @slot previous-button - Custom previous navigation button.
  *
- * @fires {CustomEvent<{index: number, slide: HelixCarouselItem}>} hx-slide-change - Dispatched when the active slide changes.
+ * @fires {CustomEvent<{index: number, slide?: HelixCarouselItem}>} hx-slide-change - Dispatched when the active slide changes. `detail.index` is the active slide index and `detail.slide` the active `hx-carousel-item`. When the carousel becomes empty (all slides removed at runtime), `detail.index` is `-1` and `detail.slide` is `undefined`.
  *
  * @csspart base - The outer wrapper element.
  * @csspart slide-viewport - The slide viewport/overflow container.
@@ -414,6 +414,7 @@ export class HelixCarousel extends HelixElement {
       .assignedElements({ flatten: true })
       .filter((el) => el.tagName.toLowerCase() === 'hx-carousel-item') as HelixCarouselItem[];
 
+    const wasEmpty = this._slides.length === 0;
     this._slides = items;
 
     // Gap-aware computed per-page width, written to a private var so the public
@@ -459,6 +460,15 @@ export class HelixCarousel extends HelixElement {
       if (sentinel) this._resizeObserver.observe(sentinel);
     }
     this._recomputeBounds();
+
+    // Announce an emptiness transition once, post-init (the recompute's clamp
+    // path is gated to slides > 0 so it doesn't fire here). Becoming empty clears
+    // the live region and emits the "no active slide" event; repopulating
+    // announces and notifies the restored slide 0. `_currentIndex` is already
+    // clamped (to 0 when empty) by the recompute above.
+    if (this._initialized && (items.length === 0) !== wasEmpty) {
+      this._emitSlideChange(this._currentIndex);
+    }
   }
 
   /**
@@ -506,8 +516,10 @@ export class HelixCarousel extends HelixElement {
       this._currentIndex = clamped;
       // A post-init clamp (responsive mode flip or resize narrowing the bound)
       // is a real active-index change — notify hosts syncing thumbnails /
-      // counters / analytics. Suppressed during initial setup.
-      if (this._initialized) {
+      // counters / analytics. Suppressed during initial setup. The empty case
+      // (0 slides) is announced by `_syncSlides` (emptiness transition) instead,
+      // so the index can't change to a no-slide state and emit twice.
+      if (this._initialized && this._slides.length > 0) {
         this._emitSlideChange(clamped);
       }
     }
@@ -517,17 +529,21 @@ export class HelixCarousel extends HelixElement {
    * Updates the ARIA live text and dispatches the `hx-slide-change` event for the
    * given (already-applied) active index. Single source of the event so a clamp
    * and a navigation emit identical detail.
+   *
+   * When there is no slide at `index` (the carousel is empty — e.g. a post-init
+   * slot shrink to 0), the live region is cleared (never "Slide N of 0") and the
+   * event reports a defined "no active slide" state: `{ index: -1, slide:
+   * undefined }` (see the `hx-slide-change` @fires contract).
    * @internal
    */
   private _emitSlideChange(index: number): void {
-    this._liveText = this.labelSlideOf(index + 1, this._slides.length);
     const slide = this._slides[index];
-    if (!slide) return;
+    this._liveText = slide ? this.labelSlideOf(index + 1, this._slides.length) : '';
     this.dispatchEvent(
       new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
         bubbles: true,
         composed: true,
-        detail: { index, slide },
+        detail: slide ? { index, slide } : { index: -1, slide: undefined },
       }),
     );
   }

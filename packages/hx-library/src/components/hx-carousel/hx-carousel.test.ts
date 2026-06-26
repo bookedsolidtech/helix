@@ -1318,6 +1318,84 @@ describe('hx-carousel', () => {
       expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('Slide 2 of 2');
     });
 
+    it('a post-init slot shrink to zero clears the live region and emits the empty-state event', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(2); // active = last slide
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+      expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('Slide 3 of 3');
+
+      const events: Array<{ index: number; slide: unknown }> = [];
+      el.addEventListener('hx-slide-change', (e) => {
+        const d = (e as CustomEvent<{ index: number; slide: unknown }>).detail;
+        events.push({ index: d.index, slide: d.slide });
+      });
+
+      // Remove every slide at runtime.
+      el.querySelectorAll('hx-carousel-item').forEach((s) => s.remove());
+      await el.updateComplete;
+      await new Promise<void>((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      expect(el['_slides'].length).toBe(0);
+      expect(el['_currentIndex']).toBe(0); // defined empty sentinel, ready for repopulation
+      // Live region cleared — no stale "Slide 1 of 0".
+      expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('');
+      // Exactly one empty-state event with the documented "no active slide" detail.
+      expect(events).toEqual([{ index: -1, slide: undefined }]);
+    });
+
+    it('repopulating an emptied carousel restores normal behavior (index 0, live text, one event)', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(1);
+      await el.updateComplete;
+
+      // Empty it.
+      el.querySelectorAll('hx-carousel-item').forEach((s) => s.remove());
+      await el.updateComplete;
+      await new Promise<void>((r) => setTimeout(r, 0));
+      await el.updateComplete;
+      expect(el['_slides'].length).toBe(0);
+
+      const events: number[] = [];
+      el.addEventListener('hx-slide-change', (e) =>
+        events.push((e as CustomEvent<{ index: number }>).detail.index),
+      );
+
+      // Repopulate.
+      const a = document.createElement('hx-carousel-item') as HelixCarouselItem;
+      a.textContent = 'A';
+      const b = document.createElement('hx-carousel-item') as HelixCarouselItem;
+      b.textContent = 'B';
+      el.append(a, b);
+      await el.updateComplete;
+      await new Promise<void>((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      expect(el['_slides'].length).toBe(2);
+      expect(el['_currentIndex']).toBe(0); // re-initialized
+      expect(events).toEqual([0]); // one "restored slide 0" event
+      expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('Slide 1 of 2');
+
+      // Navigation works again.
+      el.goTo(1);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(1);
+    });
+
     it('empty carousel initializes with _slides length 0', async () => {
       const el = await fixture<HelixCarousel>('<hx-carousel></hx-carousel>');
       await el.updateComplete;
