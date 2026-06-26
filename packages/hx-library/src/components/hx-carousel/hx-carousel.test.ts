@@ -1950,5 +1950,160 @@ describe('hx-carousel', () => {
       expect(trackTranslate(track)).toBeCloseTo(-260, 0);
       expect(next.disabled).toBe(true); // last slide
     });
+
+    // ── Gate: peek mode only on a real horizontal, non-exact-fill peek ──
+
+    it('gate: genuine horizontal peek (150px in 400px) enables custom mode', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+      // pageExtent = 2*150 = 300 != 400 viewport -> genuine peek.
+      expect(el['_customWidthActive']).toBe(true);
+      expect(el['_maxIndex']).toBe(3); // every slide selectable
+    });
+
+    it('gate: exact-fill horizontal custom width stays in the legacy page model', async () => {
+      const el = await fixture<HelixCarousel>(
+        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;'),
+      );
+      await flush(el);
+
+      // 2*(200 - 8) + 16 = 384 + 16 = 400 = viewport -> exact fill -> legacy model.
+      expect(el['_customWidthActive']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // n - slidesPerPage, not n - 1
+
+      // Legacy index clamp (would be n-1 = 3 in peek mode).
+      el.goTo(10);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+
+      // Legacy calc() transform: index 2 * (192px + 16px) = -416px (flush, no blank).
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-416, 0);
+    });
+
+    it('gate: vertical + --hx-carousel-slide-width does not enable custom mode (cross-axis hook)', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel
+          orientation="vertical"
+          slides-per-page="2"
+          style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+        >
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+
+      expect(el['_customWidthActive']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // legacy n - slidesPerPage
+
+      el.goTo(10);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2); // legacy clamp
+    });
+
+    // ── Drag and autoplay honor the peek model (they route through next/goTo) ──
+
+    it('custom-width: mouse drag reaches the last slide without overshoot and returns to 0', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel
+          mouse-dragging
+          slides-per-page="2"
+          style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+        >
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_customWidthActive']).toBe(true);
+
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      const dragNext = (): void => {
+        vp.dispatchEvent(
+          new MouseEvent('mousedown', { clientX: 200, bubbles: true, cancelable: true }),
+        );
+        vp.dispatchEvent(new MouseEvent('mousemove', { clientX: 120, bubbles: true }));
+        vp.dispatchEvent(new MouseEvent('mouseup', { clientX: 120, bubbles: true }));
+      };
+      const dragPrev = (): void => {
+        vp.dispatchEvent(
+          new MouseEvent('mousedown', { clientX: 120, bubbles: true, cancelable: true }),
+        );
+        vp.dispatchEvent(new MouseEvent('mousemove', { clientX: 200, bubbles: true }));
+        vp.dispatchEvent(new MouseEvent('mouseup', { clientX: 200, bubbles: true }));
+      };
+
+      dragNext(); // 0 -> 1
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(1);
+
+      dragNext(); // 1 -> 2
+      dragNext(); // 2 -> 3 (last)
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      dragNext(); // at last: next() clamps -> no-op
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      // No overshoot into blank: translate saturated at maxScroll.
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-el['_measuredMaxScroll'], 0);
+
+      dragPrev(); // 3 -> 2
+      dragPrev(); // 2 -> 1
+      dragPrev(); // 1 -> 0
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+    });
+
+    it('custom-width: autoplay advances through slides and wraps without overshoot', async () => {
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixCarousel>(`
+          <hx-carousel
+            autoplay
+            autoplay-interval="1000"
+            slides-per-page="2"
+            style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+          >
+            <hx-carousel-item>1</hx-carousel-item>
+            <hx-carousel-item>2</hx-carousel-item>
+            <hx-carousel-item>3</hx-carousel-item>
+            <hx-carousel-item>4</hx-carousel-item>
+          </hx-carousel>
+        `);
+        await flush(el);
+        expect(el['_customWidthActive']).toBe(true);
+        expect(el['_isPlaying']).toBe(true);
+
+        vi.advanceTimersByTime(1100); // 0 -> 1
+        await el.updateComplete;
+        expect(el['_currentIndex']).toBe(1);
+
+        vi.advanceTimersByTime(1000); // 1 -> 2
+        vi.advanceTimersByTime(1000); // 2 -> 3 (last selectable)
+        await el.updateComplete;
+        expect(el['_currentIndex']).toBe(3);
+
+        // Saturated at maxScroll — no overshoot into blank.
+        const track = shadowQuery<HTMLElement>(el, '.track')!;
+        settle(track);
+        expect(trackTranslate(track)).toBeCloseTo(-el['_measuredMaxScroll'], 0);
+
+        vi.advanceTimersByTime(1000); // non-loop: wraps back to the start
+        await el.updateComplete;
+        expect(el['_currentIndex']).toBe(0);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
   });
 });

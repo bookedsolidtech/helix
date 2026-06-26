@@ -407,18 +407,33 @@ export class HelixCarousel extends HelixElement {
     return getComputedStyle(first).getPropertyValue('--hx-carousel-slide-width').trim() !== '';
   }
 
+  /** Resets the custom-width metrics, reverting to the legacy page model. @internal */
+  private _resetCustomWidthMetrics(): void {
+    this._customWidthActive = false;
+    this._measuredStep = 0;
+    this._measuredMaxScroll = 0;
+  }
+
   /**
    * Recomputes the geometry-measured scroll metrics used by the custom-width
    * "peek" model (decoupled slide selection vs. track scroll).
    *
-   * When no custom `--hx-carousel-slide-width` is active, the metrics are reset
-   * and `_customWidthActive` is `false`, so `_maxIndex`, the transform, and the
-   * disabled states all fall back to the legacy slidesPerPage model byte-for-byte
-   * (the gap-aware computed width makes `slidesPerPage` slides + their gaps fill
-   * the viewport exactly, so the slidesPerPage-based bound stays exact for any
-   * gap). When a custom width is active, every slide stays selectable while the
-   * track translate is clamped to `_measuredMaxScroll`, so a near-end slide
-   * saturates the viewport at the trailing edge with no blank space.
+   * The peek model is enabled ONLY for a genuine main-axis peek — never on mere
+   * property presence:
+   * - **Horizontal only.** `--hx-carousel-slide-width` is a cross-axis (width)
+   *   hook for a vertical carousel, whose main axis is height, so vertical always
+   *   uses the legacy model.
+   * - **Non-exact-fill only.** When `slidesPerPage` slides + their interior gaps
+   *   still fill the viewport exactly (e.g. `calc(50% - 0.5rem)` with a matching
+   *   gap), the legacy page model is already correct and is kept; a sub-pixel
+   *   `EPS` absorbs `calc()` rounding.
+   *
+   * When the peek model is off (no custom width, vertical, exact-fill, 0 slides,
+   * or unmeasurable), `_maxIndex`, the transform, and the disabled states fall
+   * back to the legacy slidesPerPage model byte-for-byte. When it is on, every
+   * slide stays selectable while the track translate is clamped to
+   * `_measuredMaxScroll`, so a near-end slide saturates the viewport at the
+   * trailing edge with no blank space.
    *
    * Slide-size and viewport reads are transform-immune (translate does not change
    * box size), so no transition settling is required here.
@@ -426,10 +441,10 @@ export class HelixCarousel extends HelixElement {
    */
   private _recomputeBounds(): void {
     const slides = this._slides;
-    if (slides.length === 0 || !this._hasCustomSlideWidth()) {
-      this._customWidthActive = false;
-      this._measuredStep = 0;
-      this._measuredMaxScroll = 0;
+    // Vertical carousels scroll on the block axis; the slide-width hook is
+    // cross-axis there, so it never enables the peek model.
+    if (slides.length === 0 || this.orientation !== 'horizontal' || !this._hasCustomSlideWidth()) {
+      this._resetCustomWidthMetrics();
       return;
     }
 
@@ -437,23 +452,25 @@ export class HelixCarousel extends HelixElement {
     const viewport = this.shadowRoot?.querySelector<HTMLElement>('[part="slide-viewport"]');
     const first = slides[0];
     if (!track || !viewport || !first) {
-      this._customWidthActive = false;
-      this._measuredStep = 0;
-      this._measuredMaxScroll = 0;
+      this._resetCustomWidthMetrics();
       return;
     }
 
-    const horizontal = this.orientation === 'horizontal';
-    const rect = first.getBoundingClientRect();
-    const slideSize = horizontal ? rect.width : rect.height;
-    const cs = getComputedStyle(track);
-    const gap = parseFloat(horizontal ? cs.columnGap : cs.rowGap) || 0;
-    const viewportSize = horizontal ? viewport.clientWidth : viewport.clientHeight;
+    const slideSize = first.getBoundingClientRect().width;
+    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+    const viewportSize = viewport.clientWidth;
     const step = slideSize + gap;
     if (step <= 0) {
-      this._customWidthActive = false;
-      this._measuredStep = 0;
-      this._measuredMaxScroll = 0;
+      this._resetCustomWidthMetrics();
+      return;
+    }
+
+    // Genuine peek only: if slidesPerPage slides + their interior gaps fill the
+    // viewport exactly, the legacy page model is correct, so stay legacy.
+    const EPS = 0.5;
+    const pageExtent = this.slidesPerPage * slideSize + (this.slidesPerPage - 1) * gap;
+    if (Math.abs(pageExtent - viewportSize) <= EPS) {
+      this._resetCustomWidthMetrics();
       return;
     }
 
