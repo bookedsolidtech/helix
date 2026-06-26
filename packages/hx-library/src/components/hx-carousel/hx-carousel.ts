@@ -251,6 +251,15 @@ export class HelixCarousel extends HelixElement {
    */
   @state() private _measuredMaxScroll = 0;
   /**
+   * Measured maximum selectable index: the FIRST index whose offset reaches
+   * `_measuredMaxScroll`. Indices beyond it would clamp to the same translate
+   * (visually identical), so they are excluded — no duplicate no-op end states,
+   * while every visually-distinct position stays reachable. Used only in
+   * measured-nav mode.
+   * @internal
+   */
+  @state() private _measuredMaxIndex = 0;
+  /**
    * True (within the measured path) when the track fits entirely in the viewport
    * and cannot scroll. The carousel is then a single static page: `_maxIndex` is
    * 0, prev/next are both disabled, the translate is 0, and navigation is a no-op
@@ -488,6 +497,7 @@ export class HelixCarousel extends HelixElement {
     this._singlePage = false;
     this._measuredOffsets = [];
     this._measuredMaxScroll = 0;
+    this._measuredMaxIndex = 0;
   }
 
   /**
@@ -631,6 +641,7 @@ export class HelixCarousel extends HelixElement {
     if (maxScroll <= EPS) {
       this._singlePage = true;
       this._measuredMaxScroll = 0;
+      this._measuredMaxIndex = 0;
       return;
     }
 
@@ -639,6 +650,15 @@ export class HelixCarousel extends HelixElement {
     // saturates here.
     this._singlePage = false;
     this._measuredMaxScroll = maxScroll;
+
+    // The bound is the FIRST index whose offset reaches maxScroll: indices beyond
+    // it would all clamp to the same translate (visually identical), so excluding
+    // them removes duplicate no-op end states while keeping every distinct
+    // position reachable. (Uniform exact-fill -> the legacy page bound; mixed
+    // widths -> n-1.) Fallback to n-1 when no offset reaches maxScroll, e.g. a
+    // single slide wider than the viewport.
+    const reachIndex = offsets.findIndex((o) => o >= maxScroll - EPS);
+    this._measuredMaxIndex = reachIndex === -1 ? slides.length - 1 : reachIndex;
   }
 
   /** @internal */
@@ -651,11 +671,12 @@ export class HelixCarousel extends HelixElement {
   /**
    * Maximum selectable slide index.
    *
-   * Single static page (measured path, no overflow) → `0`. In the legacy default
-   * model this is the slidesPerPage page bound (`slides.length - slidesPerPage`).
-   * In measured-nav mode selection is decoupled from scroll: every slide is
-   * reachable, so the bound is the last index (`slides.length - 1`) and the track
-   * translate is clamped separately (see `_trackTransform` / `_measuredMaxScroll`).
+   * Single static page (measured path, no overflow) → `0`. In measured-nav mode
+   * selection is decoupled from scroll: the bound is the first index whose offset
+   * reaches `_measuredMaxScroll` (`_measuredMaxIndex`), so every visually-distinct
+   * position is reachable without duplicate no-op end states. In the legacy
+   * default model this is the slidesPerPage page bound
+   * (`slides.length - slidesPerPage`).
    * @internal
    */
   private get _maxIndex(): number {
@@ -663,7 +684,7 @@ export class HelixCarousel extends HelixElement {
       return 0;
     }
     if (this._measuredNav) {
-      return Math.max(0, this._slides.length - 1);
+      return this._measuredMaxIndex;
     }
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }

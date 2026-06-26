@@ -1854,7 +1854,9 @@ describe('hx-carousel', () => {
     });
 
     it('custom-width: every slide is selectable via goTo / End / Home / pagination dot', async () => {
-      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      // 250px slides (slideWidth <= viewport < 2*slideWidth) keep every index a
+      // distinct position, so the bound is n-1 and every slide is reachable.
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 250px;'));
       await flush(el);
 
       expect(el['_measuredNav']).toBe(true);
@@ -1902,7 +1904,8 @@ describe('hx-carousel', () => {
     });
 
     it('custom-width: next() steps reach the last slide and prev() returns to 0', async () => {
-      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      // 250px slides keep every index distinct (bound n-1), so every slide is reachable.
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 250px;'));
       await flush(el);
 
       el.next(); // 0 -> 1
@@ -1944,7 +1947,8 @@ describe('hx-carousel', () => {
     });
 
     it('custom-width: pagination active dot and ARIA live text track the true active index', async () => {
-      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      // 250px slides keep every index distinct (bound n-1), so the last slide is selectable.
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 250px;'));
       await flush(el);
 
       el.goTo(3);
@@ -1963,7 +1967,7 @@ describe('hx-carousel', () => {
         <hx-carousel
           slides-per-page="2"
           slides-per-move="2"
-          style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+          style="display: block; width: 400px; --hx-carousel-slide-width: 250px;"
         >
           <hx-carousel-item>1</hx-carousel-item>
           <hx-carousel-item>2</hx-carousel-item>
@@ -2084,9 +2088,11 @@ describe('hx-carousel', () => {
     it('gate: genuine horizontal peek (150px in 400px) enables custom mode', async () => {
       const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
       await flush(el);
-      // pageExtent = 2*150 = 300 != 400 viewport -> genuine peek.
+      // 4*150 = 600 > 400 -> genuine peek (measured nav). offsets [0,150,300,450],
+      // maxScroll 200; the first index reaching maxScroll is 2 (index 3 would clamp
+      // to the same translate), so the bound is 2 — no duplicate end state.
       expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3); // every slide selectable
+      expect(el['_maxIndex']).toBe(2);
     });
 
     it('gate: a uniform custom width that fills the viewport exactly is a single page', async () => {
@@ -2156,8 +2162,9 @@ describe('hx-carousel', () => {
     });
 
     it('regression: overflowing custom-width content still gets full peek navigation', async () => {
-      // 4 * 150px = 600px content > 400px viewport -> genuine peek, every slide reachable.
-      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      // 4 * 250px = 1000px content > 400px viewport -> genuine peek. Each index is
+      // a distinct position (250 <= 400 < 500), so the bound is n-1 = 3.
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 250px;'));
       await flush(el);
       expect(el['_singlePage']).toBe(false);
       expect(el['_measuredNav']).toBe(true);
@@ -2247,6 +2254,66 @@ describe('hx-carousel', () => {
       );
     });
 
+    it('uniform exact-fill multi-page: the bound is the page bound (no duplicate end states)', async () => {
+      // 6 slides at calc(50% - 8px) = 192px + 16px gap, 400px viewport (2-up
+      // exact-fill: 2*192 + 16 = 400). Content overflows -> measured peek, but the
+      // bound is the FIRST index reaching maxScroll = n - slidesPerPage, NOT n-1.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+          <hx-carousel-item>6</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(false);
+      // offsets [0,208,416,624,832,1040], content 1232, maxScroll 832 ->
+      // offset[4] === 832, so the bound is 4 = n - slidesPerPage (NOT 5).
+      expect(el['_measuredMaxScroll']).toBeCloseTo(832, 0);
+      expect(el['_maxIndex']).toBe(4);
+
+      // Next / End / goTo stop at the page bound — indices 5 are not selectable
+      // (they would clamp to the same translate -> duplicate no-op end state).
+      el.goTo(5);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(4);
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(4);
+      expect(el['_canGoNext']).toBe(false); // disabled at the bound
+
+      // At the bound the track is saturated; the last slide is flush at the trailing edge.
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-832, 0);
+      const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      expect(slides[5].getBoundingClientRect().right).toBeCloseTo(
+        vp.getBoundingClientRect().right,
+        0,
+      );
+    });
+
+    it('single oversized slide (wider than the viewport) falls back to n-1', async () => {
+      // One 600px slide in a 400px viewport: no offset reaches maxScroll (offsets
+      // [0]), so the bound falls back to n-1 = 0 (the single slide).
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel style="display: block; width: 400px; --hx-carousel-slide-width: 600px;">
+          <hx-carousel-item><div style="height: 80px"></div></hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(false); // maxScroll = 600 - 400 = 200 > 0
+      expect(el['_measuredMaxScroll']).toBeCloseTo(200, 0);
+      expect(el['_maxIndex']).toBe(0); // fallback n - 1
+    });
+
     it('regression guard: default (no custom width) keeps the legacy slidesPerPage bound', async () => {
       const el = await fixture<HelixCarousel>(`
         <hx-carousel slides-per-page="2" style="display: block; width: 400px;">
@@ -2292,8 +2359,9 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await flush(el);
-      // Constrain the viewport so the 200px of content overflows and scrolls.
-      shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!.style.height = '100px';
+      // Constrain the viewport so the 200px of content overflows. A 70px viewport
+      // (slideHeight 50 <= 70 < 100) keeps every index distinct -> bound n-1 = 3.
+      shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!.style.height = '70px';
       el['_recomputeBounds']();
       await el.updateComplete;
 
@@ -2316,7 +2384,7 @@ describe('hx-carousel', () => {
         <hx-carousel
           mouse-dragging
           slides-per-page="2"
-          style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+          style="display: block; width: 400px; --hx-carousel-slide-width: 250px;"
         >
           <hx-carousel-item>1</hx-carousel-item>
           <hx-carousel-item>2</hx-carousel-item>
@@ -2376,7 +2444,7 @@ describe('hx-carousel', () => {
             autoplay
             autoplay-interval="1000"
             slides-per-page="2"
-            style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+            style="display: block; width: 400px; --hx-carousel-slide-width: 250px;"
           >
             <hx-carousel-item>1</hx-carousel-item>
             <hx-carousel-item>2</hx-carousel-item>
@@ -2433,23 +2501,25 @@ describe('hx-carousel', () => {
       // Grow the gap so the slides overflow -> genuine peek (390 + 2*40 = 470 > 400).
       el.style.setProperty('--hx-carousel-gap', '40px');
 
-      // next() re-detects peek (refresh before its guard) and advances.
+      // next() re-detects peek (refresh before its guard) and advances. offsets
+      // [0,170,340], maxScroll 70 -> the first index reaching it is 1, so the
+      // bound is 1 (indices 2/3 would clamp to the same translate).
       el.next();
       await el.updateComplete;
       expect(el['_singlePage']).toBe(false);
-      expect(el['_maxIndex']).toBe(2);
-      expect(el['_currentIndex']).toBe(1); // advanced from 0
+      expect(el['_maxIndex']).toBe(1);
+      expect(el['_currentIndex']).toBe(1); // advanced from 0 to the last distinct position
     });
 
     it('gate transition: peek -> single-page on a runtime gap change disables navigation and clamps', async () => {
       const el = await fixture<HelixCarousel>(threeNarrow(40));
       await flush(el);
       expect(el['_singlePage']).toBe(false);
-      expect(el['_maxIndex']).toBe(2);
+      expect(el['_maxIndex']).toBe(1); // last distinct position (offsets [0,170,340], maxScroll 70)
 
-      el.goTo(2); // reach the last slide in peek mode
+      el.goTo(2); // clamps to the bound (1), the last distinct position in peek mode
       await el.updateComplete;
-      expect(el['_currentIndex']).toBe(2);
+      expect(el['_currentIndex']).toBe(1);
 
       // Remove the gap so the slides fit -> single page. Navigation re-detects it.
       el.style.setProperty('--hx-carousel-gap', '0px');
@@ -2463,14 +2533,14 @@ describe('hx-carousel', () => {
     it('index-clamp invariant: a flip to single-page clamps a peek-only index back into range', async () => {
       const el = await fixture<HelixCarousel>(threeNarrow(40));
       await flush(el);
-      expect(el['_maxIndex']).toBe(2);
+      expect(el['_maxIndex']).toBe(1); // last distinct position in peek mode
 
-      el.goTo(2); // a peek-only index
+      el.goTo(2); // clamps to the peek bound (1)
       await el.updateComplete;
-      expect(el['_currentIndex']).toBe(2);
+      expect(el['_currentIndex']).toBe(1);
 
       // Flip to single-page (no box resizes); drive a recompute as the
-      // ResizeObserver / slotchange path would. The invariant clamps 2 -> 0
+      // ResizeObserver / slotchange path would. The invariant clamps 1 -> 0
       // without any manual navigation.
       el.style.setProperty('--hx-carousel-gap', '0px');
       el['_recomputeBounds']();
@@ -2508,7 +2578,7 @@ describe('hx-carousel', () => {
       await el.updateComplete;
 
       expect(el['_singlePage']).toBe(false);
-      expect(el['_maxIndex']).toBe(2);
+      expect(el['_maxIndex']).toBe(1); // last distinct position in peek mode
       expect(el['_canGoNext']).toBe(true);
       expect(next.disabled).toBe(false); // re-enabled reactively, no navigation
     });
@@ -2518,7 +2588,8 @@ describe('hx-carousel', () => {
       // Build manually so the listener is attached before the element connects,
       // proving initial setup emits nothing.
       const el = document.createElement('hx-carousel') as HelixCarousel;
-      // 4 * 90px = 360px; gap 20 -> 360 + 3*20 = 420 > 400 -> peek (maxIndex 3).
+      // 4 * 90px = 360px; gap 20 -> 360 + 3*20 = 420 > 400 -> peek. offsets
+      // [0,110,220,330], maxScroll 20 -> first reaching index is 1, so bound 1.
       el.style.cssText =
         'display: block; width: 400px; --hx-carousel-slide-width: 90px; --hx-carousel-gap: 20px;';
       el.innerHTML = `
@@ -2534,16 +2605,17 @@ describe('hx-carousel', () => {
       await el.updateComplete;
 
       expect(el['_singlePage']).toBe(false);
-      expect(el['_maxIndex']).toBe(3);
+      expect(el['_maxIndex']).toBe(1);
       expect(events).toEqual([]); // no event during initial setup
 
-      el.goTo(3);
+      el.goTo(3); // clamps to the peek bound (1)
       await el.updateComplete;
-      expect(events).toEqual([3]); // the navigation event
+      expect(el['_currentIndex']).toBe(1);
+      expect(events).toEqual([1]); // the navigation event (clamped destination)
       events.length = 0;
 
       // Responsive flip to single-page (remove the gap; 360 < 400). Recompute
-      // clamps the out-of-range index 3 -> 0.
+      // clamps the out-of-range index 1 -> 0.
       el.style.setProperty('--hx-carousel-gap', '0px');
       el['_recomputeBounds']();
       await el.updateComplete;
@@ -2675,13 +2747,14 @@ describe('hx-carousel', () => {
         await el.updateComplete;
         expect(el['_currentIndex']).toBe(0);
 
-        // Grow the gap -> overflow -> peek (maxIndex 2); synchronous, RO not fired yet.
+        // Grow the gap -> overflow -> peek (bound 1: offsets [0,170,340],
+        // maxScroll 70); synchronous, RO not fired yet.
         el.style.setProperty('--hx-carousel-gap', '40px');
 
-        vi.advanceTimersByTime(1000); // tick refreshes first -> 0 < 2 -> advance
+        vi.advanceTimersByTime(1000); // tick refreshes first -> 0 < 1 -> advance
         await el.updateComplete;
         expect(el['_singlePage']).toBe(false);
-        expect(el['_maxIndex']).toBe(2);
+        expect(el['_maxIndex']).toBe(1);
         expect(el['_currentIndex']).toBe(1); // advanced, not stuck
       } finally {
         vi.useRealTimers();
@@ -2756,8 +2829,10 @@ describe('hx-carousel', () => {
       return vp;
     }
     // Mounts a vertical carousel whose content (4 * 50px [+ gaps] = 200px+)
-    // overflows a constrained viewport, so it genuinely scrolls.
-    async function mountScrollable(attrs = '', style = '', vpPx = 120): Promise<HelixCarousel> {
+    // overflows a constrained viewport, so it genuinely scrolls. The 70px
+    // viewport (slideHeight <= viewport < 2*slideHeight) keeps every index a
+    // visually-distinct position, so the bound is n-1 (every slide reachable).
+    async function mountScrollable(attrs = '', style = '', vpPx = 70): Promise<HelixCarousel> {
       const el = await fixture<HelixCarousel>(verticalSlides(attrs, style));
       await flush(el);
       constrainViewport(el, vpPx);
