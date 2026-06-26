@@ -379,17 +379,26 @@ export class HelixForm extends HelixElement {
     }
 
     // No action: the submitting form is host-owned/slotted. Treat it as
-    // host-owned (native) only when it declares a NON-EMPTY `action` of its own.
-    // A missing or empty action (`<form>` or `<form action="">`, e.g. templated
-    // Twig/Drupal markup binding an action that renders empty) is the controlled
+    // host-owned (native) when EITHER the form declares a NON-EMPTY `action` of
+    // its own, OR the submit button that triggered submission carries a
+    // NON-EMPTY `formaction` (a multi-submit host form — e.g. Drupal's Save vs
+    // Preview buttons — overrides the form action per-submitter). A missing or
+    // empty action/formaction (`<form>`, `<form action="">`, e.g. templated
+    // Twig/Drupal markup binding a value that renders empty) is the controlled
     // client-side case and is still bridged — mirroring how an empty
     // `this.action` is treated as the controlled case above.
     const target = e.target;
-    if (target instanceof HTMLFormElement) {
-      const action = target.getAttribute('action');
-      if (action !== null && action.trim() !== '') {
-        return false;
-      }
+    const formAction = target instanceof HTMLFormElement ? target.getAttribute('action') : null;
+    const formOwns = formAction !== null && formAction.trim() !== '';
+
+    // Read the submitter's `formaction` ATTRIBUTE (not the `.formAction` IDL
+    // property, which resolves to the document URL when unset).
+    const submitter = e instanceof SubmitEvent ? e.submitter : null;
+    const submitterFormAction = submitter?.getAttribute('formaction') ?? null;
+    const submitterOwns = submitterFormAction !== null && submitterFormAction.trim() !== '';
+
+    if (formOwns || submitterOwns) {
+      return false;
     }
 
     return true;

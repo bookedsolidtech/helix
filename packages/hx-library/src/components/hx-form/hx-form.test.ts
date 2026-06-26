@@ -866,6 +866,65 @@ describe('hx-form', () => {
       expect(event.detail.errors.length).toBeGreaterThan(0);
     });
 
+    it('does NOT intercept when the submitter carries a non-empty formaction (multi-submit host form)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="field" value="value" />
+            <button type="submit">Save</button>
+            <button type="submit" formaction="/host/preview">Preview</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const previewBtn = el.querySelector<HTMLButtonElement>('button[formaction]')!;
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      // The Preview button overrides the (empty) form action with its own
+      // formaction → host-owned → native submission, no bridge.
+      const submitEvent = new SubmitEvent('submit', {
+        bubbles: true,
+        cancelable: true,
+        submitter: previewBtn,
+      });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('intercepts when the submitter has no formaction on an action-less form (controlled case)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="field" value="value" />
+            <button type="submit">Save</button>
+            <button type="submit" formaction="/host/preview">Preview</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const saveBtn = el.querySelector<HTMLButtonElement>('button:not([formaction])')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+
+      // The Save button has no formaction → controlled bridge runs as usual.
+      const submitEvent = new SubmitEvent('submit', {
+        bubbles: true,
+        cancelable: true,
+        submitter: saveBtn,
+      });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
     it('no-intercept lets an action-less contained form submit natively (no hx-submit)', async () => {
       const el = await fixture<HelixForm>(`
         <hx-form action="" no-intercept>
