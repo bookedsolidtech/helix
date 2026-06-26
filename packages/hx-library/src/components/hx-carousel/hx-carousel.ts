@@ -76,8 +76,8 @@ const _svgPause = html`<hx-icon
  * @csspart next-button - The next navigation button.
  * @csspart play-pause-btn - The autoplay play/pause toggle button.
  *
- * @cssprop [--hx-carousel-gap=0px] - Gap between slides.
- * @cssprop [--hx-carousel-slide-width=100%] - Width override for each slide.
+ * @cssprop [--hx-carousel-gap=0px] - Gap between slides on the track. Defaults to 0 (flush slides).
+ * @cssprop [--hx-carousel-slide-width] - Width override for each slide. Defaults to the per-page width computed from slides-per-page (100% / slides-per-page).
  * @cssprop [--hx-carousel-nav-btn-size=2.5rem] - Size of previous/next navigation buttons.
  * @cssprop [--hx-carousel-pagination-dot-size=0.5rem] - Size of pagination dots.
  * @cssprop [--hx-space-3] - Spacing token.
@@ -336,8 +336,11 @@ export class HelixCarousel extends HelixElement {
     items.forEach((item, i) => {
       item.slideIndex = i;
       item.totalSlides = items.length;
+      // Computed per-page width is written to a private var so the public
+      // --hx-carousel-slide-width hook can override it without losing the
+      // slides-per-page default (see hx-carousel-item.styles.ts).
       const slideWidth = `${100 / this.slidesPerPage}%`;
-      (item as HTMLElement).style.setProperty('--_hx-carousel-slide-width', slideWidth);
+      (item as HTMLElement).style.setProperty('--_hx-carousel-computed-slide-width', slideWidth);
     });
 
     // Clamp currentIndex if slides changed

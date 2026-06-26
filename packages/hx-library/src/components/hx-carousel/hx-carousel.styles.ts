@@ -136,6 +136,9 @@ export const helixCarouselStyles = css`
 
   .track {
     display: flex;
+    /* Inter-slide gap. Public override hook; defaults to 0 so the historical
+       flush-slide layout is byte-for-byte preserved when --hx-carousel-gap is unset. */
+    gap: var(--hx-carousel-gap, 0px);
     transition: transform var(--hx-transition-base, 0.3s ease);
   }
 

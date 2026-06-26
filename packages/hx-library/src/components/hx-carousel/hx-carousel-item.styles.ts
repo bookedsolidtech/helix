@@ -4,7 +4,9 @@ export const helixCarouselItemStyles = css`
   :host {
     display: block;
     flex-shrink: 0;
-    width: var(--_hx-carousel-slide-width, 100%);
+    /* Public --hx-carousel-slide-width wins when a consumer sets it; otherwise the
+       per-page width computed by hx-carousel (_syncSlides) applies, then 100%. */
+    width: var(--hx-carousel-slide-width, var(--_hx-carousel-computed-slide-width, 100%));
     box-sizing: border-box;
   }
 
