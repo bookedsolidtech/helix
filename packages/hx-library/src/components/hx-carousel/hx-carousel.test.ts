@@ -1911,5 +1911,44 @@ describe('hx-carousel', () => {
       settle(track);
       expect(Number.isFinite(trackTranslate(track))).toBe(true);
     });
+
+    it('custom-width: a runtime --hx-carousel-gap change is picked up lazily on navigation', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+
+      // Initial gap = 0 -> step = 150, content = 600, maxScroll = 600 - 400 = 200.
+      expect(el['_measuredStep']).toBeCloseTo(150, 0);
+      expect(el['_measuredMaxScroll']).toBeCloseTo(200, 0);
+
+      // Change ONLY the gap at runtime. The slides (150px) and host (400px) keep
+      // their box sizes, so no ResizeObserver fires — only the lazy recompute on
+      // navigation can pick this up.
+      el.style.setProperty('--hx-carousel-gap', '20px');
+
+      el.next(); // 0 -> 1; lazy recompute reads the new gap
+      await el.updateComplete;
+
+      // step = 150 + 20 = 170; content = 4*150 + 3*20 = 660; maxScroll = 660 - 400 = 260.
+      expect(el['_measuredStep']).toBeCloseTo(170, 0);
+      expect(el['_measuredMaxScroll']).toBeCloseTo(260, 0);
+
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      // index 1 * new step 170 = 170, still below maxScroll 260.
+      expect(trackTranslate(track)).toBeCloseTo(-170, 0);
+
+      // Disabled states stay correct after the runtime gap change.
+      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
+      expect(prev.disabled).toBe(false); // middle
+      expect(next.disabled).toBe(false);
+
+      // Navigating to the last slide saturates at the NEW maxScroll (no blank).
+      el.goTo(3);
+      await el.updateComplete;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-260, 0);
+      expect(next.disabled).toBe(true); // last slide
+    });
   });
 });

@@ -493,6 +493,19 @@ export class HelixCarousel extends HelixElement {
   goTo(index: number): void {
     if (this._slides.length === 0) return;
 
+    // In custom-width mode the measured step/maxScroll depend on
+    // --hx-carousel-gap and the slide width, which can change at runtime without
+    // resizing any observed box (theme toggle, media query, host class) — so the
+    // ResizeObserver never fires. Navigation is the moment these matter, so
+    // refresh them lazily here. Reads are transform-immune (no settle needed) and
+    // navigation is user-triggered, so the forced reflow is cheap. Gated on
+    // _customWidthActive so the default model adds no measurement and stays
+    // byte-for-byte legacy. (Self-corrects out of custom mode too: if the width
+    // hook was removed, _recomputeBounds flips _customWidthActive back to false.)
+    if (this._customWidthActive) {
+      this._recomputeBounds();
+    }
+
     const next = this.loop
       ? ((index % this._slides.length) + this._slides.length) % this._slides.length
       : Math.max(0, Math.min(index, this._maxIndex));
