@@ -548,11 +548,19 @@ export class HelixForm extends HelixElement {
           `
         : nothing;
 
-    if (this._hasOwnAction) {
+    // Render mode is decoupled from the submit-intercept decision. hx-form
+    // renders its OWN `<form>` whenever `action` is a non-empty string —
+    // INCLUDING a whitespace-only value — so direct controls (raw inputs +
+    // submit/reset buttons that rely on hx-form to create the form owner) always
+    // get a form, even when a templated action collapses to whitespace. Only a
+    // truly-empty `action=""` renders slot-only (the slotted/controlled pattern).
+    // The `action` ATTRIBUTE is set only for a non-empty trimmed value, so a
+    // whitespace-only action yields `<form>` without a meaningless action attr.
+    if (this.action !== '') {
       return html`
         ${errorSummary}
         <form
-          action=${this.action}
+          action=${ifDefined(this._hasOwnAction ? this.action : undefined)}
           method=${this.method}
           enctype=${this.enctype}
           name=${ifDefined(this.name || undefined)}

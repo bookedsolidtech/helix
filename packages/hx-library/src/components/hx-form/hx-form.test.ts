@@ -824,6 +824,9 @@ describe('hx-form', () => {
       `);
       expect(el.action).toBe('   ');
 
+      // action="   " renders hx-form's own <form> too; the slotted form is first
+      // in document order, so querying 'form' returns it. Dispatching its submit
+      // still bridges (controlled).
       const form = queryOrThrow<HTMLFormElement>(el, 'form');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
       const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
@@ -832,6 +835,77 @@ describe('hx-form', () => {
       expect(submitEvent.defaultPrevented).toBe(true);
       const event = await eventPromise;
       expect(event.detail.valid).toBe(true);
+    });
+
+    it('renders its own <form> (no action attr) for a whitespace-only action and bridges direct controls', async () => {
+      // Regression guard: a templated `action` that collapses to whitespace must
+      // still make hx-form CREATE its own form owner for direct controls (raw
+      // input + submit button, no slotted <form>). Render mode keys off a
+      // non-empty string (incl. whitespace); the action ATTRIBUTE is omitted
+      // unless the trimmed value is non-empty; the submit bridge stays controlled.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <input type="text" name="username" value="testuser" />
+          <button type="submit">Submit</button>
+        </hx-form>
+      `);
+
+      // hx-form rendered exactly one own <form>, with no meaningless action attr.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      expect(form.hasAttribute('action')).toBe(false);
+      // The direct submit button is present in the component (functional control).
+      expect(queryOrThrow<HTMLButtonElement>(el, 'button[type="submit"]')).toBeTruthy();
+
+      // Submitting bridges (controlled): cancelled + hx-submit (valid).
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
+    it('validates direct controls on a whitespace-only action form (hx-invalid for required-empty)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <input type="text" name="required-field" required />
+          <button type="submit">Submit</button>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // Buttons are functional: the bridge validated the direct control.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.length).toBeGreaterThan(0);
+    });
+
+    it('renders its own <form action> for a non-empty action and submits natively (direct controls)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <input type="text" name="username" value="testuser" />
+          <button type="submit">Submit</button>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      expect(form.getAttribute('action')).toBe('/x');
+
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // Non-empty trimmed action → native submission, no bridge.
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
     });
 
     it('does NOT cancel a slotted host-owned <form action> (native submission proceeds)', async () => {
