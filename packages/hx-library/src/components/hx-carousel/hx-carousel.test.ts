@@ -1551,6 +1551,8 @@ describe('hx-carousel', () => {
   // ─── Custom property hooks: --hx-carousel-slide-width / --hx-carousel-gap ───
 
   describe('Custom property hooks (slide-width & gap)', () => {
+    // Two slides per page in a fixed 400px host makes the geometry exact:
+    // computed slide width = (400 - (n-1)*gap) / n.
     const fourSlides = (attrs = '') => `
       <hx-carousel slides-per-page="2" style="display: block; width: 400px;${attrs}">
         <hx-carousel-item>1</hx-carousel-item>
@@ -1560,41 +1562,95 @@ describe('hx-carousel', () => {
       </hx-carousel>
     `;
 
-    it('item width defaults to the slides-per-page computed width when --hx-carousel-slide-width is unset', async () => {
+    /** Resolved translate (px) on the track's transform matrix. */
+    function trackTranslate(track: HTMLElement, axis: 'x' | 'y' = 'x'): number {
+      const t = getComputedStyle(track).transform;
+      if (t === 'none') return 0;
+      const m = new DOMMatrixReadOnly(t);
+      return axis === 'x' ? m.m41 : m.m42;
+    }
+
+    /** Cancel the in-flight transition so geometry/matrix reads are final. */
+    function settle(track: HTMLElement): void {
+      track.style.transition = 'none';
+      void track.getBoundingClientRect();
+    }
+
+    it('default (gap 0, no override): slide width is 50% for slides-per-page=2 — zero drift', async () => {
       const el = await fixture<HelixCarousel>(fourSlides());
       await el.updateComplete;
-      const item = el.querySelector<HelixCarouselItem>('hx-carousel-item')!;
       const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const items = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      const trackW = track.getBoundingClientRect().width;
 
-      // _syncSlides writes the computed per-page width to the private var…
-      expect(item.style.getPropertyValue('--_hx-carousel-computed-slide-width').trim()).toBe('50%');
-      // …and the public override is unset.
-      expect(getComputedStyle(item).getPropertyValue('--hx-carousel-slide-width').trim()).toBe('');
-
-      // Used width is 50% of the track (zero drift vs. the prior --_hx-carousel-slide-width path).
-      const ratio = item.getBoundingClientRect().width / track.getBoundingClientRect().width;
-      expect(ratio).toBeCloseTo(0.5, 1);
-    });
-
-    it('--hx-carousel-slide-width overrides the computed per-page width', async () => {
-      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 80%;'));
-      await el.updateComplete;
-      const item = el.querySelector<HelixCarouselItem>('hx-carousel-item')!;
-      const track = shadowQuery<HTMLElement>(el, '.track')!;
-
-      // The slides-per-page computation is preserved as the fallback…
-      expect(item.style.getPropertyValue('--_hx-carousel-computed-slide-width').trim()).toBe('50%');
-      // …but the public hook wins: item renders at 80% of the track, not 50%.
-      const ratio = item.getBoundingClientRect().width / track.getBoundingClientRect().width;
-      expect(ratio).toBeCloseTo(0.8, 1);
-    });
-
-    it('track gap defaults to 0 when --hx-carousel-gap is unset', async () => {
-      const el = await fixture<HelixCarousel>(threeSlides);
-      await el.updateComplete;
-      const track = shadowQuery<HTMLElement>(el, '.track')!;
-      // Zero drift: the slide track has no inter-slide gap by default.
       expect(getComputedStyle(track).columnGap).toBe('0px');
+      expect(items[0].getBoundingClientRect().width).toBeCloseTo(trackW / 2, 0);
+      expect(items[1].getBoundingClientRect().width).toBeCloseTo(trackW / 2, 0);
+    });
+
+    it('default (gap 0, no override): navigation offset is i * (100% / slides-per-page) — zero drift', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides());
+      await el.updateComplete;
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const trackW = track.getBoundingClientRect().width;
+
+      el.next();
+      await el.updateComplete;
+      settle(track);
+      // One step = 50% of the 400px track = 200px (unchanged from the legacy percentage).
+      expect(trackTranslate(track)).toBeCloseTo(-trackW / 2, 0);
+    });
+
+    it('gap=16px: the two visible slides plus the gap fill the track exactly (no clip)', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-gap: 16px;'));
+      await el.updateComplete;
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const items = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      const trackW = track.getBoundingClientRect().width;
+      const gapPx = parseFloat(getComputedStyle(track).columnGap);
+
+      expect(gapPx).toBeCloseTo(16, 1);
+      // (400 - 16) / 2 = 192 each → 192 + 192 + 16 = 400, no overflow/clip.
+      const sum =
+        items[0].getBoundingClientRect().width + items[1].getBoundingClientRect().width + gapPx;
+      expect(sum).toBeCloseTo(trackW, 0);
+    });
+
+    it('gap=16px: navigation advances by one slide width + gap and lands the active slide flush', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-gap: 16px;'));
+      await el.updateComplete;
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const items = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      const slideW = items[0].getBoundingClientRect().width; // 192
+
+      el.next();
+      await el.updateComplete;
+      settle(track);
+
+      // Step = slide width + gap = 192 + 16 = 208px.
+      expect(trackTranslate(track)).toBeCloseTo(-(slideW + 16), 0);
+      // The active slide (index 1) sits flush with the viewport's leading edge.
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      expect(items[1].getBoundingClientRect().left - vp.getBoundingClientRect().left).toBeCloseTo(
+        0,
+        0,
+      );
+    });
+
+    it('--hx-carousel-slide-width override drives both layout and navigation', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await el.updateComplete;
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const items = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+
+      // Override wins over the computed 200px (50%).
+      expect(items[0].getBoundingClientRect().width).toBeCloseTo(150, 0);
+
+      el.next();
+      await el.updateComplete;
+      settle(track);
+      // gap is 0, so a single step advances by the custom slide width.
+      expect(trackTranslate(track)).toBeCloseTo(-150, 0);
     });
 
     it('--hx-carousel-gap sets the inter-slide gap on the track', async () => {

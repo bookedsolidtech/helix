@@ -332,15 +332,19 @@ export class HelixCarousel extends HelixElement {
 
     this._slides = items;
 
-    // Update aria labels on each item
+    // Gap-aware computed per-page width, written to a private var so the public
+    // --hx-carousel-slide-width hook can override it without losing the
+    // slides-per-page default (see hx-carousel-item.styles.ts). The expression
+    // references --hx-carousel-gap live, so slidesPerPage slides + (slidesPerPage
+    // - 1) gaps always sum to 100% with no clipping.
+    const computedSlideWidth = this._computedSlideWidthExpr();
     items.forEach((item, i) => {
       item.slideIndex = i;
       item.totalSlides = items.length;
-      // Computed per-page width is written to a private var so the public
-      // --hx-carousel-slide-width hook can override it without losing the
-      // slides-per-page default (see hx-carousel-item.styles.ts).
-      const slideWidth = `${100 / this.slidesPerPage}%`;
-      (item as HTMLElement).style.setProperty('--_hx-carousel-computed-slide-width', slideWidth);
+      (item as HTMLElement).style.setProperty(
+        '--_hx-carousel-computed-slide-width',
+        computedSlideWidth,
+      );
     });
 
     // Clamp currentIndex if slides changed
@@ -639,15 +643,42 @@ export class HelixCarousel extends HelixElement {
   // ─── Computed ───
 
   /**
+   * CSS expression for the gap-aware per-page slide size.
+   *
+   * `slidesPerPage` slides plus `slidesPerPage - 1` gaps fill 100% exactly, so
+   * adding a gap never clips the trailing slide. At gap `0px` this resolves to
+   * `100% / slidesPerPage`, byte-identical to the legacy flush layout.
+   * @internal
+   */
+  private _computedSlideWidthExpr(): string {
+    const n = this.slidesPerPage;
+    return `calc((100% - ${n - 1} * var(--hx-carousel-gap, 0px)) / ${n})`;
+  }
+
+  /**
    * CSS transform value applied to the slide track to scroll to the current index.
+   *
+   * Each step advances by one slide's outer extent (slide size + gap), so the
+   * active slide always lands flush with the viewport's leading edge for any
+   * combination of `--hx-carousel-gap` and `--hx-carousel-slide-width`. Both the
+   * gap and the width are resolved as live custom properties against the same
+   * track box that sizes the slides, keeping the transform exact without
+   * measuring rendered geometry. At gap `0px` with no width override this reduces
+   * to `currentIndex * (100% / slidesPerPage)` — identical to the legacy value.
    * @internal
    */
   private get _trackTransform(): string {
-    const slideSize = 100 / this.slidesPerPage;
-    const offset = this._currentIndex * slideSize;
-    return this.orientation === 'horizontal'
-      ? `translateX(-${offset}%)`
-      : `translateY(-${offset}%)`;
+    const i = this._currentIndex;
+    const gap = 'var(--hx-carousel-gap, 0px)';
+    if (this.orientation === 'horizontal') {
+      // The consumer's --hx-carousel-slide-width override wins over the
+      // gap-aware computed width, mirroring the slide's resolved width.
+      const slide = `var(--hx-carousel-slide-width, ${this._computedSlideWidthExpr()})`;
+      return `translateX(calc(-1 * ${i} * (${slide} + ${gap})))`;
+    }
+    // Vertical scrolls along the block axis; --hx-carousel-slide-width is a
+    // cross-axis (width) hook and does not participate in the vertical step.
+    return `translateY(calc(-1 * ${i} * (${this._computedSlideWidthExpr()} + ${gap})))`;
   }
 
   /**
