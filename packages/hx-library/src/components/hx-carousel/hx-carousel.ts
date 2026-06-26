@@ -1144,6 +1144,11 @@ export class HelixCarousel extends HelixElement {
     // the dots so pagination never advertises slides the track can't reveal.
     if (count <= 1 || this._singlePage) return nothing;
     const dots = Array.from({ length: count }, (_, i) => i);
+    // The "of N" total uses the REAL slide count (not the dot count), so the dot
+    // label agrees with the live-region announcement when you land on that index
+    // (e.g. the last reachable dot in a 6-slide exact-fill layout reads
+    // "Slide 5 of 6", matching the live region — not "Slide 5 of 5").
+    const total = this._slides.length;
     return html`
       <div class="controls">
         <div class="pagination" part="pagination">
@@ -1156,7 +1161,7 @@ export class HelixCarousel extends HelixElement {
                 })}
                 part="pagination-item"
                 type="button"
-                aria-label=${this.labelSlideOf(i + 1, count)}
+                aria-label=${this.labelSlideOf(i + 1, total)}
                 aria-current=${i === this._currentIndex ? 'true' : nothing}
                 @click=${() => this._goToManual(i)}
               >

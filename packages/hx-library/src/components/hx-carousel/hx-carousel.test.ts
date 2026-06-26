@@ -2357,6 +2357,44 @@ describe('hx-carousel', () => {
       expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(4);
     });
 
+    it('measured pagination dot labels use the real slide count, agreeing with the live region', async () => {
+      // 4 * 150px in 400px -> 3 dots (bound 2) but 4 slides; dot labels say "of 4".
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+      expect(el['_maxIndex']).toBe(2);
+
+      const dots = shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]');
+      expect(dots.length).toBe(3); // _maxIndex + 1, fewer than the 4 slides
+      // Each dot's "of N" total is the real slide count (4), not the dot count (3).
+      dots.forEach((dot, i) => {
+        expect(dot.getAttribute('aria-label')).toBe(`Slide ${i + 1} of 4`);
+      });
+
+      // Landing on the last reachable dot's index announces the SAME total via the
+      // live region — no contradiction.
+      dots[dots.length - 1].click();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+      expect(dots[2].getAttribute('aria-label')).toBe('Slide 3 of 4');
+      expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('Slide 3 of 4');
+    });
+
+    it('default-mode pagination dot labels are unchanged (one dot per slide, "of N" = slide count)', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+      const dots = shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]');
+      expect(dots.length).toBe(3); // one per slide
+      expect(dots[0].getAttribute('aria-label')).toBe('Slide 1 of 3');
+      expect(dots[2].getAttribute('aria-label')).toBe('Slide 3 of 3');
+    });
+
     it('measured loop wraps over the reachable bound and agrees with goTo', async () => {
       // 4 * 150px, _maxIndex 2 (offsets [0,150,300,450], maxScroll 200).
       const el = await fixture<HelixCarousel>(`
