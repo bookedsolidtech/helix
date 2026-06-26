@@ -378,11 +378,17 @@ export class HelixCarousel extends HelixElement {
       this._firstUpdateComplete = true;
       return;
     }
-    // slidesPerPage and orientation change the main-axis paging model (max index,
-    // exact-fill verdict, vertical block-axis step). Unlike a CSS var these are
-    // reactive, so re-derive bounds here — _recomputeBounds also runs the
-    // index-clamp invariant (and emits hx-slide-change if the index moves).
-    if (changed.has('slidesPerPage') || changed.has('orientation')) {
+    // slidesPerPage is baked into each item's --_hx-carousel-computed-slide-width
+    // (via _computedSlideWidthExpr) AND into the live transform step, so a runtime
+    // change must re-sync the per-item width — _syncSlides re-applies it for the
+    // new n and then re-derives bounds (running the index-clamp invariant), keeping
+    // the slide width and the transform's step on the same slidesPerPage.
+    // orientation only flips the navigation model (not the per-item width), so a
+    // bounds recompute is enough. If both change, _syncSlides covers it (its
+    // recompute reads the new orientation).
+    if (changed.has('slidesPerPage')) {
+      this._syncSlides();
+    } else if (changed.has('orientation')) {
       this._recomputeBounds();
     }
   }

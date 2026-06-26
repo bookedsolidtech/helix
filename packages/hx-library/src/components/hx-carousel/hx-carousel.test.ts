@@ -2311,6 +2311,45 @@ describe('hx-carousel', () => {
       expect(events).toEqual([2]); // exactly one clamp event
     });
 
+    it('re-syncs per-item slide widths when slides-per-page changes at runtime (2 <-> 3)', async () => {
+      const el = await fixture<HelixCarousel>(
+        `<hx-carousel slides-per-page="2" style="display: block; width: 600px;">${'<hx-carousel-item>x</hx-carousel-item>'.repeat(
+          6,
+        )}</hx-carousel>`,
+      );
+      await flush(el);
+      const items = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+
+      // 2-up (gap 0): each slide = 50% of 600 = 300px; legacy maxIndex = 6 - 2 = 4.
+      expect(items[0].getBoundingClientRect().width).toBeCloseTo(300, 0);
+      expect(el['_maxIndex']).toBe(4);
+
+      el.slidesPerPage = 3;
+      await flush(el);
+
+      // 3-up: each slide is re-synced to 1/3 of 600 = 200px (NOT the stale 300px);
+      // legacy maxIndex = 6 - 3 = 3.
+      expect(items[0].getBoundingClientRect().width).toBeCloseTo(200, 0);
+      expect(el['_maxIndex']).toBe(3);
+      expect(el['_canGoNext']).toBe(true);
+
+      // At the new last page the active slide lands flush (per-item width and the
+      // transform step both use n = 3, so no clip / no blank).
+      el.goTo(3);
+      await el.updateComplete;
+      settle(track);
+      expect(items[3].getBoundingClientRect().left).toBeCloseTo(vp.getBoundingClientRect().left, 0);
+      expect(items[5].getBoundingClientRect().right).toBeCloseTo(vp.getBoundingClientRect().right, 0);
+
+      // Reverse 3 -> 2: widths and bounds return to the 2-up values.
+      el.slidesPerPage = 2;
+      await flush(el);
+      expect(items[0].getBoundingClientRect().width).toBeCloseTo(300, 0);
+      expect(el['_maxIndex']).toBe(4);
+    });
+
     it('reactive bounds: a runtime orientation change re-derives the navigation model', async () => {
       const el = await fixture<HelixCarousel>(fourSlides());
       await flush(el);
