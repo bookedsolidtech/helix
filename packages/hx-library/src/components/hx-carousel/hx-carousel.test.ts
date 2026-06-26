@@ -2105,5 +2105,64 @@ describe('hx-carousel', () => {
         vi.useRealTimers();
       }
     });
+
+    // ── Gate transitions on a runtime gap change (lazy re-detect, both ways) ──
+
+    it('gate transition: exact-fill -> genuine peek on a runtime gap change is detected via next()', async () => {
+      const el = await fixture<HelixCarousel>(
+        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;'),
+      );
+      await flush(el);
+      // 2*(200 - 8) + 16 = 400 = viewport -> exact fill -> legacy model.
+      expect(el['_customWidthActive']).toBe(false);
+      expect(el['_maxIndex']).toBe(2);
+
+      // Sit at the legacy max index, where a stale guard would block next().
+      el.goTo(2);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+
+      // Shrink the gap so the layout becomes a genuine peek. Slides are
+      // calc(50% - 8px) = 192px regardless of gap, so NO observed box resizes
+      // (the ResizeObserver will not fire — only the lazy refresh can catch this).
+      el.style.setProperty('--hx-carousel-gap', '0px');
+
+      // next() re-detects peek (refresh before its guard) and advances past the
+      // old legacy max into the now-reachable last slide.
+      el.next();
+      await el.updateComplete;
+      expect(el['_customWidthActive']).toBe(true);
+      expect(el['_maxIndex']).toBe(3);
+      expect(el['_currentIndex']).toBe(3);
+
+      // content = 4*192 = 768, viewport = 400 -> maxScroll = 368; translate clamps there.
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      expect(el['_measuredMaxScroll']).toBeCloseTo(368, 0);
+      expect(trackTranslate(track)).toBeCloseTo(-368, 0);
+    });
+
+    it('gate transition: genuine peek -> exact-fill on a runtime gap change reverts to the legacy model', async () => {
+      const el = await fixture<HelixCarousel>(
+        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 0px;'),
+      );
+      await flush(el);
+      // 2*192 = 384 != 400 -> genuine peek.
+      expect(el['_customWidthActive']).toBe(true);
+      expect(el['_maxIndex']).toBe(3);
+
+      // Grow the gap so the two slides exactly fill the viewport again. No box resizes.
+      el.style.setProperty('--hx-carousel-gap', '16px');
+
+      el.goTo(1); // navigation re-detects exact-fill -> legacy
+      await el.updateComplete;
+      expect(el['_customWidthActive']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // legacy page bound
+
+      // Legacy index clamp now applies (would be n-1 = 3 in peek mode).
+      el.goTo(10);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+    });
   });
 });

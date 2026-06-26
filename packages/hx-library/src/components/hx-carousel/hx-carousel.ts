@@ -507,21 +507,41 @@ export class HelixCarousel extends HelixElement {
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }
 
-  goTo(index: number): void {
-    if (this._slides.length === 0) return;
-
-    // In custom-width mode the measured step/maxScroll depend on
-    // --hx-carousel-gap and the slide width, which can change at runtime without
-    // resizing any observed box (theme toggle, media query, host class) — so the
-    // ResizeObserver never fires. Navigation is the moment these matter, so
-    // refresh them lazily here. Reads are transform-immune (no settle needed) and
-    // navigation is user-triggered, so the forced reflow is cheap. Gated on
-    // _customWidthActive so the default model adds no measurement and stays
-    // byte-for-byte legacy. (Self-corrects out of custom mode too: if the width
-    // hook was removed, _recomputeBounds flips _customWidthActive back to false.)
-    if (this._customWidthActive) {
+  /**
+   * Lazily re-derives the peek metrics at the moment they matter (navigation).
+   *
+   * The measured step/maxScroll and the exact-fill verdict depend on
+   * `--hx-carousel-gap` and the slide width, which can change at runtime without
+   * resizing any observed box (theme toggle, media query, host class) — so the
+   * `ResizeObserver` never fires. Gating on `_hasCustomSlideWidth()` (property
+   * presence) rather than `_customWidthActive` (current verdict) lets
+   * `_recomputeBounds` re-evaluate the full gate and flip `_customWidthActive` in
+   * BOTH directions (legacy ↔ peek). When no width hook is present at all, this
+   * is a single property read and no measurement, so pure-default carousels are
+   * effectively free. Called once per navigation path (never doubled).
+   * @internal
+   */
+  private _refreshCustomBounds(): void {
+    if (this._hasCustomSlideWidth()) {
       this._recomputeBounds();
     }
+  }
+
+  goTo(index: number): void {
+    if (this._slides.length === 0) return;
+    this._refreshCustomBounds();
+    this._navigateTo(index);
+  }
+
+  /**
+   * Applies a slide selection: clamps to `_maxIndex` (or wraps when looping),
+   * updates the live region, and dispatches `hx-slide-change`. Assumes bounds are
+   * already fresh — callers run `_refreshCustomBounds()` first, so this is not
+   * re-measured here (keeps a single recompute per navigation).
+   * @internal
+   */
+  private _navigateTo(index: number): void {
+    if (this._slides.length === 0) return;
 
     const next = this.loop
       ? ((index % this._slides.length) + this._slides.length) % this._slides.length
@@ -543,24 +563,29 @@ export class HelixCarousel extends HelixElement {
   }
 
   next(): void {
+    // Refresh BEFORE the guard so the legacy-block decision uses the current
+    // _customWidthActive verdict (a runtime gap change may have flipped an
+    // exact-fill carousel into a genuine peek).
+    this._refreshCustomBounds();
     const nextIndex = this._currentIndex + this.slidesPerMove;
     // Legacy/default mode blocks a move that would pass the page bound. In
-    // custom-width mode goTo() clamps to the last slide instead, so the final,
-    // possibly partial, slidesPerMove step can always land on slides.length - 1.
+    // custom-width mode _navigateTo() clamps to the last slide instead, so the
+    // final, possibly partial, slidesPerMove step can always land on n - 1.
     if (!this._customWidthActive && !this.loop && nextIndex > this._maxIndex) {
       return;
     }
     this._livePolite = true;
-    this.goTo(nextIndex);
+    this._navigateTo(nextIndex);
   }
 
   previous(): void {
+    this._refreshCustomBounds();
     const prevIndex = this._currentIndex - this.slidesPerMove;
     if (!this._customWidthActive && !this.loop && prevIndex < 0) {
       return;
     }
     this._livePolite = true;
-    this.goTo(prevIndex);
+    this._navigateTo(prevIndex);
   }
 
   // ─── Autoplay ───
