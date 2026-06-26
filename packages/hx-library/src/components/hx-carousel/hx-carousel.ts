@@ -462,17 +462,25 @@ export class HelixCarousel extends HelixElement {
   }
 
   /**
-   * Recomputes the measured-nav metrics and then enforces the index-clamp
-   * invariant: `_maxIndex` may have just changed (mode flip in EITHER direction,
-   * slide count, or resize), so the active index is clamped back into range and a
-   * render is triggered, keeping the transform, pagination dots, prev/next
-   * disabled states, and ARIA in sync. This is the single place that enforces the
-   * invariant for every caller (firstUpdated, slotchange, ResizeObserver, lazy
-   * navigation).
+   * Recomputes the measured-nav metrics and (for non-navigation callers) enforces
+   * the index-clamp invariant: `_maxIndex` may have just changed (mode flip in
+   * EITHER direction, slide count, or resize), so the active index is clamped back
+   * into range and a render is triggered, keeping the transform, pagination dots,
+   * prev/next disabled states, and ARIA in sync.
+   *
+   * `clampIndex` is `false` on the navigation path (`_refreshMeasuredBounds` from
+   * `goTo`/`next`/`previous`/autoplay): the metrics are re-derived but the index is
+   * left to the immediately-following `_navigateTo`, which emits exactly ONE
+   * authoritative `hx-slide-change` for the destination — so a responsive mode
+   * flip during navigation never produces a clamp event PLUS a navigation event.
+   * The non-navigation callers (firstUpdated, slotchange, ResizeObserver,
+   * `updated()`) clamp here and emit on a real post-init change, since they have no
+   * following navigation.
    * @internal
    */
-  private _recomputeBounds(): void {
+  private _recomputeBounds(clampIndex = true): void {
     this._deriveMeasuredNav();
+    if (!clampIndex) return;
     const max = this._maxIndex;
     const clamped = Math.max(0, Math.min(this._currentIndex, max));
     if (clamped !== this._currentIndex) {
@@ -617,7 +625,8 @@ export class HelixCarousel extends HelixElement {
    */
   private _refreshMeasuredBounds(): void {
     if (this.orientation !== 'horizontal' || this._hasCustomSlideWidth()) {
-      this._recomputeBounds();
+      // Derive only — the following _navigateTo applies + emits the single event.
+      this._recomputeBounds(false);
     }
   }
 
@@ -681,12 +690,15 @@ export class HelixCarousel extends HelixElement {
    */
   private _autoplayTick = (): void => {
     this._livePolite = false;
-    if (this.loop) {
-      this.goTo(this._currentIndex + this.slidesPerMove);
-    } else if (this._currentIndex < this._maxIndex) {
-      this.goTo(this._currentIndex + this.slidesPerMove);
+    // Refresh bounds BEFORE deciding whether to wrap — a runtime gap/width change
+    // may have raised _maxIndex (legacy -> peek), making more slides reachable, so
+    // a non-looping carousel at the old bound advances instead of wrapping to 0.
+    // _navigateTo (not goTo) avoids a second redundant recompute this tick.
+    this._refreshMeasuredBounds();
+    if (this.loop || this._currentIndex < this._maxIndex) {
+      this._navigateTo(this._currentIndex + this.slidesPerMove);
     } else {
-      this.goTo(0);
+      this._navigateTo(0);
     }
   };
 

@@ -2326,6 +2326,82 @@ describe('hx-carousel', () => {
       expect(el['_measuredNav']).toBe(true);
       expect(el['_maxIndex']).toBe(3); // n - 1
     });
+
+    it('autoplay refreshes bounds before wrapping: exact-fill -> peek advances instead of wrapping to 0', async () => {
+      vi.useFakeTimers();
+      try {
+        const el = await fixture<HelixCarousel>(`
+          <hx-carousel
+            autoplay
+            autoplay-interval="1000"
+            slides-per-page="2"
+            style="display: block; width: 400px; --hx-carousel-slide-width: 200px; --hx-carousel-gap: 0px;"
+          >
+            <hx-carousel-item>1</hx-carousel-item>
+            <hx-carousel-item>2</hx-carousel-item>
+            <hx-carousel-item>3</hx-carousel-item>
+            <hx-carousel-item>4</hx-carousel-item>
+          </hx-carousel>
+        `);
+        await flush(el);
+        // 2*200 = 400 = viewport -> exact-fill legacy model, maxIndex = n - 2 = 2.
+        expect(el['_measuredNav']).toBe(false);
+        expect(el['_maxIndex']).toBe(2);
+
+        vi.advanceTimersByTime(1100); // 0 -> 1
+        vi.advanceTimersByTime(1000); // 1 -> 2 (the old legacy max)
+        await el.updateComplete;
+        expect(el['_currentIndex']).toBe(2);
+
+        // Runtime gap change flips exact-fill -> peek (maxIndex grows to 3); no
+        // resize, and the next tick is synchronous so the RO has not fired yet.
+        el.style.setProperty('--hx-carousel-gap', '16px');
+
+        vi.advanceTimersByTime(1000); // tick refreshes first -> 2 < 3 -> advance
+        await el.updateComplete;
+        expect(el['_measuredNav']).toBe(true);
+        expect(el['_maxIndex']).toBe(3);
+        expect(el['_currentIndex']).toBe(3); // advanced to the newly-reachable slide, NOT wrapped to 0
+
+        // Genuinely at the last slide now -> the next non-loop tick wraps to 0.
+        vi.advanceTimersByTime(1000);
+        await el.updateComplete;
+        expect(el['_currentIndex']).toBe(0);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('no double hx-slide-change on a lazy mode-flip navigation (one event for the destination)', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: 200px; --hx-carousel-gap: 16px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true); // peek: 2*200 + 16 = 416 != 400
+      el.goTo(3);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      const events: number[] = [];
+      el.addEventListener('hx-slide-change', (e) =>
+        events.push((e as CustomEvent<{ index: number }>).detail.index),
+      );
+
+      // Flip to exact-fill (gap 0) and navigate immediately — the lazy nav-path
+      // refresh sees the flip first (the ResizeObserver has not fired yet).
+      el.style.setProperty('--hx-carousel-gap', '0px');
+      el.goTo(0);
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(0);
+      // Exactly one event for the destination — NOT a clamp event [2] then [0].
+      expect(events).toEqual([0]);
+    });
   });
 
   // ─── Vertical: measured block-axis navigation ───
