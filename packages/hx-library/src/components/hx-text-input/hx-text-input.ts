@@ -50,6 +50,7 @@ export interface HxTextInputDetail {
  * @cssprop [--hx-input-border-radius=var(--hx-border-radius-md)] - Input border radius.
  * @cssprop [--hx-input-font-family=var(--hx-font-family-sans)] - Input font family.
  * @cssprop [--hx-input-focus-ring-color=var(--hx-focus-ring-color)] - Focus ring color.
+ * @cssprop [--hx-text-input-focus-ring-offset=0px] - Gap between the input border and the focus ring.
  * @cssprop [--hx-input-error-color=var(--hx-color-error-text)] - Error state color.
  * @cssprop [--hx-input-label-color=var(--hx-color-text-strong)] - Label text color.
  * @cssprop [--hx-input-sm-font-size=0.875rem] - Font size for the sm size variant.

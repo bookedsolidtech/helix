@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-06-26T12:49:27.389Z",
+  "generatedAt": "2026-06-26T12:59:18.196Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -25201,6 +25201,18 @@
             "semanticToken": "focus/ring/color",
             "fallbackPrimitive": null,
             "literalFallback": null
+          }
+        },
+        {
+          "description": "Gap between the input border and the focus ring.",
+          "name": "--hx-text-input-focus-ring-offset",
+          "default": "0px",
+          "figmaBinding": {
+            "target": null,
+            "layerSelector": "root",
+            "semanticToken": null,
+            "fallbackPrimitive": null,
+            "literalFallback": "0px"
           }
         },
         {
