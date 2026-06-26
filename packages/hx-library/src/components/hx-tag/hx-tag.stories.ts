@@ -161,7 +161,7 @@ export const Removable: Story = {
 export const RemovableLocalized: Story = {
   name: 'Removable (localized remove label)',
   render: () => html`
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+    <div style="display:flex;gap:var(--hx-space-2, 0.5rem);flex-wrap:wrap;align-items:center;">
       <hx-tag removable label-remove="Quitar {label}">Cardiología</hx-tag>
       <hx-tag removable label-remove="Entfernen {label}" variant="primary">Kardiologie</hx-tag>
       <hx-tag removable label-remove="Retirer {label}" variant="success">Cardiologie</hx-tag>
