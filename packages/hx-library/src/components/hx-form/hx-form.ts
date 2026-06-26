@@ -111,18 +111,24 @@ export class HelixForm extends HelixElement {
 
     if (typeof MutationObserver !== 'undefined') {
       this._childObserver = new MutationObserver(this._onChildMutation);
-      // subtree: a host-owned <form> may be nested in consumer markup.
-      this._childObserver.observe(this, { childList: true, subtree: true });
+      // Detection is direct-child-scoped, so only direct-child add/remove can
+      // flip the decision — no `subtree` needed (avoids reacting to deep,
+      // irrelevant mutations inside consumer markup).
+      this._childObserver.observe(this, { childList: true });
     }
   }
 
   /**
-   * Detects a consumer-provided (slotted) `<form>` in our light DOM, excluding
-   * the `<form>` hx-form renders itself (tagged `data-hx-own-form`).
+   * Detects a consumer-provided host-owned `<form>` in our light DOM. Matches
+   * only a TOP-LEVEL (direct-child) `<form>` — the host-owned-form pattern
+   * places the form as a direct child of `<hx-form>`. An unrelated `<form>`
+   * nested deeper in consumer markup is NOT the host's submission form and must
+   * not suppress hx-form's own wrapper. hx-form's own rendered form is a direct
+   * child too but carries `data-hx-own-form`, so it is excluded.
    * @internal
    */
   private _detectSlottedForm(): boolean {
-    return this.querySelector('form:not([data-hx-own-form])') !== null;
+    return this.querySelector(':scope > form:not([data-hx-own-form])') !== null;
   }
 
   /**

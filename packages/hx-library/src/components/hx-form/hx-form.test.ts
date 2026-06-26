@@ -1028,6 +1028,43 @@ describe('hx-form', () => {
       expect(dispatched).toBe(false);
     });
 
+    it('ignores an unrelated NESTED descendant <form> and still renders its own form', async () => {
+      // Regression: detection is direct-child-scoped. A <form> nested deeper in
+      // consumer markup is NOT the host's submission form and must not suppress
+      // hx-form's own wrapper for the outer direct controls.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <input type="text" name="u" value="v" />
+          <div class="widget">
+            <form action="/unrelated"><input type="text" name="n" /></form>
+          </div>
+          <button type="submit">Go</button>
+        </hx-form>
+      `);
+
+      // hx-form still rendered its own <form> (the nested one is not the host).
+      const own = el.querySelector('form[data-hx-own-form]');
+      expect(own).not.toBeNull();
+      // The nested unrelated form is not a direct child of hx-form.
+      expect(el.querySelector(':scope > form:not([data-hx-own-form])')).toBeNull();
+    });
+
+    it('detects only a DIRECT-CHILD host form and switches to slot mode', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form action="/host" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      // Direct-child host form detected → slot mode, single host form.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      expect(queryOrThrow<HTMLFormElement>(el, 'form').getAttribute('action')).toBe('/host');
+    });
+
     it('intercepts a slotted <form action=""> (empty action is the controlled case)', async () => {
       // Templated markup (Twig/Drupal) that binds an action which renders empty
       // must still be bridged exactly like a form with no action attribute.
@@ -1309,6 +1346,29 @@ describe('hx-form', () => {
       expect(el.isUpdatePending).toBe(false);
       expect(el.querySelectorAll('form')).toHaveLength(countAfterSettle);
       expect(countAfterSettle).toBe(1);
+    });
+
+    it('stays in own-form mode when only a NESTED descendant form is inserted at runtime', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <input type="text" name="u" value="v" />
+          <div class="widget"></div>
+          <button type="submit">Go</button>
+        </hx-form>
+      `);
+      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
+
+      // Insert a form deep inside a child wrapper — not a direct child of hx-form.
+      const wrapper = queryOrThrow<HTMLDivElement>(el, 'div.widget');
+      const nested = document.createElement('form');
+      nested.setAttribute('action', '/unrelated');
+      wrapper.appendChild(nested);
+
+      await flushMutations(el);
+
+      // The nested form is not the host form → hx-form keeps its own wrapper.
+      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
+      expect(el.querySelector(':scope > form:not([data-hx-own-form])')).toBeNull();
     });
   });
 });
