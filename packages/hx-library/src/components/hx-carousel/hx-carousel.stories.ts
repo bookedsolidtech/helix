@@ -622,7 +622,9 @@ export const CustomSlideWidthAndGap: Story = {
     loop: true,
   },
   render: (args) => html`
-    <div style="max-width: 700px; margin: 2rem auto; font-family: sans-serif;">
+    <div
+      style="max-width: 700px; margin: var(--hx-space-8, 2rem) auto; font-family: var(--hx-font-family-sans, sans-serif);"
+    >
       <hx-carousel
         label="${args.label}"
         ?loop=${args.loop}
@@ -632,7 +634,7 @@ export const CustomSlideWidthAndGap: Story = {
         slides-per-move="${args.slidesPerMove}"
         orientation="${args.orientation}"
         ?mouse-dragging=${args.mouseDragging}
-        style="--hx-carousel-slide-width: calc(50% - 0.5rem); --hx-carousel-gap: 1rem;"
+        style="--hx-carousel-slide-width: calc(50% - var(--hx-space-2, 0.5rem)); --hx-carousel-gap: var(--hx-space-4, 1rem);"
       >
         ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)} ${demoSlide(4)}
       </hx-carousel>
