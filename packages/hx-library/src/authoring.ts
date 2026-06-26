@@ -41,17 +41,20 @@ export type { FormMixinInterface } from './mixins/FormMixin.js';
 
 // Light-DOM style utilities — the primitives a Track-2 author reaches for when
 // a custom HELiX component needs to style slotted (light-DOM) content. Both are
-// **import-time** SSR-safe and register no custom element, so they belong on
-// this side-effect-free subpath:
+// SSR-safe to **import AND construct**, and register no custom element, so they
+// belong on this side-effect-free subpath:
 //
 //  - `injectLightStyles` guards every DOM access behind a
 //    `typeof document === 'undefined'` check (a runtime no-op under SSR).
-//  - `AdoptedStylesheetsController`'s only module-scope work is allocating
-//    static caches (`Map`/`WeakMap`); its `document` reference lives in a
-//    constructor default parameter, which is evaluated at construction, not at
-//    module evaluation.
+//  - `AdoptedStylesheetsController` does no module-scope DOM work (its only
+//    static state is `Map`/`WeakMap` caches), and its `document` fallback is
+//    resolved lazily inside its methods — never in the constructor. So
+//    `new AdoptedStylesheetsController(this, css)` in a Track-2 component field
+//    initializer instantiates during SSR without a `ReferenceError`; the DOM is
+//    only touched when `hostConnected`/`hostDisconnected` run (client-side).
 //
 // Both are DOM-runtime utilities: they require a real document/shadow root when
-// actually *invoked* in the browser. Import them here, call them at runtime.
+// their methods actually *run* in the browser. Import + construct on the server,
+// drive them at runtime on the client.
 export { injectLightStyles } from './utilities/injectLightStyles.js';
 export { AdoptedStylesheetsController } from './controllers/adopted-stylesheets.js';

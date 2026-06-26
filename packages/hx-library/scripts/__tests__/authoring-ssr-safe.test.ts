@@ -10,6 +10,10 @@
  *  - importing it requires no DOM document
  *  - the authoring symbols are present and `mixinDelegatesAria(HelixElement)`
  *    is a usable class factory without a DOM
+ *  - the light-DOM style utilities (`injectLightStyles`,
+ *    `AdoptedStylesheetsController`) are import- AND construct-safe without a
+ *    DOM: `injectLightStyles` is a runtime no-op, and the controller constructs
+ *    without a `document` default (DOM is resolved lazily, client-side only)
  *
  * Note on `customElements`: Lit's `@lit/reactive-element` installs a benign
  * custom-element *registry shim* on `globalThis` when evaluated in Node, so the
@@ -20,6 +24,7 @@
  * register a tag here and fail the assertions below.
  */
 import { describe, expect, it } from 'vitest';
+import type { ReactiveController, ReactiveControllerHost } from 'lit';
 
 // A representative sample of first-party tags. If any component module leaks
 // into the authoring graph, at least one of these would become registered.
@@ -76,13 +81,31 @@ describe('@helixui/library/authoring — SSR/Node import safety', () => {
     expect(injectLightStyles('hx-ssr-probe', 'p { color: red; }')).toBeUndefined();
   });
 
-  it('AdoptedStylesheetsController class is import-safe without a DOM', async () => {
+  it('AdoptedStylesheetsController constructs without a DOM (no document default)', async () => {
     const { AdoptedStylesheetsController } = await import('../../src/authoring.js');
-    // The class definition must not touch `document` at module/definition time —
-    // its `document` reference lives in a constructor default parameter, which
-    // is only evaluated when an instance is constructed (in the browser). Merely
-    // resolving the class here must succeed with no DOM present.
-    expect(typeof AdoptedStylesheetsController).toBe('function');
+
+    // Minimal stand-in for the `ReactiveControllerHost & HTMLElement` the
+    // constructor expects: it only calls `host.addController(this)`. The cast is
+    // a test boundary — the controller never reads anything else off the host
+    // during construction. No `any` is used.
+    const fakeHost = {
+      addController(_controller: ReactiveController): void {
+        // no-op: construction only needs this method to exist
+      },
+    } as unknown as ReactiveControllerHost & HTMLElement;
+
+    // The regression guard for the construct-safety contract: a Track-2 consumer
+    // doing `new AdoptedStylesheetsController(this, css)` in a field initializer
+    // must instantiate during SSR — with NO `document` and NO explicit root —
+    // without throwing `ReferenceError: document is not defined`. The `document`
+    // fallback is now resolved lazily in `_root`, only when a method runs.
+    expect(typeof (globalThis as { document?: unknown }).document).toBe('undefined');
+    let controller: InstanceType<typeof AdoptedStylesheetsController> | undefined;
+    expect(() => {
+      controller = new AdoptedStylesheetsController(fakeHost, 'p { color: red; }');
+    }).not.toThrow();
+    expect(controller).toBeInstanceOf(AdoptedStylesheetsController);
+    // Construction must not have materialized a DOM.
     expect(typeof (globalThis as { document?: unknown }).document).toBe('undefined');
   });
 
