@@ -977,6 +977,118 @@ describe('hx-text-input', () => {
     });
   });
 
+  // ─── Property: minlengthMessage / maxlengthMessage overrides ───
+
+  describe('Property: minlengthMessage / maxlengthMessage', () => {
+    it('minlengthMessage defaults to empty string', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.minlengthMessage).toBe('');
+    });
+
+    it('maxlengthMessage defaults to empty string', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.maxlengthMessage).toBe('');
+    });
+
+    // (a) default messages unchanged when override unset
+
+    it('uses default English tooShort message when minlength-message unset', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Please lengthen this text to 5 characters or more.');
+    });
+
+    it('uses default English tooLong message when maxlength-message unset', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Please shorten this text to 3 characters or fewer.');
+    });
+
+    // (b) minlength-message used on tooShort with {min} substituted
+
+    it('uses minlength-message with {min} substituted on tooShort', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Saisissez au moins {min} caractères."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Saisissez au moins 5 caractères.');
+    });
+
+    it('substitutes every {min} occurrence', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="4" value="ab" minlength-message="Min {min}; au moins {min}."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Min 4; au moins 4.');
+    });
+
+    // (c) maxlength-message used on tooLong with {max} substituted
+
+    it('uses maxlength-message with {max} substituted on tooLong', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong" maxlength-message="Maximum {max} caractères."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Maximum 3 caractères.');
+    });
+
+    // (d) verbatim (no placeholder) works
+
+    it('verbatim minlength-message without a placeholder is used as-is', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Trop court."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Trop court.');
+    });
+
+    it('verbatim maxlength-message without a placeholder is used as-is', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong" maxlength-message="Trop long."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Trop long.');
+    });
+
+    it('inserts a literal $ in the message verbatim (no String.replace pattern interpretation)', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Coût min {min} ($1)"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Coût min 5 ($1)');
+    });
+
+    // (e) precedence vs error matches required-message (error wins)
+
+    it('error takes precedence over minlength-message (matches required-message ordering)', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Trop court {min}." error="Hard error"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Hard error');
+    });
+
+    it('error takes precedence over maxlength-message (matches required-message ordering)', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong" maxlength-message="Trop long {max}." error="Hard error"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Hard error');
+    });
+
+    it('tooShort validity flag remains set when minlength-message is provided', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Trop court {min}."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooShort).toBe(true);
+    });
+  });
+
   // ─── Slot: prefix adds filled class ───
 
   describe('Slot: prefix and suffix filled class', () => {

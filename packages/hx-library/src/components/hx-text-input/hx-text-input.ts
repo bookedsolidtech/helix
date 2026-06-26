@@ -225,6 +225,28 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
   requiredMessage = 'This field is required.';
 
   /**
+   * Validation message shown when the value is shorter than `minlength`.
+   * Supports a `{min}` placeholder that is substituted with the resolved
+   * `minlength` value (mirrors the `{label}` token convention used elsewhere
+   * in the library). When empty, the built-in English message is used, so
+   * default output is unchanged.
+   * @attr minlength-message
+   */
+  @property({ attribute: 'minlength-message' })
+  minlengthMessage = '';
+
+  /**
+   * Validation message shown when the value is longer than `maxlength`.
+   * Supports a `{max}` placeholder that is substituted with the resolved
+   * `maxlength` value (mirrors the `{label}` token convention used elsewhere
+   * in the library). When empty, the built-in English message is used, so
+   * default output is unchanged.
+   * @attr maxlength-message
+   */
+  @property({ attribute: 'maxlength-message' })
+  maxlengthMessage = '';
+
+  /**
    * Visual size of the input field.
    * @attr hx-size
    */
@@ -346,20 +368,56 @@ export class HelixTextInput extends FocusMixin(FormMixin(HelixElement)) {
       this.value.length > 0 &&
       this.value.length < this.minlength
     ) {
+      const min = this.minlength;
       this._internals.setValidity(
         { tooShort: true },
-        this.error || `Please lengthen this text to ${this.minlength} characters or more.`,
+        this.error ||
+          this._resolveLengthMessage(
+            this.minlengthMessage,
+            '{min}',
+            min,
+            `Please lengthen this text to ${min} characters or more.`,
+          ),
         this._input,
       );
     } else if (this.maxlength !== undefined && this.value.length > this.maxlength) {
+      const max = this.maxlength;
       this._internals.setValidity(
         { tooLong: true },
-        this.error || `Please shorten this text to ${this.maxlength} characters or fewer.`,
+        this.error ||
+          this._resolveLengthMessage(
+            this.maxlengthMessage,
+            '{max}',
+            max,
+            `Please shorten this text to ${max} characters or fewer.`,
+          ),
         this._input,
       );
     } else {
       this._internals.setValidity({});
     }
+  }
+
+  /**
+   * Resolves a length-validation message. When `custom` is non-empty its
+   * `token` placeholder is substituted with `limit` using `split`/`join`
+   * (not `String.replace`, so any `$`-sequence in a localized string is
+   * inserted verbatim rather than interpreted as a replacement pattern —
+   * mirrors the `{label}` token convention in hx-tag). When `custom` is empty
+   * the built-in English `fallback` is returned, keeping default output
+   * byte-identical.
+   * @internal
+   */
+  private _resolveLengthMessage(
+    custom: string,
+    token: string,
+    limit: number,
+    fallback: string,
+  ): string {
+    if (custom === '') {
+      return fallback;
+    }
+    return custom.split(token).join(String(limit));
   }
 
   // ─── Form Lifecycle Hooks ───

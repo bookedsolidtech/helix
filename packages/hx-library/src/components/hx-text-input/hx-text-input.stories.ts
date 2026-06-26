@@ -170,6 +170,26 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    minlengthMessage: {
+      control: 'text',
+      description:
+        'Custom validation message shown when the value is shorter than `minlength`. Use the `{min}` placeholder to interpolate the minimum length. When empty, a built-in English message is used.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
+    maxlengthMessage: {
+      control: 'text',
+      description:
+        'Custom validation message shown when the value is longer than `maxlength`. Use the `{max}` placeholder to interpolate the maximum length. When empty, a built-in English message is used.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Patient Name',
@@ -597,6 +617,55 @@ export const ValidationStates: Story = {
       </div>
     </div>
   `,
+};
+
+export const LocalizedLengthMessages: Story = {
+  name: 'Localized Length Messages',
+  render: () => html`
+    <form
+      @submit=${(e: SubmitEvent) => e.preventDefault()}
+      style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;"
+    >
+      <p style="font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362); margin: 0;">
+        Override the built-in English length-validation messages for localization via
+        <code>minlength-message</code> / <code>maxlength-message</code>. The
+        <code>{min}</code> / <code>{max}</code> placeholders interpolate the limit. Submit to see
+        the localized native validation message.
+      </p>
+
+      <hx-text-input
+        label="Nom d'utilisateur"
+        name="username"
+        value="ab"
+        minlength="5"
+        minlength-message="Veuillez saisir au moins {min} caractères."
+        help-text="Minimum 5 caractères."
+      ></hx-text-input>
+
+      <hx-text-input
+        label="Code postal"
+        name="zip"
+        value="1234567890"
+        maxlength="5"
+        maxlength-message="Veuillez saisir au maximum {max} caractères."
+        help-text="Maximum 5 caractères."
+      ></hx-text-input>
+
+      <hx-button type="submit">Envoyer</hx-button>
+    </form>
+  `,
+  play: async ({ canvasElement }) => {
+    const hosts = canvasElement.querySelectorAll('hx-text-input');
+    const tooShort = hosts[0];
+    const tooLong = hosts[1];
+    if (!tooShort || !tooLong) {
+      throw new Error('Expected two hx-text-input elements in the story');
+    }
+    await tooShort.updateComplete;
+    await tooLong.updateComplete;
+    await expect(tooShort.validationMessage).toBe('Veuillez saisir au moins 5 caractères.');
+    await expect(tooLong.validationMessage).toBe('Veuillez saisir au maximum 5 caractères.');
+  },
 };
 
 // ─────────────────────────────────────────────────
