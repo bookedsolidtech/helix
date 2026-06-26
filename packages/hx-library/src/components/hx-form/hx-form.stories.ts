@@ -50,6 +50,17 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    noIntercept: {
+      name: 'no-intercept',
+      control: 'boolean',
+      description:
+        'When true, hx-form acts as a purely presentational wrapper and never runs its client-side submit bridge. Native submission of any contained or slotted form proceeds untouched and no `hx-submit` / `hx-invalid` is dispatched. Use for host-owned forms (Drupal Form API, Marketo) that manage their own submission.',
+      table: {
+        category: 'Properties',
+        defaultValue: { summary: 'false' },
+        type: { summary: 'boolean' },
+      },
+    },
     name: {
       control: 'text',
       description: 'Identifies the form for scripting and form discovery.',
@@ -80,12 +91,14 @@ const meta = {
     method: 'post',
     novalidate: false,
     name: '',
+    noIntercept: false,
   },
   render: (args) => html`
     <hx-form
       action=${args.action}
       method=${args.method}
       ?novalidate=${args.novalidate}
+      ?no-intercept=${args.noIntercept}
       name=${args.name}
     >
       <form>
@@ -299,6 +312,127 @@ export const HybridMode: Story = {
         </div>
       </form>
     </hx-form>
+  `,
+};
+
+/**
+ * Host-owned form pattern. When a slotted `<form>` declares its own `action`
+ * (a Drupal Form API form, a Marketo `mktoForm_*` form, etc.), hx-form treats it
+ * as host-owned and never cancels its submission — even though hx-form's own
+ * `action` is empty. The form posts natively to its own action; hx-form is only
+ * styling it.
+ */
+export const HostOwnedForm: Story = {
+  render: () => html`
+    <p style="margin-bottom: 1rem; color: var(--hx-color-text-muted, #4A5362); font-size: 0.875rem;">
+      The slotted <code>&lt;form action="/clinical-portal/patient/register"&gt;</code> owns its own
+      submission. hx-form styles it but does not intercept — submitting fires the native
+      <code>submit</code> without cancellation, and no <code>hx-submit</code> is dispatched.
+    </p>
+    <hx-form
+      @hx-submit=${() => {
+        const status = document.getElementById('host-owned-status');
+        if (status) {
+          status.textContent = 'hx-submit fired — unexpected for a host-owned form.';
+        }
+      }}
+    >
+      <form
+        action="/clinical-portal/patient/register"
+        method="post"
+        @submit=${(e: Event) => {
+          const status = document.getElementById('host-owned-status');
+          if (status) {
+            status.textContent = e.defaultPrevented
+              ? 'hx-form cancelled native submission — unexpected.'
+              : 'Native submit reached the host-owned form; hx-form did not cancel it.';
+          }
+          // Demo only: stop the Storybook iframe from navigating to the action URL.
+          e.preventDefault();
+        }}
+      >
+        <div class="form-item">
+          <label for="host-name">
+            Patient Name
+            <span class="form-required" aria-hidden="true">*</span>
+          </label>
+          <input type="text" id="host-name" name="name" required />
+        </div>
+
+        <div class="form-item">
+          <label for="host-mrn">Medical Record Number</label>
+          <input type="text" id="host-mrn" name="mrn" placeholder="MRN-000000" />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Register (native POST)</button>
+        </div>
+      </form>
+    </hx-form>
+
+    <p
+      id="host-owned-status"
+      style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--hx-color-surface-subtle, #f8f9fa); border-radius: 0.375rem; font-size: 0.875rem; font-family: monospace;"
+    >
+      Submit the form to see the result.
+    </p>
+  `,
+};
+
+/**
+ * The `no-intercept` opt-out. Setting the attribute makes hx-form a purely
+ * presentational wrapper: it runs no client-side submit bridge at all, so any
+ * contained form — with or without its own `action` — submits natively and no
+ * `hx-submit` / `hx-invalid` is dispatched. Toggle the `no-intercept` control
+ * in the Controls panel to compare behavior.
+ */
+export const NoIntercept: Story = {
+  args: {
+    noIntercept: true,
+  },
+  render: (args) => html`
+    <p style="margin-bottom: 1rem; color: var(--hx-color-text-muted, #4A5362); font-size: 0.875rem;">
+      With <code>no-intercept</code> set, hx-form attaches no submit bridge. The action-less form
+      below submits natively and <code>hx-submit</code> never fires.
+    </p>
+    <hx-form
+      ?no-intercept=${args.noIntercept}
+      @hx-submit=${() => {
+        const status = document.getElementById('no-intercept-status');
+        if (status) {
+          status.textContent = 'hx-submit fired — the bridge ran despite no-intercept.';
+        }
+      }}
+    >
+      <form
+        @submit=${(e: Event) => {
+          const status = document.getElementById('no-intercept-status');
+          if (status) {
+            status.textContent = e.defaultPrevented
+              ? 'hx-form cancelled submission — unexpected with no-intercept.'
+              : 'Native submit proceeded; hx-form ran no bridge (no hx-submit).';
+          }
+          // Demo only: stop the Storybook iframe from reloading.
+          e.preventDefault();
+        }}
+      >
+        <div class="form-item">
+          <label for="ni-name">Full Name</label>
+          <input type="text" id="ni-name" name="fullName" />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+    </hx-form>
+
+    <p
+      id="no-intercept-status"
+      style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--hx-color-surface-subtle, #f8f9fa); border-radius: 0.375rem; font-size: 0.875rem; font-family: monospace;"
+    >
+      Submit the form to see the result.
+    </p>
   `,
 };
 

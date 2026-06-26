@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-30T12:32:05.468Z",
+  "generatedAt": "2026-06-26T11:59:27.560Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -11412,6 +11412,17 @@
             "text/plain"
           ],
           "default": "application/x-www-form-urlencoded"
+        },
+        {
+          "figmaAxisName": "noIntercept",
+          "cemAttribute": "no-intercept",
+          "cemFieldName": "noIntercept",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ],
       "textProperties": [
@@ -11443,7 +11454,7 @@
           "type": {
             "text": "CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue | FormDataEntryValue[]>, formData: FormData}>"
           },
-          "description": "Dispatched on valid client-side submit when no action is set.",
+          "description": "Dispatched on valid client-side submit of an action-less form when `no-intercept` is not set.",
           "name": "hx-submit"
         },
         {

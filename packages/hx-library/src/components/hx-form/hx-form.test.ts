@@ -1,8 +1,27 @@
 import { describe, it, expect, afterEach } from 'vitest';
+import { customElement } from 'lit/decorators.js';
 import { fixture, cleanup, oneEvent, checkA11y } from '../../test-utils.js';
-import type { HelixForm } from './hx-form.js';
+import { HelixForm } from './hx-form.js';
 import './index.js';
 import '../hx-text-input/index.js';
+
+/**
+ * Subclass that opts out of the submit bridge by overriding the protected
+ * `shouldInterceptSubmit` hook — proving the hook is cleanly overridable
+ * without monkey-patching the private listener.
+ */
+@customElement('hx-form-no-bridge-test')
+class HelixFormNoBridge extends HelixForm {
+  protected override shouldInterceptSubmit(): boolean {
+    return false;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'hx-form-no-bridge-test': HelixFormNoBridge;
+  }
+}
 
 afterEach(cleanup);
 
@@ -752,6 +771,137 @@ describe('hx-form', () => {
       const elements = el.getNativeFormElements();
       const buttons = elements.filter((e) => e.tagName.toLowerCase() === 'button');
       expect(buttons.length).toBe(1);
+    });
+  });
+
+  // ─── Host-owned forms & no-intercept opt-out (6) ───
+
+  describe('Host-owned form submission and no-intercept', () => {
+    it('controlled action-less form is still intercepted (preventDefault + hx-submit)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // Bridge runs: the event is cancelled and hx-submit fires.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
+    it('does NOT cancel a slotted host-owned <form action> (native submission proceeds)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="/host/owned/submit" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // The slotted form owns its own action: hx-form must not cancel it and
+      // must not run the client-side bridge.
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('no-intercept lets an action-less contained form submit natively (no hx-submit)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="" no-intercept>
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      expect(el.noIntercept).toBe(true);
+
+      const form = el.querySelector('form')!;
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('no-intercept lets a contained <form action> submit natively (no hx-submit)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="" no-intercept>
+          <form action="/host/owned/submit" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('no-intercept reflects to the no-intercept attribute', async () => {
+      const el = await fixture<HelixForm>('<hx-form></hx-form>');
+      expect(el.hasAttribute('no-intercept')).toBe(false);
+      el.noIntercept = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('no-intercept')).toBe(true);
+    });
+
+    it('a subclass overriding shouldInterceptSubmit to false suppresses interception', async () => {
+      const el = await fixture<HelixFormNoBridge>(`
+        <hx-form-no-bridge-test action="">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form-no-bridge-test>
+      `);
+      expect(el).toBeInstanceOf(HelixForm);
+
+      const form = el.querySelector('form')!;
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // Even though the form is action-less (would normally bridge), the
+      // overridden hook declines interception.
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
     });
   });
 });

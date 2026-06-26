@@ -13,6 +13,13 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  * When no `action` is set (the Drupal pattern), renders only a `<slot>`
  * so Drupal can provide its own `<form>` tag.
  *
+ * The client-side submit bridge (validate + dispatch `hx-submit`) only runs for
+ * a form that hx-form effectively owns: a slotted form with no `action` of its
+ * own. A host-owned form that declares its own `action` (a Drupal Form API form
+ * or a Marketo `mktoForm_*` form) submits natively and is never cancelled. Set
+ * `no-intercept` to disable the bridge entirely and use hx-form purely for
+ * styling.
+ *
  * Uses adopted stylesheets to inject scoped CSS into the document without
  * Shadow DOM, keeping native form participation and Drupal compatibility.
  *
@@ -22,7 +29,7 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  *
  * @slot - Default slot for form fields and controls.
  *
- * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue | FormDataEntryValue[]>, formData: FormData}>} hx-submit - Dispatched on valid client-side submit when no action is set.
+ * @fires {CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue | FormDataEntryValue[]>, formData: FormData}>} hx-submit - Dispatched on valid client-side submit of an action-less form when `no-intercept` is not set.
  * @fires {CustomEvent<{errors: Array<{name: string, message: string}>}>} hx-invalid - Dispatched when validation fails on submit.
  * @fires {CustomEvent} hx-reset - Dispatched when the form is reset.
  *
@@ -128,6 +135,20 @@ export class HelixForm extends HelixElement {
   @property({ type: String })
   enctype: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain' =
     'application/x-www-form-urlencoded';
+
+  /**
+   * When true, hx-form acts as a purely presentational wrapper and never runs
+   * its client-side submit bridge. Native submission of any contained or
+   * slotted form proceeds untouched and no `hx-submit` / `hx-invalid` is
+   * dispatched.
+   *
+   * Use this when a host owns its own posting form — e.g. a Drupal Form API
+   * form or a Marketo (`mktoForm_*`) form — and hx-form is only meant to apply
+   * the design system's form styles, not control submission.
+   * @attr no-intercept
+   */
+  @property({ type: Boolean, attribute: 'no-intercept', reflect: true })
+  noIntercept = false;
 
   // ─── Public Methods ───
 
@@ -326,12 +347,55 @@ export class HelixForm extends HelixElement {
   // ─── Event Handling ───
 
   /**
+   * Decides whether hx-form should intercept a given submit event and run its
+   * client-side bridge (prevent native submission, validate, and dispatch
+   * `hx-submit` / `hx-invalid`), or let the event proceed to native submission.
+   *
+   * hx-form must NEVER cancel a form it does not itself own. It renders its own
+   * `<form>` only when `action` is set, in which case native submission to that
+   * action is the intended behaviour. When `action` is empty it renders no
+   * `<form>` at all, so the submitting form is host-owned/slotted; in that case
+   * the bridge applies ONLY to a form that does not declare its own `action`
+   * (the controlled client-side pattern). A slotted form with its own `action`
+   * (Drupal Form API, Marketo, etc.) owns its submission and must submit
+   * natively.
+   *
+   * Override in a subclass to opt out of interception without monkey-patching.
+   * Part of the hx-form subclassing contract.
+   *
+   * @param e - The native `submit` event bubbling up to the host.
+   * @returns `true` to run the client-side bridge, `false` to allow native submission.
+   * @protected
+   */
+  protected shouldInterceptSubmit(e: Event): boolean {
+    // Explicit opt-out: presentational wrapper only.
+    if (this.noIntercept) {
+      return false;
+    }
+
+    // hx-form renders its own `<form action>`; native submission is intended.
+    if (this.action) {
+      return false;
+    }
+
+    // No action: the submitting form is host-owned/slotted. Leave any form that
+    // declares its own `action` to submit natively; only bridge action-less forms.
+    const target = e.target;
+    if (target instanceof HTMLFormElement && target.hasAttribute('action')) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Handles native form submit events, intercepting for client-side validation and hx-submit dispatch.
    * @internal
    */
-  private _handleSubmit = (e: Event): void => {
-    // If there is an action, let native form submission happen
-    if (this.action) {
+  private readonly _handleSubmit = (e: Event): void => {
+    // Defer the intercept decision to the overridable hook. When it declines,
+    // native submission proceeds untouched and no hx-* event is dispatched.
+    if (!this.shouldInterceptSubmit(e)) {
       return;
     }
 
