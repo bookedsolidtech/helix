@@ -228,21 +228,23 @@ export class HelixCarousel extends HelixElement {
   /** @internal */
   @state() private _livePolite = true;
   /**
-   * Whether a custom `--hx-carousel-slide-width` is active. Gates the peek model
-   * (decoupled selection vs. scroll); `false` keeps the legacy default model
-   * byte-for-byte. Set by `_recomputeBounds`.
+   * Whether geometry-measured px navigation is active (decoupled selection vs.
+   * scroll). True for a genuine horizontal "peek" (custom slide-width that does
+   * not exactly fill the viewport) AND for every measurable vertical carousel
+   * (whose block-axis percentage transform is unreliable). `false` keeps the
+   * legacy slidesPerPage model byte-for-byte. Set by `_recomputeBounds`.
    * @internal
    */
-  @state() private _customWidthActive = false;
+  @state() private _measuredNav = false;
   /**
-   * Measured per-slide outer extent in px (slide size + gap), used only in
-   * custom-width mode for the px-clamped track translate.
+   * Measured per-slide outer extent in px (main-axis slide size + main-axis gap),
+   * used only in measured-nav mode for the px-clamped track translate.
    * @internal
    */
   @state() private _measuredStep = 0;
   /**
    * Measured maximum scroll distance in px (total content extent − viewport),
-   * used only in custom-width mode to saturate the track at the trailing edge.
+   * used only in measured-nav mode to saturate the track at the trailing edge.
    * @internal
    */
   @state() private _measuredMaxScroll = 0;
@@ -407,44 +409,58 @@ export class HelixCarousel extends HelixElement {
     return getComputedStyle(first).getPropertyValue('--hx-carousel-slide-width').trim() !== '';
   }
 
-  /** Resets the custom-width metrics, reverting to the legacy page model. @internal */
-  private _resetCustomWidthMetrics(): void {
-    this._customWidthActive = false;
+  /** Resets the measured-nav metrics, reverting to the legacy page model. @internal */
+  private _resetMeasuredNav(): void {
+    this._measuredNav = false;
     this._measuredStep = 0;
     this._measuredMaxScroll = 0;
   }
 
   /**
-   * Recomputes the geometry-measured scroll metrics used by the custom-width
-   * "peek" model (decoupled slide selection vs. track scroll).
-   *
-   * The peek model is enabled ONLY for a genuine main-axis peek — never on mere
-   * property presence:
-   * - **Horizontal only.** `--hx-carousel-slide-width` is a cross-axis (width)
-   *   hook for a vertical carousel, whose main axis is height, so vertical always
-   *   uses the legacy model.
-   * - **Non-exact-fill only.** When `slidesPerPage` slides + their interior gaps
-   *   still fill the viewport exactly (e.g. `calc(50% - 0.5rem)` with a matching
-   *   gap), the legacy page model is already correct and is kept; a sub-pixel
-   *   `EPS` absorbs `calc()` rounding.
-   *
-   * When the peek model is off (no custom width, vertical, exact-fill, 0 slides,
-   * or unmeasurable), `_maxIndex`, the transform, and the disabled states fall
-   * back to the legacy slidesPerPage model byte-for-byte. When it is on, every
-   * slide stays selectable while the track translate is clamped to
-   * `_measuredMaxScroll`, so a near-end slide saturates the viewport at the
-   * trailing edge with no blank space.
-   *
-   * Slide-size and viewport reads are transform-immune (translate does not change
-   * box size), so no transition settling is required here.
+   * Recomputes the measured-nav metrics and then enforces the index-clamp
+   * invariant: `_maxIndex` may have just changed (mode flip in EITHER direction,
+   * slide count, or resize), so the active index is clamped back into range and a
+   * render is triggered, keeping the transform, pagination dots, prev/next
+   * disabled states, and ARIA in sync. This is the single place that enforces the
+   * invariant for every caller (firstUpdated, slotchange, ResizeObserver, lazy
+   * navigation).
    * @internal
    */
   private _recomputeBounds(): void {
+    this._deriveMeasuredNav();
+    const max = this._maxIndex;
+    const clamped = Math.max(0, Math.min(this._currentIndex, max));
+    if (clamped !== this._currentIndex) {
+      this._currentIndex = clamped;
+    }
+  }
+
+  /**
+   * Derives whether measured-px navigation is active and, if so, the measured
+   * main-axis `step`/`maxScroll`. Does NOT clamp the index (its caller
+   * `_recomputeBounds` does).
+   *
+   * - **Horizontal** uses measured nav ONLY for a genuine peek: a
+   *   `--hx-carousel-slide-width` whose `slidesPerPage` slides + interior gaps do
+   *   NOT exactly fill the viewport (a sub-pixel `EPS` absorbs `calc()` rounding).
+   *   Default / gap-only / exact-fill keep the legacy `calc()` percentage
+   *   transform, which is correct because the track width equals the viewport.
+   * - **Vertical** always uses measured nav when measurable: a transform
+   *   percentage on the block axis is relative to the track's full height (≈ all
+   *   slides), not one slide, so the legacy percentage over-scrolls. The measured
+   *   px step (slide height + `row-gap`) moves exactly one slide per index.
+   *
+   * Size/viewport reads are transform-immune (translate does not change box
+   * size), so no transition settling is needed.
+   * @internal
+   */
+  private _deriveMeasuredNav(): void {
     const slides = this._slides;
-    // Vertical carousels scroll on the block axis; the slide-width hook is
-    // cross-axis there, so it never enables the peek model.
-    if (slides.length === 0 || this.orientation !== 'horizontal' || !this._hasCustomSlideWidth()) {
-      this._resetCustomWidthMetrics();
+    const horizontal = this.orientation === 'horizontal';
+    // Horizontal without a slide-width hook is handled correctly by the legacy
+    // percentage transform — skip measurement entirely (keeps default cheap).
+    if (slides.length === 0 || (horizontal && !this._hasCustomSlideWidth())) {
+      this._resetMeasuredNav();
       return;
     }
 
@@ -452,33 +468,38 @@ export class HelixCarousel extends HelixElement {
     const viewport = this.shadowRoot?.querySelector<HTMLElement>('[part="slide-viewport"]');
     const first = slides[0];
     if (!track || !viewport || !first) {
-      this._resetCustomWidthMetrics();
+      this._resetMeasuredNav();
       return;
     }
 
-    const slideSize = first.getBoundingClientRect().width;
-    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-    const viewportSize = viewport.clientWidth;
+    const rect = first.getBoundingClientRect();
+    const cs = getComputedStyle(track);
+    const slideSize = horizontal ? rect.width : rect.height;
+    const gap = parseFloat(horizontal ? cs.columnGap : cs.rowGap) || 0;
+    const viewportSize = horizontal ? viewport.clientWidth : viewport.clientHeight;
     const step = slideSize + gap;
     if (step <= 0) {
-      this._resetCustomWidthMetrics();
+      this._resetMeasuredNav();
       return;
     }
 
-    // Genuine peek only: if slidesPerPage slides + their interior gaps fill the
-    // viewport exactly, the legacy page model is correct, so stay legacy.
-    const EPS = 0.5;
-    const pageExtent = this.slidesPerPage * slideSize + (this.slidesPerPage - 1) * gap;
-    if (Math.abs(pageExtent - viewportSize) <= EPS) {
-      this._resetCustomWidthMetrics();
-      return;
+    // Horizontal genuine-peek gate: if slidesPerPage slides + interior gaps fill
+    // the viewport exactly, the legacy page model is correct, so stay legacy.
+    // Vertical always proceeds (the percentage transform is unreliable there).
+    if (horizontal) {
+      const EPS = 0.5;
+      const pageExtent = this.slidesPerPage * slideSize + (this.slidesPerPage - 1) * gap;
+      if (Math.abs(pageExtent - viewportSize) <= EPS) {
+        this._resetMeasuredNav();
+        return;
+      }
     }
 
     // Total extent of equal-size slides plus inter-slide gaps. maxScroll is how
     // far the track can translate before the trailing content edge reaches the
     // viewport's trailing edge — selecting any later slide saturates here.
     const content = slides.length * slideSize + (slides.length - 1) * gap;
-    this._customWidthActive = true;
+    this._measuredNav = true;
     this._measuredStep = step;
     this._measuredMaxScroll = Math.max(0, content - viewportSize);
   }
@@ -494,49 +515,52 @@ export class HelixCarousel extends HelixElement {
    * Maximum selectable slide index.
    *
    * In the legacy default model this is the slidesPerPage page bound
-   * (`slides.length - slidesPerPage`). In custom-width mode selection is
+   * (`slides.length - slidesPerPage`). In measured-nav mode selection is
    * decoupled from scroll: every slide is reachable, so the bound is the last
    * index (`slides.length - 1`) and the track translate is clamped separately
    * (see `_trackTransform` / `_measuredMaxScroll`).
    * @internal
    */
   private get _maxIndex(): number {
-    if (this._customWidthActive) {
+    if (this._measuredNav) {
       return Math.max(0, this._slides.length - 1);
     }
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }
 
   /**
-   * Lazily re-derives the peek metrics at the moment they matter (navigation).
+   * Lazily re-derives the measured-nav metrics at the moment they matter
+   * (navigation).
    *
-   * The measured step/maxScroll and the exact-fill verdict depend on
-   * `--hx-carousel-gap` and the slide width, which can change at runtime without
+   * The measured step/maxScroll and the horizontal exact-fill verdict depend on
+   * `--hx-carousel-gap` / the slide width, which can change at runtime without
    * resizing any observed box (theme toggle, media query, host class) — so the
-   * `ResizeObserver` never fires. Gating on `_hasCustomSlideWidth()` (property
-   * presence) rather than `_customWidthActive` (current verdict) lets
-   * `_recomputeBounds` re-evaluate the full gate and flip `_customWidthActive` in
-   * BOTH directions (legacy ↔ peek). When no width hook is present at all, this
-   * is a single property read and no measurement, so pure-default carousels are
-   * effectively free. Called once per navigation path (never doubled).
+   * `ResizeObserver` never fires. Re-deriving here flips `_measuredNav` in BOTH
+   * directions (legacy ↔ measured) and refreshes the px metrics.
+   *
+   * Gated to stay cheap for pure-default horizontal carousels: vertical always
+   * re-derives (its main axis is height, which the gap affects), horizontal only
+   * when a `--hx-carousel-slide-width` is present. A pure-default horizontal
+   * carousel pays a single property read and no measurement. Called once per
+   * navigation path (never doubled).
    * @internal
    */
-  private _refreshCustomBounds(): void {
-    if (this._hasCustomSlideWidth()) {
+  private _refreshMeasuredBounds(): void {
+    if (this.orientation !== 'horizontal' || this._hasCustomSlideWidth()) {
       this._recomputeBounds();
     }
   }
 
   goTo(index: number): void {
     if (this._slides.length === 0) return;
-    this._refreshCustomBounds();
+    this._refreshMeasuredBounds();
     this._navigateTo(index);
   }
 
   /**
    * Applies a slide selection: clamps to `_maxIndex` (or wraps when looping),
    * updates the live region, and dispatches `hx-slide-change`. Assumes bounds are
-   * already fresh — callers run `_refreshCustomBounds()` first, so this is not
+   * already fresh — callers run `_refreshMeasuredBounds()` first, so this is not
    * re-measured here (keeps a single recompute per navigation).
    * @internal
    */
@@ -564,14 +588,14 @@ export class HelixCarousel extends HelixElement {
 
   next(): void {
     // Refresh BEFORE the guard so the legacy-block decision uses the current
-    // _customWidthActive verdict (a runtime gap change may have flipped an
-    // exact-fill carousel into a genuine peek).
-    this._refreshCustomBounds();
+    // _measuredNav verdict (a runtime gap change may have flipped an exact-fill
+    // carousel into a genuine peek, or this may be a measured vertical carousel).
+    this._refreshMeasuredBounds();
     const nextIndex = this._currentIndex + this.slidesPerMove;
     // Legacy/default mode blocks a move that would pass the page bound. In
-    // custom-width mode _navigateTo() clamps to the last slide instead, so the
+    // measured-nav mode _navigateTo() clamps to the last slide instead, so the
     // final, possibly partial, slidesPerMove step can always land on n - 1.
-    if (!this._customWidthActive && !this.loop && nextIndex > this._maxIndex) {
+    if (!this._measuredNav && !this.loop && nextIndex > this._maxIndex) {
       return;
     }
     this._livePolite = true;
@@ -579,9 +603,9 @@ export class HelixCarousel extends HelixElement {
   }
 
   previous(): void {
-    this._refreshCustomBounds();
+    this._refreshMeasuredBounds();
     const prevIndex = this._currentIndex - this.slidesPerMove;
-    if (!this._customWidthActive && !this.loop && prevIndex < 0) {
+    if (!this._measuredNav && !this.loop && prevIndex < 0) {
       return;
     }
     this._livePolite = true;
@@ -838,22 +862,25 @@ export class HelixCarousel extends HelixElement {
   /**
    * CSS transform value applied to the slide track to scroll to the current index.
    *
-   * Default model: a live `calc()` of `currentIndex * (effective slide width +
-   * gap)`. Both the gap and the width resolve as custom properties against the
-   * same track box that sizes the slides, so each step lands the active slide
-   * flush with the viewport's leading edge without measuring geometry. At gap
-   * `0px` with no width override this reduces to `currentIndex * (100% /
-   * slidesPerPage)` — identical to the legacy value.
+   * Measured-nav model (genuine horizontal peek, or any measurable vertical
+   * carousel): the translate is the measured `currentIndex * step` clamped to
+   * `_measuredMaxScroll` (px) on the active axis. A near-end slide saturates the
+   * track at the trailing edge — slides crowd into view with no blank space —
+   * while the active index is still that slide.
    *
-   * Custom-width "peek" model: selection is decoupled from scroll, so the
-   * translate is the measured `currentIndex * step` clamped to `_measuredMaxScroll`
-   * (px). A near-end slide saturates the track at the trailing edge — multiple
-   * slides crowd into view with no blank space — while the active index is still
-   * that slide.
+   * Legacy model (horizontal default / gap-only / exact-fill): a live `calc()` of
+   * `currentIndex * (effective slide width + gap)`. The width and gap resolve as
+   * custom properties against the same track box that sizes the slides, so each
+   * step lands the active slide flush with the viewport's leading edge without
+   * measuring; at gap `0px` with no override this is `currentIndex * (100% /
+   * slidesPerPage)` — identical to the legacy value. The vertical `calc()` branch
+   * is an unmeasurable (e.g. SSR) fallback only; a percentage on the block axis is
+   * relative to the track's full height, so a measured vertical carousel uses the
+   * px branch above instead.
    * @internal
    */
   private get _trackTransform(): string {
-    if (this._customWidthActive) {
+    if (this._measuredNav) {
       const offset = Math.min(this._currentIndex * this._measuredStep, this._measuredMaxScroll);
       return this.orientation === 'horizontal'
         ? `translateX(-${offset}px)`
@@ -868,8 +895,8 @@ export class HelixCarousel extends HelixElement {
       const slide = `var(--hx-carousel-slide-width, ${this._computedSlideWidthExpr()})`;
       return `translateX(calc(-1 * ${i} * (${slide} + ${gap})))`;
     }
-    // Vertical scrolls along the block axis; --hx-carousel-slide-width is a
-    // cross-axis (width) hook and does not participate in the vertical step.
+    // Vertical fallback (unmeasurable only): the block-axis percentage is
+    // unreliable, but it is the best we can do without layout measurement.
     return `translateY(calc(-1 * ${i} * (${this._computedSlideWidthExpr()} + ${gap})))`;
   }
 
