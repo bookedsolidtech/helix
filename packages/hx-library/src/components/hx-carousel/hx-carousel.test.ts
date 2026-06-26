@@ -2271,6 +2271,61 @@ describe('hx-carousel', () => {
       await el.updateComplete;
       expect(events).toEqual([]); // none on a no-op recompute
     });
+
+    it('reactive bounds: a runtime slides-per-page change re-derives bounds, clamps the index, and emits once', async () => {
+      const events: number[] = [];
+      // slide-width 200px = exactly 50% of the 400px viewport.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="1" style="display: block; width: 400px; --hx-carousel-slide-width: 200px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      el.addEventListener('hx-slide-change', (e) =>
+        events.push((e as CustomEvent<{ index: number }>).detail.index),
+      );
+
+      // slides-per-page=1: 200 != 400 -> genuine peek; every slide selectable.
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(3);
+
+      el.goTo(3);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+      expect(events).toEqual([3]);
+      events.length = 0;
+
+      // Two 200px slides exactly fill the 400px viewport -> exact-fill legacy
+      // model, maxIndex = n - 2 = 2. No resize, no navigation.
+      el.slidesPerPage = 2;
+      await flush(el);
+
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_maxIndex']).toBe(2);
+      expect(el['_currentIndex']).toBe(2); // clamped 3 -> 2
+      expect(el['_canGoNext']).toBe(false);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!.disabled).toBe(true);
+      expect(events).toEqual([2]); // exactly one clamp event
+    });
+
+    it('reactive bounds: a runtime orientation change re-derives the navigation model', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides());
+      await flush(el);
+
+      // Horizontal default: legacy page model.
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // n - slidesPerPage
+
+      el.orientation = 'vertical';
+      await flush(el);
+
+      // Vertical re-derives to the measured block-axis model: every slide selectable.
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(3); // n - 1
+    });
   });
 
   // ─── Vertical: measured block-axis navigation ───

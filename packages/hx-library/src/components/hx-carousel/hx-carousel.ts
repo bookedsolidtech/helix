@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -268,6 +268,13 @@ export class HelixCarousel extends HelixElement {
    */
   private _initialized = false;
   /**
+   * Becomes true once the first `updated()` callback has run. `firstUpdated`
+   * already recomputes bounds on mount, so the first `updated()` skips its
+   * recompute to avoid a redundant mount-time reflow.
+   * @internal
+   */
+  private _firstUpdateComplete = false;
+  /**
    * Whether the user has requested reduced motion via the OS media preference.
    * @internal
    */
@@ -362,6 +369,22 @@ export class HelixCarousel extends HelixElement {
     // Initial setup is complete; clamps from here on are real, post-init
     // corrections that should emit hx-slide-change.
     this._initialized = true;
+  }
+
+  override updated(changed: PropertyValues): void {
+    // firstUpdated already ran the initial recompute in this same cycle, so the
+    // first updated() skips its recompute to avoid a redundant mount reflow.
+    if (!this._firstUpdateComplete) {
+      this._firstUpdateComplete = true;
+      return;
+    }
+    // slidesPerPage and orientation change the main-axis paging model (max index,
+    // exact-fill verdict, vertical block-axis step). Unlike a CSS var these are
+    // reactive, so re-derive bounds here — _recomputeBounds also runs the
+    // index-clamp invariant (and emits hx-slide-change if the index moves).
+    if (changed.has('slidesPerPage') || changed.has('orientation')) {
+      this._recomputeBounds();
+    }
   }
 
   // ─── Slide Management ───
