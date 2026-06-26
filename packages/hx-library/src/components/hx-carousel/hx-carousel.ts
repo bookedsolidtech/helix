@@ -731,10 +731,16 @@ export class HelixCarousel extends HelixElement {
 
     // A single static page has nothing to scroll: collapse every target to 0,
     // overriding loop wrapping so no unreachable slide can be selected.
+    // Loop wraps over the REACHABLE range, not the raw slide count: in
+    // measured-nav mode indices beyond `_maxIndex` clamp to the same translate
+    // (duplicate end states), so wrapping must use `_maxIndex + 1` so `next` from
+    // `_maxIndex` → 0 and `previous` from 0 → `_maxIndex`. Default mode wraps over
+    // the full slide count (unchanged).
+    const wrapCount = this._measuredNav ? this._maxIndex + 1 : this._slides.length;
     const next = this._singlePage
       ? 0
       : this.loop
-        ? ((index % this._slides.length) + this._slides.length) % this._slides.length
+        ? ((index % wrapCount) + wrapCount) % wrapCount
         : Math.max(0, Math.min(index, this._maxIndex));
 
     if (next === this._currentIndex) return;
@@ -1129,7 +1135,11 @@ export class HelixCarousel extends HelixElement {
 
   /** @internal */
   private _renderPagination() {
-    const count = this._slides.length;
+    // One dot per REACHABLE index. In measured-nav mode the reachable bound
+    // (`_maxIndex`) can stop before the last slide (trailing indices clamp to the
+    // same translate), so only `_maxIndex + 1` dots are rendered — no unreachable
+    // trailing dot. Default mode keeps one dot per slide.
+    const count = this._measuredNav ? this._maxIndex + 1 : this._slides.length;
     // A single static page (non-overflowing track) has nothing to page to — omit
     // the dots so pagination never advertises slides the track can't reveal.
     if (count <= 1 || this._singlePage) return nothing;

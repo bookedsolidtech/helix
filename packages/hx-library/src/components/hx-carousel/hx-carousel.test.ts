@@ -2030,14 +2030,23 @@ describe('hx-carousel', () => {
       `);
       await flush(el);
       expect(el['_measuredNav']).toBe(true);
+      // 4*150 = 600, maxScroll 200, offsets [0,150,300,450] -> reachable bound 2.
+      expect(el['_maxIndex']).toBe(2);
 
-      el.previous(); // wraps 0 -> 3
+      // Loop wraps over the REACHABLE range, not n-1 (indices 3 would clamp to the
+      // same translate as 2): previous() from 0 lands on _maxIndex (2), not 3.
+      el.previous();
       await el.updateComplete;
-      expect(el['_currentIndex']).toBe(3);
+      expect(el['_currentIndex']).toBe(2);
 
-      el.next(); // wraps 3 -> 0
+      el.next(); // wraps _maxIndex -> 0
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(0);
+
+      // Autoplay agrees with goTo: goTo(_maxIndex) then a tick wraps to 0.
+      el.goTo(2);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
 
       const track = shadowQuery<HTMLElement>(el, '.track')!;
       settle(track);
@@ -2312,6 +2321,89 @@ describe('hx-carousel', () => {
       expect(el['_singlePage']).toBe(false); // maxScroll = 600 - 400 = 200 > 0
       expect(el['_measuredMaxScroll']).toBeCloseTo(200, 0);
       expect(el['_maxIndex']).toBe(0); // fallback n - 1
+    });
+
+    it('measured pagination renders one dot per reachable index (no unreachable trailing dot)', async () => {
+      // Uniform exact-fill 6 slides (192px + 16px gap), 400px viewport -> _maxIndex 4.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+          <hx-carousel-item>6</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_maxIndex']).toBe(4);
+
+      // Exactly _maxIndex + 1 = 5 dots (NOT 6) — no unreachable trailing dot.
+      const dots = shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]');
+      expect(dots.length).toBe(5);
+
+      // The last dot maps to index 4 and becomes active at the bound.
+      dots[4].click();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(4);
+      expect(dots[4].getAttribute('aria-current')).toBe('true');
+    });
+
+    it('measured pagination keeps one dot per slide when every index is reachable', async () => {
+      // 4 * 250px peek -> every index distinct, bound n-1 = 3 -> n dots.
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 250px;'));
+      await flush(el);
+      expect(el['_maxIndex']).toBe(3);
+      expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(4);
+    });
+
+    it('measured loop wraps over the reachable bound and agrees with goTo', async () => {
+      // 4 * 150px, _maxIndex 2 (offsets [0,150,300,450], maxScroll 200).
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: 150px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(2);
+
+      // previous() from 0 wraps to _maxIndex (2), NOT n-1 (3).
+      el.previous();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+
+      // next() from _maxIndex wraps to 0 — agrees with goTo(0).
+      el.next();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+
+      // goTo never reaches index 3 either (clamps to the bound under loop wrap).
+      el.goTo(3);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0); // 3 % (maxIndex+1=3) = 0
+    });
+
+    it('regression guard: default (no custom width) loop wraps over the full slide count', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="1" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false); // default legacy
+
+      // Legacy loop wraps over slides.length: previous() from 0 -> last slide (2).
+      el.previous();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+      // And n dots (one per slide), unchanged.
+      expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(3);
     });
 
     it('regression guard: default (no custom width) keeps the legacy slidesPerPage bound', async () => {
