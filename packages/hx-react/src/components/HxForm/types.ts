@@ -25,9 +25,18 @@ on form submission. */
   /** The encoding type for form submission. Only used when `action` is set.
 Use `multipart/form-data` for forms with file uploads. */
   enctype?: 'application/x-www-form-urlencoded' | 'multipart/form-data' | 'text/plain';
+  /** When true, hx-form acts as a purely presentational wrapper and never runs
+its client-side submit bridge. Native submission of any contained or
+slotted form proceeds untouched and no `hx-submit` / `hx-invalid` is
+dispatched.
+
+Use this when a host owns its own posting form — e.g. a Drupal Form API
+form or a Marketo (`mktoForm_*`) form — and hx-form is only meant to apply
+the design system's form styles, not control submission. */
+  noIntercept?: boolean;
 
   // Event callbacks
-  /** Dispatched on valid client-side submit when no action is set. */
+  /** Dispatched on valid client-side submit of an action-less form when `no-intercept` is not set. */
   onHxSubmit?: (event: Event) => void;
   /** Dispatched when validation fails on submit. */
   onHxInvalid?: (event: Event) => void;

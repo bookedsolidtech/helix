@@ -22,6 +22,15 @@ export interface HxTagProps {
   removable?: boolean;
   /** Whether the tag is disabled. When disabled, interactions are suppressed. */
   disabled?: boolean;
+  /** Accessible name for the remove button. Override for i18n.
+
+When unset, the accessible name is the English default `Remove <tag text>`
+(falling back to `Remove tag` when the tag has no text). When set, the value
+is used verbatim unless it contains the literal `{label}` placeholder, which
+is replaced with the tag's text content — letting consumers localize either
+with a fixed string (`label-remove="Quitar"`) or dynamically
+(`label-remove="Quitar {label}"`). */
+  labelRemove?: string;
 
   // Event callbacks
   /** Dispatched when the user clicks the remove button. */

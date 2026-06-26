@@ -21,6 +21,13 @@ When `action` is set, renders a `<form>` wrapper around slotted content.
 When no `action` is set (the Drupal pattern), renders only a `<slot>`
 so Drupal can provide its own `<form>` tag.
 
+The client-side submit bridge (validate + dispatch `hx-submit`) only runs for
+a form that hx-form effectively owns: a slotted form with no `action` of its
+own. A host-owned form that declares its own `action` (a Drupal Form API form
+or a Marketo `mktoForm_*` form) submits natively and is never cancelled. Set
+`no-intercept` to disable the bridge entirely and use hx-form purely for
+styling.
+
 Uses adopted stylesheets to inject scoped CSS into the document without
 Shadow DOM, keeping native form participation and Drupal compatibility.
  *
