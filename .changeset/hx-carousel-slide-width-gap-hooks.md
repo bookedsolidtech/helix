@@ -6,9 +6,11 @@ fix(hx-carousel): honor the documented `--hx-carousel-slide-width` and `--hx-car
 
 Both CSS hooks were documented on `hx-carousel` but never read by the styles, so setting them had no effect.
 
-- `--hx-carousel-slide-width` now overrides each slide's width, and the override participates in layout, navigation, and the navigation bounds. The per-page width derived from `slides-per-page` is preserved as the default.
+- `--hx-carousel-slide-width` now overrides each slide's width, and the override participates in layout and navigation. The per-page width derived from `slides-per-page` is preserved as the default.
 - `--hx-carousel-gap` now sets the gap between slides on the slide track, defaulting to `0`.
 
-The slide-width computation, the navigation transform, and the navigation bounds are all gap- and slide-width-aware: the computed per-page width is `calc((100% - (slides-per-page - 1) * var(--hx-carousel-gap, 0px)) / slides-per-page)`, so `slides-per-page` slides plus their gaps fill the viewport exactly without clipping; each navigation step advances by one slide's full outer extent (slide width + gap) so the active slide lands flush with the viewport's leading edge; and when a custom `--hx-carousel-slide-width` is set the maximum reachable index is measured from the rendered geometry, so navigation reaches the last slide without overshooting into blank space.
+The slide-width computation and the navigation transform are gap- and slide-width-aware: the computed per-page width is `calc((100% - (slides-per-page - 1) * var(--hx-carousel-gap, 0px)) / slides-per-page)`, so `slides-per-page` slides plus their gaps fill the viewport exactly without clipping, and each navigation step advances by one slide's full outer extent (slide width + gap).
 
-With neither property set, the rendered carousel, its navigation offsets, and its navigation bounds are byte-identical to before. The `@cssprop` annotations were corrected so the Custom Elements Manifest reflects the true defaults.
+When a custom `--hx-carousel-slide-width` is active, slide selection is decoupled from track scroll: every slide stays reachable via the previous/next buttons, pagination dots, `Home`/`End`, and `goTo()`, while the track translate is clamped to the measured maximum scroll so a near-end slide saturates at the trailing edge with no blank space. Selection bounds, the active pagination dot, the prev/next disabled states, and the ARIA "slide X of N" announcement all reflect the true active index.
+
+With neither property set, the rendered carousel, its navigation offsets, its selection bounds, the transform, the disabled states, and the ARIA output are byte-identical to before. The `@cssprop` annotations were corrected so the Custom Elements Manifest reflects the true defaults.

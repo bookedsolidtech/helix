@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi, beforeEach } from 'vitest';
 import { page } from '@vitest/browser/context';
-import { fixture, shadowQuery, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
+import { fixture, shadowQuery, shadowQueryAll, oneEvent, cleanup, checkA11y } from '../../test-utils.js';
 import type { HelixCarousel } from './hx-carousel.js';
 import type { HelixCarouselItem } from './hx-carousel-item.js';
 import './index.js';
@@ -1667,9 +1667,9 @@ describe('hx-carousel', () => {
     });
   });
 
-  // ─── Navigation bounds are aware of custom slide widths ───
+  // ─── Custom-width "peek" model: selection decoupled from scroll ───
 
-  describe('Navigation bounds (custom slide widths)', () => {
+  describe('Custom-width navigation (selection vs scroll)', () => {
     const fourSlides = (style = '') => `
       <hx-carousel slides-per-page="2" style="display: block; width: 400px;${style}">
         <hx-carousel-item>1</hx-carousel-item>
@@ -1679,70 +1679,103 @@ describe('hx-carousel', () => {
       </hx-carousel>
     `;
 
-    /** Cancel the in-flight transition so geometry reads are final. */
+    /** Resolved translate (px) on the track's transform matrix. */
+    function trackTranslate(track: HTMLElement, axis: 'x' | 'y' = 'x'): number {
+      const t = getComputedStyle(track).transform;
+      if (t === 'none') return 0;
+      const m = new DOMMatrixReadOnly(t);
+      return axis === 'x' ? m.m41 : m.m42;
+    }
+
+    /** Cancel the in-flight transition so geometry/matrix reads are final. */
     function settle(track: HTMLElement): void {
       track.style.transition = 'none';
       void track.getBoundingClientRect();
     }
 
-    it('default (no custom width): measured bound is inactive, _maxIndex = slides.length - slidesPerPage — zero drift', async () => {
+    /**
+     * Measured metrics are set in firstUpdated and committed to the DOM on the
+     * following update cycle, so flush twice before reading rendered state.
+     */
+    async function flush(el: HelixCarousel): Promise<void> {
+      await el.updateComplete;
+      await el.updateComplete;
+    }
+
+    it('default (no custom width): selection, clamping, transform, and disabled states are unchanged — zero drift', async () => {
       const el = await fixture<HelixCarousel>(fourSlides());
       await el.updateComplete;
 
-      expect(el['_measuredMaxIndex']).toBeNull();
-      expect(el['_maxIndex']).toBe(2); // 4 - 2, unchanged from the legacy formula
+      expect(el['_customWidthActive']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // 4 - 2, legacy page bound
 
-      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
-      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
-      expect(prev.disabled).toBe(true); // at index 0
-      expect(next.disabled).toBe(false);
-
-      el.next(); // 0 -> 1
-      el.next(); // 1 -> 2 (max)
+      // goTo clamps to the legacy max (existing behavior).
+      el.goTo(10);
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(2);
-      expect(next.disabled).toBe(true); // cannot advance past the legacy max
-      expect(prev.disabled).toBe(false);
-    });
-
-    it('narrow custom width (150px in 400px host): bound stops before any trailing blank', async () => {
-      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
-      await el.updateComplete;
-
-      // content = 4*150 = 600, viewport = 400, step = 150 -> floor((600-400)/150) = 1.
-      expect(el['_maxIndex']).toBe(1);
 
       const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
       const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
-      expect(prev.disabled).toBe(true); // index 0
-      expect(next.disabled).toBe(false);
-
-      el.next(); // 0 -> 1 (max)
-      await el.updateComplete;
-      expect(el['_currentIndex']).toBe(1);
-      expect(next.disabled).toBe(true);
+      expect(next.disabled).toBe(true); // at legacy max
       expect(prev.disabled).toBe(false);
 
-      el.next(); // blocked — would overshoot into blank space
-      await el.updateComplete;
-      expect(el['_currentIndex']).toBe(1);
-
-      // The trailing slide's right edge reaches/exceeds the viewport's: no blank.
+      // Legacy calc() percentage transform: index 2 * 50% of a 400px track = -400px.
       const track = shadowQuery<HTMLElement>(el, '.track')!;
       settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-400, 0);
+    });
+
+    it('custom-width: every slide is selectable via goTo / End / Home / pagination dot', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+
+      expect(el['_customWidthActive']).toBe(true);
+      expect(el['_maxIndex']).toBe(3); // every slide selectable (n - 1)
+
+      el.goTo(3);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true, cancelable: true }));
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3); // End reaches the true last slide
+
+      el.goTo(0);
+      await el.updateComplete;
+      const dots = shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]');
+      expect(dots.length).toBe(4); // one dot per slide
+      dots[3].click();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+    });
+
+    it('custom-width: at the last slide the track saturates at maxScroll with the last slide flush right', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+
+      el.goTo(3);
+      await el.updateComplete;
+
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+
+      // content = 4*150 = 600, viewport = 400 -> maxScroll = 200; translate saturates there.
+      expect(el['_measuredMaxScroll']).toBeCloseTo(200, 0);
+      expect(trackTranslate(track)).toBeCloseTo(-200, 0);
+
       const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
       const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
       const lastRight = slides[slides.length - 1].getBoundingClientRect().right;
-      expect(lastRight).toBeGreaterThanOrEqual(vp.getBoundingClientRect().right - 1);
+      expect(lastRight).toBeCloseTo(vp.getBoundingClientRect().right, 0); // flush, no blank
     });
 
-    it('wide custom width (400px in 400px host): navigation can reach the last slide', async () => {
-      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 400px;'));
-      await el.updateComplete;
-
-      // content = 1600, viewport = 400, step = 400 -> floor((1600-400)/400) = 3.
-      // The legacy slidesPerPage bound (4 - 2 = 2) would strand the last slide.
-      expect(el['_maxIndex']).toBe(3);
+    it('custom-width: next() steps reach the last slide and prev() returns to 0', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
 
       el.next(); // 0 -> 1
       el.next(); // 1 -> 2
@@ -1750,10 +1783,133 @@ describe('hx-carousel', () => {
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(3);
 
+      el.next(); // no-op at the last slide
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      el.previous(); // 3 -> 2
+      el.previous(); // 2 -> 1
+      el.previous(); // 1 -> 0
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+    });
+
+    it('custom-width: prev disabled at 0, next disabled at the last slide, both enabled in the middle', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+
       const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
       const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
-      expect(next.disabled).toBe(true); // at the last slide
+
+      expect(prev.disabled).toBe(true); // index 0
+      expect(next.disabled).toBe(false);
+
+      el.goTo(1);
+      await el.updateComplete;
+      expect(prev.disabled).toBe(false); // middle
+      expect(next.disabled).toBe(false);
+
+      el.goTo(3);
+      await el.updateComplete;
       expect(prev.disabled).toBe(false);
+      expect(next.disabled).toBe(true); // last slide (n - 1)
+    });
+
+    it('custom-width: pagination active dot and ARIA live text track the true active index', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+
+      el.goTo(3);
+      await el.updateComplete;
+
+      const dots = shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]');
+      expect(dots[3].getAttribute('aria-current')).toBe('true');
+      expect(dots[0].getAttribute('aria-current')).toBeNull();
+
+      const live = shadowQuery<HTMLElement>(el, '.live-region');
+      expect(live?.textContent?.trim()).toBe('Slide 4 of 4');
+    });
+
+    it('custom-width: slidesPerMove > 1 lands on the last slide via a partial final move without overshoot', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel
+          slides-per-page="2"
+          slides-per-move="2"
+          style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+        >
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_maxIndex']).toBe(3);
+
+      el.next(); // 0 -> 2
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+
+      el.next(); // 2 -> 4, clamped to 3 (partial final move)
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      // No overshoot: the translate is saturated at maxScroll.
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-el['_measuredMaxScroll'], 0);
+    });
+
+    it('custom-width (wider than 1/slidesPerPage, 300px): every slide reachable and last slide flush', async () => {
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 300px;'));
+      await flush(el);
+
+      expect(el['_customWidthActive']).toBe(true);
+      expect(el['_maxIndex']).toBe(3); // all selectable
+      // content = 4*300 = 1200, viewport = 400 -> maxScroll = 800.
+      expect(el['_measuredMaxScroll']).toBeCloseTo(800, 0);
+
+      el.goTo(3);
+      await el.updateComplete;
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-800, 0);
+
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      expect(slides[3].getBoundingClientRect().right).toBeCloseTo(
+        vp.getBoundingClientRect().right,
+        0,
+      );
+    });
+
+    it('custom-width + loop: navigation wraps without error or NaN', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel
+          loop
+          slides-per-page="2"
+          style="display: block; width: 400px; --hx-carousel-slide-width: 150px;"
+        >
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_customWidthActive']).toBe(true);
+
+      el.previous(); // wraps 0 -> 3
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      el.next(); // wraps 3 -> 0
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      expect(Number.isFinite(trackTranslate(track))).toBe(true);
     });
   });
 });
