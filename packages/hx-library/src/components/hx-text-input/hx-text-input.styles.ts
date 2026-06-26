@@ -75,10 +75,13 @@ export const helixTextInputStyles = css`
       --hx-text-input-focus-ring-width,
       var(--hx-focus-ring-width, 2px)
     );
-    --_text-input-focus-ring-offset: var(
-      --hx-text-input-focus-ring-offset,
-      var(--hx-focus-ring-offset, 0px)
-    );
+    /* Box-shadow ring gap. Defaults to 0px (flush) — intentionally NOT chained
+       to the global --hx-focus-ring-offset, which is the library-wide
+       outline-offset token (resolves to 2px) consumed via outline-offset in
+       outline-based focus rings (hx-button, forced-colors). Wiring it here
+       would push every consumer's flush box-shadow ring out by 2px. Consumers
+       opt into a gap on this component via --hx-text-input-focus-ring-offset. */
+    --_text-input-focus-ring-offset: var(--hx-text-input-focus-ring-offset, 0px);
 
     /* Disabled */
     --_text-input-disabled-bg: var(
@@ -121,7 +124,10 @@ export const helixTextInputStyles = css`
   :host([focused-visible]) .field__input-wrapper {
     border-color: var(--_text-input-border-color-focus);
     /* Opaque solid ring (WCAG 2.4.13 >=3:1) — follows the wrapper border-radius */
-    box-shadow: 0 0 0 var(--_text-input-focus-ring-width) var(--_text-input-border-color-focus);
+    box-shadow:
+      0 0 0 var(--_text-input-focus-ring-offset) transparent,
+      0 0 0 calc(var(--_text-input-focus-ring-offset) + var(--_text-input-focus-ring-width))
+        var(--_text-input-border-color-focus);
   }
 
   * {
@@ -176,7 +182,10 @@ export const helixTextInputStyles = css`
 
   .field__input-wrapper:focus-within {
     border-color: var(--_text-input-border-color-focus);
-    box-shadow: 0 0 0 var(--_text-input-focus-ring-width) var(--_text-input-border-color-focus);
+    box-shadow:
+      0 0 0 var(--_text-input-focus-ring-offset) transparent,
+      0 0 0 calc(var(--_text-input-focus-ring-offset) + var(--_text-input-focus-ring-width))
+        var(--_text-input-border-color-focus);
   }
 
   /* ─── Error State ─── */
@@ -187,7 +196,10 @@ export const helixTextInputStyles = css`
 
   .field--error .field__input-wrapper:focus-within {
     border-color: var(--_text-input-border-color-invalid);
-    box-shadow: 0 0 0 var(--_text-input-focus-ring-width) var(--_text-input-border-color-invalid);
+    box-shadow:
+      0 0 0 var(--_text-input-focus-ring-offset) transparent,
+      0 0 0 calc(var(--_text-input-focus-ring-offset) + var(--_text-input-focus-ring-width))
+        var(--_text-input-border-color-invalid);
   }
 
   /* ─── Slots (Prefix / Suffix) ─── */

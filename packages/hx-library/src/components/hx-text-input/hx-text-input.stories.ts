@@ -945,6 +945,54 @@ export const CSSCustomProperties: Story = {
 };
 
 // ─────────────────────────────────────────────────
+// 9b. FOCUS RING OFFSET DEMO
+// ─────────────────────────────────────────────────
+
+export const FocusRingOffset: Story = {
+  name: 'Focus Ring Offset',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
+      <p style="font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362); margin: 0;">
+        Click or tab into each field to reveal the focus ring. The component-specific
+        <code>--hx-text-input-focus-ring-offset</code> hook opens a gap between the field border and
+        the ring. At the default <code>0px</code> the ring sits flush against the border —
+        byte-identical to prior releases. The ring keeps its width and color; only the gap changes.
+        (The global <code>--hx-focus-ring-offset</code> is the library outline-offset token and does
+        not affect this box-shadow ring.)
+      </p>
+
+      <div>
+        <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">Default offset (0px)</h4>
+        <hx-text-input label="Flush ring" placeholder="Focus me"></hx-text-input>
+      </div>
+
+      <div>
+        <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">
+          --hx-text-input-focus-ring-offset: 3px
+        </h4>
+        <hx-text-input
+          label="Offset ring"
+          placeholder="Focus me"
+          style="--hx-text-input-focus-ring-offset: 3px;"
+        ></hx-text-input>
+      </div>
+
+      <div>
+        <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">
+          Error-state ring honors the offset too
+        </h4>
+        <hx-text-input
+          label="Invalid field"
+          value="bad-data"
+          error="Offset applies to the invalid focus ring as well."
+          style="--hx-text-input-focus-ring-offset: 3px;"
+        ></hx-text-input>
+      </div>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
 // 10. CSS PARTS DEMO
 // ─────────────────────────────────────────────────
 

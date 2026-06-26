@@ -1342,4 +1342,80 @@ describe('hx-text-input', () => {
       expect(el.pristine).toBe(true);
     });
   });
+
+  // ─── Focus ring offset (--hx-text-input-focus-ring-offset) ───
+
+  describe('Focus ring offset', () => {
+    /**
+     * Reads the wrapper's settled focus box-shadow. The wrapper transitions
+     * box-shadow over 150ms, so getComputedStyle immediately after focus()
+     * returns the start frame of the none→target interpolation (all zeros).
+     * Disabling the transition inline lets the final value apply synchronously.
+     */
+    function settledFocusShadow(el: HxTextInput): string {
+      const wrapper = shadowQuery<HTMLElement>(el, '.field__input-wrapper')!;
+      wrapper.style.transition = 'none';
+      el.focus();
+      return getComputedStyle(wrapper).boxShadow;
+    }
+
+    function resolvedOffset(el: HxTextInput): string {
+      return getComputedStyle(el).getPropertyValue('--_text-input-focus-ring-offset').trim();
+    }
+
+    it('resolves the private offset to 0px by default (flush ring, no drift)', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      expect(resolvedOffset(el)).toBe('0px');
+    });
+
+    it('default focused ring is the flush 2px band + zero-size transparent spacer', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      await el.updateComplete;
+      const shadow = settledFocusShadow(el);
+      // Two layers: a zero-size transparent spacer (offset 0) and the colored
+      // ring at the focus-ring-width (2px). Byte-identical paint to the prior
+      // single-shadow flush ring — the colored band sits at 0–2px, no gap.
+      expect(shadow).not.toBe('none');
+      expect(shadow).toContain('0px 0px 0px 0px'); // transparent spacer at offset 0
+      expect(shadow).toContain('0px 0px 0px 2px'); // colored ring = focus-ring-width
+      expect(shadow).not.toContain('0px 0px 0px 4px'); // proves no offset gap by default
+    });
+
+    it('honors --hx-text-input-focus-ring-offset (resolved offset + rendered gap)', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      el.style.setProperty('--hx-text-input-focus-ring-offset', '4px');
+      await el.updateComplete;
+      expect(resolvedOffset(el)).toBe('4px');
+
+      const shadow = settledFocusShadow(el);
+      expect(shadow).toContain('0px 0px 0px 4px'); // transparent spacer = offset
+      expect(shadow).toContain('0px 0px 0px 6px'); // colored ring = offset(4) + width(2)
+    });
+
+    it('invalid-state focused ring also honors --hx-text-input-focus-ring-offset', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input label="Email" error="Invalid"></hx-text-input>',
+      );
+      el.style.setProperty('--hx-text-input-focus-ring-offset', '4px');
+      await el.updateComplete;
+      const shadow = settledFocusShadow(el);
+      expect(shadow).not.toBe('none');
+      expect(shadow).toContain('0px 0px 0px 4px'); // transparent spacer = offset
+      expect(shadow).toContain('0px 0px 0px 6px'); // colored invalid ring = offset(4) + width(2)
+    });
+
+    it('global --hx-focus-ring-offset (outline-offset token) does NOT shift the box-shadow ring', async () => {
+      // --hx-focus-ring-offset is the library-wide outline-offset token (2px).
+      // It is intentionally not chained into this component's box-shadow ring,
+      // so setting it leaves the resolved offset flush at 0px.
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      el.style.setProperty('--hx-focus-ring-offset', '8px');
+      await el.updateComplete;
+      expect(resolvedOffset(el)).toBe('0px');
+
+      const shadow = settledFocusShadow(el);
+      expect(shadow).toContain('0px 0px 0px 2px'); // still the flush 2px ring
+      expect(shadow).not.toContain('0px 0px 0px 10px'); // no 8px-offset gap leaked in
+    });
+  });
 });
