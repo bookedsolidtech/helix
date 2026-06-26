@@ -248,6 +248,14 @@ export class HelixCarousel extends HelixElement {
    * @internal
    */
   @state() private _measuredMaxScroll = 0;
+  /**
+   * True (within the measured path) when the track fits entirely in the viewport
+   * and cannot scroll. The carousel is then a single static page: `_maxIndex` is
+   * 0, prev/next are both disabled, the translate is 0, and navigation is a no-op
+   * — so it never advertises slides the track cannot reveal.
+   * @internal
+   */
+  @state() private _singlePage = false;
 
   /**
    * Reference to the active autoplay interval timer, or null when stopped.
@@ -463,6 +471,7 @@ export class HelixCarousel extends HelixElement {
   /** Resets the measured-nav metrics, reverting to the legacy page model. @internal */
   private _resetMeasuredNav(): void {
     this._measuredNav = false;
+    this._singlePage = false;
     this._measuredStep = 0;
     this._measuredMaxScroll = 0;
   }
@@ -539,6 +548,8 @@ export class HelixCarousel extends HelixElement {
    * @internal
    */
   private _deriveMeasuredNav(): void {
+    // Sub-pixel tolerance shared by the exact-fill and single-page checks.
+    const EPS = 0.5;
     const slides = this._slides;
     const horizontal = this.orientation === 'horizontal';
     // Horizontal without a slide-width hook is handled correctly by the legacy
@@ -571,7 +582,6 @@ export class HelixCarousel extends HelixElement {
     // the viewport exactly, the legacy page model is correct, so stay legacy.
     // Vertical always proceeds (the percentage transform is unreliable there).
     if (horizontal) {
-      const EPS = 0.5;
       const pageExtent = this.slidesPerPage * slideSize + (this.slidesPerPage - 1) * gap;
       if (Math.abs(pageExtent - viewportSize) <= EPS) {
         this._resetMeasuredNav();
@@ -579,13 +589,30 @@ export class HelixCarousel extends HelixElement {
       }
     }
 
-    // Total extent of equal-size slides plus inter-slide gaps. maxScroll is how
-    // far the track can translate before the trailing content edge reaches the
-    // viewport's trailing edge — selecting any later slide saturates here.
+    // Total extent of equal-size slides plus inter-slide gaps.
     const content = slides.length * slideSize + (slides.length - 1) * gap;
+    const overflow = content - viewportSize;
+
+    // Single static page: the whole track fits in the viewport (no overflow), so
+    // there is nothing to scroll. Without this, _maxIndex would be slides - 1 and
+    // navigation would advance the active index to slides the track can't reveal.
+    // Note this is NOT the legacy `n - slidesPerPage` fallback — that can still be
+    // > 0 for narrow custom widths that all fit; the bound must be 0 here.
+    if (overflow <= EPS) {
+      this._measuredNav = true;
+      this._singlePage = true;
+      this._measuredStep = 0;
+      this._measuredMaxScroll = 0;
+      return;
+    }
+
+    // maxScroll is how far the track can translate before the trailing content
+    // edge reaches the viewport's trailing edge — selecting any later slide
+    // saturates here.
     this._measuredNav = true;
+    this._singlePage = false;
     this._measuredStep = step;
-    this._measuredMaxScroll = Math.max(0, content - viewportSize);
+    this._measuredMaxScroll = overflow;
   }
 
   /** @internal */
@@ -598,14 +625,17 @@ export class HelixCarousel extends HelixElement {
   /**
    * Maximum selectable slide index.
    *
-   * In the legacy default model this is the slidesPerPage page bound
-   * (`slides.length - slidesPerPage`). In measured-nav mode selection is
-   * decoupled from scroll: every slide is reachable, so the bound is the last
-   * index (`slides.length - 1`) and the track translate is clamped separately
-   * (see `_trackTransform` / `_measuredMaxScroll`).
+   * Single static page (measured path, no overflow) → `0`. In the legacy default
+   * model this is the slidesPerPage page bound (`slides.length - slidesPerPage`).
+   * In measured-nav mode selection is decoupled from scroll: every slide is
+   * reachable, so the bound is the last index (`slides.length - 1`) and the track
+   * translate is clamped separately (see `_trackTransform` / `_measuredMaxScroll`).
    * @internal
    */
   private get _maxIndex(): number {
+    if (this._singlePage) {
+      return 0;
+    }
     if (this._measuredNav) {
       return Math.max(0, this._slides.length - 1);
     }
@@ -652,9 +682,13 @@ export class HelixCarousel extends HelixElement {
   private _navigateTo(index: number): void {
     if (this._slides.length === 0) return;
 
-    const next = this.loop
-      ? ((index % this._slides.length) + this._slides.length) % this._slides.length
-      : Math.max(0, Math.min(index, this._maxIndex));
+    // A single static page has nothing to scroll: collapse every target to 0,
+    // overriding loop wrapping so no unreachable slide can be selected.
+    const next = this._singlePage
+      ? 0
+      : this.loop
+        ? ((index % this._slides.length) + this._slides.length) % this._slides.length
+        : Math.max(0, Math.min(index, this._maxIndex));
 
     if (next === this._currentIndex) return;
 
@@ -980,19 +1014,21 @@ export class HelixCarousel extends HelixElement {
   }
 
   /**
-   * Whether the previous navigation button should be enabled.
+   * Whether the previous navigation button should be enabled. A single static
+   * page (no overflow) disables both directions regardless of `loop`.
    * @internal
    */
   private get _canGoPrev(): boolean {
-    return this.loop || this._currentIndex > 0;
+    return !this._singlePage && (this.loop || this._currentIndex > 0);
   }
 
   /**
-   * Whether the next navigation button should be enabled.
+   * Whether the next navigation button should be enabled. A single static page
+   * (no overflow) disables both directions regardless of `loop`.
    * @internal
    */
   private get _canGoNext(): boolean {
-    return this.loop || this._currentIndex < this._maxIndex;
+    return !this._singlePage && (this.loop || this._currentIndex < this._maxIndex);
   }
 
   // ─── Render Helpers ───
@@ -1045,7 +1081,9 @@ export class HelixCarousel extends HelixElement {
   /** @internal */
   private _renderPagination() {
     const count = this._slides.length;
-    if (count <= 1) return nothing;
+    // A single static page (non-overflowing track) has nothing to page to — omit
+    // the dots so pagination never advertises slides the track can't reveal.
+    if (count <= 1 || this._singlePage) return nothing;
     const dots = Array.from({ length: count }, (_, i) => i);
     return html`
       <div class="controls">

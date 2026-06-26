@@ -606,6 +606,11 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
+      // Constrain the viewport so the content overflows and the carousel scrolls
+      // (an unconstrained vertical viewport grows to the content -> single page).
+      shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!.style.height = '20px';
+      el['_recomputeBounds']();
+      await el.updateComplete;
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(1);
@@ -619,6 +624,9 @@ describe('hx-carousel', () => {
           <hx-carousel-item>3</hx-carousel-item>
         </hx-carousel>
       `);
+      await el.updateComplete;
+      shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!.style.height = '20px';
+      el['_recomputeBounds']();
       await el.updateComplete;
       el.goTo(2);
       await el.updateComplete;
@@ -909,6 +917,10 @@ describe('hx-carousel', () => {
       `);
       await el.updateComplete;
       const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+      // Constrain the viewport so the content overflows and the carousel scrolls.
+      container.style.height = '20px';
+      el['_recomputeBounds']();
+      await el.updateComplete;
 
       const touchStart = new TouchEvent('touchstart', {
         bubbles: true,
@@ -945,10 +957,13 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await el.updateComplete;
+      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
+      // Constrain the viewport so the content overflows and the carousel scrolls.
+      container.style.height = '20px';
+      el['_recomputeBounds']();
+      await el.updateComplete;
       el.goTo(2);
       await el.updateComplete;
-
-      const container = shadowQuery(el, '[part="slide-viewport"]') as HTMLElement;
 
       const touchStart = new TouchEvent('touchstart', {
         bubbles: true,
@@ -1982,6 +1997,63 @@ describe('hx-carousel', () => {
       expect(trackTranslate(track)).toBeCloseTo(-416, 0);
     });
 
+    it('single page: narrow custom widths that all fit the viewport disable navigation', async () => {
+      // 4 * 80px = 320px content < 400px viewport -> nothing to scroll.
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 80px;'));
+      await flush(el);
+
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
+
+      const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
+      expect(prev.disabled).toBe(true);
+      expect(next.disabled).toBe(true);
+
+      // next() / goTo(3) / End are all no-ops — no unreachable slide is selectable.
+      el.next();
+      el.goTo(3);
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+
+      // Translate stays 0 and pagination advertises no unreachable slides.
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(0, 0);
+      expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(0);
+    });
+
+    it('single page: 2 slides with slides-per-page=3 (content fits) disable navigation', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="3" style="display: block; width: 400px; --hx-carousel-slide-width: 100px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+
+      // 2 * 100px = 200px content < 400px viewport -> single page.
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!.disabled).toBe(true);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!.disabled).toBe(true);
+    });
+
+    it('regression: overflowing custom-width content still gets full peek navigation', async () => {
+      // 4 * 150px = 600px content > 400px viewport -> genuine peek, every slide reachable.
+      const el = await fixture<HelixCarousel>(fourSlides(' --hx-carousel-slide-width: 150px;'));
+      await flush(el);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(3);
+      expect(el['_measuredMaxScroll']).toBeGreaterThan(0);
+      el.goTo(3);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3); // last slide reachable
+    });
+
     it('gate: vertical uses measured block-axis nav; the cross-axis slide-width does not drive the step', async () => {
       const el = await fixture<HelixCarousel>(`
         <hx-carousel
@@ -1996,6 +2068,10 @@ describe('hx-carousel', () => {
         </hx-carousel>
       `);
       await flush(el);
+      // Constrain the viewport so the 200px of content overflows and scrolls.
+      shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!.style.height = '100px';
+      el['_recomputeBounds']();
+      await el.updateComplete;
 
       expect(el['_measuredNav']).toBe(true);
       expect(el['_maxIndex']).toBe(3); // every slide reachable on the block axis
@@ -2361,9 +2437,11 @@ describe('hx-carousel', () => {
       el.orientation = 'vertical';
       await flush(el);
 
-      // Vertical re-derives to the measured block-axis model: every slide selectable.
+      // Vertical re-derives to the measured block-axis model. These slides are
+      // unconstrained, so the content fits the viewport -> a single static page.
       expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3); // n - 1
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
     });
 
     it('autoplay refreshes bounds before wrapping: exact-fill -> peek advances instead of wrapping to 0', async () => {
@@ -2471,19 +2549,46 @@ describe('hx-carousel', () => {
       await el.updateComplete;
     }
     // The component has no viewport-height hook, so constrain it directly to
-    // create a scrollable scenario for geometry assertions.
+    // create a scrollable scenario (an unconstrained vertical viewport grows to
+    // the content, so nothing overflows and the carousel is a single page).
     function constrainViewport(el: HelixCarousel, px: number): HTMLElement {
       const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
       vp.style.height = `${px}px`;
       return vp;
     }
+    // Mounts a vertical carousel whose content (4 * 50px [+ gaps] = 200px+)
+    // overflows a constrained viewport, so it genuinely scrolls.
+    async function mountScrollable(attrs = '', style = '', vpPx = 120): Promise<HelixCarousel> {
+      const el = await fixture<HelixCarousel>(verticalSlides(attrs, style));
+      await flush(el);
+      constrainViewport(el, vpPx);
+      el['_recomputeBounds']();
+      await el.updateComplete;
+      return el;
+    }
 
-    it('default: measured nav active, step = one slide height, every slide selectable', async () => {
+    it('default (scrollable): measured nav active, step = one slide height, every slide selectable', async () => {
+      const el = await mountScrollable();
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(3); // n - 1, every slide reachable
+      expect(el['_measuredStep']).toBeCloseTo(50, 0); // slide height + 0 row-gap
+    });
+
+    it('non-overflowing vertical content is a single static page (no degenerate nav)', async () => {
+      // Unconstrained: the viewport grows to the content, so nothing scrolls.
       const el = await fixture<HelixCarousel>(verticalSlides());
       await flush(el);
       expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3); // n - 1, every slide reachable
-      expect(el['_measuredStep']).toBeCloseTo(50, 0); // slide height + 0 row-gap
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!.disabled).toBe(true);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!.disabled).toBe(true);
+
+      el.goTo(3);
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0); // no degenerate advance to an unreachable slide
     });
 
     it('constrained viewport: one slide per step; last slide saturates flush with no clip', async () => {
@@ -2512,8 +2617,7 @@ describe('hx-carousel', () => {
     });
 
     it('row-gap: the measured step includes the block-axis gap', async () => {
-      const el = await fixture<HelixCarousel>(verticalSlides('', ' --hx-carousel-gap: 10px;'));
-      await flush(el);
+      const el = await mountScrollable('', ' --hx-carousel-gap: 10px;');
       // step = slide height 50 + row-gap 10 = 60.
       expect(el['_measuredStep']).toBeCloseTo(60, 0);
       const track = shadowQuery<HTMLElement>(el, '.track')!;
@@ -2521,8 +2625,7 @@ describe('hx-carousel', () => {
     });
 
     it('End/Home reach the last/first slide; pagination dot and ARIA track the index', async () => {
-      const el = await fixture<HelixCarousel>(verticalSlides());
-      await flush(el);
+      const el = await mountScrollable();
 
       el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true, cancelable: true }));
       await el.updateComplete;
@@ -2538,8 +2641,7 @@ describe('hx-carousel', () => {
     });
 
     it('prev disabled at 0, next disabled at the last slide', async () => {
-      const el = await fixture<HelixCarousel>(verticalSlides());
-      await flush(el);
+      const el = await mountScrollable();
       const prev = shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!;
       const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
       expect(prev.disabled).toBe(true);
@@ -2551,8 +2653,7 @@ describe('hx-carousel', () => {
     });
 
     it('slidesPerMove > 1 lands on the last slide via a partial final move', async () => {
-      const el = await fixture<HelixCarousel>(verticalSlides('slides-per-move="2"'));
-      await flush(el);
+      const el = await mountScrollable('slides-per-move="2"');
       expect(el['_maxIndex']).toBe(3);
       el.next(); // 0 -> 2
       await el.updateComplete;
@@ -2563,8 +2664,7 @@ describe('hx-carousel', () => {
     });
 
     it('loop wraps without error or NaN', async () => {
-      const el = await fixture<HelixCarousel>(verticalSlides('loop'));
-      await flush(el);
+      const el = await mountScrollable('loop');
       el.previous(); // 0 -> 3
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(3);
