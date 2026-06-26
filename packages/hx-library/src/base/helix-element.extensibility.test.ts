@@ -86,6 +86,22 @@ declare global {
   }
 }
 
+/**
+ * Shadow-DOM query that fails with a clear fixture error instead of returning
+ * `null`. `shadowQuery` is typed `T | null`, so this narrows to a non-nullable
+ * `T` for the caller without a non-null assertion — a missing element surfaces
+ * as a descriptive test failure rather than an opaque null-deref.
+ */
+function shadowQueryOrThrow<T extends Element = Element>(host: HTMLElement, selector: string): T {
+  const found = shadowQuery<T>(host, selector);
+  if (found === null) {
+    throw new Error(
+      `[helix-element.extensibility.test] expected to find "${selector}" in the shadow root, but it was missing.`,
+    );
+  }
+  return found;
+}
+
 afterEach(cleanup);
 
 describe('HelixElement consumer extensibility', () => {
@@ -125,7 +141,7 @@ describe('HelixElement consumer extensibility', () => {
 
     it('inherits the hx-click event contract', async () => {
       const el = await fixture<DemoButton>('<demo-button>Click</demo-button>');
-      const inner = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const inner = shadowQueryOrThrow<HTMLButtonElement>(el, 'button');
       const clickEvent = oneEvent<CustomEvent>(el, 'hx-click');
       inner.click();
       const detail = (await clickEvent).detail;
@@ -178,13 +194,13 @@ describe('HelixElement consumer extensibility', () => {
       const el = await fixture<DemoEl>(
         '<demo-el aria-label="Save record">Field</demo-el>',
       );
-      const inner = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const inner = shadowQueryOrThrow<HTMLButtonElement>(el, 'button');
       expect(inner.getAttribute('aria-label')).toBe('Save record');
     });
 
     it('re-renders the inner control when the delegated value changes', async () => {
       const el = await fixture<DemoEl>('<demo-el>Field</demo-el>');
-      const inner = shadowQuery<HTMLButtonElement>(el, 'button')!;
+      const inner = shadowQueryOrThrow<HTMLButtonElement>(el, 'button');
 
       el.setAttribute('aria-label', 'Updated');
       await el.updateComplete;
