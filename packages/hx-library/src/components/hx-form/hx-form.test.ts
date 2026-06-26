@@ -823,6 +823,49 @@ describe('hx-form', () => {
       expect(dispatched).toBe(false);
     });
 
+    it('intercepts a slotted <form action=""> (empty action is the controlled case)', async () => {
+      // Templated markup (Twig/Drupal) that binds an action which renders empty
+      // must still be bridged exactly like a form with no action attribute.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="">
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
+    it('dispatches hx-invalid for an invalid slotted <form action=""> (controlled case)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="   ">
+            <input type="text" name="required-field" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = el.querySelector('form')!;
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // A whitespace-only action is also empty after trim → controlled bridge.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.length).toBeGreaterThan(0);
+    });
+
     it('no-intercept lets an action-less contained form submit natively (no hx-submit)', async () => {
       const el = await fixture<HelixForm>(`
         <hx-form action="" no-intercept>

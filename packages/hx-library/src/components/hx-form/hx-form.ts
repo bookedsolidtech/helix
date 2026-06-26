@@ -378,11 +378,18 @@ export class HelixForm extends HelixElement {
       return false;
     }
 
-    // No action: the submitting form is host-owned/slotted. Leave any form that
-    // declares its own `action` to submit natively; only bridge action-less forms.
+    // No action: the submitting form is host-owned/slotted. Treat it as
+    // host-owned (native) only when it declares a NON-EMPTY `action` of its own.
+    // A missing or empty action (`<form>` or `<form action="">`, e.g. templated
+    // Twig/Drupal markup binding an action that renders empty) is the controlled
+    // client-side case and is still bridged — mirroring how an empty
+    // `this.action` is treated as the controlled case above.
     const target = e.target;
-    if (target instanceof HTMLFormElement && target.hasAttribute('action')) {
-      return false;
+    if (target instanceof HTMLFormElement) {
+      const action = target.getAttribute('action');
+      if (action !== null && action.trim() !== '') {
+        return false;
+      }
     }
 
     return true;
