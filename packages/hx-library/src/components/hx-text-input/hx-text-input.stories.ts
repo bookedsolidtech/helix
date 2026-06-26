@@ -624,9 +624,11 @@ export const LocalizedLengthMessages: Story = {
   render: () => html`
     <form
       @submit=${(e: SubmitEvent) => e.preventDefault()}
-      style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 480px;"
+      style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem); max-width: 480px;"
     >
-      <p style="font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362); margin: 0;">
+      <p
+        style="font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-neutral-600, #4A5362); margin: 0;"
+      >
         Override the built-in English length-validation messages for localization via
         <code>minlength-message</code> / <code>maxlength-message</code>. The
         <code>{min}</code> / <code>{max}</code> placeholders interpolate the limit. Submit to see
@@ -951,8 +953,10 @@ export const CSSCustomProperties: Story = {
 export const FocusRingOffset: Story = {
   name: 'Focus Ring Offset',
   render: () => html`
-    <div style="display: flex; flex-direction: column; gap: 2rem; max-width: 480px;">
-      <p style="font-size: 0.875rem; color: var(--hx-color-neutral-600, #4A5362); margin: 0;">
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-8, 2rem); max-width: 480px;">
+      <p
+        style="font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-neutral-600, #4A5362); margin: 0;"
+      >
         Click or tab into each field to reveal the focus ring. The component-specific
         <code>--hx-text-input-focus-ring-offset</code> hook opens a gap between the field border and
         the ring. At the default <code>0px</code> the ring sits flush against the border —
@@ -962,12 +966,18 @@ export const FocusRingOffset: Story = {
       </p>
 
       <div>
-        <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">Default offset (0px)</h4>
+        <h4
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+        >
+          Default offset (0px)
+        </h4>
         <hx-text-input label="Flush ring" placeholder="Focus me"></hx-text-input>
       </div>
 
       <div>
-        <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">
+        <h4
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+        >
           --hx-text-input-focus-ring-offset: 3px
         </h4>
         <hx-text-input
@@ -978,7 +988,9 @@ export const FocusRingOffset: Story = {
       </div>
 
       <div>
-        <h4 style="margin: 0 0 0.5rem; font-size: 0.875rem; color: #6c757d;">
+        <h4
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+        >
           Error-state ring honors the offset too
         </h4>
         <hx-text-input

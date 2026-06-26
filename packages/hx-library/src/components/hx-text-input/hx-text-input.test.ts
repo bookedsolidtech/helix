@@ -1353,7 +1353,10 @@ describe('hx-text-input', () => {
      * Disabling the transition inline lets the final value apply synchronously.
      */
     function settledFocusShadow(el: HxTextInput): string {
-      const wrapper = shadowQuery<HTMLElement>(el, '.field__input-wrapper')!;
+      const wrapper = shadowQuery<HTMLElement>(el, '.field__input-wrapper');
+      if (!wrapper) {
+        throw new Error('settledFocusShadow: .field__input-wrapper not found in shadow DOM');
+      }
       wrapper.style.transition = 'none';
       el.focus();
       return getComputedStyle(wrapper).boxShadow;
