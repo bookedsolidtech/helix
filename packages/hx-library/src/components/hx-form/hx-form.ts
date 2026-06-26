@@ -9,9 +9,11 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  * A Light DOM form wrapper that styles native HTML form elements and
  * hx-* components with the design system's form styles.
  *
- * When `action` is set, renders a `<form>` wrapper around slotted content.
- * When no `action` is set (the Drupal pattern), renders only a `<slot>`
- * so Drupal can provide its own `<form>` tag.
+ * Render mode: hx-form renders its OWN `<form>` only when the consumer did NOT
+ * supply a slotted `<form>` AND `action` is a non-empty string. If the consumer
+ * provides its own `<form>` (the Drupal pattern), hx-form renders a bare `<slot>`
+ * and never wraps it — so the host form's native submission is preserved. With no
+ * slotted form and an empty `action`, it also renders only a `<slot>`.
  *
  * The client-side submit bridge (validate + dispatch `hx-submit`) only runs for
  * a form that hx-form effectively owns: a slotted form with no `action` of its
@@ -81,12 +83,33 @@ export class HelixForm extends HelixElement {
   @state()
   private _validationErrors: Array<{ name: string; message: string }> = [];
 
+  /**
+   * Whether the consumer supplied its own (slotted) `<form>` in our light DOM.
+   * When true, hx-form never renders its own wrapping `<form>` — it would create
+   * a second/sibling form and break the host form's native submission. Computed
+   * in `willUpdate` from the light DOM, excluding hx-form's own rendered form.
+   * @internal
+   */
+  @state()
+  private _hasSlottedForm = false;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('submit', this._handleSubmit);
     this.addEventListener('reset', this._handleReset);
+  }
+
+  /**
+   * Detects a consumer-provided (slotted) `<form>` before each render. The
+   * `<form>` hx-form renders itself is tagged with `data-hx-own-form` and
+   * excluded, so this reflects only the host's form. Runs before `render`, so
+   * the render branch can choose slot-only mode when a host form is present.
+   * @internal
+   */
+  override willUpdate(): void {
+    this._hasSlottedForm = this.querySelector('form:not([data-hx-own-form])') !== null;
   }
 
   override disconnectedCallback(): void {
@@ -549,17 +572,24 @@ export class HelixForm extends HelixElement {
         : nothing;
 
     // Render mode is decoupled from the submit-intercept decision. hx-form
-    // renders its OWN `<form>` whenever `action` is a non-empty string —
-    // INCLUDING a whitespace-only value — so direct controls (raw inputs +
-    // submit/reset buttons that rely on hx-form to create the form owner) always
-    // get a form, even when a templated action collapses to whitespace. Only a
-    // truly-empty `action=""` renders slot-only (the slotted/controlled pattern).
+    // renders its OWN `<form>` ONLY when the consumer did NOT supply a slotted
+    // `<form>` AND `action` is a non-empty string (whitespace included):
+    //  - A slotted host-owned `<form>` is present → slot-only mode regardless of
+    //    `action`, so we never wrap it in (or beside) a second form that would
+    //    break the host form's native action/formaction submission.
+    //  - No slotted form + non-empty `action` (incl. whitespace) → render our own
+    //    `<form>` so direct controls (raw inputs + submit/reset buttons) get a
+    //    form owner, even when a templated action collapses to whitespace.
+    //  - Truly-empty `action=""` (and no slotted form) → slot-only mode.
     // The `action` ATTRIBUTE is set only for a non-empty trimmed value, so a
     // whitespace-only action yields `<form>` without a meaningless action attr.
-    if (this.action !== '') {
+    // The own form is tagged `data-hx-own-form` so `willUpdate` can exclude it
+    // when detecting the consumer's slotted form.
+    if (!this._hasSlottedForm && this.action !== '') {
       return html`
         ${errorSummary}
         <form
+          data-hx-own-form
           action=${ifDefined(this._hasOwnAction ? this.action : undefined)}
           method=${this.method}
           enctype=${this.enctype}

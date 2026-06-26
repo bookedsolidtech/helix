@@ -824,9 +824,9 @@ describe('hx-form', () => {
       `);
       expect(el.action).toBe('   ');
 
-      // action="   " renders hx-form's own <form> too; the slotted form is first
-      // in document order, so querying 'form' returns it. Dispatching its submit
-      // still bridges (controlled).
+      // A slotted <form> is present, so hx-form renders slot-only — NO second
+      // form. The slotted action-less form is the controlled-bridge target.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
       const form = queryOrThrow<HTMLFormElement>(el, 'form');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
       const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
@@ -929,6 +929,89 @@ describe('hx-form', () => {
 
       // The slotted form owns its own action: hx-form must not cancel it and
       // must not run the client-side bridge.
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('does NOT render a second form around a slotted host form when action is whitespace', async () => {
+      // Regression: whitespace action must NOT add an own <form> beside a slotted
+      // host-owned form (that produced two <form>s and broke host submission).
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <form action="/host" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      // Exactly one form — the host's — and hx-form rendered none of its own.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      expect(form.getAttribute('action')).toBe('/host');
+
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // The host form owns its action → native submission, not intercepted.
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('does NOT nest a slotted host form when action is a real URL (single host form)', async () => {
+      // Pre-existing bug fix: action="/x" + a slotted host form previously
+      // rendered a second form; now slot-only mode keeps a single host form.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form action="/host" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      expect(form.getAttribute('action')).toBe('/host');
+
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('slotted host form with empty hx-form action stays a single native host form', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="/host" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
       expect(submitEvent.defaultPrevented).toBe(false);
       expect(dispatched).toBe(false);
     });
