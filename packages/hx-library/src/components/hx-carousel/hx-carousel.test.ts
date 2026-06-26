@@ -2011,25 +2011,26 @@ describe('hx-carousel', () => {
       expect(el['_maxIndex']).toBe(3); // every slide selectable
     });
 
-    it('gate: exact-fill horizontal custom width stays in the legacy page model', async () => {
-      const el = await fixture<HelixCarousel>(
-        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;'),
-      );
+    it('gate: a uniform custom width that fills the viewport exactly is a single page', async () => {
+      // 2 * 200px = 400px = viewport -> nothing overflows -> single static page
+      // (the old first-slide exact-fill reset would have wrongly chosen legacy).
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: 200px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
       await flush(el);
 
-      // 2*(200 - 8) + 16 = 384 + 16 = 400 = viewport -> exact fill -> legacy model.
-      expect(el['_measuredNav']).toBe(false);
-      expect(el['_maxIndex']).toBe(2); // n - slidesPerPage, not n - 1
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="prev-button"]')!.disabled).toBe(true);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!.disabled).toBe(true);
 
-      // Legacy index clamp (would be n-1 = 3 in peek mode).
-      el.goTo(10);
-      await el.updateComplete;
-      expect(el['_currentIndex']).toBe(2);
-
-      // Legacy calc() transform: index 2 * (192px + 16px) = -416px (flush, no blank).
       const track = shadowQuery<HTMLElement>(el, '.track')!;
       settle(track);
-      expect(trackTranslate(track)).toBeCloseTo(-416, 0);
+      expect(trackTranslate(track)).toBeCloseTo(0, 0); // nothing to scroll
     });
 
     it('single page: narrow custom widths that all fit the viewport disable navigation', async () => {
@@ -2128,6 +2129,60 @@ describe('hx-carousel', () => {
         vp.getBoundingClientRect().right,
         0,
       );
+    });
+
+    it('regression: mixed widths whose first slides-per-page slides exact-fill are NOT treated as legacy', async () => {
+      // 200 / 200 / 300 in a 400px viewport, slides-per-page=2: the first 2 slides
+      // (200+200) exactly fill the viewport — the old first-slide pageExtent gate
+      // wrongly reset to legacy (maxIndex 1), stranding the 300px last slide.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item style="--hx-carousel-slide-width: 200px;"><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 200px;"><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 300px;"><div style="height: 80px"></div></hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+
+      // Real content (700) overflows -> peek; the 300px last slide is reachable.
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2);
+      expect(el['_measuredOffsets'][0]).toBeCloseTo(0, 0);
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(200, 0);
+      expect(el['_measuredOffsets'][2]).toBeCloseTo(400, 0);
+      expect(el['_measuredMaxScroll']).toBeCloseTo(300, 0); // 700 - 400
+
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+
+      el.goTo(2); // reach the last slide
+      await el.updateComplete;
+      settle(track);
+      // offset 400 saturates at maxScroll 300; the 300px last slide is flush at the trailing edge.
+      expect(el['_currentIndex']).toBe(2);
+      expect(trackTranslate(track)).toBeCloseTo(-300, 0);
+      expect(slides[2].getBoundingClientRect().right).toBeCloseTo(
+        vp.getBoundingClientRect().right,
+        0,
+      );
+    });
+
+    it('regression guard: default (no custom width) keeps the legacy slidesPerPage bound', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      // No --hx-carousel-slide-width -> legacy model, unchanged by this fix.
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // n - slidesPerPage
     });
 
     it('mixed-size slides that all fit the viewport are a single static page', async () => {
@@ -2279,90 +2334,77 @@ describe('hx-carousel', () => {
 
     // ── Gate transitions on a runtime gap change (lazy re-detect, both ways) ──
 
-    it('gate transition: exact-fill -> genuine peek on a runtime gap change is detected via next()', async () => {
-      const el = await fixture<HelixCarousel>(
-        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;'),
-      );
+    // 3 * 130px = 390px slides in a 400px viewport: gap 0 fits (single page),
+    // a gap makes them overflow (genuine peek). The gap change resizes no slide
+    // box — only the gap sentinel — so it mirrors a real theme/media-query flip.
+    const threeNarrow = (gapPx: number) => `
+      <hx-carousel style="display: block; width: 400px; --hx-carousel-slide-width: 130px; --hx-carousel-gap: ${gapPx}px;">
+        <hx-carousel-item>1</hx-carousel-item>
+        <hx-carousel-item>2</hx-carousel-item>
+        <hx-carousel-item>3</hx-carousel-item>
+      </hx-carousel>
+    `;
+
+    it('gate transition: single-page -> peek on a runtime gap change is detected via next()', async () => {
+      const el = await fixture<HelixCarousel>(threeNarrow(0));
       await flush(el);
-      // 2*(200 - 8) + 16 = 400 = viewport -> exact fill -> legacy model.
-      expect(el['_measuredNav']).toBe(false);
-      expect(el['_maxIndex']).toBe(2);
+      // 390 < 400 -> single page; next() is a no-op.
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
 
-      // Sit at the legacy max index, where a stale guard would block next().
-      el.goTo(2);
-      await el.updateComplete;
-      expect(el['_currentIndex']).toBe(2);
+      // Grow the gap so the slides overflow -> genuine peek (390 + 2*40 = 470 > 400).
+      el.style.setProperty('--hx-carousel-gap', '40px');
 
-      // Shrink the gap so the layout becomes a genuine peek. Slides are
-      // calc(50% - 8px) = 192px regardless of gap, so NO observed box resizes
-      // (the ResizeObserver will not fire — only the lazy refresh can catch this).
-      el.style.setProperty('--hx-carousel-gap', '0px');
-
-      // next() re-detects peek (refresh before its guard) and advances past the
-      // old legacy max into the now-reachable last slide.
+      // next() re-detects peek (refresh before its guard) and advances.
       el.next();
       await el.updateComplete;
-      expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3);
-      expect(el['_currentIndex']).toBe(3);
-
-      // content = 4*192 = 768, viewport = 400 -> maxScroll = 368; translate clamps there.
-      const track = shadowQuery<HTMLElement>(el, '.track')!;
-      settle(track);
-      expect(el['_measuredMaxScroll']).toBeCloseTo(368, 0);
-      expect(trackTranslate(track)).toBeCloseTo(-368, 0);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2);
+      expect(el['_currentIndex']).toBe(1); // advanced from 0
     });
 
-    it('gate transition: genuine peek -> exact-fill on a runtime gap change reverts to the legacy model', async () => {
-      const el = await fixture<HelixCarousel>(
-        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 0px;'),
-      );
+    it('gate transition: peek -> single-page on a runtime gap change disables navigation and clamps', async () => {
+      const el = await fixture<HelixCarousel>(threeNarrow(40));
       await flush(el);
-      // 2*192 = 384 != 400 -> genuine peek.
-      expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2);
 
-      // Grow the gap so the two slides exactly fill the viewport again. No box resizes.
-      el.style.setProperty('--hx-carousel-gap', '16px');
-
-      el.goTo(1); // navigation re-detects exact-fill -> legacy
-      await el.updateComplete;
-      expect(el['_measuredNav']).toBe(false);
-      expect(el['_maxIndex']).toBe(2); // legacy page bound
-
-      // Legacy index clamp now applies (would be n-1 = 3 in peek mode).
-      el.goTo(10);
+      el.goTo(2); // reach the last slide in peek mode
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(2);
+
+      // Remove the gap so the slides fit -> single page. Navigation re-detects it.
+      el.style.setProperty('--hx-carousel-gap', '0px');
+      el.goTo(0);
+      await el.updateComplete;
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
+      expect(el['_currentIndex']).toBe(0); // collapsed to the single page
     });
 
-    it('index-clamp invariant: a mode flip to exact-fill clamps a peek-only index back into range', async () => {
-      const el = await fixture<HelixCarousel>(
-        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 0px;'),
-      );
+    it('index-clamp invariant: a flip to single-page clamps a peek-only index back into range', async () => {
+      const el = await fixture<HelixCarousel>(threeNarrow(40));
       await flush(el);
-      expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3);
+      expect(el['_maxIndex']).toBe(2);
 
-      el.goTo(3); // a peek-only index (out of range in the legacy model)
+      el.goTo(2); // a peek-only index
       await el.updateComplete;
-      expect(el['_currentIndex']).toBe(3);
+      expect(el['_currentIndex']).toBe(2);
 
-      // Runtime change to exact-fill resizes no box; drive a recompute as the
-      // ResizeObserver / slotchange path would. The invariant must clamp the
-      // now-out-of-range active index without any manual navigation.
-      el.style.setProperty('--hx-carousel-gap', '16px');
+      // Flip to single-page (no box resizes); drive a recompute as the
+      // ResizeObserver / slotchange path would. The invariant clamps 2 -> 0
+      // without any manual navigation.
+      el.style.setProperty('--hx-carousel-gap', '0px');
       el['_recomputeBounds']();
       await el.updateComplete;
 
-      expect(el['_measuredNav']).toBe(false);
-      expect(el['_maxIndex']).toBe(2);
-      expect(el['_currentIndex']).toBe(2); // clamped 3 -> 2 by the invariant
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
+      expect(el['_currentIndex']).toBe(0); // clamped by the invariant
 
-      // Legacy transform uses the clamped index — no overscroll into blank.
       const track = shadowQuery<HTMLElement>(el, '.track')!;
       settle(track);
-      expect(trackTranslate(track)).toBeCloseTo(-416, 0); // index 2 * (192 + 16)
+      expect(trackTranslate(track)).toBeCloseTo(0, 0); // nothing to scroll
     });
 
     // Let the ResizeObserver deliver (it fires after layout, before paint).
@@ -2372,28 +2414,23 @@ describe('hx-carousel', () => {
       });
     }
 
-    it('reactive bounds: a runtime gap change flipping exact-fill -> peek re-enables Next with no navigation', async () => {
-      const el = await fixture<HelixCarousel>(
-        fourSlides(' --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;'),
-      );
+    it('reactive bounds: a runtime gap change flipping single-page -> peek re-enables Next with no navigation', async () => {
+      const el = await fixture<HelixCarousel>(threeNarrow(0));
       await flush(el);
 
-      // Exact-fill -> legacy. Navigate to the page bound where Next is disabled.
-      expect(el['_measuredNav']).toBe(false);
-      el.goTo(2);
-      await el.updateComplete;
+      // 390 < 400 -> single page; Next disabled.
       const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
-      expect(el['_maxIndex']).toBe(2);
+      expect(el['_singlePage']).toBe(true);
       expect(next.disabled).toBe(true);
 
-      // Shrink the gap into a genuine peek. Resizes no laid-out box; do NOT
-      // navigate or resize the host — only the gap sentinel changes size.
-      el.style.setProperty('--hx-carousel-gap', '0px');
-      await nextFrame(); // ResizeObserver delivers -> _recomputeBounds runs
+      // Grow the gap into a genuine peek. Resizes no slide box; do NOT navigate or
+      // resize the host — only the gap sentinel changes size.
+      el.style.setProperty('--hx-carousel-gap', '40px');
+      await nextFrame(); // ResizeObserver (gap sentinel) delivers -> _recomputeBounds runs
       await el.updateComplete;
 
-      expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2);
       expect(el['_canGoNext']).toBe(true);
       expect(next.disabled).toBe(false); // re-enabled reactively, no navigation
     });
@@ -2403,9 +2440,9 @@ describe('hx-carousel', () => {
       // Build manually so the listener is attached before the element connects,
       // proving initial setup emits nothing.
       const el = document.createElement('hx-carousel') as HelixCarousel;
-      el.setAttribute('slides-per-page', '2');
+      // 4 * 90px = 360px; gap 20 -> 360 + 3*20 = 420 > 400 -> peek (maxIndex 3).
       el.style.cssText =
-        'display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 0px;';
+        'display: block; width: 400px; --hx-carousel-slide-width: 90px; --hx-carousel-gap: 20px;';
       el.innerHTML = `
         <hx-carousel-item>1</hx-carousel-item>
         <hx-carousel-item>2</hx-carousel-item>
@@ -2418,7 +2455,8 @@ describe('hx-carousel', () => {
       await el.updateComplete;
       await el.updateComplete;
 
-      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(3);
       expect(events).toEqual([]); // no event during initial setup
 
       el.goTo(3);
@@ -2426,12 +2464,14 @@ describe('hx-carousel', () => {
       expect(events).toEqual([3]); // the navigation event
       events.length = 0;
 
-      // Responsive flip to exact-fill (resizes no box); recompute clamps 3 -> 2.
-      el.style.setProperty('--hx-carousel-gap', '16px');
+      // Responsive flip to single-page (remove the gap; 360 < 400). Recompute
+      // clamps the out-of-range index 3 -> 0.
+      el.style.setProperty('--hx-carousel-gap', '0px');
       el['_recomputeBounds']();
       await el.updateComplete;
-      expect(el['_currentIndex']).toBe(2);
-      expect(events).toEqual([2]); // exactly one clamp event with the clamped index
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_currentIndex']).toBe(0);
+      expect(events).toEqual([0]); // exactly one clamp event with the clamped index
 
       events.length = 0;
       el['_recomputeBounds'](); // no index change
@@ -2439,15 +2479,17 @@ describe('hx-carousel', () => {
       expect(events).toEqual([]); // none on a no-op recompute
     });
 
-    it('reactive bounds: a runtime slides-per-page change re-derives bounds, clamps the index, and emits once', async () => {
+    it('reactive bounds: a runtime slides-per-page change re-derives the legacy bound, clamps the index, and emits once', async () => {
       const events: number[] = [];
-      // slide-width 200px = exactly 50% of the 400px viewport.
+      // Default (no custom slide-width) -> legacy page model, where slides-per-page
+      // drives the bound (n - slidesPerPage).
       const el = await fixture<HelixCarousel>(`
-        <hx-carousel slides-per-page="1" style="display: block; width: 400px; --hx-carousel-slide-width: 200px;">
+        <hx-carousel slides-per-page="1" style="display: block; width: 400px;">
           <hx-carousel-item>1</hx-carousel-item>
           <hx-carousel-item>2</hx-carousel-item>
           <hx-carousel-item>3</hx-carousel-item>
           <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
         </hx-carousel>
       `);
       await flush(el);
@@ -2455,24 +2497,21 @@ describe('hx-carousel', () => {
         events.push((e as CustomEvent<{ index: number }>).detail.index),
       );
 
-      // slides-per-page=1: 200 != 400 -> genuine peek; every slide selectable.
-      expect(el['_measuredNav']).toBe(true);
-      expect(el['_maxIndex']).toBe(3);
+      expect(el['_measuredNav']).toBe(false); // default legacy model
+      expect(el['_maxIndex']).toBe(4); // 5 - 1
 
-      el.goTo(3);
+      el.goTo(4);
       await el.updateComplete;
-      expect(el['_currentIndex']).toBe(3);
-      expect(events).toEqual([3]);
+      expect(el['_currentIndex']).toBe(4);
+      expect(events).toEqual([4]);
       events.length = 0;
 
-      // Two 200px slides exactly fill the 400px viewport -> exact-fill legacy
-      // model, maxIndex = n - 2 = 2. No resize, no navigation.
-      el.slidesPerPage = 2;
+      // Increase slides-per-page -> legacy bound shrinks to 5 - 3 = 2 -> clamp 4 -> 2.
+      el.slidesPerPage = 3;
       await flush(el);
 
-      expect(el['_measuredNav']).toBe(false);
       expect(el['_maxIndex']).toBe(2);
-      expect(el['_currentIndex']).toBe(2); // clamped 3 -> 2
+      expect(el['_currentIndex']).toBe(2); // clamped 4 -> 2
       expect(el['_canGoNext']).toBe(false);
       expect(shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!.disabled).toBe(true);
       expect(events).toEqual([2]); // exactly one clamp event
@@ -2535,46 +2574,37 @@ describe('hx-carousel', () => {
       expect(el['_maxIndex']).toBe(0);
     });
 
-    it('autoplay refreshes bounds before wrapping: exact-fill -> peek advances instead of wrapping to 0', async () => {
+    it('autoplay refreshes bounds before advancing: single-page -> peek lets it advance instead of staying put', async () => {
       vi.useFakeTimers();
       try {
         const el = await fixture<HelixCarousel>(`
           <hx-carousel
             autoplay
             autoplay-interval="1000"
-            slides-per-page="2"
-            style="display: block; width: 400px; --hx-carousel-slide-width: 200px; --hx-carousel-gap: 0px;"
+            style="display: block; width: 400px; --hx-carousel-slide-width: 130px; --hx-carousel-gap: 0px;"
           >
             <hx-carousel-item>1</hx-carousel-item>
             <hx-carousel-item>2</hx-carousel-item>
             <hx-carousel-item>3</hx-carousel-item>
-            <hx-carousel-item>4</hx-carousel-item>
           </hx-carousel>
         `);
         await flush(el);
-        // 2*200 = 400 = viewport -> exact-fill legacy model, maxIndex = n - 2 = 2.
-        expect(el['_measuredNav']).toBe(false);
-        expect(el['_maxIndex']).toBe(2);
+        // 3*130 = 390 < 400 -> single page; autoplay cannot advance.
+        expect(el['_singlePage']).toBe(true);
+        expect(el['_maxIndex']).toBe(0);
 
-        vi.advanceTimersByTime(1100); // 0 -> 1
-        vi.advanceTimersByTime(1000); // 1 -> 2 (the old legacy max)
-        await el.updateComplete;
-        expect(el['_currentIndex']).toBe(2);
-
-        // Runtime gap change flips exact-fill -> peek (maxIndex grows to 3); no
-        // resize, and the next tick is synchronous so the RO has not fired yet.
-        el.style.setProperty('--hx-carousel-gap', '16px');
-
-        vi.advanceTimersByTime(1000); // tick refreshes first -> 2 < 3 -> advance
-        await el.updateComplete;
-        expect(el['_measuredNav']).toBe(true);
-        expect(el['_maxIndex']).toBe(3);
-        expect(el['_currentIndex']).toBe(3); // advanced to the newly-reachable slide, NOT wrapped to 0
-
-        // Genuinely at the last slide now -> the next non-loop tick wraps to 0.
-        vi.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1100); // tick is a no-op (nothing to scroll)
         await el.updateComplete;
         expect(el['_currentIndex']).toBe(0);
+
+        // Grow the gap -> overflow -> peek (maxIndex 2); synchronous, RO not fired yet.
+        el.style.setProperty('--hx-carousel-gap', '40px');
+
+        vi.advanceTimersByTime(1000); // tick refreshes first -> 0 < 2 -> advance
+        await el.updateComplete;
+        expect(el['_singlePage']).toBe(false);
+        expect(el['_maxIndex']).toBe(2);
+        expect(el['_currentIndex']).toBe(1); // advanced, not stuck
       } finally {
         vi.useRealTimers();
       }

@@ -533,26 +533,29 @@ export class HelixCarousel extends HelixElement {
   }
 
   /**
-   * Derives whether measured-px navigation is active and, if so, the measured
-   * main-axis `step`/`maxScroll`. Does NOT clamp the index (its caller
+   * Derives whether measured-px navigation is active and, if so, the per-slide
+   * `_measuredOffsets`/`_measuredMaxScroll`. Does NOT clamp the index (its caller
    * `_recomputeBounds` does).
    *
-   * - **Horizontal** uses measured nav ONLY for a genuine peek: a
-   *   `--hx-carousel-slide-width` whose `slidesPerPage` slides + interior gaps do
-   *   NOT exactly fill the viewport (a sub-pixel `EPS` absorbs `calc()` rounding).
-   *   Default / gap-only / exact-fill keep the legacy `calc()` percentage
-   *   transform, which is correct because the track width equals the viewport.
+   * - **Horizontal** uses measured nav whenever a `--hx-carousel-slide-width` is
+   *   active. The peek vs. single-page vs. legacy decision is then made from REAL
+   *   rendered geometry (the track's scroll extent), not a first-slide estimate,
+   *   so mixed-size slides are handled correctly. Default / gap-only horizontal
+   *   keeps the legacy `calc()` percentage transform, which is correct because the
+   *   track width equals the viewport.
    * - **Vertical** always uses measured nav when measurable: a transform
    *   percentage on the block axis is relative to the track's full height (≈ all
    *   slides), not one slide, so the legacy percentage over-scrolls. The measured
-   *   px step (slide height + `row-gap`) moves exactly one slide per index.
+   *   per-slide offsets move exactly one slide per index.
    *
-   * Size/viewport reads are transform-immune (translate does not change box
-   * size), so no transition settling is needed.
+   * When the content does not overflow the viewport (`maxScroll <= EPS`), the
+   * carousel is a single static page (no scrollable index). Size/viewport reads
+   * are transform-immune (translate does not change box size), so no transition
+   * settling is needed.
    * @internal
    */
   private _deriveMeasuredNav(): void {
-    // Sub-pixel tolerance shared by the exact-fill and single-page checks.
+    // Sub-pixel tolerance for the single-page (no-overflow) check.
     const EPS = 0.5;
     const slides = this._slides;
     const horizontal = this.orientation === 'horizontal';
@@ -572,30 +575,24 @@ export class HelixCarousel extends HelixElement {
     }
 
     const rect = first.getBoundingClientRect();
-    const cs = getComputedStyle(track);
-    const slideSize = horizontal ? rect.width : rect.height;
-    const gap = parseFloat(horizontal ? cs.columnGap : cs.rowGap) || 0;
     const viewportSize = horizontal ? viewport.clientWidth : viewport.clientHeight;
-    const step = slideSize + gap;
-    if (step <= 0) {
+    if ((horizontal ? rect.width : rect.height) <= 0) {
       this._resetMeasuredNav();
       return;
     }
 
-    // Horizontal genuine-peek gate: if slidesPerPage slides + interior gaps fill
-    // the viewport exactly, the legacy page model is correct, so stay legacy.
-    // Vertical always proceeds (the percentage transform is unreliable there).
-    if (horizontal) {
-      const pageExtent = this.slidesPerPage * slideSize + (this.slidesPerPage - 1) * gap;
-      if (Math.abs(pageExtent - viewportSize) <= EPS) {
-        this._resetMeasuredNav();
-        return;
-      }
-    }
-
-    // Real content extent from the rendered geometry (not first-slide x count),
-    // so variable-size slides are handled correctly. The track's scroll size is
-    // the full extent of all slides + gaps; the viewport is the clipping box.
+    // The peek vs. single-page vs. legacy decision is made from REAL geometry, not
+    // a first-slide×slidesPerPage estimate (which is wrong for mixed-size slides).
+    // The track's scroll size is the full extent of all slides + gaps; the
+    // viewport is the clipping box.
+    //   - maxScroll <= EPS  -> nothing overflows -> single static page.
+    //   - otherwise         -> measured offset model (every slide reachable,
+    //                          translate clamped to maxScroll).
+    // For UNIFORM slides the offset model reduces exactly to the legacy per-page
+    // translate (proven: offsets[i] = i * (slideSize + gap)), and an exact-fill
+    // uniform layout yields maxScroll <= EPS -> single page — so no separate
+    // first-slide exact-fill reset is needed. The default (no custom slide-width)
+    // horizontal path never reaches here; it stays on the legacy model.
     const content = horizontal ? track.scrollWidth : track.scrollHeight;
     const maxScroll = Math.max(0, content - viewportSize);
 
