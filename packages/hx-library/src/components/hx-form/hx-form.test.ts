@@ -36,6 +36,18 @@ function queryOrThrow<T extends Element = Element>(root: ParentNode, selector: s
   return found;
 }
 
+/**
+ * Lets a MutationObserver callback (microtask) fire after a light-DOM change,
+ * then awaits the resulting Lit update. The macrotask tick guarantees the
+ * observer has delivered records before we check the rendered output.
+ */
+async function flushMutations(el: HelixForm): Promise<void> {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+  await el.updateComplete;
+}
+
 afterEach(cleanup);
 
 describe('hx-form', () => {
@@ -1197,6 +1209,106 @@ describe('hx-form', () => {
       // overridden hook declines interception.
       expect(submitEvent.defaultPrevented).toBe(false);
       expect(dispatched).toBe(false);
+    });
+  });
+
+  // ─── Reactive render mode on runtime child mutations (3) ───
+
+  describe('Reactive render mode (runtime child mutations)', () => {
+    it('switches to slot mode when a host form is inserted after mount', async () => {
+      // Mount with direct controls (no slotted form) + action set → own <form>.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <input type="text" name="u" value="v" />
+          <button type="submit">Go</button>
+        </hx-form>
+      `);
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
+
+      // Consumer inserts its own host-owned form at runtime.
+      const hostForm = document.createElement('form');
+      hostForm.setAttribute('action', '/host');
+      hostForm.setAttribute('method', 'post');
+      hostForm.innerHTML = '<input type="text" name="f" value="v" /><button type="submit">Go</button>';
+      el.prepend(hostForm);
+
+      await flushMutations(el);
+
+      // hx-form drops its own form → exactly one form, the host's.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      expect(form.getAttribute('action')).toBe('/host');
+
+      // Host form owns its action → native submission, not intercepted.
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('re-renders its own form when the host form is removed after mount', async () => {
+      // Mount with a slotted host form + action set → slot mode, single host form.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form action="/host" method="post">
+            <input type="text" name="f" value="v" />
+            <button type="submit">Go</button>
+          </form>
+        </hx-form>
+      `);
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+
+      // Consumer removes its form at runtime.
+      queryOrThrow<HTMLFormElement>(el, 'form:not([data-hx-own-form])').remove();
+
+      await flushMutations(el);
+
+      // hx-form re-renders its own <form action="/x"> → single own form.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      const own = queryOrThrow<HTMLFormElement>(el, 'form');
+      expect(own.hasAttribute('data-hx-own-form')).toBe(true);
+      expect(own.getAttribute('action')).toBe('/x');
+
+      // action="/x" → native submission (not intercepted).
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      own.dispatchEvent(submitEvent);
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('settles without an infinite update loop after a host form is inserted', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <input type="text" name="u" value="v" />
+          <button type="submit">Go</button>
+        </hx-form>
+      `);
+
+      const hostForm = document.createElement('form');
+      hostForm.setAttribute('action', '/host');
+      el.prepend(hostForm);
+
+      await flushMutations(el);
+      // Component is idle: no pending update remains (a loop would never settle).
+      expect(el.isUpdatePending).toBe(false);
+      const countAfterSettle = el.querySelectorAll('form').length;
+
+      // A further tick produces no additional re-render churn.
+      await flushMutations(el);
+      expect(el.isUpdatePending).toBe(false);
+      expect(el.querySelectorAll('form')).toHaveLength(countAfterSettle);
+      expect(countAfterSettle).toBe(1);
     });
   });
 });

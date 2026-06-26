@@ -93,29 +93,69 @@ export class HelixForm extends HelixElement {
   @state()
   private _hasSlottedForm = false;
 
+  /**
+   * Observes light-DOM child changes so the render-mode decision stays correct
+   * when consumers swap `<hx-form>`'s children after mount (React wrapper
+   * children, Drupal behaviors, etc.). Lit does not run an update cycle on
+   * light-DOM mutations, so without this the slot-vs-own-form choice goes stale.
+   * @internal
+   */
+  private _childObserver: MutationObserver | null = null;
+
   // ─── Lifecycle ───
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.addEventListener('submit', this._handleSubmit);
     this.addEventListener('reset', this._handleReset);
+
+    if (typeof MutationObserver !== 'undefined') {
+      this._childObserver = new MutationObserver(this._onChildMutation);
+      // subtree: a host-owned <form> may be nested in consumer markup.
+      this._childObserver.observe(this, { childList: true, subtree: true });
+    }
   }
 
   /**
-   * Detects a consumer-provided (slotted) `<form>` before each render. The
-   * `<form>` hx-form renders itself is tagged with `data-hx-own-form` and
-   * excluded, so this reflects only the host's form. Runs before `render`, so
-   * the render branch can choose slot-only mode when a host form is present.
+   * Detects a consumer-provided (slotted) `<form>` in our light DOM, excluding
+   * the `<form>` hx-form renders itself (tagged `data-hx-own-form`).
+   * @internal
+   */
+  private _detectSlottedForm(): boolean {
+    return this.querySelector('form:not([data-hx-own-form])') !== null;
+  }
+
+  /**
+   * MutationObserver callback. Recomputes slotted-form presence and requests a
+   * re-render ONLY when it actually changed. hx-form's own rendered form is
+   * excluded from the detection query, so its self-mutations never flip the
+   * value — preventing an observe → render → observe infinite loop.
+   * @internal
+   */
+  private readonly _onChildMutation = (): void => {
+    const next = this._detectSlottedForm();
+    if (next !== this._hasSlottedForm) {
+      this._hasSlottedForm = next;
+    }
+  };
+
+  /**
+   * Detects a consumer-provided (slotted) `<form>` before each render, so the
+   * render branch can choose slot-only mode when a host form is present. This is
+   * the per-render source of truth; the MutationObserver only triggers a
+   * re-render when consumer children change between updates.
    * @internal
    */
   override willUpdate(): void {
-    this._hasSlottedForm = this.querySelector('form:not([data-hx-own-form])') !== null;
+    this._hasSlottedForm = this._detectSlottedForm();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('submit', this._handleSubmit);
     this.removeEventListener('reset', this._handleReset);
+    this._childObserver?.disconnect();
+    this._childObserver = null;
   }
 
   // ─── Properties ───
