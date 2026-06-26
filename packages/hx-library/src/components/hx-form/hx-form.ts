@@ -347,6 +347,17 @@ export class HelixForm extends HelixElement {
   // ─── Event Handling ───
 
   /**
+   * True when hx-form owns submission via its own non-empty `action`. A
+   * whitespace-only `action` (e.g. a templated value that renders empty) is
+   * treated as no action, matching the slotted-form / formaction discriminators
+   * and the controlled-bridge case.
+   * @internal
+   */
+  private get _hasOwnAction(): boolean {
+    return this.action.trim() !== '';
+  }
+
+  /**
    * Decides whether hx-form should intercept a given submit event and run its
    * client-side bridge (prevent native submission, validate, and dispatch
    * `hx-submit` / `hx-invalid`), or let the event proceed to native submission.
@@ -374,7 +385,9 @@ export class HelixForm extends HelixElement {
     }
 
     // hx-form renders its own `<form action>`; native submission is intended.
-    if (this.action) {
+    // A whitespace-only `action` is treated as empty (controlled), consistent
+    // with the slotted-form / formaction checks below.
+    if (this._hasOwnAction) {
       return false;
     }
 
@@ -535,7 +548,7 @@ export class HelixForm extends HelixElement {
           `
         : nothing;
 
-    if (this.action) {
+    if (this._hasOwnAction) {
       return html`
         ${errorSummary}
         <form

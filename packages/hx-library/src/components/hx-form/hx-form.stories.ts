@@ -324,58 +324,63 @@ export const HybridMode: Story = {
  */
 export const HostOwnedForm: Story = {
   render: () => html`
-    <p style="margin-bottom: 1rem; color: var(--hx-color-text-muted, #4A5362); font-size: 0.875rem;">
-      The slotted <code>&lt;form action="/clinical-portal/patient/register"&gt;</code> owns its own
-      submission. hx-form styles it but does not intercept — submitting fires the native
-      <code>submit</code> without cancellation, and no <code>hx-submit</code> is dispatched.
-    </p>
-    <hx-form
-      @hx-submit=${() => {
+    <div
+      @submit=${(e: Event) => {
+        // This observer is on an ANCESTOR of <hx-form>, so it runs AFTER
+        // hx-form's own submit listener — e.defaultPrevented here truthfully
+        // reflects whether hx-form cancelled the submission.
         const status = document.getElementById('host-owned-status');
         if (status) {
-          status.textContent = 'hx-submit fired — unexpected for a host-owned form.';
+          status.textContent = e.defaultPrevented
+            ? 'hx-form cancelled native submission — unexpected for a host-owned form.'
+            : 'hx-form did not cancel: native submission to the host-owned form proceeded.';
         }
+        // Demo only: stop the Storybook iframe from navigating to the action URL.
+        e.preventDefault();
       }}
     >
-      <form
-        action="/clinical-portal/patient/register"
-        method="post"
-        @submit=${(e: Event) => {
+      <p
+        style="margin-bottom: var(--hx-space-4, 1rem); color: var(--hx-color-text-muted, #4A5362); font-size: var(--hx-font-size-sm, 0.875rem);"
+      >
+        The slotted <code>&lt;form action="/clinical-portal/patient/register"&gt;</code> owns its own
+        submission. hx-form styles it but does not intercept — submitting fires the native
+        <code>submit</code> without cancellation, and no <code>hx-submit</code> is dispatched.
+      </p>
+      <hx-form
+        @hx-submit=${() => {
           const status = document.getElementById('host-owned-status');
           if (status) {
-            status.textContent = e.defaultPrevented
-              ? 'hx-form cancelled native submission — unexpected.'
-              : 'Native submit reached the host-owned form; hx-form did not cancel it.';
+            status.textContent = 'hx-submit fired — unexpected for a host-owned form.';
           }
-          // Demo only: stop the Storybook iframe from navigating to the action URL.
-          e.preventDefault();
         }}
       >
-        <div class="form-item">
-          <label for="host-name">
-            Patient Name
-            <span class="form-required" aria-hidden="true">*</span>
-          </label>
-          <input type="text" id="host-name" name="name" required />
-        </div>
+        <form action="/clinical-portal/patient/register" method="post">
+          <div class="form-item">
+            <label for="host-name">
+              Patient Name
+              <span class="form-required" aria-hidden="true">*</span>
+            </label>
+            <input type="text" id="host-name" name="name" required />
+          </div>
 
-        <div class="form-item">
-          <label for="host-mrn">Medical Record Number</label>
-          <input type="text" id="host-mrn" name="mrn" placeholder="MRN-000000" />
-        </div>
+          <div class="form-item">
+            <label for="host-mrn">Medical Record Number</label>
+            <input type="text" id="host-mrn" name="mrn" placeholder="MRN-000000" />
+          </div>
 
-        <div class="form-actions">
-          <button type="submit">Register (native POST)</button>
-        </div>
-      </form>
-    </hx-form>
+          <div class="form-actions">
+            <button type="submit">Register (native POST)</button>
+          </div>
+        </form>
+      </hx-form>
 
-    <p
-      id="host-owned-status"
-      style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--hx-color-surface-subtle, #f8f9fa); border-radius: 0.375rem; font-size: 0.875rem; font-family: monospace;"
-    >
-      Submit the form to see the result.
-    </p>
+      <p
+        id="host-owned-status"
+        style="margin-top: var(--hx-space-4, 1rem); padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem); background: var(--hx-color-surface-subtle, #f8f9fa); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem); font-family: var(--hx-font-family-mono, monospace);"
+      >
+        Submit the form to see the result.
+      </p>
+    </div>
   `,
 };
 
@@ -391,48 +396,54 @@ export const NoIntercept: Story = {
     noIntercept: true,
   },
   render: (args) => html`
-    <p style="margin-bottom: 1rem; color: var(--hx-color-text-muted, #4A5362); font-size: 0.875rem;">
-      With <code>no-intercept</code> set, hx-form attaches no submit bridge. The action-less form
-      below submits natively and <code>hx-submit</code> never fires.
-    </p>
-    <hx-form
-      ?no-intercept=${args.noIntercept}
-      @hx-submit=${() => {
+    <div
+      @submit=${(e: Event) => {
+        // Ancestor observer: runs AFTER hx-form's listener, so e.defaultPrevented
+        // here proves whether hx-form ran (and cancelled via) its bridge.
         const status = document.getElementById('no-intercept-status');
         if (status) {
-          status.textContent = 'hx-submit fired — the bridge ran despite no-intercept.';
+          status.textContent = e.defaultPrevented
+            ? 'hx-form cancelled submission — unexpected with no-intercept.'
+            : 'Native submit proceeded; hx-form ran no bridge (no hx-submit).';
         }
+        // Demo only: stop the Storybook iframe from reloading.
+        e.preventDefault();
       }}
     >
-      <form
-        @submit=${(e: Event) => {
+      <p
+        style="margin-bottom: var(--hx-space-4, 1rem); color: var(--hx-color-text-muted, #4A5362); font-size: var(--hx-font-size-sm, 0.875rem);"
+      >
+        With <code>no-intercept</code> set, hx-form attaches no submit bridge. The action-less form
+        below submits natively and <code>hx-submit</code> never fires.
+      </p>
+      <hx-form
+        ?no-intercept=${args.noIntercept}
+        @hx-submit=${() => {
           const status = document.getElementById('no-intercept-status');
           if (status) {
-            status.textContent = e.defaultPrevented
-              ? 'hx-form cancelled submission — unexpected with no-intercept.'
-              : 'Native submit proceeded; hx-form ran no bridge (no hx-submit).';
+            status.textContent = 'hx-submit fired — the bridge ran despite no-intercept.';
           }
-          // Demo only: stop the Storybook iframe from reloading.
-          e.preventDefault();
         }}
       >
-        <div class="form-item">
-          <label for="ni-name">Full Name</label>
-          <input type="text" id="ni-name" name="fullName" />
-        </div>
+        <form>
+          <div class="form-item">
+            <label for="ni-name">Full Name</label>
+            <input type="text" id="ni-name" name="fullName" />
+          </div>
 
-        <div class="form-actions">
-          <button type="submit">Submit</button>
-        </div>
-      </form>
-    </hx-form>
+          <div class="form-actions">
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+      </hx-form>
 
-    <p
-      id="no-intercept-status"
-      style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--hx-color-surface-subtle, #f8f9fa); border-radius: 0.375rem; font-size: 0.875rem; font-family: monospace;"
-    >
-      Submit the form to see the result.
-    </p>
+      <p
+        id="no-intercept-status"
+        style="margin-top: var(--hx-space-4, 1rem); padding: var(--hx-space-3, 0.75rem) var(--hx-space-4, 1rem); background: var(--hx-color-surface-subtle, #f8f9fa); border-radius: var(--hx-radius-md, 0.375rem); font-size: var(--hx-font-size-sm, 0.875rem); font-family: var(--hx-font-family-mono, monospace);"
+      >
+        Submit the form to see the result.
+      </p>
+    </div>
   `,
 };
 

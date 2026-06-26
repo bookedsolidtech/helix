@@ -23,6 +23,19 @@ declare global {
   }
 }
 
+/**
+ * Query a single element from a fixture root, throwing a clear error (rather
+ * than relying on a non-null assertion) when the selector matches nothing.
+ * Narrows the return type so callers get a non-nullable element.
+ */
+function queryOrThrow<T extends Element = Element>(root: ParentNode, selector: string): T {
+  const found = root.querySelector<T>(selector);
+  if (found === null) {
+    throw new Error(`[hx-form.test] expected to find "${selector}" in the fixture, but it was missing.`);
+  }
+  return found;
+}
+
 afterEach(cleanup);
 
 describe('hx-form', () => {
@@ -787,12 +800,35 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      const form = el.querySelector('form')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
       const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
       form.dispatchEvent(submitEvent);
 
       // Bridge runs: the event is cancelled and hx-submit fires.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
+    it('intercepts when hx-form action is whitespace-only (treated as empty/controlled)', async () => {
+      // hx-form's own `action` is trimmed: a whitespace-only value is the
+      // controlled case (templated empty action), not a native-submit action.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      expect(el.action).toBe('   ');
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
       expect(submitEvent.defaultPrevented).toBe(true);
       const event = await eventPromise;
       expect(event.detail.valid).toBe(true);
@@ -808,7 +844,7 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      const form = el.querySelector('form')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
       let dispatched = false;
       el.addEventListener('hx-submit', () => {
         dispatched = true;
@@ -835,7 +871,7 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      const form = el.querySelector('form')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
       const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
       form.dispatchEvent(submitEvent);
@@ -855,7 +891,7 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      const form = el.querySelector('form')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
       const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
       form.dispatchEvent(submitEvent);
@@ -877,8 +913,8 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      const form = el.querySelector('form')!;
-      const previewBtn = el.querySelector<HTMLButtonElement>('button[formaction]')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const previewBtn = queryOrThrow<HTMLButtonElement>(el, 'button[formaction]');
       let dispatched = false;
       el.addEventListener('hx-submit', () => {
         dispatched = true;
@@ -908,8 +944,8 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      const form = el.querySelector('form')!;
-      const saveBtn = el.querySelector<HTMLButtonElement>('button:not([formaction])')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const saveBtn = queryOrThrow<HTMLButtonElement>(el, 'button:not([formaction])');
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
 
       // The Save button has no formaction → controlled bridge runs as usual.
@@ -936,7 +972,7 @@ describe('hx-form', () => {
       `);
       expect(el.noIntercept).toBe(true);
 
-      const form = el.querySelector('form')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
       let dispatched = false;
       el.addEventListener('hx-submit', () => {
         dispatched = true;
@@ -959,7 +995,7 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      const form = el.querySelector('form')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
       let dispatched = false;
       el.addEventListener('hx-submit', () => {
         dispatched = true;
@@ -991,7 +1027,7 @@ describe('hx-form', () => {
       `);
       expect(el).toBeInstanceOf(HelixForm);
 
-      const form = el.querySelector('form')!;
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
       let dispatched = false;
       el.addEventListener('hx-submit', () => {
         dispatched = true;
