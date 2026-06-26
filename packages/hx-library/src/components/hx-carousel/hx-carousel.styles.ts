@@ -158,7 +158,7 @@ export const helixCarouselStyles = css`
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(1px + var(--_hx-carousel-gap-count, 0) * var(--hx-carousel-gap, 0px));
+    width: calc(1px + var(--_carousel-gap-count, 0) * var(--hx-carousel-gap, 0px));
     height: 1px;
     visibility: hidden;
     pointer-events: none;

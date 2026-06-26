@@ -1283,6 +1283,41 @@ describe('hx-carousel', () => {
       expect(el['_currentIndex']).toBeLessThanOrEqual(1);
     });
 
+    it('a post-init slot shrink that drops the active slide emits one hx-slide-change and updates the live region', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel>
+          <hx-carousel-item>Slide 1</hx-carousel-item>
+          <hx-carousel-item>Slide 2</hx-carousel-item>
+          <hx-carousel-item>Slide 3</hx-carousel-item>
+          <hx-carousel-item>Slide 4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+      el.goTo(3); // active = last slide
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+
+      const events: number[] = [];
+      el.addEventListener('hx-slide-change', (e) =>
+        events.push((e as CustomEvent<{ index: number }>).detail.index),
+      );
+
+      // Drop the last two slides at runtime — the active index is now out of range.
+      const slides = el.querySelectorAll('hx-carousel-item');
+      slides[3]!.remove();
+      slides[2]!.remove();
+      // Let slotchange propagate -> _syncSlides -> _recomputeBounds clamps + emits.
+      await el.updateComplete;
+      await new Promise<void>((r) => setTimeout(r, 0));
+      await el.updateComplete;
+
+      // Clamped to the new max (default slides-per-page=1 -> n-1 = 1) via the
+      // event-aware path: exactly one event, and the live region updated.
+      expect(el['_currentIndex']).toBe(1);
+      expect(events).toEqual([1]);
+      expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('Slide 2 of 2');
+    });
+
     it('empty carousel initializes with _slides length 0', async () => {
       const el = await fixture<HelixCarousel>('<hx-carousel></hx-carousel>');
       await el.updateComplete;
@@ -1932,7 +1967,7 @@ describe('hx-carousel', () => {
       await flush(el);
 
       // Initial gap = 0 -> step = 150, content = 600, maxScroll = 600 - 400 = 200.
-      expect(el['_measuredStep']).toBeCloseTo(150, 0);
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(150, 0);
       expect(el['_measuredMaxScroll']).toBeCloseTo(200, 0);
 
       // Change ONLY the gap at runtime. The slides (150px) and host (400px) keep
@@ -1944,7 +1979,7 @@ describe('hx-carousel', () => {
       await el.updateComplete;
 
       // step = 150 + 20 = 170; content = 4*150 + 3*20 = 660; maxScroll = 660 - 400 = 260.
-      expect(el['_measuredStep']).toBeCloseTo(170, 0);
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(170, 0);
       expect(el['_measuredMaxScroll']).toBeCloseTo(260, 0);
 
       const track = shadowQuery<HTMLElement>(el, '.track')!;
@@ -2054,6 +2089,62 @@ describe('hx-carousel', () => {
       expect(el['_currentIndex']).toBe(3); // last slide reachable
     });
 
+    it('mixed-size slides (horizontal): every slide reachable + flush, last flush at the trailing edge', async () => {
+      // Per-item widths 100 / 200 / 300 (set on each item) -> content 600 > 400.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="1" style="display: block; width: 400px;">
+          <hx-carousel-item style="--hx-carousel-slide-width: 100px;"><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 200px;"><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 300px;"><div style="height: 80px"></div></hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // every slide reachable
+      // Offsets follow the real (variable) widths: [0, 100, 300].
+      expect(el['_measuredOffsets'][0]).toBeCloseTo(0, 0);
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(100, 0);
+      expect(el['_measuredOffsets'][2]).toBeCloseTo(300, 0);
+      expect(el['_measuredMaxScroll']).toBeCloseTo(200, 0); // 600 - 400
+
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+
+      el.goTo(1);
+      await el.updateComplete;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-100, 0); // slide 1's real offset
+      expect(slides[1].getBoundingClientRect().left).toBeCloseTo(vp.getBoundingClientRect().left, 0);
+
+      el.goTo(2);
+      await el.updateComplete;
+      settle(track);
+      // offset 300 saturates at maxScroll 200; the last slide's right edge is flush.
+      expect(trackTranslate(track)).toBeCloseTo(-200, 0);
+      expect(slides[2].getBoundingClientRect().right).toBeCloseTo(
+        vp.getBoundingClientRect().right,
+        0,
+      );
+    });
+
+    it('mixed-size slides that all fit the viewport are a single static page', async () => {
+      // 50 + 60 + 70 = 180px < 400px viewport.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel style="display: block; width: 400px;">
+          <hx-carousel-item style="--hx-carousel-slide-width: 50px;"><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 60px;"><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 70px;"><div style="height: 80px"></div></hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_singlePage']).toBe(true);
+      expect(el['_maxIndex']).toBe(0);
+      expect(shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!.disabled).toBe(true);
+    });
+
     it('gate: vertical uses measured block-axis nav; the cross-axis slide-width does not drive the step', async () => {
       const el = await fixture<HelixCarousel>(`
         <hx-carousel
@@ -2078,7 +2169,7 @@ describe('hx-carousel', () => {
 
       // Step is the block-axis extent (slide height 50 + row-gap 0), NOT the
       // cross-axis 150px width hook.
-      expect(el['_measuredStep']).toBeCloseTo(50, 0);
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(50, 0);
 
       el.goTo(3);
       await el.updateComplete;
@@ -2572,7 +2663,7 @@ describe('hx-carousel', () => {
       expect(el['_measuredNav']).toBe(true);
       expect(el['_singlePage']).toBe(false);
       expect(el['_maxIndex']).toBe(3); // n - 1, every slide reachable
-      expect(el['_measuredStep']).toBeCloseTo(50, 0); // slide height + 0 row-gap
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(50, 0); // slide height + 0 row-gap
     });
 
     it('non-overflowing vertical content is a single static page (no degenerate nav)', async () => {
@@ -2616,10 +2707,45 @@ describe('hx-carousel', () => {
       expect(slides[3].getBoundingClientRect().bottom).toBeCloseTo(vp.getBoundingClientRect().bottom, 0);
     });
 
+    it('mixed-size slides (vertical): per-slide offsets follow real heights; last slide flush', async () => {
+      // Heights 50 / 60 / 70 -> content 180; constrained viewport 100 -> maxScroll 80.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel orientation="vertical" style="display: block; width: 300px;">
+          <hx-carousel-item><div style="height: 50px"></div></hx-carousel-item>
+          <hx-carousel-item><div style="height: 60px"></div></hx-carousel-item>
+          <hx-carousel-item><div style="height: 70px"></div></hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      const vp = constrainViewport(el, 100);
+      el['_recomputeBounds']();
+      await el.updateComplete;
+
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2);
+      // Offsets follow the variable heights: [0, 50, 110].
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(50, 0);
+      expect(el['_measuredOffsets'][2]).toBeCloseTo(110, 0);
+      expect(el['_measuredMaxScroll']).toBeCloseTo(80, 0); // 180 - 100
+
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      el.goTo(1);
+      await el.updateComplete;
+      settle(track);
+      expect(trackTranslateY(track)).toBeCloseTo(-50, 0); // slide 1's real offset
+
+      el.goTo(2); // offset 110 saturates at maxScroll 80
+      await el.updateComplete;
+      settle(track);
+      expect(trackTranslateY(track)).toBeCloseTo(-80, 0);
+      const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      expect(slides[2].getBoundingClientRect().bottom).toBeCloseTo(vp.getBoundingClientRect().bottom, 0);
+    });
+
     it('row-gap: the measured step includes the block-axis gap', async () => {
       const el = await mountScrollable('', ' --hx-carousel-gap: 10px;');
       // step = slide height 50 + row-gap 10 = 60.
-      expect(el['_measuredStep']).toBeCloseTo(60, 0);
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(60, 0);
       const track = shadowQuery<HTMLElement>(el, '.track')!;
       expect(getComputedStyle(track).rowGap).toBe('10px');
     });

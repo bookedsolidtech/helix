@@ -237,11 +237,13 @@ export class HelixCarousel extends HelixElement {
    */
   @state() private _measuredNav = false;
   /**
-   * Measured per-slide outer extent in px (main-axis slide size + main-axis gap),
-   * used only in measured-nav mode for the px-clamped track translate.
+   * Per-slide leading-edge offset within the track in px (measured from real
+   * rects, so variable-size slides are handled correctly). `_measuredOffsets[i]`
+   * is the track translate that brings slide `i` to the viewport's leading edge.
+   * Used only in measured-nav mode.
    * @internal
    */
-  @state() private _measuredStep = 0;
+  @state() private _measuredOffsets: number[] = [];
   /**
    * Measured maximum scroll distance in px (total content extent − viewport),
    * used only in measured-nav mode to saturate the track at the trailing edge.
@@ -386,7 +388,7 @@ export class HelixCarousel extends HelixElement {
       this._firstUpdateComplete = true;
       return;
     }
-    // slidesPerPage is baked into each item's --_hx-carousel-computed-slide-width
+    // slidesPerPage is baked into each item's --_carousel-computed-slide-width
     // (via _computedSlideWidthExpr) AND into the live transform step, so a runtime
     // change must re-sync the per-item width — _syncSlides re-applies it for the
     // new n and then re-derives bounds (running the index-clamp invariant), keeping
@@ -424,21 +426,23 @@ export class HelixCarousel extends HelixElement {
       item.slideIndex = i;
       item.totalSlides = items.length;
       (item as HTMLElement).style.setProperty(
-        '--_hx-carousel-computed-slide-width',
+        '--_carousel-computed-slide-width',
         computedSlideWidth,
       );
     });
 
-    // Clamp currentIndex if slides changed
-    if (this._currentIndex >= items.length) {
-      this._currentIndex = Math.max(0, items.length - 1);
-    }
+    // NOTE: the active index is NOT clamped here. A slot shrink / slidesPerPage
+    // re-sync that drops the active slide out of range is clamped by the single
+    // event-aware path in `_recomputeBounds()` below (gated by `_initialized`),
+    // which both clamps to `_maxIndex` and emits `hx-slide-change` + updates the
+    // live region on a real change. Clamping here would silently move the index
+    // before that path runs.
 
     // The gap sentinel's width = (slides - 1) * --hx-carousel-gap, so observing
     // it lets a pure gap change (which resizes no laid-out box) fire the
     // ResizeObserver and reactively re-derive the bounds. Count is exposed as a
     // private custom property the sentinel's CSS multiplies by the gap.
-    this.style.setProperty('--_hx-carousel-gap-count', String(Math.max(0, items.length - 1)));
+    this.style.setProperty('--_carousel-gap-count', String(Math.max(0, items.length - 1)));
 
     // Observe the host (viewport resizes), each slide (slide-size changes, e.g. a
     // runtime --hx-carousel-slide-width override), the track (content-sized on the
@@ -472,7 +476,7 @@ export class HelixCarousel extends HelixElement {
   private _resetMeasuredNav(): void {
     this._measuredNav = false;
     this._singlePage = false;
-    this._measuredStep = 0;
+    this._measuredOffsets = [];
     this._measuredMaxScroll = 0;
   }
 
@@ -589,30 +593,39 @@ export class HelixCarousel extends HelixElement {
       }
     }
 
-    // Total extent of equal-size slides plus inter-slide gaps.
-    const content = slides.length * slideSize + (slides.length - 1) * gap;
-    const overflow = content - viewportSize;
+    // Real content extent from the rendered geometry (not first-slide x count),
+    // so variable-size slides are handled correctly. The track's scroll size is
+    // the full extent of all slides + gaps; the viewport is the clipping box.
+    const content = horizontal ? track.scrollWidth : track.scrollHeight;
+    const maxScroll = Math.max(0, content - viewportSize);
+
+    // Each slide's leading-edge offset within the track, from real rects. Both
+    // rects sit under the same track transform, so the delta is transform-immune.
+    // For uniform slides this reduces exactly to `i * (slideSize + gap)`.
+    const offsets = slides.map((slide) => {
+      const r = slide.getBoundingClientRect();
+      return horizontal ? r.left - rect.left : r.top - rect.top;
+    });
+
+    this._measuredNav = true;
+    this._measuredOffsets = offsets;
 
     // Single static page: the whole track fits in the viewport (no overflow), so
     // there is nothing to scroll. Without this, _maxIndex would be slides - 1 and
     // navigation would advance the active index to slides the track can't reveal.
     // Note this is NOT the legacy `n - slidesPerPage` fallback — that can still be
     // > 0 for narrow custom widths that all fit; the bound must be 0 here.
-    if (overflow <= EPS) {
-      this._measuredNav = true;
+    if (maxScroll <= EPS) {
       this._singlePage = true;
-      this._measuredStep = 0;
       this._measuredMaxScroll = 0;
       return;
     }
 
     // maxScroll is how far the track can translate before the trailing content
-    // edge reaches the viewport's trailing edge — selecting any later slide
+    // edge reaches the viewport's trailing edge — selecting a near-end slide
     // saturates here.
-    this._measuredNav = true;
     this._singlePage = false;
-    this._measuredStep = step;
-    this._measuredMaxScroll = overflow;
+    this._measuredMaxScroll = maxScroll;
   }
 
   /** @internal */
@@ -976,9 +989,10 @@ export class HelixCarousel extends HelixElement {
    * CSS transform value applied to the slide track to scroll to the current index.
    *
    * Measured-nav model (genuine horizontal peek, or any measurable vertical
-   * carousel): the translate is the measured `currentIndex * step` clamped to
-   * `_measuredMaxScroll` (px) on the active axis. A near-end slide saturates the
-   * track at the trailing edge — slides crowd into view with no blank space —
+   * carousel): the translate is the active slide's measured leading-edge offset
+   * (`_measuredOffsets[currentIndex]`, correct for variable-size slides) clamped
+   * to `_measuredMaxScroll` (px) on the active axis. A near-end slide saturates
+   * the track at the trailing edge — slides crowd into view with no blank space —
    * while the active index is still that slide.
    *
    * Legacy model (horizontal default / gap-only / exact-fill): a live `calc()` of
@@ -994,7 +1008,8 @@ export class HelixCarousel extends HelixElement {
    */
   private get _trackTransform(): string {
     if (this._measuredNav) {
-      const offset = Math.min(this._currentIndex * this._measuredStep, this._measuredMaxScroll);
+      const raw = this._measuredOffsets[this._currentIndex] ?? 0;
+      const offset = Math.min(raw, this._measuredMaxScroll);
       return this.orientation === 'horizontal'
         ? `translateX(-${offset}px)`
         : `translateY(-${offset}px)`;
