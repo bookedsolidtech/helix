@@ -341,17 +341,15 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * Native form controls that belong to the given form: those whose nearest
-   * ancestor `<form>` is `scopeForm`, or which are not inside any form (hx-form's
-   * own rendered form projects via `<slot>`, so its controls are orphaned light
-   * children). Controls inside a different (sibling) form are excluded. With no
-   * scope, returns every native control.
+   * Form-associated controls (native AND hx-*) that belong to the given form:
+   * those whose nearest ancestor `<form>` is `scopeForm`, or which are not inside
+   * any form (hx-form's own rendered form projects via `<slot>`, so its controls
+   * are orphaned light children). Controls inside a different (sibling) form are
+   * excluded. With no scope, returns every form-associated control.
    * @internal
    */
-  private _scopedNativeControls(
-    scopeForm: HTMLFormElement | null,
-  ): Array<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement> {
-    const all = this.getNativeFormElements();
+  private _scopedFormControls(scopeForm: HTMLFormElement | null): Element[] {
+    const all = Array.from(this.querySelectorAll('*')).filter((el) => this._isFormControl(el));
     if (scopeForm === null) {
       return all;
     }
@@ -362,33 +360,72 @@ export class HelixForm extends HelixElement {
   }
 
   /**
+   * Whether a `<form>` contains any form-associated control (native or hx-*) in
+   * its subtree, i.e. it has its own fields. hx-form's own rendered form holds
+   * only a `<slot>`, so this is `false` for it.
+   * @internal
+   */
+  private _formContainsControl(form: HTMLFormElement): boolean {
+    for (const el of form.querySelectorAll('*')) {
+      if (this._isFormControl(el)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Collects `FormData` for the controlled submit bridge, scoped to the
-   * submitting form. When that form contains its own fields (a slotted/host form),
-   * the native `FormData` constructor captures exactly its controls. When it does
-   * not (hx-form's own slot-projecting form), data is gathered manually from the
-   * in-scope controls, excluding any sibling form's fields regardless of DOM order.
+   * submitting form.
+   *
+   * When that form contains its own fields — native OR hx-* form-associated
+   * controls — the native `FormData` constructor captures them all (hx-*
+   * controls contribute via their `ElementInternals.setFormValue`). When it does
+   * not (hx-form's own slot-projecting form, whose logical fields are orphaned
+   * light children), data is gathered manually from the in-scope controls,
+   * reading each control's submission value via its public API. Single-value
+   * controls (native inputs/select/textarea, hx-text-input, hx-select,
+   * hx-number-input, hx-textarea) and boolean controls (native checkbox/radio,
+   * hx-checkbox, hx-switch) are covered; multi-value/grouped/file hx-* controls
+   * fall back to reading `.value` and may not round-trip every entry.
    * @internal
    */
   private _collectFormData(scopeForm: HTMLFormElement | null): FormData {
-    if (scopeForm !== null && scopeForm.querySelector('input, select, textarea') !== null) {
+    if (scopeForm !== null && this._formContainsControl(scopeForm)) {
       return new FormData(scopeForm);
     }
 
     const formData = new FormData();
-    for (const el of this._scopedNativeControls(scopeForm)) {
-      const input = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-      if (!input.name) continue;
+    for (const el of this._scopedFormControls(scopeForm)) {
+      const name = (el as { name?: unknown }).name;
+      if (typeof name !== 'string' || name === '') continue;
 
-      if (input instanceof HTMLInputElement) {
-        if (input.type === 'checkbox' || input.type === 'radio') {
-          if (input.checked) {
-            formData.append(input.name, input.value || 'on');
+      if (el instanceof HTMLInputElement) {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          if (el.checked) {
+            formData.append(name, el.value || 'on');
           }
         } else {
-          formData.append(input.name, input.value);
+          formData.append(name, el.value);
         }
+      } else if (el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+        formData.append(name, el.value);
+      } else if (el instanceof HTMLButtonElement) {
+        // Preserve prior behavior: a named native button contributes its value.
+        formData.append(name, el.value);
       } else {
-        formData.append(input.name, input.value);
+        // hx-* form-associated custom element: read its public value API.
+        const control = el as { value?: unknown; checked?: unknown };
+        if (typeof control.checked === 'boolean') {
+          // Boolean controls (hx-checkbox, hx-switch): submit only when checked.
+          if (control.checked) {
+            const value =
+              typeof control.value === 'string' && control.value !== '' ? control.value : 'on';
+            formData.append(name, value);
+          }
+        } else if (typeof control.value === 'string') {
+          formData.append(name, control.value);
+        }
       }
     }
 

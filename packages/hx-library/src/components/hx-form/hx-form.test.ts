@@ -1232,6 +1232,82 @@ describe('hx-form', () => {
       expect(data.get('hostField')).toBe('hostValue');
     });
 
+    it('collects values from an all-hx-* slotted form (controlled submit)', async () => {
+      // Regression: a form whose only fields are hx-* form-associated controls
+      // must still produce a non-empty payload — `new FormData(form)` captures
+      // their values via ElementInternals.setFormValue.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <hx-text-input name="username" value="alice" label="Username"></hx-text-input>
+            <hx-checkbox name="agree" value="yes" checked label="Agree"></hx-checkbox>
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      // Let the hx-* controls flush their form values.
+      await el.updateComplete;
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      const event = await eventPromise;
+      expect(event.detail.values['username']).toBe('alice');
+      expect(event.detail.formData.get('username')).toBe('alice');
+      expect(event.detail.formData.get('agree')).toBe('yes');
+      // getFormData() returns the same hx-* values, not an empty payload.
+      expect(el.getFormData().get('username')).toBe('alice');
+    });
+
+    it('collects an orphaned hx-* control in own-form mode', async () => {
+      // Whitespace action → own form rendered; the hx-* control is an orphaned
+      // light child (not inside the slot-projecting own form) and must be read
+      // manually from its public value API.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <hx-text-input name="email" value="a@b.com" label="Email"></hx-text-input>
+          <button type="submit">Submit</button>
+        </hx-form>
+      `);
+      await el.updateComplete;
+      // Own form rendered; the hx-* control is orphaned (outside any form).
+      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
+      expect(queryOrThrow<HTMLElement>(el, 'hx-text-input').closest('form')).toBeNull();
+
+      const ownForm = queryOrThrow<HTMLFormElement>(el, 'form[data-hx-own-form]');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      ownForm.dispatchEvent(submitEvent);
+
+      const event = await eventPromise;
+      expect(event.detail.values['email']).toBe('a@b.com');
+      expect(el.getFormData().get('email')).toBe('a@b.com');
+    });
+
+    it('collects mixed native and hx-* controls in the same form', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <hx-text-input name="hxField" value="hxValue" label="HX"></hx-text-input>
+            <input type="text" name="nativeField" value="nativeValue" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      const event = await eventPromise;
+      expect(event.detail.formData.get('hxField')).toBe('hxValue');
+      expect(event.detail.formData.get('nativeField')).toBe('nativeValue');
+    });
+
     it('intercepts a slotted <form action=""> (empty action is the controlled case)', async () => {
       // Templated markup (Twig/Drupal) that binds an action which renders empty
       // must still be bridged exactly like a form with no action attribute.
