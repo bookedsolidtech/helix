@@ -1054,6 +1054,64 @@ describe('hx-form', () => {
       expect(event.detail.errors.some((er) => er.name === 'required-field')).toBe(true);
     });
 
+    it('honors an externally-associated (form="id") control in the submitting form', async () => {
+      // A required control associated via `form="f"` but placed OUTSIDE the form.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <input type="text" name="external" form="ext-form" required />
+          <form id="ext-form">
+            <input type="text" name="inner" value="innerValue" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, '#ext-form');
+      const externalInput = queryOrThrow<HTMLInputElement>(el, 'input[name="external"]');
+
+      // Empty external required control → the form is invalid → hx-invalid.
+      const invalidPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const invalidSubmit = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(invalidSubmit);
+      expect(invalidSubmit.defaultPrevented).toBe(true);
+      const invalidEvent = await invalidPromise;
+      expect(invalidEvent.detail.errors.some((er) => er.name === 'external')).toBe(true);
+
+      // Fill the external control → hx-submit valid, and its value is in the payload.
+      externalInput.value = 'externalValue';
+      const validPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const validSubmit = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(validSubmit);
+      expect(validSubmit.defaultPrevented).toBe(true);
+      const validEvent = await validPromise;
+      expect(validEvent.detail.valid).toBe(true);
+      // `new FormData(form)` includes the external form="id" control.
+      expect(validEvent.detail.values['external']).toBe('externalValue');
+      expect(validEvent.detail.values['inner']).toBe('innerValue');
+    });
+
+    it('whitespace-action own-form payload includes ownerless direct controls', async () => {
+      // The bridge runs on hx-form's own wrapper form; the ownerless direct
+      // control must appear in the payload, not be lost to the empty wrapper.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <input type="text" name="email" value="a@b.com" />
+          <button type="submit">Submit</button>
+        </hx-form>
+      `);
+
+      const ownForm = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      ownForm.dispatchEvent(submitEvent);
+
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+      // Payload is NOT empty — the ownerless direct control is collected.
+      expect(event.detail.values['email']).toBe('a@b.com');
+      expect(event.detail.formData.get('email')).toBe('a@b.com');
+    });
+
     it('getFormData() falls back to the host form in slot-only mode', async () => {
       const el = await fixture<HelixForm>(`
         <hx-form>

@@ -301,13 +301,14 @@ export class HelixForm extends HelixElement {
    *
    * When `scopeForm` is provided (the controlled-submit bridge passes the form
    * that fired the submit), the result is scoped to controls that belong to that
-   * form: a control whose nearest ancestor `<form>` is `scopeForm`. Ownerless
-   * controls (`closest('form') === null`) are included ONLY when `scopeForm` is
-   * hx-form's OWN rendered form — because its inert `<slot>` does not project
-   * hx-form's light-DOM content into the form, so those controls sit outside any
-   * `<form>` yet are the own form's logical fields. For a slotted/descendant
-   * form's submit, ownerless siblings elsewhere in hx-form are excluded. With no
-   * scope (the public `checkValidity`/`reportValidity` callers), every control is
+   * form by actual form ASSOCIATION (`_formOf`, which honors `form="id"` and
+   * `ElementInternals.form`, not just DOM descent). Ownerless controls
+   * (`_formOf === null`) are included ONLY when `scopeForm` is hx-form's OWN
+   * rendered form — because its inert `<slot>` does not project hx-form's
+   * light-DOM content into the form, so those controls sit outside any `<form>`
+   * yet are the own form's logical fields. For a slotted/descendant form's
+   * submit, ownerless siblings elsewhere in hx-form are excluded. With no scope
+   * (the public `checkValidity`/`reportValidity` callers), every control is
    * returned — unchanged behavior.
    * @internal
    */
@@ -324,9 +325,72 @@ export class HelixForm extends HelixElement {
     }
     const isOwnForm = scopeForm === this._ownFormRef.value;
     return all.filter((el) => {
-      const owner = el.closest('form');
+      const owner = this._formOf(el);
       return owner === scopeForm || (owner === null && isOwnForm);
     });
+  }
+
+  /**
+   * The `<form>` a control is associated with, by actual form association rather
+   * than DOM descent. Native controls and hx-* form-associated components expose
+   * a `.form` property (the IDL form, which reflects both `form="id"` and
+   * descendant association); it is used when present. Falls back to
+   * `closest('form')` only when no `.form` property exists.
+   * @internal
+   */
+  private _formOf(el: Element): HTMLFormElement | null {
+    const candidate = (el as { form?: unknown }).form;
+    if (candidate instanceof HTMLFormElement) {
+      return candidate;
+    }
+    if (candidate === null) {
+      return null;
+    }
+    return el.closest('form');
+  }
+
+  /**
+   * Appends, to `formData`, the submission values of in-scope controls that are
+   * NOT associated to any form (`_formOf === null`). Used only for hx-form's OWN
+   * wrapper-form submit, whose inert `<slot>` never projects the light-DOM
+   * controls into it — so `new FormData(scopeForm)` misses them. Mirrors native
+   * form serialization for the common single-value controls (native inputs,
+   * select, textarea, hx-text-input, hx-select, hx-number-input, hx-textarea) and
+   * boolean controls (native checkbox/radio, hx-checkbox, hx-switch).
+   * @internal
+   */
+  private _appendOwnerlessFields(formData: FormData, scopeForm: HTMLFormElement): void {
+    for (const el of this._getAllValidatableElements(scopeForm)) {
+      if (this._formOf(el) !== null) {
+        continue; // already serialized by `new FormData(scopeForm)`
+      }
+      const name = (el as { name?: unknown }).name;
+      if (typeof name !== 'string' || name === '') {
+        continue;
+      }
+      if (el instanceof HTMLInputElement) {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          if (el.checked) {
+            formData.append(name, el.value || 'on');
+          }
+        } else {
+          formData.append(name, el.value);
+        }
+      } else if (el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+        formData.append(name, el.value);
+      } else {
+        const control = el as { value?: unknown; checked?: unknown };
+        if (typeof control.checked === 'boolean') {
+          if (control.checked) {
+            const value =
+              typeof control.value === 'string' && control.value !== '' ? control.value : 'on';
+            formData.append(name, value);
+          }
+        } else if (typeof control.value === 'string') {
+          formData.append(name, control.value);
+        }
+      }
+    }
   }
 
   /**
@@ -482,10 +546,16 @@ export class HelixForm extends HelixElement {
     this._validationErrors = [];
     this._clearAriaInvalid();
 
-    // Payload from the submitting form (captures native + hx-* controls inside it
-    // via ElementInternals). Fall back to the public collector only defensively,
-    // when the submit event has no form target.
+    // Payload from the submitting form — `new FormData` captures controls
+    // associated to it (descendant, `form="id"`, and hx-* via ElementInternals).
+    // For hx-form's OWN wrapper form, its inert `<slot>` doesn't project the
+    // light-DOM controls into it, so they are ownerless and missed by FormData;
+    // append those in-scope ownerless fields. Defensively fall back to the public
+    // collector when the submit event has no form target.
     const formData = submittingForm !== null ? new FormData(submittingForm) : this.getFormData();
+    if (submittingForm !== null && submittingForm === this._ownFormRef.value) {
+      this._appendOwnerlessFields(formData, submittingForm);
+    }
     const values: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
     for (const key of new Set(formData.keys())) {
       const all = formData.getAll(key);
