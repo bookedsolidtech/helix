@@ -2549,6 +2549,51 @@ describe('hx-carousel', () => {
       expect(el['_currentIndex']).toBe(3); // a real legacy step back
     });
 
+    it('emits exactly one hx-slide-change when a nav-time clamp is the terminal change', async () => {
+      // 6-slide 2-up measured carousel parked on the measured-only index 5. After a
+      // no-resize flip back to legacy (_maxIndex 4), next() clamps 5 -> 4 and the
+      // legacy guard no-ops the move: the clamp is the FINAL change, so exactly one
+      // hx-slide-change must fire for index 4 (not zero — hosts must not stay stale).
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+          <hx-carousel-item>6</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      el.goTo(5);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(5);
+
+      const events: number[] = [];
+      el.addEventListener('hx-slide-change', (e) =>
+        events.push((e as CustomEvent<{ index: number }>).detail.index),
+      );
+
+      // Remove the custom width (fallback = identical 192px geometry, no resize).
+      el.style.removeProperty('--hx-carousel-slide-width');
+      el.next(); // flips to legacy, clamps 5 -> 4, the legacy guard no-ops the move
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(4);
+      expect(events).toEqual([4]); // exactly one event for the terminal clamp
+      expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('Slide 5 of 6');
+
+      // goTo(currentIndex) is a true no-op now (no clamp, no move) -> no extra event.
+      events.length = 0;
+      el.goTo(4);
+      await el.updateComplete;
+      expect(events).toEqual([]);
+
+      // A real move emits exactly its destination (no double-emit from the wrapper).
+      el.goTo(1);
+      await el.updateComplete;
+      expect(events).toEqual([1]);
+    });
+
     it('measured pagination renders one dot per slide (every slide selectable)', async () => {
       // Uniform exact-fill 6 slides (192px + 16px gap), 400px viewport -> _maxIndex 5 (n-1).
       const el = await fixture<HelixCarousel>(`
@@ -2650,6 +2695,79 @@ describe('hx-carousel', () => {
       el.goTo(4);
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(3);
+    });
+
+    it('measured loop with slidesPerMove > 1 reaches the last slide before wrapping', async () => {
+      // 6 uniform exact-fill slides (192px + 16px gap), 2-up, loop, slides-per-move=2.
+      // _maxIndex is 5 (n-1). A raw 0->2->4->0 modulo would skip the last slide; the
+      // partial-final-step rule lands on 5 first, then wraps to 0 on the next step.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" slides-per-move="2" style="display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+          <hx-carousel-item>6</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(5);
+
+      // Forward cycle: 0 -> 2 -> 4 -> 5 (partial final step) -> 0 (wrap).
+      const forward: number[] = [el['_currentIndex']];
+      for (let i = 0; i < 4; i++) {
+        el.next();
+        await el.updateComplete;
+        forward.push(el['_currentIndex']);
+      }
+      expect(forward).toEqual([0, 2, 4, 5, 0]);
+
+      // The last slide (5) is genuinely reached, not skipped.
+      expect(forward).toContain(5);
+
+      // Backward cycle from 0 is symmetric: 0 -> 5 (wrap) -> 3 -> 1 -> 0 (partial).
+      el.goTo(0);
+      await el.updateComplete;
+      const backward: number[] = [el['_currentIndex']];
+      for (let i = 0; i < 4; i++) {
+        el.previous();
+        await el.updateComplete;
+        backward.push(el['_currentIndex']);
+      }
+      expect(backward).toEqual([0, 5, 3, 1, 0]);
+
+      // Across both directions every index in [0, _maxIndex] is reachable.
+      const reached = new Set([...forward, ...backward]);
+      expect([0, 1, 2, 3, 4, 5].every((i) => reached.has(i))).toBe(true);
+    });
+
+    it('measured loop with slidesPerMove > 1, odd slide count: last slide reachable', async () => {
+      // 5 slides, 2-up, loop, slides-per-move=2. _maxIndex 4 (n-1). Forward:
+      // 0 -> 2 -> 4 -> 0; the last slide (4) lands exactly (no partial needed here),
+      // and wrapping happens from 4. Confirms odd counts also reach the end.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" slides-per-move="2" style="display: block; width: 400px; --hx-carousel-slide-width: 150px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(4);
+
+      const seq: number[] = [el['_currentIndex']];
+      for (let i = 0; i < 3; i++) {
+        el.next();
+        await el.updateComplete;
+        seq.push(el['_currentIndex']);
+      }
+      expect(seq).toEqual([0, 2, 4, 0]);
+      expect(seq).toContain(4); // the last slide is reached, not skipped
     });
 
     it('regression guard: default (no custom width) loop wraps over the full slide count', async () => {

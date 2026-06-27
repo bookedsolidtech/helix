@@ -228,6 +228,16 @@ export class HelixCarousel extends HelixElement {
   /** @internal */
   @state() private _livePolite = true;
   /**
+   * Monotonic count of `hx-slide-change` dispatches. Read (not rendered) by the
+   * public navigation methods to detect whether a user action already emitted an
+   * authoritative event, so a navigation-time clamp that is the FINAL change
+   * (the following move no-ops) still emits exactly one event — and a navigation
+   * that does move never double-emits. Plain field (not reactive state): it never
+   * affects rendering.
+   * @internal
+   */
+  private _slideChangeDispatches = 0;
+  /**
    * Whether geometry-measured px navigation is active (decoupled selection vs.
    * scroll). True for a genuine horizontal "peek" (custom slide-width that does
    * not exactly fill the viewport) AND for every measurable vertical carousel
@@ -553,6 +563,7 @@ export class HelixCarousel extends HelixElement {
   private _emitSlideChange(index: number): void {
     const slide = this._slides[index];
     this._liveText = slide ? this.labelSlideOf(index + 1, this._slides.length) : '';
+    this._slideChangeDispatches++;
     this.dispatchEvent(
       new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
         bubbles: true,
@@ -715,8 +726,10 @@ export class HelixCarousel extends HelixElement {
 
   goTo(index: number): void {
     if (this._slides.length === 0) return;
-    this._refreshMeasuredBounds();
-    this._navigateTo(index);
+    this._withTerminalClampEmit(() => {
+      this._refreshMeasuredBounds();
+      this._navigateTo(index);
+    });
   }
 
   /**
@@ -756,33 +769,94 @@ export class HelixCarousel extends HelixElement {
     this._emitSlideChange(next);
   }
 
-  next(): void {
-    // Refresh BEFORE the guard so the legacy-block decision uses the current
-    // _measuredNav verdict (a runtime gap change may have flipped an exact-fill
-    // carousel into a genuine peek, or this may be a measured vertical carousel).
-    // The refresh also clamps `_currentIndex` into the (possibly newly-smaller)
-    // range, so a measured→legacy flip with no box resize can't strand a
-    // measured-only index past the legacy bound and make this guard a no-op.
-    this._refreshMeasuredBounds();
-    const nextIndex = this._currentIndex + this.slidesPerMove;
-    // Legacy/default mode blocks a move that would pass the page bound. In
-    // measured-nav mode _navigateTo() clamps to the last slide instead, so the
-    // final, possibly partial, slidesPerMove step can always land on n - 1.
-    if (!this._measuredNav && !this.loop && nextIndex > this._maxIndex) {
-      return;
+  /**
+   * Resolves a measured-loop RELATIVE step so every reachable index — including
+   * the last slide (`_maxIndex`) — is hit even when `slidesPerMove` shares a factor
+   * with the slide count. A step that would jump PAST the last slide first lands on
+   * `_maxIndex` (a partial final step), and only the SUBSEQUENT step (taken from
+   * `_maxIndex`) wraps to 0; symmetrically, `previous` lands on 0 before wrapping to
+   * `_maxIndex`. So 6 slides + `slides-per-move=2` + loop advance as `0→2→4→5→0…`
+   * instead of skipping the last slide via a raw `0→2→4→0` modulo.
+   * @internal
+   */
+  private _relativeLoopTarget(rawIndex: number, forward: boolean): number {
+    const max = this._maxIndex;
+    if (forward) {
+      // Past the end: land on the last slide first, then wrap to 0 next time.
+      return rawIndex > max ? (this._currentIndex < max ? max : 0) : rawIndex;
     }
-    this._livePolite = true;
-    this._navigateTo(nextIndex, true); // relative -> loop-wraps over the slide range
+    // Before the start: land on the first slide first, then wrap to the last next.
+    return rawIndex < 0 ? (this._currentIndex > 0 ? 0 : max) : rawIndex;
+  }
+
+  /**
+   * Performs a relative navigation step (`next`/`previous`/autoplay advance). In
+   * measured loop mode it routes through `_relativeLoopTarget` (absolute clamp) so
+   * `slidesPerMove > 1` still reaches every slide; otherwise it falls back to the
+   * generic relative `_navigateTo` (legacy loop and non-loop are unchanged).
+   * @internal
+   */
+  private _navigateRelative(rawIndex: number, forward: boolean): void {
+    if (this._measuredNav && this.loop && !this._singlePage) {
+      this._navigateTo(this._relativeLoopTarget(rawIndex, forward));
+    } else {
+      this._navigateTo(rawIndex, true);
+    }
+  }
+
+  /**
+   * Wraps a user navigation action so a navigation-time clamp that ends up being
+   * the FINAL change still emits exactly one `hx-slide-change`. The silent nav-path
+   * clamp in `_recomputeBounds(false)` suppresses its own event (expecting the
+   * following move to emit the authoritative one); when that move then no-ops
+   * (a flip-clamp lands on the bound the legacy guard blocks, or `goTo` targets the
+   * already-clamped index), no event would fire for the net index change. This
+   * captures the pre-action index + dispatch count, runs `action`, and emits once
+   * for the final index only if it changed AND nothing was dispatched during the
+   * action — never double-emitting when the action did move (it emitted its own).
+   * @internal
+   */
+  private _withTerminalClampEmit(action: () => void): void {
+    const before = this._currentIndex;
+    const dispatchesBefore = this._slideChangeDispatches;
+    action();
+    if (this._currentIndex !== before && this._slideChangeDispatches === dispatchesBefore) {
+      this._emitSlideChange(this._currentIndex);
+    }
+  }
+
+  next(): void {
+    this._withTerminalClampEmit(() => {
+      // Refresh BEFORE the guard so the legacy-block decision uses the current
+      // _measuredNav verdict (a runtime gap change may have flipped an exact-fill
+      // carousel into a genuine peek, or this may be a measured vertical carousel).
+      // The refresh also clamps `_currentIndex` into the (possibly newly-smaller)
+      // range, so a measured→legacy flip with no box resize can't strand a
+      // measured-only index past the legacy bound and make this guard a no-op (if
+      // it does, the wrapper still emits one event for the clamped final index).
+      this._refreshMeasuredBounds();
+      const nextIndex = this._currentIndex + this.slidesPerMove;
+      // Legacy/default mode blocks a move that would pass the page bound. In
+      // measured-nav mode the relative step clamps/wraps to the last slide instead,
+      // so the final, possibly partial, slidesPerMove step can always land on n - 1.
+      if (!this._measuredNav && !this.loop && nextIndex > this._maxIndex) {
+        return;
+      }
+      this._livePolite = true;
+      this._navigateRelative(nextIndex, true);
+    });
   }
 
   previous(): void {
-    this._refreshMeasuredBounds();
-    const prevIndex = this._currentIndex - this.slidesPerMove;
-    if (!this._measuredNav && !this.loop && prevIndex < 0) {
-      return;
-    }
-    this._livePolite = true;
-    this._navigateTo(prevIndex, true); // relative -> loop-wraps over the slide range
+    this._withTerminalClampEmit(() => {
+      this._refreshMeasuredBounds();
+      const prevIndex = this._currentIndex - this.slidesPerMove;
+      if (!this._measuredNav && !this.loop && prevIndex < 0) {
+        return;
+      }
+      this._livePolite = true;
+      this._navigateRelative(prevIndex, false);
+    });
   }
 
   // ─── Autoplay ───
@@ -799,8 +873,10 @@ export class HelixCarousel extends HelixElement {
     // _navigateTo (not goTo) avoids a second redundant recompute this tick.
     this._refreshMeasuredBounds();
     if (this.loop || this._currentIndex < this._maxIndex) {
-      // Relative advance -> loop-wraps over the slide range (clamps when not looping).
-      this._navigateTo(this._currentIndex + this.slidesPerMove, true);
+      // Relative advance -> loop-wraps over the slide range (clamps when not
+      // looping). In measured loop mode this reaches the last slide before wrapping
+      // even when slidesPerMove > 1.
+      this._navigateRelative(this._currentIndex + this.slidesPerMove, true);
     } else {
       this._navigateTo(0);
     }
