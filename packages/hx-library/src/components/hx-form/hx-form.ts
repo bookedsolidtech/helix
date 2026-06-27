@@ -9,11 +9,12 @@ import { helixFormScopedCss } from './hx-form.styles.js';
  * A Light DOM form wrapper that styles native HTML form elements and
  * hx-* components with the design system's form styles.
  *
- * Render mode: hx-form renders its OWN `<form>` only when the consumer did NOT
- * supply a slotted `<form>` AND `action` is a non-empty string. If the consumer
- * provides its own `<form>` (the Drupal pattern), hx-form renders a bare `<slot>`
- * and never wraps it — so the host form's native submission is preserved. With no
- * slotted form and an empty `action`, it also renders only a `<slot>`.
+ * Render mode: hx-form renders its OWN `<form>` when `action` is a non-empty
+ * string AND either no host (direct-child) `<form>` is present OR orphaned direct
+ * controls remain. If the consumer provides its own `<form>` (the Drupal pattern)
+ * and no orphaned controls remain, hx-form renders a bare `<slot>` and never wraps
+ * it — so the host form's native submission is preserved. With an empty `action`
+ * it also renders only a `<slot>`.
  *
  * The client-side submit bridge (validate + dispatch `hx-submit`) only runs for
  * a form that hx-form effectively owns: a slotted form with no `action` of its
@@ -94,6 +95,16 @@ export class HelixForm extends HelixElement {
   private _hasSlottedForm = false;
 
   /**
+   * Whether form-associated controls (`input`/`select`/`textarea`/`button`) exist
+   * in our light DOM that are NOT inside any `<form>`. When a host form is present
+   * but such orphaned direct controls also remain, hx-form keeps rendering its own
+   * `<form>` so those controls retain a form owner (two sibling forms, not nested).
+   * @internal
+   */
+  @state()
+  private _hasOrphanedControls = false;
+
+  /**
    * Observes light-DOM child changes so the render-mode decision stays correct
    * when consumers swap `<hx-form>`'s children after mount (React wrapper
    * children, Drupal behaviors, etc.). Lit does not run an update cycle on
@@ -111,10 +122,12 @@ export class HelixForm extends HelixElement {
 
     if (typeof MutationObserver !== 'undefined') {
       this._childObserver = new MutationObserver(this._onChildMutation);
-      // Detection is direct-child-scoped, so only direct-child add/remove can
-      // flip the decision — no `subtree` needed (avoids reacting to deep,
-      // irrelevant mutations inside consumer markup).
-      this._childObserver.observe(this, { childList: true });
+      // `subtree` is needed: orphaned-control detection scans the whole light-DOM
+      // subtree, so a control added/removed anywhere (not just as a direct child)
+      // must re-evaluate the render mode. Recompute is change-guarded by Lit's
+      // reactive setters, so deep mutations that don't flip a signal are cheap
+      // no-ops with no re-render.
+      this._childObserver.observe(this, { childList: true, subtree: true });
     }
   }
 
@@ -132,28 +145,52 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * MutationObserver callback. Recomputes slotted-form presence and requests a
-   * re-render ONLY when it actually changed. hx-form's own rendered form is
-   * excluded from the detection query, so its self-mutations never flip the
-   * value — preventing an observe → render → observe infinite loop.
+   * Detects form-associated controls in our light DOM that are not inside any
+   * `<form>` (the host's or hx-form's own). `closest('form')` attributes each
+   * control to its nearest ancestor form; a `null` result means the control has
+   * no form owner and would be left orphaned if hx-form dropped its own form.
+   * @internal
+   */
+  private _detectOrphanedControls(): boolean {
+    const controls = this.querySelectorAll('input, select, textarea, button');
+    for (const control of controls) {
+      if (control.closest('form') === null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Recomputes the render-mode signals from the current light DOM. Lit's reactive
+   * setters change-guard each assignment, so a re-render is requested only when a
+   * signal actually flips. hx-form's own rendered form is excluded from
+   * slotted-form detection and contains no controls, so its own insertion/removal
+   * never flips a signal — preventing an observe → render → observe loop.
+   * @internal
+   */
+  private _syncFormModeState(): void {
+    this._hasSlottedForm = this._detectSlottedForm();
+    this._hasOrphanedControls = this._detectOrphanedControls();
+  }
+
+  /**
+   * MutationObserver callback — resyncs the render-mode signals on light-DOM
+   * child changes between Lit updates.
    * @internal
    */
   private readonly _onChildMutation = (): void => {
-    const next = this._detectSlottedForm();
-    if (next !== this._hasSlottedForm) {
-      this._hasSlottedForm = next;
-    }
+    this._syncFormModeState();
   };
 
   /**
-   * Detects a consumer-provided (slotted) `<form>` before each render, so the
-   * render branch can choose slot-only mode when a host form is present. This is
-   * the per-render source of truth; the MutationObserver only triggers a
-   * re-render when consumer children change between updates.
+   * Recomputes the render-mode signals before each render (the per-render source
+   * of truth); the MutationObserver only triggers a re-render when consumer
+   * children change between updates.
    * @internal
    */
   override willUpdate(): void {
-    this._hasSlottedForm = this._detectSlottedForm();
+    this._syncFormModeState();
   }
 
   override disconnectedCallback(): void {
@@ -618,20 +655,24 @@ export class HelixForm extends HelixElement {
         : nothing;
 
     // Render mode is decoupled from the submit-intercept decision. hx-form
-    // renders its OWN `<form>` ONLY when the consumer did NOT supply a slotted
-    // `<form>` AND `action` is a non-empty string (whitespace included):
-    //  - A slotted host-owned `<form>` is present → slot-only mode regardless of
-    //    `action`, so we never wrap it in (or beside) a second form that would
-    //    break the host form's native action/formaction submission.
-    //  - No slotted form + non-empty `action` (incl. whitespace) → render our own
-    //    `<form>` so direct controls (raw inputs + submit/reset buttons) get a
-    //    form owner, even when a templated action collapses to whitespace.
-    //  - Truly-empty `action=""` (and no slotted form) → slot-only mode.
+    // renders its OWN `<form>` when `action` is a non-empty string (whitespace
+    // included) AND either no host form is present OR orphaned direct controls
+    // remain:
+    //  - Host form present, NO orphaned controls (just the host form) → slot-only
+    //    mode, single form — never beside/around the host form (would break its
+    //    native action/formaction submission).
+    //  - Host form present AND orphaned direct controls present → KEEP the own
+    //    form so those controls retain a form owner. Two SIBLING forms (own +
+    //    host), each owning its own content — valid HTML, not nested.
+    //  - No host form + non-empty `action` (incl. whitespace) → render our own
+    //    `<form>` so direct controls get a form owner, even when a templated
+    //    action collapses to whitespace.
+    //  - Truly-empty `action=""` → slot-only mode.
     // The `action` ATTRIBUTE is set only for a non-empty trimmed value, so a
     // whitespace-only action yields `<form>` without a meaningless action attr.
-    // The own form is tagged `data-hx-own-form` so `willUpdate` can exclude it
-    // when detecting the consumer's slotted form.
-    if (!this._hasSlottedForm && this.action !== '') {
+    // The own form is tagged `data-hx-own-form` so the slotted-form detection can
+    // exclude it.
+    if (this.action !== '' && (!this._hasSlottedForm || this._hasOrphanedControls)) {
       return html`
         ${errorSummary}
         <form
