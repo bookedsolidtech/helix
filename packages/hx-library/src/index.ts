@@ -8,8 +8,8 @@
  * Run `npm run generate:barrel` to regenerate.
  *
  * Public-API surface is gated by an allowlist in scripts/generate-barrel.js.
- * Internals (resetIdCounter, mixinDelegatesAria, etc.)
- * are intentionally excluded and must be imported via deep paths if needed.
+ * Internals (resetIdCounter, etc.) are intentionally excluded and must be
+ * imported via deep paths if needed.
  */
 
 // ─── Document-level token adoption ──────────────────────────────────────────
@@ -24,8 +24,8 @@ export { ensureDocumentTokens } from './utilities/document-token-adoption.js';
 export { HelixElement, createIdCounter } from './base/index.js';
 
 // ─── Mixins ───────────────────────────────────────────────────────────────────
-export { FocusMixin, FormMixin } from './mixins/index.js';
-export type { FocusMixinInterface, FormMixinInterface } from './mixins/index.js';
+export { FocusMixin, FormMixin, mixinDelegatesAria } from './mixins/index.js';
+export type { FocusMixinInterface, FormMixinInterface, AriaDelegationMixinInterface, AriaAttribute } from './mixins/index.js';
 
 // ─── HIPAA audit-trail controller ───────────────────────────────────────────
 export { HelixAuditController } from './controllers/helix-audit-controller.js';

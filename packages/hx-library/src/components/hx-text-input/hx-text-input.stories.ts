@@ -170,6 +170,26 @@ const meta = {
         type: { summary: 'string' },
       },
     },
+    minlengthMessage: {
+      control: 'text',
+      description:
+        'Custom validation message shown when the value is shorter than `minlength`. Use the `{min}` placeholder to interpolate the minimum length. When empty, a built-in English message is used.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
+    maxlengthMessage: {
+      control: 'text',
+      description:
+        'Custom validation message shown when the value is longer than `maxlength`. Use the `{max}` placeholder to interpolate the maximum length. When empty, a built-in English message is used.',
+      table: {
+        category: 'Validation',
+        defaultValue: { summary: "''" },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     label: 'Patient Name',
@@ -599,6 +619,57 @@ export const ValidationStates: Story = {
   `,
 };
 
+export const LocalizedLengthMessages: Story = {
+  name: 'Localized Length Messages',
+  render: () => html`
+    <form
+      @submit=${(e: SubmitEvent) => e.preventDefault()}
+      style="display: flex; flex-direction: column; gap: var(--hx-space-6, 1.5rem); max-width: 480px;"
+    >
+      <p
+        style="font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-neutral-600, #4A5362); margin: 0;"
+      >
+        Override the built-in English length-validation messages for localization via
+        <code>minlength-message</code> / <code>maxlength-message</code>. The
+        <code>{min}</code> / <code>{max}</code> placeholders interpolate the limit. Submit to see
+        the localized native validation message.
+      </p>
+
+      <hx-text-input
+        label="Nom d'utilisateur"
+        name="username"
+        value="ab"
+        minlength="5"
+        minlength-message="Veuillez saisir au moins {min} caractères."
+        help-text="Minimum 5 caractères."
+      ></hx-text-input>
+
+      <hx-text-input
+        label="Code postal"
+        name="zip"
+        value="1234567890"
+        maxlength="5"
+        maxlength-message="Veuillez saisir au maximum {max} caractères."
+        help-text="Maximum 5 caractères."
+      ></hx-text-input>
+
+      <hx-button type="submit">Envoyer</hx-button>
+    </form>
+  `,
+  play: async ({ canvasElement }) => {
+    const hosts = canvasElement.querySelectorAll('hx-text-input');
+    const tooShort = hosts[0];
+    const tooLong = hosts[1];
+    if (!tooShort || !tooLong) {
+      throw new Error('Expected two hx-text-input elements in the story');
+    }
+    await tooShort.updateComplete;
+    await tooLong.updateComplete;
+    await expect(tooShort.validationMessage).toBe('Veuillez saisir au moins 5 caractères.');
+    await expect(tooLong.validationMessage).toBe('Veuillez saisir au maximum 5 caractères.');
+  },
+};
+
 // ─────────────────────────────────────────────────
 // 7. COMPOSITION
 // ─────────────────────────────────────────────────
@@ -869,6 +940,64 @@ export const CSSCustomProperties: Story = {
             --hx-input-error-color: #f87171;
             --hx-input-label-color: #94a3b8;
           "
+        ></hx-text-input>
+      </div>
+    </div>
+  `,
+};
+
+// ─────────────────────────────────────────────────
+// 9b. FOCUS RING OFFSET DEMO
+// ─────────────────────────────────────────────────
+
+export const FocusRingOffset: Story = {
+  name: 'Focus Ring Offset',
+  render: () => html`
+    <div style="display: flex; flex-direction: column; gap: var(--hx-space-8, 2rem); max-width: 480px;">
+      <p
+        style="font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-neutral-600, #4A5362); margin: 0;"
+      >
+        Click or tab into each field to reveal the focus ring. The component-specific
+        <code>--hx-text-input-focus-ring-offset</code> hook opens a gap between the field border and
+        the ring. At the default <code>0px</code> the ring sits flush against the border —
+        byte-identical to prior releases. The ring keeps its width and color; only the gap changes.
+        (The global <code>--hx-focus-ring-offset</code> is the library outline-offset token and does
+        not affect this box-shadow ring.)
+      </p>
+
+      <div>
+        <h4
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+        >
+          Default offset (0px)
+        </h4>
+        <hx-text-input label="Flush ring" placeholder="Focus me"></hx-text-input>
+      </div>
+
+      <div>
+        <h4
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+        >
+          --hx-text-input-focus-ring-offset: 3px
+        </h4>
+        <hx-text-input
+          label="Offset ring"
+          placeholder="Focus me"
+          style="--hx-text-input-focus-ring-offset: 3px;"
+        ></hx-text-input>
+      </div>
+
+      <div>
+        <h4
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+        >
+          Error-state ring honors the offset too
+        </h4>
+        <hx-text-input
+          label="Invalid field"
+          value="bad-data"
+          error="Offset applies to the invalid focus ring as well."
+          style="--hx-text-input-focus-ring-offset: 3px;"
         ></hx-text-input>
       </div>
     </div>

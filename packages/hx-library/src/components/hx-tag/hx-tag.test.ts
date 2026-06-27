@@ -477,6 +477,71 @@ describe('hx-tag', () => {
     });
   });
 
+  // ─── Property: label-remove (i18n) ───
+
+  describe('Property: label-remove (i18n)', () => {
+    it('(a) default unchanged — aria-label is "Remove <slot text>" when unset', async () => {
+      const el = await fixture<HxTag>('<hx-tag removable>Cardiology</hx-tag>');
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Remove Cardiology');
+      // Property defaults to empty string (legacy behavior preserved).
+      expect(el.labelRemove).toBe('');
+    });
+
+    it('(b) verbatim string is used as the full accessible name when it has no {label}', async () => {
+      const el = await fixture<HxTag>(
+        '<hx-tag removable label-remove="Quitar">Cardiology</hx-tag>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      // No placeholder → verbatim; the tag text is intentionally NOT appended.
+      expect(btn?.getAttribute('aria-label')).toBe('Quitar');
+    });
+
+    it('(c) {label} placeholder is substituted with the tag text', async () => {
+      const el = await fixture<HxTag>(
+        '<hx-tag removable label-remove="Quitar {label}">Cardiology</hx-tag>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Quitar Cardiology');
+    });
+
+    it('(d) {label} placeholder falls back to "tag" when the tag text is empty', async () => {
+      const el = await fixture<HxTag>('<hx-tag removable label-remove="Quitar {label}"></hx-tag>');
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Quitar tag');
+    });
+
+    it('reflects the label-remove attribute to the host', async () => {
+      const el = await fixture<HxTag>(
+        '<hx-tag removable label-remove="Quitar {label}">Cardiology</hx-tag>',
+      );
+      expect(el.getAttribute('label-remove')).toBe('Quitar {label}');
+    });
+
+    it('re-renders the accessible name when labelRemove changes dynamically', async () => {
+      const el = await fixture<HxTag>('<hx-tag removable>Cardiology</hx-tag>');
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Remove Cardiology');
+      el.labelRemove = 'Entfernen {label}';
+      await el.updateComplete;
+      expect(btn?.getAttribute('aria-label')).toBe('Entfernen Cardiology');
+    });
+
+    it('substitutes every {label} occurrence in the override', async () => {
+      const el = await fixture<HxTag>(
+        '<hx-tag removable label-remove="{label}: remove {label}">Cardiology</hx-tag>',
+      );
+      await el.updateComplete;
+      const btn = shadowQuery(el, '[part="remove-button"]');
+      expect(btn?.getAttribute('aria-label')).toBe('Cardiology: remove Cardiology');
+    });
+  });
+
   // ─── hx-remove event suppression on disabled ───
 
   describe('hx-remove suppression on programmatic _handleRemove', () => {

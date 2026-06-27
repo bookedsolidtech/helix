@@ -52,6 +52,18 @@ association and `aria-labelledby`, not host-level ARIA delegation. The
   autocomplete?: string;
   /** Validation message shown when the field is required but empty. */
   requiredMessage?: string;
+  /** Validation message shown when the value is shorter than `minlength`.
+Supports a `{min}` placeholder that is substituted with the resolved
+`minlength` value (mirrors the `{label}` token convention used elsewhere
+in the library). When empty, the built-in English message is used, so
+default output is unchanged. */
+  minlengthMessage?: string;
+  /** Validation message shown when the value is longer than `maxlength`.
+Supports a `{max}` placeholder that is substituted with the resolved
+`maxlength` value (mirrors the `{label}` token convention used elsewhere
+in the library). When empty, the built-in English message is used, so
+default output is unchanged. */
+  maxlengthMessage?: string;
   /** Visual size of the input field. */
   size?: 'sm' | 'md' | 'lg';
   /** Returns the associated form element, if any. */

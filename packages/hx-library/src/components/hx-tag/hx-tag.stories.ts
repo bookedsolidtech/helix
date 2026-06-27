@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components';
 import { html } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { expect, userEvent } from 'storybook/test';
 import './hx-tag.js';
 
@@ -60,6 +61,16 @@ const meta = {
         type: { summary: 'boolean' },
       },
     },
+    labelRemove: {
+      control: 'text',
+      description:
+        'Accessible name for the remove button (shown when `removable`). Bind to the `label-remove` attribute for i18n. Use the `{label}` placeholder to interpolate the tag text — e.g. `Quitar {label}`. Without a placeholder the value is used verbatim. When unset, defaults to `Remove <tag text>`.',
+      table: {
+        category: 'Accessibility',
+        defaultValue: { summary: 'Remove <label>' },
+        type: { summary: 'string' },
+      },
+    },
   },
   args: {
     variant: 'default',
@@ -67,6 +78,7 @@ const meta = {
     pill: false,
     removable: false,
     disabled: false,
+    labelRemove: '',
   },
 } satisfies Meta;
 
@@ -85,6 +97,7 @@ export const Default: Story = {
       ?pill=${args.pill}
       ?removable=${args.removable}
       ?disabled=${args.disabled}
+      label-remove=${ifDefined(args.labelRemove || undefined)}
     >
       Healthcare
     </hx-tag>
@@ -135,6 +148,35 @@ export const Removable: Story = {
       <hx-tag removable variant="danger">Danger</hx-tag>
     </div>
   `,
+};
+
+/**
+ * The remove button's accessible name is localizable via the `label-remove`
+ * attribute. Use the `{label}` placeholder to interpolate the tag text
+ * (`Quitar {label}` → "Quitar Cardiology"), or pass a fixed string to use it
+ * verbatim. When unset, the name defaults to `Remove <tag text>`. Inspect each
+ * button with a screen reader or the accessibility panel to hear the localized
+ * name.
+ */
+export const RemovableLocalized: Story = {
+  name: 'Removable (localized remove label)',
+  render: () => html`
+    <div style="display:flex;gap:var(--hx-space-2, 0.5rem);flex-wrap:wrap;align-items:center;">
+      <hx-tag removable label-remove="Quitar {label}">Cardiología</hx-tag>
+      <hx-tag removable label-remove="Entfernen {label}" variant="primary">Kardiologie</hx-tag>
+      <hx-tag removable label-remove="Retirer {label}" variant="success">Cardiologie</hx-tag>
+      <hx-tag removable label-remove="Dismiss" variant="warning">Verbatim label</hx-tag>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const tags = canvasElement.querySelectorAll('hx-tag');
+    const first = tags[0].shadowRoot?.querySelector('[part="remove-button"]');
+    // {label} placeholder is interpolated with the tag text.
+    await expect(first?.getAttribute('aria-label')).toBe('Quitar Cardiología');
+    // A value without {label} is used verbatim (tag text not appended).
+    const verbatim = tags[3].shadowRoot?.querySelector('[part="remove-button"]');
+    await expect(verbatim?.getAttribute('aria-label')).toBe('Dismiss');
+  },
 };
 
 export const Disabled: Story = {

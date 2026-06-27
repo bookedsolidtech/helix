@@ -977,6 +977,118 @@ describe('hx-text-input', () => {
     });
   });
 
+  // ─── Property: minlengthMessage / maxlengthMessage overrides ───
+
+  describe('Property: minlengthMessage / maxlengthMessage', () => {
+    it('minlengthMessage defaults to empty string', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.minlengthMessage).toBe('');
+    });
+
+    it('maxlengthMessage defaults to empty string', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input></hx-text-input>');
+      expect(el.maxlengthMessage).toBe('');
+    });
+
+    // (a) default messages unchanged when override unset
+
+    it('uses default English tooShort message when minlength-message unset', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Please lengthen this text to 5 characters or more.');
+    });
+
+    it('uses default English tooLong message when maxlength-message unset', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Please shorten this text to 3 characters or fewer.');
+    });
+
+    // (b) minlength-message used on tooShort with {min} substituted
+
+    it('uses minlength-message with {min} substituted on tooShort', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Saisissez au moins {min} caractères."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Saisissez au moins 5 caractères.');
+    });
+
+    it('substitutes every {min} occurrence', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="4" value="ab" minlength-message="Min {min}; au moins {min}."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Min 4; au moins 4.');
+    });
+
+    // (c) maxlength-message used on tooLong with {max} substituted
+
+    it('uses maxlength-message with {max} substituted on tooLong', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong" maxlength-message="Maximum {max} caractères."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Maximum 3 caractères.');
+    });
+
+    // (d) verbatim (no placeholder) works
+
+    it('verbatim minlength-message without a placeholder is used as-is', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Trop court."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Trop court.');
+    });
+
+    it('verbatim maxlength-message without a placeholder is used as-is', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong" maxlength-message="Trop long."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Trop long.');
+    });
+
+    it('inserts a literal $ in the message verbatim (no String.replace pattern interpretation)', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Coût min {min} ($1)"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Coût min 5 ($1)');
+    });
+
+    // (e) precedence vs error matches required-message (error wins)
+
+    it('error takes precedence over minlength-message (matches required-message ordering)', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Trop court {min}." error="Hard error"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Hard error');
+    });
+
+    it('error takes precedence over maxlength-message (matches required-message ordering)', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input maxlength="3" value="toolong" maxlength-message="Trop long {max}." error="Hard error"></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validationMessage).toBe('Hard error');
+    });
+
+    it('tooShort validity flag remains set when minlength-message is provided', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input minlength="5" value="ab" minlength-message="Trop court {min}."></hx-text-input>',
+      );
+      await el.updateComplete;
+      expect(el.validity.tooShort).toBe(true);
+    });
+  });
+
   // ─── Slot: prefix adds filled class ───
 
   describe('Slot: prefix and suffix filled class', () => {
@@ -1228,6 +1340,85 @@ describe('hx-text-input', () => {
       await el.updateComplete;
       expect(el.dirty).toBe(false);
       expect(el.pristine).toBe(true);
+    });
+  });
+
+  // ─── Focus ring offset (--hx-text-input-focus-ring-offset) ───
+
+  describe('Focus ring offset', () => {
+    /**
+     * Reads the wrapper's settled focus box-shadow. The wrapper transitions
+     * box-shadow over 150ms, so getComputedStyle immediately after focus()
+     * returns the start frame of the none→target interpolation (all zeros).
+     * Disabling the transition inline lets the final value apply synchronously.
+     */
+    function settledFocusShadow(el: HxTextInput): string {
+      const wrapper = shadowQuery<HTMLElement>(el, '.field__input-wrapper');
+      if (!wrapper) {
+        throw new Error('settledFocusShadow: .field__input-wrapper not found in shadow DOM');
+      }
+      wrapper.style.transition = 'none';
+      el.focus();
+      return getComputedStyle(wrapper).boxShadow;
+    }
+
+    function resolvedOffset(el: HxTextInput): string {
+      return getComputedStyle(el).getPropertyValue('--_text-input-focus-ring-offset').trim();
+    }
+
+    it('resolves the private offset to 0px by default (flush ring, no drift)', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      expect(resolvedOffset(el)).toBe('0px');
+    });
+
+    it('default focused ring is the flush 2px band + zero-size transparent spacer', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      await el.updateComplete;
+      const shadow = settledFocusShadow(el);
+      // Two layers: a zero-size transparent spacer (offset 0) and the colored
+      // ring at the focus-ring-width (2px). Byte-identical paint to the prior
+      // single-shadow flush ring — the colored band sits at 0–2px, no gap.
+      expect(shadow).not.toBe('none');
+      expect(shadow).toContain('0px 0px 0px 0px'); // transparent spacer at offset 0
+      expect(shadow).toContain('0px 0px 0px 2px'); // colored ring = focus-ring-width
+      expect(shadow).not.toContain('0px 0px 0px 4px'); // proves no offset gap by default
+    });
+
+    it('honors --hx-text-input-focus-ring-offset (resolved offset + rendered gap)', async () => {
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      el.style.setProperty('--hx-text-input-focus-ring-offset', '4px');
+      await el.updateComplete;
+      expect(resolvedOffset(el)).toBe('4px');
+
+      const shadow = settledFocusShadow(el);
+      expect(shadow).toContain('0px 0px 0px 4px'); // transparent spacer = offset
+      expect(shadow).toContain('0px 0px 0px 6px'); // colored ring = offset(4) + width(2)
+    });
+
+    it('invalid-state focused ring also honors --hx-text-input-focus-ring-offset', async () => {
+      const el = await fixture<HxTextInput>(
+        '<hx-text-input label="Email" error="Invalid"></hx-text-input>',
+      );
+      el.style.setProperty('--hx-text-input-focus-ring-offset', '4px');
+      await el.updateComplete;
+      const shadow = settledFocusShadow(el);
+      expect(shadow).not.toBe('none');
+      expect(shadow).toContain('0px 0px 0px 4px'); // transparent spacer = offset
+      expect(shadow).toContain('0px 0px 0px 6px'); // colored invalid ring = offset(4) + width(2)
+    });
+
+    it('global --hx-focus-ring-offset (outline-offset token) does NOT shift the box-shadow ring', async () => {
+      // --hx-focus-ring-offset is the library-wide outline-offset token (2px).
+      // It is intentionally not chained into this component's box-shadow ring,
+      // so setting it leaves the resolved offset flush at 0px.
+      const el = await fixture<HxTextInput>('<hx-text-input label="Name"></hx-text-input>');
+      el.style.setProperty('--hx-focus-ring-offset', '8px');
+      await el.updateComplete;
+      expect(resolvedOffset(el)).toBe('0px');
+
+      const shadow = settledFocusShadow(el);
+      expect(shadow).toContain('0px 0px 0px 2px'); // still the flush 2px ring
+      expect(shadow).not.toContain('0px 0px 0px 10px'); // no 8px-offset gap leaked in
     });
   });
 });

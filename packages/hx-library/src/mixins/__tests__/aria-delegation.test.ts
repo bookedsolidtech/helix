@@ -432,9 +432,98 @@ describe('mixinDelegatesAria', () => {
     });
   });
 
-  // ── ariaAttrToProp conversion (tested indirectly) ──────────────────────
+  // ── Canonical IDL accessor names ───────────────────────────────────────
+  //
+  // The mixin must define its delegated accessors under the exact ARIAMixin IDL
+  // property names (e.g. `ariaColCount`, not `ariaColcount`). We assert this on
+  // the *mixin's own prototype* via getOwnPropertyDescriptor, which is
+  // independent of whether the host engine ships native ARIAMixin — this is the
+  // regression guard for engines that lack native ARIA IDL props, where the
+  // mixin's own accessor is the only one a consumer can reach.
 
-  describe('ariaAttrToProp conversion (via property accessors)', () => {
+  describe('canonical ARIAMixin IDL accessor names', () => {
+    function mixinProto(): object {
+      const ctor = customElements.get('test-aria-delegation') as unknown as {
+        prototype: object;
+      };
+      // The mixin class sits between the test element and LitElement; walk up to
+      // the prototype that actually owns an ARIA accessor.
+      let proto: object | null = ctor.prototype;
+      while (proto && !Object.getOwnPropertyDescriptor(proto, 'ariaColCount')) {
+        proto = Object.getPrototypeOf(proto) as object | null;
+      }
+      return proto ?? ctor.prototype;
+    }
+
+    const canonicalNames = [
+      'ariaColCount',
+      'ariaColIndex',
+      'ariaColIndexText',
+      'ariaColSpan',
+      'ariaRowCount',
+      'ariaRowIndex',
+      'ariaRowIndexText',
+      'ariaRowSpan',
+      'ariaDescribedBy',
+      'ariaLabelledBy',
+      'ariaActiveDescendant',
+      'ariaBrailleRoleDescription',
+      'ariaBrailleLabel',
+      'ariaAutoComplete',
+      'ariaHasPopup',
+      'ariaKeyShortcuts',
+      'ariaMultiLine',
+      'ariaMultiSelectable',
+      'ariaPosInSet',
+      'ariaSetSize',
+      'ariaReadOnly',
+      'ariaRoleDescription',
+      'ariaValueMax',
+      'ariaValueMin',
+      'ariaValueNow',
+      'ariaValueText',
+      'ariaErrorMessage',
+    ];
+
+    const wrongCasedNames = [
+      'ariaColcount',
+      'ariaDescribedby',
+      'ariaLabelledby',
+      'ariaBrailleroledescription',
+      'ariaRowindex',
+      'ariaActivedescendant',
+    ];
+
+    it('defines an own accessor for every canonical IDL name', () => {
+      const proto = mixinProto();
+      const missing = canonicalNames.filter(
+        (name) => !Object.getOwnPropertyDescriptor(proto, name),
+      );
+      expect(missing).toEqual([]);
+    });
+
+    it('does not define any wrong-cased accessor', () => {
+      const proto = mixinProto();
+      const leaked = wrongCasedNames.filter((name) =>
+        Object.getOwnPropertyDescriptor(proto, name),
+      );
+      expect(leaked).toEqual([]);
+    });
+
+    it('canonical accessor delegates to data-aria-* storage', async () => {
+      const el = await fixture<TestAriaDelegation>(
+        '<test-aria-delegation></test-aria-delegation>',
+      );
+      // Set via the canonical accessor (the property a consumer would use).
+      (el as unknown as AriaDelegationMixinInterface).ariaColCount = '7';
+      expect(el.getAttribute('data-aria-colcount')).toBe('7');
+      expect((el as unknown as AriaDelegationMixinInterface).ariaColCount).toBe('7');
+    });
+  });
+
+  // ── Attribute → IDL property name mapping (via property accessors) ──────
+
+  describe('attribute → IDL property name mapping (via property accessors)', () => {
     it('aria-label maps to ariaLabel', async () => {
       const el = await fixture<TestAriaDelegation>(
         '<test-aria-delegation aria-label="Test"></test-aria-delegation>',
