@@ -37,18 +37,6 @@ function queryOrThrow<T extends Element = Element>(root: ParentNode, selector: s
   return found;
 }
 
-/**
- * Lets a MutationObserver callback (microtask) fire after a light-DOM change,
- * then awaits the resulting Lit update. The macrotask tick guarantees the
- * observer has delivered records before we check the rendered output.
- */
-async function flushMutations(el: HelixForm): Promise<void> {
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 0);
-  });
-  await el.updateComplete;
-}
-
 afterEach(cleanup);
 
 describe('hx-form', () => {
@@ -824,56 +812,23 @@ describe('hx-form', () => {
       expect(event.detail.valid).toBe(true);
     });
 
-    it('intercepts when hx-form action is whitespace-only (treated as empty/controlled)', async () => {
-      // hx-form's own `action` is trimmed: a whitespace-only value is the
-      // controlled case (templated empty action), not a native-submit action.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="   ">
-          <form>
-            <input type="text" name="username" value="testuser" />
-            <button type="submit">Submit</button>
-          </form>
-        </hx-form>
-      `);
-      expect(el.action).toBe('   ');
-
-      // A slotted <form> is present, so hx-form renders slot-only — NO second
-      // form. The slotted action-less form is the controlled-bridge target.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      const form = queryOrThrow<HTMLFormElement>(el, 'form');
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      form.dispatchEvent(submitEvent);
-
-      expect(submitEvent.defaultPrevented).toBe(true);
-      const event = await eventPromise;
-      expect(event.detail.valid).toBe(true);
-    });
-
-    it('renders its own <form> (no action attr) for a whitespace-only action and bridges direct controls', async () => {
-      // Regression guard: a templated `action` that collapses to whitespace must
-      // still make hx-form CREATE its own form owner for direct controls (raw
-      // input + submit button, no slotted <form>). Render mode keys off a
-      // non-empty string (incl. whitespace); the action ATTRIBUTE is omitted
-      // unless the trimmed value is non-empty; the submit bridge stays controlled.
+    it('treats a whitespace-only action as controlled (own form bridged, not native)', async () => {
+      // hx-form renders its own <form action="   "> (action !== ''); the submit
+      // discriminator trims the form's action, so a whitespace-only value is the
+      // controlled case — the bridge runs instead of native submission.
       const el = await fixture<HelixForm>(`
         <hx-form action="   ">
           <input type="text" name="username" value="testuser" />
           <button type="submit">Submit</button>
         </hx-form>
       `);
+      expect(el.action).toBe('   ');
 
-      // hx-form rendered exactly one own <form>, with no meaningless action attr.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
       const form = queryOrThrow<HTMLFormElement>(el, 'form');
-      expect(form.hasAttribute('action')).toBe(false);
-      // The direct submit button is present in the component (functional control).
-      expect(queryOrThrow<HTMLButtonElement>(el, 'button[type="submit"]')).toBeTruthy();
-
-      // Submitting bridges (controlled): cancelled + hx-submit (valid).
       const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
       const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
       form.dispatchEvent(submitEvent);
+
       expect(submitEvent.defaultPrevented).toBe(true);
       const event = await eventPromise;
       expect(event.detail.valid).toBe(true);
@@ -946,64 +901,6 @@ describe('hx-form', () => {
       expect(dispatched).toBe(false);
     });
 
-    it('does NOT render a second form around a slotted host form when action is whitespace', async () => {
-      // Regression: whitespace action must NOT add an own <form> beside a slotted
-      // host-owned form (that produced two <form>s and broke host submission).
-      const el = await fixture<HelixForm>(`
-        <hx-form action="   ">
-          <form action="/host" method="post">
-            <input type="text" name="field" value="value" />
-            <button type="submit">Submit</button>
-          </form>
-        </hx-form>
-      `);
-
-      // Exactly one form — the host's — and hx-form rendered none of its own.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-      const form = queryOrThrow<HTMLFormElement>(el, 'form');
-      expect(form.getAttribute('action')).toBe('/host');
-
-      let dispatched = false;
-      el.addEventListener('hx-submit', () => {
-        dispatched = true;
-      });
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      form.dispatchEvent(submitEvent);
-
-      // The host form owns its action → native submission, not intercepted.
-      expect(submitEvent.defaultPrevented).toBe(false);
-      expect(dispatched).toBe(false);
-    });
-
-    it('does NOT nest a slotted host form when action is a real URL (single host form)', async () => {
-      // Pre-existing bug fix: action="/x" + a slotted host form previously
-      // rendered a second form; now slot-only mode keeps a single host form.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <form action="/host" method="post">
-            <input type="text" name="field" value="value" />
-            <button type="submit">Submit</button>
-          </form>
-        </hx-form>
-      `);
-
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-      const form = queryOrThrow<HTMLFormElement>(el, 'form');
-      expect(form.getAttribute('action')).toBe('/host');
-
-      let dispatched = false;
-      el.addEventListener('hx-submit', () => {
-        dispatched = true;
-      });
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      form.dispatchEvent(submitEvent);
-
-      expect(submitEvent.defaultPrevented).toBe(false);
-      expect(dispatched).toBe(false);
-    });
-
     it('slotted host form with empty hx-form action stays a single native host form', async () => {
       const el = await fixture<HelixForm>(`
         <hx-form action="">
@@ -1014,8 +911,8 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
+      // Empty action → slot-only render, so the host form is the only form.
       expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
       const form = queryOrThrow<HTMLFormElement>(el, 'form');
 
       let dispatched = false;
@@ -1027,152 +924,6 @@ describe('hx-form', () => {
 
       expect(submitEvent.defaultPrevented).toBe(false);
       expect(dispatched).toBe(false);
-    });
-
-    it('ignores an unrelated NESTED descendant <form> and still renders its own form', async () => {
-      // Regression: detection is direct-child-scoped. A <form> nested deeper in
-      // consumer markup is NOT the host's submission form and must not suppress
-      // hx-form's own wrapper for the outer direct controls.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input type="text" name="u" value="v" />
-          <div class="widget">
-            <form action="/unrelated"><input type="text" name="n" /></form>
-          </div>
-          <button type="submit">Go</button>
-        </hx-form>
-      `);
-
-      // hx-form still rendered its own <form> (the nested one is not the host).
-      const own = el.querySelector('form[data-hx-own-form]');
-      expect(own).not.toBeNull();
-      // The nested unrelated form is not a direct child of hx-form.
-      expect(el.querySelector(':scope > form:not([data-hx-own-form])')).toBeNull();
-    });
-
-    it('detects only a DIRECT-CHILD host form and switches to slot mode', async () => {
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <form action="/host" method="post">
-            <input type="text" name="field" value="value" />
-            <button type="submit">Submit</button>
-          </form>
-        </hx-form>
-      `);
-
-      // Direct-child host form detected → slot mode, single host form.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-      expect(queryOrThrow<HTMLFormElement>(el, 'form').getAttribute('action')).toBe('/host');
-    });
-
-    it('keeps its own form beside a host form when orphaned direct controls are present', async () => {
-      // Host form AND raw controls outside it → two SIBLING forms (own + host),
-      // so the orphaned controls retain a form owner. Not nested.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input type="text" name="orphan" value="v" />
-          <button type="submit">Orphan submit</button>
-          <form action="/host" method="post">
-            <input type="text" name="field" value="value" />
-            <button type="submit">Host submit</button>
-          </form>
-        </hx-form>
-      `);
-
-      // Two forms: hx-form's own AND the host's.
-      expect(el.querySelectorAll('form')).toHaveLength(2);
-      const own = queryOrThrow<HTMLFormElement>(el, 'form[data-hx-own-form]');
-      const host = queryOrThrow<HTMLFormElement>(el, 'form:not([data-hx-own-form])');
-      expect(host.getAttribute('action')).toBe('/host');
-      // Sibling, not nested either way.
-      expect(own.contains(host)).toBe(false);
-      expect(host.contains(own)).toBe(false);
-    });
-
-    it('treats an orphaned hx-* control as a form control and keeps its own form', async () => {
-      // hx-* form controls (form-associated custom elements) count as controls
-      // too — an orphaned <hx-text-input>/<hx-checkbox> outside the host form must
-      // keep hx-form's own wrapper so they retain a form owner.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <hx-text-input name="patient" label="Patient"></hx-text-input>
-          <hx-checkbox name="consent" label="Consent"></hx-checkbox>
-          <form action="/host" method="post">
-            <input type="text" name="field" value="value" />
-          </form>
-        </hx-form>
-      `);
-
-      // Own form kept beside the host form because the hx-* controls are orphaned.
-      expect(el.querySelectorAll('form')).toHaveLength(2);
-      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
-      expect(queryOrThrow<HTMLFormElement>(el, 'form:not([data-hx-own-form])').getAttribute('action')).toBe(
-        '/host',
-      );
-    });
-
-    it('controlled submit is scoped to the submitting form, ignoring a sibling host form', async () => {
-      // Own form (controlled, whitespace action) coexists with a host form that
-      // has its OWN invalid required field, prepended EARLIER in DOM order.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="   ">
-          <input type="text" name="ownField" value="ownValue" />
-          <button type="submit">Submit own</button>
-        </hx-form>
-      `);
-      const hostForm = document.createElement('form');
-      hostForm.setAttribute('action', '/host');
-      hostForm.innerHTML =
-        '<input type="text" name="hostField" required /><button type="submit">Host</button>';
-      el.prepend(hostForm);
-      await flushMutations(el);
-
-      // Own + host coexist (orphaned own controls keep the own form).
-      expect(el.querySelectorAll('form')).toHaveLength(2);
-      const ownForm = queryOrThrow<HTMLFormElement>(el, 'form[data-hx-own-form]');
-
-      // Submitting the OWN form bridges, scoped to its own fields.
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      ownForm.dispatchEvent(submitEvent);
-
-      // The host form's invalid required field does NOT block the controlled submit.
-      expect(submitEvent.defaultPrevented).toBe(true);
-      const event = await eventPromise;
-      expect(event.detail.valid).toBe(true);
-      // Payload is the own form's data only — the host's earlier-in-DOM field is excluded.
-      expect(event.detail.values['ownField']).toBe('ownValue');
-      expect(event.detail.values['hostField']).toBeUndefined();
-      expect(event.detail.formData.get('ownField')).toBe('ownValue');
-      expect(event.detail.formData.get('hostField')).toBeNull();
-    });
-
-    it('bridges a slotted action-less host form even when hx-form has an action prop', async () => {
-      // The slotted form declares no action of its own; hx-form's `action` prop
-      // must NOT force native submission — the controlled bridge still runs.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <form>
-            <input type="text" name="username" value="testuser" />
-            <button type="submit">Submit</button>
-          </form>
-        </hx-form>
-      `);
-
-      // A host form is present → slot mode, single slotted form, no own form.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-
-      const form = queryOrThrow<HTMLFormElement>(el, 'form');
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      form.dispatchEvent(submitEvent);
-
-      expect(submitEvent.defaultPrevented).toBe(true);
-      const event = await eventPromise;
-      expect(event.detail.valid).toBe(true);
-      expect(event.detail.values['username']).toBe('testuser');
     });
 
     it('validates a slotted action-less host form even when hx-form has an action prop', async () => {
@@ -1195,28 +946,6 @@ describe('hx-form', () => {
       expect(event.detail.errors.length).toBeGreaterThan(0);
     });
 
-    it('getFormData() prefers the own form over an earlier sibling host form', async () => {
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input type="text" name="ownField" value="ownValue" />
-        </hx-form>
-      `);
-      // Prepend a host form EARLIER in DOM order with a distinct field.
-      const hostForm = document.createElement('form');
-      hostForm.setAttribute('action', '/host');
-      hostForm.innerHTML = '<input type="text" name="hostField" value="hostValue" />';
-      el.prepend(hostForm);
-      await flushMutations(el);
-
-      // Own + host coexist (the orphaned own control keeps the own form).
-      expect(el.querySelectorAll('form')).toHaveLength(2);
-
-      const data = el.getFormData();
-      // Own form's data, even though the host form is FIRST in DOM order.
-      expect(data.get('ownField')).toBe('ownValue');
-      expect(data.get('hostField')).toBeNull();
-    });
-
     it('getFormData() falls back to the host form in slot-only mode', async () => {
       const el = await fixture<HelixForm>(`
         <hx-form>
@@ -1226,8 +955,8 @@ describe('hx-form', () => {
         </hx-form>
       `);
 
-      // Slot-only mode (no own form) → host form's data, unchanged.
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      // Empty action → slot-only render → getFormData reads the host form's data.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
       const data = el.getFormData();
       expect(data.get('hostField')).toBe('hostValue');
     });
@@ -1259,31 +988,6 @@ describe('hx-form', () => {
       expect(event.detail.formData.get('agree')).toBe('yes');
       // getFormData() returns the same hx-* values, not an empty payload.
       expect(el.getFormData().get('username')).toBe('alice');
-    });
-
-    it('collects an orphaned hx-* control in own-form mode', async () => {
-      // Whitespace action → own form rendered; the hx-* control is an orphaned
-      // light child (not inside the slot-projecting own form) and must be read
-      // manually from its public value API.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="   ">
-          <hx-text-input name="email" value="a@b.com" label="Email"></hx-text-input>
-          <button type="submit">Submit</button>
-        </hx-form>
-      `);
-      await el.updateComplete;
-      // Own form rendered; the hx-* control is orphaned (outside any form).
-      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
-      expect(queryOrThrow<HTMLElement>(el, 'hx-text-input').closest('form')).toBeNull();
-
-      const ownForm = queryOrThrow<HTMLFormElement>(el, 'form[data-hx-own-form]');
-      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      ownForm.dispatchEvent(submitEvent);
-
-      const event = await eventPromise;
-      expect(event.detail.values['email']).toBe('a@b.com');
-      expect(el.getFormData().get('email')).toBe('a@b.com');
     });
 
     it('collects mixed native and hx-* controls in the same form', async () => {
@@ -1489,211 +1193,6 @@ describe('hx-form', () => {
       // overridden hook declines interception.
       expect(submitEvent.defaultPrevented).toBe(false);
       expect(dispatched).toBe(false);
-    });
-  });
-
-  // ─── Reactive render mode on runtime child mutations (3) ───
-
-  describe('Reactive render mode (runtime child mutations)', () => {
-    it('switches to slot mode when a host form is inserted after mount (no orphaned controls)', async () => {
-      // Mount with NO orphaned form controls (action set, no host form) → own <form>.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <p>Intro copy with no form controls.</p>
-        </hx-form>
-      `);
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
-
-      // Consumer inserts its own host-owned form (which owns its own controls).
-      const hostForm = document.createElement('form');
-      hostForm.setAttribute('action', '/host');
-      hostForm.setAttribute('method', 'post');
-      hostForm.innerHTML = '<input type="text" name="f" value="v" /><button type="submit">Go</button>';
-      el.prepend(hostForm);
-
-      await flushMutations(el);
-
-      // No orphaned controls remain → hx-form drops its own form → single host form.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-      const form = queryOrThrow<HTMLFormElement>(el, 'form');
-      expect(form.getAttribute('action')).toBe('/host');
-
-      // Host form owns its action → native submission, not intercepted.
-      let dispatched = false;
-      el.addEventListener('hx-submit', () => {
-        dispatched = true;
-      });
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      form.dispatchEvent(submitEvent);
-      expect(submitEvent.defaultPrevented).toBe(false);
-      expect(dispatched).toBe(false);
-    });
-
-    it('re-renders its own form when the host form is removed after mount', async () => {
-      // Mount with a slotted host form + action set → slot mode, single host form.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <form action="/host" method="post">
-            <input type="text" name="f" value="v" />
-            <button type="submit">Go</button>
-          </form>
-        </hx-form>
-      `);
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-
-      // Consumer removes its form at runtime.
-      queryOrThrow<HTMLFormElement>(el, 'form:not([data-hx-own-form])').remove();
-
-      await flushMutations(el);
-
-      // hx-form re-renders its own <form action="/x"> → single own form.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      const own = queryOrThrow<HTMLFormElement>(el, 'form');
-      expect(own.hasAttribute('data-hx-own-form')).toBe(true);
-      expect(own.getAttribute('action')).toBe('/x');
-
-      // action="/x" → native submission (not intercepted).
-      let dispatched = false;
-      el.addEventListener('hx-submit', () => {
-        dispatched = true;
-      });
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      own.dispatchEvent(submitEvent);
-      expect(submitEvent.defaultPrevented).toBe(false);
-      expect(dispatched).toBe(false);
-    });
-
-    it('settles without an infinite update loop after a host form is inserted', async () => {
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input type="text" name="u" value="v" />
-          <button type="submit">Go</button>
-        </hx-form>
-      `);
-
-      const hostForm = document.createElement('form');
-      hostForm.setAttribute('action', '/host');
-      el.prepend(hostForm);
-
-      await flushMutations(el);
-      // Component is idle: no pending update remains (a loop would never settle).
-      expect(el.isUpdatePending).toBe(false);
-      const countAfterSettle = el.querySelectorAll('form').length;
-
-      // A further tick produces no additional re-render churn.
-      await flushMutations(el);
-      expect(el.isUpdatePending).toBe(false);
-      expect(el.querySelectorAll('form')).toHaveLength(countAfterSettle);
-      // The original input/button are orphaned (not in the host form), so hx-form
-      // keeps its own form beside the host's — steady state is two sibling forms.
-      expect(countAfterSettle).toBe(2);
-    });
-
-    it('stays in own-form mode when only a NESTED descendant form is inserted at runtime', async () => {
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input type="text" name="u" value="v" />
-          <div class="widget"></div>
-          <button type="submit">Go</button>
-        </hx-form>
-      `);
-      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
-
-      // Insert a form deep inside a child wrapper — not a direct child of hx-form.
-      const wrapper = queryOrThrow<HTMLDivElement>(el, 'div.widget');
-      const nested = document.createElement('form');
-      nested.setAttribute('action', '/unrelated');
-      wrapper.appendChild(nested);
-
-      await flushMutations(el);
-
-      // The nested form is not the host form → hx-form keeps its own wrapper.
-      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
-      expect(el.querySelector(':scope > form:not([data-hx-own-form])')).toBeNull();
-    });
-
-    it('keeps its own form when a host form is inserted while orphaned controls remain', async () => {
-      // Mount with direct controls (own-form mode).
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input type="text" name="orphan" value="v" />
-          <button type="submit">Go</button>
-        </hx-form>
-      `);
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
-
-      // Consumer inserts a host form but the orphaned direct controls REMAIN.
-      const hostForm = document.createElement('form');
-      hostForm.setAttribute('action', '/host');
-      hostForm.innerHTML = '<input type="text" name="f" value="v" /><button type="submit">Go</button>';
-      el.prepend(hostForm);
-
-      await flushMutations(el);
-
-      // Own form is kept beside the host form (orphaned controls retain an owner).
-      expect(el.querySelectorAll('form')).toHaveLength(2);
-      const own = queryOrThrow<HTMLFormElement>(el, 'form[data-hx-own-form]');
-      const host = queryOrThrow<HTMLFormElement>(el, 'form:not([data-hx-own-form])');
-      expect(host.getAttribute('action')).toBe('/host');
-      expect(own.contains(host)).toBe(false);
-      expect(host.contains(own)).toBe(false);
-    });
-
-    it('drops its own form once the orphaned controls are removed', async () => {
-      // Start with direct controls + insert a host form → two sibling forms.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input id="orphan-input" type="text" name="orphan" value="v" />
-          <button id="orphan-btn" type="submit">Go</button>
-        </hx-form>
-      `);
-      const hostForm = document.createElement('form');
-      hostForm.setAttribute('action', '/host');
-      hostForm.innerHTML = '<input type="text" name="f" value="v" />';
-      el.prepend(hostForm);
-      await flushMutations(el);
-      expect(el.querySelectorAll('form')).toHaveLength(2);
-
-      // Remove the orphaned direct controls, leaving only the host form.
-      queryOrThrow<HTMLInputElement>(el, '#orphan-input').remove();
-      queryOrThrow<HTMLButtonElement>(el, '#orphan-btn').remove();
-
-      await flushMutations(el);
-
-      // hx-form drops its own form → slot mode, single host form. Settles.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-      expect(queryOrThrow<HTMLFormElement>(el, 'form').getAttribute('action')).toBe('/host');
-      expect(el.isUpdatePending).toBe(false);
-    });
-
-    it('drops its own form when the orphaned hx-* control is removed at runtime', async () => {
-      // Own form kept beside a host form because an hx-* control is orphaned.
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <hx-text-input id="orphan-hx" name="patient" label="Patient"></hx-text-input>
-          <form action="/host" method="post">
-            <input type="text" name="field" value="value" />
-          </form>
-        </hx-form>
-      `);
-      expect(el.querySelectorAll('form')).toHaveLength(2);
-      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
-
-      // Remove the orphaned hx-* control, leaving only the host form.
-      queryOrThrow<HTMLElement>(el, '#orphan-hx').remove();
-
-      await flushMutations(el);
-
-      // No orphaned controls remain → drop the own form → single host form.
-      expect(el.querySelectorAll('form')).toHaveLength(1);
-      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
-      expect(queryOrThrow<HTMLFormElement>(el, 'form').getAttribute('action')).toBe('/host');
-      expect(el.isUpdatePending).toBe(false);
     });
   });
 });
