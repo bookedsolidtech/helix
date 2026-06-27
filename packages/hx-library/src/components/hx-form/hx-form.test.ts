@@ -1005,6 +1005,55 @@ describe('hx-form', () => {
       expect(event.detail.errors.some((er) => er.name === 'needed')).toBe(true);
     });
 
+    it('does NOT block a slotted form submit with an ownerless required control elsewhere', async () => {
+      // A required control sits OUTSIDE the submitted form (ownerless: not inside
+      // any <form>). Submitting the slotted inner form must not be blocked by it —
+      // ownerless controls belong to hx-form's OWN form, not a descendant form.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <input type="text" name="ownerlessRequired" required />
+          <form id="inner-form">
+            <input type="text" name="innerField" value="innerValue" />
+            <button type="submit">Submit inner</button>
+          </form>
+        </hx-form>
+      `);
+
+      const innerForm = queryOrThrow<HTMLFormElement>(el, '#inner-form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      innerForm.dispatchEvent(submitEvent);
+
+      // The ownerless required input does NOT block the inner form's controlled submit.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+      expect(event.detail.values['innerField']).toBe('innerValue');
+      expect(event.detail.values['ownerlessRequired']).toBeUndefined();
+    });
+
+    it('own-form submit still validates ownerless direct controls (whitespace action)', async () => {
+      // hx-form's OWN rendered form is the submitter; its inert <slot> never
+      // projects the direct controls, so they are ownerless — but they ARE the
+      // own form's fields and must be validated.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <input type="text" name="required-field" required />
+          <button type="submit">Submit</button>
+        </hx-form>
+      `);
+
+      const ownForm = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      ownForm.dispatchEvent(submitEvent);
+
+      // The ownerless direct control IS validated for the own-form path.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.some((er) => er.name === 'required-field')).toBe(true);
+    });
+
     it('getFormData() falls back to the host form in slot-only mode', async () => {
       const el = await fixture<HelixForm>(`
         <hx-form>

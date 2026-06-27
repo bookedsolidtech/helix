@@ -1,6 +1,7 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { createRef, ref } from 'lit/directives/ref.js';
 import { HelixElement } from '../../base/index.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixFormScopedCss } from './hx-form.styles.js';
@@ -81,6 +82,16 @@ export class HelixForm extends HelixElement {
    */
   @state()
   private _validationErrors: Array<{ name: string; message: string }> = [];
+
+  /**
+   * Handle to the `<form>` hx-form itself renders (when `action` is non-empty).
+   * Used only to recognise an own-form submit when scoping the controlled bridge,
+   * so ownerless light-DOM controls (hx-form's content, which the inert `<slot>`
+   * never projects into the own form) are validated for the own-form path but not
+   * for a slotted/descendant form's submit. Not a detection/observer mechanism.
+   * @internal
+   */
+  private _ownFormRef = createRef<HTMLFormElement>();
 
   // ─── Lifecycle ───
 
@@ -290,11 +301,14 @@ export class HelixForm extends HelixElement {
    *
    * When `scopeForm` is provided (the controlled-submit bridge passes the form
    * that fired the submit), the result is scoped to controls that belong to that
-   * form: a control whose nearest ancestor `<form>` is `scopeForm`, or which is
-   * not inside any `<form>` at all. Controls inside a DIFFERENT (sibling) form are
-   * excluded, so an unrelated form's invalid field can't block the submit. With
-   * no scope (the public `checkValidity`/`reportValidity` callers), every control
-   * is returned — unchanged behavior.
+   * form: a control whose nearest ancestor `<form>` is `scopeForm`. Ownerless
+   * controls (`closest('form') === null`) are included ONLY when `scopeForm` is
+   * hx-form's OWN rendered form — because its inert `<slot>` does not project
+   * hx-form's light-DOM content into the form, so those controls sit outside any
+   * `<form>` yet are the own form's logical fields. For a slotted/descendant
+   * form's submit, ownerless siblings elsewhere in hx-form are excluded. With no
+   * scope (the public `checkValidity`/`reportValidity` callers), every control is
+   * returned — unchanged behavior.
    * @internal
    */
   private _getAllValidatableElements(scopeForm: HTMLFormElement | null = null): HTMLElement[] {
@@ -308,9 +322,10 @@ export class HelixForm extends HelixElement {
     if (scopeForm === null) {
       return all;
     }
+    const isOwnForm = scopeForm === this._ownFormRef.value;
     return all.filter((el) => {
       const owner = el.closest('form');
-      return owner === scopeForm || owner === null;
+      return owner === scopeForm || (owner === null && isOwnForm);
     });
   }
 
@@ -567,6 +582,7 @@ export class HelixForm extends HelixElement {
       return html`
         ${errorSummary}
         <form
+          ${ref(this._ownFormRef)}
           action=${this.action}
           method=${this.method}
           enctype=${this.enctype}
