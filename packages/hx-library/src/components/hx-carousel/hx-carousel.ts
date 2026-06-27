@@ -251,15 +251,6 @@ export class HelixCarousel extends HelixElement {
    */
   @state() private _measuredMaxScroll = 0;
   /**
-   * Measured maximum selectable index: the FIRST index whose offset reaches
-   * `_measuredMaxScroll`. Indices beyond it would clamp to the same translate
-   * (visually identical), so they are excluded — no duplicate no-op end states,
-   * while every visually-distinct position stays reachable. Used only in
-   * measured-nav mode.
-   * @internal
-   */
-  @state() private _measuredMaxIndex = 0;
-  /**
    * True (within the measured path) when the track fits entirely in the viewport
    * and cannot scroll. The carousel is then a single static page: `_maxIndex` is
    * 0, prev/next are both disabled, the translate is 0, and navigation is a no-op
@@ -500,7 +491,6 @@ export class HelixCarousel extends HelixElement {
     this._singlePage = false;
     this._measuredOffsets = [];
     this._measuredMaxScroll = 0;
-    this._measuredMaxIndex = 0;
   }
 
   /**
@@ -644,29 +634,16 @@ export class HelixCarousel extends HelixElement {
     if (maxScroll <= EPS) {
       this._singlePage = true;
       this._measuredMaxScroll = 0;
-      this._measuredMaxIndex = 0;
       return;
     }
 
     // maxScroll is how far the track can translate before the trailing content
     // edge reaches the viewport's trailing edge — selecting a near-end slide
-    // saturates here.
+    // saturates here. Every slide is individually selectable (`_maxIndex` is
+    // n - 1); the translate clamps to maxScroll, so adjacent end slides may share
+    // the same saturated frame while remaining distinct accessible selections.
     this._singlePage = false;
     this._measuredMaxScroll = maxScroll;
-
-    // Unified bound = max(pageBound, reachIndex):
-    //   - pageBound = max(0, slides - slidesPerPage): the legacy page bound. For
-    //     1-up this is n-1 (every slide reachable, as the docs promise); for 2-up
-    //     exact-fill it is n-2 (excludes the truly-redundant trailing page).
-    //   - reachIndex = the first index whose offset reaches maxScroll (or n-1 if
-    //     none, e.g. a single slide wider than the viewport): handles mixed widths
-    //     where a distinct-offset slide sits beyond the page bound.
-    // The max keeps every distinct/last-slide position reachable while excluding
-    // only the trailing page that would clamp to the same translate. Always <= n-1.
-    const pageBound = Math.max(0, slides.length - this.slidesPerPage);
-    const firstReach = offsets.findIndex((o) => o >= maxScroll - EPS);
-    const reachIndex = firstReach === -1 ? slides.length - 1 : firstReach;
-    this._measuredMaxIndex = Math.max(pageBound, reachIndex);
   }
 
   /** @internal */
@@ -680,10 +657,10 @@ export class HelixCarousel extends HelixElement {
    * Maximum selectable slide index.
    *
    * Single static page (measured path, no overflow) → `0`. In measured-nav mode
-   * selection is decoupled from scroll: the bound is the first index whose offset
-   * reaches `_measuredMaxScroll` (`_measuredMaxIndex`), so every visually-distinct
-   * position is reachable without duplicate no-op end states. In the legacy
-   * default model this is the slidesPerPage page bound
+   * every slide is individually reachable, so the bound is `slides.length - 1`:
+   * the translate clamps to `_measuredMaxScroll`, so adjacent end slides may share
+   * the same saturated frame, but each remains a distinct accessible selection. In
+   * the legacy default model this is the slidesPerPage page bound
    * (`slides.length - slidesPerPage`).
    * @internal
    */
@@ -692,7 +669,7 @@ export class HelixCarousel extends HelixElement {
       return 0;
     }
     if (this._measuredNav) {
-      return this._measuredMaxIndex;
+      return Math.max(0, this._slides.length - 1);
     }
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }
@@ -737,10 +714,10 @@ export class HelixCarousel extends HelixElement {
    * `_refreshMeasuredBounds()` first, so this is not re-measured here.
    *
    * `wrap` distinguishes RELATIVE navigation (`next`/`previous`/autoplay advance),
-   * which wraps over the reachable range `[0, _maxIndex]` in loop mode, from
-   * ABSOLUTE navigation (`goTo`/`Home`/`End`/pagination dots), which always CLAMPS
-   * to `[0, _maxIndex]` — even in loop mode, so e.g. `End` lands on the last
-   * reachable index instead of wrapping `slides.length - 1` back to 0.
+   * which wraps over the full slide range `[0, slides.length - 1]` in loop mode,
+   * from ABSOLUTE navigation (`goTo`/`Home`/`End`/pagination dots), which always
+   * CLAMPS to `[0, _maxIndex]` — even in loop mode, so e.g. `End` lands on the last
+   * index instead of wrapping back to 0.
    * @internal
    */
   private _navigateTo(index: number, wrap = false): void {
@@ -751,12 +728,11 @@ export class HelixCarousel extends HelixElement {
       // A single static page has nothing to scroll — collapse every target to 0.
       next = 0;
     } else if (this.loop && wrap) {
-      // Relative loop wrap over the REACHABLE range, not the raw slide count: in
-      // measured-nav mode indices beyond `_maxIndex` clamp to the same translate
-      // (duplicate end states), so wrapping uses `_maxIndex + 1` so `next` from
-      // `_maxIndex` → 0 and `previous` from 0 → `_maxIndex`. Default mode wraps
-      // over the full slide count (unchanged).
-      const wrapCount = this._measuredNav ? this._maxIndex + 1 : this._slides.length;
+      // Relative loop wrap over the full slide range: every slide is individually
+      // reachable in both models (measured `_maxIndex` is n - 1, legacy uses the
+      // page bound but loops over the slide count), so `next` from the last slide
+      // → 0 and `previous` from 0 → the last slide.
+      const wrapCount = this._slides.length;
       next = ((index % wrapCount) + wrapCount) % wrapCount;
     } else {
       // Absolute clamp (goTo/Home/End/dots, and non-loop relative moves).
@@ -782,7 +758,7 @@ export class HelixCarousel extends HelixElement {
       return;
     }
     this._livePolite = true;
-    this._navigateTo(nextIndex, true); // relative -> loop-wraps over [0, _maxIndex]
+    this._navigateTo(nextIndex, true); // relative -> loop-wraps over the slide range
   }
 
   previous(): void {
@@ -792,7 +768,7 @@ export class HelixCarousel extends HelixElement {
       return;
     }
     this._livePolite = true;
-    this._navigateTo(prevIndex, true); // relative -> loop-wraps over [0, _maxIndex]
+    this._navigateTo(prevIndex, true); // relative -> loop-wraps over the slide range
   }
 
   // ─── Autoplay ───
@@ -809,7 +785,7 @@ export class HelixCarousel extends HelixElement {
     // _navigateTo (not goTo) avoids a second redundant recompute this tick.
     this._refreshMeasuredBounds();
     if (this.loop || this._currentIndex < this._maxIndex) {
-      // Relative advance -> loop-wraps over [0, _maxIndex] (clamps when not looping).
+      // Relative advance -> loop-wraps over the slide range (clamps when not looping).
       this._navigateTo(this._currentIndex + this.slidesPerMove, true);
     } else {
       this._navigateTo(0);
@@ -1156,19 +1132,12 @@ export class HelixCarousel extends HelixElement {
 
   /** @internal */
   private _renderPagination() {
-    // One dot per REACHABLE index. In measured-nav mode the reachable bound
-    // (`_maxIndex`) can stop before the last slide (trailing indices clamp to the
-    // same translate), so only `_maxIndex + 1` dots are rendered — no unreachable
-    // trailing dot. Default mode keeps one dot per slide.
-    const count = this._measuredNav ? this._maxIndex + 1 : this._slides.length;
+    // One dot per slide — every slide is individually reachable in both models.
+    const count = this._slides.length;
     // A single static page (non-overflowing track) has nothing to page to — omit
     // the dots so pagination never advertises slides the track can't reveal.
     if (count <= 1 || this._singlePage) return nothing;
     const dots = Array.from({ length: count }, (_, i) => i);
-    // The "of N" total uses the REAL slide count (not the dot count), so the dot
-    // label agrees with the live-region announcement when you land on that index
-    // (e.g. the last reachable dot in a 6-slide exact-fill layout reads
-    // "Slide 5 of 6", matching the live region — not "Slide 5 of 5").
     const total = this._slides.length;
     return html`
       <div class="controls">
