@@ -946,6 +946,65 @@ describe('hx-form', () => {
       expect(event.detail.errors.length).toBeGreaterThan(0);
     });
 
+    it('scopes the controlled bridge to the submitting form (ignores another sibling form)', async () => {
+      // Two action-less slotted forms coexist (plus hx-form's own <form action>).
+      // Submitting the first must validate/collect only its own fields — the
+      // second form's invalid required field must NOT block it.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="inner-form">
+            <input type="text" name="innerField" value="innerValue" />
+            <button type="submit">Submit inner</button>
+          </form>
+          <form id="other-form">
+            <input type="text" name="otherRequired" required />
+            <button type="submit">Submit other</button>
+          </form>
+        </hx-form>
+      `);
+
+      const innerForm = queryOrThrow<HTMLFormElement>(el, '#inner-form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      innerForm.dispatchEvent(submitEvent);
+
+      // The other form's invalid required field does NOT block the inner submit.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+      // Payload is the inner form's field only — the other form's field is excluded.
+      expect(event.detail.values['innerField']).toBe('innerValue');
+      expect(event.detail.values['otherRequired']).toBeUndefined();
+      expect(event.detail.formData.get('innerField')).toBe('innerValue');
+      expect(event.detail.formData.get('otherRequired')).toBeNull();
+    });
+
+    it('still validates the submitting form even when a sibling form is valid', async () => {
+      // Mirror case: submitting the form WITH the invalid field still fails,
+      // proving the scope follows the submitter, not DOM order.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="valid-form">
+            <input type="text" name="okField" value="ok" />
+            <button type="submit">Submit valid</button>
+          </form>
+          <form id="invalid-form">
+            <input type="text" name="needed" required />
+            <button type="submit">Submit invalid</button>
+          </form>
+        </hx-form>
+      `);
+
+      const invalidForm = queryOrThrow<HTMLFormElement>(el, '#invalid-form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      invalidForm.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.some((er) => er.name === 'needed')).toBe(true);
+    });
+
     it('getFormData() falls back to the host form in slot-only mode', async () => {
       const el = await fixture<HelixForm>(`
         <hx-form>

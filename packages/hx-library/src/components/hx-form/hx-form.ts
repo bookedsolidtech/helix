@@ -285,18 +285,33 @@ export class HelixForm extends HelixElement {
   // ─── Private Helpers ───
 
   /**
-   * Returns all elements that support constraint validation, including
-   * both native form elements and hx-* components with `checkValidity`.
+   * Returns elements that support constraint validation, including both native
+   * form elements and hx-* components with `checkValidity`.
+   *
+   * When `scopeForm` is provided (the controlled-submit bridge passes the form
+   * that fired the submit), the result is scoped to controls that belong to that
+   * form: a control whose nearest ancestor `<form>` is `scopeForm`, or which is
+   * not inside any `<form>` at all. Controls inside a DIFFERENT (sibling) form are
+   * excluded, so an unrelated form's invalid field can't block the submit. With
+   * no scope (the public `checkValidity`/`reportValidity` callers), every control
+   * is returned — unchanged behavior.
    * @internal
    */
-  private _getAllValidatableElements(): HTMLElement[] {
+  private _getAllValidatableElements(scopeForm: HTMLFormElement | null = null): HTMLElement[] {
     const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
     const wcElements = this.getFormElements().filter(
       (el): el is HTMLElement & { checkValidity: () => boolean } =>
         'checkValidity' in el &&
         typeof (el as { checkValidity: unknown }).checkValidity === 'function',
     );
-    return [...native, ...wcElements];
+    const all = [...native, ...wcElements];
+    if (scopeForm === null) {
+      return all;
+    }
+    return all.filter((el) => {
+      const owner = el.closest('form');
+      return owner === scopeForm || owner === null;
+    });
   }
 
   /**
@@ -318,11 +333,12 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * Sets `aria-invalid` based on native constraint validation state.
+   * Sets `aria-invalid` based on native constraint validation state, scoped to
+   * the submitting form's controls when provided.
    * @internal
    */
-  private _applyAriaInvalidFromValidity(): void {
-    const allElements = this._getAllValidatableElements();
+  private _applyAriaInvalidFromValidity(scopeForm: HTMLFormElement | null = null): void {
+    const allElements = this._getAllValidatableElements(scopeForm);
     for (const el of allElements) {
       if ('validity' in el) {
         const validatable = el as HTMLInputElement;
@@ -410,10 +426,21 @@ export class HelixForm extends HelixElement {
     // Client-side only: prevent default and dispatch hx-submit or hx-invalid.
     e.preventDefault();
 
-    if (!this.novalidate && !this.checkValidity()) {
-      const errors = this._collectValidationErrors();
+    // Scope the controlled bridge to the form that actually fired, so an
+    // unrelated sibling form's invalid fields can't block this submit and the
+    // payload comes from this form only.
+    const submittingForm = e.target instanceof HTMLFormElement ? e.target : null;
+    const scopedElements = this._getAllValidatableElements(submittingForm);
+    const scopedValid = scopedElements.every((el) =>
+      'checkValidity' in el && typeof el.checkValidity === 'function'
+        ? (el as HTMLInputElement).checkValidity()
+        : true,
+    );
+
+    if (!this.novalidate && !scopedValid) {
+      const errors = this._collectValidationErrors(submittingForm);
       this._validationErrors = errors;
-      this._applyAriaInvalidFromValidity();
+      this._applyAriaInvalidFromValidity(submittingForm);
 
       // Move focus to the error summary after it renders so screen readers announce it
       // immediately. tabindex="-1" on the summary allows programmatic focus (WCAG 2.4.3).
@@ -440,7 +467,10 @@ export class HelixForm extends HelixElement {
     this._validationErrors = [];
     this._clearAriaInvalid();
 
-    const formData = this.getFormData();
+    // Payload from the submitting form (captures native + hx-* controls inside it
+    // via ElementInternals). Fall back to the public collector only defensively,
+    // when the submit event has no form target.
+    const formData = submittingForm !== null ? new FormData(submittingForm) : this.getFormData();
     const values: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
     for (const key of new Set(formData.keys())) {
       const all = formData.getAll(key);
@@ -489,12 +519,15 @@ export class HelixForm extends HelixElement {
   };
 
   /**
-   * Collects constraint validation errors from all validatable elements after a failed submit attempt.
+   * Collects constraint validation errors from validatable elements after a
+   * failed submit attempt, scoped to the submitting form's controls when provided.
    * @internal
    */
-  private _collectValidationErrors(): Array<{ name: string; message: string }> {
+  private _collectValidationErrors(
+    scopeForm: HTMLFormElement | null = null,
+  ): Array<{ name: string; message: string }> {
     const errors: Array<{ name: string; message: string }> = [];
-    const elements = this._getAllValidatableElements();
+    const elements = this._getAllValidatableElements(scopeForm);
 
     for (const el of elements) {
       if ('validity' in el && 'validationMessage' in el) {
