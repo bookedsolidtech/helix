@@ -14,19 +14,20 @@ import type { HxFormProps } from './types.js';
 export type { HxFormProps };
 
 /**
- * A Light DOM form wrapper that styles native HTML form elements and
-hx-* components with the design system's form styles.
+ * A pure Light DOM form wrapper that styles native HTML form elements and
+hx-* components with the design system's form styles. It NEVER renders its own
+`<form>` — the consumer/host always provides the actual `<form>` (a Drupal or
+Marketo host form, or an action-less `<form>` slotted for controlled behavior).
 
-When `action` is set, renders a `<form>` wrapper around slotted content.
-When no `action` is set (the Drupal pattern), renders only a `<slot>`
-so Drupal can provide its own `<form>` tag.
-
-The client-side submit bridge (validate + dispatch `hx-submit`) only runs for
-a form that hx-form effectively owns: a slotted form with no `action` of its
-own. A host-owned form that declares its own `action` (a Drupal Form API form
-or a Marketo `mktoForm_*` form) submits natively and is never cancelled. Set
-`no-intercept` to disable the bridge entirely and use hx-form purely for
-styling.
+The client-side submit bridge (validate + dispatch `hx-submit` / `hx-invalid`)
+runs only for a submitted form that hx-form does not surrender to the host:
+native submission proceeds when the submitting `<form>` declares its own
+non-empty `action`, or its submit button carries a non-empty `formaction` (a
+host-owned Drupal Form API or Marketo `mktoForm_*` form). Otherwise the submit
+is bridged, scoped to that form's controls. If the consumer provides only loose
+controls and NO `<form>`, no submit event fires and no bridge runs — wrap
+controls in a `<form>` for controlled behavior. Set `no-intercept` to disable
+the bridge entirely and use hx-form purely for styling.
 
 Uses adopted stylesheets to inject scoped CSS into the document without
 Shadow DOM, keeping native form participation and Drupal compatibility.
