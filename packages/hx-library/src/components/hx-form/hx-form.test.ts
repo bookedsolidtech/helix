@@ -4,6 +4,7 @@ import { fixture, cleanup, oneEvent, checkA11y } from '../../test-utils.js';
 import { HelixForm } from './hx-form.js';
 import './index.js';
 import '../hx-text-input/index.js';
+import '../hx-checkbox/index.js';
 
 /**
  * Subclass that opts out of the submit bridge by overriding the protected
@@ -1089,6 +1090,64 @@ describe('hx-form', () => {
       expect(host.contains(own)).toBe(false);
     });
 
+    it('treats an orphaned hx-* control as a form control and keeps its own form', async () => {
+      // hx-* form controls (form-associated custom elements) count as controls
+      // too — an orphaned <hx-text-input>/<hx-checkbox> outside the host form must
+      // keep hx-form's own wrapper so they retain a form owner.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <hx-text-input name="patient" label="Patient"></hx-text-input>
+          <hx-checkbox name="consent" label="Consent"></hx-checkbox>
+          <form action="/host" method="post">
+            <input type="text" name="field" value="value" />
+          </form>
+        </hx-form>
+      `);
+
+      // Own form kept beside the host form because the hx-* controls are orphaned.
+      expect(el.querySelectorAll('form')).toHaveLength(2);
+      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
+      expect(queryOrThrow<HTMLFormElement>(el, 'form:not([data-hx-own-form])').getAttribute('action')).toBe(
+        '/host',
+      );
+    });
+
+    it('controlled submit is scoped to the submitting form, ignoring a sibling host form', async () => {
+      // Own form (controlled, whitespace action) coexists with a host form that
+      // has its OWN invalid required field, prepended EARLIER in DOM order.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <input type="text" name="ownField" value="ownValue" />
+          <button type="submit">Submit own</button>
+        </hx-form>
+      `);
+      const hostForm = document.createElement('form');
+      hostForm.setAttribute('action', '/host');
+      hostForm.innerHTML =
+        '<input type="text" name="hostField" required /><button type="submit">Host</button>';
+      el.prepend(hostForm);
+      await flushMutations(el);
+
+      // Own + host coexist (orphaned own controls keep the own form).
+      expect(el.querySelectorAll('form')).toHaveLength(2);
+      const ownForm = queryOrThrow<HTMLFormElement>(el, 'form[data-hx-own-form]');
+
+      // Submitting the OWN form bridges, scoped to its own fields.
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      ownForm.dispatchEvent(submitEvent);
+
+      // The host form's invalid required field does NOT block the controlled submit.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+      // Payload is the own form's data only — the host's earlier-in-DOM field is excluded.
+      expect(event.detail.values['ownField']).toBe('ownValue');
+      expect(event.detail.values['hostField']).toBeUndefined();
+      expect(event.detail.formData.get('ownField')).toBe('ownValue');
+      expect(event.detail.formData.get('hostField')).toBeNull();
+    });
+
     it('intercepts a slotted <form action=""> (empty action is the controlled case)', async () => {
       // Templated markup (Twig/Drupal) that binds an action which renders empty
       // must still be bridged exactly like a form with no action attribute.
@@ -1446,6 +1505,31 @@ describe('hx-form', () => {
       await flushMutations(el);
 
       // hx-form drops its own form → slot mode, single host form. Settles.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      expect(queryOrThrow<HTMLFormElement>(el, 'form').getAttribute('action')).toBe('/host');
+      expect(el.isUpdatePending).toBe(false);
+    });
+
+    it('drops its own form when the orphaned hx-* control is removed at runtime', async () => {
+      // Own form kept beside a host form because an hx-* control is orphaned.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <hx-text-input id="orphan-hx" name="patient" label="Patient"></hx-text-input>
+          <form action="/host" method="post">
+            <input type="text" name="field" value="value" />
+          </form>
+        </hx-form>
+      `);
+      expect(el.querySelectorAll('form')).toHaveLength(2);
+      expect(el.querySelector('form[data-hx-own-form]')).not.toBeNull();
+
+      // Remove the orphaned hx-* control, leaving only the host form.
+      queryOrThrow<HTMLElement>(el, '#orphan-hx').remove();
+
+      await flushMutations(el);
+
+      // No orphaned controls remain → drop the own form → single host form.
       expect(el.querySelectorAll('form')).toHaveLength(1);
       expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
       expect(queryOrThrow<HTMLFormElement>(el, 'form').getAttribute('action')).toBe('/host');

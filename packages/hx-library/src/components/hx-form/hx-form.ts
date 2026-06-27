@@ -5,6 +5,11 @@ import { HelixElement } from '../../base/index.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixFormScopedCss } from './hx-form.styles.js';
 
+/** Custom-element constructor that may opt into form association. */
+interface FormAssociatedConstructor {
+  formAssociated?: boolean;
+}
+
 /**
  * A Light DOM form wrapper that styles native HTML form elements and
  * hx-* components with the design system's form styles.
@@ -152,13 +157,48 @@ export class HelixForm extends HelixElement {
    * @internal
    */
   private _detectOrphanedControls(): boolean {
-    const controls = this.querySelectorAll('input, select, textarea, button');
-    for (const control of controls) {
-      if (control.closest('form') === null) {
+    for (const el of this.querySelectorAll('*')) {
+      if (this._isFormControl(el) && el.closest('form') === null) {
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * Native form-control tag names. Native controls are not registered custom
+   * elements, so they are matched by tag rather than by a `formAssociated` flag.
+   * @internal
+   */
+  private static readonly _nativeControlTags: ReadonlySet<string> = new Set([
+    'input',
+    'select',
+    'textarea',
+    'button',
+  ]);
+
+  /**
+   * Whether an element is a form-associated control — a native
+   * `input`/`select`/`textarea`/`button`, OR a registered custom element whose
+   * constructor declares `static formAssociated = true` (every hx-* form control:
+   * hx-text-input, hx-select, hx-checkbox, hx-radio-group, hx-textarea, etc.).
+   * The generic `formAssociated` check avoids a hardcoded hx-* tag allowlist that
+   * would silently rot as new form controls are added.
+   * @internal
+   */
+  private _isFormControl(el: Element): boolean {
+    const tag = el.tagName.toLowerCase();
+    if (HelixForm._nativeControlTags.has(tag)) {
+      return true;
+    }
+    if (typeof customElements === 'undefined') {
+      return false;
+    }
+    const ctor = customElements.get(tag);
+    return (
+      ctor !== undefined &&
+      (ctor as CustomElementConstructor & FormAssociatedConstructor).formAssociated === true
+    );
   }
 
   /**
@@ -263,13 +303,7 @@ export class HelixForm extends HelixElement {
    * validation UI. Returns `true` if all elements are valid.
    */
   checkValidity(): boolean {
-    const formElements = this._getAllValidatableElements();
-    return formElements.every((el) => {
-      if ('checkValidity' in el && typeof el.checkValidity === 'function') {
-        return (el as HTMLInputElement).checkValidity();
-      }
-      return true;
-    });
+    return this._checkValidity(this._getAllValidatableElements());
   }
 
   /**
@@ -304,6 +338,61 @@ export class HelixForm extends HelixElement {
     const formData = new FormData();
     const elements = this.getNativeFormElements();
     for (const el of elements) {
+      const input = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      if (!input.name) continue;
+
+      if (input instanceof HTMLInputElement) {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+          if (input.checked) {
+            formData.append(input.name, input.value || 'on');
+          }
+        } else {
+          formData.append(input.name, input.value);
+        }
+      } else {
+        formData.append(input.name, input.value);
+      }
+    }
+
+    return formData;
+  }
+
+  /**
+   * Native form controls that belong to the given form: those whose nearest
+   * ancestor `<form>` is `scopeForm`, or which are not inside any form (hx-form's
+   * own rendered form projects via `<slot>`, so its controls are orphaned light
+   * children). Controls inside a different (sibling) form are excluded. With no
+   * scope, returns every native control.
+   * @internal
+   */
+  private _scopedNativeControls(
+    scopeForm: HTMLFormElement | null,
+  ): Array<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | HTMLButtonElement> {
+    const all = this.getNativeFormElements();
+    if (scopeForm === null) {
+      return all;
+    }
+    return all.filter((el) => {
+      const owner = el.closest('form');
+      return owner === null || owner === scopeForm;
+    });
+  }
+
+  /**
+   * Collects `FormData` for the controlled submit bridge, scoped to the
+   * submitting form. When that form contains its own fields (a slotted/host form),
+   * the native `FormData` constructor captures exactly its controls. When it does
+   * not (hx-form's own slot-projecting form), data is gathered manually from the
+   * in-scope controls, excluding any sibling form's fields regardless of DOM order.
+   * @internal
+   */
+  private _collectFormData(scopeForm: HTMLFormElement | null): FormData {
+    if (scopeForm !== null && scopeForm.querySelector('input, select, textarea') !== null) {
+      return new FormData(scopeForm);
+    }
+
+    const formData = new FormData();
+    for (const el of this._scopedNativeControls(scopeForm)) {
       const input = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
       if (!input.name) continue;
 
@@ -389,18 +478,46 @@ export class HelixForm extends HelixElement {
   // ─── Private Helpers ───
 
   /**
-   * Returns all elements that support constraint validation, including
-   * both native form elements and hx-* components with `checkValidity`.
+   * Returns elements that support constraint validation, including both native
+   * form elements and hx-* components with `checkValidity`.
+   *
+   * When `scopeForm` is provided, only controls that BELONG to that form are
+   * returned: a control whose nearest ancestor `<form>` is `scopeForm`, or which
+   * is not inside any form at all (hx-form's own rendered form projects its
+   * controls via `<slot>`, so they sit outside it as orphaned light children).
+   * Controls inside a DIFFERENT (sibling) form are excluded — so a coexisting
+   * host form can neither block the controlled submit with its own invalid fields
+   * nor leak into the emitted payload.
    * @internal
    */
-  private _getAllValidatableElements(): HTMLElement[] {
+  private _getAllValidatableElements(scopeForm: HTMLFormElement | null = null): HTMLElement[] {
     const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
     const wcElements = this.getFormElements().filter(
       (el): el is HTMLElement & { checkValidity: () => boolean } =>
         'checkValidity' in el &&
         typeof (el as { checkValidity: unknown }).checkValidity === 'function',
     );
-    return [...native, ...wcElements];
+    const all = [...native, ...wcElements];
+    if (scopeForm === null) {
+      return all;
+    }
+    return all.filter((el) => {
+      const owner = el.closest('form');
+      return owner === null || owner === scopeForm;
+    });
+  }
+
+  /**
+   * Runs `checkValidity()` over the given controls (native and hx-*).
+   * @internal
+   */
+  private _checkValidity(elements: HTMLElement[]): boolean {
+    return elements.every((el) => {
+      if ('checkValidity' in el && typeof el.checkValidity === 'function') {
+        return (el as HTMLInputElement).checkValidity();
+      }
+      return true;
+    });
   }
 
   /**
@@ -422,11 +539,12 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * Sets `aria-invalid` based on native constraint validation state.
+   * Sets `aria-invalid` based on native constraint validation state, scoped to
+   * the submitting form's controls when provided.
    * @internal
    */
-  private _applyAriaInvalidFromValidity(): void {
-    const allElements = this._getAllValidatableElements();
+  private _applyAriaInvalidFromValidity(scopeForm: HTMLFormElement | null = null): void {
+    const allElements = this._getAllValidatableElements(scopeForm);
     for (const el of allElements) {
       if ('validity' in el) {
         const validatable = el as HTMLInputElement;
@@ -534,13 +652,18 @@ export class HelixForm extends HelixElement {
       return;
     }
 
-    // Client-side only: prevent default and dispatch hx-submit or hx-invalid
+    // Client-side only: prevent default and dispatch hx-submit or hx-invalid.
     e.preventDefault();
 
-    if (!this.novalidate && !this.checkValidity()) {
-      const errors = this._collectValidationErrors();
+    // Scope the bridge to the form that actually submitted, so a coexisting
+    // sibling host form neither blocks validation with its own invalid fields nor
+    // contributes to the emitted payload (regardless of DOM order).
+    const submittingForm = e.target instanceof HTMLFormElement ? e.target : null;
+
+    if (!this.novalidate && !this._checkValidity(this._getAllValidatableElements(submittingForm))) {
+      const errors = this._collectValidationErrors(submittingForm);
       this._validationErrors = errors;
-      this._applyAriaInvalidFromValidity();
+      this._applyAriaInvalidFromValidity(submittingForm);
 
       // Move focus to the error summary after it renders so screen readers announce it
       // immediately. tabindex="-1" on the summary allows programmatic focus (WCAG 2.4.3).
@@ -567,7 +690,7 @@ export class HelixForm extends HelixElement {
     this._validationErrors = [];
     this._clearAriaInvalid();
 
-    const formData = this.getFormData();
+    const formData = this._collectFormData(submittingForm);
     const values: Record<string, FormDataEntryValue | FormDataEntryValue[]> = {};
     for (const key of new Set(formData.keys())) {
       const all = formData.getAll(key);
@@ -616,12 +739,15 @@ export class HelixForm extends HelixElement {
   };
 
   /**
-   * Collects constraint validation errors from all validatable elements after a failed submit attempt.
+   * Collects constraint validation errors from validatable elements after a
+   * failed submit attempt, scoped to the submitting form's controls when provided.
    * @internal
    */
-  private _collectValidationErrors(): Array<{ name: string; message: string }> {
+  private _collectValidationErrors(
+    scopeForm: HTMLFormElement | null = null,
+  ): Array<{ name: string; message: string }> {
     const errors: Array<{ name: string; message: string }> = [];
-    const elements = this._getAllValidatableElements();
+    const elements = this._getAllValidatableElements(scopeForm);
 
     for (const el of elements) {
       if ('validity' in el && 'validationMessage' in el) {
