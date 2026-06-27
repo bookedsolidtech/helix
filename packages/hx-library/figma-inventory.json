@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-06-27T01:18:34.117Z",
+  "generatedAt": "2026-06-27T03:09:06.653Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -11369,7 +11369,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-form",
       "figmaPagePlacement": "4a",
-      "description": "A Light DOM form wrapper that styles native HTML form elements and hx-* components with the design system's form styles.",
+      "description": "A pure Light DOM form wrapper that styles native HTML form elements and hx-* components with the design system's form styles. It NEVER renders its own `<form>` — the consumer/host always provides…",
       "tier": "organism",
       "variantAxes": [
         {

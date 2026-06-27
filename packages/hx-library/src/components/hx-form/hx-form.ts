@@ -1,25 +1,24 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { ifDefined } from 'lit/directives/if-defined.js';
 import { HelixElement } from '../../base/index.js';
 import { AdoptedStylesheetsController } from '../../controllers/adopted-stylesheets.js';
 import { helixFormScopedCss } from './hx-form.styles.js';
 
 /**
- * A Light DOM form wrapper that styles native HTML form elements and
- * hx-* components with the design system's form styles.
- *
- * When `action` is set, renders a `<form>` wrapper around slotted content.
- * When no `action` is set (the Drupal pattern), renders only a `<slot>`
- * so the host can provide its own `<form>` tag.
+ * A pure Light DOM form wrapper that styles native HTML form elements and
+ * hx-* components with the design system's form styles. It NEVER renders its own
+ * `<form>` — the consumer/host always provides the actual `<form>` (a Drupal or
+ * Marketo host form, or an action-less `<form>` slotted for controlled behavior).
  *
  * The client-side submit bridge (validate + dispatch `hx-submit` / `hx-invalid`)
- * runs only for a form that hx-form does not surrender to the host: native
- * submission proceeds when the submitting `<form>` declares its own non-empty
- * `action`, or its submit button carries a non-empty `formaction` (a host-owned
- * Drupal Form API or Marketo `mktoForm_*` form). Otherwise the submit is bridged.
- * Set `no-intercept` to disable the bridge entirely and use hx-form purely for
- * styling.
+ * runs only for a submitted form that hx-form does not surrender to the host:
+ * native submission proceeds when the submitting `<form>` declares its own
+ * non-empty `action`, or its submit button carries a non-empty `formaction` (a
+ * host-owned Drupal Form API or Marketo `mktoForm_*` form). Otherwise the submit
+ * is bridged, scoped to that form's controls. If the consumer provides only loose
+ * controls and NO `<form>`, no submit event fires and no bridge runs — wrap
+ * controls in a `<form>` for controlled behavior. Set `no-intercept` to disable
+ * the bridge entirely and use hx-form purely for styling.
  *
  * Uses adopted stylesheets to inject scoped CSS into the document without
  * Shadow DOM, keeping native form participation and Drupal compatibility.
@@ -99,8 +98,11 @@ export class HelixForm extends HelixElement {
   // ─── Properties ───
 
   /**
-   * The URL to submit the form to. When empty, the form handles
-   * submission client-side only and dispatches `hx-submit`.
+   * The URL to submit the form to.
+   *
+   * @deprecated hx-form is a Light-DOM wrapper and no longer renders its own
+   * `<form>`; provide your own `<form>` (the host/consumer owns posting via its
+   * `action`). Retained for compatibility; has no rendering effect.
    * @attr action
    */
   @property({ type: String })
@@ -108,6 +110,9 @@ export class HelixForm extends HelixElement {
 
   /**
    * The HTTP method used when submitting the form.
+   *
+   * @deprecated hx-form no longer renders its own `<form>`, so this has no
+   * effect. Set `method` on your own `<form>`. Retained for compatibility.
    * @attr method
    */
   @property({ type: String })
@@ -123,14 +128,19 @@ export class HelixForm extends HelixElement {
 
   /**
    * Identifies the form for scripting and form discovery.
+   *
+   * @deprecated hx-form no longer renders its own `<form>`, so this has no
+   * effect. Set `name` on your own `<form>`. Retained for compatibility.
    * @attr name
    */
   @property({ type: String })
   name = '';
 
   /**
-   * The encoding type for form submission. Only used when `action` is set.
-   * Use `multipart/form-data` for forms with file uploads.
+   * The encoding type for form submission.
+   *
+   * @deprecated hx-form no longer renders its own `<form>`, so this has no
+   * effect. Set `enctype` on your own `<form>`. Retained for compatibility.
    * @attr enctype
    */
   @property({ type: String })
@@ -565,6 +575,10 @@ export class HelixForm extends HelixElement {
   // ─── Render ───
 
   override render() {
+    // hx-form is a PURE Light-DOM wrapper: it never renders its own `<form>`. The
+    // consumer/host provides the actual `<form>` (Drupal/Marketo host form, or an
+    // action-less `<form>` slotted for the controlled bridge). The render is the
+    // error-summary region (live `role="alert"`) plus the default `<slot>`.
     const errorSummary =
       this._validationErrors.length > 0
         ? html`
@@ -577,25 +591,6 @@ export class HelixForm extends HelixElement {
             </div>
           `
         : nothing;
-
-    // When `action` is a non-empty (non-whitespace) string, render hx-form's own
-    // `<form>` wrapper around the slotted content. An empty or whitespace-only
-    // `action` (the Drupal pattern) renders only a `<slot>` so the host provides
-    // its own `<form>`; the discriminator treats such an action as controlled.
-    if (this.action.trim() !== '') {
-      return html`
-        ${errorSummary}
-        <form
-          action=${this.action}
-          method=${this.method}
-          enctype=${this.enctype}
-          name=${ifDefined(this.name || undefined)}
-          ?novalidate=${this.novalidate}
-        >
-          <slot></slot>
-        </form>
-      `;
-    }
 
     return html`${errorSummary}<slot></slot>`;
   }

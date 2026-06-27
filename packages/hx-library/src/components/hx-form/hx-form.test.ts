@@ -48,58 +48,49 @@ describe('hx-form', () => {
       expect(el.shadowRoot).toBeNull();
     });
 
-    it('renders <form> tag when action is set', async () => {
+    it('renders NO own <form>, even with an action set', async () => {
+      // hx-form is a pure Light-DOM wrapper: it never renders its own <form>.
       const el = await fixture<HelixForm>('<hx-form action="/submit"></hx-form>');
-      const form = el.querySelector('form');
-      expect(form).toBeTruthy();
-      expect(form?.getAttribute('action')).toBe('/submit');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('does not render <form> tag when no action', async () => {
+    it('renders only the slotted content (no own <form>) with no action', async () => {
       const el = await fixture<HelixForm>('<hx-form></hx-form>');
-      const form = el.querySelector('form');
-      expect(form).toBeNull();
+      expect(el.querySelector('form')).toBeNull();
     });
   });
 
-  // ─── Properties (5) ───
+  // ─── Properties — deprecated, retained for compat, no render effect (5) ───
 
-  describe('Properties', () => {
-    it('action property sets form action attribute', async () => {
+  describe('Properties (deprecated, retained, no render effect)', () => {
+    it('action property is retained but renders no <form>', async () => {
       const el = await fixture<HelixForm>('<hx-form action="/api/save"></hx-form>');
       expect(el.action).toBe('/api/save');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('action')).toBe('/api/save');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('method property defaults to post', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api"></hx-form>');
-      expect(el.method).toBe('post');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('method')).toBe('post');
+    it('method property is retained but renders no <form>', async () => {
+      const el = await fixture<HelixForm>('<hx-form method="get"></hx-form>');
+      expect(el.method).toBe('get');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('novalidate property sets novalidate attribute on form', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" novalidate></hx-form>');
+    it('novalidate property is retained', async () => {
+      const el = await fixture<HelixForm>('<hx-form novalidate></hx-form>');
       expect(el.novalidate).toBe(true);
-      const form = el.querySelector('form');
-      expect(form?.hasAttribute('novalidate')).toBe(true);
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('name property sets name attribute on form', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" name="login-form"></hx-form>');
+    it('name property is retained but renders no <form>', async () => {
+      const el = await fixture<HelixForm>('<hx-form name="login-form"></hx-form>');
       expect(el.name).toBe('login-form');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('name')).toBe('login-form');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('enctype property sets enctype attribute on form', async () => {
-      const el = await fixture<HelixForm>(
-        '<hx-form action="/api" enctype="multipart/form-data"></hx-form>',
-      );
+    it('enctype property is retained but renders no <form>', async () => {
+      const el = await fixture<HelixForm>('<hx-form enctype="multipart/form-data"></hx-form>');
       expect(el.enctype).toBe('multipart/form-data');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('enctype')).toBe('multipart/form-data');
+      expect(el.querySelector('form')).toBeNull();
     });
   });
 
@@ -643,30 +634,6 @@ describe('hx-form', () => {
     });
   });
 
-  // ─── Method property (3) ───
-
-  describe('method property', () => {
-    it('method can be set to get', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" method="get"></hx-form>');
-      expect(el.method).toBe('get');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('method')).toBe('get');
-    });
-
-    it('method can be set to post', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" method="post"></hx-form>');
-      expect(el.method).toBe('post');
-    });
-
-    it('enctype multipart sets enctype attribute on rendered form', async () => {
-      const el = await fixture<HelixForm>(
-        '<hx-form action="/upload" enctype="multipart/form-data"></hx-form>',
-      );
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('enctype')).toBe('multipart/form-data');
-    });
-  });
-
   // ─── novalidate skips checkValidity on submit (2) ───
 
   describe('novalidate skips validation on submit', () => {
@@ -857,29 +824,6 @@ describe('hx-form', () => {
       expect(submitEvent.defaultPrevented).toBe(true);
       const event = await eventPromise;
       expect(event.detail.errors.length).toBeGreaterThan(0);
-    });
-
-    it('renders its own <form action> for a non-empty action and submits natively (direct controls)', async () => {
-      const el = await fixture<HelixForm>(`
-        <hx-form action="/x">
-          <input type="text" name="username" value="testuser" />
-          <button type="submit">Submit</button>
-        </hx-form>
-      `);
-
-      const form = queryOrThrow<HTMLFormElement>(el, 'form');
-      expect(form.getAttribute('action')).toBe('/x');
-
-      let dispatched = false;
-      el.addEventListener('hx-submit', () => {
-        dispatched = true;
-      });
-      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
-      form.dispatchEvent(submitEvent);
-
-      // Non-empty trimmed action → native submission, no bridge.
-      expect(submitEvent.defaultPrevented).toBe(false);
-      expect(dispatched).toBe(false);
     });
 
     it('does NOT cancel a slotted host-owned <form action> (native submission proceeds)', async () => {
