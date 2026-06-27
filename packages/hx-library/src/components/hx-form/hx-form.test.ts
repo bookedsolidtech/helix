@@ -412,6 +412,53 @@ describe('hx-form', () => {
         expect(doc.name).toBe('doc.txt');
       }
     });
+
+    it('getFormData() fallback matches native FormData (disabled/submit-like/multiselect)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="ok" value="okValue" />
+          <input type="text" name="d" value="disabledValue" disabled />
+          <button type="submit" name="btn" value="go">Submit</button>
+          <input type="submit" name="submitInput" value="send" />
+          <select name="picks" multiple>
+            <option value="a" selected>A</option>
+            <option value="b">B</option>
+            <option value="c" selected>C</option>
+          </select>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const fd = el.getFormData();
+      // Valid control is included.
+      expect(fd.get('ok')).toBe('okValue');
+      // Disabled control, native submit button, and submit-like input are EXCLUDED.
+      expect(fd.has('d')).toBe(false);
+      expect(fd.has('btn')).toBe(false);
+      expect(fd.has('submitInput')).toBe(false);
+      // Multi-select contributes EVERY selected option's value.
+      const picks = fd.getAll('picks');
+      expect(picks).toHaveLength(2);
+      expect(picks).toContain('a');
+      expect(picks).toContain('c');
+      expect(picks).not.toContain('b');
+
+      // Equivalence check: the same controls inside a real <form> serialize the same.
+      const realForm = document.createElement('form');
+      realForm.innerHTML = `
+        <input type="text" name="ok" value="okValue" />
+        <input type="text" name="d" value="disabledValue" disabled />
+        <button type="submit" name="btn" value="go">Submit</button>
+        <input type="submit" name="submitInput" value="send" />
+        <select name="picks" multiple>
+          <option value="a" selected>A</option>
+          <option value="b">B</option>
+          <option value="c" selected>C</option>
+        </select>
+      `;
+      const nativeFd = new FormData(realForm);
+      expect([...fd.entries()].sort()).toEqual([...nativeFd.entries()].sort());
+    });
   });
 
   // ─── Validation (5) ───

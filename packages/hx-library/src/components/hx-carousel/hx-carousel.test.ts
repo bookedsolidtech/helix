@@ -1339,7 +1339,9 @@ describe('hx-carousel', () => {
       });
 
       // Remove every slide at runtime.
-      el.querySelectorAll('hx-carousel-item').forEach((s) => s.remove());
+      el.querySelectorAll('hx-carousel-item').forEach((s) => {
+        s.remove();
+      });
       await el.updateComplete;
       await new Promise<void>((r) => setTimeout(r, 0));
       await el.updateComplete;
@@ -1364,7 +1366,9 @@ describe('hx-carousel', () => {
       await el.updateComplete;
 
       // Empty it.
-      el.querySelectorAll('hx-carousel-item').forEach((s) => s.remove());
+      el.querySelectorAll('hx-carousel-item').forEach((s) => {
+        s.remove();
+      });
       await el.updateComplete;
       await new Promise<void>((r) => setTimeout(r, 0));
       await el.updateComplete;

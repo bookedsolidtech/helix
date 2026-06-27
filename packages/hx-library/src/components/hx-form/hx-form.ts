@@ -221,11 +221,16 @@ export class HelixForm extends HelixElement {
 
   /**
    * Serializes a single form-associated control's submission value into
-   * `formData`, handling all value shapes robustly:
-   * - native `input`/`select`/`textarea`: existing handling (checkbox/radio
-   *   `value || 'on'` when checked; file inputs append their `File`s, matching
-   *   native `new FormData(form)` which appends one empty `File` for an empty
-   *   file input; otherwise `.value`).
+   * `formData`, matching `new FormData(form)` semantics for the loose-controls
+   * fallback:
+   * - SKIP disabled controls (`.disabled === true`) — native and hx-*.
+   * - native `input`: skip submit-like types (`submit`/`reset`/`button`/`image`);
+   *   `file` inputs append their `File`s (one empty `File` for an empty input,
+   *   matching native); `checkbox`/`radio` append `value || 'on'` only when
+   *   checked; otherwise `.value`. (Native `<button>` elements are never in the
+   *   collected set — `_isFormControl` matches only input/select/textarea.)
+   * - native `select`: a multi-select appends EVERY `selectedOptions` value;
+   *   otherwise `.value`. `textarea` → `.value`.
    * - boolean hx-* control (`typeof .checked === 'boolean'`, e.g. hx-checkbox/
    *   hx-switch): append `value || 'on'` only when checked, else omit.
    * - file hx-* control (`.files` is a `FileList`/`File[]`, or `.value` is a
@@ -237,8 +242,24 @@ export class HelixForm extends HelixElement {
    * @internal
    */
   private _appendControlValue(formData: FormData, name: string, el: Element): void {
+    // Native `new FormData(form)` excludes disabled controls — skip them
+    // (native `.disabled`, and hx-* controls exposing a `.disabled` property).
+    if ((el as { disabled?: unknown }).disabled === true) {
+      return;
+    }
+
     // ── Native controls ──
     if (el instanceof HTMLInputElement) {
+      // Submit-like inputs are never serialized by `new FormData(form)` — only
+      // the activating submitter is, and getFormData has none.
+      if (
+        el.type === 'submit' ||
+        el.type === 'reset' ||
+        el.type === 'button' ||
+        el.type === 'image'
+      ) {
+        return;
+      }
       if (el.type === 'file') {
         const files = el.files;
         if (files !== null && files.length > 0) {
@@ -260,7 +281,18 @@ export class HelixForm extends HelixElement {
       formData.append(name, el.value);
       return;
     }
-    if (el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+    if (el instanceof HTMLSelectElement) {
+      // A multi-select contributes EVERY selected option's value.
+      if (el.multiple) {
+        for (const option of Array.from(el.selectedOptions)) {
+          formData.append(name, option.value);
+        }
+      } else {
+        formData.append(name, el.value);
+      }
+      return;
+    }
+    if (el instanceof HTMLTextAreaElement) {
       formData.append(name, el.value);
       return;
     }
