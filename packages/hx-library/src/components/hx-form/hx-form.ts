@@ -213,33 +213,106 @@ export class HelixForm extends HelixElement {
     for (const el of this._hostFormControls()) {
       const name = (el as { name?: unknown }).name;
       if (typeof name !== 'string' || name === '') continue;
-
-      if (el instanceof HTMLInputElement) {
-        if (el.type === 'checkbox' || el.type === 'radio') {
-          if (el.checked) {
-            formData.append(name, el.value || 'on');
-          }
-        } else {
-          formData.append(name, el.value);
-        }
-      } else if (el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
-        formData.append(name, el.value);
-      } else {
-        // hx-* form-associated custom element: read its public value API.
-        const control = el as { value?: unknown; checked?: unknown };
-        if (typeof control.checked === 'boolean') {
-          if (control.checked) {
-            const value =
-              typeof control.value === 'string' && control.value !== '' ? control.value : 'on';
-            formData.append(name, value);
-          }
-        } else if (typeof control.value === 'string') {
-          formData.append(name, control.value);
-        }
-      }
+      this._appendControlValue(formData, name, el);
     }
 
     return formData;
+  }
+
+  /**
+   * Serializes a single form-associated control's submission value into
+   * `formData`, handling all value shapes robustly:
+   * - native `input`/`select`/`textarea`: existing handling (checkbox/radio
+   *   `value || 'on'` when checked; file inputs append their `File`s, matching
+   *   native `new FormData(form)` which appends one empty `File` for an empty
+   *   file input; otherwise `.value`).
+   * - boolean hx-* control (`typeof .checked === 'boolean'`, e.g. hx-checkbox/
+   *   hx-switch): append `value || 'on'` only when checked, else omit.
+   * - file hx-* control (`.files` is a `FileList`/`File[]`, or `.value` is a
+   *   `File`): append each `File`; an EMPTY list contributes nothing — matching
+   *   the component's `ElementInternals.setFormValue(null)` (no empty key).
+   * - string `.value` → append as-is; number `.value` (not NaN) → `String(value)`.
+   * - `null`/`undefined` value with no checked/file state → omit (matches
+   *   ElementInternals form-value semantics). Other non-null shapes → `String`.
+   * @internal
+   */
+  private _appendControlValue(formData: FormData, name: string, el: Element): void {
+    // ── Native controls ──
+    if (el instanceof HTMLInputElement) {
+      if (el.type === 'file') {
+        const files = el.files;
+        if (files !== null && files.length > 0) {
+          for (const file of Array.from(files)) {
+            formData.append(name, file);
+          }
+        } else {
+          // Native `new FormData(form)` appends one empty File for an empty file input.
+          formData.append(name, new File([], ''));
+        }
+        return;
+      }
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) {
+          formData.append(name, el.value || 'on');
+        }
+        return;
+      }
+      formData.append(name, el.value);
+      return;
+    }
+    if (el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+      formData.append(name, el.value);
+      return;
+    }
+
+    // ── hx-* form-associated custom element: read its public value API by shape ──
+    const control = el as { value?: unknown; checked?: unknown; files?: unknown };
+
+    // Boolean controls (hx-checkbox, hx-switch): value || 'on' only when checked.
+    if (typeof control.checked === 'boolean') {
+      if (control.checked) {
+        const value =
+          typeof control.value === 'string' && control.value !== '' ? control.value : 'on';
+        formData.append(name, value);
+      }
+      return;
+    }
+
+    // File controls (hx-file-upload): a FileList or File[] via `.files`, or a
+    // single File `.value`. An empty list contributes nothing (the component's
+    // own ElementInternals semantics set no form value when empty).
+    const files = control.files;
+    let fileList: readonly unknown[] | null = null;
+    if (files instanceof FileList) {
+      fileList = Array.from(files);
+    } else if (Array.isArray(files)) {
+      fileList = files as readonly unknown[];
+    }
+    if (fileList !== null) {
+      const onlyFiles = fileList.filter((f): f is File => f instanceof File);
+      if (onlyFiles.length === fileList.length) {
+        for (const file of onlyFiles) {
+          formData.append(name, file);
+        }
+        return;
+      }
+    }
+    if (control.value instanceof File) {
+      formData.append(name, control.value);
+      return;
+    }
+
+    // Scalar value shapes.
+    const value = control.value;
+    if (typeof value === 'string') {
+      formData.append(name, value);
+    } else if (typeof value === 'number' && !Number.isNaN(value)) {
+      formData.append(name, String(value));
+    } else if (value === null || value === undefined) {
+      // Omit — matches ElementInternals form-value semantics (no empty key).
+    } else {
+      formData.append(name, String(value));
+    }
   }
 
   /**

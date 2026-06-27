@@ -5,6 +5,7 @@ import { HelixForm } from './hx-form.js';
 import './index.js';
 import '../hx-text-input/index.js';
 import '../hx-checkbox/index.js';
+import '../hx-number-input/index.js';
 
 /**
  * Subclass that opts out of the submit bridge by overriding the protected
@@ -360,6 +361,56 @@ describe('hx-form', () => {
       expect(formData.get('patientName')).toBe('Dana Lee');
       expect(formData.get('consent')).toBe('yes');
       expect(formData.get('native')).toBe('nativeValue');
+    });
+
+    it('getFormData() serializes numeric/boolean/null hx-* values; omits empty ones', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <hx-number-input name="qty" value="5" label="Qty"></hx-number-input>
+          <hx-number-input name="missing" label="Missing"></hx-number-input>
+          <hx-text-input name="patient" value="Dana" label="Name"></hx-text-input>
+          <hx-checkbox name="agree" value="yes" checked label="Agree"></hx-checkbox>
+          <hx-checkbox name="optout" value="yes" label="Opt out"></hx-checkbox>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const fd = el.getFormData();
+      // Numeric value serialized as a string; string value as-is; checked boolean included.
+      expect(fd.get('qty')).toBe('5');
+      expect(fd.get('patient')).toBe('Dana');
+      expect(fd.get('agree')).toBe('yes');
+      // Null numeric value and unchecked checkbox are OMITTED — no empty key.
+      expect(fd.has('missing')).toBe(false);
+      expect(fd.has('optout')).toBe(false);
+    });
+
+    it('getFormData() appends native file input files (empty → empty File) in the fallback', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="file" name="emptyFile" />
+          <input type="file" name="docs" />
+        </hx-form>
+      `);
+      // Populate the second file input via DataTransfer.
+      const fileInput = queryOrThrow<HTMLInputElement>(el, 'input[name="docs"]');
+      const dt = new DataTransfer();
+      dt.items.add(new File(['hello'], 'doc.txt', { type: 'text/plain' }));
+      fileInput.files = dt.files;
+
+      const fd = el.getFormData();
+      // Empty native file input → one empty File (matches native new FormData(form)).
+      const empty = fd.get('emptyFile');
+      expect(empty).toBeInstanceOf(File);
+      if (empty instanceof File) {
+        expect(empty.size).toBe(0);
+      }
+      // Populated file input → the File.
+      const doc = fd.get('docs');
+      expect(doc).toBeInstanceOf(File);
+      if (doc instanceof File) {
+        expect(doc.name).toBe('doc.txt');
+      }
     });
   });
 
