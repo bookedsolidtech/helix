@@ -17,6 +17,38 @@ The `fa-free` library resolves through the pre-built sprite at
 To use FA Pro Medical or any other Font Awesome paid tier, register a custom
 library — see `apps/docs/src/content/docs/icons/fa-pro.mdx`.
 
+## Feather Icons (bundled as `feather` library)
+
+- **Version**: `feather-icons@4.29.2`
+- **Glyphs bundled**: 287
+- **License**: MIT — https://opensource.org/license/mit
+  - SPDX-License-Identifier: `MIT`
+  - Copyright (c) 2013-2023 Cole Bemis
+  - Upstream project: Feather Icons — https://github.com/feathericons/feather
+
+The `feather` library resolves through the pre-built sprite at
+`dist/feather.svg`, generated at build time from the upstream package. Feather
+glyphs are stroke-paint outlines (`paintMode: 'stroke'`); the bundled sprite
+redistributes their glyph geometry, which is what makes the MIT attribution
+above legally required.
+
+## Lucide (bundled as `lucide` library)
+
+- **Version**: `lucide-static@1.21.0`
+- **Glyphs bundled**: ~1,986
+- **License**: ISC — https://opensource.org/license/isc-license-txt
+  - SPDX-License-Identifier: `ISC`
+  - Copyright (c) 2026 Lucide Icons and Contributors
+  - Upstream project: Lucide — https://github.com/lucide-icons/lucide
+
+The `lucide` library resolves through the pre-built sprite at `dist/lucide.svg`,
+generated at build time from the upstream package. Lucide glyphs are stroke-paint
+outlines (`paintMode: 'stroke'`); the bundled sprite redistributes their glyph
+geometry, which is what makes the ISC attribution above legally required. A
+subset of Lucide glyphs are derived from the Feather project and carry Feather's
+MIT terms (Copyright (c) 2013-present Cole Bemis); see the upstream
+`lucide-static` LICENSE file for the per-glyph list.
+
 ## Helix glyphs (bundled as `helix` library)
 
 The HELiX `helix` library glyphs are **original work** drawn for this project,
@@ -30,7 +62,7 @@ for the helix coordinate system. No upstream SVG markup is copied verbatim.
 
 ## Build-time only dependencies
 
-The published package does **not** depend on `@fortawesome/fontawesome-free`
-at runtime. The dependency is `devDependencies`-only; sprites and tree-shake
-exports are generated during `pnpm run build` and shipped pre-rendered in
-`dist/`.
+The published package does **not** depend on `@fortawesome/fontawesome-free`,
+`feather-icons`, or `lucide-static` at runtime. They are `devDependencies`-only;
+sprites and tree-shake exports are generated during `pnpm run build` and shipped
+pre-rendered in `dist/`.

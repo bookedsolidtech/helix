@@ -18,8 +18,9 @@ web component library.
 `<hx-icon>` is purely a renderer. Resolving icon names to SVG payloads is
 delegated to a registry of named libraries. This separation lets consumers:
 
-- Use the bundled `helix` (original glyphs, MIT) and `fa-free` (Font Awesome
-  Free Solid v7, CC BY 4.0) libraries out of the box.
+- Use the bundled `helix` (original glyphs, MIT), `fa-free` (Font Awesome
+  Free Solid v7, CC BY 4.0), `feather` (Feather Icons, MIT), and `lucide`
+  (Lucide, ISC) libraries out of the box.
 - Register custom libraries — e.g. Font Awesome Pro Medical — without
   modifying or rebuilding `@helixui/library`.
 - Tree-shake to a single icon when bundle budget matters
@@ -31,19 +32,41 @@ without translation.
 
 ## Bundled libraries
 
-Importing the package triggers auto-registration of two libraries:
+Importing the package triggers auto-registration of four libraries:
 
-| Library    | Glyphs | Source                                     | License    |
-| ---------- | ------ | ------------------------------------------ | ---------- |
-| `helix`    | 32     | Original HELiX glyphs                      | MIT        |
-| `fa-free`  | 1900+  | Font Awesome Free Solid v7.x (Fonticons)   | CC BY 4.0  |
+| Library   | Glyphs | Source                                   | License   | Paint    |
+| --------- | ------ | ---------------------------------------- | --------- | -------- |
+| `helix`   | 32     | Original HELiX glyphs                    | MIT       | `fill`   |
+| `fa-free` | 1900+  | Font Awesome Free Solid v7.x (Fonticons) | CC BY 4.0 | `fill`   |
+| `feather` | 287    | Feather Icons (Cole Bemis)               | MIT       | `stroke` |
+| `lucide`  | ~1986  | Lucide (Lucide Contributors)             | ISC       | `stroke` |
 
-Both ship with `paintMode: 'fill'` and `spriteSheet: true` — they resolve
-through pre-built sprite sheets in the package's `dist/`.
+All four set `spriteSheet: true` — they resolve through pre-built sprite sheets
+in the package's `dist/`. `helix` and `fa-free` are `paintMode: 'fill'` solid
+silhouettes; `feather` and `lucide` are `paintMode: 'stroke'` outlines (see
+[paintMode](#paintmode) below).
 
 ```ts
 import '@helixui/icons';
-// `helix` and `fa-free` are now both registered.
+// `helix`, `fa-free`, `feather`, and `lucide` are now all registered.
+```
+
+```html
+<!-- A stroke-paint glyph from each new library -->
+<hx-icon library="feather" name="activity"></hx-icon>
+<hx-icon library="lucide" name="heart-pulse"></hx-icon>
+```
+
+`feather` and `lucide` glyphs paint with `stroke: currentColor` (no fill) and
+honor the `--hx-icon-stroke-width` token (default `2`):
+
+```html
+<!-- Override the stroke width for a hairline feather glyph -->
+<hx-icon
+  library="feather"
+  name="activity"
+  style="--hx-icon-stroke-width: 1.5;"
+></hx-icon>
 ```
 
 ## Custom libraries
@@ -84,10 +107,27 @@ For bundle-sensitive applications, import a single glyph:
 ```ts
 import { check } from '@helixui/icons/tree-shake/helix/check';
 import { stethoscope } from '@helixui/icons/tree-shake/fa-free/solid/stethoscope';
+import { activity } from '@helixui/icons/tree-shake/feather/activity';
+import { heartPulse } from '@helixui/icons/tree-shake/lucide/heart-pulse';
 ```
 
 Each tree-shake module exports a single `string` constant containing the
 sanitized inline SVG markup.
+
+### Import paths
+
+Every bundled library exposes the same export surface in `package.json`:
+
+| Library   | Library side-effect import | Tree-shake glyph import                | Sprite sheet                       |
+| --------- | -------------------------- | -------------------------------------- | ---------------------------------- |
+| `helix`   | `@helixui/icons/helix`     | `@helixui/icons/tree-shake/helix/*`    | `@helixui/icons/dist/helix.svg`    |
+| `fa-free` | `@helixui/icons/fa-free`   | `@helixui/icons/tree-shake/fa-free/solid/*` | `@helixui/icons/dist/fa-free-solid.svg` |
+| `feather` | `@helixui/icons/feather`   | `@helixui/icons/tree-shake/feather/*`  | `@helixui/icons/dist/feather.svg`  |
+| `lucide`  | `@helixui/icons/lucide`    | `@helixui/icons/tree-shake/lucide/*`   | `@helixui/icons/dist/lucide.svg`   |
+
+Importing a library side-effect module (e.g. `@helixui/icons/feather`)
+registers only that single library — useful when you want `feather` and
+`lucide` without pulling `fa-free` into the bundle.
 
 ## paintMode
 
@@ -95,7 +135,9 @@ sanitized inline SVG markup.
 glyphs are painted:
 
 - `'fill'` — solid silhouettes (default; matches `helix`, `fa-free`)
-- `'stroke'` — outline glyphs (e.g. Lucide, Phosphor Thin)
+- `'stroke'` — outline glyphs painted with `stroke: currentColor` and no fill
+  (matches the bundled `feather` and `lucide`; also e.g. Phosphor Thin). Stroke
+  libraries honor the `--hx-icon-stroke-width` token (default `2`).
 - `'mixed'` — per-glyph fill + stroke (e.g. Phosphor Duotone)
 
 The formal AAA contrast harness measures rendered `<hx-icon>` color/background samples on the
@@ -107,11 +149,12 @@ not from `paintMode` dispatch.
 ## Attribution
 
 Bundled icon libraries carry their own licenses. **Font Awesome Free Solid
-icons are licensed under CC BY 4.0; attribution is required.** See
-[`NOTICE.md`](./NOTICE.md) for the canonical attribution text covering the
+icons are licensed under CC BY 4.0; attribution is required.** `feather` is
+MIT (© Cole Bemis) and `lucide` is ISC (© Lucide Icons and Contributors). See
+[`NOTICE.md`](./NOTICE.md) for the canonical attribution text covering all
 bundled libraries (the file is an attribution / license disclosure, not an
-asset-level inventory — see the `helix` / `fa-free` library directories
-under `dist/` for the actual glyph filenames).
+asset-level inventory — see the per-library directories under `dist/` for the
+actual glyph filenames).
 
 ## License
 

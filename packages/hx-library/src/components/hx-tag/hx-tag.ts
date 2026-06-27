@@ -122,6 +122,20 @@ export class HelixTag extends HelixElement {
   @property({ type: Boolean, reflect: true })
   disabled = false;
 
+  /**
+   * Accessible name for the remove button. Override for i18n.
+   *
+   * When unset, the accessible name is the English default `Remove <tag text>`
+   * (falling back to `Remove tag` when the tag has no text). When set, the value
+   * is used verbatim unless it contains the literal `{label}` placeholder, which
+   * is replaced with the tag's text content — letting consumers localize either
+   * with a fixed string (`label-remove="Quitar"`) or dynamically
+   * (`label-remove="Quitar {label}"`).
+   * @attr label-remove
+   */
+  @property({ type: String, reflect: true, attribute: 'label-remove' })
+  labelRemove = '';
+
   // ─── Internal State ───
 
   /**
@@ -190,6 +204,31 @@ export class HelixTag extends HelixElement {
     return HelixTag._SEMANTIC_VARIANT_LABELS[this.variant] ?? '';
   }
 
+  // ─── Remove button accessible name (i18n) ───
+
+  /**
+   * Builds the remove button's accessible name. Pure — depends only on its args.
+   *
+   * - Empty `override` → legacy `Remove <text>` name (backward compatible).
+   * - `override` containing the literal `{label}` placeholder → placeholder
+   *   replaced with the tag text (uses `split`/`join`, not `String.replace`, so
+   *   `$`-sequences in the tag text are inserted literally).
+   * - Any other non-empty `override` → used verbatim.
+   *
+   * `text` falls back to `'tag'` when empty, matching the pre-i18n default.
+   * @internal
+   */
+  private static _buildRemoveLabel(override: string, text: string): string {
+    const label = text || 'tag';
+    if (override === '') {
+      return `Remove ${label}`;
+    }
+    if (override.includes('{label}')) {
+      return override.split('{label}').join(label);
+    }
+    return override;
+  }
+
   // ─── Render ───
 
   override render() {
@@ -228,7 +267,7 @@ export class HelixTag extends HelixElement {
           ? html`<button
               part="remove-button"
               class="tag__remove-button"
-              aria-label=${`Remove ${this._defaultSlotText || 'tag'}`}
+              aria-label=${HelixTag._buildRemoveLabel(this.labelRemove, this._defaultSlotText)}
               ?disabled=${this.disabled}
               @click=${this._handleRemove}
             >

@@ -892,4 +892,206 @@ describe('hx-icon', () => {
       }
     });
   });
+
+  // ─── Paint Mode (stroke libraries: Feather, Lucide) ───
+
+  describe('Paint Mode (sprite libraries)', () => {
+    it('library="feather" renders a sprite svg[part="svg"] with data-paint-mode="stroke"', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="feather" name="check"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg).toBeTruthy();
+      expect(svg?.getAttribute('data-paint-mode')).toBe('stroke');
+    });
+
+    it('library="feather" <use href> resolves to the feather.svg#name sprite reference', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="feather" name="check"></hx-icon>');
+      await el.updateComplete;
+      const use = shadowQuery(el, 'use');
+      expect(use?.getAttribute('href')).toMatch(/\/feather\.svg#check$/);
+    });
+
+    it('library="lucide" renders a sprite svg[part="svg"] with data-paint-mode="stroke"', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="lucide" name="circle"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg).toBeTruthy();
+      expect(svg?.getAttribute('data-paint-mode')).toBe('stroke');
+    });
+
+    it('library="lucide" <use href> resolves to the lucide.svg#name sprite reference', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="lucide" name="circle"></hx-icon>');
+      await el.updateComplete;
+      const use = shadowQuery(el, 'use');
+      expect(use?.getAttribute('href')).toMatch(/\/lucide\.svg#circle$/);
+    });
+
+    it('library="fa-free" (fill library) renders data-paint-mode="fill"', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="fa-free" name="circle"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg?.getAttribute('data-paint-mode')).toBe('fill');
+    });
+
+    it('library="helix" (fill library) renders data-paint-mode="fill"', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="helix" name="check"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg?.getAttribute('data-paint-mode')).toBe('fill');
+    });
+
+    it('bare name (no library) defaults to data-paint-mode="fill"', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon name="check"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg?.getAttribute('data-paint-mode')).toBe('fill');
+    });
+
+    it('stroke-mode svg computes fill:none and stroke matching currentColor', async () => {
+      // Real-browser mode (Chromium) — the static stroke CSS rule
+      // `svg[part="svg"][data-paint-mode="stroke"]` resolves deterministically.
+      const el = await fixture<HelixIcon>('<hx-icon library="feather" name="check"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery<SVGElement>(el, 'svg[part="svg"]');
+      expect(svg).toBeTruthy();
+      const styles = getComputedStyle(svg!);
+      expect(styles.fill).toBe('none');
+      // stroke is `currentColor`, so it resolves to the same computed value as `color`.
+      expect(styles.stroke).toBe(styles.color);
+    });
+
+    it('fill-mode svg computes fill matching currentColor (not none)', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="fa-free" name="circle"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery<SVGElement>(el, 'svg[part="svg"]');
+      expect(svg).toBeTruthy();
+      const styles = getComputedStyle(svg!);
+      expect(styles.fill).not.toBe('none');
+      // fill is `currentColor`, so it resolves to the same computed value as `color`.
+      expect(styles.fill).toBe(styles.color);
+    });
+  });
+
+  // ─── Public paint-mode override (explicit sprite-url / name="#" escape hatches) ───
+
+  describe('Paint Mode (public paint-mode attribute)', () => {
+    it('paint-mode="stroke" on an explicit sprite-url renders data-paint-mode="stroke"', async () => {
+      const el = await fixture<HelixIcon>(
+        '<hx-icon sprite-url="/icons/feather.svg" name="activity" paint-mode="stroke"></hx-icon>',
+      );
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg?.getAttribute('data-paint-mode')).toBe('stroke');
+    });
+
+    it('paint-mode="stroke" on a bare name renders data-paint-mode="stroke"', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon name="custom" paint-mode="stroke"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg?.getAttribute('data-paint-mode')).toBe('stroke');
+    });
+
+    it('an explicit paint-mode overrides the library-derived mode', async () => {
+      const el = await fixture<HelixIcon>(
+        '<hx-icon library="fa-free" name="circle" paint-mode="stroke"></hx-icon>',
+      );
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg?.getAttribute('data-paint-mode')).toBe('stroke');
+    });
+
+    it('no paint-mode falls back to the library-derived mode (feather → stroke)', async () => {
+      const el = await fixture<HelixIcon>('<hx-icon library="feather" name="check"></hx-icon>');
+      await el.updateComplete;
+      const svg = shadowQuery(el, 'svg[part="svg"]');
+      expect(svg?.getAttribute('data-paint-mode')).toBe('stroke');
+    });
+  });
+
+  // ─── Security: re-sanitization AFTER the library mutator ───
+
+  describe('Security: post-mutator re-sanitization', () => {
+    it('strips a <script> injected by a fetch-mode library mutator', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0"/></svg>',
+        } as Response);
+
+        registerIconLibrary('test-hostile-script-lib', {
+          resolver: () => '/test-hostile-script.svg',
+          spriteSheet: false,
+          // A hostile/compromised mutator reintroduces a <script> AFTER the
+          // first sanitize pass. _applyLibraryMutator re-sanitizes, so it must
+          // never reach the rendered DOM.
+          mutator: (svg: SVGElement) => {
+            const script = svg.ownerDocument.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'script',
+            );
+            script.textContent = 'alert(1)';
+            svg.appendChild(script);
+          },
+        });
+        try {
+          const el = await fixture<HelixIcon>(
+            '<hx-icon library="test-hostile-script-lib" name="any"></hx-icon>',
+          );
+          await waitForInlineSvg(el);
+
+          const wrapper = shadowQuery(el, '[part="svg"]');
+          const innerSvg = wrapper?.querySelector('svg');
+          expect(innerSvg).toBeTruthy();
+          // Re-sanitization stripped the injected <script>.
+          expect(innerSvg?.querySelector('script')).toBeNull();
+          expect(el.shadowRoot?.innerHTML).not.toContain('<script');
+          expect(el.shadowRoot?.innerHTML).not.toContain('alert(1)');
+        } finally {
+          unregisterIconLibrary('test-hostile-script-lib');
+        }
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('strips an on* event-handler attribute injected by a fetch-mode library mutator', async () => {
+      const originalFetch = globalThis.fetch;
+      try {
+        globalThis.fetch = vi.fn().mockResolvedValue({
+          ok: true,
+          text: async () =>
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0"/></svg>',
+        } as Response);
+
+        registerIconLibrary('test-hostile-onload-lib', {
+          resolver: () => '/test-hostile-onload.svg',
+          spriteSheet: false,
+          // Mutator injects an onload handler onto the root SVG; the post-mutator
+          // re-sanitize pass must strip it before it reaches unsafeHTML.
+          mutator: (svg: SVGElement) => {
+            svg.setAttribute('onload', 'alert(1)');
+          },
+        });
+        try {
+          const el = await fixture<HelixIcon>(
+            '<hx-icon library="test-hostile-onload-lib" name="any"></hx-icon>',
+          );
+          await waitForInlineSvg(el);
+
+          const wrapper = shadowQuery(el, '[part="svg"]');
+          const innerSvg = wrapper?.querySelector('svg');
+          expect(innerSvg).toBeTruthy();
+          // Re-sanitization stripped the injected onload handler.
+          expect(innerSvg?.hasAttribute('onload')).toBe(false);
+          expect(el.shadowRoot?.innerHTML).not.toContain('onload');
+        } finally {
+          unregisterIconLibrary('test-hostile-onload-lib');
+        }
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+  });
 });

@@ -31,12 +31,28 @@
       "import": "./dist/libraries/fa-free.js",
       "default": "./dist/libraries/fa-free.js"
     },
+    "./feather": {
+      "types": "./dist/libraries/feather.d.ts",
+      "import": "./dist/libraries/feather.js",
+      "default": "./dist/libraries/feather.js"
+    },
+    "./lucide": {
+      "types": "./dist/libraries/lucide.d.ts",
+      "import": "./dist/libraries/lucide.js",
+      "default": "./dist/libraries/lucide.js"
+    },
     "./tree-shake/helix": "./dist/tree-shake/helix/index.js",
     "./tree-shake/fa-free/solid": "./dist/tree-shake/fa-free/solid/index.js",
     "./tree-shake/fa-free/solid/*": "./dist/tree-shake/fa-free/solid/*.js",
     "./tree-shake/helix/*": "./dist/tree-shake/helix/*.js",
+    "./tree-shake/feather": "./dist/tree-shake/feather/index.js",
+    "./tree-shake/feather/*": "./dist/tree-shake/feather/*.js",
+    "./tree-shake/lucide": "./dist/tree-shake/lucide/index.js",
+    "./tree-shake/lucide/*": "./dist/tree-shake/lucide/*.js",
     "./dist/helix.svg": "./dist/helix.svg",
-    "./dist/fa-free-solid.svg": "./dist/fa-free-solid.svg"
+    "./dist/fa-free-solid.svg": "./dist/fa-free-solid.svg",
+    "./dist/feather.svg": "./dist/feather.svg",
+    "./dist/lucide.svg": "./dist/lucide.svg"
   },
   "files": [
     "dist",
@@ -80,7 +96,9 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
     "@vitest/coverage-v8": "^4.1.6",
+    "feather-icons": "^4.29.2",
     "linkedom": "^0.18.12",
+    "lucide-static": "^1.21.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.6"

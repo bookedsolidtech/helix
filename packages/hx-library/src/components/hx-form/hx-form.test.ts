@@ -1,8 +1,42 @@
 import { describe, it, expect, afterEach } from 'vitest';
+import { customElement } from 'lit/decorators.js';
 import { fixture, cleanup, oneEvent, checkA11y } from '../../test-utils.js';
-import type { HelixForm } from './hx-form.js';
+import { HelixForm } from './hx-form.js';
 import './index.js';
 import '../hx-text-input/index.js';
+import '../hx-checkbox/index.js';
+import '../hx-number-input/index.js';
+
+/**
+ * Subclass that opts out of the submit bridge by overriding the protected
+ * `shouldInterceptSubmit` hook — proving the hook is cleanly overridable
+ * without monkey-patching the private listener.
+ */
+@customElement('hx-form-no-bridge-test')
+class HelixFormNoBridge extends HelixForm {
+  protected override shouldInterceptSubmit(): boolean {
+    return false;
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'hx-form-no-bridge-test': HelixFormNoBridge;
+  }
+}
+
+/**
+ * Query a single element from a fixture root, throwing a clear error (rather
+ * than relying on a non-null assertion) when the selector matches nothing.
+ * Narrows the return type so callers get a non-nullable element.
+ */
+function queryOrThrow<T extends Element = Element>(root: ParentNode, selector: string): T {
+  const found = root.querySelector<T>(selector);
+  if (found === null) {
+    throw new Error(`[hx-form.test] expected to find "${selector}" in the fixture, but it was missing.`);
+  }
+  return found;
+}
 
 afterEach(cleanup);
 
@@ -15,58 +49,49 @@ describe('hx-form', () => {
       expect(el.shadowRoot).toBeNull();
     });
 
-    it('renders <form> tag when action is set', async () => {
+    it('renders NO own <form>, even with an action set', async () => {
+      // hx-form is a pure Light-DOM wrapper: it never renders its own <form>.
       const el = await fixture<HelixForm>('<hx-form action="/submit"></hx-form>');
-      const form = el.querySelector('form');
-      expect(form).toBeTruthy();
-      expect(form?.getAttribute('action')).toBe('/submit');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('does not render <form> tag when no action', async () => {
+    it('renders only the slotted content (no own <form>) with no action', async () => {
       const el = await fixture<HelixForm>('<hx-form></hx-form>');
-      const form = el.querySelector('form');
-      expect(form).toBeNull();
+      expect(el.querySelector('form')).toBeNull();
     });
   });
 
-  // ─── Properties (5) ───
+  // ─── Properties — deprecated, retained for compat, no render effect (5) ───
 
-  describe('Properties', () => {
-    it('action property sets form action attribute', async () => {
+  describe('Properties (deprecated, retained, no render effect)', () => {
+    it('action property is retained but renders no <form>', async () => {
       const el = await fixture<HelixForm>('<hx-form action="/api/save"></hx-form>');
       expect(el.action).toBe('/api/save');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('action')).toBe('/api/save');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('method property defaults to post', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api"></hx-form>');
-      expect(el.method).toBe('post');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('method')).toBe('post');
+    it('method property is retained but renders no <form>', async () => {
+      const el = await fixture<HelixForm>('<hx-form method="get"></hx-form>');
+      expect(el.method).toBe('get');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('novalidate property sets novalidate attribute on form', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" novalidate></hx-form>');
+    it('novalidate property is retained', async () => {
+      const el = await fixture<HelixForm>('<hx-form novalidate></hx-form>');
       expect(el.novalidate).toBe(true);
-      const form = el.querySelector('form');
-      expect(form?.hasAttribute('novalidate')).toBe(true);
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('name property sets name attribute on form', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" name="login-form"></hx-form>');
+    it('name property is retained but renders no <form>', async () => {
+      const el = await fixture<HelixForm>('<hx-form name="login-form"></hx-form>');
       expect(el.name).toBe('login-form');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('name')).toBe('login-form');
+      expect(el.querySelector('form')).toBeNull();
     });
 
-    it('enctype property sets enctype attribute on form', async () => {
-      const el = await fixture<HelixForm>(
-        '<hx-form action="/api" enctype="multipart/form-data"></hx-form>',
-      );
+    it('enctype property is retained but renders no <form>', async () => {
+      const el = await fixture<HelixForm>('<hx-form enctype="multipart/form-data"></hx-form>');
       expect(el.enctype).toBe('multipart/form-data');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('enctype')).toBe('multipart/form-data');
+      expect(el.querySelector('form')).toBeNull();
     });
   });
 
@@ -318,6 +343,121 @@ describe('hx-form', () => {
       expect(meds).toHaveLength(2);
       expect(meds).toContain('aspirin');
       expect(meds).toContain('ibuprofen');
+    });
+
+    it('getFormData() includes hx-* controls in the no-form fallback', async () => {
+      // No consumer <form>: the fallback must collect hx-* form-associated
+      // controls (not just native), reading each via its public value API.
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <hx-text-input name="patientName" value="Dana Lee" label="Name"></hx-text-input>
+          <hx-checkbox name="consent" value="yes" checked label="Consent"></hx-checkbox>
+          <input type="text" name="native" value="nativeValue" />
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const formData = el.getFormData();
+      expect(formData.get('patientName')).toBe('Dana Lee');
+      expect(formData.get('consent')).toBe('yes');
+      expect(formData.get('native')).toBe('nativeValue');
+    });
+
+    it('getFormData() serializes numeric/boolean/null hx-* values; omits empty ones', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <hx-number-input name="qty" value="5" label="Qty"></hx-number-input>
+          <hx-number-input name="missing" label="Missing"></hx-number-input>
+          <hx-text-input name="patient" value="Dana" label="Name"></hx-text-input>
+          <hx-checkbox name="agree" value="yes" checked label="Agree"></hx-checkbox>
+          <hx-checkbox name="optout" value="yes" label="Opt out"></hx-checkbox>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const fd = el.getFormData();
+      // Numeric value serialized as a string; string value as-is; checked boolean included.
+      expect(fd.get('qty')).toBe('5');
+      expect(fd.get('patient')).toBe('Dana');
+      expect(fd.get('agree')).toBe('yes');
+      // Null numeric value and unchecked checkbox are OMITTED — no empty key.
+      expect(fd.has('missing')).toBe(false);
+      expect(fd.has('optout')).toBe(false);
+    });
+
+    it('getFormData() appends native file input files (empty → empty File) in the fallback', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="file" name="emptyFile" />
+          <input type="file" name="docs" />
+        </hx-form>
+      `);
+      // Populate the second file input via DataTransfer.
+      const fileInput = queryOrThrow<HTMLInputElement>(el, 'input[name="docs"]');
+      const dt = new DataTransfer();
+      dt.items.add(new File(['hello'], 'doc.txt', { type: 'text/plain' }));
+      fileInput.files = dt.files;
+
+      const fd = el.getFormData();
+      // Empty native file input → one empty File (matches native new FormData(form)).
+      const empty = fd.get('emptyFile');
+      expect(empty).toBeInstanceOf(File);
+      if (empty instanceof File) {
+        expect(empty.size).toBe(0);
+      }
+      // Populated file input → the File.
+      const doc = fd.get('docs');
+      expect(doc).toBeInstanceOf(File);
+      if (doc instanceof File) {
+        expect(doc.name).toBe('doc.txt');
+      }
+    });
+
+    it('getFormData() fallback matches native FormData (disabled/submit-like/multiselect)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="ok" value="okValue" />
+          <input type="text" name="d" value="disabledValue" disabled />
+          <button type="submit" name="btn" value="go">Submit</button>
+          <input type="submit" name="submitInput" value="send" />
+          <select name="picks" multiple>
+            <option value="a" selected>A</option>
+            <option value="b">B</option>
+            <option value="c" selected>C</option>
+          </select>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const fd = el.getFormData();
+      // Valid control is included.
+      expect(fd.get('ok')).toBe('okValue');
+      // Disabled control, native submit button, and submit-like input are EXCLUDED.
+      expect(fd.has('d')).toBe(false);
+      expect(fd.has('btn')).toBe(false);
+      expect(fd.has('submitInput')).toBe(false);
+      // Multi-select contributes EVERY selected option's value.
+      const picks = fd.getAll('picks');
+      expect(picks).toHaveLength(2);
+      expect(picks).toContain('a');
+      expect(picks).toContain('c');
+      expect(picks).not.toContain('b');
+
+      // Equivalence check: the same controls inside a real <form> serialize the same.
+      const realForm = document.createElement('form');
+      realForm.innerHTML = `
+        <input type="text" name="ok" value="okValue" />
+        <input type="text" name="d" value="disabledValue" disabled />
+        <button type="submit" name="btn" value="go">Submit</button>
+        <input type="submit" name="submitInput" value="send" />
+        <select name="picks" multiple>
+          <option value="a" selected>A</option>
+          <option value="b">B</option>
+          <option value="c" selected>C</option>
+        </select>
+      `;
+      const nativeFd = new FormData(realForm);
+      expect([...fd.entries()].sort()).toEqual([...nativeFd.entries()].sort());
     });
   });
 
@@ -610,30 +750,6 @@ describe('hx-form', () => {
     });
   });
 
-  // ─── Method property (3) ───
-
-  describe('method property', () => {
-    it('method can be set to get', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" method="get"></hx-form>');
-      expect(el.method).toBe('get');
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('method')).toBe('get');
-    });
-
-    it('method can be set to post', async () => {
-      const el = await fixture<HelixForm>('<hx-form action="/api" method="post"></hx-form>');
-      expect(el.method).toBe('post');
-    });
-
-    it('enctype multipart sets enctype attribute on rendered form', async () => {
-      const el = await fixture<HelixForm>(
-        '<hx-form action="/upload" enctype="multipart/form-data"></hx-form>',
-      );
-      const form = el.querySelector('form');
-      expect(form?.getAttribute('enctype')).toBe('multipart/form-data');
-    });
-  });
-
   // ─── novalidate skips checkValidity on submit (2) ───
 
   describe('novalidate skips validation on submit', () => {
@@ -752,6 +868,492 @@ describe('hx-form', () => {
       const elements = el.getNativeFormElements();
       const buttons = elements.filter((e) => e.tagName.toLowerCase() === 'button');
       expect(buttons.length).toBe(1);
+    });
+  });
+
+  // ─── Host-owned forms & no-intercept opt-out (6) ───
+
+  describe('Host-owned form submission and no-intercept', () => {
+    it('controlled action-less form is still intercepted (preventDefault + hx-submit)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // Bridge runs: the event is cancelled and hx-submit fires.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
+    it('treats a whitespace-only action as empty: slot-only render, slotted form bridged', async () => {
+      // A whitespace-only `action` collapses to the empty case — hx-form renders
+      // only a <slot> (no own <form>); a slotted action-less form is bridged, and
+      // the discriminator treats the whitespace action as controlled.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      expect(el.action).toBe('   ');
+      // Slot-only: the only form is the slotted one (no own <form action="   ">).
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+      expect(event.detail.values['username']).toBe('testuser');
+    });
+
+    it('validates a slotted form under a whitespace-only action (hx-invalid for required-empty)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="   ">
+          <form>
+            <input type="text" name="required-field" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.length).toBeGreaterThan(0);
+    });
+
+    it('does NOT cancel a slotted host-owned <form action> (native submission proceeds)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="/host/owned/submit" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // The slotted form owns its own action: hx-form must not cancel it and
+      // must not run the client-side bridge.
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('slotted host form with empty hx-form action stays a single native host form', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="/host" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      // Empty action → slot-only render, so the host form is the only form.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('validates a slotted action-less host form even when hx-form has an action prop', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form>
+            <input type="text" name="required-field" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.length).toBeGreaterThan(0);
+    });
+
+    it('scopes the controlled bridge to the submitting form (ignores another sibling form)', async () => {
+      // Two action-less slotted forms coexist (plus hx-form's own <form action>).
+      // Submitting the first must validate/collect only its own fields — the
+      // second form's invalid required field must NOT block it.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="inner-form">
+            <input type="text" name="innerField" value="innerValue" />
+            <button type="submit">Submit inner</button>
+          </form>
+          <form id="other-form">
+            <input type="text" name="otherRequired" required />
+            <button type="submit">Submit other</button>
+          </form>
+        </hx-form>
+      `);
+
+      const innerForm = queryOrThrow<HTMLFormElement>(el, '#inner-form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      innerForm.dispatchEvent(submitEvent);
+
+      // The other form's invalid required field does NOT block the inner submit.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+      // Payload is the inner form's field only — the other form's field is excluded.
+      expect(event.detail.values['innerField']).toBe('innerValue');
+      expect(event.detail.values['otherRequired']).toBeUndefined();
+      expect(event.detail.formData.get('innerField')).toBe('innerValue');
+      expect(event.detail.formData.get('otherRequired')).toBeNull();
+    });
+
+    it('still validates the submitting form even when a sibling form is valid', async () => {
+      // Mirror case: submitting the form WITH the invalid field still fails,
+      // proving the scope follows the submitter, not DOM order.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="valid-form">
+            <input type="text" name="okField" value="ok" />
+            <button type="submit">Submit valid</button>
+          </form>
+          <form id="invalid-form">
+            <input type="text" name="needed" required />
+            <button type="submit">Submit invalid</button>
+          </form>
+        </hx-form>
+      `);
+
+      const invalidForm = queryOrThrow<HTMLFormElement>(el, '#invalid-form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      invalidForm.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.some((er) => er.name === 'needed')).toBe(true);
+    });
+
+    it('honors an externally-associated (form="id") control in the submitting form', async () => {
+      // A required control associated via `form="f"` but placed OUTSIDE the form.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <input type="text" name="external" form="ext-form" required />
+          <form id="ext-form">
+            <input type="text" name="inner" value="innerValue" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, '#ext-form');
+      const externalInput = queryOrThrow<HTMLInputElement>(el, 'input[name="external"]');
+
+      // Empty external required control → the form is invalid → hx-invalid.
+      const invalidPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const invalidSubmit = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(invalidSubmit);
+      expect(invalidSubmit.defaultPrevented).toBe(true);
+      const invalidEvent = await invalidPromise;
+      expect(invalidEvent.detail.errors.some((er) => er.name === 'external')).toBe(true);
+
+      // Fill the external control → hx-submit valid, and its value is in the payload.
+      externalInput.value = 'externalValue';
+      const validPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const validSubmit = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(validSubmit);
+      expect(validSubmit.defaultPrevented).toBe(true);
+      const validEvent = await validPromise;
+      expect(validEvent.detail.valid).toBe(true);
+      // `new FormData(form)` includes the external form="id" control.
+      expect(validEvent.detail.values['external']).toBe('externalValue');
+      expect(validEvent.detail.values['inner']).toBe('innerValue');
+    });
+
+    it('getFormData() falls back to the host form in slot-only mode', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <form action="/host">
+            <input type="text" name="hostField" value="hostValue" />
+          </form>
+        </hx-form>
+      `);
+
+      // Empty action → slot-only render → getFormData reads the host form's data.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      const data = el.getFormData();
+      expect(data.get('hostField')).toBe('hostValue');
+    });
+
+    it('collects values from an all-hx-* slotted form (controlled submit)', async () => {
+      // Regression: a form whose only fields are hx-* form-associated controls
+      // must still produce a non-empty payload — `new FormData(form)` captures
+      // their values via ElementInternals.setFormValue.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <hx-text-input name="username" value="alice" label="Username"></hx-text-input>
+            <hx-checkbox name="agree" value="yes" checked label="Agree"></hx-checkbox>
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      // Let the hx-* controls flush their form values.
+      await el.updateComplete;
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      const event = await eventPromise;
+      expect(event.detail.values['username']).toBe('alice');
+      expect(event.detail.formData.get('username')).toBe('alice');
+      expect(event.detail.formData.get('agree')).toBe('yes');
+      // getFormData() returns the same hx-* values, not an empty payload.
+      expect(el.getFormData().get('username')).toBe('alice');
+    });
+
+    it('collects mixed native and hx-* controls in the same form', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <hx-text-input name="hxField" value="hxValue" label="HX"></hx-text-input>
+            <input type="text" name="nativeField" value="nativeValue" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      const event = await eventPromise;
+      expect(event.detail.formData.get('hxField')).toBe('hxValue');
+      expect(event.detail.formData.get('nativeField')).toBe('nativeValue');
+    });
+
+    it('intercepts a slotted <form action=""> (empty action is the controlled case)', async () => {
+      // Templated markup (Twig/Drupal) that binds an action which renders empty
+      // must still be bridged exactly like a form with no action attribute.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="">
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
+    it('dispatches hx-invalid for an invalid slotted <form action=""> (controlled case)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form action="   ">
+            <input type="text" name="required-field" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // A whitespace-only action is also empty after trim → controlled bridge.
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.length).toBeGreaterThan(0);
+    });
+
+    it('does NOT intercept when the submitter carries a non-empty formaction (multi-submit host form)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="field" value="value" />
+            <button type="submit">Save</button>
+            <button type="submit" formaction="/host/preview">Preview</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const previewBtn = queryOrThrow<HTMLButtonElement>(el, 'button[formaction]');
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      // The Preview button overrides the (empty) form action with its own
+      // formaction → host-owned → native submission, no bridge.
+      const submitEvent = new SubmitEvent('submit', {
+        bubbles: true,
+        cancelable: true,
+        submitter: previewBtn,
+      });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('intercepts when the submitter has no formaction on an action-less form (controlled case)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="">
+          <form>
+            <input type="text" name="field" value="value" />
+            <button type="submit">Save</button>
+            <button type="submit" formaction="/host/preview">Preview</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const saveBtn = queryOrThrow<HTMLButtonElement>(el, 'button:not([formaction])');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+
+      // The Save button has no formaction → controlled bridge runs as usual.
+      const submitEvent = new SubmitEvent('submit', {
+        bubbles: true,
+        cancelable: true,
+        submitter: saveBtn,
+      });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+    });
+
+    it('no-intercept lets an action-less contained form submit natively (no hx-submit)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="" no-intercept>
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+      expect(el.noIntercept).toBe(true);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('no-intercept lets a contained <form action> submit natively (no hx-submit)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="" no-intercept>
+          <form action="/host/owned/submit" method="post">
+            <input type="text" name="field" value="value" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
+    });
+
+    it('no-intercept reflects to the no-intercept attribute', async () => {
+      const el = await fixture<HelixForm>('<hx-form></hx-form>');
+      expect(el.hasAttribute('no-intercept')).toBe(false);
+      el.noIntercept = true;
+      await el.updateComplete;
+      expect(el.hasAttribute('no-intercept')).toBe(true);
+    });
+
+    it('a subclass overriding shouldInterceptSubmit to false suppresses interception', async () => {
+      const el = await fixture<HelixFormNoBridge>(`
+        <hx-form-no-bridge-test action="">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form-no-bridge-test>
+      `);
+      expect(el).toBeInstanceOf(HelixForm);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      let dispatched = false;
+      el.addEventListener('hx-submit', () => {
+        dispatched = true;
+      });
+
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      // Even though the form is action-less (would normally bridge), the
+      // overridden hook declines interception.
+      expect(submitEvent.defaultPrevented).toBe(false);
+      expect(dispatched).toBe(false);
     });
   });
 });

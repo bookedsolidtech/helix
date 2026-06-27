@@ -37,18 +37,37 @@ export class AdoptedStylesheetsController implements ReactiveController {
 
   private readonly _host: ReactiveControllerHost & HTMLElement;
   private readonly _cssText: string;
-  private readonly _root: Document | ShadowRoot;
+  private readonly _passedRoot: Document | ShadowRoot | undefined;
   private _sheet: CSSStyleSheet | undefined;
 
   constructor(
     host: ReactiveControllerHost & HTMLElement,
     cssText: string,
-    root: Document | ShadowRoot = document,
+    root?: Document | ShadowRoot,
   ) {
     this._host = host;
     this._cssText = cssText;
-    this._root = root;
+    // Store the caller-supplied root verbatim (possibly `undefined`). The
+    // fallback to `document` is resolved lazily by the `_root` getter so that
+    // *construction* never touches `document`. This keeps the controller usable
+    // on the SSR-safe `@helixui/library/authoring` path: a Track-2 component can
+    // do `new AdoptedStylesheetsController(this, css)` in a field initializer
+    // and instantiate during SSR without a `ReferenceError: document is not
+    // defined`. DOM is only resolved when a controller method actually runs
+    // (`hostConnected`/`hostDisconnected`), which is client-side only.
+    this._passedRoot = root;
     this._host.addController(this);
+  }
+
+  /**
+   * Lazily resolves the effective root. Defers the `document` fallback to call
+   * time so the constructor stays SSR-safe. `document` is a stable per-document
+   * singleton, so omitting the argument always yields the same root object —
+   * the WeakMap-keyed ref-counting (`_getRootId`) therefore stays consistent
+   * across the instance lifetime, byte-identical to the previous eager default.
+   */
+  private get _root(): Document | ShadowRoot {
+    return this._passedRoot ?? document;
   }
 
   /**
