@@ -500,30 +500,41 @@ export class HelixCarousel extends HelixElement {
    * into range and a render is triggered, keeping the transform, pagination dots,
    * prev/next disabled states, and ARIA in sync.
    *
-   * `clampIndex` is `false` on the navigation path (`_refreshMeasuredBounds` from
-   * `goTo`/`next`/`previous`/autoplay): the metrics are re-derived but the index is
-   * left to the immediately-following `_navigateTo`, which emits exactly ONE
-   * authoritative `hx-slide-change` for the destination — so a responsive mode
-   * flip during navigation never produces a clamp event PLUS a navigation event.
-   * The non-navigation callers (firstUpdated, slotchange, ResizeObserver,
-   * `updated()`) clamp here and emit on a real post-init change, since they have no
-   * following navigation.
+   * `clampIndex` only governs whether the clamp EMITS, not whether it clamps. The
+   * active index is ALWAYS clamped back into range here (a mode flip in either
+   * direction may have lowered `_maxIndex`), so the navigation path never enters
+   * `next()`/`previous()` with a stale measured-only index that the legacy guard
+   * would then strand. On the navigation path (`clampIndex = false`, via
+   * `_refreshMeasuredBounds` from `goTo`/`next`/`previous`/autoplay) the clamp is
+   * silent: the immediately-following `_navigateTo` emits exactly ONE authoritative
+   * `hx-slide-change` for the destination, so a responsive flip during navigation
+   * never produces a clamp event PLUS a navigation event. The non-navigation
+   * callers (firstUpdated, slotchange, ResizeObserver, `updated()`) emit on a real
+   * post-init clamp, since they have no following navigation.
    * @internal
    */
   private _recomputeBounds(clampIndex = true): void {
     this._deriveMeasuredNav();
-    if (!clampIndex) return;
     const max = this._maxIndex;
     const clamped = Math.max(0, Math.min(this._currentIndex, max));
     if (clamped !== this._currentIndex) {
       this._currentIndex = clamped;
-      // A post-init clamp (responsive mode flip or resize narrowing the bound)
-      // is a real active-index change — notify hosts syncing thumbnails /
-      // counters / analytics. Suppressed during initial setup. The empty case
-      // (0 slides) is announced by `_syncSlides` (emptiness transition) instead,
-      // so the index can't change to a no-slide state and emit twice.
-      if (this._initialized && this._slides.length > 0) {
+      if (clampIndex && this._initialized && this._slides.length > 0) {
+        // A post-init clamp (responsive mode flip or resize narrowing the bound)
+        // is a real active-index change — emit the single authoritative event,
+        // which also refreshes the live region. The empty case (0 slides) is
+        // announced by `_syncSlides` (emptiness transition) instead, so the index
+        // can't change to a no-slide state and emit twice.
         this._emitSlideChange(clamped);
+      } else if (this._slides.length > 0) {
+        // Navigation path (or pre-init): the clamp is silent — the following
+        // `_navigateTo` emits the one authoritative event for the destination, so
+        // a flip during navigation never produces a clamp event PLUS a navigation
+        // event. But refresh the live region NOW so ARIA never reflects the
+        // stranded pre-clamp index even when the imminent navigation early-returns
+        // at the (now-clamped) bound without re-emitting.
+        const slide = this._slides[clamped];
+        this._liveText = slide ? this.labelSlideOf(clamped + 1, this._slides.length) : '';
       }
     }
   }
@@ -749,6 +760,9 @@ export class HelixCarousel extends HelixElement {
     // Refresh BEFORE the guard so the legacy-block decision uses the current
     // _measuredNav verdict (a runtime gap change may have flipped an exact-fill
     // carousel into a genuine peek, or this may be a measured vertical carousel).
+    // The refresh also clamps `_currentIndex` into the (possibly newly-smaller)
+    // range, so a measured→legacy flip with no box resize can't strand a
+    // measured-only index past the legacy bound and make this guard a no-op.
     this._refreshMeasuredBounds();
     const nextIndex = this._currentIndex + this.slidesPerMove;
     // Legacy/default mode blocks a move that would pass the page bound. In

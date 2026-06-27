@@ -2491,6 +2491,64 @@ describe('hx-carousel', () => {
       expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(6);
     });
 
+    it('measured->legacy flip with no resize clamps a stranded measured-only index on next()', async () => {
+      // 6 slides at calc(50% - 8px) = 192px + 16px gap, spp=2 -> measured nav,
+      // _maxIndex 5 (n-1). Sit on a measured-ONLY index (5) that the legacy model
+      // (n - slidesPerPage = 4) cannot reach.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: calc(50% - 8px); --hx-carousel-gap: 16px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+          <hx-carousel-item>6</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(5);
+      el.goTo(5); // the measured-only last slide
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(5);
+
+      // Remove the custom width. The default computed width is calc((100% - 16px)/2)
+      // = 192px = identical geometry, so NO box resizes (the ResizeObserver never
+      // fires) — the flip back to legacy can only happen on the next navigation.
+      el.style.removeProperty('--hx-carousel-slide-width');
+      expect(el['_measuredNav']).toBe(true); // still stale before navigation
+
+      // Before the fix: next()'s refresh flipped _measuredNav off but left
+      // _currentIndex at the stranded 5, so the legacy guard (nextIndex 6 > max 4)
+      // returned and left an impossible index — a visible no-op. Now the refresh
+      // clamps 5 -> 4 first, so next() produces a real move into the legacy range.
+      el.next();
+      await el.updateComplete;
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(4); // legacy n - slidesPerPage = 6 - 2
+      expect(el['_currentIndex']).toBe(4); // clamped from the stranded 5 (real move)
+
+      // The transform is consistent with the legacy last page (slides 5 & 6): the
+      // 192px slides + 16px gaps make a 1232px track, so index 4 sits at the flush
+      // trailing position (1232 - 400 = 832) with the last slide flush, no
+      // over-scroll. The live region no longer reads the stranded "Slide 6 of 6".
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const vp = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      settle(track);
+      expect(trackTranslate(track)).toBeCloseTo(-832, 0);
+      const slides = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      expect(slides[5].getBoundingClientRect().right).toBeCloseTo(vp.getBoundingClientRect().right, 0);
+      expect(shadowQuery<HTMLElement>(el, '.live-region')?.textContent?.trim()).toBe('Slide 5 of 6');
+
+      // The clamped index is now a valid legacy index: prev/next behave normally.
+      const next = shadowQuery<HTMLButtonElement>(el, '[part="next-button"]')!;
+      expect(next.disabled).toBe(true); // at the legacy bound
+      el.previous();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3); // a real legacy step back
+    });
+
     it('measured pagination renders one dot per slide (every slide selectable)', async () => {
       // Uniform exact-fill 6 slides (192px + 16px gap), 400px viewport -> _maxIndex 5 (n-1).
       const el = await fixture<HelixCarousel>(`
