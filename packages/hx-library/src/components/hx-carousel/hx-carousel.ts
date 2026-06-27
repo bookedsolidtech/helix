@@ -546,7 +546,7 @@ export class HelixCarousel extends HelixElement {
    * When there is no slide at `index` (the carousel is empty — e.g. a post-init
    * slot shrink to 0), the live region is cleared (never "Slide N of 0") and the
    * event reports a defined "no active slide" state: `{ index: -1, slide:
-   * undefined }` (see the `hx-slide-change` @fires contract).
+   * undefined }` (per the `hx-slide-change` event contract documented on the class).
    * @internal
    */
   private _emitSlideChange(index: number): void {

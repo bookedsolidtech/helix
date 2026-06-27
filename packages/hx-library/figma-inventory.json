@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-06-26T12:59:18.196Z",
+  "generatedAt": "2026-06-27T01:18:34.117Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -3848,9 +3848,9 @@
         {
           "name": "hx-slide-change",
           "type": {
-            "text": "CustomEvent<{index: number, slide: HelixCarouselItem}>"
+            "text": "CustomEvent<{index: number, slide?: HelixCarouselItem}>"
           },
-          "description": "Dispatched when the active slide changes."
+          "description": "Dispatched when the active slide changes. `detail.index` is the active slide index and `detail.slide` the active `hx-carousel-item`. When the carousel becomes empty (all slides removed at runtime), `detail.index` is `-1` and `detail.slide` is `undefined`."
         }
       ],
       "cssProperties": [
