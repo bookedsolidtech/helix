@@ -6,7 +6,7 @@ fix(hx-carousel): honor `--hx-carousel-slide-width` / `--hx-carousel-gap` and co
 
 Both CSS hooks were documented on `hx-carousel` but never read by the styles, so setting them had no effect.
 
-- `--hx-carousel-slide-width` now overrides each slide's width, and the override participates in layout and navigation. The per-page width derived from `slides-per-page` is preserved as the default.
+- `--hx-carousel-slide-width` now overrides each slide's width, and the override participates in layout and navigation. The per-page width derived from `slides-per-page` is preserved as the default. The override is honored whether it is set on the host (inherited by every slide) or per-slide on individual `hx-carousel-item`s — a custom width on any slide enables measured navigation, so per-slide widths on later slides (with the first slide left at the default) still align.
 - `--hx-carousel-gap` now sets the gap between slides on the slide track, defaulting to `0`.
 
 The slide-width computation and the navigation transform are gap- and slide-width-aware: the computed per-page width is `calc((100% - (slides-per-page - 1) * var(--hx-carousel-gap, 0px)) / slides-per-page)`, so `slides-per-page` slides plus their gaps fill the viewport exactly without clipping, and each navigation step advances by one slide's full outer extent (slide size + gap).

@@ -481,14 +481,17 @@ export class HelixCarousel extends HelixElement {
   }
 
   /**
-   * Whether a consumer has set the public `--hx-carousel-slide-width` hook,
-   * resolved from the first slide (the hook inherits from the host).
+   * Whether a consumer has set the public `--hx-carousel-slide-width` hook on ANY
+   * slide — checked across all slides, not just the first, so per-slide overrides
+   * on later items (with slide 0 left at the default) still enable measured nav.
+   * Short-circuits on the first match; only called on recompute (not per frame).
+   * SSR-guarded via the `getComputedStyle` availability of the slide elements.
    * @internal
    */
   private _hasCustomSlideWidth(): boolean {
-    const first = this._slides[0];
-    if (!first) return false;
-    return getComputedStyle(first).getPropertyValue('--hx-carousel-slide-width').trim() !== '';
+    return this._slides.some(
+      (slide) => getComputedStyle(slide).getPropertyValue('--hx-carousel-slide-width').trim() !== '',
+    );
   }
 
   /** Resets the measured-nav metrics, reverting to the legacy page model. @internal */

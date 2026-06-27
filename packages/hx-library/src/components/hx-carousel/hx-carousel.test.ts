@@ -2225,6 +2225,52 @@ describe('hx-carousel', () => {
       );
     });
 
+    it('detects a per-slide width override on a later slide (slide 0 default) and enables measured nav', async () => {
+      // Slide 0 keeps the DEFAULT width (spp=1 -> 100% = 400px); slides 1 & 2 carry
+      // per-slide --hx-carousel-slide-width overrides. The slide-0-only check would
+      // miss these; the all-slides check enables measured nav so they align.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="1" style="display: block; width: 400px;">
+          <hx-carousel-item><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 150px;"><div style="height: 80px"></div></hx-carousel-item>
+          <hx-carousel-item style="--hx-carousel-slide-width: 150px;"><div style="height: 80px"></div></hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_singlePage']).toBe(false);
+      expect(el['_maxIndex']).toBe(2); // pageBound (spp=1) -> every slide reachable
+      // Offsets reflect the real per-slide sizes: slide 0 = 400px, then 150 each.
+      expect(el['_measuredOffsets'][0]).toBeCloseTo(0, 0);
+      expect(el['_measuredOffsets'][1]).toBeCloseTo(400, 0);
+      expect(el['_measuredOffsets'][2]).toBeCloseTo(550, 0);
+
+      // The later variable-width slides are reachable and land flush.
+      const t = shadowQuery<HTMLElement>(el, '.track')!;
+      const v = shadowQuery<HTMLElement>(el, '[part="slide-viewport"]')!;
+      const items = el.querySelectorAll<HelixCarouselItem>('hx-carousel-item');
+      el.goTo(2);
+      await el.updateComplete;
+      settle(t);
+      expect(el['_currentIndex']).toBe(2);
+      // content 700, maxScroll 300; offset 550 saturates there, last slide flush right.
+      expect(items[2].getBoundingClientRect().right).toBeCloseTo(v.getBoundingClientRect().right, 0);
+    });
+
+    it('regression guard: no slide carries a custom width -> stays legacy (measured nav off)', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_maxIndex']).toBe(1); // legacy n - slidesPerPage
+    });
+
     it('regression: mixed widths whose first slides-per-page slides exact-fill are NOT treated as legacy', async () => {
       // 200 / 200 / 300 in a 400px viewport, slides-per-page=2: the first 2 slides
       // (200+200) exactly fill the viewport — the old first-slide pageExtent gate
