@@ -1148,6 +1148,90 @@ describe('hx-form', () => {
       expect(event.detail.formData.get('hostField')).toBeNull();
     });
 
+    it('bridges a slotted action-less host form even when hx-form has an action prop', async () => {
+      // The slotted form declares no action of its own; hx-form's `action` prop
+      // must NOT force native submission — the controlled bridge still runs.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form>
+            <input type="text" name="username" value="testuser" />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      // A host form is present → slot mode, single slotted form, no own form.
+      expect(el.querySelectorAll('form')).toHaveLength(1);
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.valid).toBe(true);
+      expect(event.detail.values['username']).toBe('testuser');
+    });
+
+    it('validates a slotted action-less host form even when hx-form has an action prop', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form>
+            <input type="text" name="required-field" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, 'form');
+      const eventPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      const submitEvent = new SubmitEvent('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+
+      expect(submitEvent.defaultPrevented).toBe(true);
+      const event = await eventPromise;
+      expect(event.detail.errors.length).toBeGreaterThan(0);
+    });
+
+    it('getFormData() prefers the own form over an earlier sibling host form', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <input type="text" name="ownField" value="ownValue" />
+        </hx-form>
+      `);
+      // Prepend a host form EARLIER in DOM order with a distinct field.
+      const hostForm = document.createElement('form');
+      hostForm.setAttribute('action', '/host');
+      hostForm.innerHTML = '<input type="text" name="hostField" value="hostValue" />';
+      el.prepend(hostForm);
+      await flushMutations(el);
+
+      // Own + host coexist (the orphaned own control keeps the own form).
+      expect(el.querySelectorAll('form')).toHaveLength(2);
+
+      const data = el.getFormData();
+      // Own form's data, even though the host form is FIRST in DOM order.
+      expect(data.get('ownField')).toBe('ownValue');
+      expect(data.get('hostField')).toBeNull();
+    });
+
+    it('getFormData() falls back to the host form in slot-only mode', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <form action="/host">
+            <input type="text" name="hostField" value="hostValue" />
+          </form>
+        </hx-form>
+      `);
+
+      // Slot-only mode (no own form) → host form's data, unchanged.
+      expect(el.querySelector('form[data-hx-own-form]')).toBeNull();
+      const data = el.getFormData();
+      expect(data.get('hostField')).toBe('hostValue');
+    });
+
     it('intercepts a slotted <form action=""> (empty action is the controlled case)', async () => {
       // Templated markup (Twig/Drupal) that binds an action which renders empty
       // must still be bridged exactly like a form with no action attribute.

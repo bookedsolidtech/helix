@@ -324,37 +324,20 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * Collects form data from all child form elements (native and hx-*).
-   * Returns a `FormData` object.
+   * Collects form data from the form's controls and returns a `FormData` object.
+   *
+   * Precedence: when hx-form rendered its OWN `<form>` (`data-hx-own-form`), data
+   * is collected for that form's controls — so a sibling host form prepended
+   * earlier in DOM order (Drupal/React) cannot hijack the payload. In slot-only
+   * mode (no own form), it falls back to the consumer's first `<form>` (the host
+   * form), or, when there is no `<form>` at all, to every named control.
    */
   getFormData(): FormData {
-    // If there is a native <form> child, use it directly
-    const formEl = this.querySelector('form');
-    if (formEl) {
-      return new FormData(formEl);
+    const ownForm = this.querySelector<HTMLFormElement>('form[data-hx-own-form]');
+    if (ownForm !== null) {
+      return this._collectFormData(ownForm);
     }
-
-    // Otherwise, manually collect from all named inputs
-    const formData = new FormData();
-    const elements = this.getNativeFormElements();
-    for (const el of elements) {
-      const input = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-      if (!input.name) continue;
-
-      if (input instanceof HTMLInputElement) {
-        if (input.type === 'checkbox' || input.type === 'radio') {
-          if (input.checked) {
-            formData.append(input.name, input.value || 'on');
-          }
-        } else {
-          formData.append(input.name, input.value);
-        }
-      } else {
-        formData.append(input.name, input.value);
-      }
-    }
-
-    return formData;
+    return this._collectFormData(this.querySelector<HTMLFormElement>('form'));
   }
 
   /**
@@ -586,14 +569,19 @@ export class HelixForm extends HelixElement {
    * client-side bridge (prevent native submission, validate, and dispatch
    * `hx-submit` / `hx-invalid`), or let the event proceed to native submission.
    *
-   * hx-form must NEVER cancel a form it does not itself own. It renders its own
-   * `<form>` only when `action` is set, in which case native submission to that
-   * action is the intended behaviour. When `action` is empty it renders no
-   * `<form>` at all, so the submitting form is host-owned/slotted; in that case
-   * the bridge applies ONLY to a form that does not declare its own `action`
-   * (the controlled client-side pattern). A slotted form with its own `action`
-   * (Drupal Form API, Marketo, etc.) owns its submission and must submit
-   * natively.
+   * The decision is made purely from the SUBMITTING form (and its submitter),
+   * never from hx-form's own `action` prop — so a slotted action-less host form
+   * is still bridged even when `<hx-form>` carries an `action`. Submission is
+   * left native iff the submitting `<form>` declares its own NON-EMPTY `action`
+   * attribute, OR the submit button carries a NON-EMPTY `formaction` (a
+   * multi-submit host form — e.g. Drupal's Save vs Preview buttons — overrides
+   * the form action per-submitter). Otherwise it is the controlled client-side
+   * case and is bridged.
+   *
+   * hx-form's OWN rendered `<form>` gets its `action` attribute only when
+   * `_hasOwnAction` (trimmed non-empty), so the form-action check below already
+   * covers the own-form-with-action native case: a whitespace-only `action`
+   * renders the own form WITHOUT an attribute → controlled.
    *
    * Override in a subclass to opt out of interception without monkey-patching.
    * Part of the hx-form subclassing contract.
@@ -608,22 +596,11 @@ export class HelixForm extends HelixElement {
       return false;
     }
 
-    // hx-form renders its own `<form action>`; native submission is intended.
-    // A whitespace-only `action` is treated as empty (controlled), consistent
-    // with the slotted-form / formaction checks below.
-    if (this._hasOwnAction) {
-      return false;
-    }
-
-    // No action: the submitting form is host-owned/slotted. Treat it as
-    // host-owned (native) when EITHER the form declares a NON-EMPTY `action` of
-    // its own, OR the submit button that triggered submission carries a
-    // NON-EMPTY `formaction` (a multi-submit host form — e.g. Drupal's Save vs
-    // Preview buttons — overrides the form action per-submitter). A missing or
-    // empty action/formaction (`<form>`, `<form action="">`, e.g. templated
-    // Twig/Drupal markup binding a value that renders empty) is the controlled
-    // client-side case and is still bridged — mirroring how an empty
-    // `this.action` is treated as the controlled case above.
+    // Native submission iff the SUBMITTING form declares its own NON-EMPTY
+    // `action`. A missing or empty action (`<form>`, `<form action="">`, e.g.
+    // templated Twig/Drupal markup binding a value that renders empty, OR
+    // hx-form's own whitespace-action form which omits the attribute) is the
+    // controlled client-side case and is bridged.
     const target = e.target;
     const formAction = target instanceof HTMLFormElement ? target.getAttribute('action') : null;
     const formOwns = formAction !== null && formAction.trim() !== '';
