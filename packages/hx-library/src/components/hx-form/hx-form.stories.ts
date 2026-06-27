@@ -231,49 +231,55 @@ export const NativeHtmlForm: Story = {
   `,
 };
 
-/** Form using only hx-* web components for all fields. */
+/**
+ * Form using only hx-* web components for all fields. hx-form is a Light-DOM
+ * wrapper — the consumer provides the `<form>`. With no `action` on that form,
+ * hx-form bridges the submit (validate + dispatch `hx-submit`).
+ */
 export const WithWebComponents: Story = {
   render: () => html`
-    <hx-form action="/api/patients" method="post">
-      <hx-text-input
-        label="Patient Name"
-        name="patientName"
-        placeholder="Enter patient name"
-        required
-      ></hx-text-input>
+    <hx-form>
+      <form>
+        <hx-text-input
+          label="Patient Name"
+          name="patientName"
+          placeholder="Enter patient name"
+          required
+        ></hx-text-input>
 
-      <hx-text-input
-        label="Date of Birth"
-        name="dob"
-        type="text"
-        placeholder="MM/DD/YYYY"
-        required
-      ></hx-text-input>
+        <hx-text-input
+          label="Date of Birth"
+          name="dob"
+          type="text"
+          placeholder="MM/DD/YYYY"
+          required
+        ></hx-text-input>
 
-      <hx-select label="Insurance Provider" name="insurance" placeholder="Select provider">
-        <option value="blue-cross">Blue Cross Blue Shield</option>
-        <option value="aetna">Aetna</option>
-        <option value="united">UnitedHealthcare</option>
-        <option value="cigna">Cigna</option>
-      </hx-select>
+        <hx-select label="Insurance Provider" name="insurance" placeholder="Select provider">
+          <option value="blue-cross">Blue Cross Blue Shield</option>
+          <option value="aetna">Aetna</option>
+          <option value="united">UnitedHealthcare</option>
+          <option value="cigna">Cigna</option>
+        </hx-select>
 
-      <hx-textarea
-        label="Medical History"
-        name="history"
-        placeholder="Relevant medical history..."
-        rows="4"
-      ></hx-textarea>
+        <hx-textarea
+          label="Medical History"
+          name="history"
+          placeholder="Relevant medical history..."
+          rows="4"
+        ></hx-textarea>
 
-      <hx-checkbox
-        label="I confirm this information is accurate"
-        name="confirm"
-        required
-      ></hx-checkbox>
+        <hx-checkbox
+          label="I confirm this information is accurate"
+          name="confirm"
+          required
+        ></hx-checkbox>
 
-      <div class="form-actions">
-        <hx-button type="submit">Register Patient</hx-button>
-        <hx-button type="reset" variant="secondary">Clear</hx-button>
-      </div>
+        <div class="form-actions">
+          <hx-button type="submit">Register Patient</hx-button>
+          <hx-button type="reset" variant="secondary">Clear</hx-button>
+        </div>
+      </form>
     </hx-form>
   `,
 };

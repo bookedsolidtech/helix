@@ -343,6 +343,24 @@ describe('hx-form', () => {
       expect(meds).toContain('aspirin');
       expect(meds).toContain('ibuprofen');
     });
+
+    it('getFormData() includes hx-* controls in the no-form fallback', async () => {
+      // No consumer <form>: the fallback must collect hx-* form-associated
+      // controls (not just native), reading each via its public value API.
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <hx-text-input name="patientName" value="Dana Lee" label="Name"></hx-text-input>
+          <hx-checkbox name="consent" value="yes" checked label="Consent"></hx-checkbox>
+          <input type="text" name="native" value="nativeValue" />
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const formData = el.getFormData();
+      expect(formData.get('patientName')).toBe('Dana Lee');
+      expect(formData.get('consent')).toBe('yes');
+      expect(formData.get('native')).toBe('nativeValue');
+    });
   });
 
   // ─── Validation (5) ───

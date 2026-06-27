@@ -206,27 +206,74 @@ export class HelixForm extends HelixElement {
       return new FormData(formEl);
     }
 
-    // Otherwise, manually collect from all named inputs
+    // No consumer <form>: collect from every named form-associated control in the
+    // host light DOM — native AND hx-* components (so all-web-component layouts
+    // return complete data, not just native fields).
     const formData = new FormData();
-    const elements = this.getNativeFormElements();
-    for (const el of elements) {
-      const input = el as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-      if (!input.name) continue;
+    for (const el of this._hostFormControls()) {
+      const name = (el as { name?: unknown }).name;
+      if (typeof name !== 'string' || name === '') continue;
 
-      if (input instanceof HTMLInputElement) {
-        if (input.type === 'checkbox' || input.type === 'radio') {
-          if (input.checked) {
-            formData.append(input.name, input.value || 'on');
+      if (el instanceof HTMLInputElement) {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          if (el.checked) {
+            formData.append(name, el.value || 'on');
           }
         } else {
-          formData.append(input.name, input.value);
+          formData.append(name, el.value);
         }
+      } else if (el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement) {
+        formData.append(name, el.value);
       } else {
-        formData.append(input.name, input.value);
+        // hx-* form-associated custom element: read its public value API.
+        const control = el as { value?: unknown; checked?: unknown };
+        if (typeof control.checked === 'boolean') {
+          if (control.checked) {
+            const value =
+              typeof control.value === 'string' && control.value !== '' ? control.value : 'on';
+            formData.append(name, value);
+          }
+        } else if (typeof control.value === 'string') {
+          formData.append(name, control.value);
+        }
       }
     }
 
     return formData;
+  }
+
+  /**
+   * Form-associated controls in the host light DOM — native `input`/`select`/
+   * `textarea`, plus any registered custom element whose constructor declares
+   * `static formAssociated = true` (every hx-* form control). Used by the
+   * `getFormData()` fallback when the consumer supplies no `<form>`.
+   * @internal
+   */
+  private _hostFormControls(): Element[] {
+    return Array.from(this.querySelectorAll('*')).filter((el) => this._isFormControl(el));
+  }
+
+  /**
+   * Whether an element is a form-associated control — a native
+   * `input`/`select`/`textarea`, OR a registered custom element whose
+   * constructor declares `static formAssociated = true`. The generic
+   * `formAssociated` check auto-includes every hx-* form control without a
+   * hardcoded tag allowlist.
+   * @internal
+   */
+  private _isFormControl(el: Element): boolean {
+    const tag = el.tagName.toLowerCase();
+    if (tag === 'input' || tag === 'select' || tag === 'textarea') {
+      return true;
+    }
+    if (typeof customElements === 'undefined') {
+      return false;
+    }
+    const ctor = customElements.get(tag);
+    return (
+      ctor !== undefined &&
+      (ctor as CustomElementConstructor & { formAssociated?: boolean }).formAssociated === true
+    );
   }
 
   /**
