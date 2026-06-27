@@ -491,7 +491,8 @@ export class HelixCarousel extends HelixElement {
    */
   private _hasCustomSlideWidth(): boolean {
     return this._slides.some(
-      (slide) => getComputedStyle(slide).getPropertyValue('--hx-carousel-slide-width').trim() !== '',
+      (slide) =>
+        getComputedStyle(slide).getPropertyValue('--hx-carousel-slide-width').trim() !== '',
     );
   }
 
