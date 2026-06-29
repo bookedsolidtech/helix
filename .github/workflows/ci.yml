@@ -1079,7 +1079,7 @@ jobs:
       - name: Restore VRT baselines
         if: steps.detect.outputs.changed != ''
         id: vrt-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: packages/hx-library/__screenshots__
           key: vrt-screenshots-${{ hashFiles('packages/hx-library/src/**/*.ts') }}
