@@ -1071,6 +1071,618 @@ describe('hx-form', () => {
       expect(event.detail.errors.some((er) => er.name === 'needed')).toBe(true);
     });
 
+    it("a valid sibling form's successful submit does NOT clear another form's aria-invalid (regression: P2)", async () => {
+      // Two action-less sibling forms. Form A is marked invalid by its own failed
+      // submit; a SUBSEQUENT valid submit of form B must not wipe A's aria-invalid
+      // markers — A was never corrected. The success cleanup is scoped to the
+      // submitting form.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="text" name="aRequired" required />
+            <button type="submit">Submit A</button>
+          </form>
+          <form id="form-b">
+            <input type="text" name="bField" value="ok" />
+            <button type="submit">Submit B</button>
+          </form>
+        </hx-form>
+      `);
+
+      const formA = queryOrThrow<HTMLFormElement>(el, '#form-a');
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+      const inputA = queryOrThrow<HTMLInputElement>(el, 'input[name="aRequired"]');
+      const inputB = queryOrThrow<HTMLInputElement>(el, 'input[name="bField"]');
+
+      // Submit A invalid → A's control is marked aria-invalid="true".
+      const invalidPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      formA.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await invalidPromise;
+      await el.updateComplete;
+      expect(inputA.getAttribute('aria-invalid')).toBe('true');
+
+      // Submit B (valid) → its success must NOT clear A's marker.
+      const validPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      formB.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      const validEvent = await validPromise;
+      await el.updateComplete;
+      expect(validEvent.detail.valid).toBe(true);
+
+      // A was never corrected — its aria-invalid persists.
+      expect(inputA.getAttribute('aria-invalid')).toBe('true');
+      // B's own controls carry no aria-invalid.
+      expect(inputB.hasAttribute('aria-invalid')).toBe(false);
+    });
+
+    it("a valid sibling form's success preserves the still-invalid form's CUSTOM (server-set) summary message and marker (regression: P2)", async () => {
+      // Form A's error is set via setFieldError with a CUSTOM server message. After
+      // "B valid", A's field must keep aria-invalid AND the summary must still show
+      // the CUSTOM message — proving the success path FILTERS the existing errors
+      // (preserving the original text) rather than re-deriving from the native
+      // validationMessage or a bare field name.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="text" name="aRequired" />
+            <button type="submit">Submit A</button>
+          </form>
+          <form id="form-b">
+            <input type="text" name="bField" value="ok" />
+            <button type="submit">Submit B</button>
+          </form>
+        </hx-form>
+      `);
+
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+      const inputA = queryOrThrow<HTMLInputElement>(el, 'input[name="aRequired"]');
+
+      const customMessage = 'MRN already exists in the system.';
+      // Mark A invalid with a custom server message (renders the summary + marker).
+      el.setFieldError('aRequired', customMessage);
+      await el.updateComplete;
+      expect(inputA.getAttribute('aria-invalid')).toBe('true');
+      const summaryAfterA = el.querySelector('.hx-form-error-summary');
+      expect(summaryAfterA?.textContent).toContain(customMessage);
+
+      // Submit B (valid) → success must NOT drop A's marker or its CUSTOM summary.
+      const validPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      formB.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await validPromise;
+      await el.updateComplete;
+
+      // A's marker persists AND the CUSTOM message survives (not re-derived).
+      expect(inputA.getAttribute('aria-invalid')).toBe('true');
+      const summaryAfterB = el.querySelector('.hx-form-error-summary');
+      expect(summaryAfterB).toBeTruthy();
+      expect(summaryAfterB?.textContent).toContain(customMessage);
+      // Exactly the one still-invalid field (A) remains; nothing from B.
+      expect(summaryAfterB?.querySelectorAll('li').length).toBe(1);
+    });
+
+    it('same-name cross-form: per-control identity merges failures and drops only the succeeding form (regression: P2)', async () => {
+      // Two sibling forms BOTH have <input name="email">. The error model must key
+      // by CONTROL IDENTITY, not by `name`: A's email and B's email are distinct.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" required />
+            <button type="submit">Submit A</button>
+          </form>
+          <form id="form-b">
+            <input type="email" name="email" required />
+            <button type="submit">Submit B</button>
+          </form>
+        </hx-form>
+      `);
+
+      const formA = queryOrThrow<HTMLFormElement>(el, '#form-a');
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+      const emailA = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+      const emailB = queryOrThrow<HTMLInputElement>(el, '#form-b input[name="email"]');
+
+      // Submit A invalid → summary has exactly A's email entry; A marked, B not.
+      const invalidA = oneEvent<CustomEvent>(el, 'hx-invalid');
+      formA.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await invalidA;
+      await el.updateComplete;
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.hasAttribute('aria-invalid')).toBe(false);
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(1);
+
+      // Submit B invalid → MERGE: summary now has BOTH A's and B's email entries.
+      const invalidB = oneEvent<CustomEvent>(el, 'hx-invalid');
+      formB.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await invalidB;
+      await el.updateComplete;
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.getAttribute('aria-invalid')).toBe('true');
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(2);
+
+      // Fix B and submit B valid → ONLY B's entry drops; A's remains, A stays marked.
+      emailB.value = 'valid@example.com';
+      const validB = oneEvent<CustomEvent>(el, 'hx-submit');
+      formB.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await validB;
+      await el.updateComplete;
+      expect(emailA.getAttribute('aria-invalid')).toBe('true'); // A untouched
+      expect(emailB.hasAttribute('aria-invalid')).toBe(false); // B cleared
+      // Exactly A's one entry survives — B's same-name entry was dropped by identity.
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(1);
+    });
+
+    it('form-targeted setFieldError disambiguates same-name sibling forms (element target)', async () => {
+      // setFieldError(name, message, form) binds the error to the named control
+      // INSIDE that form, so two sibling forms sharing name="email" get distinct
+      // entries/markers — and a valid submit of one drops only ITS entry.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" />
+            <button type="submit">Submit A</button>
+          </form>
+          <form id="form-b">
+            <input type="email" name="email" />
+            <button type="submit">Submit B</button>
+          </form>
+        </hx-form>
+      `);
+
+      const formA = queryOrThrow<HTMLFormElement>(el, '#form-a');
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+      const emailA = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+      const emailB = queryOrThrow<HTMLInputElement>(el, '#form-b input[name="email"]');
+
+      el.setFieldError('email', 'A failed', formA);
+      el.setFieldError('email', 'B failed', formB);
+      await el.updateComplete;
+
+      // Distinct markers and two distinct summary entries.
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.getAttribute('aria-invalid')).toBe('true');
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(2);
+      expect(summary?.textContent).toContain('A failed');
+      expect(summary?.textContent).toContain('B failed');
+
+      // Submit B valid → ONLY B's entry/marker drops; A's 'A failed' remains.
+      const validB = oneEvent<CustomEvent>(el, 'hx-submit');
+      formB.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await validB;
+      await el.updateComplete;
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.hasAttribute('aria-invalid')).toBe(false);
+      const after = el.querySelector('.hx-form-error-summary');
+      expect(after?.querySelectorAll('li').length).toBe(1);
+      expect(after?.textContent).toContain('A failed');
+      expect(after?.textContent).not.toContain('B failed');
+    });
+
+    it('form-targeted setErrors resolves a string form id the same as the element', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" />
+          </form>
+          <form id="form-b">
+            <input type="email" name="email" />
+          </form>
+        </hx-form>
+      `);
+
+      const emailA = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+      const emailB = queryOrThrow<HTMLInputElement>(el, '#form-b input[name="email"]');
+
+      // Mix of string-id targeting (A) and element targeting (B).
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+      el.setErrors([
+        { name: 'email', message: 'A failed', form: 'form-a' },
+        { name: 'email', message: 'B failed', form: formB },
+      ]);
+      await el.updateComplete;
+
+      // Each error marks ONLY its targeted form's control.
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.getAttribute('aria-invalid')).toBe('true');
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(2);
+    });
+
+    it('setErrors with a mix of targeted and untargeted entries resolves each independently', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="text" name="mrn" />
+          </form>
+          <form id="form-b">
+            <input type="text" name="dob" />
+          </form>
+        </hx-form>
+      `);
+
+      const mrn = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="mrn"]');
+      const dob = queryOrThrow<HTMLInputElement>(el, '#form-b input[name="dob"]');
+      const formA = queryOrThrow<HTMLFormElement>(el, '#form-a');
+
+      el.setErrors([
+        { name: 'mrn', message: 'MRN already exists', form: formA }, // targeted
+        { name: 'dob', message: 'Invalid date' }, // untargeted (unique name)
+      ]);
+      await el.updateComplete;
+
+      expect(mrn.getAttribute('aria-invalid')).toBe('true');
+      expect(dob.getAttribute('aria-invalid')).toBe('true');
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(2);
+      expect(summary?.textContent).toContain('MRN already exists');
+      expect(summary?.textContent).toContain('Invalid date');
+    });
+
+    it('omitted form target preserves prior best-effort behavior (regression guard)', async () => {
+      // A single form, name-only setFieldError — must behave exactly as before:
+      // marks the field and renders the message, replacing a same-name prior entry.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="solo">
+            <input type="text" name="field" />
+          </form>
+        </hx-form>
+      `);
+
+      const input = queryOrThrow<HTMLInputElement>(el, 'input[name="field"]');
+      el.setFieldError('field', 'first message');
+      await el.updateComplete;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      expect(el.querySelector('.hx-form-error-summary')?.textContent).toContain('first message');
+
+      // Re-setting the same name replaces the prior entry (no duplicate).
+      el.setFieldError('field', 'second message');
+      await el.updateComplete;
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(1);
+      expect(summary?.textContent).toContain('second message');
+      expect(summary?.textContent).not.toContain('first message');
+    });
+
+    it('an unresolvable string form id degrades to untargeted best-effort (no throw)', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="solo">
+            <input type="text" name="field" />
+          </form>
+        </hx-form>
+      `);
+
+      const input = queryOrThrow<HTMLInputElement>(el, 'input[name="field"]');
+      // 'no-such-form' resolves to null → untargeted fallback (best-effort by name).
+      expect(() => el.setFieldError('field', 'msg', 'no-such-form')).not.toThrow();
+      await el.updateComplete;
+      expect(input.getAttribute('aria-invalid')).toBe('true');
+      expect(el.querySelector('.hx-form-error-summary')?.textContent).toContain('msg');
+    });
+
+    it('UNTARGETED setErrors marks EVERY same-name control across sibling forms (name-based)', async () => {
+      // Contract: an entry with no `form` is name-based, byte-identical to pre-
+      // targeting — it must mark BOTH email controls, not just the first.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" />
+          </form>
+          <form id="form-b">
+            <input type="email" name="email" />
+          </form>
+        </hx-form>
+      `);
+
+      const emailA = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+      const emailB = queryOrThrow<HTMLInputElement>(el, '#form-b input[name="email"]');
+
+      el.setErrors([{ name: 'email', message: 'Invalid email' }]); // no `form`
+      await el.updateComplete;
+
+      // BOTH same-name controls are marked (name-based), not just the first.
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.getAttribute('aria-invalid')).toBe('true');
+      // One summary entry (one error object), but it applies across all matches.
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(1);
+    });
+
+    it('UNTARGETED setFieldError replaces only a prior UNTARGETED same-name entry (targeted entries coexist)', async () => {
+      // Entry identity is (name, scope). An untargeted `email` (scope=undefined) is
+      // a DISTINCT key from targeted-to-A / targeted-to-B `email`, so it never
+      // clobbers them — it coexists. A second untargeted `email` replaces the first.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" />
+          </form>
+          <form id="form-b">
+            <input type="email" name="email" />
+          </form>
+        </hx-form>
+      `);
+
+      const formA = queryOrThrow<HTMLFormElement>(el, '#form-a');
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+
+      // Two distinct targeted entries.
+      el.setFieldError('email', 'A failed', formA);
+      el.setFieldError('email', 'B failed', formB);
+      await el.updateComplete;
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(2);
+
+      // Untargeted setFieldError → a THIRD, distinct (name, undefined) entry.
+      el.setFieldError('email', 'untargeted 1');
+      await el.updateComplete;
+      let summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(3);
+      expect(summary?.textContent).toContain('A failed'); // targeted entries survive
+      expect(summary?.textContent).toContain('B failed');
+      expect(summary?.textContent).toContain('untargeted 1');
+
+      // A SECOND untargeted setFieldError for the same name replaces the first
+      // untargeted entry (same (name, undefined) key) — still 3 total, not 4.
+      el.setFieldError('email', 'untargeted 2');
+      await el.updateComplete;
+      summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(3);
+      expect(summary?.textContent).toContain('untargeted 2');
+      expect(summary?.textContent).not.toContain('untargeted 1');
+      expect(summary?.textContent).toContain('A failed');
+      expect(summary?.textContent).toContain('B failed');
+    });
+
+    it('GROUPS: a scoped error marks EVERY member of a radio group named by the entry', async () => {
+      // A single error entry scoped to a form resolves to the FULL control set for
+      // its name — so a radio GROUP has aria-invalid on all 3 members, not just one.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="plan-form">
+            <input type="radio" name="plan" value="basic" />
+            <input type="radio" name="plan" value="pro" />
+            <input type="radio" name="plan" value="max" />
+          </form>
+        </hx-form>
+      `);
+
+      const planForm = queryOrThrow<HTMLFormElement>(el, '#plan-form');
+      const radios = Array.from(el.querySelectorAll<HTMLInputElement>('input[name="plan"]'));
+      expect(radios.length).toBe(3);
+
+      el.setFieldError('plan', 'pick one', planForm);
+      await el.updateComplete;
+
+      // ALL group members are marked (finding 615).
+      for (const r of radios) {
+        expect(r.getAttribute('aria-invalid')).toBe('true');
+      }
+      // One summary entry for the group.
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(1);
+    });
+
+    it('UNTARGETED SHARED: an untargeted entry is retained across a sibling submit while any same-name control is still invalid (SUCCESS)', async () => {
+      // Untargeted `email` marks BOTH sibling forms' email controls. Submitting B
+      // (valid) clears only B's markers; the untargeted entry must REMAIN because
+      // A's email is still marked, and drop only once A is also cleared (finding 904).
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" required />
+            <button type="submit">Submit A</button>
+          </form>
+          <form id="form-b">
+            <input type="email" name="email" value="ok@example.com" />
+            <button type="submit">Submit B</button>
+          </form>
+        </hx-form>
+      `);
+
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+      const emailA = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+      const emailB = queryOrThrow<HTMLInputElement>(el, '#form-b input[name="email"]');
+
+      el.setErrors([{ name: 'email', message: 'Invalid email' }]); // untargeted
+      await el.updateComplete;
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.getAttribute('aria-invalid')).toBe('true');
+
+      // Submit B (valid) → clears B's marker; the untargeted entry REMAINS (A still marked).
+      const validB = oneEvent<CustomEvent>(el, 'hx-submit');
+      formB.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await validB;
+      await el.updateComplete;
+      expect(emailB.hasAttribute('aria-invalid')).toBe(false);
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary).toBeTruthy();
+      expect(summary?.textContent).toContain('Invalid email'); // retained
+    });
+
+    it('UNTARGETED SHARED: an untargeted entry survives a sibling form FAILURE (its scope differs)', async () => {
+      // A different form's FAILURE merge keeps entries not scoped to it — including
+      // the untargeted (scope=undefined) entry — so the untargeted `email` remains.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" />
+          </form>
+          <form id="form-b">
+            <input type="text" name="zip" required />
+            <button type="submit">Submit B</button>
+          </form>
+        </hx-form>
+      `);
+
+      const formB = queryOrThrow<HTMLFormElement>(el, '#form-b');
+      const emailA = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+
+      el.setErrors([{ name: 'email', message: 'Invalid email' }]); // untargeted
+      await el.updateComplete;
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+
+      // Submit B invalid (its own zip is required-empty) → merge keeps the untargeted
+      // email entry (scope undefined !== formB), appends B's zip error.
+      const invalidB = oneEvent<CustomEvent>(el, 'hx-invalid');
+      formB.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await invalidB;
+      await el.updateComplete;
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.textContent).toContain('Invalid email'); // untargeted survives
+      expect(emailA.getAttribute('aria-invalid')).toBe('true'); // still marked
+      // Both entries present: the untargeted email + B's zip.
+      expect(summary?.querySelectorAll('li').length).toBe(2);
+    });
+
+    it('MIXED: an untargeted and a targeted same-name error coexist and retain/drop independently', async () => {
+      // Untargeted `email` (marks A and B) + targeted-to-A `email` = 2 distinct
+      // entries. Submitting A valid clears A's markers: the targeted-to-A entry
+      // drops (all its controls are in A), but the untargeted entry REMAINS because
+      // B's email is still marked.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" value="ok@a.com" />
+            <button type="submit">Submit A</button>
+          </form>
+          <form id="form-b">
+            <input type="email" name="email" />
+          </form>
+        </hx-form>
+      `);
+
+      const formA = queryOrThrow<HTMLFormElement>(el, '#form-a');
+      const emailA = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+      const emailB = queryOrThrow<HTMLInputElement>(el, '#form-b input[name="email"]');
+
+      el.setErrors([
+        { name: 'email', message: 'untargeted email' }, // scope=undefined → marks A + B
+        { name: 'email', message: 'A-scoped email', form: formA }, // scope=A → marks A
+      ]);
+      await el.updateComplete;
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(2);
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.getAttribute('aria-invalid')).toBe('true');
+
+      // Submit A (valid) → clears A's markers.
+      const validA = oneEvent<CustomEvent>(el, 'hx-submit');
+      formA.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await validA;
+      await el.updateComplete;
+
+      // The A-scoped entry drops (its only control, A.email, is now clear); the
+      // untargeted entry REMAINS because B.email is still marked.
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(1);
+      expect(summary?.textContent).toContain('untargeted email');
+      expect(summary?.textContent).not.toContain('A-scoped email');
+      expect(emailB.getAttribute('aria-invalid')).toBe('true'); // untargeted still marks B
+    });
+
+    it('STABLE ID SCOPE: an id-scoped entry survives an in-place re-render and a same-id re-set REPLACES (not appends)', async () => {
+      // A scoped error is keyed by the form's stable id, not its element ref. When
+      // the form node is replaced in place (same id), the entry must re-bind to the
+      // NEW control and a second setFieldError targeting the same id must REPLACE.
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="form-a">
+            <input type="email" name="email" />
+          </form>
+        </hx-form>
+      `);
+
+      const formA = queryOrThrow<HTMLFormElement>(el, '#form-a');
+      el.setFieldError('email', 'v1', formA);
+      await el.updateComplete;
+      expect(queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]').getAttribute('aria-invalid')).toBe('true');
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(1);
+
+      // Replace the form NODE in place, keeping the same id (simulates a re-render).
+      const replacement = document.createElement('form');
+      replacement.id = 'form-a';
+      replacement.innerHTML = '<input type="email" name="email" />';
+      formA.replaceWith(replacement);
+      await el.updateComplete;
+
+      // A second setFieldError targeting the same id string REPLACES the prior
+      // entry (stable (name, id) key) — one entry, message 'v2' — and marks the NEW
+      // control (live re-resolution by id).
+      el.setFieldError('email', 'v2', 'form-a');
+      await el.updateComplete;
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(1); // replaced, not appended
+      expect(summary?.textContent).toContain('v2');
+      expect(summary?.textContent).not.toContain('v1');
+      // The NEW control (in the replacement form) is the one marked.
+      const newEmail = queryOrThrow<HTMLInputElement>(el, '#form-a input[name="email"]');
+      expect(newEmail).toBe(replacement.querySelector('input[name="email"]'));
+      expect(newEmail.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('ELEMENT-REF SCOPE FALLBACK: a targeted error on a form WITHOUT an id still works for a single render', async () => {
+      // No id → the scope falls back to the element reference. It still marks the
+      // right control and a same-element re-set replaces (single-render robustness).
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form>
+            <input type="email" name="email" />
+          </form>
+          <form>
+            <input type="email" name="email" />
+          </form>
+        </hx-form>
+      `);
+
+      const [formA, formB] = Array.from(el.querySelectorAll('form'));
+      const emailA = queryOrThrow<HTMLInputElement>(formA!, 'input[name="email"]');
+      const emailB = queryOrThrow<HTMLInputElement>(formB!, 'input[name="email"]');
+
+      el.setFieldError('email', 'A only', formA!);
+      await el.updateComplete;
+      // Only form A's email is marked (element-ref scope disambiguates same-name).
+      expect(emailA.getAttribute('aria-invalid')).toBe('true');
+      expect(emailB.hasAttribute('aria-invalid')).toBe(false);
+      expect(el.querySelector('.hx-form-error-summary')?.querySelectorAll('li').length).toBe(1);
+
+      // A same-element re-set replaces (same (name, element) key) — one entry.
+      el.setFieldError('email', 'A updated', formA!);
+      await el.updateComplete;
+      const summary = el.querySelector('.hx-form-error-summary');
+      expect(summary?.querySelectorAll('li').length).toBe(1);
+      expect(summary?.textContent).toContain('A updated');
+      expect(summary?.textContent).not.toContain('A only');
+    });
+
+    it('single-form success clears the error summary entirely (byte-identical to the prior blanket clear)', async () => {
+      // Regression guard: the common single-form case must still fully clear the
+      // summary on a successful submit (no stray entries from the rebuild).
+      const el = await fixture<HelixForm>(`
+        <hx-form action="/x">
+          <form id="solo">
+            <input type="text" name="field" required />
+            <button type="submit">Submit</button>
+          </form>
+        </hx-form>
+      `);
+
+      const form = queryOrThrow<HTMLFormElement>(el, '#solo');
+      const input = queryOrThrow<HTMLInputElement>(el, 'input[name="field"]');
+
+      // Fail once → summary present, control marked.
+      const invalidPromise = oneEvent<CustomEvent>(el, 'hx-invalid');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await invalidPromise;
+      await el.updateComplete;
+      expect(el.querySelector('.hx-form-error-summary')).toBeTruthy();
+
+      // Correct the field and resubmit → success clears summary and aria-invalid.
+      input.value = 'now valid';
+      const validPromise = oneEvent<CustomEvent>(el, 'hx-submit');
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true }));
+      await validPromise;
+      await el.updateComplete;
+      expect(el.querySelector('.hx-form-error-summary')).toBeNull();
+      expect(input.hasAttribute('aria-invalid')).toBe(false);
+    });
+
     it('honors an externally-associated (form="id") control in the submitting form', async () => {
       // A required control associated via `form="f"` but placed OUTSIDE the form.
       const el = await fixture<HelixForm>(`

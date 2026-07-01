@@ -677,14 +677,21 @@ export class HelixCarousel extends HelixElement {
   // ─── Navigation ───
 
   /**
-   * Maximum selectable slide index.
+   * Maximum SELECTABLE slide index (the selection bound, not the translate bound).
    *
-   * Single static page (measured path, no overflow) → `0`. In measured-nav mode
-   * every slide is individually reachable, so the bound is `slides.length - 1`:
-   * the translate clamps to `_measuredMaxScroll`, so adjacent end slides may share
-   * the same saturated frame, but each remains a distinct accessible selection. In
-   * the legacy default model this is the slidesPerPage page bound
-   * (`slides.length - slidesPerPage`).
+   * Single static page (measured path, no overflow) → `0`. Whenever every slide is
+   * individually reachable — measured-nav mode AND legacy LOOP mode — the bound is
+   * `slides.length - 1`. In those cases the track translate saturates short of the
+   * raw index (at `_measuredMaxScroll` in measured mode, at the page bound in
+   * legacy loop — see `_trackTransform`), so adjacent end slides may share the same
+   * frame while each remains a distinct accessible selection. Only the legacy
+   * NON-loop model uses the slidesPerPage PAGE bound (`slides.length -
+   * slidesPerPage`); there selection and translate coincide page-by-page.
+   *
+   * Legacy loop returning `n - 1` (rather than the page bound) is the root fix for
+   * the resize/recompute snap-back: `_recomputeBounds` clamps `_currentIndex` to
+   * this bound, so a last-slide loop selection now stays STABLE across resizes
+   * instead of being snapped back to the page bound (with a spurious event).
    * @internal
    */
   private get _maxIndex(): number {
@@ -694,6 +701,30 @@ export class HelixCarousel extends HelixElement {
     if (this._measuredNav) {
       return Math.max(0, this._slides.length - 1);
     }
+    if (this.loop) {
+      // Legacy loop: every slide is individually selectable (translate saturates
+      // at the page bound in `_trackTransform`) — but ONLY when the track actually
+      // overflows (`slides.length > slidesPerPage`). When the carousel fits (no
+      // overflow) on the unmeasured default path `_singlePage` never flips, so
+      // returning `n - 1` here would let next/End/dots advance `_currentIndex` and
+      // emit `hx-slide-change` while the translate stays clamped at the page bound
+      // 0 — phantom navigation of slides that never move. Collapse to 0 in that
+      // case, exactly as the old `n - slidesPerPage` bound did.
+      return this._slides.length > this.slidesPerPage ? Math.max(0, this._slides.length - 1) : 0;
+    }
+    return Math.max(0, this._slides.length - this.slidesPerPage);
+  }
+
+  /**
+   * The legacy slidesPerPage PAGE bound (`slides.length - slidesPerPage`) — the
+   * furthest the track can translate and still show a FULL page. Distinct from
+   * `_maxIndex` (the SELECTION bound), which in legacy loop is `n - 1`. The
+   * `_trackTransform` legacy branch clamps the translate index to this so a
+   * near-end loop selection saturates at the last full page instead of
+   * over-scrolling into empty trailing space.
+   * @internal
+   */
+  private get _legacyPageBound(): number {
     return Math.max(0, this._slides.length - this.slidesPerPage);
   }
 
@@ -749,18 +780,33 @@ export class HelixCarousel extends HelixElement {
     if (this._slides.length === 0) return;
 
     let next: number;
-    if (this._singlePage) {
-      // A single static page has nothing to scroll — collapse every target to 0.
+    if (this._maxIndex === 0) {
+      // Nothing to scroll — collapse every target to 0. Covers a single static
+      // page AND a non-overflowing loop carousel (`slides <= slidesPerPage` on the
+      // unmeasured path, where `_singlePage` never flips). Without this, the loop
+      // relative-wrap branch below would advance over `slides.length` and emit a
+      // phantom `hx-slide-change` for an index the track can't reveal.
       next = 0;
     } else if (this.loop && wrap) {
       // Relative loop wrap over the full slide range: every slide is individually
-      // reachable in both models (measured `_maxIndex` is n - 1, legacy uses the
-      // page bound but loops over the slide count), so `next` from the last slide
-      // → 0 and `previous` from 0 → the last slide.
+      // reachable in both models (`_maxIndex` is `n - 1` in measured AND legacy
+      // loop), so `next` from the last slide → 0 and `previous` from 0 → the last
+      // slide.
+      const wrapCount = this._slides.length;
+      next = ((index % wrapCount) + wrapCount) % wrapCount;
+    } else if (this.loop && !this._measuredNav) {
+      // Legacy loop ABSOLUTE nav (goTo/Home/End/dots) — match origin/main
+      // byte-for-byte: wrap via modulo over the FULL slide range. `_maxIndex` is
+      // now `n - 1` in legacy loop, so an in-range target already resolves to
+      // itself ([0, n-1] all reachable); the modulo additionally preserves
+      // origin/main's OUT-of-range wrap (e.g. `goTo(7)` on 6 slides → 1, not a
+      // clamp to 5). The track translate saturates at the page bound (see
+      // `_trackTransform`) while each near-end index stays a distinct selection.
+      // Measured mode and non-loop keep the absolute clamp below.
       const wrapCount = this._slides.length;
       next = ((index % wrapCount) + wrapCount) % wrapCount;
     } else {
-      // Absolute clamp (goTo/Home/End/dots, and non-loop relative moves).
+      // Absolute clamp (goTo/Home/End/dots in measured mode, and non-loop moves).
       next = Math.max(0, Math.min(index, this._maxIndex));
     }
 
@@ -771,13 +817,15 @@ export class HelixCarousel extends HelixElement {
   }
 
   /**
-   * Resolves a measured-loop RELATIVE step so every reachable index — including
-   * the last slide (`_maxIndex`) — is hit even when `slidesPerMove` shares a factor
-   * with the slide count. A step that would jump PAST the last slide first lands on
-   * `_maxIndex` (a partial final step), and only the SUBSEQUENT step (taken from
-   * `_maxIndex`) wraps to 0; symmetrically, `previous` lands on 0 before wrapping to
-   * `_maxIndex`. So 6 slides + `slides-per-move=2` + loop advance as `0→2→4→5→0…`
-   * instead of skipping the last slide via a raw `0→2→4→0` modulo.
+   * Resolves a loop RELATIVE step (measured OR legacy) so every reachable index —
+   * including the last slide (`_maxIndex`) — is hit even when `slidesPerMove`
+   * shares a factor with the slide count. A step that would jump PAST the last
+   * slide first lands on `_maxIndex` (a partial final step), and only the
+   * SUBSEQUENT step (taken from `_maxIndex`) wraps to 0; symmetrically, `previous`
+   * lands on 0 before wrapping to `_maxIndex`. So 6 slides + `slides-per-move=2` +
+   * loop advance as `0→2→4→5→0…` instead of skipping the last slide via a raw
+   * `0→2→4→0` modulo. Both loop models share `_maxIndex = n - 1`, so this logic is
+   * identical for each.
    * @internal
    */
   private _relativeLoopTarget(rawIndex: number, forward: boolean): number {
@@ -792,13 +840,18 @@ export class HelixCarousel extends HelixElement {
 
   /**
    * Performs a relative navigation step (`next`/`previous`/autoplay advance). In
-   * measured loop mode it routes through `_relativeLoopTarget` (absolute clamp) so
-   * `slidesPerMove > 1` still reaches every slide; otherwise it falls back to the
-   * generic relative `_navigateTo` (legacy loop and non-loop are unchanged).
+   * ANY loop mode that can scroll (measured OR legacy, `_maxIndex > 0`) it routes
+   * through `_relativeLoopTarget` so `slidesPerMove > 1` lands on the last slide
+   * via a partial final step before wrapping, instead of skipping it with a raw
+   * modulo. `_relativeLoopTarget` keys only off `_maxIndex`/`_currentIndex`, which
+   * are `n - 1` in both loop models, so the two paths are byte-identical. The
+   * `_maxIndex > 0` guard excludes the non-overflowing loop case (collapsed to 0,
+   * where any step must stay at 0); non-loop falls back to the generic relative
+   * `_navigateTo`, unchanged.
    * @internal
    */
   private _navigateRelative(rawIndex: number, forward: boolean): void {
-    if (this._measuredNav && this.loop && !this._singlePage) {
+    if (this.loop && !this._singlePage && this._maxIndex > 0) {
       this._navigateTo(this._relativeLoopTarget(rawIndex, forward));
     } else {
       this._navigateTo(rawIndex, true);
@@ -1143,7 +1196,18 @@ export class HelixCarousel extends HelixElement {
         : `translateY(-${offset}px)`;
     }
 
-    const i = this._currentIndex;
+    // Clamp the TRANSLATE index to the legacy PAGE bound (`_legacyPageBound`, the
+    // furthest a full page can translate) while leaving `_currentIndex` unclamped
+    // for selection / ARIA / pagination dots. In legacy LOOP mode an absolute
+    // target (End/goTo/dots) can SELECT a near-end slide beyond the page bound
+    // (`_maxIndex` is `n - 1` there); translating to that raw index would
+    // over-scroll the track past the last full page, exposing empty trailing
+    // space. Saturating the translate at the page bound shows the last full page
+    // (selection-vs-translate decoupling, mirroring the measured branch above).
+    // In legacy NON-loop mode `_currentIndex` is already ≤ the page bound (the
+    // absolute clamp in `_navigateTo` + the recompute invariant, where `_maxIndex`
+    // IS the page bound), so this `Math.min` is a no-op and behavior is identical.
+    const i = Math.min(this._currentIndex, this._legacyPageBound);
     const gap = 'var(--hx-carousel-gap, 0px)';
     if (this.orientation === 'horizontal') {
       // The consumer's --hx-carousel-slide-width override wins over the
@@ -1158,20 +1222,30 @@ export class HelixCarousel extends HelixElement {
 
   /**
    * Whether the previous navigation button should be enabled. A single static
-   * page (no overflow) disables both directions regardless of `loop`.
+   * page (no overflow) disables both directions regardless of `loop`. A loop
+   * carousel that cannot scroll (`_maxIndex === 0`, e.g. `slides <= slidesPerPage`
+   * on the unmeasured path) also disables both directions, so `loop` never enables
+   * a button that would no-op.
    * @internal
    */
   private get _canGoPrev(): boolean {
-    return !this._singlePage && (this.loop || this._currentIndex > 0);
+    if (this._singlePage || this._maxIndex === 0) {
+      return false;
+    }
+    return this.loop || this._currentIndex > 0;
   }
 
   /**
    * Whether the next navigation button should be enabled. A single static page
-   * (no overflow) disables both directions regardless of `loop`.
+   * (no overflow) — or a non-scrollable loop carousel (`_maxIndex === 0`) —
+   * disables both directions regardless of `loop`.
    * @internal
    */
   private get _canGoNext(): boolean {
-    return !this._singlePage && (this.loop || this._currentIndex < this._maxIndex);
+    if (this._singlePage || this._maxIndex === 0) {
+      return false;
+    }
+    return this.loop || this._currentIndex < this._maxIndex;
   }
 
   // ─── Render Helpers ───
@@ -1223,11 +1297,15 @@ export class HelixCarousel extends HelixElement {
 
   /** @internal */
   private _renderPagination() {
-    // One dot per slide — every slide is individually reachable in both models.
+    // A non-scrollable carousel (`_maxIndex === 0`) has nothing to page to — omit
+    // the dots entirely so pagination never renders dead controls that can't move
+    // the active index. This uniformly covers a single slide, a single static page
+    // (measured no-overflow), and a legacy non-overflowing loop (`slides <=
+    // slidesPerPage`) — all of which resolve to `_maxIndex === 0`. Prev/next are
+    // already disabled via `_canGoPrev`/`_canGoNext` in the same state.
+    if (this._maxIndex === 0) return nothing;
+    // One dot per slide — every slide is individually reachable when scrollable.
     const count = this._slides.length;
-    // A single static page (non-overflowing track) has nothing to page to — omit
-    // the dots so pagination never advertises slides the track can't reveal.
-    if (count <= 1 || this._singlePage) return nothing;
     const dots = Array.from({ length: count }, (_, i) => i);
     const total = this._slides.length;
     return html`
