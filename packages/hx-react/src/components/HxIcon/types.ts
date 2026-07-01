@@ -66,5 +66,5 @@ is applied automatically — set this ONLY for the explicit `sprite-url` /
 `name="#…"` escape hatches when pinning a STROKE sprite sheet (e.g. the
 bundled `feather.svg` / `lucide.svg`), where no registry library is
 consulted. An explicit value overrides the library-derived mode. */
-  paintMode?: string | undefined;
+  paintMode?: 'fill' | 'stroke' | 'mixed' | undefined;
 }

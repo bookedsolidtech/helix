@@ -77,7 +77,7 @@ const _svgPause = html`<hx-icon
  * @csspart play-pause-btn - The autoplay play/pause toggle button.
  *
  * @cssprop [--hx-carousel-gap=0px] - Gap between slides on the track. Defaults to 0 (flush slides).
- * @cssprop [--hx-carousel-slide-width] - Width override for each slide. Defaults to the per-page width computed from slides-per-page (100% / slides-per-page).
+ * @cssprop [--hx-carousel-slide-width] - Width override for each slide. Defaults to the gap-aware per-page width computed from slides-per-page.
  * @cssprop [--hx-carousel-nav-btn-size=2.5rem] - Size of previous/next navigation buttons.
  * @cssprop [--hx-carousel-pagination-dot-size=0.5rem] - Size of pagination dots.
  * @cssprop [--hx-space-3] - Spacing token.
@@ -677,6 +677,26 @@ export class HelixCarousel extends HelixElement {
   // ─── Navigation ───
 
   /**
+   * The effective slides-per-page used by ALL internal layout / bounds /
+   * navigation math — the public `slidesPerPage` normalized to an integer `>= 1`.
+   *
+   * A consumer can set `slides-per-page="0"` or a negative / fractional value; the
+   * public `@property` keeps that raw value (consumers read it back), but every
+   * MATH site reads this getter instead so a non-positive or fractional page count
+   * can never divide by zero in `_computedSlideWidthExpr` nor push `_maxIndex`
+   * past the last real slide (which would report an empty state while slides
+   * exist). Non-finite / `<= 0` degrades to a 1-up carousel; a positive fraction
+   * floors to whole slides per page but never below 1 — `Math.floor(0.5)` is `0`,
+   * which would re-introduce the divide-by-zero, so the result is clamped up to 1.
+   * @internal
+   */
+  private get _effectiveSlidesPerPage(): number {
+    return Number.isFinite(this.slidesPerPage) && this.slidesPerPage > 0
+      ? Math.max(1, Math.floor(this.slidesPerPage))
+      : 1;
+  }
+
+  /**
    * Maximum SELECTABLE slide index (the selection bound, not the translate bound).
    *
    * Single static page (measured path, no overflow) → `0`. Whenever every slide is
@@ -710,9 +730,11 @@ export class HelixCarousel extends HelixElement {
       // emit `hx-slide-change` while the translate stays clamped at the page bound
       // 0 — phantom navigation of slides that never move. Collapse to 0 in that
       // case, exactly as the old `n - slidesPerPage` bound did.
-      return this._slides.length > this.slidesPerPage ? Math.max(0, this._slides.length - 1) : 0;
+      return this._slides.length > this._effectiveSlidesPerPage
+        ? Math.max(0, this._slides.length - 1)
+        : 0;
     }
-    return Math.max(0, this._slides.length - this.slidesPerPage);
+    return Math.max(0, this._slides.length - this._effectiveSlidesPerPage);
   }
 
   /**
@@ -725,7 +747,7 @@ export class HelixCarousel extends HelixElement {
    * @internal
    */
   private get _legacyPageBound(): number {
-    return Math.max(0, this._slides.length - this.slidesPerPage);
+    return Math.max(0, this._slides.length - this._effectiveSlidesPerPage);
   }
 
   /**
@@ -1162,7 +1184,7 @@ export class HelixCarousel extends HelixElement {
    * @internal
    */
   private _computedSlideWidthExpr(): string {
-    const n = this.slidesPerPage;
+    const n = this._effectiveSlidesPerPage;
     return `calc((100% - ${n - 1} * var(--hx-carousel-gap, 0px)) / ${n})`;
   }
 

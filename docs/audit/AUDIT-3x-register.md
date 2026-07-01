@@ -158,7 +158,7 @@ phi-field + clinical-status (not patient-banner — a one-line detector tweak).
 | E1 | **Legacy `size` alias is on only 10 of 29 size components.** (The `size`-vs-`hx-size` "split" is **refuted** — all 29 uniformly use the `hx-size` attribute.) 13 non-form components should gain the alias via a shared helper; **exclude the 6 form controls** (native `<input size>` collision — the reason `hx-size` exists). | Medium | SHIM | new `src/utils/apply-legacy-size-alias.ts` + 13 `connectedCallback`s |
 | E2 | **18 of ~28 event-emitting components lack `HTMLElementEventMap` augmentation** — `detail` is `any` for `addEventListener` consumers. All change/input details already carry `value`. | Medium | SHIM | per-component `declare global` blocks + exported named detail types |
 | E3 | **Variant additive gaps:** `hx-icon-button` lacks `outline`; `hx-toggle-button` lacks `danger`. Safe to add now. | Medium | SHIM | `hx-icon-button.ts:100`, `hx-toggle-button.ts:133` |
-| E4 | **`mixinDelegatesAria` is unexported** (FocusMixin/FormMixin are **already** public — recon partially refuted). Add to the `generate-barrel.js` allowlist; regenerate (never hand-edit the generated `src/index.ts`). | Low | SHIM | `scripts/generate-barrel.js:58-59` |
+| E4 | **`mixinDelegatesAria` is now publicly re-exported** from `packages/hx-library/src/index.ts` (resolved in 3.11.0 alongside the `@helixui/library/authoring` subpath; FocusMixin/FormMixin were already public). | Low | DONE (3.11.0) | `src/index.ts` re-export + `@helixui/library/authoring` subpath |
 | E5 | **CEM `./custom-elements.json` is already a published export** (recon's "not exported" branch refuted). Additive: advertise the subpath + `customElements` field for tooling. | Low | NB | docs only |
 | E6 | **`danger`↔`error` value naming diverges** (`hx-tag` uses `danger`; `hx-alert`/`hx-banner`/`hx-badge` use `error`). Unification removes a value → **4.0**. 3.x bridge: dual-accept alias + DEV warn. | Low | 4.0 (+SHIM) | parked |
 
@@ -198,8 +198,9 @@ for protected paths. The B gate is the proof obligation for C/D/E.
 
 - ❌ "size vs hx-size split across components" — **all 29 use `hx-size`**; the real gap
   is the legacy-`size` *compat shim* coverage (E1).
-- ❌ "FocusMixin/FormMixin/mixinDelegatesAria are unexported" — FocusMixin & FormMixin
-  are **already public**; only `mixinDelegatesAria` is internal (E4).
+- ❌ "FocusMixin/FormMixin/mixinDelegatesAria are unexported" — FocusMixin, FormMixin
+  **and** `mixinDelegatesAria` are all public as of 3.11.0 (E4 resolved via the
+  `src/index.ts` re-export + the `@helixui/library/authoring` subpath).
 - ❌ "CEM not published as an export" — it **is** (`exports`, `files`, `customElements`);
   it's simultaneously gitignored + generated-on-build + published (E5).
 - ❌ "hx-tooltip/hx-toast render unsanitized HTML" — slot-projection only; **`hx-icon`

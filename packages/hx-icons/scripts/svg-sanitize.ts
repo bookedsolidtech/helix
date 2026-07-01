@@ -13,14 +13,35 @@
  * leave the dot to inherit the stroke-mode `fill: none` and hollow it out.
  */
 
-/** Paint values that are safe to keep because they cooperate with the cascade. */
-const PRESERVED_PAINT = new Set([
-  'currentColor',
-  'none',
-  'inherit',
-  'context-fill',
-  'context-stroke',
-]);
+/**
+ * Paint values that are safe to keep because they cooperate with the cascade.
+ *
+ * SVG/CSS paint keywords are case-INSENSITIVE, so the lookup lowercases both the
+ * candidate value and these entries before comparing (see {@link sanitizeAttrs}).
+ * Entries are stored lowercase; the ORIGINAL author-cased value is preserved in
+ * the output — only the comparison is case-folded.
+ */
+const PRESERVED_PAINT = new Set(
+  ['currentColor', 'none', 'inherit', 'context-fill', 'context-stroke', 'transparent'].map((v) =>
+    v.toLowerCase(),
+  ),
+);
+
+/**
+ * Escape a string for safe interpolation into a double-quoted XML/SVG attribute
+ * value. Third-party source SVGs (under node_modules) can carry malformed
+ * attribute values containing `"`, `<`, `>`, or `&`; concatenating those raw
+ * into a serialized `<symbol>` could break out of the attribute and inject
+ * arbitrary markup into a published sprite artifact. Every preserved attribute
+ * value MUST pass through this helper before interpolation.
+ */
+export function escapeAttr(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 /**
  * Sanitize a single element in place. `Element` is the DOM-lib shape; linkedom
@@ -33,7 +54,10 @@ export function sanitizeAttrs(el: Element): void {
   }
   for (const attr of ['fill', 'stroke']) {
     const value = el.getAttribute(attr);
-    if (value !== null && !PRESERVED_PAINT.has(value.trim())) {
+    // Paint keywords are case-insensitive: compare lowercased against the
+    // lowercased PRESERVED_PAINT set (e.g. `currentcolor`, `CONTEXT-STROKE`
+    // must survive) while keeping the original author-cased value in output.
+    if (value !== null && !PRESERVED_PAINT.has(value.trim().toLowerCase())) {
       el.removeAttribute(attr);
     }
   }

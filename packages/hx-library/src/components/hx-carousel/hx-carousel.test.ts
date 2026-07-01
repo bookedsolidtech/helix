@@ -789,6 +789,110 @@ describe('hx-carousel', () => {
       await el.updateComplete;
       expect(el['_currentIndex']).toBe(2);
     });
+
+    it('slides-per-page="0" degrades to 1-up: no /0 width, valid maxIndex, goTo works', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="0" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+
+      // Width math normalizes to 1 slide per page — no division by zero.
+      expect(el['_effectiveSlidesPerPage']).toBe(1);
+      const widthExpr = el['_computedSlideWidthExpr']();
+      expect(widthExpr).toBe('calc((100% - 0 * var(--hx-carousel-gap, 0px)) / 1)');
+      expect(widthExpr).not.toContain('/ 0');
+
+      // Non-loop selection bound is the last real slide (n - 1), not n.
+      expect(el['_maxIndex']).toBe(2);
+
+      // The track transform is a finite CSS value (no NaN / Infinity).
+      const transform = el['_trackTransform'];
+      expect(transform).not.toContain('NaN');
+      expect(transform).not.toContain('Infinity');
+
+      // goTo(last) lands on the final slide and stays clamped there.
+      el.goTo(el['_slides'].length - 1);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+      el.goTo(99);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+    });
+
+    it('negative slides-per-page degrades to 1-up: valid width and bounds', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel slides-per-page="-2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await el.updateComplete;
+
+      expect(el['_effectiveSlidesPerPage']).toBe(1);
+      // A negative page count must not inflate _maxIndex past the last slide
+      // (n - (-2) = n + 2 would strand goTo in an out-of-range/empty state).
+      expect(el['_maxIndex']).toBe(2);
+      const widthExpr = el['_computedSlideWidthExpr']();
+      expect(widthExpr).toBe('calc((100% - 0 * var(--hx-carousel-gap, 0px)) / 1)');
+
+      el.goTo(2);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(2);
+    });
+
+    it('fractional slides-per-page floors to whole slides per page', async () => {
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      el.slidesPerPage = 2.7;
+      await el.updateComplete;
+      expect(el['_effectiveSlidesPerPage']).toBe(2);
+      // Legacy non-loop page bound = n - floor(2.7) = 4 - 2 = 2.
+      expect(el['_maxIndex']).toBe(2);
+    });
+
+    it('positive fraction < 1 (0.5, 0.99) degrades to 1-up: floor(<1) never yields 0', async () => {
+      // A positive fraction below 1 passes `> 0` but `Math.floor` is 0 — the
+      // clamp to >= 1 keeps it a valid 1-up carousel (no divide-by-zero).
+      for (const value of [0.5, 0.99]) {
+        const el = await fixture<HelixCarousel>(`
+          <hx-carousel style="display: block; width: 400px;">
+            <hx-carousel-item>1</hx-carousel-item>
+            <hx-carousel-item>2</hx-carousel-item>
+            <hx-carousel-item>3</hx-carousel-item>
+          </hx-carousel>
+        `);
+        el.slidesPerPage = value;
+        await el.updateComplete;
+
+        expect(el['_effectiveSlidesPerPage']).toBe(1);
+        // Width math resolves to a single 100% page — no `/ 0`.
+        const widthExpr = el['_computedSlideWidthExpr']();
+        expect(widthExpr).toBe('calc((100% - 0 * var(--hx-carousel-gap, 0px)) / 1)');
+        expect(widthExpr).not.toContain('/ 0');
+
+        // Selection bound is the last real slide; transform is finite.
+        expect(el['_maxIndex']).toBe(2);
+        const transform = el['_trackTransform'];
+        expect(transform).not.toContain('NaN');
+        expect(transform).not.toContain('Infinity');
+
+        // goTo(last) works and stays clamped.
+        el.goTo(el['_slides'].length - 1);
+        await el.updateComplete;
+        expect(el['_currentIndex']).toBe(2);
+      }
+    });
   });
 
   // ─── Accessibility (axe-core) (3) ───

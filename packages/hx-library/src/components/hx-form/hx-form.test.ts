@@ -26,6 +26,100 @@ declare global {
 }
 
 /**
+ * A minimal form-associated custom element that is NOT in `getFormElements()`'s
+ * hardcoded tag allowlist. It exists to prove the validation/serialization
+ * lockstep fix: `_getAllValidatableElements()` discovers it via the generic
+ * `static formAssociated = true` path (the same path `getFormData()` serializes
+ * over), so a control that is serialized is also validated — no divergence.
+ *
+ * `checkValidity()` reports the current `_valid` flag; `validity`/
+ * `validationMessage` mirror it so the constraint-collection path (used by
+ * `_handleSubmit`/`hx-invalid`) sees the same verdict.
+ */
+class CustomFormControl extends HTMLElement {
+  static formAssociated = true;
+  private _internals: ElementInternals;
+  private _valid = true;
+
+  constructor() {
+    super();
+    this._internals = this.attachInternals();
+  }
+
+  get name(): string {
+    return this.getAttribute('name') ?? '';
+  }
+
+  value = '';
+
+  /** Test hook: force this control valid or invalid. */
+  setValid(valid: boolean): void {
+    this._valid = valid;
+    this._internals.setValidity(
+      valid ? {} : { customError: true },
+      valid ? '' : 'Custom control is invalid.',
+    );
+  }
+
+  get validity(): ValidityState {
+    return this._internals.validity;
+  }
+
+  get validationMessage(): string {
+    return this._internals.validationMessage;
+  }
+
+  checkValidity(): boolean {
+    return this._valid;
+  }
+
+  reportValidity(): boolean {
+    return this._valid;
+  }
+}
+customElements.define('custom-form-control', CustomFormControl);
+
+/**
+ * A form-associated custom element with only a PARTIAL validity surface — it
+ * exposes `checkValidity()` but NOT `reportValidity`/`validity`/
+ * `validationMessage`. It proves the P2 fix: such a control must NOT be pulled
+ * into the validatable set (where its `checkValidity()` could block a submit that
+ * `reportValidity()`/`_collectValidationErrors`/`_applyAriaInvalidFromValidity`
+ * can't surface), yet it is STILL serialized by `getFormData()` (a value-only
+ * control is effectively always-valid).
+ */
+class PartialValidityControl extends HTMLElement {
+  static formAssociated = true;
+
+  constructor() {
+    super();
+    // Attach internals so it is a genuine form-associated element, but expose no
+    // `validity` / `validationMessage` / `reportValidity` on the element itself.
+    this.attachInternals();
+  }
+
+  get name(): string {
+    return this.getAttribute('name') ?? '';
+  }
+
+  value = '';
+
+  // Always "invalid" if it were ever consulted — the whole point is that it is
+  // NOT consulted, so this must never block a submit.
+  checkValidity(): boolean {
+    return false;
+  }
+}
+customElements.define('partial-validity-control', PartialValidityControl);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'custom-form-control': CustomFormControl;
+    'partial-validity-control': PartialValidityControl;
+  }
+}
+
+/**
  * Query a single element from a fixture root, throwing a clear error (rather
  * than relying on a non-null assertion) when the selector matches nothing.
  * Narrows the return type so callers get a non-nullable element.
@@ -532,6 +626,113 @@ describe('hx-form', () => {
       await invalidPromise;
 
       expect(input.getAttribute('aria-invalid')).toBe('true');
+    });
+  });
+
+  // ─── Validation / serialization lockstep (3) ───
+
+  describe('Validation and serialization operate on the same control set', () => {
+    it('a form-associated custom element that getFormData serializes is also validated', async () => {
+      // custom-form-control is NOT in getFormElements()'s hardcoded allowlist,
+      // but it declares `static formAssociated = true`, so getFormData()'s generic
+      // discovery serializes it. The lockstep fix routes _getAllValidatableElements
+      // through the SAME discovery, so checkValidity() now also validates it.
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <custom-form-control name="custom"></custom-form-control>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const control = queryOrThrow<CustomFormControl>(el, 'custom-form-control');
+      control.value = 'serialized';
+
+      // Serialized set includes it.
+      expect(el.getFormData().get('custom')).toBe('serialized');
+
+      // Validated set includes it too: forcing it invalid makes the form invalid.
+      control.setValid(false);
+      expect(el.checkValidity()).toBe(false);
+      expect(el.reportValidity()).toBe(false);
+
+      // And it is validatable via the same discovery path getFormData uses.
+      const validatable = el['_getAllValidatableElements']();
+      expect(validatable).toContain(control);
+    });
+
+    it('the validatable set equals the serialized form-associated set', async () => {
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="native" value="n" />
+          <hx-text-input name="hxField" value="v" label="Field"></hx-text-input>
+          <custom-form-control name="custom"></custom-form-control>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      // Serialized set: the names getFormData() produces from form-associated controls.
+      const serializedNames = new Set([...el.getFormData().keys()]);
+
+      // Validated set: the names _getAllValidatableElements() discovers.
+      const validatableNames = new Set(
+        el['_getAllValidatableElements']().map((control) => {
+          const named = control as HTMLElement & { name?: string };
+          return named.name || control.tagName.toLowerCase();
+        }),
+      );
+
+      // Every serialized form-associated control is also validated — no divergence.
+      for (const name of serializedNames) {
+        expect(validatableNames.has(name)).toBe(true);
+      }
+      expect(validatableNames.has('custom')).toBe(true);
+    });
+
+    it('a control excluded from serialization is excluded from validation', async () => {
+      // A custom element WITHOUT `static formAssociated = true` is neither
+      // serialized nor validated — the two sets stay in lockstep on exclusion.
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="native" value="n" />
+          <div name="notAControl"></div>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      expect(el.getFormData().has('notAControl')).toBe(false);
+      const validatable = el['_getAllValidatableElements']();
+      const div = queryOrThrow<HTMLElement>(el, 'div[name="notAControl"]');
+      expect(validatable).not.toContain(div);
+    });
+
+    it('a form-associated control with only a partial validity surface is serialized but not validated', async () => {
+      // partial-validity-control has checkValidity() but NOT reportValidity/
+      // validity/validationMessage. It must be EXCLUDED from the validatable set
+      // (so its always-false checkValidity can't block a submit that the
+      // report/collect/aria paths can't surface) while STILL being serialized.
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="native" value="n" />
+          <partial-validity-control name="partial"></partial-validity-control>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const control = queryOrThrow<PartialValidityControl>(el, 'partial-validity-control');
+      control.value = 'kept';
+
+      // Serialized: a value-only control still contributes to getFormData().
+      expect(el.getFormData().get('partial')).toBe('kept');
+
+      // NOT validatable: excluded from the set despite exposing checkValidity().
+      const validatable = el['_getAllValidatableElements']();
+      expect(validatable).not.toContain(control);
+
+      // And it does NOT block the form — checkValidity() ignores it entirely (the
+      // native field is valid, so the form is valid), instead of the partial
+      // control's always-false verdict blocking a submit with no feedback.
+      expect(el.checkValidity()).toBe(true);
+      expect(el.reportValidity()).toBe(true);
     });
   });
 

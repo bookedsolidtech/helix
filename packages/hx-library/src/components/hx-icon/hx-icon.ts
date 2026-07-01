@@ -158,7 +158,7 @@ export class HelixIcon extends HelixElement {
    * @attr paint-mode
    */
   @property({ type: String, reflect: true, attribute: 'paint-mode' })
-  paintMode: IconPaintMode | undefined = undefined;
+  paintMode: 'fill' | 'stroke' | 'mixed' | undefined = undefined;
 
   /**
    * Stores the sanitized inner markup of an externally fetched SVG.
