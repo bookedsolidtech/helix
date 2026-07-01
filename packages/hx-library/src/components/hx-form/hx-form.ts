@@ -531,7 +531,18 @@ export class HelixForm extends HelixElement {
 
   /**
    * Returns elements that support constraint validation, including both native
-   * form elements and hx-* components with `checkValidity`.
+   * form elements and form-associated custom elements exposing `checkValidity`.
+   *
+   * Custom elements are discovered via the SAME path `getFormData()` uses —
+   * `_hostFormControls()` / `_isFormControl()` (the generic `static
+   * formAssociated = true` check), not the hardcoded `getFormElements()` tag
+   * allowlist. This keeps the VALIDATED set identical to the SERIALIZED set: a
+   * form-associated hx-* control that `getFormData()` serializes is also validated
+   * by `checkValidity`/`reportValidity`/`_handleSubmit`/`hx-invalid`, and a control
+   * excluded from one is excluded from the other — no divergence where a value is
+   * submitted while its validity is silently skipped. Custom elements without a
+   * `checkValidity` function are omitted (they contribute no constraint state);
+   * natives always expose it.
    *
    * When `scopeForm` is provided (the controlled-submit bridge passes the form
    * that fired the submit), the result is scoped to controls that belong to that
@@ -544,13 +555,19 @@ export class HelixForm extends HelixElement {
    * @internal
    */
   private _getAllValidatableElements(scopeForm: HTMLFormElement | null = null): HTMLElement[] {
-    const native = Array.from(this.querySelectorAll<HTMLElement>('input, select, textarea'));
-    const wcElements = this.getFormElements().filter(
+    // `_hostFormControls()` returns every form-associated control (natives —
+    // input/select/textarea — AND custom elements declaring `static
+    // formAssociated = true`), the SAME discovery `getFormData()` serializes over.
+    // Keep only elements exposing a `checkValidity` function: natives always do,
+    // and a form-associated custom element that does becomes validatable. This
+    // makes the validated set === the serialized set (minus controls with no
+    // constraint API), instead of pulling custom elements from the hardcoded
+    // `getFormElements()` tag allowlist which could diverge from serialization.
+    const all = this._hostFormControls().filter(
       (el): el is HTMLElement & { checkValidity: () => boolean } =>
         'checkValidity' in el &&
         typeof (el as { checkValidity: unknown }).checkValidity === 'function',
     );
-    const all = [...native, ...wcElements];
     if (scopeForm === null) {
       return all;
     }
