@@ -318,7 +318,8 @@ jobs:
              [[ "${{ needs.format.result }}" == "failure" ]] || \
              [[ "${{ needs.type-check.result }}" == "failure" ]] || \
              [[ "${{ needs.build.result }}" == "failure" ]] || \
-             [[ "${{ needs.test.result }}" == "failure" ]]; then
+             [[ "${{ needs.test.result }}" == "failure" ]] || \
+             [[ "${{ needs.changeset.result }}" == "failure" ]]; then
             echo ""
             echo "❌ One or more quality gates failed"
             exit 1

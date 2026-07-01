@@ -228,8 +228,17 @@ function splitUnion(text) {
 }
 
 /**
- * Field names of the outermost object literal in a type string, or null if there
- * is none. Used for event-detail payloads (e.g. `CustomEvent<{value, date}>`).
+ * Named field names of the outermost object literal in a type string. Returns:
+ *   - the Set of plain property names when the object has named fields;
+ *   - an EMPTY Set for a genuinely-empty object `{}` (no members at all), so a
+ *     `{ foo }` → `{}` narrowing stays comparable and every removed field is
+ *     detected; and
+ *   - `null` when there is no object literal, OR when the object has ONLY
+ *     non-enumerable members (index / call / construct signatures) and no named
+ *     fields — such a shape isn't a named-field map, so we can't assert any
+ *     named field was removed and must skip the removal check rather than
+ *     mis-report a removal (e.g. `{ foo }` → `{ [key: string]: unknown }`).
+ * Used for event-detail payloads (e.g. `CustomEvent<{value, date}>`).
  * Optionality and field types are intentionally ignored — see the events check.
  */
 function objectFieldNames(text) {
@@ -238,15 +247,26 @@ function objectFieldNames(text) {
   const end = t.lastIndexOf('}');
   if (start === -1 || end <= start) return null;
   const names = new Set();
+  let sawSignature = false;
   for (const field of splitTopLevelChars(t.slice(start + 1, end), [';', ','])) {
     const idx = topLevelColon(field);
-    if (idx === -1) continue; // index/call signature — skip
+    if (idx === -1) {
+      // No top-level `:` — a bare call/construct signature (e.g. `() => void`).
+      sawSignature = true;
+      continue;
+    }
     const name = field.slice(0, idx).trim().replace(/\?$/, '').trim();
-    if (name) names.add(name);
+    // Index (`[key: string]`), call (`(x): T`), and construct (`new (): T`)
+    // signatures are not enumerable property names — never treat them as fields.
+    if (!name || name.startsWith('[') || name.startsWith('(') || /^new\s*\(/.test(name)) {
+      sawSignature = true;
+      continue;
+    }
+    names.add(name);
   }
-  // Always return the Set (even when empty) so an object literal that loses all
-  // its fields — `{ foo }` → `{}` — stays comparable. Returning null here would
-  // skip the removal-check branch below and miss every removed detail field.
+  // Empty names with a signature present → not a named-field map; skip the
+  // removal check. A truly-empty `{}` (no members at all) returns the empty Set.
+  if (names.size === 0 && sawSignature) return null;
   return names;
 }
 
