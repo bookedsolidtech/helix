@@ -967,7 +967,7 @@ export const FocusRingOffset: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);"
         >
           Default offset (0px)
         </h4>
@@ -976,7 +976,7 @@ export const FocusRingOffset: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);"
         >
           --hx-text-input-focus-ring-offset: 3px
         </h4>
@@ -989,7 +989,7 @@ export const FocusRingOffset: Story = {
 
       <div>
         <h4
-          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: #6c757d;"
+          style="margin: 0 0 var(--hx-space-2, 0.5rem); font-size: var(--hx-font-size-sm, 0.875rem); color: var(--hx-color-neutral-500, #66787B);"
         >
           Error-state ring honors the offset too
         </h4>

@@ -39,7 +39,7 @@ import { fileURLToPath } from 'node:url';
 import { parseHTML } from 'linkedom';
 
 import { assignIdentifiers } from './tree-shake-identifiers.js';
-import { sanitizeTree } from './svg-sanitize.js';
+import { escapeAttr, sanitizeTree } from './svg-sanitize.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(here, '..');
@@ -103,16 +103,19 @@ function loadGlyph(filePath: string, id: string, paintMode: 'fill' | 'stroke'): 
   // re-apply them on the emitted wrapper; otherwise the standalone string renders
   // blank. Caps/joins are read from the source rather than hard-coded, so each
   // library keeps its own line style.
+  // `cap`/`join`/`viewBox` originate from third-party source SVGs; escape them
+  // before interpolation so a malformed value containing `"`/`<`/`>`/`&` cannot
+  // break out of its attribute and inject markup into the published module.
   let strokeAttrs = '';
   if (paintMode === 'stroke') {
     const cap = svg.getAttribute('stroke-linecap');
     const join = svg.getAttribute('stroke-linejoin');
     strokeAttrs =
       ' fill="none" stroke="currentColor" stroke-width="2"' +
-      (cap ? ` stroke-linecap="${cap}"` : '') +
-      (join ? ` stroke-linejoin="${join}"` : '');
+      (cap ? ` stroke-linecap="${escapeAttr(cap)}"` : '') +
+      (join ? ` stroke-linejoin="${escapeAttr(join)}"` : '');
   }
-  const svgText = `<svg xmlns="${SVG_NS}" viewBox="${viewBox}"${strokeAttrs}>${inner}</svg>`;
+  const svgText = `<svg xmlns="${SVG_NS}" viewBox="${escapeAttr(viewBox)}"${strokeAttrs}>${inner}</svg>`;
   return { id, svg: svgText };
 }
 

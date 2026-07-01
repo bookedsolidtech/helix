@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-06-27T03:09:06.653Z",
+  "generatedAt": "2026-07-01T11:43:31.843Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -3867,7 +3867,7 @@
           }
         },
         {
-          "description": "Width override for each slide. Defaults to the per-page width computed from slides-per-page (100% / slides-per-page).",
+          "description": "Width override for each slide. Defaults to the gap-aware per-page width computed from slides-per-page.",
           "name": "--hx-carousel-slide-width",
           "figmaBinding": null
         },
@@ -12134,6 +12134,18 @@
             "xl"
           ],
           "default": "md"
+        },
+        {
+          "figmaAxisName": "paintMode",
+          "cemAttribute": "paint-mode",
+          "cemFieldName": "paintMode",
+          "type": "enum",
+          "values": [
+            "fill",
+            "stroke",
+            "mixed"
+          ],
+          "default": "undefined"
         }
       ],
       "textProperties": [

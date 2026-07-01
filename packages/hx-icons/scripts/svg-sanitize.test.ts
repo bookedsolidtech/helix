@@ -1,7 +1,7 @@
 import { parseHTML } from 'linkedom';
 import { describe, expect, it } from 'vitest';
 
-import { sanitizeTree } from './svg-sanitize.js';
+import { escapeAttr, sanitizeTree } from './svg-sanitize.js';
 
 /** Sanitize the CHILDREN of a source <svg> (mirrors how the generators use it). */
 function sanitizeChildren(svg: string): string {
@@ -47,5 +47,74 @@ describe('sanitizeTree', () => {
     expect(out).toContain('fill="currentColor"');
     expect(out).not.toContain('#abc');
     expect(out).not.toContain('id="dot"');
+  });
+
+  // Paint keywords are case-INSENSITIVE per SVG/CSS: lowercase, uppercase, and
+  // mixed-case spellings of a preserved keyword must all survive sanitization.
+  it('preserves case-variant paint keywords (currentcolor, CONTEXT-STROKE, CurrentColor)', () => {
+    const out = sanitizeChildren(
+      '<svg>' +
+        '<path fill="currentcolor" d="M0 0"/>' +
+        '<path stroke="CONTEXT-STROKE" d="M1 1"/>' +
+        '<path fill="CurrentColor" d="M2 2"/>' +
+        '<path fill="NONE" stroke="Context-Fill" d="M3 3"/>' +
+        '<path fill="TRANSPARENT" d="M4 4"/>' +
+        '</svg>',
+    );
+    expect(out).toContain('fill="currentcolor"');
+    expect(out).toContain('stroke="CONTEXT-STROKE"');
+    expect(out).toContain('fill="CurrentColor"');
+    expect(out).toContain('fill="NONE"');
+    expect(out).toContain('stroke="Context-Fill"');
+    expect(out).toContain('fill="TRANSPARENT"');
+  });
+
+  it('still strips genuinely-unsafe paints regardless of case', () => {
+    const out = sanitizeChildren(
+      '<svg>' +
+        '<path fill="url(#evil)" d="M0 0"/>' +
+        '<path stroke="JavaScript:alert(1)" d="M1 1"/>' +
+        '<path fill="#FF0000" d="M2 2"/>' +
+        '</svg>',
+    );
+    expect(out).not.toContain('url(#evil)');
+    expect(out).not.toContain('JavaScript:alert(1)');
+    expect(out).not.toContain('#FF0000');
+  });
+});
+
+describe('escapeAttr', () => {
+  it('escapes the four XML-significant characters', () => {
+    expect(escapeAttr('a"b')).toBe('a&quot;b');
+    expect(escapeAttr('a<b')).toBe('a&lt;b');
+    expect(escapeAttr('a>b')).toBe('a&gt;b');
+    expect(escapeAttr('a&b')).toBe('a&amp;b');
+  });
+
+  it('escapes `&` first so entities are not double-encoded', () => {
+    // If `"` were escaped before `&`, the resulting `&quot;` would then have its
+    // `&` re-escaped to `&amp;quot;`. Escaping `&` first prevents that.
+    expect(escapeAttr('"')).toBe('&quot;');
+    expect(escapeAttr('&quot;')).toBe('&amp;quot;');
+  });
+
+  it('neutralizes an attribute-breakout payload so no raw markup survives', () => {
+    // A malformed third-party stroke-linecap that tries to close the attribute
+    // and inject a <script>. After escaping, no raw `"`, `<`, or `>` remain, so
+    // the serialized `<symbol id=".." stroke-linecap="${escaped}">` cannot be
+    // structurally altered.
+    const payload = 'round"><script>alert(1)</script><symbol id="x';
+    const escaped = escapeAttr(payload);
+    expect(escaped).not.toMatch(/[<>"]/);
+    expect(escaped).toContain('&quot;');
+    expect(escaped).toContain('&lt;script&gt;');
+    // Sanity: interpolating the escaped value keeps the attribute intact.
+    const serialized = `<symbol stroke-linecap="${escaped}"></symbol>`;
+    const { document } = parseHTML(`<!doctype html><body>${serialized}</body>`);
+    const symbol = document.querySelector('symbol');
+    expect(symbol).not.toBeNull();
+    expect(symbol?.getAttribute('stroke-linecap')).toBe(payload);
+    // No injected <script> element made it into the DOM.
+    expect(document.querySelector('script')).toBeNull();
   });
 });
