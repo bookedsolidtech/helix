@@ -118,11 +118,13 @@ export class HelixForm extends HelixElement {
    * Current list of validation errors rendered in the error summary and used to
    * set aria-invalid on fields.
    *
-   * Each entry carries an optional `control` — the SOURCE element the error came
-   * from — so the multi-form model can attribute entries to a specific control
-   * (not just a `name`, which two sibling forms can share). The public summary
-   * render and the `hx-submit`/`hx-invalid` event payloads expose only
-   * `{name, message}`; `control` is internal and never rendered or dispatched.
+   * Each entry carries an optional `scope` — a stable form identifier (`id`
+   * string, or the `<form>` element when it has no id) — so the multi-form
+   * model can attribute entries to a specific form (not just a `name`, which
+   * two sibling forms can share); `undefined` scope means the whole hx-form.
+   * Controls are resolved live from `(name, scope)`. The public summary render
+   * and the `hx-submit`/`hx-invalid` event payloads expose only `{name, message}`;
+   * `scope` is internal and never rendered or dispatched.
    * @internal
    */
   @state()
