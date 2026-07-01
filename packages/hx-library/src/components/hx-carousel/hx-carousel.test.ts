@@ -2809,6 +2809,300 @@ describe('hx-carousel', () => {
       expect(el['_maxIndex']).toBe(2); // n - slidesPerPage
     });
 
+    // ── Legacy-loop ABSOLUTE navigation reaches every slide (regression: P1) ──
+    // origin/main's looped goTo wrapped via modulo over the FULL slide range, so
+    // End/goTo/dots could reach ANY slide. The refactor clamped the absolute branch
+    // to the legacy `_maxIndex` (n - slidesPerPage) page bound, stranding the last
+    // `slidesPerPage - 1` slides. These guard that legacy loop matches origin/main.
+    const legacyLoopSixSlides = `
+      <hx-carousel loop slides-per-page="2" style="display: block; width: 400px;">
+        <hx-carousel-item>1</hx-carousel-item>
+        <hx-carousel-item>2</hx-carousel-item>
+        <hx-carousel-item>3</hx-carousel-item>
+        <hx-carousel-item>4</hx-carousel-item>
+        <hx-carousel-item>5</hx-carousel-item>
+        <hx-carousel-item>6</hx-carousel-item>
+      </hx-carousel>
+    `;
+
+    it('legacy loop: End key reveals the LAST slide (index 5), not the page bound (index 4)', async () => {
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlides);
+      await flush(el);
+      // Default horizontal -> legacy model. The SELECTION bound is n - 1 in legacy
+      // loop (every slide reachable); the translate saturates at the page bound.
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_maxIndex']).toBe(5); // legacy loop selection bound = n - 1
+
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      // Before the fix this clamped to 4; legacy loop must reach the last slide.
+      expect(el['_currentIndex']).toBe(5);
+    });
+
+    it('legacy loop: the last pagination dot selects the last slide (index 5)', async () => {
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlides);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+      const dots = shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]');
+      // One dot per slide (unchanged from origin/main).
+      expect(dots.length).toBe(6);
+      dots[5].click();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(5);
+    });
+
+    it('legacy loop: goTo(last) reaches the last slide, goTo past-end wraps via modulo (origin/main parity)', async () => {
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlides);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+
+      // Absolute goTo to the last slide lands on it (not clamped to the page bound).
+      el.goTo(5);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(5);
+
+      // Past-end absolute target wraps via modulo over slides.length (6) like
+      // origin/main: goTo(6) -> 0, goTo(7) -> 1.
+      el.goTo(6);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+      el.goTo(7);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(1);
+    });
+
+    it('legacy loop: relative next() from the last slide still wraps to 0 (unchanged)', async () => {
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlides);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+
+      el.goTo(5); // last slide
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(5);
+
+      // Relative wrap is governed by the (untouched) `loop && wrap` branch.
+      el.next();
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+    });
+
+    it('regression guard: measured-nav loop absolute goTo still CLAMPS to n-1 (this fix is legacy-only)', async () => {
+      // 4 * 150px peek -> measured nav, _maxIndex = n-1 = 3. Measured mode keeps the
+      // absolute clamp; the legacy-loop modulo branch must NOT apply here.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" style="display: block; width: 400px; --hx-carousel-slide-width: 150px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(true);
+      expect(el['_maxIndex']).toBe(3);
+
+      // Past-end absolute target clamps to the last slide (does NOT wrap to 0).
+      el.goTo(4);
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(3);
+    });
+
+    it('legacy loop: selection reaches the last slide while the track translate saturates at the last full page (no over-scroll)', async () => {
+      // 6 slides, 2-up, loop, 400px wide -> legacy model, page bound _maxIndex = 4,
+      // each slide 200px. goTo(5) selects the last slide; the translate must NOT
+      // over-scroll to -5*200 = -1000px (empty trailing space) — it saturates at
+      // the last full page (-4*200 = -800px, showing slides 4 & 5).
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+          <hx-carousel-item>5</hx-carousel-item>
+          <hx-carousel-item>6</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_maxIndex']).toBe(5); // legacy loop SELECTION bound = n - 1
+
+      const track = shadowQuery<HTMLElement>(el, '.track')!;
+      const trackW = track.getBoundingClientRect().width; // 400
+      const pageStep = trackW / 2; // 200px per slide at slides-per-page=2
+
+      el.goTo(5);
+      await el.updateComplete;
+      settle(track);
+
+      // Selection / ARIA / dots reach the last slide.
+      expect(el['_currentIndex']).toBe(5);
+      // Translate is clamped to the page-bound index (4), saturating at the last
+      // full page: -4 * 200 = -800px, NOT -5 * 200 = -1000px.
+      expect(trackTranslate(track)).toBeCloseTo(-4 * pageStep, 0);
+    });
+
+    it('legacy loop: a last-slide selection is STABLE across a recompute — no snap-back, no spurious event (root fix)', async () => {
+      // Root cause of the prior rounds: legacy-loop `_maxIndex` was the page bound,
+      // so `_recomputeBounds` clamped a last-slide selection back to it (and emitted
+      // a spurious hx-slide-change) on every resize/slot recompute. With the
+      // selection bound now n - 1, the selection must survive a recompute untouched.
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlides);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_maxIndex']).toBe(5);
+
+      el.goTo(5); // select the last slide
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(5);
+
+      // A recompute (what a ResizeObserver fire / slot recompute runs) must NOT
+      // snap the index back NOR emit an event.
+      let spurious = 0;
+      el.addEventListener('hx-slide-change', () => {
+        spurious++;
+      });
+      el['_recomputeBounds']();
+      await el.updateComplete;
+
+      expect(el['_currentIndex']).toBe(5); // stable, no snap-back to the page bound
+      expect(spurious).toBe(0); // no spurious clamp event
+    });
+
+    it('legacy loop with NO overflow (slides <= slidesPerPage): bound is 0, no phantom navigation', async () => {
+      // 2 slides, slides-per-page=2 -> the track fits, nothing overflows. On the
+      // unmeasured default path `_singlePage` never flips, so the loop selection
+      // bound must collapse to 0 (not n - 1) — otherwise next/End would advance the
+      // index and emit hx-slide-change while the translate is pinned at page 0.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+      expect(el['_maxIndex']).toBe(0); // non-overflowing loop collapses to 0
+
+      // Both directions are disabled (nothing to scroll).
+      expect(el['_canGoNext']).toBe(false);
+      expect(el['_canGoPrev']).toBe(false);
+
+      // next() / End must be a no-op AND emit no hx-slide-change.
+      let events = 0;
+      el.addEventListener('hx-slide-change', () => {
+        events++;
+      });
+      el.next();
+      await el.updateComplete;
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+      expect(events).toBe(0);
+    });
+
+    it('non-scrollable loop (slides <= slidesPerPage): renders NO pagination dots (dead controls suppressed)', async () => {
+      // 2 slides, slides-per-page=2, loop -> _maxIndex 0 (non-scrollable). The dots
+      // could not change the active index, so pagination is omitted entirely.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_maxIndex']).toBe(0);
+      expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(0);
+      expect(shadowQuery(el, '[part="pagination"]')).toBeNull();
+    });
+
+    it('scrollable loop (slides > slidesPerPage): still renders one pagination dot per slide', async () => {
+      // Guard: a genuinely scrollable carousel (_maxIndex > 0) keeps its dots.
+      const el = await fixture<HelixCarousel>(`
+        <hx-carousel loop slides-per-page="2" style="display: block; width: 400px;">
+          <hx-carousel-item>1</hx-carousel-item>
+          <hx-carousel-item>2</hx-carousel-item>
+          <hx-carousel-item>3</hx-carousel-item>
+          <hx-carousel-item>4</hx-carousel-item>
+        </hx-carousel>
+      `);
+      await flush(el);
+      expect(el['_maxIndex']).toBeGreaterThan(0);
+      expect(shadowQueryAll<HTMLButtonElement>(el, '[part="pagination-item"]').length).toBe(4);
+    });
+
+    // ── Legacy-loop partial-step wrapping with slidesPerMove > 1 (regression: P2) ──
+    // Legacy loop relative nav used raw modulo, so a newly-reachable last slide was
+    // skipped when slidesPerMove shares a factor with the slide count. Legacy loop
+    // now shares the measured `_relativeLoopTarget` partial-step logic.
+    const legacyLoopSixSlidesPerMove2 = `
+      <hx-carousel loop slides-per-page="2" slides-per-move="2" style="display: block; width: 400px;">
+        <hx-carousel-item>1</hx-carousel-item>
+        <hx-carousel-item>2</hx-carousel-item>
+        <hx-carousel-item>3</hx-carousel-item>
+        <hx-carousel-item>4</hx-carousel-item>
+        <hx-carousel-item>5</hx-carousel-item>
+        <hx-carousel-item>6</hx-carousel-item>
+      </hx-carousel>
+    `;
+
+    it('legacy loop, slides-per-move=2: repeated next() lands on the last slide before wrapping (0→2→4→5→0)', async () => {
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlidesPerMove2);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false); // default legacy model
+      expect(el['_maxIndex']).toBe(5); // selection bound n - 1
+
+      const seq: number[] = [el['_currentIndex']];
+      for (let i = 0; i < 4; i++) {
+        el.next();
+        await el.updateComplete;
+        seq.push(el['_currentIndex']);
+      }
+      // Partial final step lands on 5, then wraps to 0 — never skips the last slide.
+      expect(seq).toEqual([0, 2, 4, 5, 0]);
+      expect(seq).toContain(5);
+    });
+
+    it('legacy loop, slides-per-move=2: goTo(5) then next() wraps to 0 (not 1 via raw modulo)', async () => {
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlidesPerMove2);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+
+      el.goTo(5); // the last slide
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(5);
+
+      el.next(); // from the last slide, the next step wraps to 0
+      await el.updateComplete;
+      expect(el['_currentIndex']).toBe(0);
+    });
+
+    it('legacy loop, slides-per-move=2: previous() symmetry lands on the last slide before wrapping (0→5→3→1→0)', async () => {
+      const el = await fixture<HelixCarousel>(legacyLoopSixSlidesPerMove2);
+      await flush(el);
+      expect(el['_measuredNav']).toBe(false);
+
+      const seq: number[] = [el['_currentIndex']];
+      for (let i = 0; i < 4; i++) {
+        el.previous();
+        await el.updateComplete;
+        seq.push(el['_currentIndex']);
+      }
+      // From 0, previous wraps to the last slide (5) first, then steps back.
+      expect(seq).toEqual([0, 5, 3, 1, 0]);
+
+      // Every index in [0, _maxIndex] is reachable across both directions.
+      const forward: number[] = [0];
+      el.goTo(0);
+      await el.updateComplete;
+      for (let i = 0; i < 4; i++) {
+        el.next();
+        await el.updateComplete;
+        forward.push(el['_currentIndex']);
+      }
+      const reached = new Set([...seq, ...forward]);
+      expect([0, 1, 2, 3, 4, 5].every((i) => reached.has(i))).toBe(true);
+    });
+
     it('mixed-size slides that all fit the viewport are a single static page', async () => {
       // 50 + 60 + 70 = 180px < 400px viewport.
       const el = await fixture<HelixCarousel>(`
