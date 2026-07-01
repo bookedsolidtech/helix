@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url';
 
 import { parseHTML } from 'linkedom';
 
-import { sanitizeTree } from './svg-sanitize.js';
+import { escapeAttr, sanitizeTree } from './svg-sanitize.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(here, '..');
@@ -98,7 +98,7 @@ function parseSvgFile(filePath: string, id: string): Symbol | null {
   const presentation = ['stroke-linecap', 'stroke-linejoin']
     .map((attr) => {
       const value = svg.getAttribute(attr);
-      return value ? ` ${attr}="${value}"` : '';
+      return value ? ` ${attr}="${escapeAttr(value)}"` : '';
     })
     .join('');
 
@@ -128,7 +128,13 @@ function parseSvgFile(filePath: string, id: string): Symbol | null {
  */
 function buildSprite(symbols: Symbol[]): string {
   const body = symbols
-    .map((s) => `<symbol id="${s.id}" viewBox="${s.viewBox}"${s.presentation}>${s.inner}</symbol>`)
+    // `id` (file basename) and `viewBox` (source attribute) are escaped here;
+    // `presentation` is already escaped at collection time and serialized as
+    // ready-to-emit attributes, so it is interpolated as-is (no double-escape).
+    .map(
+      (s) =>
+        `<symbol id="${escapeAttr(s.id)}" viewBox="${escapeAttr(s.viewBox)}"${s.presentation}>${s.inner}</symbol>`,
+    )
     .join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none">${body}</svg>`;
 }
