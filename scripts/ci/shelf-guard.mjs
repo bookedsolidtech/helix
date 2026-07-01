@@ -244,7 +244,10 @@ function objectFieldNames(text) {
     const name = field.slice(0, idx).trim().replace(/\?$/, '').trim();
     if (name) names.add(name);
   }
-  return names.size ? names : null;
+  // Always return the Set (even when empty) so an object literal that loses all
+  // its fields — `{ foo }` → `{}` — stays comparable. Returning null here would
+  // skip the removal-check branch below and miss every removed detail field.
+  return names;
 }
 
 /** Split on top-level occurrences of any char in `seps`, respecting nesting. */

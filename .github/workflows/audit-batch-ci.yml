@@ -241,8 +241,10 @@ jobs:
       - name: Save head CEM
         run: cp packages/hx-library/custom-elements.json .cache/head-cem.json
       - name: Check out base branch public-API inputs
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          BASE="origin/${{ github.base_ref }}"
+          BASE="origin/${BASE_REF}"
           # Fail loudly if the base ref is unavailable — otherwise the gate would
           # silently compare head-vs-head and miss every breaking change.
           git rev-parse --verify --quiet "$BASE" >/dev/null || {
@@ -274,6 +276,8 @@ jobs:
       - name: Save base CEM
         run: cp packages/hx-library/custom-elements.json .cache/base-cem.json
       - name: Enforce 3.0 shelf (breaking API change requires a major changeset)
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: >
           node scripts/ci/shelf-guard.mjs
           --base-cem .cache/base-cem.json
@@ -283,7 +287,7 @@ jobs:
           --base-pkg .cache/base-pkg.json
           --head-pkg .cache/head-pkg.json
           --changesets .changeset
-          --base-ref "origin/${{ github.base_ref }}"
+          --base-ref "origin/${BASE_REF}"
           ${{ contains(github.event.pull_request.labels.*.name, 'breaking-change-approved') && '--label-bypass' || '' }}
 
   # ── Summary gate ────────────────────────────────────────────────────────
@@ -314,10 +318,18 @@ jobs:
              [[ "${{ needs.format.result }}" == "failure" ]] || \
              [[ "${{ needs.type-check.result }}" == "failure" ]] || \
              [[ "${{ needs.build.result }}" == "failure" ]] || \
-             [[ "${{ needs.test.result }}" == "failure" ]] || \
-             [[ "${{ needs.api-breaking-change.result }}" == "failure" ]]; then
+             [[ "${{ needs.test.result }}" == "failure" ]]; then
             echo ""
             echo "❌ One or more quality gates failed"
+            exit 1
+          fi
+
+          # The API breaking-change gate must actively SUCCEED — a cancelled or
+          # skipped result must not be treated as a pass, otherwise a breaking
+          # change could merge whenever the gate did not run to completion.
+          if [[ "${{ needs.api-breaking-change.result }}" != "success" ]]; then
+            echo ""
+            echo "❌ API breaking-change gate did not succeed: ${{ needs.api-breaking-change.result }}"
             exit 1
           fi
 
