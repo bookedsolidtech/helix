@@ -685,13 +685,14 @@ export class HelixCarousel extends HelixElement {
    * MATH site reads this getter instead so a non-positive or fractional page count
    * can never divide by zero in `_computedSlideWidthExpr` nor push `_maxIndex`
    * past the last real slide (which would report an empty state while slides
-   * exist). Non-finite / `<= 0` degrades to a 1-up carousel; a fractional value
-   * floors to whole slides per page.
+   * exist). Non-finite / `<= 0` degrades to a 1-up carousel; a positive fraction
+   * floors to whole slides per page but never below 1 — `Math.floor(0.5)` is `0`,
+   * which would re-introduce the divide-by-zero, so the result is clamped up to 1.
    * @internal
    */
   private get _effectiveSlidesPerPage(): number {
     return Number.isFinite(this.slidesPerPage) && this.slidesPerPage > 0
-      ? Math.floor(this.slidesPerPage)
+      ? Math.max(1, Math.floor(this.slidesPerPage))
       : 1;
   }
 

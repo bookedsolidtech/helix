@@ -558,20 +558,57 @@ export class HelixForm extends HelixElement {
     // `_hostFormControls()` returns every form-associated control (natives —
     // input/select/textarea — AND custom elements declaring `static
     // formAssociated = true`), the SAME discovery `getFormData()` serializes over.
-    // Keep only elements exposing a `checkValidity` function: natives always do,
-    // and a form-associated custom element that does becomes validatable. This
-    // makes the validated set === the serialized set (minus controls with no
-    // constraint API), instead of pulling custom elements from the hardcoded
-    // `getFormElements()` tag allowlist which could diverge from serialization.
-    const all = this._hostFormControls().filter(
-      (el): el is HTMLElement & { checkValidity: () => boolean } =>
-        'checkValidity' in el &&
-        typeof (el as { checkValidity: unknown }).checkValidity === 'function',
+    // Keep only elements exposing the FULL constraint-validation surface this
+    // form's paths actually use: `checkValidity` (checkValidity/submit gate),
+    // `reportValidity` (reportValidity), and `validity` + `validationMessage`
+    // (`_collectValidationErrors` / `_applyAriaInvalidFromValidity`). Natives
+    // always expose all four; a form-associated custom control must too. A control
+    // with only a partial surface (e.g. `checkValidity` but no `validity`/
+    // `validationMessage`) is NOT validatable — otherwise its `checkValidity()`
+    // could BLOCK a submit while the error-collection / aria-invalid / reportValidity
+    // paths silently skip it, blocking the form with no visible feedback. It still
+    // SERIALIZES via `getFormData()` (a value-only control is effectively
+    // always-valid); it is only excluded from validation/blocking. This keeps the
+    // validated set aligned with serialization without pulling custom elements from
+    // the hardcoded `getFormElements()` tag allowlist (which could diverge).
+    const all = this._hostFormControls().filter((el): el is HTMLElement =>
+      this._isValidatableControl(el),
     );
     if (scopeForm === null) {
       return all;
     }
     return all.filter((el) => this._formOf(el) === scopeForm);
+  }
+
+  /**
+   * Whether a control exposes the FULL constraint-validation surface this form's
+   * validation paths rely on: `checkValidity()` AND `reportValidity()` (both
+   * functions), a `validity` object (a `ValidityState`-like with a boolean
+   * `valid`), and a string `validationMessage`. Requiring all four keeps
+   * `checkValidity`/submit-gating in lockstep with `reportValidity`,
+   * `_collectValidationErrors`, and `_applyAriaInvalidFromValidity` — a control
+   * with only a partial surface can't silently block a submit while producing no
+   * error summary, aria-invalid marker, or native bubble. Native input/select/
+   * textarea satisfy this; a form-associated custom control must implement the
+   * whole surface to be validated (else it's treated as always-valid and only
+   * serialized).
+   * @internal
+   */
+  private _isValidatableControl(el: Element): boolean {
+    const candidate = el as {
+      checkValidity?: unknown;
+      reportValidity?: unknown;
+      validity?: unknown;
+      validationMessage?: unknown;
+    };
+    return (
+      typeof candidate.checkValidity === 'function' &&
+      typeof candidate.reportValidity === 'function' &&
+      typeof candidate.validationMessage === 'string' &&
+      typeof candidate.validity === 'object' &&
+      candidate.validity !== null &&
+      typeof (candidate.validity as { valid?: unknown }).valid === 'boolean'
+    );
   }
 
   /**

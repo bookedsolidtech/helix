@@ -79,9 +79,43 @@ class CustomFormControl extends HTMLElement {
 }
 customElements.define('custom-form-control', CustomFormControl);
 
+/**
+ * A form-associated custom element with only a PARTIAL validity surface — it
+ * exposes `checkValidity()` but NOT `reportValidity`/`validity`/
+ * `validationMessage`. It proves the P2 fix: such a control must NOT be pulled
+ * into the validatable set (where its `checkValidity()` could block a submit that
+ * `reportValidity()`/`_collectValidationErrors`/`_applyAriaInvalidFromValidity`
+ * can't surface), yet it is STILL serialized by `getFormData()` (a value-only
+ * control is effectively always-valid).
+ */
+class PartialValidityControl extends HTMLElement {
+  static formAssociated = true;
+
+  constructor() {
+    super();
+    // Attach internals so it is a genuine form-associated element, but expose no
+    // `validity` / `validationMessage` / `reportValidity` on the element itself.
+    this.attachInternals();
+  }
+
+  get name(): string {
+    return this.getAttribute('name') ?? '';
+  }
+
+  value = '';
+
+  // Always "invalid" if it were ever consulted — the whole point is that it is
+  // NOT consulted, so this must never block a submit.
+  checkValidity(): boolean {
+    return false;
+  }
+}
+customElements.define('partial-validity-control', PartialValidityControl);
+
 declare global {
   interface HTMLElementTagNameMap {
     'custom-form-control': CustomFormControl;
+    'partial-validity-control': PartialValidityControl;
   }
 }
 
@@ -669,6 +703,36 @@ describe('hx-form', () => {
       const validatable = el['_getAllValidatableElements']();
       const div = queryOrThrow<HTMLElement>(el, 'div[name="notAControl"]');
       expect(validatable).not.toContain(div);
+    });
+
+    it('a form-associated control with only a partial validity surface is serialized but not validated', async () => {
+      // partial-validity-control has checkValidity() but NOT reportValidity/
+      // validity/validationMessage. It must be EXCLUDED from the validatable set
+      // (so its always-false checkValidity can't block a submit that the
+      // report/collect/aria paths can't surface) while STILL being serialized.
+      const el = await fixture<HelixForm>(`
+        <hx-form>
+          <input type="text" name="native" value="n" />
+          <partial-validity-control name="partial"></partial-validity-control>
+        </hx-form>
+      `);
+      await el.updateComplete;
+
+      const control = queryOrThrow<PartialValidityControl>(el, 'partial-validity-control');
+      control.value = 'kept';
+
+      // Serialized: a value-only control still contributes to getFormData().
+      expect(el.getFormData().get('partial')).toBe('kept');
+
+      // NOT validatable: excluded from the set despite exposing checkValidity().
+      const validatable = el['_getAllValidatableElements']();
+      expect(validatable).not.toContain(control);
+
+      // And it does NOT block the form — checkValidity() ignores it entirely (the
+      // native field is valid, so the form is valid), instead of the partial
+      // control's always-false verdict blocking a submit with no feedback.
+      expect(el.checkValidity()).toBe(true);
+      expect(el.reportValidity()).toBe(true);
     });
   });
 
