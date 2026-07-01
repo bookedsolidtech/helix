@@ -5,6 +5,46 @@ import { AdoptedStylesheetsController } from '../../controllers/adopted-styleshe
 import { helixFormScopedCss } from './hx-form.styles.js';
 
 /**
+ * The public shape of a validation error — `{name, message}`. This is what the
+ * error-summary render and the `hx-submit` / `hx-invalid` event payloads expose.
+ */
+interface PublicFormError {
+  name: string;
+  message: string;
+}
+
+/**
+ * A `setErrors` entry: the public `{name, message}` plus an OPTIONAL `form`
+ * target — a `<form>` element OR a form id resolved WITHIN this hx-form's light
+ * DOM. When provided, the error is SCOPED to that form, so it marks/retains only
+ * that form's control(s) named `name` — disambiguating sibling forms that share a
+ * field `name`. When omitted, the error is hx-form-wide (untargeted): it marks
+ * EVERY control matching `name` across the hx-form.
+ */
+interface FormErrorInput extends PublicFormError {
+  form?: HTMLFormElement | string;
+}
+
+/**
+ * The internal error entry. Extends the public `{name, message}` with an OPTIONAL
+ * `scope` — the target form's STABLE identity, or `undefined` for an untargeted
+ * (whole-hx-form) error. An entry's identity is `(name, scope)`.
+ *
+ * `scope` is a form `id` STRING when the target `<form>` has an id — stable across
+ * re-renders, so the entry keeps matching (and replacing) after the form node is
+ * replaced in place with the same id. When the target form has NO id it falls back
+ * to the element REFERENCE (no stable identity exists to key on; still works for a
+ * single render, just less re-render-robust). The controls an entry applies to are
+ * resolved LIVE from `(name, scope)` at mark/retain time (never cached), so control
+ * sets — radio / checkbox groups, repeated names — are always current. `scope` is
+ * internal: never rendered nor dispatched.
+ * @internal
+ */
+interface FormErrorEntry extends PublicFormError {
+  scope?: string | HTMLFormElement;
+}
+
+/**
  * A pure Light DOM form wrapper that styles native HTML form elements and
  * hx-* components with the design system's form styles. It NEVER renders its own
  * `<form>` — the consumer/host always provides the actual `<form>` (a Drupal or
@@ -75,11 +115,20 @@ export class HelixForm extends HelixElement {
   // ─── Internal State ───
 
   /**
-   * Current list of validation errors rendered in the error summary and used to set aria-invalid on fields.
+   * Current list of validation errors rendered in the error summary and used to
+   * set aria-invalid on fields.
+   *
+   * Each entry carries an optional `scope` — a stable form identifier (`id`
+   * string, or the `<form>` element when it has no id) — so the multi-form
+   * model can attribute entries to a specific form (not just a `name`, which
+   * two sibling forms can share); `undefined` scope means the whole hx-form.
+   * Controls are resolved live from `(name, scope)`. The public summary render
+   * and the `hx-submit`/`hx-invalid` event payloads expose only `{name, message}`;
+   * `scope` is internal and never rendered or dispatched.
    * @internal
    */
   @state()
-  private _validationErrors: Array<{ name: string; message: string }> = [];
+  private _validationErrors: FormErrorEntry[] = [];
 
   // ─── Lifecycle ───
 
@@ -412,27 +461,61 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * Programmatically sets server-side validation errors on the form.
-   * Renders an error summary and sets `aria-invalid="true"` on named fields.
+   * Programmatically sets server-side validation errors on the form. Renders an
+   * error summary and sets `aria-invalid="true"` on the matching fields. Replaces
+   * any current errors with the supplied set.
    *
    * Useful for surfacing Drupal server-side validation responses.
    *
-   * @param errors - Array of `{name, message}` pairs matching field `name` attributes.
+   * Untargeted errors (no `form`) applied to a field name that exists in MULTIPLE
+   * sibling forms have best-effort partial-success semantics — a successful submit
+   * of one sibling clears its own `aria-invalid` markers, but the untargeted
+   * summary entry persists until ALL same-name controls are valid. For precise
+   * per-form control across sibling forms that share field names, pass the `form`
+   * target.
+   *
+   * @param errors - Array of error entries. Each is `{name, message}` matching a
+   *   field `name`, plus an OPTIONAL `form` (a `<form>` element or a form id
+   *   resolved within this hx-form). When `form` is given, the error is SCOPED to
+   *   that form — it marks only that form's control(s) named `name`,
+   *   disambiguating sibling forms that share a field `name`. When omitted, the
+   *   error is hx-form-wide and marks EVERY control matching `name`.
    */
-  setErrors(errors: Array<{ name: string; message: string }>): void {
-    this._validationErrors = errors;
-    this._applyAriaInvalidFromErrors(errors);
+  setErrors(errors: FormErrorInput[]): void {
+    // Each input becomes an entry keyed by (name, scope). setErrors replaces the
+    // whole set; marking is resolved live from each entry's (name, scope).
+    this._validationErrors = errors.map((e) => this._toEntry(e));
+    this._applyAriaInvalidFromEntries(this._validationErrors);
   }
 
   /**
    * Programmatically sets a single field error. Merges with any existing errors.
    *
+   * Untargeted errors (no `form`) applied to a field name that exists in MULTIPLE
+   * sibling forms have best-effort partial-success semantics — a successful submit
+   * of one sibling clears its own `aria-invalid` markers, but the untargeted
+   * summary entry persists until ALL same-name controls are valid. For precise
+   * per-form control across sibling forms that share field names, pass the `form`
+   * target.
+   *
    * @param name - The `name` attribute of the field.
    * @param message - The error message to display.
+   * @param form - OPTIONAL target form (a `<form>` element or a form id resolved
+   *   within this hx-form). When given, the error is SCOPED to that form and
+   *   replaces only a prior error with the SAME `(name, form)` — a same-name error
+   *   on a DIFFERENT form (or an untargeted one) is preserved. When omitted, the
+   *   error is hx-form-wide and replaces any prior untargeted error with the same
+   *   `name` (the pre-targeting behavior).
    */
-  setFieldError(name: string, message: string): void {
-    const existing = this._validationErrors.filter((e) => e.name !== name);
-    this.setErrors([...existing, { name, message }]);
+  setFieldError(name: string, message: string, form?: HTMLFormElement | string): void {
+    const next = this._toEntry(form !== undefined ? { name, message, form } : { name, message });
+    // Replace by ENTRY IDENTITY (name, scope): drop any existing entry with the
+    // same name AND same scope (`undefined` scope matches only `undefined`), so a
+    // scoped error and an untargeted error — or two differently-scoped errors —
+    // never clobber each other. Then append the new entry.
+    const existing = this._validationErrors.filter((e) => !this._sameKey(e, next));
+    this._validationErrors = [...existing, next];
+    this._applyAriaInvalidFromEntries(this._validationErrors);
   }
 
   /**
@@ -494,21 +577,134 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * Sets `aria-invalid="true"` on fields with errors, removes it from valid fields.
+   * The LIVE set of controls an error entry applies to: every validatable control
+   * named `entry.name` within the entry's scope — the target `<form>` (resolved
+   * from the entry's stable id string, or its element ref fallback) when
+   * `entry.scope` is set, else the whole hx-form. Resolved fresh each call (never
+   * cached), so a radio/checkbox GROUP or any repeated name yields ALL matching
+   * controls, DOM changes between set-time and mark/retain-time are honored, and an
+   * id-scoped entry re-binds to a form re-rendered in place with the same id. A
+   * scope that no longer resolves yields no controls (the entry is then dropped on
+   * the next success retain).
    * @internal
    */
-  private _applyAriaInvalidFromErrors(errors: Array<{ name: string; message: string }>): void {
-    const errorNames = new Set(errors.map((e) => e.name));
-    const allElements = this._getAllValidatableElements();
-    for (const el of allElements) {
-      const named = el as HTMLElement & { name?: string };
-      const fieldName = named.name ?? el.tagName.toLowerCase();
-      if (errorNames.has(fieldName)) {
+  private _entryControls(entry: FormErrorEntry): Element[] {
+    const form = this._scopeForm(entry.scope);
+    // A scoped entry whose form vanished (id no longer present) resolves to no
+    // form; scope to nothing rather than silently widening to the whole hx-form.
+    if (entry.scope !== undefined && form === null) {
+      return [];
+    }
+    return this._getAllValidatableElements(form).filter(
+      (el) => this._controlName(el) === entry.name,
+    );
+  }
+
+  /**
+   * Whether two entries share the same identity `(name, scope)`. `undefined` scope
+   * matches only `undefined`, so an untargeted entry and a scoped entry — or two
+   * differently-scoped entries — are DISTINCT keys.
+   * @internal
+   */
+  private _sameKey(a: FormErrorEntry, b: FormErrorEntry): boolean {
+    return a.name === b.name && a.scope === b.scope;
+  }
+
+  /**
+   * Sets `aria-invalid="true"` on every control referenced by any entry (via
+   * `_entryControls`), removing it from all others. A scoped entry marks only its
+   * form's matching controls; an untargeted entry marks every same-name control;
+   * both mark ALL members of a group. Live-resolved, so group/repeated-name
+   * membership is always current.
+   * @internal
+   */
+  private _applyAriaInvalidFromEntries(entries: FormErrorEntry[]): void {
+    const marked = new Set<Element>();
+    for (const entry of entries) {
+      for (const el of this._entryControls(entry)) {
+        marked.add(el);
+      }
+    }
+    for (const el of this._getAllValidatableElements()) {
+      if (marked.has(el)) {
         el.setAttribute('aria-invalid', 'true');
       } else {
         el.removeAttribute('aria-invalid');
       }
     }
+  }
+
+  /**
+   * Resolves a `form` target — a `<form>` element OR a form id string — to a
+   * `<form>` that lives within this hx-form's light DOM. A string id matches a
+   * `<form id="...">` inside the host; an element is accepted only when it is a
+   * `<form>` contained by the host. Returns `undefined` (never throws) when the
+   * target can't be resolved, so a stale id degrades to an untargeted entry.
+   * @internal
+   */
+  private _resolveForm(form: HTMLFormElement | string): HTMLFormElement | undefined {
+    if (typeof form === 'string') {
+      // Match by id without an attribute selector (no CSS.escape dependency, no
+      // selector-injection surface): scan the host's own <form> descendants.
+      return Array.from(this.querySelectorAll('form')).find((f) => f.id === form);
+    }
+    return form instanceof HTMLFormElement && this.contains(form) ? form : undefined;
+  }
+
+  /**
+   * Builds the internal `FormErrorEntry` for a public `setErrors` input, resolving
+   * its optional `form` to a STABLE scope key: the target form's `id` string when
+   * it has one (so the entry survives an in-place re-render of the form node), else
+   * the resolved element reference (no stable identity to key on). A provided-but-
+   * unresolvable target (e.g. a stale id) yields an untargeted (scopeless) entry —
+   * never throws.
+   * @internal
+   */
+  private _toEntry(input: FormErrorInput): FormErrorEntry {
+    const form = input.form !== undefined ? this._resolveForm(input.form) : undefined;
+    if (form === undefined) {
+      return { name: input.name, message: input.message };
+    }
+    return { name: input.name, message: input.message, scope: this._scopeKey(form) };
+  }
+
+  /**
+   * The STABLE scope key for a `<form>`: its `id` string when non-empty (survives
+   * an in-place re-render of the form node), else the element reference (no stable
+   * identity exists to key on).
+   * @internal
+   */
+  private _scopeKey(form: HTMLFormElement): string | HTMLFormElement {
+    return form.id !== '' ? form.id : form;
+  }
+
+  /**
+   * Resolves an entry scope (a form `id` string, an element ref, or `undefined`)
+   * to the LIVE `<form>` it targets, or `null` when untargeted (`undefined` scope)
+   * or unresolvable. An id-string scope re-resolves each call, so it re-binds to a
+   * form re-rendered in place with the same id.
+   * @internal
+   */
+  private _scopeForm(scope: string | HTMLFormElement | undefined): HTMLFormElement | null {
+    if (scope === undefined) {
+      return null;
+    }
+    return this._resolveForm(scope) ?? null;
+  }
+
+  /**
+   * Whether an entry is scoped to the submit `form` — the set a failure MERGE
+   * replaces. When `form` is a `<form>`, true iff the entry's scope resolves to it
+   * (so an id-string scope and an element-ref scope both compare by form identity).
+   * When `form` is `null` (a loose-controls submit whose fresh errors are
+   * untargeted), true iff the entry is itself untargeted (scope `undefined`).
+   * @internal
+   */
+  private _entryScopedTo(entry: FormErrorEntry, form: HTMLFormElement | null): boolean {
+    if (form === null) {
+      return entry.scope === undefined;
+    }
+    return this._scopeForm(entry.scope) === form;
   }
 
   /**
@@ -531,11 +727,17 @@ export class HelixForm extends HelixElement {
   }
 
   /**
-   * Removes `aria-invalid` from all validatable elements.
+   * Removes `aria-invalid` from validatable elements, scoped to the submitting
+   * form's controls when provided (same membership scoping as the failure path's
+   * `_applyAriaInvalidFromValidity`, via `_getAllValidatableElements`). A
+   * successful submit of one form must not wipe a DIFFERENT sibling form's invalid
+   * markers — so the controlled-submit success path passes its `submittingForm`.
+   * With no scope (the public `clearErrors`/`_handleReset` callers) every control
+   * is cleared — unchanged global behavior.
    * @internal
    */
-  private _clearAriaInvalid(): void {
-    const allElements = this._getAllValidatableElements();
+  private _clearAriaInvalid(scopeForm: HTMLFormElement | null = null): void {
+    const allElements = this._getAllValidatableElements(scopeForm);
     for (const el of allElements) {
       el.removeAttribute('aria-invalid');
     }
@@ -618,7 +820,16 @@ export class HelixForm extends HelixElement {
 
     if (!this.novalidate && !scopedValid) {
       const errors = this._collectValidationErrors(submittingForm);
-      this._validationErrors = errors;
+      // MERGE by scope (resolved to a form, so id-string and element-ref scopes
+      // compare correctly): drop this submit's own prior entries — the fresh
+      // collection supersedes them — and keep every other entry, so sibling-scoped
+      // AND untargeted entries survive. Replacing wholesale would discard a sibling
+      // form's entries, leaving a later success on this form no correct sibling
+      // entry to retain.
+      const retained = this._validationErrors.filter(
+        (e) => !this._entryScopedTo(e, submittingForm),
+      );
+      this._validationErrors = [...retained, ...errors];
       this._applyAriaInvalidFromValidity(submittingForm);
 
       // Move focus to the error summary after it renders so screen readers announce it
@@ -629,22 +840,38 @@ export class HelixForm extends HelixElement {
       });
 
       /**
-       * Dispatched when validation fails on submit.
+       * Dispatched when validation fails on submit. The detail reports ONLY this
+       * submit's freshly-collected errors (the public `{name, message}` shape),
+       * not the merged hx-form-wide summary.
        * @event hx-invalid
        */
       this.dispatchEvent(
-        new CustomEvent<{ errors: Array<{ name: string; message: string }> }>('hx-invalid', {
+        new CustomEvent<{ errors: PublicFormError[] }>('hx-invalid', {
           bubbles: true,
           composed: true,
-          detail: { errors },
+          detail: { errors: errors.map(({ name, message }) => ({ name, message })) },
         }),
       );
       return;
     }
 
-    // Clear any previous errors on successful submit
-    this._validationErrors = [];
-    this._clearAriaInvalid();
+    // Clear errors on successful submit, scoped to the SUBMITTING form so a valid
+    // sibling form's success can't wipe a different (still-invalid, never-corrected)
+    // form's aria-invalid markers. When the submit event has no form target
+    // (`submittingForm === null`), fall back to clearing globally — preserving the
+    // prior behavior for the loose-controls case.
+    this._clearAriaInvalid(submittingForm);
+    // Keep the summary in lockstep with the markers via LIVE control sets: retain
+    // each existing entry iff ANY control in `_entryControls(entry)` still carries
+    // `aria-invalid="true"` after the scoped clear.
+    //   - scope=F entries: all their controls are in F, now cleared → dropped.
+    //   - scope=other-form entries: still invalid → retained (original message).
+    //   - untargeted entries spanning forms: retained while ANY same-name control
+    //     anywhere in the hx-form is still invalid (e.g. A.email after B submits) —
+    //     dropped only once none remain.
+    // Single-form case: the submitting form is the only marked form → its entries
+    // drop, nothing else remains → `[]`, byte-identical to the prior blanket clear.
+    this._validationErrors = this._validationErrors.filter((e) => this._entryStillInvalid(e));
 
     // Payload from the submitting form — `new FormData` captures controls
     // associated to it (descendant, `form="id"`, and hx-* via ElementInternals).
@@ -703,25 +930,60 @@ export class HelixForm extends HelixElement {
    * failed submit attempt, scoped to the submitting form's controls when provided.
    * @internal
    */
-  private _collectValidationErrors(
-    scopeForm: HTMLFormElement | null = null,
-  ): Array<{ name: string; message: string }> {
-    const errors: Array<{ name: string; message: string }> = [];
+  private _collectValidationErrors(scopeForm: HTMLFormElement | null = null): FormErrorEntry[] {
+    const errors: FormErrorEntry[] = [];
+    const seen = new Set<string>();
     const elements = this._getAllValidatableElements(scopeForm);
 
     for (const el of elements) {
       if ('validity' in el && 'validationMessage' in el) {
         const validatable = el as HTMLInputElement;
         if (!validatable.validity.valid) {
-          errors.push({
-            name: validatable.name || validatable.tagName.toLowerCase(),
-            message: validatable.validationMessage,
-          });
+          // One entry per field `name` within this scope — collapse group members
+          // (e.g. a radio group's members share a name) into a single summary line.
+          const name = this._controlName(el);
+          if (seen.has(name)) {
+            continue;
+          }
+          seen.add(name);
+          // Scope each collected error to the submitting form (when there is one)
+          // via its STABLE key so the multi-form model marks/retains it precisely —
+          // two sibling forms can share a `name`. A `null` scopeForm (loose
+          // controls, no form target) yields an untargeted entry.
+          const entry: FormErrorEntry = { name, message: validatable.validationMessage };
+          if (scopeForm !== null) {
+            entry.scope = this._scopeKey(scopeForm);
+          }
+          errors.push(entry);
         }
       }
     }
 
     return errors;
+  }
+
+  /**
+   * Whether an error entry is still active — i.e. ANY control in its LIVE set
+   * (`_entryControls`) still carries `aria-invalid="true"`. A scoped entry checks
+   * only its form's matching controls; an untargeted entry checks every same-name
+   * control across the hx-form; a group entry checks all members. Keeps the summary
+   * in lockstep with the markers after a scoped clear.
+   * @internal
+   */
+  private _entryStillInvalid(entry: FormErrorEntry): boolean {
+    return this._entryControls(entry).some((el) => el.getAttribute('aria-invalid') === 'true');
+  }
+
+  /**
+   * The effective field name of a control: the control's `name` when present,
+   * else its lowercased tag name. For a non-empty name this is just the name; an
+   * empty/absent name is rare for a named-error lookup, so `name || tag` is the
+   * robust choice and is used consistently across the error-attribution paths.
+   * @internal
+   */
+  private _controlName(el: Element): string {
+    const named = el as HTMLElement & { name?: string };
+    return named.name || el.tagName.toLowerCase();
   }
 
   // ─── Render ───
