@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -200,6 +200,17 @@ export class HelixImage extends HelixElement {
   private _hasSlottedMedia = false;
 
   /**
+   * Whether the pre-render WRAPPED seed has run. `slotchange` fires AFTER the
+   * first render, so `_hasSlottedMedia` is seeded synchronously (before the
+   * first `render()`) from the host's light-DOM children destined for the
+   * default slot. This flag ensures that seed runs exactly once — subsequent
+   * dynamic changes are owned by `_onDefaultSlotChange`, so the pre-render
+   * computation never fights the authoritative slotchange handler.
+   * @internal
+   */
+  private _seededSlottedMedia = false;
+
+  /**
    * The slotted `<img>` currently wired for load/error re-dispatch in WRAPPED
    * mode (either a directly-slotted `<img>` or the `<img>` inside a slotted
    * `<picture>`), or `null` when none is attached.
@@ -240,11 +251,18 @@ export class HelixImage extends HelixElement {
       this._usedFallbackSrc = false;
       this._erroredImg = null;
     }
-    // At most one hx-load per resolved image: if we already emitted for this
-    // node (native or the synthetic cached-load path), don't dispatch again.
+    // At most one hx-load per resolved SOURCE: a load for a source we already
+    // emitted for (native + synthetic cached-load path racing on the same
+    // initial source) is suppressed, but a genuinely new source on the same
+    // reused node (src/srcset change, or a new <picture> candidate) re-emits.
     const img = this._slottedImg;
-    if (img && this._loadEmittedFor === img) return;
-    if (img) this._loadEmittedFor = img;
+    if (img) {
+      // `currentSrc` is the resolved candidate the browser actually loaded;
+      // fall back to `src` when it isn't populated (some cached/SSR cases).
+      const source = img.currentSrc || img.src;
+      if (this._lastEmittedSrc === source) return;
+      this._lastEmittedSrc = source;
+    }
     this.dispatchEvent(new CustomEvent<void>('hx-load', { bubbles: true, composed: true }));
   };
 
@@ -262,14 +280,20 @@ export class HelixImage extends HelixElement {
   };
 
   /**
-   * The slotted `<img>` for which an `hx-load` has already been emitted during
-   * its current attachment (via the native `load` listener or the synthetic
-   * cached-load microtask). Ensures at most one `hx-load` per resolved image —
-   * a cached image whose native `load` also fires does not double-dispatch.
-   * Reset on detach so a freshly resolved image can emit its own `hx-load`.
+   * The image SOURCE for which an `hx-load` has already been emitted for the
+   * currently-attached slotted `<img>`. Keyed by `currentSrc` (the resolved
+   * candidate the browser actually loaded) rather than node identity, so:
+   *  - a cached image whose native `load` also fires does NOT double-dispatch
+   *    (same source → suppressed), preserving the exactly-one-per-cached-image
+   *    guarantee; and
+   *  - a consumer that reuses one `<img>` and updates `src`/`srcset` (or a
+   *    slotted `<picture>` whose nested `<img>` loads a new candidate) DOES get
+   *    a fresh `hx-load` — the new source differs from the last emitted one.
+   * `null` when nothing has been emitted for the attached node. Reset on detach
+   * so a freshly resolved image can emit its own `hx-load`.
    * @internal
    */
-  private _loadEmittedFor: HTMLImageElement | null = null;
+  private _lastEmittedSrc: string | null = null;
 
   /**
    * The slotted `<img>` that last drove the WRAPPED error state. Retained so a
@@ -380,10 +404,11 @@ export class HelixImage extends HelixElement {
         if (next.naturalWidth > 0) {
           const resolved = next;
           queueMicrotask(() => {
-            // Ignore if the slot changed again before the microtask ran, or if an
-            // hx-load was already emitted for this image (e.g. a native `load`).
-            if (this._slottedImg !== resolved || this._loadEmittedFor === resolved) return;
-            // Route through the shared handler so the one-per-image guard applies.
+            // Ignore if the slot changed again before the microtask ran. The
+            // shared handler's per-source guard suppresses a double-dispatch if
+            // a native `load` for the same source already emitted.
+            if (this._slottedImg !== resolved) return;
+            // Route through the shared handler so the one-per-source guard applies.
             this._handleSlottedLoad();
           });
         } else if (next.naturalWidth === 0 && next.currentSrc) {
@@ -400,9 +425,9 @@ export class HelixImage extends HelixElement {
       this._slottedImg.removeEventListener('error', this._handleSlottedError);
       this._slottedImg = null;
     }
-    // Clear the per-image load-emit guard so a newly resolved image can emit
+    // Clear the per-source load-emit guard so a newly resolved image can emit
     // its own hx-load.
-    this._loadEmittedFor = null;
+    this._lastEmittedSrc = null;
   }
 
   /**
@@ -419,6 +444,48 @@ export class HelixImage extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._detachSlottedListeners();
+  }
+
+  /**
+   * Seeds WRAPPED-mode detection SYNCHRONOUSLY before the first render. The
+   * default slot's `slotchange` only fires AFTER the first render, so without
+   * this a caller providing BOTH `src` and default-slot media (WRAPPED wins)
+   * would briefly render the owned `<img>` — kicking off a wasted `src` fetch
+   * that can paint the wrong image before the re-render drops it. Computing the
+   * initial `_hasSlottedMedia` from the host's light-DOM children here means the
+   * owned `<img>` is never produced when default-slot media exists.
+   *
+   * This runs once (guarded by `_seededSlottedMedia`); `_onDefaultSlotChange`
+   * remains authoritative for every subsequent dynamic change.
+   * @internal
+   */
+  override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed);
+    if (!this._seededSlottedMedia) {
+      this._seededSlottedMedia = true;
+      this._hasSlottedMedia = this._hasDefaultSlotLightChildren();
+    }
+  }
+
+  /**
+   * Detects whether the host has light-DOM children destined for the DEFAULT
+   * slot — element children (and meaningful, non-whitespace text nodes) that do
+   * NOT carry a `slot=` attribute. Children with `slot="fallback"` /
+   * `slot="caption"` are named-slot content and do not count. Used to seed
+   * WRAPPED mode before the first render (see `willUpdate`).
+   * @internal
+   */
+  private _hasDefaultSlotLightChildren(): boolean {
+    for (const node of this.childNodes) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        if (!(node as Element).hasAttribute('slot')) return true;
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        // Text nodes can't carry a `slot=` attribute, so any non-whitespace
+        // text is default-slot content.
+        if ((node.textContent ?? '').trim().length > 0) return true;
+      }
+    }
+    return false;
   }
 
   /**

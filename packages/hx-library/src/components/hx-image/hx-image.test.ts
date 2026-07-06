@@ -717,6 +717,63 @@ describe('hx-image', () => {
       await el.updateComplete;
     };
 
+    it('detects WRAPPED before the first render for mixed src + slotted media (no owned <img>) (Fix A)', async () => {
+      // Both `src` and default-slot media are provided. WRAPPED must win on the
+      // FIRST render — the owned <img> (and its `src` fetch) must never be
+      // produced. `fixture()` awaits only the first `updateComplete`; we do NOT
+      // wait for a slotchange tick here, so this proves the synchronous
+      // pre-render seed (not slotchange) drove the decision.
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/owned.png" alt="Owned"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      // No owned shadow <img> was ever rendered — WRAPPED won on first paint.
+      expect(shadowQuery(el, 'img[part="base"]')).toBeNull();
+      expect(shadowQuery(el, 'img')).toBeNull();
+      // The slotted media projects through the default slot.
+      const defaultSlot = shadowQuery<HTMLSlotElement>(
+        el,
+        '.image__container > slot:not([name])',
+      );
+      expect(defaultSlot).toBeTruthy();
+      const assigned = defaultSlot!.assignedElements({ flatten: true });
+      expect(assigned.length).toBe(1);
+      expect(assigned[0]?.tagName.toLowerCase()).toBe('img');
+    });
+
+    it('re-emits hx-load when a reused slotted <img> changes its src (Fix B)', async () => {
+      // Drive the per-source guard deterministically by controlling `currentSrc`
+      // (the value `_handleSlottedLoad` keys the guard on), so the test does not
+      // depend on real browser fetch timing.
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://example.com/a.png" alt="Reused" /></hx-image>',
+      );
+      await settleWrapped(el);
+      const slotted = el.querySelector('img') as HTMLImageElement;
+      let currentSrc = 'https://example.com/a.png';
+      Object.defineProperty(slotted, 'currentSrc', {
+        get: () => currentSrc,
+        configurable: true,
+      });
+
+      let loads = 0;
+      el.addEventListener('hx-load', () => {
+        loads += 1;
+      });
+
+      // First load for source A → 1 emit.
+      slotted.dispatchEvent(new Event('load'));
+      expect(loads).toBe(1);
+
+      // Same source, another native load → no extra emit (per-source guard).
+      slotted.dispatchEvent(new Event('load'));
+      expect(loads).toBe(1);
+
+      // Consumer reuses the SAME node and updates its source → new load → new emit.
+      currentSrc = 'https://example.com/b.png';
+      slotted.dispatchEvent(new Event('load'));
+      expect(loads).toBe(2);
+    });
+
     it('switches to WRAPPED mode when an <img> is slotted (no shadow img rendered)', async () => {
       const el = await fixture<HelixImage>(
         '<hx-image ratio="4/3"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
@@ -893,14 +950,20 @@ describe('hx-image', () => {
     });
 
     it('recovers from a slotted-image error when the broken node is replaced (P2)', async () => {
+      // Listen for hx-error BEFORE settling: a non-resolvable src can fire a real
+      // native `error` during settle (which already drives the WRAPPED error
+      // state). Attaching first means the promise resolves for whichever error —
+      // real or the synthetic one dispatched below — lands first, so the test is
+      // deterministic regardless of network timing.
       const el = await fixture<HelixImage>(
         '<hx-image><img src="https://broken.invalid/x.png" alt="First" /><span slot="fallback" class="rfb">Broken</span></hx-image>',
       );
+      const errorPromise = oneEvent(el, 'hx-error');
       await settleWrapped(el);
       const broken = el.querySelector('img')!;
 
-      // Drive the error state deterministically.
-      const errorPromise = oneEvent(el, 'hx-error');
+      // Drive the error state deterministically (no-op if the native error
+      // already fired and set `_error`).
       broken.dispatchEvent(new Event('error'));
       await errorPromise;
       await el.updateComplete;
@@ -955,14 +1018,22 @@ describe('hx-image', () => {
     });
 
     it('does not re-dispatch a duplicate hx-load for an already-complete slotted <img>', async () => {
+      // Non-resolvable src so no real network `load` races the synthetic path —
+      // the assertion below is about the SYNTHETIC re-slot path only. `currentSrc`
+      // is pinned so the per-source emit guard is deterministic regardless of
+      // whether the browser populated it.
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        '<hx-image><img src="https://broken.invalid/slotted.png" alt="Slotted" /></hx-image>',
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img') as HTMLImageElement;
       // Force the "already complete and valid" branch.
       Object.defineProperty(slotted, 'complete', { value: true, configurable: true });
       Object.defineProperty(slotted, 'naturalWidth', { value: 200, configurable: true });
+      Object.defineProperty(slotted, 'currentSrc', {
+        value: 'https://broken.invalid/slotted.png',
+        configurable: true,
+      });
 
       let loads = 0;
       el.addEventListener('hx-load', () => {
