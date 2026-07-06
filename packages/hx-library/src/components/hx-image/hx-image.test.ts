@@ -1075,6 +1075,63 @@ describe('hx-image', () => {
     });
   });
 
+  // ─── WRAPPED entry gated on resolvable media (P2) ───
+
+  describe('WRAPPED entry gated on resolvable media', () => {
+    // slotchange is async; after fixture() we let it fire and the component
+    // re-render before asserting.
+    const settle = async (el: HelixImage): Promise<void> => {
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await el.updateComplete;
+    };
+
+    it('activates WRAPPED for an <img> nested in a wrapper element (<a><img></a>) and re-emits hx-load', async () => {
+      // A wrapped <img> (anchor wrapper) with `src` also set: WRAPPED must win —
+      // the owned <img part="base"> must NOT render, and the nested <img> must
+      // be sized and wired for load re-dispatch.
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/owned.png" alt="Owned">' +
+          '<a href="/detail"><img src="https://example.com/slotted.png" alt="Slotted" /></a>' +
+          '</hx-image>',
+      );
+      await settle(el);
+
+      // Owned shadow <img> is suppressed — WRAPPED took over.
+      expect(shadowQuery(el, 'img[part="base"]')).toBeNull();
+      expect(shadowQuery(el, 'img')).toBeNull();
+
+      // The nested <img> is resolved and re-emits hx-load.
+      const nested = el.querySelector('a img') as HTMLImageElement;
+      expect(nested).toBeTruthy();
+      const loadPromise = oneEvent(el, 'hx-load');
+      nested.dispatchEvent(new Event('load'));
+      const event = await loadPromise;
+      expect(event.type).toBe('hx-load');
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+
+      // The nested <img> is sized via the injected light sheet (display: block).
+      expect(getComputedStyle(nested).display).toBe('block');
+    });
+
+    it('stays OWNED when default-slot content has no resolvable image (<span>text</span> + src)', async () => {
+      // Non-media default-slot content must NOT enter WRAPPED: the owned <img>
+      // must still render and its `src` fetch must not be suppressed.
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/owned.png" alt="Owned"><span>caption-ish text</span></hx-image>',
+      );
+      await settle(el);
+
+      // OWNED mode retained: the owned <img part="base"> renders with the src.
+      const owned = shadowQuery<HTMLImageElement>(el, 'img[part="base"]');
+      expect(owned).toBeTruthy();
+      expect(owned?.getAttribute('src')).toBe('https://example.com/owned.png');
+
+      // No WRAPPED framing side effects: the host is not stamped for light sizing.
+      expect(el.getAttribute('data-hx-styled')).toBeNull();
+    });
+  });
+
   // ─── OWNED mode regression (default slot empty) ───
 
   describe('OWNED mode regression', () => {

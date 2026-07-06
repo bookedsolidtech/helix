@@ -320,7 +320,12 @@ export class HelixImage extends HelixElement {
   private _onDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const elements = slot.assignedElements({ flatten: true });
-    this._hasSlottedMedia = elements.length > 0;
+    // WRAPPED mode is entered ONLY for resolvable media: a direct `<img>`, a
+    // slotted `<picture>`, or any assigned element that contains an `<img>`
+    // (e.g. `<a><img></a>`). Default-slot content with no resolvable image
+    // (e.g. `<span>text</span>`) leaves the component in OWNED mode so the owned
+    // `<img>` still renders and the `src` fetch is not suppressed.
+    this._hasSlottedMedia = this._resolveImgCandidate(elements) !== null;
 
     if (this._hasSlottedMedia) {
       this._ensureWrappedLightStyles();
@@ -348,9 +353,16 @@ export class HelixImage extends HelixElement {
   }
 
   /**
-   * Resolves the `<img>` candidate from assigned elements — a directly-slotted
-   * `<img>`, or the inner `<img>` of a slotted `<picture>` — without mutating
-   * listeners or state. `null` when none is present.
+   * Resolves the `<img>` candidate from assigned elements. Resolution order per
+   * assigned element:
+   *  1. a directly-slotted `<img>`;
+   *  2. the inner `<img>` of a slotted `<picture>`;
+   *  3. otherwise a descendant `<img>` anywhere inside the assigned element
+   *     (e.g. `<a><img></a>` or other wrapper markup).
+   * Sizing already targets descendant `img` via the injected
+   * `[data-hx-styled]` light sheet, so a wrapped `<img>` is framed correctly;
+   * this resolver additionally wires load/error to the resolved node. `null`
+   * when no `<img>` exists in any assigned element's subtree.
    * @internal
    */
   private _resolveImgCandidate(elements: readonly Element[]): HTMLImageElement | null {
@@ -360,6 +372,11 @@ export class HelixImage extends HelixElement {
         const inner = node.querySelector('img');
         if (inner) return inner;
       }
+      // Wrapper markup (anchor, figure, span, …) around an `<img>`: resolve the
+      // first descendant image so the owned `<img>` is suppressed only when
+      // there is real media to frame and wire.
+      const descendant = node.querySelector('img');
+      if (descendant) return descendant;
     }
     return null;
   }
@@ -468,21 +485,25 @@ export class HelixImage extends HelixElement {
   }
 
   /**
-   * Detects whether the host has light-DOM children destined for the DEFAULT
-   * slot — element children (and meaningful, non-whitespace text nodes) that do
-   * NOT carry a `slot=` attribute. Children with `slot="fallback"` /
-   * `slot="caption"` are named-slot content and do not count. Used to seed
-   * WRAPPED mode before the first render (see `willUpdate`).
+   * Seeds WRAPPED mode before the first render by detecting whether the host has
+   * RESOLVABLE default-slot media — a light-DOM element child (without a `slot=`
+   * attribute) that is, or contains, an `<img>`. Children with
+   * `slot="fallback"` / `slot="caption"` are named-slot content and are ignored,
+   * as are non-media default-slot children (e.g. a bare `<span>text</span>` or
+   * loose text): those leave the component in OWNED mode so the owned `<img>` /
+   * `src` fetch is not suppressed. This mirrors the runtime `slotchange` gate
+   * (`_resolveImgCandidate`), keeping the pre-render seed and the authoritative
+   * slotchange handler in agreement.
    * @internal
    */
   private _hasDefaultSlotLightChildren(): boolean {
     for (const node of this.childNodes) {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        if (!(node as Element).hasAttribute('slot')) return true;
-      } else if (node.nodeType === Node.TEXT_NODE) {
-        // Text nodes can't carry a `slot=` attribute, so any non-whitespace
-        // text is default-slot content.
-        if ((node.textContent ?? '').trim().length > 0) return true;
+      if (node.nodeType !== Node.ELEMENT_NODE) continue;
+      const el = node as Element;
+      if (el.hasAttribute('slot')) continue; // named-slot content — not default slot
+      // Resolvable only if the default-slot element is, or contains, an <img>.
+      if (el instanceof HTMLImageElement || el.querySelector('img') !== null) {
+        return true;
       }
     }
     return false;

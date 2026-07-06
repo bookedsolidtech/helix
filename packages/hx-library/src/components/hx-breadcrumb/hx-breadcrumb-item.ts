@@ -52,6 +52,15 @@ export class HelixBreadcrumbItem extends HelixElement {
   /** @internal */
   private _roleObserver: MutationObserver | null = null;
 
+  /**
+   * @internal Guards against re-entrant `refreshBreadcrumbContext()` calls. The
+   * item→host→item notification path (a late item upgrade asks the host to
+   * re-run discovery, which calls back into `refreshBreadcrumbContext()`) could
+   * otherwise recurse; this flag makes the refresh a no-op while one is already
+   * in flight.
+   */
+  private _refreshingContext = false;
+
   override connectedCallback(): void {
     super.connectedCallback();
     // Host carries role="listitem" so the composed-tree walk from
@@ -65,11 +74,7 @@ export class HelixBreadcrumbItem extends HelixElement {
     // inside the parent's own shadow root). Standalone instances
     // leave the host neutral so they don't themselves trip
     // aria-required-parent.
-    const existingRole = this.getAttribute('role');
-    if ((existingRole === null || existingRole === '') && this._isInsideBreadcrumb()) {
-      this.setAttribute('role', 'listitem');
-      this._autoSetRole = true;
-    }
+    this._applyBreadcrumbRole();
     // Observer attaches AFTER the potential setAttribute so our own
     // initial write does not trigger it. Subsequent mutations branch
     // on intent:
@@ -81,6 +86,76 @@ export class HelixBreadcrumbItem extends HelixElement {
     //   - role still listitem → no-op
     this._roleObserver = new MutationObserver(() => this._handleRoleMutation());
     this._roleObserver.observe(this, { attributes: true, attributeFilter: ['role'] });
+
+    // Upgrade-order gap A1: this item's class may have upgraded AFTER its host
+    // already ran discovery (host defined first, or SSR/late-defined item
+    // markup). In that case the host saw a plain, un-upgraded element and
+    // skipped it. Now that we ARE upgraded, locate the ancestor breadcrumb and
+    // ask it to re-run discovery so this item becomes discoverable and marked
+    // (collapse / current / JSON-LD). If the host is not upgraded yet, do
+    // nothing — it will pick us up when IT upgrades (see the host's
+    // connectedCallback / firstUpdated discovery path).
+    this._notifyBreadcrumbHost();
+  }
+
+  /**
+   * Applies (or re-applies) the `role="listitem"` marker idempotently. Extracted
+   * from `connectedCallback` so `refreshBreadcrumbContext()` can re-run it when
+   * the host upgrades late.
+   * @internal
+   */
+  private _applyBreadcrumbRole(): void {
+    const existingRole = this.getAttribute('role');
+    if ((existingRole === null || existingRole === '') && this._isInsideBreadcrumb()) {
+      this.setAttribute('role', 'listitem');
+      this._autoSetRole = true;
+    }
+  }
+
+  /**
+   * Re-runs the breadcrumb-context check (ancestor detection + `role="listitem"`
+   * assignment) idempotently. Called by the host `hx-breadcrumb` for every
+   * discovered item whenever it runs discovery / applies item attributes — so a
+   * LATE host upgrade (upgrade-order gap A2: item upgraded before its branded
+   * host) re-triggers role assignment on items that connected while no ancestor
+   * breadcrumb was yet upgraded.
+   *
+   * Idempotent: if the role is already applied (or a consumer owns a non-listitem
+   * role) this is a no-op. Re-entrancy guarded so the item→host→item path cannot
+   * recurse.
+   * @internal
+   */
+  refreshBreadcrumbContext(): void {
+    if (this._refreshingContext) return;
+    this._refreshingContext = true;
+    try {
+      this._applyBreadcrumbRole();
+    } finally {
+      this._refreshingContext = false;
+    }
+  }
+
+  /**
+   * Walks the light-DOM `parentNode` chain and, at each shadow boundary, the
+   * shadow host, looking for an upgraded ancestor `HelixBreadcrumb`. When found,
+   * asks it to re-run discovery + attribute application so a late-upgraded item
+   * (gap A1) becomes discoverable and marked. No-op when no upgraded breadcrumb
+   * ancestor exists yet.
+   * @internal
+   */
+  private _notifyBreadcrumbHost(): void {
+    let node: Node | null = this.parentNode;
+    while (node) {
+      if (node instanceof HelixBreadcrumb) {
+        node.refreshItemsFromUpgrade();
+        return;
+      }
+      if (node instanceof ShadowRoot) {
+        node = node.host;
+        continue;
+      }
+      node = node.parentNode;
+    }
   }
 
   /** @internal */
