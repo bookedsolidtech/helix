@@ -4,6 +4,12 @@ import { customElement, property } from 'lit/decorators.js';
 import { HelixElement } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixBreadcrumbItemStyles } from './hx-breadcrumb-item.styles.js';
+// Imported for a runtime `instanceof` check inside _isInsideBreadcrumb (never
+// referenced at module-eval time). hx-breadcrumb.ts also imports this module for
+// its own runtime `instanceof` check, so the two modules form an ESM cycle — but
+// because BOTH imports are used only lazily inside methods (not at module top
+// level), the cycle resolves safely under ESM/bundler live-binding semantics.
+import { HelixBreadcrumb } from './hx-breadcrumb.js';
 
 /**
  * A single breadcrumb navigation item.
@@ -99,13 +105,30 @@ export class HelixBreadcrumbItem extends HelixElement {
 
   /** @internal */
   private _isInsideBreadcrumb(): boolean {
-    const parentTag = this.parentElement?.tagName.toLowerCase();
-    if (parentTag === 'hx-breadcrumb') {
+    // Robust path: an instanceof check matches HelixBreadcrumb AND any brand
+    // subclass registered under a different tag, so a renamed host still grants
+    // its items the listitem role. Literal tag checks are kept as OR
+    // fast-paths for the stock element.
+    const parent = this.parentElement;
+    if (parent instanceof HelixBreadcrumb || parent?.tagName.toLowerCase() === 'hx-breadcrumb') {
       return true;
     }
-    const rootNode = this.getRootNode();
-    if (rootNode instanceof ShadowRoot && rootNode.host.tagName.toLowerCase() === 'hx-breadcrumb') {
+    // Consumer-markup fallback: the parent renders a `role="list"` container in
+    // its shadow root, but a slotted light-DOM item's nearest light-DOM ancestor
+    // is the host itself. When the host carries role="list" (or a consumer wraps
+    // items in one) this catches it without relying on the tag name.
+    if (this.closest('[role="list"]') !== null) {
       return true;
+    }
+    // Collapse-ellipsis path: the item is rendered inside the breadcrumb's own
+    // shadow root, so the composed parent is the shadow-root host. Match the
+    // host by subclass-robust instanceof, with the literal tag as a fast-path.
+    const rootNode = this.getRootNode();
+    if (rootNode instanceof ShadowRoot) {
+      const host = rootNode.host;
+      if (host instanceof HelixBreadcrumb || host.tagName.toLowerCase() === 'hx-breadcrumb') {
+        return true;
+      }
     }
     return false;
   }

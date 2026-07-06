@@ -4,6 +4,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
+// Imported for a runtime `instanceof` check inside _getBreadcrumbItems (never
+// referenced at module-eval time). hx-breadcrumb-item.ts does NOT import this
+// module in return, so no ESM cycle is created — see _getBreadcrumbItems.
+import { HelixBreadcrumbItem } from './hx-breadcrumb-item.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
 interface JsonLdListItem {
@@ -150,13 +154,15 @@ export class HelixBreadcrumb extends HelixElement {
    * @internal
    */
   private _getBreadcrumbItems(slot: HTMLSlotElement): Element[] {
-    return slot
-      .assignedElements({ flatten: true })
-      .filter(
-        (el) =>
-          el.tagName.toLowerCase() === 'hx-breadcrumb-item' &&
-          !el.classList.contains('hx-bc-ellipsis'),
-      );
+    return slot.assignedElements({ flatten: true }).filter((el) => {
+      // Robust path: match any HelixBreadcrumbItem instance, including brand
+      // subclasses registered under a different tag (e.g. a subclass that
+      // renames the item). The literal tag-name check is kept as an OR
+      // fast-path for the stock element.
+      const isItem =
+        el instanceof HelixBreadcrumbItem || el.tagName.toLowerCase() === 'hx-breadcrumb-item';
+      return isItem && !el.classList.contains('hx-bc-ellipsis');
+    });
   }
 
   /**

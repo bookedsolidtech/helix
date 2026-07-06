@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
-import type { HelixBreadcrumb } from './hx-breadcrumb.js';
-import type { HelixBreadcrumbItem } from './hx-breadcrumb-item.js';
+import { HelixBreadcrumb } from './hx-breadcrumb.js';
+import { HelixBreadcrumbItem } from './hx-breadcrumb-item.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -803,6 +803,87 @@ describe('hx-breadcrumb', () => {
         '<hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>',
       );
       expect(el.getAttribute('role')).toBeNull();
+    });
+  });
+
+  // ─── Subclass interop: renamed host/item tags (Track-1 brand subclassing) ───
+
+  // Test-only brand subclasses registered under DIFFERENT tag names. A downstream
+  // brand can `class X extends HelixBreadcrumb {}` and register it as its own tag;
+  // discovery and the listitem role must follow the CLASS, not the literal
+  // hx-breadcrumb / hx-breadcrumb-item tag names. Definitions are guarded against
+  // re-registration so repeated test runs in the same realm don't throw.
+  class TestBrandBreadcrumb extends HelixBreadcrumb {}
+  class TestBrandBreadcrumbItem extends HelixBreadcrumbItem {}
+  if (!customElements.get('test-brand-breadcrumb')) {
+    customElements.define('test-brand-breadcrumb', TestBrandBreadcrumb);
+  }
+  if (!customElements.get('test-brand-breadcrumb-item')) {
+    customElements.define('test-brand-breadcrumb-item', TestBrandBreadcrumbItem);
+  }
+
+  describe('Subclass interop (renamed host/item tags)', () => {
+    it('a renamed host discovers its renamed items (collapse logic runs)', async () => {
+      // maxItems=2 with 4 items must collapse the two middle items, proving the
+      // subclassed host found and operated on the subclassed items despite the
+      // tag names no longer being hx-breadcrumb / hx-breadcrumb-item.
+      const el = await fixture<HelixBreadcrumb>(`
+        <test-brand-breadcrumb max-items="2">
+          <test-brand-breadcrumb-item href="/a">A</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item href="/b">B</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item href="/c">C</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item>D</test-brand-breadcrumb-item>
+        </test-brand-breadcrumb>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HTMLElement>('test-brand-breadcrumb-item'));
+      expect(items.length).toBe(4);
+      // First and last stay visible; the two middle items collapse.
+      expect(items[0]?.hasAttribute('data-bc-hidden')).toBe(false);
+      expect(items[1]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[2]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[3]?.hasAttribute('data-bc-hidden')).toBe(false);
+      // Discovery drove the ellipsis into the shadow root.
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeTruthy();
+    });
+
+    it('each renamed item receives role="listitem" inside a renamed host', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <test-brand-breadcrumb>
+          <test-brand-breadcrumb-item href="/home">Home</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item>Current</test-brand-breadcrumb-item>
+        </test-brand-breadcrumb>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll('test-brand-breadcrumb-item'));
+      expect(items.length).toBe(2);
+      items.forEach((item) => {
+        expect(item.getAttribute('role')).toBe('listitem');
+      });
+    });
+
+    it('the last renamed item is marked current so it renders as static text', async () => {
+      // Confirms _applyItemAttributes ran over the discovered subclassed items:
+      // the trailing item gets `current`, so it renders a text span (not a link).
+      const el = await fixture<HelixBreadcrumb>(`
+        <test-brand-breadcrumb>
+          <test-brand-breadcrumb-item href="/home">Home</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item href="/section">Section</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item>Current</test-brand-breadcrumb-item>
+        </test-brand-breadcrumb>
+      `);
+      await el.updateComplete;
+      const items = Array.from(
+        el.querySelectorAll<HelixBreadcrumbItem>('test-brand-breadcrumb-item'),
+      );
+      const last = items[items.length - 1];
+      expect(last?.hasAttribute('current')).toBe(true);
+      await last?.updateComplete;
+      // current item renders static text, never a navigable link.
+      expect(shadowQuery(last as HTMLElement, '[part="text"]')).toBeTruthy();
+      expect(shadowQuery(last as HTMLElement, '[part="link"]')).toBeNull();
     });
   });
 
