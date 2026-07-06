@@ -19,6 +19,8 @@
  */
 
 import { injectLightStyles } from './injectLightStyles.js';
+import { sanitizeCss } from './sanitizeCss.js';
+import { generateScopedSelectors } from './generateScopedSelectors.js';
 
 /** True when the Constructable Stylesheets API is available. */
 const supportsConstructableSheets =
@@ -27,8 +29,10 @@ const supportsConstructableSheets =
   typeof CSSStyleSheet.prototype.replaceSync === 'function';
 
 /**
- * Cache mapping CSS text to its CSSStyleSheet instance. Prevents duplicate
- * sheet creation when the same CSS is registered multiple times.
+ * Cache mapping the final scoped CSS text to its CSSStyleSheet instance.
+ * Prevents duplicate sheet creation when the same CSS is registered multiple
+ * times. Keyed by the scoped output (not the raw input) so dedup is by the
+ * exact bytes emitted into `document.adoptedStyleSheets`.
  */
 const sheetCache = new Map<string, CSSStyleSheet>();
 
@@ -39,23 +43,32 @@ const sheetCache = new Map<string, CSSStyleSheet>();
  * 1. **Constructable Stylesheets** (`document.adoptedStyleSheets`) — preferred;
  *    zero-duplication via `CSSStyleSheet` identity.
  * 2. **`<style>` injection** — fallback for older browsers or SSR-hydrated pages
- *    that do not support Constructable Stylesheets. Delegates to `injectLightStyles`
- *    which scopes selectors via `[data-hx-styled="componentName"]`.
+ *    that do not support Constructable Stylesheets. Delegates to `injectLightStyles`.
  *
- * Calling `register` multiple times with the same `componentName` is safe —
- * the implementation deduplicates at the sheet level.
+ * Both paths sanitize the CSS via `sanitizeCss` and scope every selector under
+ * `[data-hx-styled="componentName"]` via `generateScopedSelectors`, so the
+ * emitted CSS is identical regardless of delivery mechanism and never leaks to
+ * unscoped page content. If `sanitizeCss` rejects the input, nothing is emitted.
+ *
+ * Calling `register` multiple times with the same `componentName` and CSS is
+ * safe — the implementation deduplicates on the final scoped output.
  *
  * @param componentName - The component tag name (e.g. `'hx-card'`).
- * @param css - The CSS string to register. For fallback mode, selectors will be
- *   scoped under `[data-hx-styled="componentName"]`.
+ * @param css - The CSS string to register. Selectors are scoped under
+ *   `[data-hx-styled="componentName"]`.
  */
 function register(componentName: string, css: string): void {
   if (supportsConstructableSheets) {
-    let sheet = sheetCache.get(css);
+    const safeCss = sanitizeCss(css, componentName);
+    if (safeCss === null) return;
+
+    const scopedCss = generateScopedSelectors(componentName, safeCss);
+
+    let sheet = sheetCache.get(scopedCss);
     if (!sheet) {
       sheet = new CSSStyleSheet();
-      sheet.replaceSync(css);
-      sheetCache.set(css, sheet);
+      sheet.replaceSync(scopedCss);
+      sheetCache.set(scopedCss, sheet);
     }
 
     if (!document.adoptedStyleSheets.includes(sheet)) {

@@ -51,6 +51,21 @@ describe('hx-link', () => {
       expect(anchor.getAttribute('href')).toBe('https://example.com');
     });
 
+    it('reflects a property-set href to the host attribute', async () => {
+      const el = await fixture<HelixLink>('<hx-link>Link</hx-link>');
+      el.href = 'https://example.com/set-via-property';
+      await el.updateComplete;
+      expect(el.getAttribute('href')).toBe('https://example.com/set-via-property');
+    });
+
+    it('clears the host href attribute when the property is cleared', async () => {
+      const el = await fixture<HelixLink>('<hx-link href="https://example.com">Link</hx-link>');
+      expect(el.getAttribute('href')).toBe('https://example.com');
+      el.href = undefined;
+      await el.updateComplete;
+      expect(el.hasAttribute('href')).toBe(false);
+    });
+
     it('renders slot content', async () => {
       const el = await fixture<HelixLink>('<hx-link href="/page">Visit Page</hx-link>');
       expect(el.textContent?.trim()).toBe('Visit Page');

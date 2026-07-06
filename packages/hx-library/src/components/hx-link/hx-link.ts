@@ -71,7 +71,7 @@ export class HelixLink extends mixinDelegatesAria(HelixElement) {
    * The URL the link points to.
    * @attr href
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   href: string | undefined = undefined;
 
   /**
