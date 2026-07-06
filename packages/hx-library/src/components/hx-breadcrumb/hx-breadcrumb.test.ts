@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { page } from '@vitest/browser/context';
 import { fixture, shadowQuery, cleanup, checkA11y } from '../../test-utils.js';
-import type { HelixBreadcrumb } from './hx-breadcrumb.js';
-import type { HelixBreadcrumbItem } from './hx-breadcrumb-item.js';
+import { HelixBreadcrumb } from './hx-breadcrumb.js';
+import { HelixBreadcrumbItem } from './hx-breadcrumb-item.js';
 import './index.js';
 
 afterEach(cleanup);
@@ -803,6 +803,198 @@ describe('hx-breadcrumb', () => {
         '<hx-breadcrumb-item href="/home">Home</hx-breadcrumb-item>',
       );
       expect(el.getAttribute('role')).toBeNull();
+    });
+  });
+
+  // ─── Subclass interop: renamed host/item tags (Track-1 brand subclassing) ───
+
+  // Test-only brand subclasses registered under DIFFERENT tag names. A downstream
+  // brand can `class X extends HelixBreadcrumb {}` and register it as its own tag;
+  // discovery and the listitem role must follow the CLASS, not the literal
+  // hx-breadcrumb / hx-breadcrumb-item tag names. Definitions are guarded against
+  // re-registration so repeated test runs in the same realm don't throw.
+  class TestBrandBreadcrumb extends HelixBreadcrumb {}
+  class TestBrandBreadcrumbItem extends HelixBreadcrumbItem {}
+  if (!customElements.get('test-brand-breadcrumb')) {
+    customElements.define('test-brand-breadcrumb', TestBrandBreadcrumb);
+  }
+  if (!customElements.get('test-brand-breadcrumb-item')) {
+    customElements.define('test-brand-breadcrumb-item', TestBrandBreadcrumbItem);
+  }
+
+  describe('Subclass interop (renamed host/item tags)', () => {
+    it('a renamed host discovers its renamed items (collapse logic runs)', async () => {
+      // maxItems=2 with 4 items must collapse the two middle items, proving the
+      // subclassed host found and operated on the subclassed items despite the
+      // tag names no longer being hx-breadcrumb / hx-breadcrumb-item.
+      const el = await fixture<HelixBreadcrumb>(`
+        <test-brand-breadcrumb max-items="2">
+          <test-brand-breadcrumb-item href="/a">A</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item href="/b">B</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item href="/c">C</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item>D</test-brand-breadcrumb-item>
+        </test-brand-breadcrumb>
+      `);
+      await el.updateComplete;
+      await el.updateComplete;
+
+      const items = Array.from(el.querySelectorAll<HTMLElement>('test-brand-breadcrumb-item'));
+      expect(items.length).toBe(4);
+      // First and last stay visible; the two middle items collapse.
+      expect(items[0]?.hasAttribute('data-bc-hidden')).toBe(false);
+      expect(items[1]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[2]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[3]?.hasAttribute('data-bc-hidden')).toBe(false);
+      // Discovery drove the ellipsis into the shadow root.
+      expect(shadowQuery(el, '.hx-bc-ellipsis')).toBeTruthy();
+    });
+
+    it('each renamed item receives role="listitem" inside a renamed host', async () => {
+      const el = await fixture<HelixBreadcrumb>(`
+        <test-brand-breadcrumb>
+          <test-brand-breadcrumb-item href="/home">Home</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item>Current</test-brand-breadcrumb-item>
+        </test-brand-breadcrumb>
+      `);
+      await el.updateComplete;
+      const items = Array.from(el.querySelectorAll('test-brand-breadcrumb-item'));
+      expect(items.length).toBe(2);
+      items.forEach((item) => {
+        expect(item.getAttribute('role')).toBe('listitem');
+      });
+    });
+
+    it('the last renamed item is marked current so it renders as static text', async () => {
+      // Confirms _applyItemAttributes ran over the discovered subclassed items:
+      // the trailing item gets `current`, so it renders a text span (not a link).
+      const el = await fixture<HelixBreadcrumb>(`
+        <test-brand-breadcrumb>
+          <test-brand-breadcrumb-item href="/home">Home</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item href="/section">Section</test-brand-breadcrumb-item>
+          <test-brand-breadcrumb-item>Current</test-brand-breadcrumb-item>
+        </test-brand-breadcrumb>
+      `);
+      await el.updateComplete;
+      const items = Array.from(
+        el.querySelectorAll<HelixBreadcrumbItem>('test-brand-breadcrumb-item'),
+      );
+      const last = items[items.length - 1];
+      expect(last?.hasAttribute('current')).toBe(true);
+      await last?.updateComplete;
+      // current item renders static text, never a navigable link.
+      expect(shadowQuery(last as HTMLElement, '[part="text"]')).toBeTruthy();
+      expect(shadowQuery(last as HTMLElement, '[part="link"]')).toBeNull();
+    });
+  });
+
+  // ─── Upgrade-order robustness (custom-element upgrade timing) ───
+
+  // Deferred-definition brand subclasses: these tags are inserted into the DOM
+  // as plain (un-upgraded) elements BEFORE their classes are defined, so each
+  // test can control the exact upgrade order. Definitions are guarded so
+  // repeated runs in the same realm don't throw. Distinct tag names per gap so
+  // the two ordering scenarios don't share upgrade state.
+  class LateBreadcrumbHostA1 extends HelixBreadcrumb {}
+  class LateBreadcrumbItemA1 extends HelixBreadcrumbItem {}
+  class LateBreadcrumbHostA2 extends HelixBreadcrumb {}
+  class LateBreadcrumbItemA2 extends HelixBreadcrumbItem {}
+
+  describe('Upgrade-order robustness', () => {
+    it('host defined first, items upgrade late → discovered + role="listitem" (A1)', async () => {
+      // Insert markup where the HOST tag is already defined but the ITEM tag is
+      // NOT yet defined. The host runs discovery against plain, un-upgraded
+      // item elements (instanceof false, tag not hx-breadcrumb-item) and misses
+      // them. Defining the item class later must retrigger discovery via the
+      // item's connectedCallback → host notification.
+      if (!customElements.get('late-host-a1')) {
+        customElements.define('late-host-a1', LateBreadcrumbHostA1);
+      }
+      const wrapper = document.createElement('div');
+      document.body.appendChild(wrapper);
+      // max-items=2 with 4 items proves discovery ran (collapse happens) only
+      // AFTER the items upgrade — before upgrade the host sees zero real items.
+      wrapper.innerHTML = `
+        <late-host-a1 max-items="2">
+          <late-item-a1 href="/a">A</late-item-a1>
+          <late-item-a1 href="/b">B</late-item-a1>
+          <late-item-a1 href="/c">C</late-item-a1>
+          <late-item-a1>D</late-item-a1>
+        </late-host-a1>
+      `;
+      const host = wrapper.querySelector<HelixBreadcrumb>('late-host-a1')!;
+      await host.updateComplete;
+
+      // Items are still plain elements — not upgraded, so no role and no collapse.
+      let items = Array.from(wrapper.querySelectorAll<HTMLElement>('late-item-a1'));
+      expect(items.every((i) => i.getAttribute('role') === null)).toBe(true);
+      expect(items.some((i) => i.hasAttribute('data-bc-hidden'))).toBe(false);
+
+      // Upgrade the item class LATE.
+      if (!customElements.get('late-item-a1')) {
+        customElements.define('late-item-a1', LateBreadcrumbItemA1);
+      }
+      await customElements.whenDefined('late-item-a1');
+      items = Array.from(wrapper.querySelectorAll<HTMLElement>('late-item-a1'));
+      await Promise.all(items.map((i) => (i as LateBreadcrumbItemA1).updateComplete));
+      await host.updateComplete;
+
+      // Discovery re-ran on the late item upgrade: middle items collapse now.
+      expect(items.length).toBe(4);
+      expect(items[0]?.hasAttribute('data-bc-hidden')).toBe(false);
+      expect(items[1]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[2]?.hasAttribute('data-bc-hidden')).toBe(true);
+      expect(items[3]?.hasAttribute('data-bc-hidden')).toBe(false);
+      // Every discovered item is marked listitem.
+      items.forEach((item) => {
+        expect(item.getAttribute('role')).toBe('listitem');
+      });
+
+      wrapper.remove();
+    });
+
+    it('items defined first, host upgrades late → each item gets role="listitem" (A2)', async () => {
+      // Insert markup where the ITEM tag is already defined but the HOST tag is
+      // NOT. Each item's connectedCallback runs while no ancestor breadcrumb is
+      // upgraded (parent is a plain element), so `_isInsideBreadcrumb` is false
+      // and no role is applied. Defining the host class later must re-run each
+      // item's context check via discovery (firstUpdated → refreshItemsFromUpgrade).
+      if (!customElements.get('late-item-a2')) {
+        customElements.define('late-item-a2', LateBreadcrumbItemA2);
+      }
+      await customElements.whenDefined('late-item-a2');
+      const wrapper = document.createElement('div');
+      document.body.appendChild(wrapper);
+      wrapper.innerHTML = `
+        <late-host-a2>
+          <late-item-a2 href="/home">Home</late-item-a2>
+          <late-item-a2 href="/section">Section</late-item-a2>
+          <late-item-a2>Current</late-item-a2>
+        </late-host-a2>
+      `;
+      // Items are upgraded but their parent host is still a plain element →
+      // no listitem role yet.
+      let items = Array.from(wrapper.querySelectorAll<HTMLElement>('late-item-a2'));
+      await Promise.all(items.map((i) => (i as LateBreadcrumbItemA2).updateComplete));
+      expect(items.every((i) => i.getAttribute('role') === null)).toBe(true);
+
+      // Upgrade the host class LATE.
+      if (!customElements.get('late-host-a2')) {
+        customElements.define('late-host-a2', LateBreadcrumbHostA2);
+      }
+      await customElements.whenDefined('late-host-a2');
+      const host = wrapper.querySelector<HelixBreadcrumb>('late-host-a2')!;
+      await host.updateComplete;
+      // firstUpdated → refreshItemsFromUpgrade runs discovery; allow the items
+      // to settle after their context re-check.
+      items = Array.from(wrapper.querySelectorAll<HTMLElement>('late-item-a2'));
+      await Promise.all(items.map((i) => (i as LateBreadcrumbItemA2).updateComplete));
+      await host.updateComplete;
+
+      // Every item now carries role="listitem" after the late host upgrade.
+      expect(items.length).toBe(3);
+      items.forEach((item) => {
+        expect(item.getAttribute('role')).toBe('listitem');
+      });
     });
   });
 

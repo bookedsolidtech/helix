@@ -135,7 +135,7 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
    * When set, renders an `<a>` element instead of a `<button>`.
    * @attr href
    */
-  @property({ type: String })
+  @property({ type: String, reflect: true })
   href: string | undefined = undefined;
 
   /**

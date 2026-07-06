@@ -4,6 +4,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { HelixElement, createIdCounter } from '../../base/index.js';
 import { forcedColorsInteractive } from '../../styles/forced-colors.js';
 import { helixBreadcrumbStyles } from './hx-breadcrumb.styles.js';
+// Imported for a runtime `instanceof` check inside _getBreadcrumbItems (never
+// referenced at module-eval time). hx-breadcrumb-item.ts does NOT import this
+// module in return, so no ESM cycle is created — see _getBreadcrumbItems.
+import { HelixBreadcrumbItem } from './hx-breadcrumb-item.js';
 
 /** Typed schema.org ListItem entry for JSON-LD BreadcrumbList structured data. */
 interface JsonLdListItem {
@@ -150,13 +154,15 @@ export class HelixBreadcrumb extends HelixElement {
    * @internal
    */
   private _getBreadcrumbItems(slot: HTMLSlotElement): Element[] {
-    return slot
-      .assignedElements({ flatten: true })
-      .filter(
-        (el) =>
-          el.tagName.toLowerCase() === 'hx-breadcrumb-item' &&
-          !el.classList.contains('hx-bc-ellipsis'),
-      );
+    return slot.assignedElements({ flatten: true }).filter((el) => {
+      // Robust path: match any HelixBreadcrumbItem instance, including brand
+      // subclasses registered under a different tag (e.g. a subclass that
+      // renames the item). The literal tag-name check is kept as an OR
+      // fast-path for the stock element.
+      const isItem =
+        el instanceof HelixBreadcrumbItem || el.tagName.toLowerCase() === 'hx-breadcrumb-item';
+      return isItem && !el.classList.contains('hx-bc-ellipsis');
+    });
   }
 
   /**
@@ -182,6 +188,16 @@ export class HelixBreadcrumb extends HelixElement {
     items.forEach((item, i) => {
       const el = item as HTMLElement;
       const isLast = i === items.length - 1;
+
+      // Upgrade-order gap A2: if this host upgraded AFTER the item connected
+      // (branded item upgraded first), the item's connectedCallback ran while
+      // no ancestor breadcrumb was upgraded, so it never received
+      // role="listitem". Re-run its context check idempotently now that WE are
+      // upgraded and driving discovery. Guarded on the method existing so a
+      // not-yet-upgraded plain element (or a foreign element) is skipped safely.
+      if (item instanceof HelixBreadcrumbItem) {
+        item.refreshBreadcrumbContext();
+      }
 
       // Separator hiding: always positional — last item has no trailing separator.
       if (isLast) {
@@ -209,10 +225,22 @@ export class HelixBreadcrumb extends HelixElement {
 
   // ─── Slot Handling ───
 
-  /** @internal */
-  private _handleSlotChange(e: Event): void {
-    if (!(e.target instanceof HTMLSlotElement)) return;
-    const items = this._getBreadcrumbItems(e.target);
+  /**
+   * @internal Re-entrancy guard for `refreshItemsFromUpgrade()`. A late item
+   * upgrade calls this via its `connectedCallback`; discovery then re-runs
+   * `refreshBreadcrumbContext()` on each item, which must never loop back into
+   * host discovery. This flag makes a nested call a no-op.
+   */
+  private _runningItemUpgrade = false;
+
+  /**
+   * Discovers slotted items and applies collapse + aria/state attributes.
+   * Shared by `slotchange`, `firstUpdated`, and the late-upgrade re-run path so
+   * every entry point produces identical results.
+   * @internal
+   */
+  private _runDiscovery(slot: HTMLSlotElement): void {
+    const items = this._getBreadcrumbItems(slot);
 
     // Handle collapse behaviour
     if (this.maxItems > 0 && items.length > this.maxItems) {
@@ -226,6 +254,33 @@ export class HelixBreadcrumb extends HelixElement {
     if (this.jsonLd) {
       this._updateJsonLd(items);
     }
+  }
+
+  /**
+   * Re-runs discovery/attribute-application when a LATE-upgraded item asks for
+   * it (upgrade-order gap A1). The item's `connectedCallback` located this host
+   * (already upgraded) and called here so the now-upgraded item is picked up by
+   * `_getBreadcrumbItems` (its `instanceof HelixBreadcrumbItem` is now true) and
+   * marked. No-op before the host's own shadow root exists or while an upgrade
+   * re-run is already in flight (re-entrancy guard).
+   * @internal
+   */
+  refreshItemsFromUpgrade(): void {
+    if (this._runningItemUpgrade) return;
+    const slot = this.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])');
+    if (!slot) return;
+    this._runningItemUpgrade = true;
+    try {
+      this._runDiscovery(slot);
+    } finally {
+      this._runningItemUpgrade = false;
+    }
+  }
+
+  /** @internal */
+  private _handleSlotChange(e: Event): void {
+    if (!(e.target instanceof HTMLSlotElement)) return;
+    this._runDiscovery(e.target);
   }
 
   /** @internal */
@@ -343,6 +398,17 @@ export class HelixBreadcrumb extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._removeJsonLd();
+  }
+
+  override firstUpdated(changedProperties: PropertyValues<this>): void {
+    super.firstUpdated(changedProperties);
+    // Run discovery once the shadow root (and its default <slot>) exist. This
+    // covers the upgrade-order case where the HOST upgrades AFTER its items are
+    // already in the DOM and already upgraded (gap A2): the initial `slotchange`
+    // may have fired before this host was defined, so an explicit first-render
+    // discovery guarantees each already-upgraded item is re-checked and marked
+    // (role="listitem") even if no further slotchange occurs.
+    this.refreshItemsFromUpgrade();
   }
 
   override updated(changedProperties: PropertyValues<this>): void {

@@ -561,6 +561,149 @@ export const ErrorEventDemo: Story = {
   },
 };
 
+// ════════════════════════════════════════════════════════════════════════════
+// 11. WRAPPED MODE — slotted <img>
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * WRAPPED mode: a consumer-supplied `<img>` slotted into the default slot.
+ * `hx-image` becomes a pure framing/style layer — it applies ratio/fit/rounded
+ * framing and re-emits `hx-load`/`hx-error`, but renders no `<img>` of its own.
+ * The slotted media owns its own `alt`.
+ */
+export const WrappedImage: Story = {
+  name: 'Wrapped: slotted <img>',
+  render: () => html`
+    <hx-image ratio="4/3" style="width: 300px;">
+      <img
+        src="https://picsum.photos/seed/wrapped-img/600/450"
+        alt="Consumer-supplied slotted image"
+      />
+    </hx-image>
+  `,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-image');
+    await expect(host).toBeTruthy();
+    // WRAPPED mode renders no shadow <img>; the slotted <img> stays in light DOM.
+    await expect(host?.shadowRoot?.querySelector('img')).toBeNull();
+    const slotted = host?.querySelector('img');
+    await expect(slotted).toBeTruthy();
+    await expect(slotted?.getAttribute('alt')).toBe('Consumer-supplied slotted image');
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 12. WRAPPED MODE — slotted <picture> (responsive-image markup)
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * WRAPPED mode over a `<picture>` with `<source>` candidates — the shape CMS
+ * responsive-image fields emit. `hx-image` frames the picture and re-emits
+ * events from the inner `<img>`. A scoped light-DOM sheet sizes the nested
+ * `<img>` so it fills the framed figure.
+ */
+export const WrappedPicture: Story = {
+  name: 'Wrapped: slotted <picture>',
+  render: () => html`
+    <hx-image ratio="16/9" style="width: 360px;">
+      <picture>
+        <source
+          srcset="https://picsum.photos/seed/wrapped-pic/1280/720 1280w"
+          media="(min-width: 800px)"
+        />
+        <source srcset="https://picsum.photos/seed/wrapped-pic/640/360 640w" />
+        <img src="https://picsum.photos/seed/wrapped-pic/640/360" alt="Responsive picture" />
+      </picture>
+    </hx-image>
+  `,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-image');
+    await expect(host).toBeTruthy();
+    await expect(host?.shadowRoot?.querySelector('img')).toBeNull();
+    // The scoping stamp drives the light-DOM sheet that sizes nested media.
+    await expect(host?.getAttribute('data-hx-styled')).toBe('hx-image');
+    const nested = host?.querySelector('picture img');
+    await expect(nested).toBeTruthy();
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 13. WRAPPED MODE — framing (ratio / fit / rounded)
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * The framing layer applies identically to slotted media: aspect ratio, object-fit,
+ * and border radius all shape the consumer-supplied `<img>`.
+ */
+export const WrappedFraming: Story = {
+  name: 'Wrapped: framing',
+  render: () => html`
+    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start;">
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <hx-image ratio="1" fit="cover" rounded="50%" style="width: 160px;">
+          <img src="https://picsum.photos/seed/wf1/400/400" alt="Circular framed slotted image" />
+        </hx-image>
+        <span style="font-size: 0.75rem; color: #6b7280;">ratio=1 · fit=cover · rounded=50%</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+        <hx-image ratio="16/9" fit="contain" rounded="0.5rem" style="width: 260px;">
+          <img src="https://picsum.photos/seed/wf2/300/200" alt="Contained framed slotted image" />
+        </hx-image>
+        <span style="font-size: 0.75rem; color: #6b7280;">ratio=16/9 · fit=contain · rounded</span>
+      </div>
+    </div>
+  `,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-image');
+    const container = host?.shadowRoot?.querySelector('.image__container');
+    const style = container?.getAttribute('style') ?? '';
+    await expect(style).toContain('--_ratio:1');
+    await expect(style).toContain('--_fit:cover');
+    await expect(style).toContain('--_radius:50%');
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// 14. WRAPPED MODE — error → fallback
+// ════════════════════════════════════════════════════════════════════════════
+
+/**
+ * When the slotted image fails to load, `hx-image` swaps to the shared error
+ * state and shows the `fallback` slot — no `fallback-src` is involved because the
+ * consumer owns the media. `hx-error` is re-emitted from the slotted image.
+ */
+export const WrappedError: Story = {
+  name: 'Wrapped: error → fallback',
+  render: () => html`
+    <hx-image ratio="4/3" style="width: 300px;">
+      <img src="https://broken.url/wrapped-missing.jpg" alt="Broken slotted image" />
+      <div
+        slot="fallback"
+        style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #fef2f2; color: #991b1b; font-size: 0.875rem; font-family: sans-serif;"
+      >
+        Slotted image unavailable
+      </div>
+    </hx-image>
+  `,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector('hx-image');
+    await expect(host).toBeTruthy();
+
+    let errorFired = false;
+    host!.addEventListener('hx-error', () => {
+      errorFired = true;
+    });
+
+    // Drive the error deterministically off the slotted <img>.
+    const slotted = host!.querySelector('img');
+    slotted?.dispatchEvent(new Event('error'));
+
+    await expect(errorFired).toBe(true);
+    const errorContainer = host!.shadowRoot?.querySelector('.image__container--error');
+    await expect(errorContainer).toBeTruthy();
+  },
+};
+
 export const DarkMode: Story = {
   decorators: [
     (story) =>
