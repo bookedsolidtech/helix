@@ -7,15 +7,53 @@ import { HelixElement } from '../../base/index.js';
 import { helixImageStyles } from './hx-image.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
 import { devWarn } from '../../utils/dev-warn.js';
+import { injectLightStyles } from '../../utilities/injectLightStyles.js';
+
+/**
+ * Scoped light-DOM CSS for WRAPPED mode. `::slotted()` in the shadow sheet can
+ * size a directly-slotted `<img>`/`<picture>`, but it cannot reach the `<img>`
+ * nested inside a slotted `<picture>` (a light-DOM descendant). This sheet,
+ * injected once into `document.head` and scoped to
+ * `[data-hx-styled="hx-image"]`, sizes those descendants so responsive-image
+ * markup (`<picture><source><img></picture>`) fills the framed figure.
+ */
+const WRAPPED_LIGHT_CSS = `
+:is(picture, img) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: var(--_fit, var(--hx-image-object-fit, cover));
+  border-radius: var(--_radius, var(--hx-image-border-radius, 0));
+}
+`;
 
 /**
  * An accessible image wrapper with lazy loading, fallback support, aspect ratio control,
  * responsive image (srcset/sizes) support, and optional caption.
  *
- * @summary Accessible image wrapper with lazy loading, fallback, srcset, and aspect ratio control.
+ * `hx-image` operates in one of two modes, selected automatically:
+ *
+ * - **OWNED mode** (default, attribute-driven): with `src` (and optional
+ *   `srcset`/`sizes`) set and no default-slot content, the component renders and
+ *   owns its own responsive `<img>`. Behaviour is unchanged from prior releases.
+ * - **WRAPPED mode** (slotted): when the default (unnamed) slot has assigned
+ *   element(s), `hx-image` becomes a pure framing/style/enhancement layer over
+ *   consumer-supplied media (e.g. a Drupal responsive-image
+ *   `<picture><source><img></picture>`). The same figure framing
+ *   (ratio/fit/rounded/width/height), caption, error/fallback handling, and
+ *   `hx-load`/`hx-error` events apply. In WRAPPED mode the slotted media owns its
+ *   own `alt`; `fallback-src` does not apply.
+ *
+ * If both `src` and default-slot content are provided, WRAPPED mode wins (the
+ * consumer explicitly supplied media) and a development warning is emitted.
+ *
+ * @summary Accessible image wrapper with lazy loading, fallback, srcset, aspect ratio control, and a slotted (WRAPPED) mode.
  *
  * @tag hx-image
  *
+ * @slot - Default slot for consumer-supplied media (WRAPPED mode). Assigning an
+ *   `<img>` or `<picture>` here switches the component to WRAPPED mode, where it
+ *   frames and enhances the slotted media instead of rendering its own `<img>`.
  * @slot fallback - Custom content shown when the image fails to load and no fallback-src is set.
  * @slot caption - Optional caption content rendered in a figcaption element below the image.
  *
@@ -153,6 +191,22 @@ export class HelixImage extends HelixElement {
   @state()
   private _hasCaptionSlot = false;
 
+  /**
+   * Whether the default (unnamed) slot has assigned element content, which
+   * switches the component into WRAPPED mode.
+   * @internal
+   */
+  @state()
+  private _hasSlottedMedia = false;
+
+  /**
+   * The slotted `<img>` currently wired for load/error re-dispatch in WRAPPED
+   * mode (either a directly-slotted `<img>` or the `<img>` inside a slotted
+   * `<picture>`), or `null` when none is attached.
+   * @internal
+   */
+  private _slottedImg: HTMLImageElement | null = null;
+
   /** @internal */
   private _handleLoad(): void {
     this.dispatchEvent(new CustomEvent<void>('hx-load', { bubbles: true, composed: true }));
@@ -169,10 +223,127 @@ export class HelixImage extends HelixElement {
     this.dispatchEvent(new CustomEvent<void>('hx-error', { bubbles: true, composed: true }));
   }
 
+  /**
+   * Re-dispatches `hx-load` from slotted media (WRAPPED mode). Bound as an arrow
+   * so it can be added/removed on the slotted `<img>` via addEventListener with a
+   * stable `this` and stable identity.
+   * @internal
+   */
+  private _handleSlottedLoad = (): void => {
+    this.dispatchEvent(new CustomEvent<void>('hx-load', { bubbles: true, composed: true }));
+  };
+
+  /**
+   * Handles native `error` on the slotted media (WRAPPED mode). `fallback-src`
+   * does not apply here — the consumer owns the media — so we go straight to the
+   * shared error state (fallback slot) and re-dispatch `hx-error`.
+   * @internal
+   */
+  private _handleSlottedError = (): void => {
+    if (this._error) return;
+    this._error = true;
+    this.dispatchEvent(new CustomEvent<void>('hx-error', { bubbles: true, composed: true }));
+  };
+
   /** @internal */
   private _onCaptionSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     this._hasCaptionSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
+  /**
+   * Handles the default slot's `slotchange`. Detects WRAPPED mode, resolves the
+   * slotted `<img>` (direct, or nested inside a slotted `<picture>`), and wires
+   * native load/error listeners for re-dispatch. Previously-attached listeners
+   * are always removed first so slot mutations never double-dispatch or leak.
+   * @internal
+   */
+  private _onDefaultSlotChange(e: Event): void {
+    const slot = e.target as HTMLSlotElement;
+    const elements = slot.assignedElements({ flatten: true });
+    this._hasSlottedMedia = elements.length > 0;
+
+    if (this._hasSlottedMedia) {
+      this._ensureWrappedLightStyles();
+    }
+
+    this._resolveSlottedImg(elements);
+  }
+
+  /**
+   * Resolves the slotted `<img>` from assigned elements and (re)attaches
+   * load/error listeners. A direct `<img>` is used as-is; a `<picture>` resolves
+   * to its inner `<img>`. Detaches any prior listeners first.
+   * @internal
+   */
+  private _resolveSlottedImg(elements: readonly Element[]): void {
+    let next: HTMLImageElement | null = null;
+    for (const node of elements) {
+      if (node instanceof HTMLImageElement) {
+        next = node;
+        break;
+      }
+      if (node instanceof HTMLPictureElement) {
+        const inner = node.querySelector('img');
+        if (inner) {
+          next = inner;
+          break;
+        }
+      }
+    }
+
+    if (next === this._slottedImg) return;
+
+    this._detachSlottedListeners();
+
+    if (next) {
+      // Soft, minimal a11y hint: slotted media owns its own alt in WRAPPED mode,
+      // but a missing alt with no presentation role is likely an oversight.
+      if (!next.hasAttribute('alt') && next.getAttribute('role') !== 'presentation') {
+        devWarn(
+          'hx-image',
+          'Slotted image has no `alt` attribute and is not marked presentational. ' +
+            'Provide an `alt` value on the slotted <img>, or set role="presentation" if decorative (WCAG 1.1.1).',
+        );
+      }
+
+      next.addEventListener('load', this._handleSlottedLoad);
+      next.addEventListener('error', this._handleSlottedError);
+      this._slottedImg = next;
+
+      // If the slotted image already finished loading before we attached, do not
+      // synthesize a duplicate hx-load — but do surface an already-broken image.
+      if (next.complete) {
+        if (next.naturalWidth === 0 && next.currentSrc) {
+          this._handleSlottedError();
+        }
+      }
+    }
+  }
+
+  /** @internal */
+  private _detachSlottedListeners(): void {
+    if (this._slottedImg) {
+      this._slottedImg.removeEventListener('load', this._handleSlottedLoad);
+      this._slottedImg.removeEventListener('error', this._handleSlottedError);
+      this._slottedImg = null;
+    }
+  }
+
+  /**
+   * Stamps the host with `data-hx-styled` and injects the WRAPPED light-DOM
+   * sheet once (deduped by injectLightStyles). No-op in SSR (injectLightStyles
+   * guards for a missing `document`).
+   * @internal
+   */
+  private _ensureWrappedLightStyles(): void {
+    this.setAttribute('data-hx-styled', 'hx-image');
+    injectLightStyles('hx-image', WRAPPED_LIGHT_CSS);
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._detachSlottedListeners();
   }
 
   /** @internal */
@@ -195,7 +366,22 @@ export class HelixImage extends HelixElement {
   }
 
   override render() {
-    if (!this.decorative && !this.alt) {
+    // WRAPPED mode = the default slot has assigned element(s). When both `src`
+    // and slotted media are present, WRAPPED wins (the consumer explicitly
+    // supplied media) and we flag the ambiguity for the developer.
+    const wrapped = this._hasSlottedMedia;
+    if (wrapped && this.src) {
+      devWarn(
+        'hx-image',
+        'Both `src` and slotted media were provided. Slotted media (WRAPPED mode) takes ' +
+          'precedence and the `src` image is ignored. Remove one to resolve the ambiguity.',
+      );
+    }
+
+    // OWNED mode owns the `alt` contract; WRAPPED media owns its own `alt`, so
+    // the OWNED alt warning is suppressed there (a soft slotted-alt hint is
+    // emitted at slot-resolution time instead).
+    if (!wrapped && !this.decorative && !this.alt) {
       devWarn(
         'hx-image',
         'Informative images require an `alt` attribute for accessibility (WCAG 1.1.1). ' +
@@ -231,22 +417,30 @@ export class HelixImage extends HelixElement {
       `;
     }
 
+    // The default slot is always rendered so `slotchange` can drive mode
+    // detection; in OWNED mode it is empty and renders nothing. In OWNED mode
+    // the `<img>` path below is byte-identical to the pre-WRAPPED template.
     return html`
       <figure class="image__container" style=${styleMap(containerStyles)}>
-        <img
-          part="base"
-          class="image__img"
-          src=${this._currentSrc() || nothing}
-          alt=${altText}
-          role=${isDecorative ? 'presentation' : nothing}
-          loading=${this.loading}
-          width=${this.width != null ? this.width : nothing}
-          height=${this.height != null ? this.height : nothing}
-          srcset=${this.srcset ?? nothing}
-          sizes=${this.sizes ?? nothing}
-          @load=${this._handleLoad}
-          @error=${this._handleError}
-        />
+        ${wrapped
+          ? nothing
+          : html`
+              <img
+                part="base"
+                class="image__img"
+                src=${this._currentSrc() || nothing}
+                alt=${altText}
+                role=${isDecorative ? 'presentation' : nothing}
+                loading=${this.loading}
+                width=${this.width != null ? this.width : nothing}
+                height=${this.height != null ? this.height : nothing}
+                srcset=${this.srcset ?? nothing}
+                sizes=${this.sizes ?? nothing}
+                @load=${this._handleLoad}
+                @error=${this._handleError}
+              />
+            `}
+        <slot @slotchange=${this._onDefaultSlotChange}></slot>
         <figcaption
           part="caption"
           class=${classMap({ image__caption: true, 'image__caption--visible': showCaption })}

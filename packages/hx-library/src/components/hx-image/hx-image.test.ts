@@ -706,4 +706,231 @@ describe('hx-image', () => {
       expect(violations).toEqual([]);
     });
   });
+
+  // ─── WRAPPED mode (slotted media) ───
+
+  describe('WRAPPED mode (slotted media)', () => {
+    // slotchange is async; after fixture() we let it fire and the component
+    // re-render into WRAPPED mode before asserting.
+    const settleWrapped = async (el: HelixImage): Promise<void> => {
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await el.updateComplete;
+    };
+
+    it('switches to WRAPPED mode when an <img> is slotted (no shadow img rendered)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image ratio="4/3"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      // WRAPPED mode renders no owned <img> in shadow DOM.
+      expect(shadowQuery(el, 'img')).toBeNull();
+      // The default slot exists so the slotted media projects through.
+      const defaultSlot = shadowQuery<HTMLSlotElement>(
+        el,
+        '.image__container > slot:not([name])',
+      );
+      expect(defaultSlot).toBeTruthy();
+      const assigned = defaultSlot!.assignedElements({ flatten: true });
+      expect(assigned.length).toBe(1);
+      expect(assigned[0]?.tagName.toLowerCase()).toBe('img');
+    });
+
+    it('stamps data-hx-styled="hx-image" on the host for light-DOM descendant sizing', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      expect(el.getAttribute('data-hx-styled')).toBe('hx-image');
+      // The scoped light sheet is injected once into document.head.
+      const injected = document.head.querySelector('style[data-hx-light-styles="hx-image"]');
+      expect(injected).toBeTruthy();
+      expect(injected?.textContent).toContain('object-fit');
+    });
+
+    it('applies ::slotted sizing so a directly-slotted <img> fills the figure', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image ratio="1" fit="cover" style="width: 120px;"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      const slotted = el.querySelector('img')!;
+      const cs = getComputedStyle(slotted);
+      // ::slotted(img) rules make the slotted image block-level and object-fit: cover.
+      expect(cs.display).toBe('block');
+      expect(cs.objectFit).toBe('cover');
+    });
+
+    it('re-emits hx-load from a directly-slotted <img>', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      const slotted = el.querySelector('img')!;
+
+      const loadPromise = oneEvent(el, 'hx-load');
+      slotted.dispatchEvent(new Event('load'));
+      const event = await loadPromise;
+      expect(event.type).toBe('hx-load');
+      expect(event.bubbles).toBe(true);
+      expect(event.composed).toBe(true);
+    });
+
+    it('re-emits hx-error from a directly-slotted <img> and swaps to fallback', async () => {
+      // Use a resolvable src so no native error races the synthetic one below;
+      // the synthetic 'error' deterministically drives the WRAPPED error path.
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /><span slot="fallback" class="wfb">Gone</span></hx-image>',
+      );
+      await settleWrapped(el);
+      const slotted = el.querySelector('img')!;
+
+      const errorPromise = oneEvent(el, 'hx-error');
+      slotted.dispatchEvent(new Event('error'));
+      const event = await errorPromise;
+      expect(event.type).toBe('hx-error');
+
+      await el.updateComplete;
+      const errorContainer = shadowQuery(el, '.image__container--error');
+      expect(errorContainer).toBeTruthy();
+      expect(errorContainer?.getAttribute('role')).toBe('alert');
+      // Fallback slot content projects into the error state.
+      const fb = el.querySelector('.wfb');
+      expect(fb).toBeTruthy();
+    });
+
+    it('does NOT apply fallback-src in WRAPPED mode (consumer owns the media)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image fallback-src="https://example.com/fallback.jpg"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      const slotted = el.querySelector('img')!;
+
+      const errorPromise = oneEvent(el, 'hx-error');
+      slotted.dispatchEvent(new Event('error'));
+      await errorPromise;
+      await el.updateComplete;
+
+      // Error state shown immediately; no owned <img> ever swaps to fallback-src.
+      expect(shadowQuery(el, '.image__container--error')).toBeTruthy();
+      expect(shadowQuery(el, 'img')).toBeNull();
+    });
+
+    it('resolves and re-emits hx-load from the <img> inside a slotted <picture>', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image ratio="16/9">' +
+          '<picture>' +
+          '<source srcset="https://example.com/large.png 1280w" media="(min-width: 800px)" />' +
+          '<img src="https://example.com/small.png" alt="Picture" />' +
+          '</picture>' +
+          '</hx-image>',
+      );
+      await settleWrapped(el);
+      expect(shadowQuery(el, 'img')).toBeNull();
+
+      const nestedImg = el.querySelector('picture img')!;
+      const loadPromise = oneEvent(el, 'hx-load');
+      nestedImg.dispatchEvent(new Event('load'));
+      const event = await loadPromise;
+      expect(event.type).toBe('hx-load');
+    });
+
+    it('re-emits hx-error from the <img> inside a slotted <picture>', async () => {
+      // Resolvable srcs so the synthetic error is the deterministic trigger.
+      const el = await fixture<HelixImage>(
+        '<hx-image>' +
+          '<picture>' +
+          '<source srcset="https://example.com/large.png 1280w" />' +
+          '<img src="https://example.com/small.png" alt="Picture" />' +
+          '</picture>' +
+          '</hx-image>',
+      );
+      await settleWrapped(el);
+      const nestedImg = el.querySelector('picture img')!;
+
+      const errorPromise = oneEvent(el, 'hx-error');
+      nestedImg.dispatchEvent(new Event('error'));
+      const event = await errorPromise;
+      expect(event.type).toBe('hx-error');
+    });
+
+    it('applies framing (ratio/fit/rounded) to the figure in WRAPPED mode', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image ratio="16/9" fit="contain" rounded="0.5rem"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      const container = shadowQuery(el, '.image__container');
+      const style = container?.getAttribute('style') ?? '';
+      expect(style).toContain('--_ratio:16/9');
+      expect(style).toContain('--_fit:contain');
+      expect(style).toContain('--_radius:0.5rem');
+    });
+
+    it('does not re-dispatch a duplicate hx-load for an already-complete slotted <img>', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      const slotted = el.querySelector('img') as HTMLImageElement;
+      // Force the "already complete and valid" branch.
+      Object.defineProperty(slotted, 'complete', { value: true, configurable: true });
+      Object.defineProperty(slotted, 'naturalWidth', { value: 200, configurable: true });
+
+      let loads = 0;
+      el.addEventListener('hx-load', () => {
+        loads += 1;
+      });
+      // Re-run slot resolution by re-slotting the same node — should not synthesize a load.
+      el.append(document.createComment('nudge'));
+      await settleWrapped(el);
+      expect(loads).toBe(0);
+    });
+
+    it('detaches slotted listeners on disconnect (no dispatch after removal)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+      const slotted = el.querySelector('img')!;
+
+      let fired = false;
+      el.addEventListener('hx-load', () => {
+        fired = true;
+      });
+
+      el.remove();
+      // After disconnect the listener is removed; dispatching load must not re-emit.
+      slotted.dispatchEvent(new Event('load'));
+      expect(fired).toBe(false);
+    });
+
+    it('has no axe violations in WRAPPED mode with a labelled slotted <img>', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image ratio="4/3"><img src="https://example.com/slotted.png" alt="Descriptive slotted label" /></hx-image>',
+      );
+      await settleWrapped(el);
+      await page.screenshot();
+      // Traverse the full composed tree (host + light DOM) so axe sees the slotted media.
+      const { violations } = await checkA11y(el, { useElement: true });
+      expect(violations).toEqual([]);
+    });
+  });
+
+  // ─── OWNED mode regression (default slot empty) ───
+
+  describe('OWNED mode regression', () => {
+    it('renders the owned <img> and no assigned default-slot media by default', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Owned"></hx-image>',
+      );
+      await el.updateComplete;
+      // Owned <img> present.
+      expect(shadowQuery(el, 'img[part="base"]')).toBeTruthy();
+      // Default slot present but empty → OWNED mode retained.
+      const defaultSlot = shadowQuery<HTMLSlotElement>(
+        el,
+        '.image__container > slot:not([name])',
+      );
+      expect(defaultSlot).toBeTruthy();
+      expect(defaultSlot!.assignedElements({ flatten: true }).length).toBe(0);
+    });
+  });
 });
