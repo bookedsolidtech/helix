@@ -6,20 +6,34 @@ import './index.js';
 
 afterEach(cleanup);
 
+// ─── Network-independent image sources ───
+// The suite must be fully deterministic in CI: NO real-network image URLs.
+//   VALID_SRC   — a 1x1 transparent PNG data-URI that decodes synchronously and
+//                 fires the img `load` event. Used everywhere a load/render or an
+//                 attribute-value assertion is made.
+//   BROKEN_SRC  — a data-URI whose base64 payload is NOT a valid PNG, so the img
+//                 deterministically fires the `error` event WITHOUT any network
+//                 request. Verified in this Vitest browser (Chromium) environment
+//                 to fire `error` reliably. Used for error/fallback paths as the
+//                 primary (erroring) source.
+const VALID_SRC =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+const BROKEN_SRC = 'data:image/png;base64,Tm90QVZhbGlkUE5H';
+
 describe('hx-image', () => {
   // ─── Rendering (4) ───
 
   describe('Rendering', () => {
     it('renders with shadow DOM', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       expect(el.shadowRoot).toBeTruthy();
     });
 
     it('renders an img element inside shadow DOM', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       expect(img).toBeTruthy();
@@ -27,7 +41,7 @@ describe('hx-image', () => {
 
     it('exposes "base" CSS part on the img element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery(el, '[part="base"]');
       expect(img).toBeTruthy();
@@ -36,7 +50,7 @@ describe('hx-image', () => {
 
     it('applies default loading=lazy to the img', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('loading')).toBe('lazy');
@@ -48,20 +62,23 @@ describe('hx-image', () => {
   describe('Property: src', () => {
     it('sets the src attribute on the img element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/photo.jpg" alt="Photo"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Photo"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
-      expect(img?.getAttribute('src')).toBe('https://example.com/photo.jpg');
+      expect(img?.getAttribute('src')).toBe(VALID_SRC);
     });
 
     it('reflects property to img src when changed', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/a.jpg" alt="A"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="A"></hx-image>`,
       );
-      el.src = 'https://example.com/b.jpg';
+      // Reassign to a DISTINCT (still network-free) data-URI to prove the
+      // property→img `src` reflection updated. This test only asserts the
+      // attribute value; it never depends on a load/error firing.
+      el.src = BROKEN_SRC;
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
-      expect(img?.getAttribute('src')).toBe('https://example.com/b.jpg');
+      expect(img?.getAttribute('src')).toBe(BROKEN_SRC);
     });
   });
 
@@ -70,7 +87,7 @@ describe('hx-image', () => {
   describe('Property: alt and ARIA', () => {
     it('sets alt text on the img element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Descriptive text"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Descriptive text"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('alt')).toBe('Descriptive text');
@@ -78,7 +95,7 @@ describe('hx-image', () => {
 
     it('does NOT add role=presentation when alt is non-empty', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Descriptive text"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Descriptive text"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('role')).toBeNull();
@@ -86,7 +103,7 @@ describe('hx-image', () => {
 
     it('adds role=presentation when alt is empty string (decorative)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt=""></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt=""></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -95,7 +112,7 @@ describe('hx-image', () => {
 
     it('does NOT add aria-label to the host element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Photo"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Photo"></hx-image>`,
       );
       expect(el.hasAttribute('aria-label')).toBe(false);
     });
@@ -106,7 +123,7 @@ describe('hx-image', () => {
   describe('Property: decorative', () => {
     it('adds role=presentation and alt="" when decorative is set', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" decorative></hx-image>',
+        `<hx-image src="${VALID_SRC}" decorative></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -116,14 +133,14 @@ describe('hx-image', () => {
 
     it('reflects decorative attribute to host', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" decorative></hx-image>',
+        `<hx-image src="${VALID_SRC}" decorative></hx-image>`,
       );
       expect(el.hasAttribute('decorative')).toBe(true);
     });
 
     it('decorative prop takes precedence — sets role=presentation even when alt is provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Ignored" decorative></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Ignored" decorative></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -137,7 +154,7 @@ describe('hx-image', () => {
   describe('Property: loading', () => {
     it('defaults to loading=lazy', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('loading')).toBe('lazy');
@@ -145,7 +162,7 @@ describe('hx-image', () => {
 
     it('sets loading=eager when specified', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" loading="eager"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" loading="eager"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('loading')).toBe('eager');
@@ -157,7 +174,7 @@ describe('hx-image', () => {
   describe('Property: rounded', () => {
     it('applies theme radius token when rounded attribute is present (empty string)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" rounded></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" rounded></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -167,7 +184,7 @@ describe('hx-image', () => {
 
     it('applies custom CSS value when rounded is a non-empty string', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" rounded="1rem"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" rounded="1rem"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -177,7 +194,7 @@ describe('hx-image', () => {
 
     it('applies 50% border-radius for circular images', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" rounded="50%"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" rounded="50%"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -187,7 +204,7 @@ describe('hx-image', () => {
 
     it('does not apply border-radius when rounded="false"', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" rounded="false"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" rounded="false"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -201,7 +218,7 @@ describe('hx-image', () => {
   describe('Property: ratio', () => {
     it('sets --_ratio CSS variable on the container', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" ratio="16/9"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" ratio="16/9"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -211,7 +228,7 @@ describe('hx-image', () => {
 
     it('does not set --_ratio when ratio is not provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -225,7 +242,7 @@ describe('hx-image', () => {
   describe('Property: fit', () => {
     it('sets --_fit CSS variable on the container', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" fit="contain"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" fit="contain"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -235,7 +252,7 @@ describe('hx-image', () => {
 
     it('does not set --_fit when fit is not provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -249,7 +266,7 @@ describe('hx-image', () => {
   describe('Property: width and height', () => {
     it('sets width in px when a number is provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" width="200"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" width="200"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -259,7 +276,7 @@ describe('hx-image', () => {
 
     it('sets height in px when a number is provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" height="150"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" height="150"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -269,7 +286,7 @@ describe('hx-image', () => {
 
     it('sets width attribute on the inner img element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" width="320"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" width="320"></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -278,7 +295,7 @@ describe('hx-image', () => {
 
     it('sets height attribute on the inner img element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" height="240"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" height="240"></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -291,7 +308,7 @@ describe('hx-image', () => {
   describe('Property: srcset and sizes', () => {
     it('sets srcset attribute on the inner img element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" srcset="https://example.com/img-400.png 400w, https://example.com/img-800.png 800w"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" srcset="${VALID_SRC} 400w, ${VALID_SRC} 800w"></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -301,7 +318,7 @@ describe('hx-image', () => {
 
     it('sets sizes attribute on the inner img element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" srcset="https://example.com/img-400.png 400w" sizes="(max-width: 600px) 100vw, 50vw"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" srcset="${VALID_SRC} 400w" sizes="(max-width: 600px) 100vw, 50vw"></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -310,7 +327,7 @@ describe('hx-image', () => {
 
     it('omits srcset attribute when not provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -323,7 +340,7 @@ describe('hx-image', () => {
   describe('Events', () => {
     it('dispatches hx-load when image loads', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
       expect(img).toBeTruthy();
@@ -337,7 +354,7 @@ describe('hx-image', () => {
 
     it('dispatches hx-error when image fails to load', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://broken.url/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${BROKEN_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
       expect(img).toBeTruthy();
@@ -355,7 +372,7 @@ describe('hx-image', () => {
   describe('Fallback', () => {
     it('shows fallback slot when image fails and no fallback-src is set', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://broken.url/img.png" alt="Test"><span slot="fallback" class="fb">Broken</span></hx-image>',
+        `<hx-image src="${BROKEN_SRC}" alt="Test"><span slot="fallback" class="fb">Broken</span></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
       img!.dispatchEvent(new Event('error'));
@@ -371,7 +388,7 @@ describe('hx-image', () => {
 
     it('switches to fallback-src when primary src fails', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://broken.url/img.png" fallback-src="https://example.com/fallback.jpg" alt="Test"></hx-image>',
+        `<hx-image src="${BROKEN_SRC}" fallback-src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
 
@@ -380,12 +397,12 @@ describe('hx-image', () => {
       await el.updateComplete;
 
       const updatedImg = shadowQuery<HTMLImageElement>(el, 'img');
-      expect(updatedImg?.getAttribute('src')).toBe('https://example.com/fallback.jpg');
+      expect(updatedImg?.getAttribute('src')).toBe(VALID_SRC);
     });
 
     it('shows fallback slot and dispatches hx-error after fallback-src also fails', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://broken.url/img.png" fallback-src="https://also-broken.url/fallback.jpg" alt="Test"><span slot="fallback" class="fb2">Unavailable</span></hx-image>',
+        `<hx-image src="${BROKEN_SRC}" fallback-src="${BROKEN_SRC}" alt="Test"><span slot="fallback" class="fb2">Unavailable</span></hx-image>`,
       );
 
       // First error triggers fallback-src switch
@@ -413,7 +430,7 @@ describe('hx-image', () => {
   describe('Error container', () => {
     it('error container has role=alert for screen reader announcements', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://broken.url/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${BROKEN_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
       img!.dispatchEvent(new Event('error'));
@@ -425,7 +442,7 @@ describe('hx-image', () => {
 
     it('error container does NOT have aria-live attribute (WCAG 4.1.2: role=alert already implies aria-live=assertive)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://broken.url/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${BROKEN_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img');
       img!.dispatchEvent(new Event('error'));
@@ -443,7 +460,7 @@ describe('hx-image', () => {
   describe('Caption slot', () => {
     it('shows figcaption when caption slot content is provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"><span slot="caption">Photo credit</span></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"><span slot="caption">Photo credit</span></hx-image>`,
       );
       await el.updateComplete;
 
@@ -454,7 +471,7 @@ describe('hx-image', () => {
 
     it('hides figcaption when no caption slot content is provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       await el.updateComplete;
 
@@ -466,7 +483,7 @@ describe('hx-image', () => {
 
     it('wraps content in a semantic figure element', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const figure = shadowQuery(el, 'figure');
       expect(figure).toBeTruthy();
@@ -479,7 +496,7 @@ describe('hx-image', () => {
   describe('CSS Parts', () => {
     it('exposes "base" part on img element and "caption" part on figcaption', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const base = shadowQuery(el, '[part="base"]');
       expect(base).toBeTruthy();
@@ -496,7 +513,7 @@ describe('hx-image', () => {
   describe('Property: alt defaults', () => {
     it('renders empty alt text when alt is undefined (no alt attribute)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png"></hx-image>',
+        `<hx-image src="${VALID_SRC}"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       // When alt is undefined and not decorative, altText is empty string
@@ -505,7 +522,7 @@ describe('hx-image', () => {
 
     it('does not add role=presentation when alt is undefined', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png"></hx-image>',
+        `<hx-image src="${VALID_SRC}"></hx-image>`,
       );
       const img = shadowQuery(el, 'img');
       expect(img?.getAttribute('role')).toBeNull();
@@ -517,7 +534,7 @@ describe('hx-image', () => {
   describe('Property: rounded — programmatic boolean', () => {
     it('applies theme radius token when rounded set programmatically to true', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       el.rounded = true;
       // Wait for property reflection (String type reflects true → 'true' → re-read as 'true')
@@ -531,7 +548,7 @@ describe('hx-image', () => {
 
     it('applies theme radius token when rounded="true" string value', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" rounded="true"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" rounded="true"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -545,7 +562,7 @@ describe('hx-image', () => {
   describe('Property: fit — all values', () => {
     it('sets --_fit:cover', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" fit="cover"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" fit="cover"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -555,7 +572,7 @@ describe('hx-image', () => {
 
     it('sets --_fit:fill', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" fit="fill"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" fit="fill"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -565,7 +582,7 @@ describe('hx-image', () => {
 
     it('sets --_fit:none', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" fit="none"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" fit="none"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -575,7 +592,7 @@ describe('hx-image', () => {
 
     it('sets --_fit:scale-down', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" fit="scale-down"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" fit="scale-down"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -589,7 +606,7 @@ describe('hx-image', () => {
   describe('Property: loading — reflection', () => {
     it('reflects loading property to attribute', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" loading="eager"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" loading="eager"></hx-image>`,
       );
       expect(el.getAttribute('loading')).toBe('eager');
     });
@@ -600,7 +617,7 @@ describe('hx-image', () => {
   describe('Property: width/height as string CSS values', () => {
     it('sets width as CSS string directly when non-numeric', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" width="50%"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" width="50%"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -610,7 +627,7 @@ describe('hx-image', () => {
 
     it('sets height as CSS string directly when non-numeric', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test" height="auto"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test" height="auto"></hx-image>`,
       );
       await el.updateComplete;
       const container = shadowQuery(el, '.image__container');
@@ -624,7 +641,7 @@ describe('hx-image', () => {
   describe('Events: bubbles and composed', () => {
     it('hx-load event bubbles and is composed', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img')!;
       const loadPromise = oneEvent(el, 'hx-load');
@@ -636,7 +653,7 @@ describe('hx-image', () => {
 
     it('hx-error event bubbles and is composed', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       const img = shadowQuery<HTMLImageElement>(el, 'img')!;
       const errorPromise = oneEvent(el, 'hx-error');
@@ -652,7 +669,7 @@ describe('hx-image', () => {
   describe('Sizes attribute: omitted when undefined', () => {
     it('omits sizes attribute when not provided', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Test"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Test"></hx-image>`,
       );
       await el.updateComplete;
       const img = shadowQuery(el, 'img');
@@ -678,7 +695,7 @@ describe('hx-image', () => {
   describe('Accessibility (axe-core)', () => {
     it('has no axe violations with informative image (alt provided)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="A descriptive label"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="A descriptive label"></hx-image>`,
       );
       await el.updateComplete;
       await page.screenshot();
@@ -688,7 +705,7 @@ describe('hx-image', () => {
 
     it('has no axe violations with decorative image (decorative prop)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" decorative></hx-image>',
+        `<hx-image src="${VALID_SRC}" decorative></hx-image>`,
       );
       await el.updateComplete;
       await page.screenshot();
@@ -698,7 +715,7 @@ describe('hx-image', () => {
 
     it('has no axe violations with decorative image (alt empty string)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt=""></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt=""></hx-image>`,
       );
       await el.updateComplete;
       await page.screenshot();
@@ -724,7 +741,7 @@ describe('hx-image', () => {
       // wait for a slotchange tick here, so this proves the synchronous
       // pre-render seed (not slotchange) drove the decision.
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/owned.png" alt="Owned"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Owned"><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       // No owned shadow <img> was ever rendered — WRAPPED won on first paint.
       expect(shadowQuery(el, 'img[part="base"]')).toBeNull();
@@ -745,11 +762,15 @@ describe('hx-image', () => {
       // (the value `_handleSlottedLoad` keys the guard on), so the test does not
       // depend on real browser fetch timing.
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://example.com/a.png" alt="Reused" /></hx-image>',
+        `<hx-image><img src="${VALID_SRC}" alt="Reused" /></hx-image>`,
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img') as HTMLImageElement;
-      let currentSrc = 'https://example.com/a.png';
+      // Opaque, network-free sentinels used ONLY as the per-source guard key
+      // (assigned to a mocked `currentSrc` getter, never fetched). They must
+      // differ from the browser-resolved `currentSrc` of the loaded VALID_SRC so
+      // the first synthetic `load` below is not swallowed by the emit guard.
+      let currentSrc = 'wrapped-src-a';
       Object.defineProperty(slotted, 'currentSrc', {
         get: () => currentSrc,
         configurable: true,
@@ -769,14 +790,14 @@ describe('hx-image', () => {
       expect(loads).toBe(1);
 
       // Consumer reuses the SAME node and updates its source → new load → new emit.
-      currentSrc = 'https://example.com/b.png';
+      currentSrc = 'wrapped-src-b';
       slotted.dispatchEvent(new Event('load'));
       expect(loads).toBe(2);
     });
 
     it('switches to WRAPPED mode when an <img> is slotted (no shadow img rendered)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image ratio="4/3"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image ratio="4/3"><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       // WRAPPED mode renders no owned <img> in shadow DOM.
@@ -794,7 +815,7 @@ describe('hx-image', () => {
 
     it('stamps data-hx-styled="hx-image" on the host for light-DOM descendant sizing', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       expect(el.getAttribute('data-hx-styled')).toBe('hx-image');
@@ -806,7 +827,7 @@ describe('hx-image', () => {
 
     it('applies ::slotted sizing so a directly-slotted <img> fills the figure', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image ratio="1" fit="cover" style="width: 120px;"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image ratio="1" fit="cover" style="width: 120px;"><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img')!;
@@ -822,10 +843,10 @@ describe('hx-image', () => {
       // the default-slot media — the caption image is named-slot content and must
       // NOT be stretched to fill the frame.
       const el = await fixture<HelixImage>(
-        '<hx-image ratio="1" fit="cover" style="width: 120px;">' +
-          '<img src="https://example.com/slotted.png" alt="Slotted" />' +
-          '<img slot="caption" src="https://example.com/credit.png" alt="Credit" class="cap-img" />' +
-          '</hx-image>',
+        `<hx-image ratio="1" fit="cover" style="width: 120px;">` +
+          `<img src="${VALID_SRC}" alt="Slotted" />` +
+          `<img slot="caption" src="${VALID_SRC}" alt="Credit" class="cap-img" />` +
+          `</hx-image>`,
       );
       await settleWrapped(el);
 
@@ -847,10 +868,10 @@ describe('hx-image', () => {
       // Same guard for the fallback slot: an <img slot="fallback"> must not be
       // stretched to fill the frame while the default-slot media is framed.
       const el = await fixture<HelixImage>(
-        '<hx-image ratio="1" fit="cover" style="width: 120px;">' +
-          '<img src="https://example.com/slotted.png" alt="Slotted" />' +
-          '<img slot="fallback" src="https://example.com/fb.png" alt="Fallback" class="fb-img" />' +
-          '</hx-image>',
+        `<hx-image ratio="1" fit="cover" style="width: 120px;">` +
+          `<img src="${VALID_SRC}" alt="Slotted" />` +
+          `<img slot="fallback" src="${VALID_SRC}" alt="Fallback" class="fb-img" />` +
+          `</hx-image>`,
       );
       await settleWrapped(el);
 
@@ -862,10 +883,20 @@ describe('hx-image', () => {
 
     it('re-emits hx-load from a directly-slotted <img>', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img')!;
+
+      // VALID_SRC decodes synchronously, so the slotted <img> already emitted an
+      // hx-load for its resolved source during settle. Pin `currentSrc` to a
+      // distinct (network-free) sentinel so the synthetic `load` below represents
+      // a NEW resolved source — the per-source guard then re-emits, which is the
+      // behaviour this test asserts.
+      Object.defineProperty(slotted, 'currentSrc', {
+        value: 'wrapped-reemit-src',
+        configurable: true,
+      });
 
       const loadPromise = oneEvent(el, 'hx-load');
       slotted.dispatchEvent(new Event('load'));
@@ -879,7 +910,7 @@ describe('hx-image', () => {
       // Use a resolvable src so no native error races the synthetic one below;
       // the synthetic 'error' deterministically drives the WRAPPED error path.
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /><span slot="fallback" class="wfb">Gone</span></hx-image>',
+        `<hx-image><img src="${VALID_SRC}" alt="Slotted" /><span slot="fallback" class="wfb">Gone</span></hx-image>`,
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img')!;
@@ -900,7 +931,7 @@ describe('hx-image', () => {
 
     it('does NOT apply fallback-src in WRAPPED mode (consumer owns the media)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image fallback-src="https://example.com/fallback.jpg"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image fallback-src="${VALID_SRC}"><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img')!;
@@ -919,15 +950,23 @@ describe('hx-image', () => {
       const el = await fixture<HelixImage>(
         '<hx-image ratio="16/9">' +
           '<picture>' +
-          '<source srcset="https://example.com/large.png 1280w" media="(min-width: 800px)" />' +
-          '<img src="https://example.com/small.png" alt="Picture" />' +
+          `<source srcset="${VALID_SRC} 1280w" media="(min-width: 800px)" />` +
+          `<img src="${VALID_SRC}" alt="Picture" />` +
           '</picture>' +
           '</hx-image>',
       );
       await settleWrapped(el);
       expect(shadowQuery(el, 'img')).toBeNull();
 
-      const nestedImg = el.querySelector('picture img')!;
+      const nestedImg = el.querySelector('picture img')! as HTMLImageElement;
+      // VALID_SRC decodes synchronously, so the nested <img> already emitted an
+      // hx-load for its resolved source during settle. Pin `currentSrc` to a
+      // distinct (network-free) sentinel so the synthetic `load` below represents
+      // a NEW resolved candidate and the per-source guard re-emits.
+      Object.defineProperty(nestedImg, 'currentSrc', {
+        value: 'wrapped-picture-reemit-src',
+        configurable: true,
+      });
       const loadPromise = oneEvent(el, 'hx-load');
       nestedImg.dispatchEvent(new Event('load'));
       const event = await loadPromise;
@@ -939,8 +978,8 @@ describe('hx-image', () => {
       const el = await fixture<HelixImage>(
         '<hx-image>' +
           '<picture>' +
-          '<source srcset="https://example.com/large.png 1280w" />' +
-          '<img src="https://example.com/small.png" alt="Picture" />' +
+          `<source srcset="${VALID_SRC} 1280w" />` +
+          `<img src="${VALID_SRC}" alt="Picture" />` +
           '</picture>' +
           '</hx-image>',
       );
@@ -955,7 +994,7 @@ describe('hx-image', () => {
 
     it('applies framing (ratio/fit/rounded) to the figure in WRAPPED mode', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image ratio="16/9" fit="contain" rounded="0.5rem"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image ratio="16/9" fit="contain" rounded="0.5rem"><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       const container = shadowQuery(el, '.image__container');
@@ -967,7 +1006,7 @@ describe('hx-image', () => {
 
     it('mirrors --_fit/--_radius onto the HOST so light-DOM slotted media inherits them (P1 regression)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image fit="contain" rounded="0.75rem"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image fit="contain" rounded="0.75rem"><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
 
@@ -985,7 +1024,7 @@ describe('hx-image', () => {
 
     it('does NOT set the host --_fit/--_radius vars in OWNED mode', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Owned" fit="contain" rounded="0.5rem"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Owned" fit="contain" rounded="0.5rem"></hx-image>`,
       );
       await el.updateComplete;
       // OWNED mode's shadow <img> inherits from the figure; the host vars stay unset.
@@ -994,13 +1033,13 @@ describe('hx-image', () => {
     });
 
     it('recovers from a slotted-image error when the broken node is replaced (P2)', async () => {
-      // Listen for hx-error BEFORE settling: a non-resolvable src can fire a real
-      // native `error` during settle (which already drives the WRAPPED error
-      // state). Attaching first means the promise resolves for whichever error —
-      // real or the synthetic one dispatched below — lands first, so the test is
-      // deterministic regardless of network timing.
+      // Listen for hx-error BEFORE settling: BROKEN_SRC deterministically fires a
+      // native `error` (network-free) during settle, which already drives the
+      // WRAPPED error state. Attaching first means the promise resolves for
+      // whichever error — the native one or the synthetic no-op dispatched below —
+      // lands first, so the test is deterministic without any real network.
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://broken.invalid/x.png" alt="First" /><span slot="fallback" class="rfb">Broken</span></hx-image>',
+        `<hx-image><img src="${BROKEN_SRC}" alt="First" /><span slot="fallback" class="rfb">Broken</span></hx-image>`,
       );
       const errorPromise = oneEvent(el, 'hx-error');
       await settleWrapped(el);
@@ -1018,7 +1057,7 @@ describe('hx-image', () => {
       // _error and re-rendering the framed media.
       broken.remove();
       const good = document.createElement('img');
-      good.setAttribute('src', 'https://example.com/good.png');
+      good.setAttribute('src', VALID_SRC);
       good.setAttribute('alt', 'Second');
       el.appendChild(good);
       await settleWrapped(el);
@@ -1033,11 +1072,10 @@ describe('hx-image', () => {
     });
 
     it('emits exactly one hx-load for an already-complete (cached) slotted <img> (P2)', async () => {
-      // A 1x1 transparent PNG data URI decodes synchronously, so by the time the
-      // component resolves the slotted node it is already `complete` with a
-      // non-zero naturalWidth — the cached/SSR first-paint case.
-      const dataUri =
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+      // A 1x1 transparent PNG data URI (VALID_SRC) decodes synchronously, so by
+      // the time the component resolves the slotted node it is already `complete`
+      // with a non-zero naturalWidth — the cached/SSR first-paint case.
+      const dataUri = VALID_SRC;
 
       let loads = 0;
       const el = await fixture<HelixImage>('<hx-image></hx-image>');
@@ -1062,12 +1100,12 @@ describe('hx-image', () => {
     });
 
     it('does not re-dispatch a duplicate hx-load for an already-complete slotted <img>', async () => {
-      // Non-resolvable src so no real network `load` races the synthetic path —
-      // the assertion below is about the SYNTHETIC re-slot path only. `currentSrc`
-      // is pinned so the per-source emit guard is deterministic regardless of
-      // whether the browser populated it.
+      // BROKEN_SRC fires a native `error` (not `load`), so no real `load` can race
+      // the SYNTHETIC re-slot path this test asserts on — a real `load` would
+      // increment `loads` and break the `toBe(0)` check. `currentSrc` is pinned so
+      // the per-source emit guard is deterministic regardless of the browser.
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://broken.invalid/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image><img src="${BROKEN_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img') as HTMLImageElement;
@@ -1075,7 +1113,7 @@ describe('hx-image', () => {
       Object.defineProperty(slotted, 'complete', { value: true, configurable: true });
       Object.defineProperty(slotted, 'naturalWidth', { value: 200, configurable: true });
       Object.defineProperty(slotted, 'currentSrc', {
-        value: 'https://broken.invalid/slotted.png',
+        value: BROKEN_SRC,
         configurable: true,
       });
 
@@ -1091,7 +1129,7 @@ describe('hx-image', () => {
 
     it('detaches slotted listeners on disconnect (no dispatch after removal)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       await settleWrapped(el);
       const slotted = el.querySelector('img')!;
@@ -1109,7 +1147,7 @@ describe('hx-image', () => {
 
     it('has no axe violations in WRAPPED mode with a labelled slotted <img>', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image ratio="4/3"><img src="https://example.com/slotted.png" alt="Descriptive slotted label" /></hx-image>',
+        `<hx-image ratio="4/3"><img src="${VALID_SRC}" alt="Descriptive slotted label" /></hx-image>`,
       );
       await settleWrapped(el);
       await page.screenshot();
@@ -1137,9 +1175,9 @@ describe('hx-image', () => {
       // render wrong. Such content leaves the component in OWNED mode: the owned
       // <img part="base"> renders with `src` and no WRAPPED framing is applied.
       const el = await fixture<HelixImage>(
-        '<hx-image src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Owned">' +
-          '<a href="/detail"><img src="https://example.com/slotted.png" alt="Slotted" /></a>' +
-          '</hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Owned">` +
+          `<a href="/detail"><img src="${VALID_SRC}" alt="Slotted" /></a>` +
+          `</hx-image>`,
       );
       await settle(el);
 
@@ -1157,7 +1195,7 @@ describe('hx-image', () => {
       // Non-media default-slot content must NOT enter WRAPPED: the owned <img>
       // must still render and its `src` fetch must not be suppressed.
       const el = await fixture<HelixImage>(
-        '<hx-image src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Owned"><span>caption-ish text</span></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Owned"><span>caption-ish text</span></hx-image>`,
       );
       await settle(el);
 
@@ -1177,7 +1215,7 @@ describe('hx-image', () => {
   describe('OWNED mode regression', () => {
     it('renders the owned <img> and no assigned default-slot media by default', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/img.png" alt="Owned"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Owned"></hx-image>`,
       );
       await el.updateComplete;
       // Owned <img> present.
@@ -1216,8 +1254,7 @@ describe('hx-image', () => {
       // hiding whatever it projects. A resolvable data-URI `src` is used so the
       // owned <img> loads (and does not trip the error state) even after the
       // slotchange settle tick, keeping the assertion deterministic.
-      const ownedSrc =
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+      const ownedSrc = VALID_SRC;
       const el = await fixture<HelixImage>(
         `<hx-image src="${ownedSrc}" alt="Owned"><span class="stray">slot text</span></hx-image>`,
       );
@@ -1250,7 +1287,7 @@ describe('hx-image', () => {
       // slotchange and the component must switch to WRAPPED — proving the inert
       // wrapper did NOT drop dynamic detection.
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/owned.png" alt="Owned"></hx-image>',
+        `<hx-image src="${VALID_SRC}" alt="Owned"></hx-image>`,
       );
       await el.updateComplete;
       // OWNED first: owned <img> present, not stamped for WRAPPED light sizing.
@@ -1259,7 +1296,7 @@ describe('hx-image', () => {
 
       // Append a bare <img> to the default slot.
       const added = document.createElement('img');
-      added.setAttribute('src', 'https://example.com/slotted.png');
+      added.setAttribute('src', VALID_SRC);
       added.setAttribute('alt', 'Slotted');
       el.appendChild(added);
       await settle(el);
@@ -1279,7 +1316,7 @@ describe('hx-image', () => {
 
     it('detects a default-slot <img> as WRAPPED media via the tagName path (Fix 1)', async () => {
       const el = await fixture<HelixImage>(
-        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+        `<hx-image><img src="${VALID_SRC}" alt="Slotted" /></hx-image>`,
       );
       // The pre-render seed (_hasDefaultSlotLightChildren) runs in willUpdate and
       // uses tagName === 'IMG' rather than instanceof HTMLImageElement, so an IMG
@@ -1291,7 +1328,7 @@ describe('hx-image', () => {
     it('detects a default-slot <picture> as WRAPPED media via the tagName path (Fix 1)', async () => {
       const el = await fixture<HelixImage>(
         '<hx-image>' +
-          '<picture><img src="https://example.com/small.png" alt="Picture" /></picture>' +
+          `<picture><img src="${VALID_SRC}" alt="Picture" /></picture>` +
           '</hx-image>',
       );
       // A directly-slotted PICTURE is detected by tagName === 'PICTURE' in the
@@ -1304,8 +1341,7 @@ describe('hx-image', () => {
       // with `src` set the component stays OWNED and renders the owned <img>.
       // A resolvable data-URI keeps the owned <img> out of the error state
       // across the slotchange settle tick.
-      const ownedSrc =
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+      const ownedSrc = VALID_SRC;
       const el = await fixture<HelixImage>(
         `<hx-image src="${ownedSrc}" alt="Owned">` +
           '<div class="d">block</div><span class="s">inline</span>' +
