@@ -57,4 +57,14 @@ applied. */
 By default, only same-origin URLs are permitted. Set this to allow
 specific CDN or asset server origins (e.g., "https://cdn.example.com,https://assets.example.com"). */
   allowedOrigins?: string;
+  /** Paint-mode override for the rendered glyph geometry. `'fill'` (default)
+paints with `fill: currentColor`; `'stroke'` paints outline glyphs with
+`fill: none; stroke: currentColor` and the `--hx-icon-stroke-width` token.
+
+When `library` resolves through the registry, the library's own paint mode
+is applied automatically — set this ONLY for the explicit `sprite-url` /
+`name="#…"` escape hatches when pinning a STROKE sprite sheet (e.g. the
+bundled `feather.svg` / `lucide.svg`), where no registry library is
+consulted. An explicit value overrides the library-derived mode. */
+  paintMode?: 'fill' | 'stroke' | 'mixed' | undefined;
 }

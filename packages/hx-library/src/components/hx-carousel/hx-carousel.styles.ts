@@ -136,11 +136,32 @@ export const helixCarouselStyles = css`
 
   .track {
     display: flex;
+    /* Inter-slide gap. Public override hook; defaults to 0 so the historical
+       flush-slide layout is byte-for-byte preserved when --hx-carousel-gap is unset. */
+    gap: var(--hx-carousel-gap, 0px);
     transition: transform var(--hx-transition-base, 0.3s ease);
   }
 
   :host([orientation='vertical']) .track {
     flex-direction: column;
+  }
+
+  /* ─── Gap sentinel ─────────────────────────────────────────────
+     An out-of-flow, invisible probe whose width tracks the total inter-slide
+     gap extent ((slides - 1) * --hx-carousel-gap). A runtime --hx-carousel-gap
+     change resizes no laid-out box (the track is viewport-constrained and the
+     slides keep their size), so the ResizeObserver would never fire; observing
+     this sentinel makes a pure gap change resize an observed box, which
+     re-derives the navigation bounds reactively (no navigation required). The
+     constant 1px base keeps the box non-zero so the observer always reports it. */
+  .gap-sentinel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(1px + var(--_carousel-gap-count, 0) * var(--hx-carousel-gap, 0px));
+    height: 1px;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   /* ─── Pagination ─── */

@@ -237,6 +237,23 @@ describe('hx-button', () => {
       expect(anchor.getAttribute('href')).toBe('https://example.com');
     });
 
+    it('reflects a property-set href to the host attribute', async () => {
+      const el = await fixture<HelixButton>('<hx-button>Link</hx-button>');
+      el.href = 'https://example.com/set-via-property';
+      await el.updateComplete;
+      expect(el.getAttribute('href')).toBe('https://example.com/set-via-property');
+    });
+
+    it('clears the host href attribute when the property is cleared', async () => {
+      const el = await fixture<HelixButton>(
+        '<hx-button href="https://example.com">Link</hx-button>',
+      );
+      expect(el.getAttribute('href')).toBe('https://example.com');
+      el.href = undefined;
+      await el.updateComplete;
+      expect(el.hasAttribute('href')).toBe(false);
+    });
+
     it('sets target attribute on anchor', async () => {
       const el = await fixture<HelixButton>(
         '<hx-button href="https://example.com" target="_blank">Link</hx-button>',

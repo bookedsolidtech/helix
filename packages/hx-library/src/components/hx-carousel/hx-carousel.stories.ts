@@ -601,3 +601,43 @@ export const KeyboardNavigation: Story = {
     await userEvent.tab();
   },
 };
+
+// ─────────────────────────────────────────────────
+// CUSTOM SLIDE WIDTH & GAP — public CSS hooks
+// ─────────────────────────────────────────────────
+
+export const CustomSlideWidthAndGap: Story = {
+  name: 'Custom Slide Width & Gap',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Two public custom properties tune the slide track: `--hx-carousel-slide-width` overrides each slide’s width (otherwise it is computed from `slides-per-page`), and `--hx-carousel-gap` sets the gap between slides (default `0`). Here, with `slides-per-page="2"`, the slide width is `calc(50% - 0.5rem)` and the gap is `1rem`, so two slides plus the gap fill the viewport exactly.',
+      },
+    },
+  },
+  args: {
+    label: 'Carousel with custom slide width and gap',
+    slidesPerPage: 2,
+    loop: true,
+  },
+  render: (args) => html`
+    <div
+      style="max-width: 700px; margin: var(--hx-space-8, 2rem) auto; font-family: var(--hx-font-family-sans, sans-serif);"
+    >
+      <hx-carousel
+        label="${args.label}"
+        ?loop=${args.loop}
+        ?autoplay=${args.autoplay}
+        autoplay-interval="${args.autoplayInterval}"
+        slides-per-page="${args.slidesPerPage}"
+        slides-per-move="${args.slidesPerMove}"
+        orientation="${args.orientation}"
+        ?mouse-dragging=${args.mouseDragging}
+        style="--hx-carousel-slide-width: calc(50% - var(--hx-space-2, 0.5rem)); --hx-carousel-gap: var(--hx-space-4, 1rem);"
+      >
+        ${demoSlide(0)} ${demoSlide(1)} ${demoSlide(2)} ${demoSlide(3)} ${demoSlide(4)}
+      </hx-carousel>
+    </div>
+  `,
+};

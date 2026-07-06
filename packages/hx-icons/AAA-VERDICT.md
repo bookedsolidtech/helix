@@ -106,6 +106,47 @@ library (designed for the 12px `xs` cell).
 
 ---
 
+## Library: `feather`
+
+| Dimension       | Verdict | Notes                                                                                       |
+| --------------- | ------- | ------------------------------------------------------------------------------------------- |
+| `contrast`      | unknown | Stroke-paint outlines; non-text contrast depends on render size and `--hx-icon-stroke-width`. Unmeasured pending a formal `pnpm aaa:audit` pass. |
+| `forcedColors`  | pass    | Every glyph paints with `stroke="currentColor"` (→ CanvasText under forced-colors) and hardcodes no color. |
+| `opticalSizing` | unknown | Thin strokes at small render sizes / sub-default `--hx-icon-stroke-width` are unmeasured pending a formal audit. |
+
+**Paint mode:** `stroke`
+**Total glyphs:** 287 (`feather-icons@4.29.2`)
+**Sprite sheet:** `packages/hx-icons/dist/feather.svg`
+**License / attribution:** MIT (© Cole Bemis) — see [`NOTICE.md`](./NOTICE.md).
+
+`contrast` and `opticalSizing` are `'unknown'` (not `'fail'`): at the default
+2px stroke (`--hx-icon-stroke-width`) and `hx-size="md"` (24px) render they are
+expected to clear 3:1, but a thinner stroke override or a sub-minimum render
+size can drop a stroke glyph below non-text contrast, so no measured `'pass'`
+is claimed until the formal harness runs. Mirrors `src/aaa.ts`.
+
+---
+
+## Library: `lucide`
+
+| Dimension       | Verdict | Notes                                                                                       |
+| --------------- | ------- | ------------------------------------------------------------------------------------------- |
+| `contrast`      | unknown | Stroke-paint outlines; non-text contrast depends on render size and `--hx-icon-stroke-width`. Unmeasured pending a formal `pnpm aaa:audit` pass. |
+| `forcedColors`  | pass    | Every glyph paints with `stroke="currentColor"` (→ CanvasText under forced-colors) and hardcodes no color. |
+| `opticalSizing` | unknown | Thin strokes at small render sizes / sub-default `--hx-icon-stroke-width` are unmeasured pending a formal audit. |
+
+**Paint mode:** `stroke`
+**Total glyphs:** ~1,986 (`lucide-static@1.21.0`)
+**Sprite sheet:** `packages/hx-icons/dist/lucide.svg`
+**License / attribution:** ISC (© Lucide Icons and Contributors) — see [`NOTICE.md`](./NOTICE.md).
+
+`contrast` and `opticalSizing` are `'unknown'` (not `'fail'`) for the same
+reason as `feather`: the default 2px stroke at `hx-size="md"` is expected to
+clear 3:1, but a thinner stroke or smaller render size is unmeasured. Mirrors
+`src/aaa.ts`.
+
+---
+
 ## Consumer library obligation
 
 A consumer registering a custom library via `registerIconLibrary()`
@@ -133,8 +174,9 @@ full consumer recipe.
 
 This per-library verdict is invalidated when:
 
-- The library's sprite sheet (`dist/helix.svg`, `dist/fa-free-solid.svg`)
-  is regenerated from a different source set.
+- The library's sprite sheet (`dist/helix.svg`, `dist/fa-free-solid.svg`,
+  `dist/feather.svg`, `dist/lucide.svg`) is regenerated from a different
+  source set.
 - A new glyph is added that has not been measured by the harness.
 - The minimum render-size cell of `<hx-icon>` changes.
 - The semantic icon color cascade (`--hx-icon-color`,

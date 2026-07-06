@@ -42,6 +42,6 @@ Automatically pauses on hover, focus, and when prefers-reduced-motion is active.
   labelSlideOf?: string;
 
   // Event callbacks
-  /** Dispatched when the active slide changes. */
+  /** Dispatched when the active slide changes. `detail.index` is the active slide index and `detail.slide` the active `hx-carousel-item`. When the carousel becomes empty (all slides removed at runtime), `detail.index` is `-1` and `detail.slide` is `undefined`. */
   onHxSlideChange?: (event: Event) => void;
 }

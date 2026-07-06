@@ -3,7 +3,7 @@ import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { getIconLibrary } from '@helixui/icons';
-import type { IconLibrary } from '@helixui/icons';
+import type { IconLibrary, IconPaintMode } from '@helixui/icons';
 import { HelixElement } from '../../base/index.js';
 import { helixIconStyles } from './hx-icon.styles.js';
 import { forcedColorsSurface } from '../../styles/forced-colors.js';
@@ -144,6 +144,21 @@ export class HelixIcon extends HelixElement {
    */
   @property({ type: String, attribute: 'allowed-origins' })
   allowedOrigins = '';
+
+  /**
+   * Paint-mode override for the rendered glyph geometry. `'fill'` (default)
+   * paints with `fill: currentColor`; `'stroke'` paints outline glyphs with
+   * `fill: none; stroke: currentColor` and the `--hx-icon-stroke-width` token.
+   *
+   * When `library` resolves through the registry, the library's own paint mode
+   * is applied automatically — set this ONLY for the explicit `sprite-url` /
+   * `name="#…"` escape hatches when pinning a STROKE sprite sheet (e.g. the
+   * bundled `feather.svg` / `lucide.svg`), where no registry library is
+   * consulted. An explicit value overrides the library-derived mode.
+   * @attr paint-mode
+   */
+  @property({ type: String, reflect: true, attribute: 'paint-mode' })
+  paintMode: 'fill' | 'stroke' | 'mixed' | undefined = undefined;
 
   /**
    * Stores the sanitized inner markup of an externally fetched SVG.
@@ -469,7 +484,7 @@ export class HelixIcon extends HelixElement {
    * @internal
    */
   private _resolveLibraryHref():
-    | { kind: 'sprite'; href: string }
+    | { kind: 'sprite'; href: string; paintMode: IconPaintMode }
     | { kind: 'inline'; url: string; library: IconLibrary }
     | null {
     const lib = getIconLibrary(this.library);
@@ -502,7 +517,7 @@ export class HelixIcon extends HelixElement {
       return null;
     }
     if (lib.spriteSheet) {
-      return { kind: 'sprite', href: resolved };
+      return { kind: 'sprite', href: resolved, paintMode: lib.paintMode };
     }
     return { kind: 'inline', url: resolved, library: lib };
   }
@@ -556,7 +571,13 @@ export class HelixIcon extends HelixElement {
       const svg = doc.querySelector('svg');
       if (!svg) return sanitized;
       library.mutator(svg as unknown as SVGElement);
-      return svg.outerHTML;
+      // Re-sanitize AFTER the mutator. A hostile or compromised library mutator
+      // could otherwise reintroduce <script>, on* handlers, foreignObject, or
+      // javascript:/data: payloads that the first pass stripped — those would
+      // then flow straight to unsafeHTML. Running the mutated markup back through
+      // the same sanitizer closes that gap; legitimate mutations (viewBox, class,
+      // fill/stroke normalization) survive untouched.
+      return this._sanitizeSvg(svg.outerHTML);
     } catch (err) {
       console.warn(
         `[hx-icon] Mutator for library "${library.name}" threw on name "${this.name}"; rendering un-mutated SVG.`,
@@ -583,7 +604,7 @@ export class HelixIcon extends HelixElement {
   }
 
   /** @internal */
-  private _renderSprite(href?: string) {
+  private _renderSprite(href?: string, paintMode: IconPaintMode = 'fill') {
     const isDecorative = !this.label.trim();
     const useHref = href ?? this._spriteHref();
 
@@ -591,6 +612,7 @@ export class HelixIcon extends HelixElement {
       <svg
         part="svg"
         class="icon__svg"
+        data-paint-mode=${paintMode}
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
         role=${isDecorative ? nothing : 'img'}
@@ -605,7 +627,7 @@ export class HelixIcon extends HelixElement {
   }
 
   /** @internal */
-  private _renderInline() {
+  private _renderInline(paintMode: IconPaintMode = 'fill') {
     if (!this._inlineSvg) {
       return nothing;
     }
@@ -620,6 +642,7 @@ export class HelixIcon extends HelixElement {
       <span
         part="svg"
         class="icon__inline"
+        data-paint-mode=${paintMode}
         role=${isDecorative ? nothing : 'img'}
         aria-label=${isDecorative ? nothing : this.label}
         aria-hidden=${isDecorative ? 'true' : nothing}
@@ -635,7 +658,7 @@ export class HelixIcon extends HelixElement {
     // 1. Inline fetch mode takes precedence when src is a non-empty string.
     //    Library attribute is ignored on this path.
     if (typeof this.src === 'string' && this.src.trim().length > 0) {
-      return this._renderInline();
+      return this._renderInline(this.paintMode ?? 'fill');
     }
 
     // 2. Explicit sprite-url + name. Library attribute is ignored — the
@@ -645,14 +668,14 @@ export class HelixIcon extends HelixElement {
     //    consumers who want strict document-local sprite behavior
     //    can pin it that way without setting `library=""`.
     if (typeof this.spriteUrl === 'string' && this.name) {
-      return this._renderSprite();
+      return this._renderSprite(undefined, this.paintMode ?? 'fill');
     }
 
     // 2b. In-document fragment reference (`name="#custom-icon"`). Library
     //     attribute is ignored — the consumer is pointing at a sprite symbol
     //     embedded directly in the host page.
     if (this.name.startsWith('#')) {
-      return this._renderSprite();
+      return this._renderSprite(undefined, this.paintMode ?? 'fill');
     }
 
     // 3. Registry resolution — only when `library` is explicitly set to a
@@ -665,17 +688,17 @@ export class HelixIcon extends HelixElement {
       const resolved = this._resolveLibraryHref();
       if (!resolved) return nothing;
       if (resolved.kind === 'sprite') {
-        return this._renderSprite(resolved.href);
+        return this._renderSprite(resolved.href, this.paintMode ?? resolved.paintMode);
       }
       // Inline fetch mode driven by the registry — markup populated by
       // `_maybeFetchLibraryIcon` after sanitization + mutator pass.
-      return this._renderInline();
+      return this._renderInline(this.paintMode ?? resolved.library.paintMode);
     }
 
     // 4. Bare `name` (no library) → document-local sprite fragment
     //    (`<use href="#<name>">`). Pre-3.9.0 contract preserved.
     if (this.name) {
-      return this._renderSprite();
+      return this._renderSprite(undefined, this.paintMode ?? 'fill');
     }
 
     return nothing;

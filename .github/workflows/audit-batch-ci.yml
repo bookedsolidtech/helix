@@ -207,10 +207,93 @@ jobs:
             # The changeset check in the main CI handles label detection
           fi
 
+  # ── API Breaking-Change Gate (batch) ────────────────────────────────────
+  # The same 3.0-shelf enforcement as the main CI gate, mirrored here so an audit
+  # batch branch can't bypass the breaking-change/semver contract. Compares the
+  # base-vs-head manifest + barrel and fails a breaking change that lacks a
+  # `@helixui/library: major` changeset. See scripts/ci/shelf-guard.mjs and
+  # docs/audit/AUDIT-3x-register.md §1.
+  api-breaking-change:
+    name: API Breaking Change Gate (Batch)
+    needs: [detect-batch]
+    if: needs.detect-batch.outputs.is_batch == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Generate + save head barrel
+        run: |
+          pnpm --filter=@helixui/library exec node scripts/generate-barrel.js
+          mkdir -p .cache
+          cp packages/hx-library/src/index.ts .cache/head-barrel.ts
+          cp packages/hx-library/package.json .cache/head-pkg.json
+      - name: Generate head CEM
+        run: pnpm --filter=@helixui/library exec custom-elements-manifest analyze --litelement --globs "src/components/**/*.ts" --exclude "**/*.stories.ts" --exclude "**/*.styles.ts"
+      - name: Save head CEM
+        run: cp packages/hx-library/custom-elements.json .cache/head-cem.json
+      - name: Check out base branch public-API inputs
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          BASE="origin/${BASE_REF}"
+          # Fail loudly if the base ref is unavailable — otherwise the gate would
+          # silently compare head-vs-head and miss every breaking change.
+          git rev-parse --verify --quiet "$BASE" >/dev/null || {
+            echo "::error::shelf-guard: base ref $BASE is unavailable on the runner"
+            exit 1
+          }
+          # Restore the base version of each input. A path absent on base (new in
+          # this PR) is skipped; any other git failure is fatal.
+          for p in \
+            packages/hx-library/src \
+            packages/hx-library/custom-elements-manifest.config.mjs \
+            packages/hx-library/cem-plugins \
+            packages/hx-library/scripts/generate-barrel.js \
+            packages/hx-library/tsconfig.json \
+            tsconfig.base.json; do
+            if git cat-file -e "$BASE:$p" 2>/dev/null; then
+              git checkout "$BASE" -- "$p"
+            else
+              echo "Path $p not present on base — new in this PR, skipping."
+            fi
+          done
+          git show "$BASE:packages/hx-library/package.json" > .cache/base-pkg.json
+      - name: Generate + save base barrel
+        run: |
+          pnpm --filter=@helixui/library exec node scripts/generate-barrel.js
+          cp packages/hx-library/src/index.ts .cache/base-barrel.ts
+      - name: Generate base CEM
+        run: pnpm --filter=@helixui/library exec custom-elements-manifest analyze --litelement --globs "src/components/**/*.ts" --exclude "**/*.stories.ts" --exclude "**/*.styles.ts"
+      - name: Save base CEM
+        run: cp packages/hx-library/custom-elements.json .cache/base-cem.json
+      - name: Enforce 3.0 shelf (breaking API change requires a major changeset)
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: >
+          node scripts/ci/shelf-guard.mjs
+          --base-cem .cache/base-cem.json
+          --head-cem .cache/head-cem.json
+          --base-barrel .cache/base-barrel.ts
+          --head-barrel .cache/head-barrel.ts
+          --base-pkg .cache/base-pkg.json
+          --head-pkg .cache/head-pkg.json
+          --changesets .changeset
+          --base-ref "origin/${BASE_REF}"
+          ${{ contains(github.event.pull_request.labels.*.name, 'breaking-change-approved') && '--label-bypass' || '' }}
+
   # ── Summary gate ────────────────────────────────────────────────────────
   quality-gates:
     name: Quality Gates (Batch)
-    needs: [detect-batch, lint, format, type-check, build, test, changeset]
+    needs: [detect-batch, lint, format, type-check, build, test, changeset, api-breaking-change]
     if: always() && needs.detect-batch.outputs.is_batch == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 1
@@ -228,15 +311,26 @@ jobs:
           echo "  Build:      ${{ needs.build.result }}"
           echo "  Test:       ${{ needs.test.result }}"
           echo "  Changeset:  ${{ needs.changeset.result }}"
+          echo "  API Break:  ${{ needs.api-breaking-change.result }}"
 
           # Fail if any required gate failed
           if [[ "${{ needs.lint.result }}" == "failure" ]] || \
              [[ "${{ needs.format.result }}" == "failure" ]] || \
              [[ "${{ needs.type-check.result }}" == "failure" ]] || \
              [[ "${{ needs.build.result }}" == "failure" ]] || \
-             [[ "${{ needs.test.result }}" == "failure" ]]; then
+             [[ "${{ needs.test.result }}" == "failure" ]] || \
+             [[ "${{ needs.changeset.result }}" == "failure" ]]; then
             echo ""
             echo "❌ One or more quality gates failed"
+            exit 1
+          fi
+
+          # The API breaking-change gate must actively SUCCEED — a cancelled or
+          # skipped result must not be treated as a pass, otherwise a breaking
+          # change could merge whenever the gate did not run to completion.
+          if [[ "${{ needs.api-breaking-change.result }}" != "success" ]]; then
+            echo ""
+            echo "❌ API breaking-change gate did not succeed: ${{ needs.api-breaking-change.result }}"
             exit 1
           fi
 

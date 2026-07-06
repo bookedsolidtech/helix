@@ -61,6 +61,19 @@ export const helixIconStyles = css`
     overflow: visible;
   }
 
+  /* ─── Stroke-paint libraries (Feather, Lucide, Heroicons-outline) ───
+     Outline glyphs whose visible ink is the stroke. <hx-icon> reflects the
+     resolved library's paintMode onto [data-paint-mode]; we supply fill:none +
+     stroke:currentColor here, and stroke-width comes from the
+     --hx-icon-stroke-width token on the base rule above. Line cap/join is NOT
+     set here — it is a library-specific design choice carried by each glyph's
+     own geometry, so the component never imposes round on a stroke library
+     whose source uses square caps or miter joins. */
+  svg[part='svg'][data-paint-mode='stroke'] {
+    fill: none;
+    stroke: currentColor;
+  }
+
   /* ─── Inline SVG wrapper ───
      In inline mode [part="svg"] is a <span> that wraps the fetched SVG.
      The inner <svg> is sized to fill the wrapper. */
@@ -79,6 +92,11 @@ export const helixIconStyles = css`
     fill: currentColor;
     stroke-width: var(--hx-icon-stroke-width, 2);
     display: block;
+  }
+
+  .icon__inline[data-paint-mode='stroke'] svg {
+    fill: none;
+    stroke: currentColor;
   }
 
   /* ─── Forced Colors (Windows High Contrast) ─── */

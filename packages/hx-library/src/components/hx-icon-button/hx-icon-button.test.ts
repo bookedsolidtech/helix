@@ -260,6 +260,23 @@ describe('hx-icon-button', () => {
       expect(anchor).toBeTruthy();
       expect(anchor?.getAttribute('aria-disabled')).toBe('true');
     });
+
+    it('reflects a property-set href to the host attribute', async () => {
+      const el = await fixture<HelixIconButton>('<hx-icon-button label="Visit site"></hx-icon-button>');
+      el.href = 'https://example.com/set-via-property';
+      await el.updateComplete;
+      expect(el.getAttribute('href')).toBe('https://example.com/set-via-property');
+    });
+
+    it('clears the host href attribute when the property is cleared', async () => {
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Visit site" href="https://example.com"></hx-icon-button>',
+      );
+      expect(el.getAttribute('href')).toBe('https://example.com');
+      el.href = undefined;
+      await el.updateComplete;
+      expect(el.hasAttribute('href')).toBe(false);
+    });
   });
 
   // ─── Events (4) ───

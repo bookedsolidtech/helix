@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-05-30T12:32:05.468Z",
+  "generatedAt": "2026-07-06T17:19:29.987Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -3848,14 +3848,14 @@
         {
           "name": "hx-slide-change",
           "type": {
-            "text": "CustomEvent<{index: number, slide: HelixCarouselItem}>"
+            "text": "CustomEvent<{index: number, slide?: HelixCarouselItem}>"
           },
-          "description": "Dispatched when the active slide changes."
+          "description": "Dispatched when the active slide changes. `detail.index` is the active slide index and `detail.slide` the active `hx-carousel-item`. When the carousel becomes empty (all slides removed at runtime), `detail.index` is `-1` and `detail.slide` is `undefined`."
         }
       ],
       "cssProperties": [
         {
-          "description": "Gap between slides.",
+          "description": "Gap between slides on the track. Defaults to 0 (flush slides).",
           "name": "--hx-carousel-gap",
           "default": "0px",
           "figmaBinding": {
@@ -3867,16 +3867,9 @@
           }
         },
         {
-          "description": "Width override for each slide.",
+          "description": "Width override for each slide. Defaults to the gap-aware per-page width computed from slides-per-page.",
           "name": "--hx-carousel-slide-width",
-          "default": "100%",
-          "figmaBinding": {
-            "target": null,
-            "layerSelector": "root",
-            "semanticToken": null,
-            "fallbackPrimitive": null,
-            "literalFallback": "100%"
-          }
+          "figmaBinding": null
         },
         {
           "description": "Size of previous/next navigation buttons.",
@@ -11376,7 +11369,7 @@
       "figmaEligible": true,
       "figmaComponentName": "hx-form",
       "figmaPagePlacement": "4a",
-      "description": "A Light DOM form wrapper that styles native HTML form elements and hx-* components with the design system's form styles.",
+      "description": "A pure Light DOM form wrapper that styles native HTML form elements and hx-* components with the design system's form styles. It NEVER renders its own `<form>` — the consumer/host always provides…",
       "tier": "organism",
       "variantAxes": [
         {
@@ -11412,6 +11405,17 @@
             "text/plain"
           ],
           "default": "application/x-www-form-urlencoded"
+        },
+        {
+          "figmaAxisName": "noIntercept",
+          "cemAttribute": "no-intercept",
+          "cemFieldName": "noIntercept",
+          "type": "boolean",
+          "values": [
+            "false",
+            "true"
+          ],
+          "default": "false"
         }
       ],
       "textProperties": [
@@ -11443,7 +11447,7 @@
           "type": {
             "text": "CustomEvent<{valid: boolean, values: Record<string, FormDataEntryValue | FormDataEntryValue[]>, formData: FormData}>"
           },
-          "description": "Dispatched on valid client-side submit when no action is set.",
+          "description": "Dispatched on valid client-side submit of an action-less form when `no-intercept` is not set.",
           "name": "hx-submit"
         },
         {
@@ -12130,6 +12134,18 @@
             "xl"
           ],
           "default": "md"
+        },
+        {
+          "figmaAxisName": "paintMode",
+          "cemAttribute": "paint-mode",
+          "cemFieldName": "paintMode",
+          "type": "enum",
+          "values": [
+            "fill",
+            "stroke",
+            "mixed"
+          ],
+          "default": "undefined"
         }
       ],
       "textProperties": [
@@ -12728,6 +12744,13 @@
         }
       ],
       "slots": [
+        {
+          "figmaPropertyName": "content",
+          "cemSlot": null,
+          "type": "instance-swap",
+          "default": "Label",
+          "description": "Default slot for consumer-supplied media (WRAPPED mode). Assigning an `<img>` or `<picture>` here switches the component to WRAPPED mode, where it frames and enhances the slotted media instead of rendering its own `<img>`."
+        },
         {
           "figmaPropertyName": "fallback",
           "cemSlot": "fallback",
@@ -24065,7 +24088,7 @@
       "figmaComponentName": "hx-tag",
       "figmaPagePlacement": "4a",
       "description": "A compact label for categorization, filtering, and selection.",
-      "tier": "atom",
+      "tier": "molecule",
       "variantAxes": [
         {
           "figmaAxisName": "variant",
@@ -24127,7 +24150,14 @@
           "default": "false"
         }
       ],
-      "textProperties": [],
+      "textProperties": [
+        {
+          "figmaPropertyName": "labelRemove",
+          "cemAttribute": "label-remove",
+          "type": "text",
+          "defaultValue": ""
+        }
+      ],
       "slots": [
         {
           "figmaPropertyName": "content",
@@ -24463,7 +24493,9 @@
           "figmaBinding": null
         }
       ],
-      "dependsOn": [],
+      "dependsOn": [
+        "hx-icon"
+      ],
       "excludedAttributes": [],
       "aaa": {
         "certified": false,
@@ -25024,6 +25056,18 @@
           "cemAttribute": "required-message",
           "type": "text",
           "defaultValue": "This field is required."
+        },
+        {
+          "figmaPropertyName": "minlengthMessage",
+          "cemAttribute": "minlength-message",
+          "type": "text",
+          "defaultValue": ""
+        },
+        {
+          "figmaPropertyName": "maxlengthMessage",
+          "cemAttribute": "maxlength-message",
+          "type": "text",
+          "defaultValue": ""
         }
       ],
       "slots": [
@@ -25176,6 +25220,18 @@
             "semanticToken": "focus/ring/color",
             "fallbackPrimitive": null,
             "literalFallback": null
+          }
+        },
+        {
+          "description": "Gap between the input border and the focus ring.",
+          "name": "--hx-text-input-focus-ring-offset",
+          "default": "0px",
+          "figmaBinding": {
+            "target": null,
+            "layerSelector": "root",
+            "semanticToken": null,
+            "fallbackPrimitive": null,
+            "literalFallback": "0px"
           }
         },
         {

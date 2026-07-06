@@ -18,7 +18,7 @@ import {
 } from './registry.js';
 import type { IconLibraryOptions, IconMutator, IconResolver } from './types.js';
 
-const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist';
+const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist';
 
 const TEST_LIBRARIES = ['lib-a', 'lib-b', 'helix-test', 'fa-free-test', 'overwrite-target'];
 

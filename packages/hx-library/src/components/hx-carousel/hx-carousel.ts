@@ -1,4 +1,4 @@
-import { html, nothing } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import '../../utilities/document-token-adoption.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -65,7 +65,7 @@ const _svgPause = html`<hx-icon
  * @slot next-button - Custom next navigation button.
  * @slot previous-button - Custom previous navigation button.
  *
- * @fires {CustomEvent<{index: number, slide: HelixCarouselItem}>} hx-slide-change - Dispatched when the active slide changes.
+ * @fires {CustomEvent<{index: number, slide?: HelixCarouselItem}>} hx-slide-change - Dispatched when the active slide changes. `detail.index` is the active slide index and `detail.slide` the active `hx-carousel-item`. When the carousel becomes empty (all slides removed at runtime), `detail.index` is `-1` and `detail.slide` is `undefined`.
  *
  * @csspart base - The outer wrapper element.
  * @csspart slide-viewport - The slide viewport/overflow container.
@@ -76,8 +76,8 @@ const _svgPause = html`<hx-icon
  * @csspart next-button - The next navigation button.
  * @csspart play-pause-btn - The autoplay play/pause toggle button.
  *
- * @cssprop [--hx-carousel-gap=0px] - Gap between slides.
- * @cssprop [--hx-carousel-slide-width=100%] - Width override for each slide.
+ * @cssprop [--hx-carousel-gap=0px] - Gap between slides on the track. Defaults to 0 (flush slides).
+ * @cssprop [--hx-carousel-slide-width] - Width override for each slide. Defaults to the gap-aware per-page width computed from slides-per-page.
  * @cssprop [--hx-carousel-nav-btn-size=2.5rem] - Size of previous/next navigation buttons.
  * @cssprop [--hx-carousel-pagination-dot-size=0.5rem] - Size of pagination dots.
  * @cssprop [--hx-space-3] - Spacing token.
@@ -227,12 +227,73 @@ export class HelixCarousel extends HelixElement {
   @state() private _liveText = '';
   /** @internal */
   @state() private _livePolite = true;
+  /**
+   * Monotonic count of `hx-slide-change` dispatches. Read (not rendered) by the
+   * public navigation methods to detect whether a user action already emitted an
+   * authoritative event, so a navigation-time clamp that is the FINAL change
+   * (the following move no-ops) still emits exactly one event — and a navigation
+   * that does move never double-emits. Plain field (not reactive state): it never
+   * affects rendering.
+   * @internal
+   */
+  private _slideChangeDispatches = 0;
+  /**
+   * Whether geometry-measured px navigation is active (decoupled selection vs.
+   * scroll). True for a genuine horizontal "peek" (custom slide-width that does
+   * not exactly fill the viewport) AND for every measurable vertical carousel
+   * (whose block-axis percentage transform is unreliable). `false` keeps the
+   * legacy slidesPerPage model byte-for-byte. Set by `_recomputeBounds`.
+   * @internal
+   */
+  @state() private _measuredNav = false;
+  /**
+   * Per-slide leading-edge offset within the track in px (measured from real
+   * rects, so variable-size slides are handled correctly). `_measuredOffsets[i]`
+   * is the track translate that brings slide `i` to the viewport's leading edge.
+   * Used only in measured-nav mode.
+   * @internal
+   */
+  @state() private _measuredOffsets: number[] = [];
+  /**
+   * Measured maximum scroll distance in px (total content extent − viewport),
+   * used only in measured-nav mode to saturate the track at the trailing edge.
+   * @internal
+   */
+  @state() private _measuredMaxScroll = 0;
+  /**
+   * True (within the measured path) when the track fits entirely in the viewport
+   * and cannot scroll. The carousel is then a single static page: `_maxIndex` is
+   * 0, prev/next are both disabled, the translate is 0, and navigation is a no-op
+   * — so it never advertises slides the track cannot reveal.
+   * @internal
+   */
+  @state() private _singlePage = false;
 
   /**
    * Reference to the active autoplay interval timer, or null when stopped.
    * @internal
    */
   private _autoplayTimer: ReturnType<typeof setInterval> | null = null;
+  /**
+   * Observes viewport and slide-size changes so the measured navigation bound
+   * stays correct for custom slide widths and the gap. Null until connected.
+   * @internal
+   */
+  private _resizeObserver: ResizeObserver | null = null;
+  /**
+   * Becomes true after the first render/sync completes. Gates the
+   * `hx-slide-change` emitted when a recompute clamps the active index, so the
+   * event never fires during initial setup.
+   * @internal
+   */
+  private _initialized = false;
+  /**
+   * Becomes true once the first `updated()` callback has run. `firstUpdated`
+   * already recomputes bounds on mount, so the first `updated()` skips its
+   * recompute to avoid a redundant mount-time reflow.
+   * @internal
+   */
+  private _firstUpdateComplete = false;
   /**
    * Whether the user has requested reduced motion via the OS media preference.
    * @internal
@@ -293,6 +354,12 @@ export class HelixCarousel extends HelixElement {
       this._mql.addEventListener('change', this._handleMotionChange);
     }
 
+    // Keep the measured navigation bound fresh as the viewport or slides resize.
+    // Guard for SSR / older runtimes where ResizeObserver is unavailable.
+    if (typeof ResizeObserver !== 'undefined') {
+      this._resizeObserver = new ResizeObserver(() => this._recomputeBounds());
+    }
+
     this.addEventListener('mouseenter', this._handleMouseEnter);
     this.addEventListener('mouseleave', this._handleMouseLeave);
     this.addEventListener('focusin', this._handleFocusIn);
@@ -304,6 +371,8 @@ export class HelixCarousel extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._mql?.removeEventListener('change', this._handleMotionChange);
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = null;
     this._stopAutoplay();
     this.removeEventListener('mouseenter', this._handleMouseEnter);
     this.removeEventListener('mouseleave', this._handleMouseLeave);
@@ -316,6 +385,31 @@ export class HelixCarousel extends HelixElement {
     this._syncSlides();
     if (this.autoplay && !this._reducedMotion) {
       this._startAutoplay();
+    }
+    // Initial setup is complete; clamps from here on are real, post-init
+    // corrections that should emit hx-slide-change.
+    this._initialized = true;
+  }
+
+  override updated(changed: PropertyValues): void {
+    // firstUpdated already ran the initial recompute in this same cycle, so the
+    // first updated() skips its recompute to avoid a redundant mount reflow.
+    if (!this._firstUpdateComplete) {
+      this._firstUpdateComplete = true;
+      return;
+    }
+    // slidesPerPage is baked into each item's --_carousel-computed-slide-width
+    // (via _computedSlideWidthExpr) AND into the live transform step, so a runtime
+    // change must re-sync the per-item width — _syncSlides re-applies it for the
+    // new n and then re-derives bounds (running the index-clamp invariant), keeping
+    // the slide width and the transform's step on the same slidesPerPage.
+    // orientation only flips the navigation model (not the per-item width), so a
+    // bounds recompute is enough. If both change, _syncSlides covers it (its
+    // recompute reads the new orientation).
+    if (changed.has('slidesPerPage')) {
+      this._syncSlides();
+    } else if (changed.has('orientation')) {
+      this._recomputeBounds();
     }
   }
 
@@ -330,20 +424,249 @@ export class HelixCarousel extends HelixElement {
       .assignedElements({ flatten: true })
       .filter((el) => el.tagName.toLowerCase() === 'hx-carousel-item') as HelixCarouselItem[];
 
+    const wasEmpty = this._slides.length === 0;
     this._slides = items;
 
-    // Update aria labels on each item
+    // Gap-aware computed per-page width, written to a private var so the public
+    // --hx-carousel-slide-width hook can override it without losing the
+    // slides-per-page default (see hx-carousel-item.styles.ts). The expression
+    // references --hx-carousel-gap live, so slidesPerPage slides + (slidesPerPage
+    // - 1) gaps always sum to 100% with no clipping.
+    const computedSlideWidth = this._computedSlideWidthExpr();
     items.forEach((item, i) => {
       item.slideIndex = i;
       item.totalSlides = items.length;
-      const slideWidth = `${100 / this.slidesPerPage}%`;
-      (item as HTMLElement).style.setProperty('--_hx-carousel-slide-width', slideWidth);
+      (item as HTMLElement).style.setProperty(
+        '--_carousel-computed-slide-width',
+        computedSlideWidth,
+      );
     });
 
-    // Clamp currentIndex if slides changed
-    if (this._currentIndex >= items.length) {
-      this._currentIndex = Math.max(0, items.length - 1);
+    // NOTE: the active index is NOT clamped here. A slot shrink / slidesPerPage
+    // re-sync that drops the active slide out of range is clamped by the single
+    // event-aware path in `_recomputeBounds()` below (gated by `_initialized`),
+    // which both clamps to `_maxIndex` and emits `hx-slide-change` + updates the
+    // live region on a real change. Clamping here would silently move the index
+    // before that path runs.
+
+    // The gap sentinel's width = (slides - 1) * --hx-carousel-gap, so observing
+    // it lets a pure gap change (which resizes no laid-out box) fire the
+    // ResizeObserver and reactively re-derive the bounds. Count is exposed as a
+    // private custom property the sentinel's CSS multiplies by the gap.
+    this.style.setProperty('--_carousel-gap-count', String(Math.max(0, items.length - 1)));
+
+    // Observe the host (viewport resizes), each slide (slide-size changes, e.g. a
+    // runtime --hx-carousel-slide-width override), the track (content-sized on the
+    // block axis → vertical row-gap changes), and the gap sentinel (gap changes on
+    // either axis). Then measure synchronously so the bound is correct after
+    // updateComplete.
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver.observe(this);
+      items.forEach((item) => this._resizeObserver?.observe(item));
+      const track = this.shadowRoot?.querySelector<HTMLElement>('.track');
+      if (track) this._resizeObserver.observe(track);
+      const sentinel = this.shadowRoot?.querySelector<HTMLElement>('.gap-sentinel');
+      if (sentinel) this._resizeObserver.observe(sentinel);
     }
+    this._recomputeBounds();
+
+    // Announce an emptiness transition once, post-init (the recompute's clamp
+    // path is gated to slides > 0 so it doesn't fire here). Becoming empty clears
+    // the live region and emits the "no active slide" event; repopulating
+    // announces and notifies the restored slide 0. `_currentIndex` is already
+    // clamped (to 0 when empty) by the recompute above.
+    if (this._initialized && (items.length === 0) !== wasEmpty) {
+      this._emitSlideChange(this._currentIndex);
+    }
+  }
+
+  /**
+   * Whether a consumer has set the public `--hx-carousel-slide-width` hook on ANY
+   * slide — checked across all slides, not just the first, so per-slide overrides
+   * on later items (with slide 0 left at the default) still enable measured nav.
+   * Short-circuits on the first match; only called on recompute (not per frame).
+   * SSR-guarded via the `getComputedStyle` availability of the slide elements.
+   * @internal
+   */
+  private _hasCustomSlideWidth(): boolean {
+    return this._slides.some(
+      (slide) =>
+        getComputedStyle(slide).getPropertyValue('--hx-carousel-slide-width').trim() !== '',
+    );
+  }
+
+  /** Resets the measured-nav metrics, reverting to the legacy page model. @internal */
+  private _resetMeasuredNav(): void {
+    this._measuredNav = false;
+    this._singlePage = false;
+    this._measuredOffsets = [];
+    this._measuredMaxScroll = 0;
+  }
+
+  /**
+   * Recomputes the measured-nav metrics and (for non-navigation callers) enforces
+   * the index-clamp invariant: `_maxIndex` may have just changed (mode flip in
+   * EITHER direction, slide count, or resize), so the active index is clamped back
+   * into range and a render is triggered, keeping the transform, pagination dots,
+   * prev/next disabled states, and ARIA in sync.
+   *
+   * `clampIndex` only governs whether the clamp EMITS, not whether it clamps. The
+   * active index is ALWAYS clamped back into range here (a mode flip in either
+   * direction may have lowered `_maxIndex`), so the navigation path never enters
+   * `next()`/`previous()` with a stale measured-only index that the legacy guard
+   * would then strand. On the navigation path (`clampIndex = false`, via
+   * `_refreshMeasuredBounds` from `goTo`/`next`/`previous`/autoplay) the clamp is
+   * silent: the immediately-following `_navigateTo` emits exactly ONE authoritative
+   * `hx-slide-change` for the destination, so a responsive flip during navigation
+   * never produces a clamp event PLUS a navigation event. The non-navigation
+   * callers (firstUpdated, slotchange, ResizeObserver, `updated()`) emit on a real
+   * post-init clamp, since they have no following navigation.
+   * @internal
+   */
+  private _recomputeBounds(clampIndex = true): void {
+    this._deriveMeasuredNav();
+    const max = this._maxIndex;
+    const clamped = Math.max(0, Math.min(this._currentIndex, max));
+    if (clamped !== this._currentIndex) {
+      this._currentIndex = clamped;
+      if (clampIndex && this._initialized && this._slides.length > 0) {
+        // A post-init clamp (responsive mode flip or resize narrowing the bound)
+        // is a real active-index change — emit the single authoritative event,
+        // which also refreshes the live region. The empty case (0 slides) is
+        // announced by `_syncSlides` (emptiness transition) instead, so the index
+        // can't change to a no-slide state and emit twice.
+        this._emitSlideChange(clamped);
+      } else if (this._slides.length > 0) {
+        // Navigation path (or pre-init): the clamp is silent — the following
+        // `_navigateTo` emits the one authoritative event for the destination, so
+        // a flip during navigation never produces a clamp event PLUS a navigation
+        // event. But refresh the live region NOW so ARIA never reflects the
+        // stranded pre-clamp index even when the imminent navigation early-returns
+        // at the (now-clamped) bound without re-emitting.
+        const slide = this._slides[clamped];
+        this._liveText = slide ? this.labelSlideOf(clamped + 1, this._slides.length) : '';
+      }
+    }
+  }
+
+  /**
+   * Updates the ARIA live text and dispatches the `hx-slide-change` event for the
+   * given (already-applied) active index. Single source of the event so a clamp
+   * and a navigation emit identical detail.
+   *
+   * When there is no slide at `index` (the carousel is empty — e.g. a post-init
+   * slot shrink to 0), the live region is cleared (never "Slide N of 0") and the
+   * event reports a defined "no active slide" state: `{ index: -1, slide:
+   * undefined }` (per the `hx-slide-change` event contract documented on the class).
+   * @internal
+   */
+  private _emitSlideChange(index: number): void {
+    const slide = this._slides[index];
+    this._liveText = slide ? this.labelSlideOf(index + 1, this._slides.length) : '';
+    this._slideChangeDispatches++;
+    this.dispatchEvent(
+      new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
+        bubbles: true,
+        composed: true,
+        detail: slide ? { index, slide } : { index: -1, slide: undefined },
+      }),
+    );
+  }
+
+  /**
+   * Derives whether measured-px navigation is active and, if so, the per-slide
+   * `_measuredOffsets`/`_measuredMaxScroll`. Does NOT clamp the index (its caller
+   * `_recomputeBounds` does).
+   *
+   * - **Horizontal** uses measured nav whenever a `--hx-carousel-slide-width` is
+   *   active. The peek vs. single-page vs. legacy decision is then made from REAL
+   *   rendered geometry (the track's scroll extent), not a first-slide estimate,
+   *   so mixed-size slides are handled correctly. Default / gap-only horizontal
+   *   keeps the legacy `calc()` percentage transform, which is correct because the
+   *   track width equals the viewport.
+   * - **Vertical** always uses measured nav when measurable: a transform
+   *   percentage on the block axis is relative to the track's full height (≈ all
+   *   slides), not one slide, so the legacy percentage over-scrolls. The measured
+   *   per-slide offsets move exactly one slide per index.
+   *
+   * When the content does not overflow the viewport (`maxScroll <= EPS`), the
+   * carousel is a single static page (no scrollable index). Size/viewport reads
+   * are transform-immune (translate does not change box size), so no transition
+   * settling is needed.
+   * @internal
+   */
+  private _deriveMeasuredNav(): void {
+    // Sub-pixel tolerance for the single-page (no-overflow) check.
+    const EPS = 0.5;
+    const slides = this._slides;
+    const horizontal = this.orientation === 'horizontal';
+    // Horizontal without a slide-width hook is handled correctly by the legacy
+    // percentage transform — skip measurement entirely (keeps default cheap).
+    if (slides.length === 0 || (horizontal && !this._hasCustomSlideWidth())) {
+      this._resetMeasuredNav();
+      return;
+    }
+
+    const track = this.shadowRoot?.querySelector<HTMLElement>('.track');
+    const viewport = this.shadowRoot?.querySelector<HTMLElement>('[part="slide-viewport"]');
+    const first = slides[0];
+    if (!track || !viewport || !first) {
+      this._resetMeasuredNav();
+      return;
+    }
+
+    const rect = first.getBoundingClientRect();
+    const viewportSize = horizontal ? viewport.clientWidth : viewport.clientHeight;
+    if ((horizontal ? rect.width : rect.height) <= 0) {
+      this._resetMeasuredNav();
+      return;
+    }
+
+    // The peek vs. single-page vs. legacy decision is made from REAL geometry, not
+    // a first-slide×slidesPerPage estimate (which is wrong for mixed-size slides).
+    // The track's scroll size is the full extent of all slides + gaps; the
+    // viewport is the clipping box.
+    //   - maxScroll <= EPS  -> nothing overflows -> single static page.
+    //   - otherwise         -> measured offset model (every slide reachable,
+    //                          translate clamped to maxScroll).
+    // For UNIFORM slides the offset model reduces exactly to the legacy per-page
+    // translate (proven: offsets[i] = i * (slideSize + gap)), and an exact-fill
+    // uniform layout yields maxScroll <= EPS -> single page — so no separate
+    // first-slide exact-fill reset is needed. The default (no custom slide-width)
+    // horizontal path never reaches here; it stays on the legacy model.
+    const content = horizontal ? track.scrollWidth : track.scrollHeight;
+    const maxScroll = Math.max(0, content - viewportSize);
+
+    // Each slide's leading-edge offset within the track, from real rects. Both
+    // rects sit under the same track transform, so the delta is transform-immune.
+    // For uniform slides this reduces exactly to `i * (slideSize + gap)`.
+    const offsets = slides.map((slide) => {
+      const r = slide.getBoundingClientRect();
+      return horizontal ? r.left - rect.left : r.top - rect.top;
+    });
+
+    this._measuredNav = true;
+    this._measuredOffsets = offsets;
+
+    // Single static page: the whole track fits in the viewport (no overflow), so
+    // there is nothing to scroll. Without this, _maxIndex would be slides - 1 and
+    // navigation would advance the active index to slides the track can't reveal.
+    // Note this is NOT the legacy `n - slidesPerPage` fallback — that can still be
+    // > 0 for narrow custom widths that all fit; the bound must be 0 here.
+    if (maxScroll <= EPS) {
+      this._singlePage = true;
+      this._measuredMaxScroll = 0;
+      return;
+    }
+
+    // maxScroll is how far the track can translate before the trailing content
+    // edge reaches the viewport's trailing edge — selecting a near-end slide
+    // saturates here. Every slide is individually selectable (`_maxIndex` is
+    // n - 1); the translate clamps to maxScroll, so adjacent end slides may share
+    // the same saturated frame while remaining distinct accessible selections.
+    this._singlePage = false;
+    this._measuredMaxScroll = maxScroll;
   }
 
   /** @internal */
@@ -354,51 +677,262 @@ export class HelixCarousel extends HelixElement {
   // ─── Navigation ───
 
   /**
-   * Maximum valid slide index accounting for the number of slides visible per page.
+   * The effective slides-per-page used by ALL internal layout / bounds /
+   * navigation math — the public `slidesPerPage` normalized to an integer `>= 1`.
+   *
+   * A consumer can set `slides-per-page="0"` or a negative / fractional value; the
+   * public `@property` keeps that raw value (consumers read it back), but every
+   * MATH site reads this getter instead so a non-positive or fractional page count
+   * can never divide by zero in `_computedSlideWidthExpr` nor push `_maxIndex`
+   * past the last real slide (which would report an empty state while slides
+   * exist). Non-finite / `<= 0` degrades to a 1-up carousel; a positive fraction
+   * floors to whole slides per page but never below 1 — `Math.floor(0.5)` is `0`,
+   * which would re-introduce the divide-by-zero, so the result is clamped up to 1.
+   * @internal
+   */
+  private get _effectiveSlidesPerPage(): number {
+    return Number.isFinite(this.slidesPerPage) && this.slidesPerPage > 0
+      ? Math.max(1, Math.floor(this.slidesPerPage))
+      : 1;
+  }
+
+  /**
+   * Maximum SELECTABLE slide index (the selection bound, not the translate bound).
+   *
+   * Single static page (measured path, no overflow) → `0`. Whenever every slide is
+   * individually reachable — measured-nav mode AND legacy LOOP mode — the bound is
+   * `slides.length - 1`. In those cases the track translate saturates short of the
+   * raw index (at `_measuredMaxScroll` in measured mode, at the page bound in
+   * legacy loop — see `_trackTransform`), so adjacent end slides may share the same
+   * frame while each remains a distinct accessible selection. Only the legacy
+   * NON-loop model uses the slidesPerPage PAGE bound (`slides.length -
+   * slidesPerPage`); there selection and translate coincide page-by-page.
+   *
+   * Legacy loop returning `n - 1` (rather than the page bound) is the root fix for
+   * the resize/recompute snap-back: `_recomputeBounds` clamps `_currentIndex` to
+   * this bound, so a last-slide loop selection now stays STABLE across resizes
+   * instead of being snapped back to the page bound (with a spurious event).
    * @internal
    */
   private get _maxIndex(): number {
-    return Math.max(0, this._slides.length - this.slidesPerPage);
+    if (this._singlePage) {
+      return 0;
+    }
+    if (this._measuredNav) {
+      return Math.max(0, this._slides.length - 1);
+    }
+    if (this.loop) {
+      // Legacy loop: every slide is individually selectable (translate saturates
+      // at the page bound in `_trackTransform`) — but ONLY when the track actually
+      // overflows (`slides.length > slidesPerPage`). When the carousel fits (no
+      // overflow) on the unmeasured default path `_singlePage` never flips, so
+      // returning `n - 1` here would let next/End/dots advance `_currentIndex` and
+      // emit `hx-slide-change` while the translate stays clamped at the page bound
+      // 0 — phantom navigation of slides that never move. Collapse to 0 in that
+      // case, exactly as the old `n - slidesPerPage` bound did.
+      return this._slides.length > this._effectiveSlidesPerPage
+        ? Math.max(0, this._slides.length - 1)
+        : 0;
+    }
+    return Math.max(0, this._slides.length - this._effectiveSlidesPerPage);
+  }
+
+  /**
+   * The legacy slidesPerPage PAGE bound (`slides.length - slidesPerPage`) — the
+   * furthest the track can translate and still show a FULL page. Distinct from
+   * `_maxIndex` (the SELECTION bound), which in legacy loop is `n - 1`. The
+   * `_trackTransform` legacy branch clamps the translate index to this so a
+   * near-end loop selection saturates at the last full page instead of
+   * over-scrolling into empty trailing space.
+   * @internal
+   */
+  private get _legacyPageBound(): number {
+    return Math.max(0, this._slides.length - this._effectiveSlidesPerPage);
+  }
+
+  /**
+   * Lazily re-derives the measured-nav metrics at the moment they matter
+   * (navigation).
+   *
+   * The measured step/maxScroll and the horizontal exact-fill verdict depend on
+   * `--hx-carousel-gap` / the slide width, which can change at runtime without
+   * resizing any observed box (theme toggle, media query, host class) — so the
+   * `ResizeObserver` never fires. Re-deriving here flips `_measuredNav` in BOTH
+   * directions (legacy ↔ measured) and refreshes the px metrics.
+   *
+   * Gated to stay cheap for pure-default horizontal carousels: vertical always
+   * re-derives (its main axis is height, which the gap affects), horizontal only
+   * when a `--hx-carousel-slide-width` is present OR the carousel is currently in
+   * measured mode. The latter lets it turn OFF: if the custom width is removed and
+   * the default width yields equivalent geometry (no box resize → no
+   * ResizeObserver fire), `_recomputeBounds` re-evaluates `_hasCustomSlideWidth()`
+   * (now false) and resets `_measuredNav`. A pure-default horizontal carousel
+   * (never measured, no custom width) still pays a single property read and no
+   * measurement. Called once per navigation path (never doubled).
+   * @internal
+   */
+  private _refreshMeasuredBounds(): void {
+    if (this.orientation !== 'horizontal' || this._hasCustomSlideWidth() || this._measuredNav) {
+      // Derive only — the following _navigateTo applies + emits the single event.
+      this._recomputeBounds(false);
+    }
   }
 
   goTo(index: number): void {
     if (this._slides.length === 0) return;
+    this._withTerminalClampEmit(() => {
+      this._refreshMeasuredBounds();
+      this._navigateTo(index);
+    });
+  }
 
-    const next = this.loop
-      ? ((index % this._slides.length) + this._slides.length) % this._slides.length
-      : Math.max(0, Math.min(index, this._maxIndex));
+  /**
+   * Applies a slide selection: updates the live region and dispatches
+   * `hx-slide-change`. Assumes bounds are already fresh — callers run
+   * `_refreshMeasuredBounds()` first, so this is not re-measured here.
+   *
+   * `wrap` distinguishes RELATIVE navigation (`next`/`previous`/autoplay advance),
+   * which wraps over the full slide range `[0, slides.length - 1]` in loop mode,
+   * from ABSOLUTE navigation (`goTo`/`Home`/`End`/pagination dots), which always
+   * CLAMPS to `[0, _maxIndex]` — even in loop mode, so e.g. `End` lands on the last
+   * index instead of wrapping back to 0.
+   * @internal
+   */
+  private _navigateTo(index: number, wrap = false): void {
+    if (this._slides.length === 0) return;
+
+    let next: number;
+    if (this._maxIndex === 0) {
+      // Nothing to scroll — collapse every target to 0. Covers a single static
+      // page AND a non-overflowing loop carousel (`slides <= slidesPerPage` on the
+      // unmeasured path, where `_singlePage` never flips). Without this, the loop
+      // relative-wrap branch below would advance over `slides.length` and emit a
+      // phantom `hx-slide-change` for an index the track can't reveal.
+      next = 0;
+    } else if (this.loop && wrap) {
+      // Relative loop wrap over the full slide range: every slide is individually
+      // reachable in both models (`_maxIndex` is `n - 1` in measured AND legacy
+      // loop), so `next` from the last slide → 0 and `previous` from 0 → the last
+      // slide.
+      const wrapCount = this._slides.length;
+      next = ((index % wrapCount) + wrapCount) % wrapCount;
+    } else if (this.loop && !this._measuredNav) {
+      // Legacy loop ABSOLUTE nav (goTo/Home/End/dots) — match origin/main
+      // byte-for-byte: wrap via modulo over the FULL slide range. `_maxIndex` is
+      // now `n - 1` in legacy loop, so an in-range target already resolves to
+      // itself ([0, n-1] all reachable); the modulo additionally preserves
+      // origin/main's OUT-of-range wrap (e.g. `goTo(7)` on 6 slides → 1, not a
+      // clamp to 5). The track translate saturates at the page bound (see
+      // `_trackTransform`) while each near-end index stays a distinct selection.
+      // Measured mode and non-loop keep the absolute clamp below.
+      const wrapCount = this._slides.length;
+      next = ((index % wrapCount) + wrapCount) % wrapCount;
+    } else {
+      // Absolute clamp (goTo/Home/End/dots in measured mode, and non-loop moves).
+      next = Math.max(0, Math.min(index, this._maxIndex));
+    }
 
     if (next === this._currentIndex) return;
 
     this._currentIndex = next;
-    this._liveText = this.labelSlideOf(next + 1, this._slides.length);
-    const slide = this._slides[next];
-    if (!slide) return;
-    this.dispatchEvent(
-      new CustomEvent<{ index: number; slide: HelixCarouselItem | undefined }>('hx-slide-change', {
-        bubbles: true,
-        composed: true,
-        detail: { index: next, slide },
-      }),
-    );
+    this._emitSlideChange(next);
+  }
+
+  /**
+   * Resolves a loop RELATIVE step (measured OR legacy) so every reachable index —
+   * including the last slide (`_maxIndex`) — is hit even when `slidesPerMove`
+   * shares a factor with the slide count. A step that would jump PAST the last
+   * slide first lands on `_maxIndex` (a partial final step), and only the
+   * SUBSEQUENT step (taken from `_maxIndex`) wraps to 0; symmetrically, `previous`
+   * lands on 0 before wrapping to `_maxIndex`. So 6 slides + `slides-per-move=2` +
+   * loop advance as `0→2→4→5→0…` instead of skipping the last slide via a raw
+   * `0→2→4→0` modulo. Both loop models share `_maxIndex = n - 1`, so this logic is
+   * identical for each.
+   * @internal
+   */
+  private _relativeLoopTarget(rawIndex: number, forward: boolean): number {
+    const max = this._maxIndex;
+    if (forward) {
+      // Past the end: land on the last slide first, then wrap to 0 next time.
+      return rawIndex > max ? (this._currentIndex < max ? max : 0) : rawIndex;
+    }
+    // Before the start: land on the first slide first, then wrap to the last next.
+    return rawIndex < 0 ? (this._currentIndex > 0 ? 0 : max) : rawIndex;
+  }
+
+  /**
+   * Performs a relative navigation step (`next`/`previous`/autoplay advance). In
+   * ANY loop mode that can scroll (measured OR legacy, `_maxIndex > 0`) it routes
+   * through `_relativeLoopTarget` so `slidesPerMove > 1` lands on the last slide
+   * via a partial final step before wrapping, instead of skipping it with a raw
+   * modulo. `_relativeLoopTarget` keys only off `_maxIndex`/`_currentIndex`, which
+   * are `n - 1` in both loop models, so the two paths are byte-identical. The
+   * `_maxIndex > 0` guard excludes the non-overflowing loop case (collapsed to 0,
+   * where any step must stay at 0); non-loop falls back to the generic relative
+   * `_navigateTo`, unchanged.
+   * @internal
+   */
+  private _navigateRelative(rawIndex: number, forward: boolean): void {
+    if (this.loop && !this._singlePage && this._maxIndex > 0) {
+      this._navigateTo(this._relativeLoopTarget(rawIndex, forward));
+    } else {
+      this._navigateTo(rawIndex, true);
+    }
+  }
+
+  /**
+   * Wraps a user navigation action so a navigation-time clamp that ends up being
+   * the FINAL change still emits exactly one `hx-slide-change`. The silent nav-path
+   * clamp in `_recomputeBounds(false)` suppresses its own event (expecting the
+   * following move to emit the authoritative one); when that move then no-ops
+   * (a flip-clamp lands on the bound the legacy guard blocks, or `goTo` targets the
+   * already-clamped index), no event would fire for the net index change. This
+   * captures the pre-action index + dispatch count, runs `action`, and emits once
+   * for the final index only if it changed AND nothing was dispatched during the
+   * action — never double-emitting when the action did move (it emitted its own).
+   * @internal
+   */
+  private _withTerminalClampEmit(action: () => void): void {
+    const before = this._currentIndex;
+    const dispatchesBefore = this._slideChangeDispatches;
+    action();
+    if (this._currentIndex !== before && this._slideChangeDispatches === dispatchesBefore) {
+      this._emitSlideChange(this._currentIndex);
+    }
   }
 
   next(): void {
-    const nextIndex = this._currentIndex + this.slidesPerMove;
-    if (!this.loop && nextIndex > this._maxIndex) {
-      return;
-    }
-    this._livePolite = true;
-    this.goTo(nextIndex);
+    this._withTerminalClampEmit(() => {
+      // Refresh BEFORE the guard so the legacy-block decision uses the current
+      // _measuredNav verdict (a runtime gap change may have flipped an exact-fill
+      // carousel into a genuine peek, or this may be a measured vertical carousel).
+      // The refresh also clamps `_currentIndex` into the (possibly newly-smaller)
+      // range, so a measured→legacy flip with no box resize can't strand a
+      // measured-only index past the legacy bound and make this guard a no-op (if
+      // it does, the wrapper still emits one event for the clamped final index).
+      this._refreshMeasuredBounds();
+      const nextIndex = this._currentIndex + this.slidesPerMove;
+      // Legacy/default mode blocks a move that would pass the page bound. In
+      // measured-nav mode the relative step clamps/wraps to the last slide instead,
+      // so the final, possibly partial, slidesPerMove step can always land on n - 1.
+      if (!this._measuredNav && !this.loop && nextIndex > this._maxIndex) {
+        return;
+      }
+      this._livePolite = true;
+      this._navigateRelative(nextIndex, true);
+    });
   }
 
   previous(): void {
-    const prevIndex = this._currentIndex - this.slidesPerMove;
-    if (!this.loop && prevIndex < 0) {
-      return;
-    }
-    this._livePolite = true;
-    this.goTo(prevIndex);
+    this._withTerminalClampEmit(() => {
+      this._refreshMeasuredBounds();
+      const prevIndex = this._currentIndex - this.slidesPerMove;
+      if (!this._measuredNav && !this.loop && prevIndex < 0) {
+        return;
+      }
+      this._livePolite = true;
+      this._navigateRelative(prevIndex, false);
+    });
   }
 
   // ─── Autoplay ───
@@ -409,12 +943,18 @@ export class HelixCarousel extends HelixElement {
    */
   private _autoplayTick = (): void => {
     this._livePolite = false;
-    if (this.loop) {
-      this.goTo(this._currentIndex + this.slidesPerMove);
-    } else if (this._currentIndex < this._maxIndex) {
-      this.goTo(this._currentIndex + this.slidesPerMove);
+    // Refresh bounds BEFORE deciding whether to wrap — a runtime gap/width change
+    // may have raised _maxIndex (legacy -> peek), making more slides reachable, so
+    // a non-looping carousel at the old bound advances instead of wrapping to 0.
+    // _navigateTo (not goTo) avoids a second redundant recompute this tick.
+    this._refreshMeasuredBounds();
+    if (this.loop || this._currentIndex < this._maxIndex) {
+      // Relative advance -> loop-wraps over the slide range (clamps when not
+      // looping). In measured loop mode this reaches the last slide before wrapping
+      // even when slidesPerMove > 1.
+      this._navigateRelative(this._currentIndex + this.slidesPerMove, true);
     } else {
-      this.goTo(0);
+      this._navigateTo(0);
     }
   };
 
@@ -636,30 +1176,97 @@ export class HelixCarousel extends HelixElement {
   // ─── Computed ───
 
   /**
-   * CSS transform value applied to the slide track to scroll to the current index.
+   * CSS expression for the gap-aware per-page slide size.
+   *
+   * `slidesPerPage` slides plus `slidesPerPage - 1` gaps fill 100% exactly, so
+   * adding a gap never clips the trailing slide. At gap `0px` this resolves to
+   * `100% / slidesPerPage`, byte-identical to the legacy flush layout.
    * @internal
    */
-  private get _trackTransform(): string {
-    const slideSize = 100 / this.slidesPerPage;
-    const offset = this._currentIndex * slideSize;
-    return this.orientation === 'horizontal'
-      ? `translateX(-${offset}%)`
-      : `translateY(-${offset}%)`;
+  private _computedSlideWidthExpr(): string {
+    const n = this._effectiveSlidesPerPage;
+    return `calc((100% - ${n - 1} * var(--hx-carousel-gap, 0px)) / ${n})`;
   }
 
   /**
-   * Whether the previous navigation button should be enabled.
+   * CSS transform value applied to the slide track to scroll to the current index.
+   *
+   * Measured-nav model (genuine horizontal peek, or any measurable vertical
+   * carousel): the translate is the active slide's measured leading-edge offset
+   * (`_measuredOffsets[currentIndex]`, correct for variable-size slides) clamped
+   * to `_measuredMaxScroll` (px) on the active axis. A near-end slide saturates
+   * the track at the trailing edge — slides crowd into view with no blank space —
+   * while the active index is still that slide.
+   *
+   * Legacy model (horizontal default / gap-only / exact-fill): a live `calc()` of
+   * `currentIndex * (effective slide width + gap)`. The width and gap resolve as
+   * custom properties against the same track box that sizes the slides, so each
+   * step lands the active slide flush with the viewport's leading edge without
+   * measuring; at gap `0px` with no override this is `currentIndex * (100% /
+   * slidesPerPage)` — identical to the legacy value. The vertical `calc()` branch
+   * is an unmeasurable (e.g. SSR) fallback only; a percentage on the block axis is
+   * relative to the track's full height, so a measured vertical carousel uses the
+   * px branch above instead.
+   * @internal
+   */
+  private get _trackTransform(): string {
+    if (this._measuredNav) {
+      const raw = this._measuredOffsets[this._currentIndex] ?? 0;
+      const offset = Math.min(raw, this._measuredMaxScroll);
+      return this.orientation === 'horizontal'
+        ? `translateX(-${offset}px)`
+        : `translateY(-${offset}px)`;
+    }
+
+    // Clamp the TRANSLATE index to the legacy PAGE bound (`_legacyPageBound`, the
+    // furthest a full page can translate) while leaving `_currentIndex` unclamped
+    // for selection / ARIA / pagination dots. In legacy LOOP mode an absolute
+    // target (End/goTo/dots) can SELECT a near-end slide beyond the page bound
+    // (`_maxIndex` is `n - 1` there); translating to that raw index would
+    // over-scroll the track past the last full page, exposing empty trailing
+    // space. Saturating the translate at the page bound shows the last full page
+    // (selection-vs-translate decoupling, mirroring the measured branch above).
+    // In legacy NON-loop mode `_currentIndex` is already ≤ the page bound (the
+    // absolute clamp in `_navigateTo` + the recompute invariant, where `_maxIndex`
+    // IS the page bound), so this `Math.min` is a no-op and behavior is identical.
+    const i = Math.min(this._currentIndex, this._legacyPageBound);
+    const gap = 'var(--hx-carousel-gap, 0px)';
+    if (this.orientation === 'horizontal') {
+      // The consumer's --hx-carousel-slide-width override wins over the
+      // gap-aware computed width, mirroring the slide's resolved width.
+      const slide = `var(--hx-carousel-slide-width, ${this._computedSlideWidthExpr()})`;
+      return `translateX(calc(-1 * ${i} * (${slide} + ${gap})))`;
+    }
+    // Vertical fallback (unmeasurable only): the block-axis percentage is
+    // unreliable, but it is the best we can do without layout measurement.
+    return `translateY(calc(-1 * ${i} * (${this._computedSlideWidthExpr()} + ${gap})))`;
+  }
+
+  /**
+   * Whether the previous navigation button should be enabled. A single static
+   * page (no overflow) disables both directions regardless of `loop`. A loop
+   * carousel that cannot scroll (`_maxIndex === 0`, e.g. `slides <= slidesPerPage`
+   * on the unmeasured path) also disables both directions, so `loop` never enables
+   * a button that would no-op.
    * @internal
    */
   private get _canGoPrev(): boolean {
+    if (this._singlePage || this._maxIndex === 0) {
+      return false;
+    }
     return this.loop || this._currentIndex > 0;
   }
 
   /**
-   * Whether the next navigation button should be enabled.
+   * Whether the next navigation button should be enabled. A single static page
+   * (no overflow) — or a non-scrollable loop carousel (`_maxIndex === 0`) —
+   * disables both directions regardless of `loop`.
    * @internal
    */
   private get _canGoNext(): boolean {
+    if (this._singlePage || this._maxIndex === 0) {
+      return false;
+    }
     return this.loop || this._currentIndex < this._maxIndex;
   }
 
@@ -712,9 +1319,17 @@ export class HelixCarousel extends HelixElement {
 
   /** @internal */
   private _renderPagination() {
+    // A non-scrollable carousel (`_maxIndex === 0`) has nothing to page to — omit
+    // the dots entirely so pagination never renders dead controls that can't move
+    // the active index. This uniformly covers a single slide, a single static page
+    // (measured no-overflow), and a legacy non-overflowing loop (`slides <=
+    // slidesPerPage`) — all of which resolve to `_maxIndex === 0`. Prev/next are
+    // already disabled via `_canGoPrev`/`_canGoNext` in the same state.
+    if (this._maxIndex === 0) return nothing;
+    // One dot per slide — every slide is individually reachable when scrollable.
     const count = this._slides.length;
-    if (count <= 1) return nothing;
     const dots = Array.from({ length: count }, (_, i) => i);
+    const total = this._slides.length;
     return html`
       <div class="controls">
         <div class="pagination" part="pagination">
@@ -727,7 +1342,7 @@ export class HelixCarousel extends HelixElement {
                 })}
                 part="pagination-item"
                 type="button"
-                aria-label=${this.labelSlideOf(i + 1, count)}
+                aria-label=${this.labelSlideOf(i + 1, total)}
                 aria-current=${i === this._currentIndex ? 'true' : nothing}
                 @click=${() => this._goToManual(i)}
               >
@@ -798,6 +1413,7 @@ export class HelixCarousel extends HelixElement {
               <slot @slotchange=${this._handleSlotChange}></slot>
             </div>
           </div>
+          <div class="gap-sentinel" aria-hidden="true"></div>
         </div>
         ${this._renderPagination()}
       </div>

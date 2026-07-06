@@ -16,6 +16,22 @@ export type { HxImageProps };
 /**
  * An accessible image wrapper with lazy loading, fallback support, aspect ratio control,
 responsive image (srcset/sizes) support, and optional caption.
+
+`hx-image` operates in one of two modes, selected automatically:
+
+- **OWNED mode** (default, attribute-driven): with `src` (and optional
+  `srcset`/`sizes`) set and no default-slot content, the component renders and
+  owns its own responsive `<img>`. Behaviour is unchanged from prior releases.
+- **WRAPPED mode** (slotted): when the default (unnamed) slot has assigned
+  element(s), `hx-image` becomes a pure framing/style/enhancement layer over
+  consumer-supplied media (e.g. a Drupal responsive-image
+  `<picture><source><img></picture>`). The same figure framing
+  (ratio/fit/rounded/width/height), caption, error/fallback handling, and
+  `hx-load`/`hx-error` events apply. In WRAPPED mode the slotted media owns its
+  own `alt`; `fallback-src` does not apply.
+
+If both `src` and default-slot content are provided, WRAPPED mode wins (the
+consumer explicitly supplied media) and a development warning is emitted.
  *
  * @example
  * ```tsx

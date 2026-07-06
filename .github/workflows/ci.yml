@@ -829,6 +829,112 @@ jobs:
             --repo ${{ github.repository }} \
             --body "$BODY"
 
+  # ── API Breaking-Change Gate (PR only) ──────────────────────────────────
+  # Enforces the 3.0 shelf: a breaking public-API change must carry a
+  # `@helixui/library: major` changeset. shelf-guard.mjs compares the base-vs-head
+  # Custom Elements Manifests directly and comprehensively — removed components,
+  # removed/renamed attributes, removed/narrowed public properties (incl. JS-only
+  # `attribute: false` props), removed public methods, and removed events/slots/
+  # parts/custom-properties. It is a SUPERSET of the informational "CEM API Diff"
+  # comment above (which only diffs attribute-backed props). Replaces the H18/H23
+  # hooks, which gated on git-staged files vs HEAD (a commit-time model that
+  # no-ops on PR runners). Runs on EVERY pull request (no path guard) so that a
+  # source, base/mixin, analyzer-config, plugin, or toolchain change can never
+  # skip it; it is a fast no-op when the manifest is unchanged. Blocking — wired
+  # into the quality-gates aggregate. See docs/audit/AUDIT-3x-register.md §1.
+
+  api-breaking-change:
+    name: API Breaking Change Gate
+    needs: [changes, secret-scan]
+    if: >
+      github.event_name == 'pull_request' &&
+      needs.changes.outputs.is_audit != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      # The HEAD public-API surface: the manifest (component API) + the barrel
+      # (src/index.ts — the allowlist-gated named-export surface, incl. mixins,
+      # utilities, and the base class). The manifest is generated analyze-only —
+      # NOT `run cem`, which also runs validate-cem.mjs + the figma helper from the
+      # PR head; those would execute against the base checkout and could fail or
+      # differ. The analyze flags mirror the `cem` package script's analyze step.
+      - name: Generate + save head barrel
+        run: |
+          pnpm --filter=@helixui/library exec node scripts/generate-barrel.js
+          mkdir -p .cache
+          cp packages/hx-library/src/index.ts .cache/head-barrel.ts
+          cp packages/hx-library/package.json .cache/head-pkg.json
+      - name: Generate head CEM
+        run: pnpm --filter=@helixui/library exec custom-elements-manifest analyze --litelement --globs "src/components/**/*.ts" --exclude "**/*.stories.ts" --exclude "**/*.styles.ts"
+      - name: Save head CEM
+        run: cp packages/hx-library/custom-elements.json .cache/head-cem.json
+      # Check out the base versions of every public-API input — component source,
+      # analyzer config + plugins, AND the barrel generator (its allowlist defines
+      # the export surface) — so the base manifest and barrel reflect the base API.
+      # Note: both are produced with the PR's installed analyzer toolchain, so a
+      # toolchain-version bump that itself alters output is not differentially
+      # detected here — that rare case is covered by the informational CEM API Diff
+      # comment and review.
+      - name: Check out base branch public-API inputs
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          BASE="origin/${BASE_REF}"
+          # Fail loudly if the base ref is unavailable — otherwise the gate would
+          # silently compare head-vs-head and miss every breaking change.
+          git rev-parse --verify --quiet "$BASE" >/dev/null || {
+            echo "::error::shelf-guard: base ref $BASE is unavailable on the runner"
+            exit 1
+          }
+          # Restore the base version of each input. A path absent on base (new in
+          # this PR) is skipped; any other git failure is fatal.
+          for p in \
+            packages/hx-library/src \
+            packages/hx-library/custom-elements-manifest.config.mjs \
+            packages/hx-library/cem-plugins \
+            packages/hx-library/scripts/generate-barrel.js \
+            packages/hx-library/tsconfig.json \
+            tsconfig.base.json; do
+            if git cat-file -e "$BASE:$p" 2>/dev/null; then
+              git checkout "$BASE" -- "$p"
+            else
+              echo "Path $p not present on base — new in this PR, skipping."
+            fi
+          done
+          git show "$BASE:packages/hx-library/package.json" > .cache/base-pkg.json
+      - name: Generate + save base barrel
+        run: |
+          pnpm --filter=@helixui/library exec node scripts/generate-barrel.js
+          cp packages/hx-library/src/index.ts .cache/base-barrel.ts
+      - name: Generate base CEM
+        run: pnpm --filter=@helixui/library exec custom-elements-manifest analyze --litelement --globs "src/components/**/*.ts" --exclude "**/*.stories.ts" --exclude "**/*.styles.ts"
+      - name: Save base CEM
+        run: cp packages/hx-library/custom-elements.json .cache/base-cem.json
+      - name: Enforce 3.0 shelf (breaking API change requires a major changeset)
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: >
+          node scripts/ci/shelf-guard.mjs
+          --base-cem .cache/base-cem.json
+          --head-cem .cache/head-cem.json
+          --base-barrel .cache/base-barrel.ts
+          --head-barrel .cache/head-barrel.ts
+          --base-pkg .cache/base-pkg.json
+          --head-pkg .cache/head-pkg.json
+          --changesets .changeset
+          --base-ref "origin/${BASE_REF}"
+          ${{ contains(github.event.pull_request.labels.*.name, 'breaking-change-approved') && '--label-bypass' || '' }}
+
   # ── Bundle Size Diff (PR only) ──────────────────────────────────────────
   # Downloads the base branch bundle size artifact, compares with the current
   # branch, posts a PR comment with per-component deltas, and blocks merge on
@@ -1193,6 +1299,7 @@ jobs:
         vrt,
         audit,
         changeset,
+        api-breaking-change,
         storybook-tests,
         test-react,
       ]
@@ -1215,6 +1322,7 @@ jobs:
           echo "Bundle Size:        ${{ needs.bundle-size.result }}"
           echo "VRT:                ${{ needs.vrt.result }}"
           echo "Audit:              ${{ needs.audit.result }}"
+          echo "API Break Gate:     ${{ needs.api-breaking-change.result }}"
           echo "Storybook Tests:    ${{ needs.storybook-tests.result }}"
           echo "React Tests:        ${{ needs.test-react.result }}"
 
@@ -1248,16 +1356,28 @@ jobs:
           for gate in test vrt changeset bundle-size; do
             result="${{ needs.test.result }}"
             case "$gate" in
-              test)        result="${{ needs.test.result }}" ;;
-              vrt)         result="${{ needs.vrt.result }}" ;;
-              changeset)   result="${{ needs.changeset.result }}" ;;
-              bundle-size) result="${{ needs.bundle-size.result }}" ;;
+              test)                result="${{ needs.test.result }}" ;;
+              vrt)                 result="${{ needs.vrt.result }}" ;;
+              changeset)           result="${{ needs.changeset.result }}" ;;
+              bundle-size)         result="${{ needs.bundle-size.result }}" ;;
             esac
             if [[ "$result" != "success" && "$result" != "skipped" && "$result" != "cancelled" ]]; then
               echo "::error::Gate '$gate' did not succeed: $result"
               FAIL=1
             fi
           done
+
+          # The API breaking-change gate must actively SUCCEED on pull requests —
+          # a cancelled or skipped result must not pass, otherwise a breaking API
+          # change could merge whenever the gate did not run to completion. The
+          # gate only runs on PRs (and never on audit branches, which return
+          # above), so require success only for the pull_request event.
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ needs.api-breaking-change.result }}" != "success" ]]; then
+              echo "::error::Gate 'api-breaking-change' did not succeed: ${{ needs.api-breaking-change.result }}"
+              FAIL=1
+            fi
+          fi
 
           # Coverage is informational-only while issue #1556 is open. The
           # vitest --coverage.enabled + browser-mode + chromium combination

@@ -21,7 +21,7 @@ import {
 
 import './helix.js';
 
-const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist';
+const DEFAULT_BASE_PATH = 'https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist';
 
 describe('libraries/helix — auto-registration', () => {
   let originalBasePath: string;
