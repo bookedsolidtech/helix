@@ -864,6 +864,96 @@ describe('hx-image', () => {
       expect(style).toContain('--_radius:0.5rem');
     });
 
+    it('mirrors --_fit/--_radius onto the HOST so light-DOM slotted media inherits them (P1 regression)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image fit="contain" rounded="0.75rem"><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      await settleWrapped(el);
+
+      // The host carries the custom properties so light-DOM slotted descendants
+      // (which are NOT inside the shadow figure) inherit them. Without this,
+      // ::slotted() and the injected light sheet resolve var(--_fit)/(--_radius)
+      // against the host cascade, find nothing, and fall back to defaults.
+      expect(el.style.getPropertyValue('--_fit')).toBe('contain');
+      expect(el.style.getPropertyValue('--_radius')).toBe('0.75rem');
+
+      // And the slotted image actually resolves object-fit from the inherited var.
+      const slotted = el.querySelector('img')!;
+      expect(getComputedStyle(slotted).objectFit).toBe('contain');
+    });
+
+    it('does NOT set the host --_fit/--_radius vars in OWNED mode', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/img.png" alt="Owned" fit="contain" rounded="0.5rem"></hx-image>',
+      );
+      await el.updateComplete;
+      // OWNED mode's shadow <img> inherits from the figure; the host vars stay unset.
+      expect(el.style.getPropertyValue('--_fit')).toBe('');
+      expect(el.style.getPropertyValue('--_radius')).toBe('');
+    });
+
+    it('recovers from a slotted-image error when the broken node is replaced (P2)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://broken.invalid/x.png" alt="First" /><span slot="fallback" class="rfb">Broken</span></hx-image>',
+      );
+      await settleWrapped(el);
+      const broken = el.querySelector('img')!;
+
+      // Drive the error state deterministically.
+      const errorPromise = oneEvent(el, 'hx-error');
+      broken.dispatchEvent(new Event('error'));
+      await errorPromise;
+      await el.updateComplete;
+      expect(shadowQuery(el, '.image__container--error')).toBeTruthy();
+
+      // Replace the broken node with a good one — slotchange must fire (the
+      // default slot is still present, hidden, in the error state), clearing
+      // _error and re-rendering the framed media.
+      broken.remove();
+      const good = document.createElement('img');
+      good.setAttribute('src', 'https://example.com/good.png');
+      good.setAttribute('alt', 'Second');
+      el.appendChild(good);
+      await settleWrapped(el);
+
+      // No longer stuck on the fallback; WRAPPED media renders again.
+      expect(shadowQuery(el, '.image__container--error')).toBeNull();
+      expect(shadowQuery(el, 'img')).toBeNull(); // still WRAPPED (no owned img)
+      const defaultSlot = shadowQuery<HTMLSlotElement>(el, '.image__container > slot:not([name])');
+      expect(defaultSlot).toBeTruthy();
+      const assigned = defaultSlot!.assignedElements({ flatten: true });
+      expect(assigned.some((n) => n.tagName.toLowerCase() === 'img')).toBe(true);
+    });
+
+    it('emits exactly one hx-load for an already-complete (cached) slotted <img> (P2)', async () => {
+      // A 1x1 transparent PNG data URI decodes synchronously, so by the time the
+      // component resolves the slotted node it is already `complete` with a
+      // non-zero naturalWidth — the cached/SSR first-paint case.
+      const dataUri =
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+      let loads = 0;
+      const el = await fixture<HelixImage>('<hx-image></hx-image>');
+      el.addEventListener('hx-load', () => {
+        loads += 1;
+      });
+
+      const cached = document.createElement('img');
+      cached.setAttribute('alt', 'Cached');
+      cached.src = dataUri;
+      // Ensure the "already complete and valid" branch regardless of decode timing.
+      Object.defineProperty(cached, 'complete', { value: true, configurable: true });
+      Object.defineProperty(cached, 'naturalWidth', { value: 1, configurable: true });
+
+      el.appendChild(cached);
+      await settleWrapped(el);
+      // Let the queued synthetic-load microtask flush.
+      await Promise.resolve();
+      await el.updateComplete;
+
+      expect(loads).toBe(1);
+    });
+
     it('does not re-dispatch a duplicate hx-load for an already-complete slotted <img>', async () => {
       const el = await fixture<HelixImage>(
         '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',

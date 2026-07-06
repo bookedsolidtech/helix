@@ -230,6 +230,21 @@ export class HelixImage extends HelixElement {
    * @internal
    */
   private _handleSlottedLoad = (): void => {
+    // A successful (re)load recovers the WRAPPED error state. This covers the
+    // same-node repair case (the broken `<img>`'s `src` is fixed and it
+    // re-loads without a `slotchange`), where the still-attached `load` listener
+    // is the only recovery signal. Recovery is independent of the emit guard so
+    // a repaired image always clears the fallback even if it re-fires `load`.
+    if (this._error) {
+      this._error = false;
+      this._usedFallbackSrc = false;
+      this._erroredImg = null;
+    }
+    // At most one hx-load per resolved image: if we already emitted for this
+    // node (native or the synthetic cached-load path), don't dispatch again.
+    const img = this._slottedImg;
+    if (img && this._loadEmittedFor === img) return;
+    if (img) this._loadEmittedFor = img;
     this.dispatchEvent(new CustomEvent<void>('hx-load', { bubbles: true, composed: true }));
   };
 
@@ -242,8 +257,28 @@ export class HelixImage extends HelixElement {
   private _handleSlottedError = (): void => {
     if (this._error) return;
     this._error = true;
+    this._erroredImg = this._slottedImg;
     this.dispatchEvent(new CustomEvent<void>('hx-error', { bubbles: true, composed: true }));
   };
+
+  /**
+   * The slotted `<img>` for which an `hx-load` has already been emitted during
+   * its current attachment (via the native `load` listener or the synthetic
+   * cached-load microtask). Ensures at most one `hx-load` per resolved image —
+   * a cached image whose native `load` also fires does not double-dispatch.
+   * Reset on detach so a freshly resolved image can emit its own `hx-load`.
+   * @internal
+   */
+  private _loadEmittedFor: HTMLImageElement | null = null;
+
+  /**
+   * The slotted `<img>` that last drove the WRAPPED error state. Retained so a
+   * `slotchange` that merely re-projects the same still-broken node (e.g. the
+   * error template re-rendering the default slot) does NOT clear `_error`, while
+   * a genuine replacement (a different node, or the same node repaired) does.
+   * @internal
+   */
+  private _erroredImg: HTMLImageElement | null = null;
 
   /** @internal */
   private _onCaptionSlotChange(e: Event): void {
@@ -267,7 +302,42 @@ export class HelixImage extends HelixElement {
       this._ensureWrappedLightStyles();
     }
 
+    // WRAPPED recovery: while in the error state the default `<slot>` stays in
+    // the DOM (hidden) so replacing the broken media re-fires `slotchange`. A
+    // `slotchange` clears `_error` only when a *different* node is now resolved
+    // (a genuine replacement). This deliberately ignores the same-node case:
+    //  - the error template's freshly-rendered slot re-projects the same broken
+    //    node and must NOT bounce out of the error state (no node change), and
+    //  - a same-node repair (its `src` is fixed and it re-loads) does not fire
+    //    `slotchange` at all — it recovers via the still-attached `load`
+    //    listener (see _handleSlottedLoad).
+    if (this._error) {
+      const nextImg = this._resolveImgCandidate(elements);
+      if (nextImg !== this._erroredImg) {
+        this._error = false;
+        this._usedFallbackSrc = false;
+        this._erroredImg = null;
+      }
+    }
+
     this._resolveSlottedImg(elements);
+  }
+
+  /**
+   * Resolves the `<img>` candidate from assigned elements — a directly-slotted
+   * `<img>`, or the inner `<img>` of a slotted `<picture>` — without mutating
+   * listeners or state. `null` when none is present.
+   * @internal
+   */
+  private _resolveImgCandidate(elements: readonly Element[]): HTMLImageElement | null {
+    for (const node of elements) {
+      if (node instanceof HTMLImageElement) return node;
+      if (node instanceof HTMLPictureElement) {
+        const inner = node.querySelector('img');
+        if (inner) return inner;
+      }
+    }
+    return null;
   }
 
   /**
@@ -277,20 +347,7 @@ export class HelixImage extends HelixElement {
    * @internal
    */
   private _resolveSlottedImg(elements: readonly Element[]): void {
-    let next: HTMLImageElement | null = null;
-    for (const node of elements) {
-      if (node instanceof HTMLImageElement) {
-        next = node;
-        break;
-      }
-      if (node instanceof HTMLPictureElement) {
-        const inner = node.querySelector('img');
-        if (inner) {
-          next = inner;
-          break;
-        }
-      }
-    }
+    const next = this._resolveImgCandidate(elements);
 
     if (next === this._slottedImg) return;
 
@@ -311,10 +368,25 @@ export class HelixImage extends HelixElement {
       next.addEventListener('error', this._handleSlottedError);
       this._slottedImg = next;
 
-      // If the slotted image already finished loading before we attached, do not
-      // synthesize a duplicate hx-load — but do surface an already-broken image.
+      // Cached/SSR slotted media can already be resolved by the time slotchange
+      // runs (the native `load`/`error` fired before we attached listeners).
+      // Surface the terminal state synthetically so the WRAPPED load/error
+      // contract holds on first paint:
+      //  - complete + naturalWidth > 0 → loaded → emit exactly one hx-load
+      //    (deferred to a microtask so it dispatches after this render, and
+      //    guarded per-image so a later native `load` can't double-dispatch).
+      //  - complete + naturalWidth === 0 + currentSrc → already broken → hx-error.
       if (next.complete) {
-        if (next.naturalWidth === 0 && next.currentSrc) {
+        if (next.naturalWidth > 0) {
+          const resolved = next;
+          queueMicrotask(() => {
+            // Ignore if the slot changed again before the microtask ran, or if an
+            // hx-load was already emitted for this image (e.g. a native `load`).
+            if (this._slottedImg !== resolved || this._loadEmittedFor === resolved) return;
+            // Route through the shared handler so the one-per-image guard applies.
+            this._handleSlottedLoad();
+          });
+        } else if (next.naturalWidth === 0 && next.currentSrc) {
           this._handleSlottedError();
         }
       }
@@ -328,6 +400,9 @@ export class HelixImage extends HelixElement {
       this._slottedImg.removeEventListener('error', this._handleSlottedError);
       this._slottedImg = null;
     }
+    // Clear the per-image load-emit guard so a newly resolved image can emit
+    // its own hx-load.
+    this._loadEmittedFor = null;
   }
 
   /**
@@ -344,6 +419,41 @@ export class HelixImage extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this._detachSlottedListeners();
+  }
+
+  /**
+   * In WRAPPED mode the slotted `<img>`/`<picture> img` live in LIGHT DOM, so
+   * they are NOT descendants of the shadow `<figure>` that carries `--_fit` /
+   * `--_radius`. Both the `::slotted(...)` shadow rules and the injected
+   * `[data-hx-styled="hx-image"]` light-DOM sheet resolve those vars against the
+   * slotted element's light-DOM cascade (the HOST and up) — where nothing sets
+   * them — so per-instance `fit`/`rounded` would silently fall back to defaults.
+   * Mirroring them onto the HOST lets the light-DOM slotted descendants inherit
+   * the intended values. OWNED mode never touches these host vars (its shadow
+   * `<img>` already inherits from the figure), so existing behaviour is
+   * unchanged; they are cleared whenever WRAPPED mode is not active.
+   * @internal
+   */
+  override updated(changed: Map<PropertyKey, unknown>): void {
+    super.updated(changed);
+
+    if (this._hasSlottedMedia) {
+      const fit = this.fit;
+      const radius = this._computeBorderRadius();
+      if (fit) {
+        this.style.setProperty('--_fit', fit);
+      } else {
+        this.style.removeProperty('--_fit');
+      }
+      if (radius) {
+        this.style.setProperty('--_radius', radius);
+      } else {
+        this.style.removeProperty('--_radius');
+      }
+    } else {
+      this.style.removeProperty('--_fit');
+      this.style.removeProperty('--_radius');
+    }
   }
 
   /** @internal */
@@ -406,6 +516,11 @@ export class HelixImage extends HelixElement {
     };
 
     if (this._error) {
+      // In WRAPPED mode the default `<slot>` must remain in the DOM even while
+      // the fallback is shown, so replacing/repairing the broken slotted media
+      // still fires `slotchange` (which clears `_error` and re-resolves). It is
+      // visually removed via `hidden` so only the fallback is seen. OWNED mode
+      // has no slotted media to recover, so it omits the slot as before.
       return html`
         <figure
           class="image__container image__container--error"
@@ -413,6 +528,9 @@ export class HelixImage extends HelixElement {
           role="alert"
         >
           <slot name="fallback"></slot>
+          ${wrapped
+            ? html`<slot hidden @slotchange=${this._onDefaultSlotChange}></slot>`
+            : nothing}
         </figure>
       `;
     }
