@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-07-01T11:43:31.843Z",
+  "generatedAt": "2026-07-06T17:19:29.987Z",
   "sourceCem": "custom-elements.json",
   "helixVersion": "3.10.0",
   "tokensVersion": "3.9.4",
@@ -12744,6 +12744,13 @@
         }
       ],
       "slots": [
+        {
+          "figmaPropertyName": "content",
+          "cemSlot": null,
+          "type": "instance-swap",
+          "default": "Label",
+          "description": "Default slot for consumer-supplied media (WRAPPED mode). Assigning an `<img>` or `<picture>` here switches the component to WRAPPED mode, where it frames and enhances the slotted media instead of rendering its own `<img>`."
+        },
         {
           "figmaPropertyName": "fallback",
           "cemSlot": "fallback",
