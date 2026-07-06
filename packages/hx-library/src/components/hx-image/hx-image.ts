@@ -637,9 +637,7 @@ export class HelixImage extends HelixElement {
           role="alert"
         >
           <slot name="fallback"></slot>
-          ${wrapped
-            ? html`<slot hidden @slotchange=${this._onDefaultSlotChange}></slot>`
-            : nothing}
+          ${wrapped ? html`<slot hidden @slotchange=${this._onDefaultSlotChange}></slot>` : nothing}
         </figure>
       `;
     }
