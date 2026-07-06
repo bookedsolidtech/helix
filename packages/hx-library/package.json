@@ -102,7 +102,7 @@
   },
   "peerDependencies": {
     "@floating-ui/dom": "^1.7.6",
-    "@helixui/icons": "workspace:*"
+    "@helixui/icons": "workspace:^"
   },
   "repository": {
     "type": "git",
