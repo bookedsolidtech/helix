@@ -1180,13 +1180,140 @@ describe('hx-image', () => {
       await el.updateComplete;
       // Owned <img> present.
       expect(shadowQuery(el, 'img[part="base"]')).toBeTruthy();
-      // Default slot present but empty → OWNED mode retained.
+      // Default slot present (a stable direct child of the figure in both
+      // modes) but INERT in OWNED mode — it carries the `image__owned-slot`
+      // class (display:none) so its projected content is hidden, while
+      // slotchange can still drive a later WRAPPED switch. It is empty here.
       const defaultSlot = shadowQuery<HTMLSlotElement>(
         el,
         '.image__container > slot:not([name])',
       );
       expect(defaultSlot).toBeTruthy();
+      expect(defaultSlot!.classList.contains('image__owned-slot')).toBe(true);
       expect(defaultSlot!.assignedElements({ flatten: true }).length).toBe(0);
+    });
+  });
+
+  // ─── Downstream interop fixes (Fix 1 SSR-safe detection, Fix 2 inert OWNED slot) ───
+
+  describe('Downstream interop fixes', () => {
+    // slotchange is async; after fixture() we let it fire and the component
+    // re-render before asserting.
+    const settle = async (el: HelixImage): Promise<void> => {
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await el.updateComplete;
+    };
+
+    // ─── Fix 2: stray default-slot content is inert in OWNED mode ───
+
+    it('does NOT project stray default-slot content in OWNED mode (Fix 2)', async () => {
+      // A consumer sets `src` (OWNED) AND slots a stray <span>. The span is not
+      // resolvable media, so the component stays OWNED and the stray content
+      // must not be projected as visible frame content: the default slot is
+      // rendered inert (the `image__owned-slot` class applies display:none),
+      // hiding whatever it projects. A resolvable data-URI `src` is used so the
+      // owned <img> loads (and does not trip the error state) even after the
+      // slotchange settle tick, keeping the assertion deterministic.
+      const ownedSrc =
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+      const el = await fixture<HelixImage>(
+        `<hx-image src="${ownedSrc}" alt="Owned"><span class="stray">slot text</span></hx-image>`,
+      );
+      await settle(el);
+
+      // OWNED retained: the owned img renders with its src.
+      const owned = shadowQuery<HTMLImageElement>(el, 'img[part="base"]');
+      expect(owned).toBeTruthy();
+      expect(owned?.getAttribute('src')).toBe(ownedSrc);
+
+      // The default slot is a direct child of the figure (stable element) but
+      // INERT: it carries the display:none owned-slot class, so the stray span
+      // it projects is not part of the visible frame.
+      const inertSlot = shadowQuery<HTMLSlotElement>(el, '.image__container > slot:not([name])');
+      expect(inertSlot).toBeTruthy();
+      expect(inertSlot!.classList.contains('image__owned-slot')).toBe(true);
+      expect(getComputedStyle(inertSlot!).display).toBe('none');
+
+      // The stray span is assigned to the (inert) default slot — proving it was
+      // captured there and, because the slot is display:none, NOT rendered as
+      // visible frame content.
+      const stray = el.querySelector('.stray') as HTMLElement;
+      expect(stray).toBeTruthy();
+      expect(inertSlot!.assignedElements({ flatten: true })).toContain(stray);
+    });
+
+    it('switches OWNED→WRAPPED when a default-slot <img> is appended dynamically (Fix 2)', async () => {
+      // Start OWNED (src set, no slotted media). The default slot is rendered
+      // inert but still present, so appending default-slot media later fires
+      // slotchange and the component must switch to WRAPPED — proving the inert
+      // wrapper did NOT drop dynamic detection.
+      const el = await fixture<HelixImage>(
+        '<hx-image src="https://example.com/owned.png" alt="Owned"></hx-image>',
+      );
+      await el.updateComplete;
+      // OWNED first: owned <img> present, not stamped for WRAPPED light sizing.
+      expect(shadowQuery(el, 'img[part="base"]')).toBeTruthy();
+      expect(el.getAttribute('data-hx-styled')).toBeNull();
+
+      // Append a bare <img> to the default slot.
+      const added = document.createElement('img');
+      added.setAttribute('src', 'https://example.com/slotted.png');
+      added.setAttribute('alt', 'Slotted');
+      el.appendChild(added);
+      await settle(el);
+
+      // WRAPPED now: owned <img> removed, host stamped for light-DOM sizing.
+      expect(shadowQuery(el, 'img[part="base"]')).toBeNull();
+      expect(shadowQuery(el, 'img')).toBeNull();
+      expect(el.getAttribute('data-hx-styled')).toBe('hx-image');
+      // The default slot is now a direct child of the figure (WRAPPED) and
+      // projects the added media.
+      const defaultSlot = shadowQuery<HTMLSlotElement>(el, '.image__container > slot:not([name])');
+      expect(defaultSlot).toBeTruthy();
+      expect(defaultSlot!.assignedElements({ flatten: true })).toContain(added);
+    });
+
+    // ─── Fix 1: tagName-based detection (SSR-safe, DOM-global-free) ───
+
+    it('detects a default-slot <img> as WRAPPED media via the tagName path (Fix 1)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
+      );
+      // The pre-render seed (_hasDefaultSlotLightChildren) runs in willUpdate and
+      // uses tagName === 'IMG' rather than instanceof HTMLImageElement, so an IMG
+      // is detected without referencing DOM-global constructors. WRAPPED wins on
+      // first paint: no owned <img> is rendered.
+      expect(shadowQuery(el, 'img[part="base"]')).toBeNull();
+    });
+
+    it('detects a default-slot <picture> as WRAPPED media via the tagName path (Fix 1)', async () => {
+      const el = await fixture<HelixImage>(
+        '<hx-image>' +
+          '<picture><img src="https://example.com/small.png" alt="Picture" /></picture>' +
+          '</hx-image>',
+      );
+      // A directly-slotted PICTURE is detected by tagName === 'PICTURE' in the
+      // pre-render seed; WRAPPED wins on first paint (no owned <img>).
+      expect(shadowQuery(el, 'img[part="base"]')).toBeNull();
+    });
+
+    it('does NOT treat a non-media default-slot child (<div>/<span>) as WRAPPED media (Fix 1)', async () => {
+      // A <div>/<span> is not IMG/PICTURE, so the tagName detection ignores it:
+      // with `src` set the component stays OWNED and renders the owned <img>.
+      // A resolvable data-URI keeps the owned <img> out of the error state
+      // across the slotchange settle tick.
+      const ownedSrc =
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+      const el = await fixture<HelixImage>(
+        `<hx-image src="${ownedSrc}" alt="Owned">` +
+          '<div class="d">block</div><span class="s">inline</span>' +
+          '</hx-image>',
+      );
+      await settle(el);
+      const owned = shadowQuery<HTMLImageElement>(el, 'img[part="base"]');
+      expect(owned).toBeTruthy();
+      expect(owned?.getAttribute('src')).toBe(ownedSrc);
+      expect(el.getAttribute('data-hx-styled')).toBeNull();
     });
   });
 });

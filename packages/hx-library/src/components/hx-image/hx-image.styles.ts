@@ -50,6 +50,20 @@ export const helixImageStyles = css`
     border-radius: var(--_radius, var(--hx-image-border-radius, 0));
   }
 
+  /*
+   * OWNED mode: the default (unnamed) slot is a single stable element rendered
+   * in every mode (so a later dynamically-added <img>/<picture> still fires
+   * slotchange and switches the component to WRAPPED), but this class is
+   * toggled onto it while OWNED to render it inert — display:none hides
+   * whatever stray non-media content it projects so nothing appears alongside
+   * the owned <img>. slotchange still fires on a display:none slot, so dynamic
+   * WRAPPED detection is preserved. In WRAPPED mode the class is removed and the
+   * slotted media projects and is framed normally.
+   */
+  .image__owned-slot {
+    display: none;
+  }
+
   .image__caption {
     display: none;
     padding: var(--hx-image-caption-padding, 0.5rem 0 0);

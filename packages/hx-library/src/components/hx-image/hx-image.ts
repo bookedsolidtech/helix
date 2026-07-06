@@ -378,8 +378,14 @@ export class HelixImage extends HelixElement {
    */
   private _resolveImgCandidate(elements: readonly Element[]): HTMLImageElement | null {
     for (const node of elements) {
-      if (node instanceof HTMLImageElement) return node;
-      if (node instanceof HTMLPictureElement) {
+      // Match on `tagName` (uppercase for HTML) rather than
+      // `instanceof HTMLImageElement`/`HTMLPictureElement` for consistency with
+      // the SSR-safe pre-render seed (`_hasDefaultSlotLightChildren`). This path
+      // is client-only (driven by `slotchange`), so a real DOM always exists,
+      // but keeping one detection idiom avoids divergence between seed and
+      // slotchange.
+      if (node.tagName === 'IMG') return node as HTMLImageElement;
+      if (node.tagName === 'PICTURE') {
         const inner = node.querySelector('img');
         if (inner) return inner;
       }
@@ -504,11 +510,20 @@ export class HelixImage extends HelixElement {
    */
   private _hasDefaultSlotLightChildren(): boolean {
     for (const node of this.childNodes) {
-      if (node.nodeType !== Node.ELEMENT_NODE) continue;
+      // ELEMENT_NODE === 1. The numeric literal is used instead of
+      // `Node.ELEMENT_NODE` because this method runs on the SSR render path
+      // (via `willUpdate`), where the `Node` DOM global is `undefined` and any
+      // reference to it throws a `TypeError`.
+      if (node.nodeType !== 1) continue;
       const el = node as Element;
       if (el.hasAttribute('slot')) continue; // named-slot content — not default slot
       // Resolvable only for a DIRECT <img> or <picture> default-slot child.
-      if (el instanceof HTMLImageElement || el instanceof HTMLPictureElement) {
+      // Detected via `tagName` (uppercase for HTML) rather than
+      // `instanceof HTMLImageElement`/`HTMLPictureElement`: under server
+      // rendering those DOM-global constructors are `undefined`, so `instanceof`
+      // throws and breaks SSR. `tagName` comparison is DOM-free and identical in
+      // behaviour for real IMG/PICTURE elements.
+      if (el.tagName === 'IMG' || el.tagName === 'PICTURE') {
         return true;
       }
     }
@@ -629,9 +644,17 @@ export class HelixImage extends HelixElement {
       `;
     }
 
-    // The default slot is always rendered so `slotchange` can drive mode
-    // detection; in OWNED mode it is empty and renders nothing. In OWNED mode
-    // the `<img>` path below is byte-identical to the pre-WRAPPED template.
+    // The default slot is ALWAYS rendered — as a single STABLE `<slot>` element
+    // whose identity does not change between modes — so `slotchange` can drive
+    // mode detection (including a dynamic OWNED→WRAPPED switch when a consumer
+    // adds media later) without the slot being torn down and recreated (which
+    // would re-fire slotchange and re-run the cached-load synthetic path). In
+    // WRAPPED mode it projects the slotted media directly into the figure. In
+    // OWNED mode the `image__owned-slot` class (display:none) is toggled onto
+    // it, rendering it INERT: `slotchange` still fires but any stray non-media
+    // default-slot content (e.g. a `<span>` alongside `src`) is hidden and never
+    // shown alongside the owned `<img>`. In OWNED mode the `<img>` path below is
+    // byte-identical to the pre-WRAPPED template.
     return html`
       <figure class="image__container" style=${styleMap(containerStyles)}>
         ${wrapped
@@ -652,7 +675,10 @@ export class HelixImage extends HelixElement {
                 @error=${this._handleError}
               />
             `}
-        <slot @slotchange=${this._onDefaultSlotChange}></slot>
+        <slot
+          class=${classMap({ 'image__owned-slot': !wrapped })}
+          @slotchange=${this._onDefaultSlotChange}
+        ></slot>
         <figcaption
           part="caption"
           class=${classMap({ image__caption: true, 'image__caption--visible': showCaption })}
