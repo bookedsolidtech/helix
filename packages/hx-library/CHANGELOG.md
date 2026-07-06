@@ -1,5 +1,229 @@
 # @helixui/library
 
+## 3.11.0
+
+### Minor Changes
+
+- 95351f0: Expose `adoptedStylesheetRegistry` on the `@helixui/library/authoring` subpath, alongside the already-exported `injectLightStyles` and `AdoptedStylesheetsController`.
+
+  `adoptedStylesheetRegistry` is the capability-detecting light-DOM style-delivery singleton: `register(componentName, css)` sanitizes the CSS and scopes every selector under `[data-hx-styled="componentName"]`, then delivers it via Constructable Stylesheets (`document.adoptedStyleSheets`) when available and scoped `<style>` injection (`injectLightStyles`) otherwise. It was previously reachable only by importing hash-named `dist/shared/*` build internals; consumers styling slotted/light-DOM content can now import it from the stable `authoring` subpath.
+
+  As part of exposing it, the Constructable Stylesheets path is now scoped consistently with the `<style>`-injection fallback. Previously the modern-browser path adopted the raw CSS into `document.adoptedStyleSheets` unscoped — so a rule such as `p { … }` intended for slotted content could restyle every matching element on the page — while only the fallback path scoped selectors. Both paths now emit identical `[data-hx-styled]`-scoped CSS and reject unsafe input via `sanitizeCss`.
+
+  Like the other `authoring` exports it is SSR-safe to import and call: its only module-scope state is a guarded feature-detect plus a `Map` cache, and `register()` degrades to the `injectLightStyles` no-op when no DOM is present. Additive only — no existing export changes, so nothing that already imports from `@helixui/library/authoring` is affected.
+
+- 8769f4f: Add an SSR-safe `@helixui/library/authoring` subpath exposing `mixinDelegatesAria` (plus `HelixElement`, `FocusMixin`, `FormMixin`) for Track-2 consumer components that extend `HelixElement`, with canonical ARIAMixin IDL accessor names.
+
+  The same `@helixui/library/authoring` subpath also exposes the light-DOM style utilities `injectLightStyles` and `AdoptedStylesheetsController`, so consumers can style slotted/light-DOM content without reaching into hash-named `dist/shared/*` internals. Both are SSR-safe to import and construct: `injectLightStyles` is a runtime no-op without a DOM, and `AdoptedStylesheetsController` no longer defaults its root to `document` in the constructor — the `document` fallback is resolved lazily inside its methods, so constructing it during SSR (e.g. in a Track-2 component field initializer) does not throw. The DOM is only touched client-side when the controller's `hostConnected`/`hostDisconnected` run.
+
+- d5bf3a7: feat(hx-icon): add Feather and Lucide icon libraries with stroke-paint rendering
+
+  Registers `feather` (287 glyphs, MIT) and `lucide` (~1,986 glyphs, ISC) as built-in
+  stroke-paint icon libraries in `@helixui/icons`, shipped as CDN sprite sheets
+  (`dist/feather.svg`, `dist/lucide.svg`) and per-icon tree-shake modules
+  (`@helixui/icons/tree-shake/feather/*`, `.../lucide/*`).
+
+  `<hx-icon>` now reflects the resolved library's `paintMode` onto the rendered SVG and
+  paints stroke libraries with `fill: none; stroke: currentColor`, with stroke width
+  driven by the existing `--hx-icon-stroke-width` token. Line caps and joins are not
+  imposed by the component — each glyph carries its own caps/joins in its library's
+  source geometry. Fill libraries (`helix`, `fa-free`) are unchanged.
+
+  ```html
+  <hx-icon library="feather" name="activity" label="Activity"></hx-icon>
+  <hx-icon library="lucide" name="heart" label="Favorite"></hx-icon>
+  ```
+
+  Also hardens `<hx-icon>`: icon-library mutator output is now re-sanitized before render,
+  so a compromised or hostile library mutator cannot reintroduce `<script>`, `on*`
+  handlers, or `javascript:` payloads that the first sanitization pass stripped.
+
+- dc0b356: make hx-form a pure Light-DOM wrapper: add a `no-intercept` opt-out, stop cancelling host-owned form submission, and stop rendering its own `<form>`.
+
+  hx-form no longer cancels a form the host owns. Its client-side submit bridge decides from the SUBMITTING form: native submission proceeds untouched (no `hx-submit` / `hx-invalid`) when the submitting `<form>` declares its own non-empty `action` attribute, OR the submit button that triggered it carries a non-empty `formaction` (a multi-submit host form such as a Drupal Form API form's Save vs Preview buttons). A form with no own `action`/`formaction` is the controlled case and is bridged (validated + `hx-submit`/`hx-invalid`), scoped to that form's controls (honoring `form="id"` association). Previously hx-form intercepted and cancelled every bubbling submit event, breaking host-owned and slotted forms.
+
+  The new reflected boolean attribute `no-intercept` makes hx-form a purely presentational wrapper: it runs no submit bridge at all. The intercept decision is exposed as a protected `shouldInterceptSubmit(e)` hook that subclasses can override.
+
+  BEHAVIOR CHANGE: hx-form is now a pure Light-DOM wrapper and NO LONGER renders its own `<form>` in any mode. The consumer/host provides the actual `<form>` (a Drupal/Marketo host form, or an action-less `<form>` slotted for controlled behavior). The `action` property (and the now-inert `method`/`name`/`enctype`) is `@deprecated` and retained only for compatibility — it has no rendering effect; posting is owned by the consumer's `<form>`. A consumer that relied on hx-form to render a `<form>` for them must now provide their own `<form>` (loose controls with no `<form>` no longer submit). This was already the de facto reality: the Light-DOM `<slot>` never projected slotted controls into the rendered wrapper, so that `<form>` never owned them.
+
+- 0cb0051: Add a WRAPPED (slotted) mode to `hx-image` alongside its existing OWNED (attribute-driven) mode, making the component a framing/style/enhancement layer over BOTH its own responsive image and consumer-supplied slotted media.
+
+  The mode is selected automatically and is fully additive — OWNED mode is unchanged and back-compatible:
+  - **OWNED mode** (unchanged): with `src` (and optional `srcset`/`sizes`) set and no default-slot content, `hx-image` renders and owns its own responsive `<img>`, exactly as before.
+  - **WRAPPED mode** (new): when the default (unnamed) slot has assigned element(s), `hx-image` renders no `<img>` of its own and instead frames the slotted media. This lets consumers slot a plain `<img>` or full responsive-image markup (`<picture><source><img></picture>`) and still get the component's framing and enhancement layer.
+
+  Both modes share the same figure framing (`ratio`/`fit`/`rounded`/`width`/`height`), the caption slot, and the error/fallback slot. In WRAPPED mode:
+  - The framed figure sizes directly-slotted `<img>`/`<picture>` via shadow `::slotted()` rules, and sizes the `<img>` nested inside a slotted `<picture>` via a scoped, deduplicated light-DOM stylesheet (stamped with `data-hx-styled="hx-image"`), so responsive-image markup fills the frame. This is SSR-safe (a no-op without a DOM).
+  - `hx-load`/`hx-error` are re-emitted (composed + bubbling) from the resolved slotted `<img>` — whether directly slotted or nested inside a `<picture>` — with listeners cleaned up on every slot change and on disconnect to avoid leaks or double-dispatch.
+  - On a slotted-image error the component swaps to the shared error state and shows the `fallback` slot. `fallback-src` does not apply in WRAPPED mode, since the consumer owns the media.
+  - The slotted media owns its own `alt`; the OWNED `alt`-required warning is not imposed. Providing both `src` and slotted media logs a development warning and resolves to WRAPPED.
+
+  A new default `@slot` is documented for the Custom Elements Manifest.
+
+- 3b1afdf: add `label-remove` attribute to `hx-tag` for localizing the remove button's accessible name
+
+  The dismiss button's accessible name was previously hardcoded to English (`Remove <tag text>`), leaving localized apps unable to translate it. The new `label-remove` attribute overrides that name: pass a value containing the `{label}` placeholder to interpolate the tag text dynamically (`label-remove="Quitar {label}"` → "Quitar Cardiology"), or a value without a placeholder to use it verbatim. When unset, the accessible name is unchanged (`Remove <tag text>`, falling back to `Remove tag` when the tag has no text), so existing usage is unaffected.
+
+- 3622e2c: add `minlength-message` and `maxlength-message` override attributes to `hx-text-input`
+
+  The length-validation messages on `hx-text-input` were hardcoded English, so localized
+  `tooShort` / `tooLong` errors were impossible without setting `error` (which overrides every
+  state). Two new reflected-as-attribute properties let consumers supply their own copy:
+  - `minlengthMessage` (attribute `minlength-message`) — shown when the value is shorter than
+    `minlength`. Supports a `{min}` placeholder, substituted with the resolved `minlength`.
+  - `maxlengthMessage` (attribute `maxlength-message`) — shown when the value is longer than
+    `maxlength`. Supports a `{max}` placeholder, substituted with the resolved `maxlength`.
+
+  Both mirror the existing `required-message` property: precedence is `error` first, then the
+  override, then the built-in English default. The `{min}` / `{max}` tokens follow the library's
+  `{label}` placeholder convention (`hx-tag`) and are substituted with `split`/`join` so a literal
+  `$` in a localized string is inserted verbatim. When unset, output is byte-identical to today.
+
+  ```html
+  <hx-text-input
+    minlength="5"
+    minlength-message="Veuillez saisir au moins {min} caractères."
+  ></hx-text-input>
+  ```
+
+- 0d66a4e: Reflect the `href` property to the host `href` attribute on `hx-button`, `hx-link`, and `hx-icon-button`.
+
+  Previously `href` was set-only from the attribute side: assigning `element.href` via JavaScript updated the rendered internal anchor but left the host element's `href` attribute untouched, so attribute-based CSS selectors (`[href]`) and DOM queries (`getAttribute('href')`) could not observe a property-assigned value. With reflection enabled, a property write now mirrors to the host attribute, making the host `href` a stable, observable interop surface for external scripts that operate on attributes rather than reaching into shadow DOM. This matches the already-reflected `variant` and `disabled` properties on these atoms. Reflection follows Lit's default `String` converter: setting `href` to `null` or `undefined` removes the host attribute, while an empty string reflects as `href=""` (which still matches `[href]`). Attribute-set usage is unchanged.
+
+- 9f32606: add a form-targeted error API to hx-form and fix release-3.11 regressions in hx-carousel and hx-form.
+
+  hx-form (feature): `setErrors` and `setFieldError` now accept an OPTIONAL `form` target — a `<form>` element or a form id resolved within the hx-form (`setFieldError(name, message, form?)`; `setErrors([{ name, message, form? }])`). When supplied, the error is scoped to that form, disambiguating sibling forms that share a field `name`; it marks that form's control(s) named `name` (all members of a radio/checkbox group). A form-id target is keyed by its stable id, so a scoped error survives an in-place re-render of the form node and a same-id re-set replaces rather than appends. Omitting `form` keeps the prior hx-form-wide behavior: the entry marks every control matching `name`. An unresolvable target degrades to the untargeted path (no throw). The rendered summary shape and the `hx-submit` / `hx-invalid` payloads are unchanged.
+
+  Known limitation: untargeted errors (no `form`) on a field name that exists in multiple sibling forms have best-effort partial-success semantics — a successful submit of one sibling clears its own markers, but the untargeted summary entry persists until all same-name controls are valid. Pass the `form` target for precise per-form control across sibling forms that share field names.
+
+  hx-carousel (fix): legacy loop-mode navigation could not reach (or stably hold) the last `slidesPerPage - 1` slides, and `slides-per-move > 1` skipped the last slide. The selection bound `_maxIndex` is now `slides.length - 1` in legacy loop when the track overflows (`slides.length > slidesPerPage`) — matching measured mode — so End / `goTo` / pagination dots reach every slide AND a last-slide selection stays stable across a resize/recompute instead of being snapped back (with a spurious `hx-slide-change`). Legacy loop relative navigation now uses the same partial-step logic as measured loop, so `slides-per-move > 1` lands on the last slide before wrapping (e.g. 6 slides, move 2: `0→2→4→5→0`). A non-scrollable carousel (`_maxIndex === 0` — a single slide, a non-overflowing loop, or a measured single page) now renders NO pagination dots and disables prev/next, so `loop` never produces dead controls or phantom navigation. The track translate clamps separately to the slidesPerPage page bound so a near-end loop selection saturates at the last full page rather than over-scrolling. Measured-nav and legacy non-loop navigation are unchanged.
+
+  hx-form (fix): a successful submit cleared validation state across the whole hx-form, wiping a different (still-invalid, never-corrected) sibling form's `aria-invalid` markers and error summary. The internal error model keys each entry by `(name, scope)` and resolves its controls live: the failure path merges a form's fresh errors with sibling forms' retained entries (instead of replacing wholesale), and the success path drops only the submitting form's entries while retaining sibling entries whose controls are still marked invalid. This keeps markers and summary in lockstep and preserves each surviving entry's original message — including custom server-set text — even when sibling forms share a field `name`. The single-form case is byte-identical.
+
+### Patch Changes
+
+- 738e2ed: Decouple `hx-breadcrumb` item discovery and the `listitem` role from the literal
+  `hx-breadcrumb` / `hx-breadcrumb-item` tag names, so a subclass that renames the
+  host or item inherits both behaviors.
+
+  Previously the breadcrumb located its items by matching `tagName === 'hx-breadcrumb-item'`,
+  and each item self-assigned `role="listitem"` only when its parent (or shadow-root host)
+  `tagName` was exactly `'hx-breadcrumb'`. A consumer that extended `HelixBreadcrumb` /
+  `HelixBreadcrumbItem` and registered the subclass under a different tag name broke on both
+  counts: the renamed host discovered zero items (collapse logic and current-page marking
+  never ran), and the renamed items never received `role="listitem"`, producing an
+  `aria-required-children` accessibility violation.
+
+  Discovery now collects children that are `instanceof HelixBreadcrumbItem`, and an item
+  detects its breadcrumb ancestor structurally — `instanceof HelixBreadcrumb` against its
+  light-DOM parent and shadow-root host, plus a `closest('[role="list"]')` fallback — with
+  the literal tag names kept only as OR fast-paths. As a result, `HelixBreadcrumb` /
+  `HelixBreadcrumbItem` subclasses registered under different tags inherit item discovery,
+  collapse behavior, and the `listitem` role. Behavior for the stock `hx-breadcrumb` /
+  `hx-breadcrumb-item` elements (including JSON-LD and collapse) is unchanged.
+
+- 5f239e4: fix(release): widen the `@helixui/icons` peer range so a same-cycle icons bump no longer forces a spurious major
+
+  `@helixui/library` declared `"@helixui/icons": "workspace:*"` as a peer dependency. Because `workspace:*` resolves to the icons package's exact current version at publish time (an exact pin such as `1.0.4`), any release cycle that bumped `@helixui/icons` (even a minor) caused Changesets' `shouldBumpMajor` peer-dependent rule to fire: the incremented icons version left library's exact-pinned peer range, so library was force-bumped to a **major**. Through the `[@helixui/library, @helixui/tokens, @helixui/react]` linked group and library's downstream dependents, that spurious major cascaded (library/react → 4.0.0, drupal packages → 5.0.0) even though every changeset in the cycle was minor/patch.
+
+  Changing the peer specifier to `workspace:^` publishes a caret range (`^1.1.0`) that a compatible icons minor satisfies, so a same-cycle icons bump no longer leaves the range and library versions on its own changeset severity. The change is specifier-only — the resolved workspace link is unchanged and the lockfile is unaffected. The published peer range moves from an exact `icons` pin to a caret range, which is the intended, less-brittle contract.
+
+- 9b70d85: fix(hx-carousel): honor `--hx-carousel-slide-width` / `--hx-carousel-gap` and correct navigation across orientation, gap, peek, and responsive transitions
+
+  Both CSS hooks were documented on `hx-carousel` but never read by the styles, so setting them had no effect.
+  - `--hx-carousel-slide-width` now overrides each slide's width, and the override participates in layout and navigation. The per-page width derived from `slides-per-page` is preserved as the default. The override is honored whether it is set on the host (inherited by every slide) or per-slide on individual `hx-carousel-item`s — a custom width on any slide enables measured navigation, so per-slide widths on later slides (with the first slide left at the default) still align.
+  - `--hx-carousel-gap` now sets the gap between slides on the slide track, defaulting to `0`.
+
+  The slide-width computation and the navigation transform are gap- and slide-width-aware: the computed per-page width is `calc((100% - (slides-per-page - 1) * var(--hx-carousel-gap, 0px)) / slides-per-page)`, so `slides-per-page` slides plus their gaps fill the viewport exactly without clipping, and each navigation step advances by one slide's full outer extent (slide size + gap).
+
+  When a custom `--hx-carousel-slide-width` (or a vertical carousel) makes the track overflow the viewport, slide selection is decoupled from track scroll: every slide stays reachable via the previous/next buttons, pagination dots, drag/swipe, autoplay, `Home`/`End`, and `goTo()`, while the track translate is clamped to the measured maximum scroll so a near-end slide saturates at the trailing edge with no blank space. Selection bounds, the active pagination dot, the prev/next disabled states, and the ARIA "slide X of N" announcement all reflect the true active index. Runtime changes to `--hx-carousel-gap` / `--hx-carousel-slide-width` (theme toggles, media queries) and to the `slides-per-page` / `orientation` properties re-derive the model (single-page ⇄ peek, or legacy ⇄ measured) in either direction; the bounds re-derive reactively (a gap change resizes an internal observed sentinel, and `slides-per-page` / `orientation` changes are picked up in `updated()` — a `slides-per-page` change also re-syncs every slide's computed width so the per-item width and the transform stay on the same value), so the prev/next disabled states update with no navigation required. Removing the custom width reverts a measured carousel to the default model on the next navigation even when the fallback default width yields identical geometry (no box resize, so the ResizeObserver never fires); the navigation-path refresh clamps the active index into the (possibly newly-smaller) legacy range before the legacy step runs, so a measured-only index sitting past the legacy bound can never strand the carousel in an impossible state where the first button press is a silent no-op. Autoplay also re-derives bounds before deciding whether to advance, so a carousel sitting at the old bound advances into newly-reachable slides. Whenever the selection bound changes the active index is clamped back into range so the transform, dots, disabled states, and ARIA never desync; this clamp is owned by a single event-aware path, so a slot shrink or `slides-per-page` re-sync that drops the active slide emits exactly one `hx-slide-change` and updates the live region. A resize or responsive recompute with no following navigation emits one `hx-slide-change` on the clamp (never during initial setup), and a navigation that coincides with a mode flip emits exactly one event for its destination — so hosts syncing thumbnails, counters, or analytics stay in sync. If every slide is removed at runtime the carousel reports a defined empty state: the live region is cleared (never a stale "Slide 1 of 0") and `hx-slide-change` fires with `detail.index` `-1` and `detail.slide` `undefined`; repopulating restores slide 0 and notifies hosts.
+
+  Measured navigation is derived entirely from the rendered geometry (each slide's real leading-edge offset and the track's actual scroll extent) rather than a first-slide estimate, so slides of differing sizes are each reached and land flush, the last slide is flush at the trailing edge, and over/under-scroll never occurs — and a carousel whose first `slides-per-page` slides happen to fill the viewport exactly while later slides differ is no longer mis-detected as a fixed page. For uniform slides this reduces exactly to the previous per-page math. In measured mode every slide is individually selectable, so the bound is `slides.length − 1`: the track translate clamps to the measured maximum scroll, so adjacent slides near the end may share the same saturated frame, but each remains a distinct accessible selection (`End` and the last pagination dot reach the true last slide). This bound propagates to pagination (measured mode renders one dot per slide) and to looped navigation (relative `next()`/`previous()`/autoplay wrap over the full slide range, while absolute `goTo()` / `Home` / `End` / pagination-dot targets always clamp to `[0, slides.length − 1]` even in loop mode — so `End` lands on the last slide rather than wrapping back to the first). Pagination dot ARIA labels use the real slide count for their "of N" total, so a dot label agrees with the live-region announcement for the index it activates. Default (no custom slide-width) pagination and loop wrapping are unchanged.
+
+  When the whole track fits inside the viewport (narrow custom widths whose total is under the viewport, a uniform custom width that exactly fills it, `slides-per-page` greater than the slide count, or a vertical carousel no taller than its viewport), the carousel is treated as a single static page: the maximum index is 0, the previous and next buttons are both disabled, the track translate is 0, pagination is omitted, and navigation is a no-op — so it never advertises slides the track cannot reveal.
+
+  Vertical carousels now navigate correctly. Previously a vertical step used a transform percentage relative to the track's full height (≈ all slides), so it jumped multiple slides per `next()`; vertical now navigates by the measured block-axis offsets (slide heights + `row-gap`), reaches every slide, and clamps at the trailing edge with no blank space.
+
+  Horizontal default and gap-only layouts (no custom slide-width) run the legacy page model byte-for-byte (selection bounds, transform, disabled states, and ARIA unchanged). The `@cssprop` annotations were corrected so the Custom Elements Manifest reflects the true defaults.
+
+- 65f80b8: honor the component-specific `--hx-text-input-focus-ring-offset` hook on the `hx-text-input` focus indicator (default flush)
+
+  The component resolved a private `--_text-input-focus-ring-offset` token but the focus ring was
+  painted as a single `box-shadow` that never referenced it, so the documented offset hook was dead.
+  The three focus `box-shadow` declarations (normal `:host([focused])` / `:focus-within`, and the
+  invalid `:focus-within`) now use a transparent-spacer dual-shadow that opens a gap when the offset
+  is non-zero:
+
+  ```css
+  box-shadow:
+    0 0 0 var(--_text-input-focus-ring-offset) transparent,
+    0 0 0 calc(var(--_text-input-focus-ring-offset) + var(--_text-input-focus-ring-width)) <color>;
+  ```
+
+  The private offset now defaults to `0px` (flush), so at the default the ring evaluates to
+  `0 0 0 0 transparent, 0 0 0 2px <color>` — a zero-size invisible spacer plus the existing 2px ring —
+  i.e. byte-identical rendering to today, with no AAA focus-appearance (2.4.13) regression. Consumers
+  opt into a gap via `--hx-text-input-focus-ring-offset`.
+
+  The global `--hx-focus-ring-offset` remains the library-wide outline-offset token (consumed via
+  `outline-offset` on outline-based focus rings such as `hx-button`) and is intentionally not applied
+  to this component's box-shadow ring — chaining it here would push every consumer's flush ring out by
+  its 2px default. Ring color and width plumbing are unchanged.
+
+- 0765c59: fix release-review findings surfaced on the 3.11 release.
+
+  hx-carousel now normalizes `slides-per-page` through an internal integer-`>= 1`
+  getter for all layout, bounds, and navigation math. A `slides-per-page="0"`,
+  negative, or fractional value no longer divides by zero in the per-slide width
+  expression nor pushes the maximum selectable index past the last real slide
+  (which could report an empty state while slides exist); such values degrade to a
+  1-up carousel (fractional floors to whole slides per page). The public
+  `slidesPerPage` property is unchanged — only internal math reads the normalized
+  value.
+
+  hx-form now discovers validatable custom elements via the same
+  `static formAssociated = true` path `getFormData()` serializes over, instead of a
+  hardcoded tag allowlist. This keeps validation and serialization in lockstep: a
+  form-associated control that is serialized is also covered by
+  `checkValidity()`/`reportValidity()`/submit validation and `hx-invalid`, and a
+  control excluded from one is excluded from the other — closing a gap where a
+  value could be submitted while its validity was silently skipped.
+
+  `@helixui/icons` sprite/tree-shake generators now escape preserved root-`<svg>`
+  attribute values (`viewBox`, `stroke-linecap`, `stroke-linejoin`, and the symbol
+  `id`) before interpolating them into the serialized `<symbol>` / inlined `<svg>`.
+  A third-party source SVG carrying a malformed attribute value (e.g. an embedded
+  `"`, `<`, or `>`) can no longer break out of its attribute and inject arbitrary
+  markup into the published sprite or tree-shake artifacts.
+
+  `@helixui/icons` SVG sanitization now compares paint keywords
+  case-insensitively. Valid cascade-cooperative values such as `fill="currentcolor"`
+  or `stroke="CONTEXT-STROKE"` are preserved (previously only exact-case
+  `currentColor` / `context-stroke` survived), while genuinely-unsafe paints
+  (hardcoded colors, `url(...)`) are still stripped. `transparent` was also added
+  to the preserved set.
+
+  hx-icon's `paintMode` property is now annotated with its literal
+  `'fill' | 'stroke' | 'mixed'` union so the CEM and the generated `@helixui/react`
+  wrapper expose the exact union type instead of a bare `string` — restoring
+  autocomplete and compile-time validation for React consumers.
+
+  CI hardening (no package runtime impact): the shelf-guard breaking-change gate
+  in `ci.yml` and `audit-batch-ci.yml` now passes `github.base_ref` through a
+  `BASE_REF` env var instead of interpolating it directly into the shell, closing a
+  workflow template-injection vector. Both aggregate quality-gate summaries now
+  require the API breaking-change gate to resolve to `success` (a `cancelled` or
+  `skipped` result no longer counts as a pass), so a breaking API change cannot
+  merge when the gate did not run to completion. `scripts/ci/shelf-guard.mjs`
+  `objectFieldNames()` now always returns a Set (even when empty), so an event
+  detail that drops all fields (`{ foo }` → `{}`) is still compared and its removed
+  fields are detected.
+
+- f9a47fa: Remove the dangling `sideEffects` entry for `./dist/utilities/document-token-adoption.js`, a file that is never emitted. The `dist/utilities/` directory ships type declarations only; the module's runtime is bundled into `dist/index.js`. The document-token-adoption side effect is preserved via `./dist/index.js`, which is already listed in `sideEffects`, so tree-shaking behavior is unchanged — this only stops the published `package.json` from referencing a build artifact that does not exist.
+- Updated dependencies [d5bf3a7]
+- Updated dependencies [0765c59]
+  - @helixui/icons@1.1.0
+
 ## 3.10.0
 
 ### Minor Changes
