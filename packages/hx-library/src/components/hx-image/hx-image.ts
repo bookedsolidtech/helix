@@ -10,15 +10,25 @@ import { devWarn } from '../../utils/dev-warn.js';
 import { injectLightStyles } from '../../utilities/injectLightStyles.js';
 
 /**
- * Scoped light-DOM CSS for WRAPPED mode. `::slotted()` in the shadow sheet can
- * size a directly-slotted `<img>`/`<picture>`, but it cannot reach the `<img>`
- * nested inside a slotted `<picture>` (a light-DOM descendant). This sheet,
+ * Scoped light-DOM CSS for WRAPPED mode. `::slotted()` in the shadow sheet
+ * already sizes a directly-slotted `<img>`/`<picture>`; the ONE case it cannot
+ * reach is the `<img>` nested inside a slotted `<picture>` (a light-DOM
+ * descendant of the picture, not a directly-assigned node). This sheet,
  * injected once into `document.head` and scoped to
- * `[data-hx-styled="hx-image"]`, sizes those descendants so responsive-image
+ * `[data-hx-styled="hx-image"]`, sizes only that descendant so responsive-image
  * markup (`<picture><source><img></picture>`) fills the framed figure.
+ *
+ * The selector uses a leading child combinator so it targets ONLY the inner
+ * `<img>` of a DEFAULT-slot `<picture>` (a direct child of the host with no
+ * `slot=` attribute). `generateScopedSelectors` prepends the scope attribute
+ * with a descendant combinator, yielding
+ * `[data-hx-styled="hx-image"] > picture:not([slot]) img`. This deliberately
+ * excludes `<img slot="fallback">` / `<img slot="caption">` (named-slot media)
+ * and any non-picture descendant `<img>`, so caption/fallback images are never
+ * stretched to fill the frame.
  */
 const WRAPPED_LIGHT_CSS = `
-:is(picture, img) {
+> picture:not([slot]) img {
   display: block;
   width: 100%;
   height: 100%;
@@ -320,10 +330,9 @@ export class HelixImage extends HelixElement {
   private _onDefaultSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
     const elements = slot.assignedElements({ flatten: true });
-    // WRAPPED mode is entered ONLY for resolvable media: a direct `<img>`, a
-    // slotted `<picture>`, or any assigned element that contains an `<img>`
-    // (e.g. `<a><img></a>`). Default-slot content with no resolvable image
-    // (e.g. `<span>text</span>`) leaves the component in OWNED mode so the owned
+    // WRAPPED mode is entered ONLY for a DIRECTLY-slotted `<img>` or `<picture>`.
+    // Any other default-slot content — wrapper markup (`<a><img></a>`), a
+    // `<div>`, loose text — leaves the component in OWNED mode so the owned
     // `<img>` still renders and the `src` fetch is not suppressed.
     this._hasSlottedMedia = this._resolveImgCandidate(elements) !== null;
 
@@ -353,16 +362,18 @@ export class HelixImage extends HelixElement {
   }
 
   /**
-   * Resolves the `<img>` candidate from assigned elements. Resolution order per
-   * assigned element:
-   *  1. a directly-slotted `<img>`;
-   *  2. the inner `<img>` of a slotted `<picture>`;
-   *  3. otherwise a descendant `<img>` anywhere inside the assigned element
-   *     (e.g. `<a><img></a>` or other wrapper markup).
-   * Sizing already targets descendant `img` via the injected
-   * `[data-hx-styled]` light sheet, so a wrapped `<img>` is framed correctly;
-   * this resolver additionally wires load/error to the resolved node. `null`
-   * when no `<img>` exists in any assigned element's subtree.
+   * Resolves the `<img>` candidate from assigned elements. The WRAPPED contract
+   * is deliberately narrow — only a DIRECTLY-slotted `<img>` or `<picture>`
+   * qualifies:
+   *  1. a directly-slotted `<img>` → itself;
+   *  2. a directly-slotted `<picture>` → its inner `<img>`.
+   * Wrapper markup (`<a><img></a>`, `<div>`, `<figure>`, …) is intentionally NOT
+   * matched: the wrapper element is never sized by the framing rules, so its
+   * nested `<img>`'s `100%/100%` would resolve against the auto-sized wrapper
+   * rather than the framed figure and render wrong. Such content leaves the
+   * component in OWNED mode. To frame a linked image, wrap the `<hx-image>`
+   * element in the `<a>` and slot a bare `<img>`/`<picture>` inside it. `null`
+   * when no directly-slotted `<img>`/`<picture>` is present.
    * @internal
    */
   private _resolveImgCandidate(elements: readonly Element[]): HTMLImageElement | null {
@@ -372,11 +383,6 @@ export class HelixImage extends HelixElement {
         const inner = node.querySelector('img');
         if (inner) return inner;
       }
-      // Wrapper markup (anchor, figure, span, …) around an `<img>`: resolve the
-      // first descendant image so the owned `<img>` is suppressed only when
-      // there is real media to frame and wire.
-      const descendant = node.querySelector('img');
-      if (descendant) return descendant;
     }
     return null;
   }
@@ -486,14 +492,14 @@ export class HelixImage extends HelixElement {
 
   /**
    * Seeds WRAPPED mode before the first render by detecting whether the host has
-   * RESOLVABLE default-slot media — a light-DOM element child (without a `slot=`
-   * attribute) that is, or contains, an `<img>`. Children with
+   * a DIRECT default-slot child that IS an `<img>` or a `<picture>` (a light-DOM
+   * element child without a `slot=` attribute). Children with
    * `slot="fallback"` / `slot="caption"` are named-slot content and are ignored,
-   * as are non-media default-slot children (e.g. a bare `<span>text</span>` or
-   * loose text): those leave the component in OWNED mode so the owned `<img>` /
-   * `src` fetch is not suppressed. This mirrors the runtime `slotchange` gate
-   * (`_resolveImgCandidate`), keeping the pre-render seed and the authoritative
-   * slotchange handler in agreement.
+   * as is any other default-slot content — wrapper markup (`<a><img></a>`), a
+   * bare `<span>text</span>`, or loose text — which leaves the component in
+   * OWNED mode so the owned `<img>` / `src` fetch is not suppressed. This mirrors
+   * the runtime `slotchange` gate (`_resolveImgCandidate`), keeping the
+   * pre-render seed and the authoritative slotchange handler in agreement.
    * @internal
    */
   private _hasDefaultSlotLightChildren(): boolean {
@@ -501,8 +507,8 @@ export class HelixImage extends HelixElement {
       if (node.nodeType !== Node.ELEMENT_NODE) continue;
       const el = node as Element;
       if (el.hasAttribute('slot')) continue; // named-slot content — not default slot
-      // Resolvable only if the default-slot element is, or contains, an <img>.
-      if (el instanceof HTMLImageElement || el.querySelector('img') !== null) {
+      // Resolvable only for a DIRECT <img> or <picture> default-slot child.
+      if (el instanceof HTMLImageElement || el instanceof HTMLPictureElement) {
         return true;
       }
     }

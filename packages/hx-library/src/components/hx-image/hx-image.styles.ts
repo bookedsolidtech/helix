@@ -32,14 +32,17 @@ export const helixImageStyles = css`
   }
 
   /*
-   * WRAPPED mode: consumer-supplied media slotted into the default slot.
-   * ::slotted() only reaches directly-assigned nodes, so this sizes a
-   * top-level <img>/<picture>. The <img> INSIDE a slotted <picture> is a
-   * descendant and cannot be reached here — that case is handled by a scoped
-   * light-DOM sheet injected via injectLightStyles (see hx-image.ts).
+   * WRAPPED mode: consumer-supplied media slotted into the DEFAULT (unnamed)
+   * slot. ::slotted() only reaches directly-assigned nodes, so this sizes a
+   * top-level <img>/<picture>. The :not([slot]) guard scopes the sizing to
+   * default-slot media only — an <img slot="caption"> / <img slot="fallback">
+   * is named-slot content and must NOT be stretched to fill the frame. The
+   * <img> INSIDE a slotted <picture> is a descendant and cannot be reached
+   * here — that case is handled by a scoped light-DOM sheet injected via
+   * injectLightStyles (see hx-image.ts).
    */
-  ::slotted(img),
-  ::slotted(picture) {
+  ::slotted(img:not([slot])),
+  ::slotted(picture:not([slot])) {
     display: block;
     width: 100%;
     height: 100%;

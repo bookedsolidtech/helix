@@ -816,6 +816,50 @@ describe('hx-image', () => {
       expect(cs.objectFit).toBe('cover');
     });
 
+    it('does NOT size a caption-slot <img> to the frame while the default-slot <img> IS sized (finding #1)', async () => {
+      // A WRAPPED instance whose default-slot media is a bare <img> AND that also
+      // carries an <img slot="caption">. The framing sizing rules must reach ONLY
+      // the default-slot media — the caption image is named-slot content and must
+      // NOT be stretched to fill the frame.
+      const el = await fixture<HelixImage>(
+        '<hx-image ratio="1" fit="cover" style="width: 120px;">' +
+          '<img src="https://example.com/slotted.png" alt="Slotted" />' +
+          '<img slot="caption" src="https://example.com/credit.png" alt="Credit" class="cap-img" />' +
+          '</hx-image>',
+      );
+      await settleWrapped(el);
+
+      const defaultImg = el.querySelector('img:not([slot])') as HTMLImageElement;
+      const captionImg = el.querySelector('img.cap-img') as HTMLImageElement;
+      expect(defaultImg).toBeTruthy();
+      expect(captionImg).toBeTruthy();
+
+      // Default-slot media IS framed: object-fit: cover from ::slotted(img:not([slot])).
+      expect(getComputedStyle(defaultImg).objectFit).toBe('cover');
+
+      // Caption-slot media is NOT framed: the ::slotted(:not([slot])) guard and
+      // the light sheet's default-slot-picture scope both exclude it, so it keeps
+      // the UA object-fit (fill) rather than the full-frame cover sizing.
+      expect(getComputedStyle(captionImg).objectFit).not.toBe('cover');
+    });
+
+    it('does NOT size a fallback-slot <img> to the frame in WRAPPED mode (finding #1)', async () => {
+      // Same guard for the fallback slot: an <img slot="fallback"> must not be
+      // stretched to fill the frame while the default-slot media is framed.
+      const el = await fixture<HelixImage>(
+        '<hx-image ratio="1" fit="cover" style="width: 120px;">' +
+          '<img src="https://example.com/slotted.png" alt="Slotted" />' +
+          '<img slot="fallback" src="https://example.com/fb.png" alt="Fallback" class="fb-img" />' +
+          '</hx-image>',
+      );
+      await settleWrapped(el);
+
+      const captionImg = el.querySelector('img.fb-img') as HTMLImageElement;
+      expect(captionImg).toBeTruthy();
+      // Fallback-slot media keeps UA object-fit (fill), not the full-frame cover.
+      expect(getComputedStyle(captionImg).objectFit).not.toBe('cover');
+    });
+
     it('re-emits hx-load from a directly-slotted <img>', async () => {
       const el = await fixture<HelixImage>(
         '<hx-image><img src="https://example.com/slotted.png" alt="Slotted" /></hx-image>',
@@ -1085,10 +1129,13 @@ describe('hx-image', () => {
       await el.updateComplete;
     };
 
-    it('activates WRAPPED for an <img> nested in a wrapper element (<a><img></a>) and re-emits hx-load', async () => {
-      // A wrapped <img> (anchor wrapper) with `src` also set: WRAPPED must win —
-      // the owned <img part="base"> must NOT render, and the nested <img> must
-      // be sized and wired for load re-dispatch.
+    it('stays OWNED when default-slot media is wrapped (<a><img></a> + src)', async () => {
+      // The WRAPPED contract is narrow: only a DIRECTLY-slotted <img>/<picture>
+      // qualifies. Wrapper markup (an anchor around an <img>) does NOT — the
+      // wrapper element is never sized by the framing rules, so its nested
+      // <img>'s 100%/100% would resolve against the auto-sized wrapper and
+      // render wrong. Such content leaves the component in OWNED mode: the owned
+      // <img part="base"> renders with `src` and no WRAPPED framing is applied.
       const el = await fixture<HelixImage>(
         '<hx-image src="https://example.com/owned.png" alt="Owned">' +
           '<a href="/detail"><img src="https://example.com/slotted.png" alt="Slotted" /></a>' +
@@ -1096,22 +1143,13 @@ describe('hx-image', () => {
       );
       await settle(el);
 
-      // Owned shadow <img> is suppressed — WRAPPED took over.
-      expect(shadowQuery(el, 'img[part="base"]')).toBeNull();
-      expect(shadowQuery(el, 'img')).toBeNull();
+      // OWNED mode retained: the owned <img part="base"> renders with the src.
+      const owned = shadowQuery<HTMLImageElement>(el, 'img[part="base"]');
+      expect(owned).toBeTruthy();
+      expect(owned?.getAttribute('src')).toBe('https://example.com/owned.png');
 
-      // The nested <img> is resolved and re-emits hx-load.
-      const nested = el.querySelector('a img') as HTMLImageElement;
-      expect(nested).toBeTruthy();
-      const loadPromise = oneEvent(el, 'hx-load');
-      nested.dispatchEvent(new Event('load'));
-      const event = await loadPromise;
-      expect(event.type).toBe('hx-load');
-      expect(event.bubbles).toBe(true);
-      expect(event.composed).toBe(true);
-
-      // The nested <img> is sized via the injected light sheet (display: block).
-      expect(getComputedStyle(nested).display).toBe('block');
+      // No WRAPPED framing side effects: the host is not stamped for light sizing.
+      expect(el.getAttribute('data-hx-styled')).toBeNull();
     });
 
     it('stays OWNED when default-slot content has no resolvable image (<span>text</span> + src)', async () => {
