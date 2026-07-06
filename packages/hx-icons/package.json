@@ -95,12 +95,12 @@
   ],
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
-    "@vitest/coverage-v8": "^4.1.6",
+    "@vitest/coverage-v8": "^4.1.10",
     "feather-icons": "^4.29.2",
     "linkedom": "^0.18.12",
     "lucide-static": "^1.21.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.10"
   }
 }
