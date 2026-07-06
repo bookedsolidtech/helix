@@ -1137,16 +1137,17 @@ describe('hx-image', () => {
       // render wrong. Such content leaves the component in OWNED mode: the owned
       // <img part="base"> renders with `src` and no WRAPPED framing is applied.
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/owned.png" alt="Owned">' +
+        '<hx-image src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Owned">' +
           '<a href="/detail"><img src="https://example.com/slotted.png" alt="Slotted" /></a>' +
           '</hx-image>',
       );
       await settle(el);
 
-      // OWNED mode retained: the owned <img part="base"> renders with the src.
+      // OWNED mode retained: the owned <img part="base"> renders. A resolvable
+      // data-URI src avoids the real-network error state that would remove it in CI.
       const owned = shadowQuery<HTMLImageElement>(el, 'img[part="base"]');
       expect(owned).toBeTruthy();
-      expect(owned?.getAttribute('src')).toBe('https://example.com/owned.png');
+      expect(owned?.getAttribute('src')?.startsWith('data:image/png;base64,')).toBe(true);
 
       // No WRAPPED framing side effects: the host is not stamped for light sizing.
       expect(el.getAttribute('data-hx-styled')).toBeNull();
@@ -1156,14 +1157,15 @@ describe('hx-image', () => {
       // Non-media default-slot content must NOT enter WRAPPED: the owned <img>
       // must still render and its `src` fetch must not be suppressed.
       const el = await fixture<HelixImage>(
-        '<hx-image src="https://example.com/owned.png" alt="Owned"><span>caption-ish text</span></hx-image>',
+        '<hx-image src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" alt="Owned"><span>caption-ish text</span></hx-image>',
       );
       await settle(el);
 
-      // OWNED mode retained: the owned <img part="base"> renders with the src.
+      // OWNED mode retained: the owned <img part="base"> renders. A resolvable
+      // data-URI src avoids the real-network error state that would remove it in CI.
       const owned = shadowQuery<HTMLImageElement>(el, 'img[part="base"]');
       expect(owned).toBeTruthy();
-      expect(owned?.getAttribute('src')).toBe('https://example.com/owned.png');
+      expect(owned?.getAttribute('src')?.startsWith('data:image/png;base64,')).toBe(true);
 
       // No WRAPPED framing side effects: the host is not stamped for light sizing.
       expect(el.getAttribute('data-hx-styled')).toBeNull();
