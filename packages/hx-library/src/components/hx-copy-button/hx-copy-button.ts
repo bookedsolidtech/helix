@@ -105,7 +105,11 @@ export class HelixCopyButton extends HelixElement {
   value = '';
 
   /**
-   * Accessible label applied as `aria-label` and `title` on the button.
+   * Accessible label applied as `aria-label` on the button, announced once —
+   * the button itself carries no `title` (an identical `title` becomes the
+   * accessible description and double-announces in NVDA). The native hover
+   * tooltip is preserved via an internal aria-hidden carrier holding `title`,
+   * bound to this idle label in both states.
    * @attr label
    */
   @property({ type: String })
@@ -300,6 +304,23 @@ export class HelixCopyButton extends HelixElement {
     `;
   }
 
+  /**
+   * Native-tooltip carrier. `title` must NOT sit on the focusable button:
+   * with an identical `aria-label` it maps to the accessible description
+   * and NVDA announces the label twice (and the old on-button `title` also
+   * went stale in the copied state while `aria-label` updated). Instead an
+   * aria-hidden, non-focusable overlay spanning the button face carries
+   * `title`, so the hover tooltip survives while the description stays
+   * empty. Bound to the idle `label` in both states. It must be an overlay
+   * (not a wrapper around the content) because `.icon` sets
+   * `pointer-events: none` — hover falls through to the button, and native
+   * tooltip lookup only walks up from the hovered node.
+   * @internal
+   */
+  private _renderTooltipCarrier() {
+    return html`<span class="tooltip-carrier" title=${this.label} aria-hidden="true"></span>`;
+  }
+
   // ─── Render ───
 
   override render() {
@@ -315,11 +336,11 @@ export class HelixCopyButton extends HelixElement {
         type="button"
         ?disabled=${this.disabled}
         aria-label=${ariaLabel}
-        title=${this.label}
         @click=${this._handleClick}
       >
         ${this._renderIcon()}
         <slot></slot>
+        ${this._renderTooltipCarrier()}
       </button>
 
       <span aria-live="polite" aria-atomic="true" class="sr-only">

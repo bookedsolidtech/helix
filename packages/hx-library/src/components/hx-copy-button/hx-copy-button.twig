@@ -15,8 +15,9 @@
                                like & → &amp;. Use `|e('html_attr')` to HTML-attribute-
                                encode while preserving the intended raw value in the DOM.
                                Example: value="{{ node.field_mrn.value|e('html_attr') }}"
-    label            (string)  Optional. Accessible label for the button (aria-label +
-                               title). Defaults to 'Copy to clipboard'. Always provide
+    label            (string)  Optional. Accessible label for the button (aria-label;
+                               hover tooltip preserved internally).
+                               Defaults to 'Copy to clipboard'. Always provide
                                a label that describes WHAT is being copied, e.g.
                                "Copy patient MRN" for clinical context.
     feedback_duration (number) Optional. Duration in milliseconds to display the

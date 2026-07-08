@@ -188,7 +188,7 @@ const meta = {
     label: {
       control: 'text',
       description:
-        'Accessible name for the button. Required. Rendered as `aria-label` and `title` on the underlying element. The component suppresses render and emits a console warning when absent.',
+        'Accessible name for the button. Required. Announced once via `aria-label`; the native hover tooltip is preserved via an internal AT-hidden carrier. The component suppresses render and emits a console warning when absent.',
       table: {
         category: 'Accessibility',
         type: { summary: 'string' },

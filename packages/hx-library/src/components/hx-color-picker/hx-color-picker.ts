@@ -1344,6 +1344,12 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
   /** @internal */
   private _renderSwatches() {
     if (!this.swatches?.length) return nothing;
+    // Native-tooltip carrier: `title` must NOT sit on the focusable swatch
+    // button — with an identical `aria-label` it maps to the accessible
+    // description and NVDA announces the color twice. The aria-hidden,
+    // non-focusable overlay carries `title` instead, keeping the exact color
+    // value visible on hover (close shades are otherwise indistinguishable
+    // without clicking) while the description stays empty.
     return html`
       <div part="swatches" class="swatches" role="group" aria-label=${this.labelSwatches}>
         ${this.swatches.map(
@@ -1353,9 +1359,10 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
               class="swatch-btn"
               style=${styleMap({ background: color })}
               aria-label=${color}
-              title=${color}
               @click=${() => this._handleSwatchClick(color)}
-            ></button>
+            >
+              <span class="tooltip-carrier" title=${color} aria-hidden="true"></span>
+            </button>
           `,
         )}
       </div>
@@ -1375,7 +1382,6 @@ export class HelixColorPicker extends FormMixin(HelixElement) {
           type="button"
           class="format-btn"
           aria-label=${this.labelSwitchFormat}
-          title="Switch format"
           @click=${this._handleFormatCycle}
         >
           ${this.format}
