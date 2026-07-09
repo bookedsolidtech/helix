@@ -12,9 +12,11 @@ export interface HxIconButtonProps {
   className?: string;
   /** Inline styles */
   style?: React.CSSProperties;
-  /** Accessible name for the button. Required. Rendered as `aria-label` and
-`title` on the underlying element. The component renders nothing when absent,
-and a console warning is emitted to alert developers during authoring. */
+  /** Accessible name for the button. Required. Rendered as `aria-label` on
+the underlying element (announced once); the native hover tooltip is
+preserved via an internal aria-hidden carrier holding `title`. The
+component renders nothing when absent, and a console warning is
+emitted to alert developers during authoring. */
   label?: string;
   /** Visual style variant of the button. */
   variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost';

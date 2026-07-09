@@ -5,7 +5,7 @@
   Renders a square button (or anchor) containing a single icon.
 
   IMPORTANT: The `label` variable is REQUIRED for accessibility. It is
-  rendered as both aria-label and title on the underlying element.
+  announced once via aria-label; the hover tooltip is preserved internally.
   The component renders nothing when absent.
 
   IMPORTANT: The `hx-size` attribute (not `size`) controls button dimensions.
@@ -13,7 +13,8 @@
 
   Variables:
     - label     (string, required): Accessible name for the button. Required.
-                Exposed as aria-label and title. Healthcare context: use a
+                Exposed as aria-label (hover tooltip preserved
+                internally). Healthcare context: use a
                 meaningful description like "Edit patient record" not "Edit".
     - variant   (string, optional): 'primary' | 'secondary' | 'tertiary' | 'danger' | 'ghost'.
                 Default: 'ghost'.

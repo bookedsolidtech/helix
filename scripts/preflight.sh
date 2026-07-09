@@ -152,7 +152,10 @@ echo ""
 
 if [ "${TESTS_RAN:-0}" -eq 1 ]; then
   echo "  Checking per-component coverage thresholds..."
-  node scripts/check-coverage.mjs
+  # Scope the threshold check to the components the smart run actually
+  # tested — mirrors CI (ci.yml sets HX_COVERAGE_COMPONENTS from the changed
+  # set). Unscoped, barrel-import side-effect components report 0% and fail.
+  HX_COVERAGE_COMPONENTS="$(echo "$COMPONENTS" | paste -sd, -)" node scripts/check-coverage.mjs
   echo "  ✓ Coverage passed"
   echo ""
 fi

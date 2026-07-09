@@ -15,7 +15,11 @@ export interface HxCopyButtonProps {
   /** The text value to write to the clipboard on click. Required for the
 component to perform a copy operation. */
   value?: string;
-  /** Accessible label applied as `aria-label` and `title` on the button. */
+  /** Accessible label applied as `aria-label` on the button, announced once —
+the button itself carries no `title` (an identical `title` becomes the
+accessible description and double-announces in NVDA). The native hover
+tooltip is preserved via an internal aria-hidden carrier holding `title`,
+bound to this idle label in both states. */
   label?: string;
   /** Duration in milliseconds to display the success (copied) state before
 reverting to the idle state. Values below 300 ms are clamped to 300 ms

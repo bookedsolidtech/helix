@@ -16,8 +16,11 @@ export type { HxIconButtonProps };
 /**
  * An icon-only button component for compact, accessible actions.
 Renders a square button or anchor element containing a single icon.
-The `label` property is required and provides the accessible name
-via `aria-label` and a native tooltip via the `title` attribute.
+The `label` property is required and provides the accessible name via
+`aria-label`, announced exactly once — the focusable element carries no
+`title` attribute (an identical `title` becomes the accessible
+description and double-announces in NVDA). The native hover tooltip is
+preserved via an internal aria-hidden carrier that holds `title`.
  *
  * @example
  * ```tsx

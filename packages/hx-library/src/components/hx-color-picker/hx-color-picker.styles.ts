@@ -186,6 +186,7 @@ export const helixColorPickerStyles = css`
     gap: var(--hx-space-1, 0.25rem);
   }
   .swatch-btn {
+    position: relative;
     width: 20px;
     height: 20px;
     border-radius: var(--hx-border-radius-sm, 0.25rem);
@@ -195,6 +196,13 @@ export const helixColorPickerStyles = css`
     padding: 0;
     flex-shrink: 0;
     transition: transform var(--hx-transition-fast, 150ms ease);
+  }
+  /* Full-face hit area for the native-tooltip carrier (see _renderSwatches
+     in hx-color-picker.ts). Empty + aria-hidden: no layout or AX impact;
+     pointer events bubble to the swatch button. */
+  .tooltip-carrier {
+    position: absolute;
+    inset: 0;
   }
   .swatch-btn:hover {
     transform: scale(1.15);

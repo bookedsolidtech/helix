@@ -12,8 +12,11 @@ import { devWarn } from '../../utils/dev-warn.js';
 /**
  * An icon-only button component for compact, accessible actions.
  * Renders a square button or anchor element containing a single icon.
- * The `label` property is required and provides the accessible name
- * via `aria-label` and a native tooltip via the `title` attribute.
+ * The `label` property is required and provides the accessible name via
+ * `aria-label`, announced exactly once — the focusable element carries no
+ * `title` attribute (an identical `title` becomes the accessible
+ * description and double-announces in NVDA). The native hover tooltip is
+ * preserved via an internal aria-hidden carrier that holds `title`.
  *
  * @summary Icon-only action button with full accessibility support.
  *
@@ -84,9 +87,11 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
   static override styles = [helixIconButtonStyles, forcedColorsInteractive];
 
   /**
-   * Accessible name for the button. Required. Rendered as `aria-label` and
-   * `title` on the underlying element. The component renders nothing when absent,
-   * and a console warning is emitted to alert developers during authoring.
+   * Accessible name for the button. Required. Rendered as `aria-label` on
+   * the underlying element (announced once); the native hover tooltip is
+   * preserved via an internal aria-hidden carrier holding `title`. The
+   * component renders nothing when absent, and a console warning is
+   * emitted to alert developers during authoring.
    * @attr label
    */
   @property({ type: String })
@@ -215,6 +220,22 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
     return html`<span part="icon" class="icon"><slot></slot></span>`;
   }
 
+  /**
+   * Native-tooltip carrier. `title` must NOT sit on the focusable element:
+   * with an identical `aria-label` it maps to the accessible description
+   * and NVDA announces the label twice. Instead an aria-hidden,
+   * non-focusable overlay spanning the button face carries `title`, so the
+   * hover tooltip survives while the control's description stays empty.
+   * It must be an overlay (not a wrapper around the content) because
+   * `.icon` sets `pointer-events: none` — hover falls through to the
+   * button, and native tooltip lookup only walks up from the hovered node,
+   * so a content wrapper would never be the tooltip target.
+   * @internal
+   */
+  private _renderTooltipCarrier(label: string): TemplateResult {
+    return html`<span class="tooltip-carrier" title=${label} aria-hidden="true"></span>`;
+  }
+
   /** @internal */
   private _renderSpinner(): TemplateResult {
     return html`
@@ -283,7 +304,6 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
           class=${classMap(this._classes())}
           href=${ifDefined(this.disabled || this.loading ? undefined : this.href)}
           aria-label=${normalizedLabel}
-          title=${normalizedLabel}
           aria-disabled=${this.disabled ? 'true' : nothing}
           aria-busy=${this.loading ? 'true' : nothing}
           aria-pressed=${ifDefined(projectedPressed ?? undefined)}
@@ -296,6 +316,7 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
           @click=${this._handleClick}
         >
           ${this.loading ? this._renderSpinner() : this._iconSlot()}
+          ${this._renderTooltipCarrier(normalizedLabel)}
         </a>
       `;
     }
@@ -311,7 +332,6 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
         ?disabled=${this.disabled}
         type=${this.type}
         aria-label=${normalizedLabel}
-        title=${normalizedLabel}
         aria-busy=${this.loading ? 'true' : nothing}
         aria-pressed=${ifDefined(projectedPressed ?? undefined)}
         aria-expanded=${ifDefined(projectedExpanded ?? undefined)}
@@ -324,6 +344,7 @@ export class HelixIconButton extends mixinDelegatesAria(HelixElement) {
         @click=${this._handleClick}
       >
         ${this.loading ? this._renderSpinner() : this._iconSlot()}
+        ${this._renderTooltipCarrier(normalizedLabel)}
       </button>
     `;
   }

@@ -2,7 +2,7 @@
 
 ## Overview
 
-`hx-icon-button` renders a square icon-only button (or anchor link) with full accessibility support. The `label` attribute is mandatory — it provides the accessible name via `aria-label` and a native tooltip via `title`. The component renders nothing when `label` is absent.
+`hx-icon-button` renders a square icon-only button (or anchor link) with full accessibility support. The `label` attribute is mandatory — it is announced once via `aria-label`, and the native hover tooltip is preserved via an internal AT-hidden carrier. The component renders nothing when `label` is absent.
 
 **Note on `hx-size`:** The size attribute uses the non-standard `hx-size` name (not `size`). This must be set explicitly in Twig templates.
 
@@ -31,7 +31,7 @@ Use the provided `hx-icon-button.twig` template or render the component directly
 
 | Variable     | Type                                                                    | Default    | Description                                                                              |
 | ------------ | ----------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------- |
-| `label`      | string                                                                  | —          | **Required.** Accessible name (aria-label + title). Component renders nothing if absent. |
+| `label`      | string                                                                  | —          | **Required.** Accessible name (aria-label; hover tooltip preserved internally). Component renders nothing if absent. |
 | `variant`    | `'ghost'` \| `'primary'` \| `'secondary'` \| `'tertiary'` \| `'danger'` | `'ghost'`  | Visual style variant                                                                     |
 | `hx_size`    | `'sm'` \| `'md'` \| `'lg'`                                              | `'md'`     | Button size. Maps to the `hx-size` attribute (not `size`).                               |
 | `type`       | `'button'` \| `'submit'` \| `'reset'`                                   | `'button'` | Button type. Ignored when `href` is set.                                                 |
