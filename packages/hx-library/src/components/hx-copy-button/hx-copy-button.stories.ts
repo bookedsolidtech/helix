@@ -25,7 +25,7 @@ const meta = {
     label: {
       control: 'text',
       description:
-        'Accessible label applied as `aria-label` and `title` on the button. Announced by screen readers.',
+        'Accessible label announced once via `aria-label`; the native hover tooltip is preserved via an internal AT-hidden carrier.',
       table: {
         category: 'Accessibility',
         type: { summary: 'string' },

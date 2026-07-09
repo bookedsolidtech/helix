@@ -11,6 +11,7 @@ export const helixIconButtonStyles = css`
   }
 
   .button {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -38,6 +39,14 @@ export const helixIconButtonStyles = css`
 
   .button:active {
     filter: brightness(var(--hx-filter-brightness-active, 0.8));
+  }
+
+  /* Full-face hit area for the native-tooltip carrier (see
+     _renderTooltipCarrier in hx-icon-button.ts). Empty + aria-hidden:
+     no layout or AX impact; pointer events bubble to the button. */
+  .tooltip-carrier {
+    position: absolute;
+    inset: 0;
   }
 
   /* ─── Size Variants ─── */

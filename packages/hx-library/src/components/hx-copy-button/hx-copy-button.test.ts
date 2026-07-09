@@ -88,7 +88,7 @@ describe('hx-copy-button', () => {
     });
   });
 
-  // ─── Property: label (4) ───
+  // ─── Property: label (5) ───
 
   describe('Property: label', () => {
     it('sets aria-label on native button from label property', async () => {
@@ -99,21 +99,41 @@ describe('hx-copy-button', () => {
       expect(btn?.getAttribute('aria-label')).toBe('Copy patient ID');
     });
 
-    it('sets title on native button from label property', async () => {
+    it('does not render a title attribute on the focusable button', async () => {
+      // A title identical to aria-label maps to the accessible description,
+      // causing NVDA to announce the label twice — and it went stale in the
+      // copied state (aria-label updated, title did not). The button must
+      // never carry title; the native tooltip lives on an internal carrier.
       const el = await fixture<HelixCopyButton>(
         '<hx-copy-button label="Copy patient ID"></hx-copy-button>',
       );
       const btn = shadowQuery(el, 'button');
-      expect(btn?.getAttribute('title')).toBe('Copy patient ID');
+      expect(btn?.hasAttribute('title')).toBe(false);
     });
 
-    it('updates aria-label and title when label property changes', async () => {
+    it('preserves the native tooltip via an aria-hidden internal carrier', async () => {
+      // The carrier holds title on a non-focusable, aria-hidden overlay so
+      // the hover tooltip survives without becoming the control's
+      // accessible description (NVDA double-announce).
+      const el = await fixture<HelixCopyButton>(
+        '<hx-copy-button label="Copy patient ID"></hx-copy-button>',
+      );
+      const carrier = shadowQuery(el, 'button .tooltip-carrier');
+      expect(carrier).toBeTruthy();
+      expect(carrier?.getAttribute('title')).toBe('Copy patient ID');
+      expect(carrier?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('updates aria-label when label property changes', async () => {
       const el = await fixture<HelixCopyButton>('<hx-copy-button label="Copy"></hx-copy-button>');
       el.label = 'Copy record number';
       await el.updateComplete;
       const btn = shadowQuery(el, 'button');
       expect(btn?.getAttribute('aria-label')).toBe('Copy record number');
-      expect(btn?.getAttribute('title')).toBe('Copy record number');
+      expect(btn?.hasAttribute('title')).toBe(false);
+      // The carrier tracks the label property.
+      const carrier = shadowQuery(el, 'button .tooltip-carrier');
+      expect(carrier?.getAttribute('title')).toBe('Copy record number');
     });
 
     it('aria-label reflects copied state for re-focus scenarios (WCAG 1.3.1)', async () => {
