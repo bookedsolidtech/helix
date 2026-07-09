@@ -86,6 +86,14 @@ export const helixCopyButtonStyles = css`
     border-color: var(--hx-copy-button-copied-border-color, var(--hx-color-success-500, #3b9e58));
   }
 
+  /* Full-face hit area for the native-tooltip carrier (see
+     _renderTooltipCarrier in hx-copy-button.ts). Empty + aria-hidden:
+     no layout or AX impact; pointer events bubble to the button. */
+  .tooltip-carrier {
+    position: absolute;
+    inset: 0;
+  }
+
   /* ─── Icon Container ─── */
 
   .icon {

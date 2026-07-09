@@ -41,7 +41,7 @@ describe('hx-icon-button', () => {
     });
   });
 
-  // ─── Property: label (3) ───
+  // ─── Property: label (4) ───
 
   describe('Property: label', () => {
     it('sets aria-label on native button from label property', async () => {
@@ -53,13 +53,44 @@ describe('hx-icon-button', () => {
       expect(btn?.getAttribute('aria-label')).toBe('Delete record');
     });
 
-    it('sets title attribute on native button from label property', async () => {
+    it('does not render a title attribute on the focusable element', async () => {
+      // A title identical to aria-label maps to the accessible description,
+      // causing NVDA to announce the label twice. The focusable element must
+      // never carry title; the native tooltip lives on an internal carrier.
       const el = await fixture<HelixIconButton>(
         '<hx-icon-button label="Edit patient"></hx-icon-button>',
       );
       const btn = shadowQuery(el, 'button');
       expect(btn).toBeTruthy();
-      expect(btn?.getAttribute('title')).toBe('Edit patient');
+      expect(btn?.hasAttribute('title')).toBe(false);
+
+      const link = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Edit patient" href="/edit"></hx-icon-button>',
+      );
+      const anchor = shadowQuery(link, 'a');
+      expect(anchor).toBeTruthy();
+      expect(anchor?.hasAttribute('title')).toBe(false);
+    });
+
+    it('preserves the native tooltip via an aria-hidden internal carrier', async () => {
+      // The carrier holds title on a non-focusable, aria-hidden overlay so
+      // the hover tooltip survives without becoming the control's
+      // accessible description (NVDA double-announce).
+      const el = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Edit patient"></hx-icon-button>',
+      );
+      const carrier = shadowQuery(el, 'button .tooltip-carrier');
+      expect(carrier).toBeTruthy();
+      expect(carrier?.getAttribute('title')).toBe('Edit patient');
+      expect(carrier?.getAttribute('aria-hidden')).toBe('true');
+
+      const link = await fixture<HelixIconButton>(
+        '<hx-icon-button label="Edit patient" href="/edit"></hx-icon-button>',
+      );
+      const anchorCarrier = shadowQuery(link, 'a .tooltip-carrier');
+      expect(anchorCarrier).toBeTruthy();
+      expect(anchorCarrier?.getAttribute('title')).toBe('Edit patient');
+      expect(anchorCarrier?.getAttribute('aria-hidden')).toBe('true');
     });
 
     it('renders nothing when label is empty', async () => {

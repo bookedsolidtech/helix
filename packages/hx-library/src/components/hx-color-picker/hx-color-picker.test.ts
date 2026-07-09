@@ -105,9 +105,38 @@ describe('hx-color-picker', () => {
     });
   });
 
-  // ─── Property: swatches (3) ───
+  // ─── Property: swatches (5) ───
 
   describe('Property: swatches', () => {
+    it('does not render title attributes on swatch or format buttons (aria-label only)', async () => {
+      // title identical to aria-label double-announces in NVDA; the format
+      // button title was also a hardcoded English string bypassing i18n.
+      const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
+      el.swatches = ['#ff0000'];
+      await el.updateComplete;
+      const swatchBtn = el.shadowRoot?.querySelector('.swatch-btn');
+      const formatBtn = el.shadowRoot?.querySelector('.format-btn');
+      expect(swatchBtn).toBeTruthy();
+      expect(formatBtn).toBeTruthy();
+      expect(swatchBtn?.hasAttribute('title')).toBe(false);
+      expect(formatBtn?.hasAttribute('title')).toBe(false);
+    });
+
+    it('preserves the swatch tooltip via an aria-hidden internal carrier', async () => {
+      // The carrier keeps the exact color value visible on hover (close
+      // shades are indistinguishable otherwise) without becoming the swatch
+      // button's accessible description (NVDA double-announce). The format
+      // button is self-labeling via its visible text and gets no carrier.
+      const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
+      el.swatches = ['#ff0000'];
+      await el.updateComplete;
+      const carrier = el.shadowRoot?.querySelector('.swatch-btn .tooltip-carrier');
+      expect(carrier).toBeTruthy();
+      expect(carrier?.getAttribute('title')).toBe('#ff0000');
+      expect(carrier?.getAttribute('aria-hidden')).toBe('true');
+      expect(el.shadowRoot?.querySelector('.format-btn .tooltip-carrier')).toBeNull();
+    });
+
     it('does not render swatches container when swatches is empty', async () => {
       const el = await fixture<HelixColorPicker>('<hx-color-picker inline></hx-color-picker>');
       const swatches = shadowQuery(el, '[part="swatches"]');
