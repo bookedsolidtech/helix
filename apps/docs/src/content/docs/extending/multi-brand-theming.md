@@ -814,7 +814,7 @@ function harbor_health_preprocess_html(array &$variables): void {
         "imports": {
           "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
           "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
-          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
           "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
         }
       }
