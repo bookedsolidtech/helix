@@ -273,17 +273,17 @@ When a new HELiX version is available:
 4. Hard-reload the browser (Cmd+Shift+R) to bypass browser cache
 
 ```yaml
-# Before
+# Before — both the URL pin and the Drupal version key name the old release
 helix-components:
-  version: 3.11.2
+  version: PREVIOUS_VERSION
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@PREVIOUS_VERSION/dist/index.js:
       type: external
       attributes:
         type: module
       preprocess: false
 
-# After upgrade
+# After upgrade — change both, or Drupal keeps serving the cached asset
 helix-components:
   version: 3.11.2
   js:
@@ -299,7 +299,7 @@ helix-components:
 ```yaml
 # DO NOT do this in production
 js:
-  https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
+  https://cdn.jsdelivr.net/npm/@helixui/library@latest/dist/index.js:
     type: external
     attributes:
       type: module
