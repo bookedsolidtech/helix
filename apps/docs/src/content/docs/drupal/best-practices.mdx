@@ -917,7 +917,7 @@ For optimal performance, define one library per component and attach conditional
 
 # Full library bundle (loaded on every page if you don't tree-shake)
 helix-core:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/index.js:
       preprocess: false
@@ -926,7 +926,7 @@ helix-core:
 
 # Individual components (loaded on-demand)
 helix-button:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/components/hx-button/index.js:
       preprocess: false
@@ -936,7 +936,7 @@ helix-button:
     - mytheme/helix-core
 
 helix-card:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/components/hx-card/index.js:
       preprocess: false
@@ -946,7 +946,7 @@ helix-card:
     - mytheme/helix-core
 
 helix-data-table:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/components/hx-data-table/index.js:
       preprocess: false
@@ -1285,7 +1285,7 @@ Pin component library versions in production, use ranges in development.
 ```json
 {
   "dependencies": {
-    "@helixui/library": "^3.9.0"
+    "@helixui/library": "^3.11.2"
   }
 }
 ```
@@ -1296,7 +1296,7 @@ Pin component library versions in production, use ranges in development.
 # mytheme.libraries.yml
 
 helix-components:
-  version: 3.9.0 # Explicit version for cache-busting
+  version: 3.11.2 # Explicit version for cache-busting
   js:
     dist/index.js:
       preprocess: false
@@ -1637,7 +1637,7 @@ function mytheme_preprocess_node(&$variables) {
 
   // Add cache tags for component library
   $variables['#cache']['tags'][] = 'helix:components';
-  $variables['#cache']['tags'][] = 'helix:card:v3.9.0';
+  $variables['#cache']['tags'][] = 'helix:card:v3.11.2';
 
   // Add cache contexts
   $variables['#cache']['contexts'][] = 'user.permissions';

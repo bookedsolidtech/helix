@@ -13,12 +13,12 @@ HELiX components are ES modules built on Lit. Loading them efficiently in Drupal
 
 These sizes are gzipped. Raw sizes are approximately 2.5–3× larger.
 
-| Load strategy                        | Approximate gzipped size | When to use                             |
-| ------------------------------------ | ------------------------ | --------------------------------------- |
-| Full bundle (`dist/index.js`)        | ~38 KB                   | Prototypes, sites using 8+ components   |
-| Per-component (e.g., `hx-button`)    | 3–6 KB per component     | Production sites, page-specific loading |
-| Lit runtime alone                    | ~12 KB                   | Shared dependency baseline              |
-| Tokens CSS (`@helixui/tokens@3.9.4`) | ~4 KB                    | Always load separately                  |
+| Load strategy                        | Approximate gzipped size | When to use                                        |
+| ------------------------------------ | ------------------------ | -------------------------------------------------- |
+| Full bundle (`dist/index.js`)        | ~38 KB                   | Prototypes, sites using 8+ components              |
+| Per-component (e.g., `hx-button`)    | 3–6 KB per component     | Production sites, page-specific loading            |
+| Lit runtime alone                    | ~12 KB                   | Shared dependency baseline                         |
+| Tokens CSS (`@helixui/tokens@3.9.4`) | ~4 KB                    | Only if theme CSS uses `--hx-*` outside components |
 
 The full bundle CDN URL is:
 

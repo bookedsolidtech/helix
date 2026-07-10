@@ -110,7 +110,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 function hx_library_help($route_name, RouteMatchInterface $route_match) {
   if ($route_name === 'help.page.hx_library') {
     $output = '<h3>' . t('About') . '</h3>';
-    $output .= '<p>' . t('Provides HELiX web components (@helixui/library v3.9.0) as Drupal library assets.') . '</p>';
+    $output .= '<p>' . t('Provides HELiX web components (@helixui/library v3.11.2) as Drupal library assets.') . '</p>';
     $output .= '<h3>' . t('Usage') . '</h3>';
     $output .= '<pre><code>';
     $output .= "# In mytheme.info.yml\nlibraries:\n  - hx_library/components\n\n";
@@ -133,7 +133,7 @@ function hx_library_help($route_name, RouteMatchInterface $route_match) {
 ```yaml
 # Full library bundle — loads all HELiX components
 components:
-  version: 3.9.0
+  version: 3.11.2
   js:
     libraries/helix/dist/index.js:
       attributes:
@@ -176,7 +176,7 @@ For large sites where different page types use different components:
 
 # Full bundle
 components:
-  version: 3.9.0
+  version: 3.11.2
   js:
     libraries/helix/dist/index.js:
       attributes:
@@ -186,7 +186,7 @@ components:
 
 # Individual component libraries
 button:
-  version: 3.9.0
+  version: 3.11.2
   js:
     libraries/helix/dist/components/hx-button/index.js:
       attributes:
@@ -195,7 +195,7 @@ button:
       minified: true
 
 card:
-  version: 3.9.0
+  version: 3.11.2
   js:
     libraries/helix/dist/components/hx-card/index.js:
       attributes:
@@ -204,7 +204,7 @@ card:
       minified: true
 
 text-input:
-  version: 3.9.0
+  version: 3.11.2
   js:
     libraries/helix/dist/components/hx-text-input/index.js:
       attributes:
@@ -273,7 +273,7 @@ Use Composer to manage the JavaScript dependency alongside your PHP packages.
 **Require the package:**
 
 ```bash
-composer require npm-asset/helixui--library:^3.9.0
+composer require npm-asset/helixui--library:^3.11.2
 ```
 
 **Configure installer path in `composer.json`:**
@@ -282,9 +282,7 @@ composer require npm-asset/helixui--library:^3.9.0
 {
   "extra": {
     "installer-paths": {
-      "web/modules/custom/hx_library/libraries/helix": [
-        "npm-asset/helixui--library"
-      ]
+      "web/modules/custom/hx_library/libraries/helix": ["npm-asset/helixui--library"]
     }
   }
 }
@@ -295,7 +293,7 @@ After `composer install`, the HELiX dist files land at `web/modules/custom/hx_li
 **Updating:**
 
 ```bash
-composer require npm-asset/helixui--library:^3.9.0
+composer require npm-asset/helixui--library:^3.11.2
 drush cr
 ```
 
@@ -433,6 +431,7 @@ function mytheme_page_attachments(array &$attachments) {
 ```
 
 Key attribute notes:
+
 - Use `hx-size` (not `size`) for component sizing
 - Use the `href` attribute on `hx-card` for link card behavior; the card fires `hx-click` on activation
 
@@ -504,12 +503,12 @@ function hx_library_requirements($phase) {
 }
 
 /**
- * Update HELiX library version to 3.9.0.
+ * Update HELiX library version to 3.11.2.
  */
 function hx_library_update_10001() {
   // Clear all caches to reload updated library definitions.
   drupal_flush_all_caches();
-  return t('HELiX Library updated to version 3.9.0. Cache cleared.');
+  return t('HELiX Library updated to version 3.11.2. Cache cleared.');
 }
 ```
 
@@ -524,7 +523,7 @@ The `hook_requirements()` implementation makes the status report at `/admin/repo
 **`config/install/hx_library.settings.yml`:**
 
 ```yaml
-version: '3.9.0'
+version: '3.11.2'
 use_cdn_fallback: false
 cdn_url: 'https://cdn.jsdelivr.net/npm/@helixui/library'
 ```
@@ -608,7 +607,7 @@ function hx_library_library_info_alter(&$libraries, $extension) {
 
   // Allow per-site CDN fallback via settings.
   if ($config->get('use_cdn_fallback')) {
-    $version = $config->get('version') ?? '3.9.0';
+    $version = $config->get('version') ?? '3.11.2';
     $cdn_url = $config->get('cdn_url') ?? 'https://cdn.jsdelivr.net/npm/@helixui/library';
 
     // Rewrite BOTH the JS entry AND the CSS entries — if you only
@@ -639,7 +638,7 @@ Override in a site-specific `settings.php`:
 ```php
 // sites/site-a.example.com/settings.php
 $config['hx_library.settings']['use_cdn_fallback'] = TRUE;
-$config['hx_library.settings']['version'] = '3.9.0';
+$config['hx_library.settings']['version'] = '3.11.2';
 ```
 
 ---
@@ -648,15 +647,15 @@ $config['hx_library.settings']['version'] = '3.9.0';
 
 HELiX itself has no Drupal PHP version dependencies — it is entirely a JavaScript/CSS library. Drupal-side compatibility comes from the module scaffolding:
 
-| Feature | Drupal 10 | Drupal 11 |
-|---|---|---|
-| `core_version_requirement: ^10 \|\| ^11` | Yes | Yes |
-| Libraries API (`*.libraries.yml`) | Yes | Yes |
-| `attributes: { type: module }` in libraries | Yes (since D9.3) | Yes |
-| `hook_page_attachments()` | Yes | Yes |
-| `hook_library_info_alter()` | Yes | Yes |
-| Configuration management | Yes | Yes |
-| Composer dependency management | Yes | Yes |
+| Feature                                     | Drupal 10        | Drupal 11 |
+| ------------------------------------------- | ---------------- | --------- |
+| `core_version_requirement: ^10 \|\| ^11`    | Yes              | Yes       |
+| Libraries API (`*.libraries.yml`)           | Yes              | Yes       |
+| `attributes: { type: module }` in libraries | Yes (since D9.3) | Yes       |
+| `hook_page_attachments()`                   | Yes              | Yes       |
+| `hook_library_info_alter()`                 | Yes              | Yes       |
+| Configuration management                    | Yes              | Yes       |
+| Composer dependency management              | Yes              | Yes       |
 
 No conditional code or version detection is needed in the module. The same `.info.yml`, `.libraries.yml`, and hook implementations work identically on Drupal 10 and 11.
 
@@ -712,11 +711,11 @@ libraries/helix/dist/index.js:
 
 ```yaml
 components:
-  version: 3.9.0
+  version: 3.11.2
   js:
     libraries/helix/dist/index.js:
       attributes:
-        type: module    # This line is required
+        type: module # This line is required
       preprocess: false
 ```
 
@@ -742,11 +741,11 @@ When a new HELiX version is available:
 
 ```php
 /**
- * Update HELiX library files to version 3.9.0.
+ * Update HELiX library files to version 3.11.2.
  */
 function hx_library_update_10002() {
   drupal_flush_all_caches();
-  return t('HELiX Library updated to version 3.9.0.');
+  return t('HELiX Library updated to version 3.11.2.');
 }
 ```
 

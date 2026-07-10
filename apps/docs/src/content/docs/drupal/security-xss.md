@@ -257,14 +257,17 @@ helix-button:
 
 Get the hash from [https://www.srihash.org](https://www.srihash.org) or jsDelivr's SRI tool.
 
-The per-component module above imports a shared chunk that pulls `lit` from a bare specifier. Ship an import map (or use the bundled aggregate entry, `dist/index.js`) so the browser can resolve `lit` — otherwise the module fails to load even with a valid `integrity` hash:
+The per-component module above imports a shared chunk that pulls `lit`, `@helixui/tokens`, and `@helixui/icons` from bare specifiers. Ship an import map (or use the bundled aggregate entry, `dist/index.js`) so the browser can resolve them — otherwise the module fails to load even with a valid `integrity` hash:
 
 ```html
 <script type="importmap">
   {
     "imports": {
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
-      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
+      "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
     }
   }
 </script>
