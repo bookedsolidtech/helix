@@ -1,6 +1,6 @@
 {
   "name": "@helixui/library",
-  "version": "3.11.0",
+  "version": "3.11.1",
   "description": "Enterprise Web Component Library built with Lit 3.x",
   "type": "module",
   "sideEffects": [
@@ -71,9 +71,10 @@
     "generate:barrel": "node scripts/generate-barrel.js",
     "prepare": "node scripts/generate-barrel.js",
     "prebuild": "node scripts/generate-barrel.js",
-    "build": "vite build && pnpm run cem && pnpm run css:build",
+    "build": "vite build && pnpm run cem && pnpm run css:build && pnpm run css:validate",
     "css:build": "node scripts/generate-css-bundles.mjs",
     "css:validate": "node scripts/validate-css.mjs",
+    "prepack": "pnpm run build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
