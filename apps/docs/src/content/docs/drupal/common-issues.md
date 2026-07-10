@@ -22,7 +22,7 @@ For detailed diagnostic walkthroughs, see [Troubleshooting](/drupal/troubleshoot
 ```yaml
 # mytheme.libraries.yml — use the correct versioned URL
 helix-button:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
@@ -56,7 +56,7 @@ helix-button:
     dist/components/hx-button/index.js:
       preprocess: false
       attributes:
-        type: module   # This is required — without it, the file is treated as a classic script
+        type: module # This is required — without it, the file is treated as a classic script
 ```
 
 `drush cr` after editing.
@@ -94,8 +94,8 @@ helix-button:
 ```yaml
 # mytheme.info.yml
 libraries:
-  - mytheme/helix-button    # Used in navigation on every page
-  - mytheme/helix-tokens    # CSS custom properties — always load
+  - mytheme/helix-button # Used in navigation on every page
+  - mytheme/helix-tokens # CSS custom properties — always load
 ```
 
 **Fix — Template-specific attachment:**
@@ -236,7 +236,7 @@ tokens (e.g. `--hx-color-action-primary-bg`), which fall back to the primitive p
 helix-button:
   js:
     dist/components/hx-button/index.js:
-      preprocess: false  # Opt out of aggregation — required for ALL ES modules
+      preprocess: false # Opt out of aggregation — required for ALL ES modules
       minified: true
       attributes:
         type: module
@@ -289,10 +289,10 @@ curl -s https://your-site.com/some-page | grep 'type="module"'
 ```javascript
 // Browser console — run on any page with a HELiX component
 const checks = ['hx-button', 'hx-card', 'hx-text-input', 'hx-select'];
-checks.forEach(tag => {
+checks.forEach((tag) => {
   const defined = customElements.get(tag) ? 'registered' : 'MISSING';
   const el = document.querySelector(tag);
-  const upgraded = el?.shadowRoot ? 'upgraded' : (el ? 'NOT upgraded' : 'not on page');
+  const upgraded = el?.shadowRoot ? 'upgraded' : el ? 'NOT upgraded' : 'not on page';
   console.log(`${tag}: ${defined}, ${upgraded}`);
 });
 ```

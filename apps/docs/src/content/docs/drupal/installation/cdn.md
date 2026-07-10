@@ -59,7 +59,7 @@ Load `dist/cdn/core.js` (registry + tokens, ~8.4KB min+gz) once, then load each 
 # mytheme.libraries.yml
 
 helix-components:
-  version: 3.0.0
+  version: 3.11.2
   js:
     # Core: registry + tokens, ~8.4KB min+gz
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/cdn/core.js:
@@ -92,7 +92,7 @@ helix-components:
 
 ```yaml
 helix-components:
-  version: 3.0.0
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
@@ -110,7 +110,7 @@ Both jsDelivr and unpkg are reliable and serve correct ES module MIME types. jsD
 ```yaml
 # Swap the host — same paths work on unpkg
 helix-components:
-  version: 3.0.0
+  version: 3.11.2
   js:
     https://unpkg.com/@helixui/library@3.11.2/dist/cdn/core.js:
       type: external
@@ -125,7 +125,7 @@ To load the HELiX CSS bundle alongside the JavaScript:
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
@@ -252,7 +252,7 @@ For link cards, use `href` (not `href`):
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
@@ -275,7 +275,7 @@ When a new HELiX version is available:
 ```yaml
 # Before
 helix-components:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
@@ -285,7 +285,7 @@ helix-components:
 
 # After upgrade
 helix-components:
-  version: 1.2.0
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
@@ -319,7 +319,7 @@ Loading the full bundle delivers all HELiX components. If your site uses only a 
 # mytheme.libraries.yml
 
 helix-button:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
@@ -328,7 +328,7 @@ helix-button:
       preprocess: false
 
 helix-card:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js:
       type: external
@@ -337,7 +337,7 @@ helix-card:
       preprocess: false
 
 helix-text-input:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-text-input/index.js:
       type: external
@@ -397,7 +397,7 @@ This outputs a base64-encoded SHA-384 hash. Prepend `sha384-` to form the integr
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
@@ -462,7 +462,7 @@ web/themes/custom/mytheme/
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.11.2
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
@@ -531,7 +531,7 @@ By default Drupal places scripts at the bottom of `<body>`. To load HELiX earlie
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.11.2
   header: true
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
@@ -649,7 +649,7 @@ libraries:
 
 ```yaml
 helix-components:
-  version: 1.1.2
+  version: 3.11.2
   header: true
   js:
     https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:

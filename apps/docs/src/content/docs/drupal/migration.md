@@ -40,7 +40,7 @@ Add HELiX as a library dependency without removing anything. Both Bootstrap (or 
 ```yaml
 # mytheme.libraries.yml
 helix-core:
-  version: 1.1.2
+  version: 3.11.2
   css:
     theme:
       https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/tokens.css:
@@ -274,7 +274,7 @@ The CDN approach is the lowest-friction way to introduce HELiX into an existing 
 ```yaml
 # Add to an existing theme's libraries YAML
 helix-gradual:
-  version: 1.1.2
+  version: 3.11.2
   css:
     theme:
       https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/tokens.css:
@@ -299,14 +299,14 @@ This limits the blast radius — CDN load only on migrated pages, no impact on o
 
 ## Migration Risk Register
 
-| Migration step | Risk | Mitigation |
-|---|---|---|
-| Loading HELiX CSS tokens | Medium — `--hx-*` properties visible globally | Use `--hx-` prefix — no conflict with `--bs-` |
-| Migrating card templates | Low — no form interaction | Test in staging, compare screenshots |
-| Migrating form elements | High — validation and submission | Use FormElement plugin, preserve `#type` API |
-| Removing Bootstrap JS | Medium — existing behaviors may depend on it | Audit all jQuery dependencies before removal |
-| Removing Bootstrap CSS | High — global selectors affect many templates | Remove only after all templates migrated |
-| Removing jQuery | High — Drupal core still uses jQuery | Do not remove jQuery — only remove your custom jQuery behaviors |
+| Migration step           | Risk                                          | Mitigation                                                      |
+| ------------------------ | --------------------------------------------- | --------------------------------------------------------------- |
+| Loading HELiX CSS tokens | Medium — `--hx-*` properties visible globally | Use `--hx-` prefix — no conflict with `--bs-`                   |
+| Migrating card templates | Low — no form interaction                     | Test in staging, compare screenshots                            |
+| Migrating form elements  | High — validation and submission              | Use FormElement plugin, preserve `#type` API                    |
+| Removing Bootstrap JS    | Medium — existing behaviors may depend on it  | Audit all jQuery dependencies before removal                    |
+| Removing Bootstrap CSS   | High — global selectors affect many templates | Remove only after all templates migrated                        |
+| Removing jQuery          | High — Drupal core still uses jQuery          | Do not remove jQuery — only remove your custom jQuery behaviors |
 
 ---
 
