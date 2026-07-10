@@ -184,7 +184,7 @@ Every HELiX integration starts with the runtime library. This is the shared foun
 # alongside the components is the design-token CSS.
 
 hx.runtime:
-  version: 3.9.0
+  version: 3.11.2
   css:
     theme:
       # Design tokens: CSS custom properties for theming
@@ -230,7 +230,7 @@ Each component gets its own library entry with explicit dependencies.
 # ─── Atoms ───
 
 hx.button:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-button/index.js:
       type: module
@@ -240,7 +240,7 @@ hx.button:
     - mytheme/hx.runtime
 
 hx.icon:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-icon/index.js:
       type: module
@@ -250,7 +250,7 @@ hx.icon:
     - mytheme/hx.runtime
 
 hx.badge:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-badge/index.js:
       type: module
@@ -260,7 +260,7 @@ hx.badge:
     - mytheme/hx.runtime
 
 hx.spinner:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-spinner/index.js:
       type: module
@@ -273,7 +273,7 @@ hx.spinner:
 # Form elements depend on the runtime only
 
 hx.text_input:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-text-input/index.js:
       type: module
@@ -283,7 +283,7 @@ hx.text_input:
     - mytheme/hx.runtime
 
 hx.textarea:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-textarea/index.js:
       type: module
@@ -293,7 +293,7 @@ hx.textarea:
     - mytheme/hx.runtime
 
 hx.select:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-select/index.js:
       type: module
@@ -303,7 +303,7 @@ hx.select:
     - mytheme/hx.runtime
 
 hx.checkbox:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-checkbox/index.js:
       type: module
@@ -313,7 +313,7 @@ hx.checkbox:
     - mytheme/hx.runtime
 
 hx.radio_group:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-radio-group/index.js:
       type: module
@@ -323,7 +323,7 @@ hx.radio_group:
     - mytheme/hx.runtime
 
 hx.switch:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-switch/index.js:
       type: module
@@ -336,7 +336,7 @@ hx.switch:
 # Molecules may depend on atoms they use internally
 
 hx.card:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-card/index.js:
       type: module
@@ -351,7 +351,7 @@ hx.card:
   # in templates that put an <hx-button> inside hx-card's actions slot.
 
 hx.alert:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-alert/index.js:
       type: module
@@ -362,7 +362,7 @@ hx.alert:
     - mytheme/hx.icon # Alerts show icons for variant (info, warning, etc.)
 
 hx.breadcrumb:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-breadcrumb/index.js:
       type: module
@@ -375,7 +375,7 @@ hx.breadcrumb:
 # Organisms compose multiple components
 
 hx.dialog:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-dialog/index.js:
       type: module
@@ -386,7 +386,7 @@ hx.dialog:
     - mytheme/hx.button # Modal footer actions use buttons
 
 hx.accordion:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-accordion/index.js:
       type: module
@@ -397,7 +397,7 @@ hx.accordion:
     - mytheme/hx.icon # Accordion uses chevron icons
 
 hx.form:
-  version: 3.9.0
+  version: 3.11.2
   js:
     vendor/helix/components/hx-form/index.js:
       type: module
@@ -434,7 +434,7 @@ Groups are pure dependency aggregators with NO JavaScript of their own.
 # Use these in preprocess functions for cleaner code.
 
 hx.group_core:
-  version: 3.9.0
+  version: 3.11.2
   # No js: or css: — pure dependency aggregator
   dependencies:
     - mytheme/hx.button
@@ -443,7 +443,7 @@ hx.group_core:
     - mytheme/hx.spinner
 
 hx.group_forms:
-  version: 3.9.0
+  version: 3.11.2
   dependencies:
     - mytheme/hx.text_input
     - mytheme/hx.textarea
@@ -454,7 +454,7 @@ hx.group_forms:
     - mytheme/hx.group_core # Forms use buttons for submit
 
 hx.group_content:
-  version: 3.9.0
+  version: 3.11.2
   dependencies:
     - mytheme/hx.card
     - mytheme/hx.alert
@@ -462,7 +462,7 @@ hx.group_content:
     - mytheme/hx.group_core # Content uses buttons, badges
 
 hx.group_interactive:
-  version: 3.9.0
+  version: 3.11.2
   dependencies:
     - mytheme/hx.dialog
     - mytheme/hx.accordion
@@ -471,7 +471,7 @@ hx.group_interactive:
 # ─── Development Bundle (NEVER in production) ───
 
 hx.all:
-  version: 3.9.0
+  version: 3.11.2
   dependencies:
     - mytheme/hx.group_core
     - mytheme/hx.group_forms
@@ -847,7 +847,7 @@ Inter-component dependencies must be kept accurate. When a component template ch
 
 ```diff
  hx.card:
-   version: 3.9.0
+   version: 3.11.2
    js:
      vendor/helix/components/hx-card/index.js:
        type: module

@@ -11,7 +11,7 @@ HELIX components work in any HTML page with a single `<script>` tag. No build to
 
 ## CDN via Script Tag (import map)
 
-A bare specifier like `import '@helixui/library'` only resolves in the browser if an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) is in scope — otherwise the browser throws a module-resolution error. Use a pinned, version-locked CDN URL plus an import map for the library's bare dependencies (`lit`, `lit/*`, `@helixui/tokens`, `@helixui/icons`):
+A bare specifier like `import '@helixui/library'` only resolves in the browser if an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) is in scope — otherwise the browser throws a module-resolution error. Use a pinned, version-locked CDN URL plus an import map for the library's bare dependencies (`lit`, `lit/*`, `@helixui/tokens`, `@helixui/icons`, `@floating-ui/dom`):
 
 ```html
 <!DOCTYPE html>
@@ -26,6 +26,7 @@ A bare specifier like `import '@helixui/library'` only resolves in the browser i
           "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js",
           "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
           "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
+          "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
           "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
           "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
         }
@@ -56,6 +57,7 @@ For performance, load only the components you use. Per-component entry points re
       "@helixui/library/components/hx-text-input": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-text-input/index.js",
       "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
       "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
+      "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
       "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
     }
