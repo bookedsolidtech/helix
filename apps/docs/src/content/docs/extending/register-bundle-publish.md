@@ -328,7 +328,7 @@ An import map pins bare module specifiers to resolved URLs, preventing duplicate
       "@lit/reactive-element": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@2/reactive-element.js",
       "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@3/lit-html.js",
       "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
-      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
       "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm",
       "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js",
       "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js"
@@ -362,7 +362,7 @@ For incremental adoption — loading only the components a specific page needs:
       "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
       "lit/directives/class-map.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/class-map.js",
       "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
-      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
       "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm",
       "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js"
     }

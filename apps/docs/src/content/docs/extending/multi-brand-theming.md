@@ -807,13 +807,15 @@ function harbor_health_preprocess_html(array &$variables): void {
     <title>{{ head_title }}</title>
     {{ head }}
     {# HELiX library — loaded from CDN. The published distribution imports
-       `lit` and `@helixui/icons` from bare specifiers, so a CDN load needs
-       an import map; see /drupal/theming/ for the canonical snippet. #}
+       `lit`, `@helixui/tokens`, and `@helixui/icons` from bare specifiers, so
+       a CDN load needs an import map; see /drupal/theming/ for the canonical
+       snippet. #}
     <script type="importmap">
       {
         "imports": {
           "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
           "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
           "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
           "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
         }
