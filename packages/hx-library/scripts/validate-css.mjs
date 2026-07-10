@@ -139,6 +139,41 @@ if (existsSync(allFile)) {
   );
 }
 
+// ─── JS-Leak Content Gate ─────────────────────────────────────────────────────
+//
+// A CSS extraction bug (fixed in generate-css-bundles.mjs) once swept the
+// JavaScript between multiple css`` literals — export statements, tagged-literal
+// terminators — into the emitted CSS. postcss then choked on those lines with
+// "Invalid empty selector". These patterns catch that class of leak so a bad
+// publish fails here instead of shipping. Anchored to line starts where sensible
+// to stay clear of legitimate CSS (e.g. index.css uses `@import`, which the
+// import pattern deliberately does not match).
+const JS_LEAK_PATTERNS = [
+  { name: 'css`` tagged literal', re: /css`/ },
+  { name: 'export statement', re: /^\s*export\s/ },
+  { name: 'import statement', re: /^\s*import\s/ },
+  { name: 'arrow function', re: /=>/ },
+  { name: 'template interpolation', re: /\$\{/ },
+  { name: 'tagged-literal terminator', re: /`;/ },
+];
+
+const cssFiles = readdirSync(OUT_DIR).filter((f) => f.endsWith('.css'));
+let leakCount = 0;
+for (const file of cssFiles) {
+  const lines = readFileSync(join(OUT_DIR, file), 'utf-8').split('\n');
+  lines.forEach((line, idx) => {
+    for (const { name, re } of JS_LEAK_PATTERNS) {
+      if (re.test(line)) {
+        fail(`${file}:${idx + 1} leaked JavaScript (${name}): ${line.trim().slice(0, 80)}`);
+        leakCount++;
+      }
+    }
+  });
+}
+if (leakCount === 0) {
+  pass(`No JavaScript leaks across ${cssFiles.length} CSS files`);
+}
+
 if (hasErrors) {
   console.error('\n[css-validate] Validation FAILED. Run pnpm run css:build to regenerate.');
   process.exit(1);
