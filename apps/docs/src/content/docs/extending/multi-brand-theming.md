@@ -734,7 +734,7 @@ A single `@helixui/library` instance on a CDN serves all Drupal multisite instal
                     ┌─────────────────────────────────┐
                     │   CDN / Static Asset Server     │
                     │                                 │
-                    │  @helixui/library@3.9.0          │
+                    │  @helixui/library@3.11.2          │
                     │  ├── helix.esm.js               │
                     │  └── helix.css (base tokens)    │
                     └──────────────┬──────────────────┘
@@ -814,14 +814,14 @@ function harbor_health_preprocess_html(array &$variables): void {
         "imports": {
           "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
           "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
-          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
           "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
         }
       }
     </script>
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+      src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"
     ></script>
     {# Brand tokens loaded via Drupal library (harbor_health/brand-tokens) #}
   </head>
@@ -887,7 +887,7 @@ The following CSS custom properties are available for brand override.
 
 ### Color
 
-Default values below reflect the canonical **Apex** brand from `@helixui/tokens@3.9.0` (`packages/hx-tokens/dist/tokens.css`); other shipped brands override the primary ramp at their `[data-brand]` scope.
+Default values below reflect the canonical **Apex** brand from `@helixui/tokens@3.9.4` (`packages/hx-tokens/dist/tokens.css`); other shipped brands override the primary ramp at their `[data-brand]` scope.
 
 | Property                     | Type      | Default (Apex)                | Use case                                     |
 | ---------------------------- | --------- | ----------------------------- | -------------------------------------------- |

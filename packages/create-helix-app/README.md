@@ -20,7 +20,7 @@
 
 ## The stub vs the real package
 
-The published `create-helix@0.8.0` package ships **278 files** including:
+The published `create-helix` package ships the full scaffolder tree, including:
 
 - **16 framework templates** (`wc-storybook`, `react-next`, `react-vite`,
   `remix`, `vue-nuxt`, `vue-vite`, `solid-vite`, `qwik-vite`, `svelte-kit`,

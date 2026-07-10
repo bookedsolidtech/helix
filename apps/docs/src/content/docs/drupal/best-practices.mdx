@@ -34,11 +34,11 @@ Load HELiX components from a CDN for automatic caching and global distribution.
 # CDN approach with version pinning
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
-  version: 3.9.0
+  version: 3.11.2
   header: true
 ```
 
@@ -58,7 +58,7 @@ libraries:
 
 <Aside type="tip" title="Best Practice">
   Use CDN loading for production to benefit from browser caching and HTTP/2 multiplexing. Pin to a
-  specific version (e.g., `@3.9.0`) to prevent breaking changes from auto-updating.
+  specific version (e.g., `@3.11.2`) to prevent breaking changes from auto-updating.
 </Aside>
 
 ### Local Installation (For Development or Private Hosting)
@@ -97,19 +97,19 @@ For performance-critical pages, load only the components you use.
 ```yaml
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       attributes:
         type: module
-  version: 3.9.0
+  version: 3.11.2
 
 helix-card:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js:
       type: external
       attributes:
         type: module
-  version: 3.9.0
+  version: 3.11.2
 ```
 
 Attach only what you need:
@@ -589,11 +589,11 @@ Here's a complete `your_theme.libraries.yml` for HELiX integration:
 # Global HELiX library (CDN)
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
-  version: 3.9.0
+  version: 3.11.2
   header: true
 
 # HELiX behaviors
@@ -1153,26 +1153,29 @@ Use SRI hashes for CDN-loaded components.
 **Generate SRI hash:**
 
 ```bash
-curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js | \
+curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js | \
   openssl dgst -sha384 -binary | \
   openssl base64 -A
 ```
 
-**Library definition with SRI:**
+**Library definition with SRI** — the `integrity` value below is a placeholder. SRI digests are
+specific to one exact file, so paste the digest you generated above and regenerate it every time you
+change the pinned version, or the browser will refuse to execute the script:
 
 ```yaml
 # mytheme.libraries.yml
 
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       minified: true
       preprocess: false
       attributes:
         type: module
         crossorigin: anonymous
-        integrity: sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxy9rx7HNQlGYl1kPzQho1wx4JwY8wC
+        # sha384 digest from the command above — regenerate it whenever you change the pinned version
+        integrity: sha384-REPLACE_WITH_DIGEST_FOR_THE_VERSION_YOU_PIN
 ```
 
 **Benefits:**

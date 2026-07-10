@@ -67,7 +67,7 @@ For external URLs (CDN):
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
 ```
 
@@ -141,7 +141,7 @@ For CDN-hosted files:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
       attributes:
         type: module
@@ -279,7 +279,7 @@ For CDN assets with their own versioning:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
       version: -1 # Disable query string
       attributes:
@@ -382,9 +382,9 @@ For optimal performance, define one library per component. This enables tree-sha
 ```yaml
 # mytheme.libraries.yml
 helix-all:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
       minified: true
       preprocess: false
@@ -672,7 +672,7 @@ Drupal's library system integrates with its cache system:
    ```yaml
    helix-cdn:
      js:
-       https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+       https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
          type: external
          minified: true
    ```
@@ -699,9 +699,9 @@ ls -lh dist/js/hx-*.js | awk '{print $5, $9}'
 # mytheme.libraries.yml
 
 helix-button-cdn:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button.js:
       type: external
       minified: true
       preprocess: false

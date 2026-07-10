@@ -47,14 +47,14 @@ The element is in the DOM but the Custom Element registry does not contain a def
 # mytheme.libraries.yml
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes:
         type: module # Without this, the ES module fails to parse
 ```
 
-> **Heads up:** the per-component CDN module above imports a shared chunk that pulls `lit` and `@helixui/icons` from bare specifiers, so the page also needs an [import map](#) (or a CDN that bundles dependencies) for the module to resolve. The simpler path is to load the aggregate `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js` after an import map. See [Theming HELiX Components in Drupal](/drupal/theming/) and [XSS Prevention](/drupal/security-xss/) for the canonical import-map snippet.
+> **Heads up:** the per-component CDN module above imports a shared chunk that pulls `lit` and `@helixui/icons` from bare specifiers, so the page also needs an [import map](/drupal/theming/) (or a CDN that bundles dependencies) for the module to resolve. The simpler path is to load the aggregate `https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js` after an import map. See [Theming HELiX Components in Drupal](/drupal/theming/) and [XSS Prevention](/drupal/security-xss/) for the canonical import-map snippet.
 
 **Fix — Library not attached:**
 
@@ -87,7 +87,7 @@ The Shadow DOM upgraded successfully but design tokens are not defined, so the c
 helix-tokens:
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/tokens.css:
+      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/tokens.css:
         type: external
 ```
 

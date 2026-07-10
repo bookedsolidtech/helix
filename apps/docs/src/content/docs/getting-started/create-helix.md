@@ -119,11 +119,11 @@ The Drupal track exposes preset choices in the prompt:
 | `intranet`   | Standard + employee portal components               | 11        |
 | `ecommerce`  | Ecommerce-optimized component set                   | —         |
 
-## CLI Surface (v0.8.0)
+## CLI Surface
 
 The shipped binary parses subcommands and a full flag surface. Run
 `npx create-helix --help` for the exact list bundled with the version you
-have installed; the table below captures what `create-helix@0.8.0` supports.
+have installed; the table below captures the published surface.
 
 ```
 create-helix [project-name] [options]
