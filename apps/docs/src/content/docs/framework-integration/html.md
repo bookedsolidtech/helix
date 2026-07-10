@@ -23,9 +23,9 @@ A bare specifier like `import '@helixui/library'` only resolves in the browser i
     <script type="importmap">
       {
         "imports": {
-          "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
-          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+          "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js",
+          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
           "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
           "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
         }
@@ -52,10 +52,10 @@ For performance, load only the components you use. Per-component entry points re
 <script type="importmap">
   {
     "imports": {
-      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js",
-      "@helixui/library/components/hx-text-input": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js",
-      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js",
+      "@helixui/library/components/hx-text-input": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-text-input/index.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
       "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
     }

@@ -9,29 +9,29 @@ HELiX components are ES modules built on Lit. Loading them efficiently in Drupal
 
 ---
 
-## Bundle Size Reference — @helixui/library@3.9.0
+## Bundle Size Reference — @helixui/library@3.11.2
 
 These sizes are gzipped. Raw sizes are approximately 2.5–3× larger.
 
-| Load strategy | Approximate gzipped size | When to use |
-|---|---|---|
-| Full bundle (`dist/index.js`) | ~38 KB | Prototypes, sites using 8+ components |
-| Per-component (e.g., `hx-button`) | 3–6 KB per component | Production sites, page-specific loading |
-| Lit runtime alone | ~12 KB | Shared dependency baseline |
-| Tokens CSS (`@helixui/tokens@3.9.0`) | ~4 KB | Always load separately |
+| Load strategy                        | Approximate gzipped size | When to use                             |
+| ------------------------------------ | ------------------------ | --------------------------------------- |
+| Full bundle (`dist/index.js`)        | ~38 KB                   | Prototypes, sites using 8+ components   |
+| Per-component (e.g., `hx-button`)    | 3–6 KB per component     | Production sites, page-specific loading |
+| Lit runtime alone                    | ~12 KB                   | Shared dependency baseline              |
+| Tokens CSS (`@helixui/tokens@3.9.4`) | ~4 KB                    | Always load separately                  |
 
 The full bundle CDN URL is:
 
 ```
-https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js
+https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js
 ```
 
 Per-component CDN pattern:
 
 ```text
-https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js
-https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js
-https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js
+https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js
+https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js
+https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-text-input/index.js
 ```
 
 ---
@@ -45,9 +45,9 @@ Load all components at once from a single URL. Drupal attaches one library globa
 ```yaml
 # mytheme.libraries.yml
 helix:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       preprocess: false
       attributes:
@@ -70,9 +70,9 @@ Define a library per component and attach only what each template needs.
 ```yaml
 # mytheme.libraries.yml
 helix-button:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes:
@@ -80,9 +80,9 @@ helix-button:
         crossorigin: anonymous
 
 helix-card:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js:
       type: external
       preprocess: false
       attributes:
@@ -90,9 +90,9 @@ helix-card:
         crossorigin: anonymous
 
 helix-text-input:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-text-input/index.js:
       type: external
       preprocess: false
       attributes:
@@ -121,7 +121,7 @@ Every HELiX component depends on Lit. When per-component files are loaded separa
 jsDelivr serves Lit as a shared module import. Because browsers cache ES modules by URL, the same Lit bundle is reused across all component imports when they reference the same URL:
 
 ```
-https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/lit-runtime.js
+https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/lit-runtime.js
 ```
 
 Define it as a dependency:
@@ -129,9 +129,9 @@ Define it as a dependency:
 ```yaml
 # mytheme.libraries.yml
 helix-runtime:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/lit-runtime.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/lit-runtime.js:
       type: external
       preprocess: false
       attributes:
@@ -139,9 +139,9 @@ helix-runtime:
         crossorigin: anonymous
 
 helix-button:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes:
@@ -151,9 +151,9 @@ helix-button:
     - mytheme/helix-runtime
 
 helix-card:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js:
       type: external
       preprocess: false
       attributes:
@@ -198,7 +198,7 @@ Drupal's built-in JS aggregation concatenates files — a technique incompatible
 helix-button:
   js:
     dist/hx-button.js:
-      preprocess: false  # REQUIRED — aggregation breaks ES module imports
+      preprocess: false # REQUIRED — aggregation breaks ES module imports
       minified: true
       attributes:
         type: module
@@ -213,6 +213,7 @@ Without `preprocess: false`, Drupal concatenates the module file with other scri
 HTTP/2 multiplexing allows many files to download in parallel over a single connection. This eliminates the HTTP/1.1 penalty for multiple requests and makes per-component loading viable without concatenation.
 
 On HTTP/2 infrastructure, 10 component files of 4 KB each typically load faster than one file of 40 KB because:
+
 - Downloads start simultaneously
 - Each file is individually cacheable
 - Browser caches individual components when only one changes
@@ -235,7 +236,7 @@ function mytheme_page_attachments(array &$attachments): void {
   // Preload components used on every page.
   $attachments['#attached']['html_head_link'][][] = [
     'rel' => 'modulepreload',
-    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/lit-runtime.js',
+    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/lit-runtime.js',
     'crossorigin' => 'anonymous',
   ];
 }
@@ -268,20 +269,20 @@ function build_article_card(NodeInterface $node): array {
 
 ### Browser cache via versioned CDN URLs
 
-jsDelivr URLs include the exact version number (`@1.1.2`). Browsers cache these with long-lived headers. A component update requires a new library version in Drupal's YAML — the URL changes, bypassing browser cache.
+jsDelivr URLs include the exact version number. Browsers cache these with long-lived headers. A component update requires a new library version in Drupal's YAML — the URL changes, bypassing browser cache.
 
 ```yaml
 # Old version — cached in browsers
 helix-button:
-  version: 1.1.1
+  version: PREVIOUS_VERSION
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js: ...
+    https://cdn.jsdelivr.net/npm/@helixui/library@PREVIOUS_VERSION/dist/components/hx-button/index.js: ...
 
 # New version — new URL, fresh download
 helix-button:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js: ...
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js: ...
 ```
 
 ### Drupal library version key
@@ -290,7 +291,7 @@ If serving local files, increment the `version` key to bust Drupal's cache-busti
 
 ```yaml
 helix-button:
-  version: 1.1.2  # Drupal appends ?v=1.1.2 to the script URL
+  version: 1.1.2 # Drupal appends ?v=1.1.2 to the script URL
   js:
     dist/hx-button.js:
       preprocess: false
@@ -302,11 +303,11 @@ helix-button:
 
 ## Core Web Vitals Impact
 
-| Metric | HELiX Consideration | Mitigation |
-|---|---|---|
-| **LCP** (Largest Contentful Paint) | Components upgrade asynchronously — LCP element may be unstyled briefly | Use `:not(:defined)` skeleton styles; prioritize loading components used above fold |
-| **INP** (Interaction to Next Paint) | Component event handlers are attached after upgrade | Lit component upgrades are fast; avoid blocking main thread in `connectedCallback` |
-| **CLS** (Cumulative Layout Shift) | Components with unknown dimensions before upgrade shift layout | Set explicit dimensions with CSS on the host element or use `contain: layout` |
+| Metric                              | HELiX Consideration                                                     | Mitigation                                                                          |
+| ----------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **LCP** (Largest Contentful Paint)  | Components upgrade asynchronously — LCP element may be unstyled briefly | Use `:not(:defined)` skeleton styles; prioritize loading components used above fold |
+| **INP** (Interaction to Next Paint) | Component event handlers are attached after upgrade                     | Lit component upgrades are fast; avoid blocking main thread in `connectedCallback`  |
+| **CLS** (Cumulative Layout Shift)   | Components with unknown dimensions before upgrade shift layout          | Set explicit dimensions with CSS on the host element or use `contain: layout`       |
 
 ### Preventing layout shift
 
@@ -333,7 +334,7 @@ HELiX components include `fouc.css` distributed with `@helixui/tokens`. Load it 
 helix-fouc:
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/fouc.css:
+      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/fouc.css:
         type: external
   js: {}
 ```

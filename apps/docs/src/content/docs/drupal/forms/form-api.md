@@ -75,15 +75,15 @@ public function buildForm(array $form, FormStateInterface $form_state): array {
 
 **Key render array properties for HELiX components:**
 
-| Property | Maps to Component Attribute | Notes |
-|---|---|---|
-| `#title` | `label` | Passed by custom element plugin |
-| `#description` | `help-text` | Passed by custom element plugin |
-| `#required` | `required` (boolean) | Mapped in `#process` callback |
-| `#disabled` | `disabled` (boolean) | Mapped in `#process` callback |
-| `#placeholder` | `placeholder` | Mapped in `#process` callback |
-| `#default_value` | `value` | Mapped in `#pre_render` callback |
-| `#attributes` | passed through directly | Arbitrary component attributes |
+| Property         | Maps to Component Attribute | Notes                            |
+| ---------------- | --------------------------- | -------------------------------- |
+| `#title`         | `label`                     | Passed by custom element plugin  |
+| `#description`   | `help-text`                 | Passed by custom element plugin  |
+| `#required`      | `required` (boolean)        | Mapped in `#process` callback    |
+| `#disabled`      | `disabled` (boolean)        | Mapped in `#process` callback    |
+| `#placeholder`   | `placeholder`               | Mapped in `#process` callback    |
+| `#default_value` | `value`                     | Mapped in `#pre_render` callback |
+| `#attributes`    | passed through directly     | Arbitrary component attributes   |
 
 ---
 
@@ -202,8 +202,8 @@ export class HelixTextInput extends FormMixin(HelixElement) {
 ```javascript
 // DevTools console
 const input = document.querySelector('hx-text-input[name="email"]');
-console.log(input.form);   // Returns the parent <form> element
-console.log(input.value);  // Returns current value
+console.log(input.form); // Returns the parent <form> element
+console.log(input.value); // Returns current value
 ```
 
 ---
@@ -292,19 +292,19 @@ public function buildForm(array $form, FormStateInterface $form_state): array {
 ```yaml
 # my_module.libraries.yml
 helix-forms:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-text-input/index.js:
       type: external
       preprocess: false
       attributes:
         type: module
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-select/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-select/index.js:
       type: external
       preprocess: false
       attributes:
         type: module
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-checkbox/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-checkbox/index.js:
       type: external
       preprocess: false
       attributes:
@@ -318,9 +318,9 @@ Or load the full bundle:
 
 ```yaml
 helix-forms:
-  version: 1.1.2
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       preprocess: false
       attributes:

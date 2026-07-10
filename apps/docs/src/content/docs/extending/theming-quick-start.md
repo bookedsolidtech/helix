@@ -557,9 +557,9 @@ that lets the bare `lit` / `@helixui/tokens` imports resolve.
     <script type="importmap">
       {
         "imports": {
-          "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
-          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+          "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js",
+          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
           "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
           "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
           "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"
@@ -672,8 +672,22 @@ Load the HELiX library via CDN (or your Drupal library definition) and wrap a re
     <title>{{ head_title }}</title>
     {{ head }}
 
-    {# HELiX via CDN — substitute with your Drupal library path; pin a version #}
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"></script>
+    {# HELiX via CDN — substitute with your Drupal library path; pin a version.
+       `dist/index.js` imports `lit`, `@helixui/icons` and `@floating-ui/dom` as
+       bare specifiers, so the import map below is required — without it the
+       browser fails with `Failed to resolve module specifier`. #}
+    <script type="importmap">
+      {
+        "imports": {
+          "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
+          "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
+          "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+          "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
+          "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
+        }
+      }
+    </script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"></script>
 
     {# Brand theme — a plain CSS file, no build step needed #}
     <link rel="stylesheet" href="/themes/custom/acme_health/css/acme-health-theme.css" />

@@ -8,7 +8,7 @@ description: Distributing HELiX web components via CDN for zero-install consumpt
 import { Aside } from '@astrojs/starlight/components';
 
 <Aside type="caution" title="Only the library-mode tree is published">
-  As of @helixui/library@3.9.0, the published npm package ships the Vite
+  As of <code>@helixui/library</code> v3.9.0, the published npm package ships the Vite
   library-mode tree only (<code>dist/index.js</code>,
   <code>dist/components/&lt;tag&gt;/index.js</code>,
   <code>dist/css/*</code>, etc.). The repo also contains a
@@ -76,11 +76,14 @@ For consumers who need only specific components, per-component CDN bundles reduc
 
 ```html
 <!-- Core: registry + tokens (~8.4KB min+gz) -->
-<script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/cdn/core.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.11.2/dist/cdn/core.js"></script>
 
 <!-- Per-component modules (~2KB each) -->
-<script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/cdn/hx-button.js"></script>
-<script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/cdn/hx-card.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.11.2/dist/cdn/hx-button.js"
+></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.11.2/dist/cdn/hx-card.js"></script>
 ```
 
 ### Single-File CDN Bundle (not recommended for production)
@@ -205,8 +208,8 @@ jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`. The shipped `d
     "imports": {
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
       "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
-      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3/dist/index.js",
-      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
       "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
     }
   }
@@ -218,7 +221,7 @@ jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`. The shipped `d
 <!-- Or pinned to exact version (recommended for production, pair with SRI) -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"
 ></script>
 ```
 
@@ -239,13 +242,13 @@ unpkg proxies npm at `https://unpkg.com/`. The same import-map prerequisite appl
     "imports": {
       "lit": "https://unpkg.com/lit@3/index.js?module",
       "lit/": "https://unpkg.com/lit@3/",
-      "@helixui/tokens": "https://unpkg.com/@helixui/tokens@3/dist/index.js",
-      "@helixui/icons": "https://unpkg.com/@helixui/icons@1/dist/index.js",
+      "@helixui/tokens": "https://unpkg.com/@helixui/tokens@3.9.4/dist/index.js",
+      "@helixui/icons": "https://unpkg.com/@helixui/icons@1.1.0/dist/index.js",
       "@floating-ui/dom": "https://unpkg.com/@floating-ui/dom@1/?module"
     }
   }
 </script>
-<script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/index.js"></script>
+<script type="module" src="https://unpkg.com/@helixui/library@3.11.2/dist/index.js"></script>
 ```
 
 **Recommendation:** Use jsDelivr for production. It has better uptime guarantees and performance than unpkg, which is community-operated with no SLA.
@@ -262,7 +265,7 @@ Drupal's library system (`libraries.yml`) can reference CDN URLs directly with a
 # helix_theme.libraries.yml
 
 helix-components:
-  version: '3.9.0'
+  version: '3.11.2'
   header: true
   js:
     # Load Lit first (required by HELiX components)
@@ -272,7 +275,7 @@ helix-components:
       attributes:
         type: module
     # Then load the HELiX bundle
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       minified: true
       attributes:
@@ -288,10 +291,10 @@ Drupal can serve a local copy of the file when the CDN is unreachable. The `exte
 
 ```yaml
 helix-components:
-  version: '3.9.0'
+  version: '3.11.2'
   header: true
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       minified: true
       attributes:
@@ -310,7 +313,7 @@ Copy the CDN file to `js/vendor/index.js` during your theme build process:
 ```bash
 # In your theme's build script
 curl -o themes/custom/helix_theme/js/vendor/index.js \
-  "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+  "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"
 ```
 
 **Note:** Drupal's `type: external` libraries do not automatically implement fallback logic. For true failover, use a small inline script that checks if `customElements.get('hx-button')` is defined after the CDN script tag and loads the local version if not.
@@ -368,7 +371,7 @@ Object.entries(hashes).forEach(([file, hash]) => {
 <!-- With SRI: browser refuses to execute if file has been tampered with -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"
   integrity="sha384-ABC123..."
   crossorigin="anonymous"
 ></script>
@@ -380,9 +383,9 @@ The `crossorigin="anonymous"` attribute is required when using `integrity` with 
 
 ```yaml
 helix-components:
-  version: '3.9.0'
+  version: '3.11.2'
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       minified: true
       attributes:
@@ -400,7 +403,7 @@ CDN URLs should be immutable and versioned. Never serve different content at the
 **Versioned URL pattern (recommended):**
 
 ```
-https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js
+https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js
                                                    ^^^^^^
                                                    Exact semver version
 ```
@@ -411,16 +414,10 @@ This URL is permanently cached. When `3.10.0` ships, a new URL is served. Old UR
 
 ```html
 <!-- ❌ BAD — a new release changes what this URL serves -->
-<script
-  type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
-></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js"></script>
 
-<!-- ❌ BAD — minor/patch updates silently change the file -->
-<script
-  type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
-></script>
+<!-- ❌ BAD — minor/patch updates silently change the file (illustrative; do not copy) -->
+<script type="module" src="https://unpkg.com/@helixui/library@3.11/dist/index.js"></script>
 ```
 
 Floating ranges work in `package.json` (with a lockfile) because `npm ci` resolves and pins the version. On CDN URLs there is no lockfile, so a minor update can silently break a Drupal site.
@@ -463,7 +460,7 @@ https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist/components/hx-butto
 ```html
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"
 ></script>
 ```
 
@@ -495,8 +492,8 @@ https://cdn.jsdelivr.net/npm/@helixui/library@{VERSION}/dist/components/hx-butto
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
       "lit/decorators.js": "https://cdn.jsdelivr.net/npm/lit@3/decorators.js",
       "lit/directives/class-map.js": "https://cdn.jsdelivr.net/npm/lit@3/directives/class-map.js",
-      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js",
-      "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js"
+      "@helixui/library/components/hx-button": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js",
+      "@helixui/library/components/hx-card": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js"
     }
   }
 </script>
@@ -528,7 +525,7 @@ Import maps let browsers resolve bare module specifiers (`import from 'lit'`) wi
           "@lit/reactive-element/decorators/": "https://cdn.jsdelivr.net/npm/@lit/reactive-element@2/decorators/",
           "lit-html": "https://cdn.jsdelivr.net/npm/lit-html@3/lit-html.js",
           "lit-html/": "https://cdn.jsdelivr.net/npm/lit-html@3/",
-          "@helixui/library/": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/"
+          "@helixui/library/": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/"
         }
       }
     </script>

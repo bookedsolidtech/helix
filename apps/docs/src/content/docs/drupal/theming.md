@@ -57,7 +57,7 @@ You do not need to configure this. Loading `@helixui/library` activates it autom
 
 ## Loading the Token System
 
-### @helixui/tokens@3.9.0
+### @helixui/tokens@3.9.4
 
 The token package provides the foundational CSS custom property values. Load it before component scripts to prevent FOUC.
 
@@ -69,7 +69,7 @@ helix-tokens:
   version: 0.3.4
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/tokens.css:
+      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/tokens.css:
         type: external
 ```
 
@@ -279,7 +279,7 @@ Flash of Unstyled Content occurs when components render as plain HTML before the
 helix-fouc:
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/fouc.css:
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/fouc.css:
         type: external
 ```
 

@@ -699,7 +699,7 @@ Replace the `helixui.libraries.yml` paths with CDN URLs:
 global:
   version: VERSION
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -717,7 +717,7 @@ Use CDN when:
 
 ```bash
 # In your Drupal project root
-npm install @helixui/library@3.9.0
+npm install @helixui/library@3.11.2
 
 # Copy to /libraries/helixui/ (or use a post-install script)
 npx helixui-copy-assets  # provided by the helixui module
