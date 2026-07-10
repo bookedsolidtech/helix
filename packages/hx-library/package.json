@@ -74,7 +74,7 @@
     "build": "vite build && pnpm run cem && pnpm run css:build && pnpm run css:validate",
     "css:build": "node scripts/generate-css-bundles.mjs",
     "css:validate": "node scripts/validate-css.mjs",
-    "prepack": "pnpm run css:build && pnpm run css:validate",
+    "prepack": "pnpm run build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:cross-browser": "vitest run --config vitest.config.cross-browser.ts",
