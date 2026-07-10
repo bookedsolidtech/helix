@@ -27,7 +27,6 @@ block_ai_attribution: true
 blocked_paths:
   - .env
   - .env.*
-  - .rea/policy.yaml
   - .rea/HALT
 
 # Optional: Discord webhook for halt/promote notifications
@@ -42,3 +41,4 @@ context_protection:
 review:
   concerns_blocks: true
   codex_required: true
+  codex_model: gpt-5.5
