@@ -1,0 +1,79 @@
+{
+  "tag": "@helixui/library@3.11.3",
+  "commit_sha": "97deac56277309acb919b68fe4bf810053ecaa1c",
+  "ref": "refs/heads/main",
+  "repository": "bookedsolidtech/helix",
+  "published_at": "2026-07-10T18:19:41.731Z",
+  "publisher": "himerus",
+  "ci_run_id": "29113983695",
+  "ci_run_url": "https://github.com/bookedsolidtech/helix/actions/runs/29113983695",
+  "packages": {
+    "@helixui/library": "3.11.3",
+    "@helixui/tokens": "3.9.4",
+    "@helixui/react": "3.11.3"
+  },
+  "changeset_files": [],
+  "published_packages": [
+    {
+      "name": "@helixui/library",
+      "version": "3.11.3"
+    },
+    {
+      "name": "@helixui/react",
+      "version": "3.11.3"
+    }
+  ],
+  "merged_prs_since_last_tag": [
+    1813,
+    1808,
+    1812,
+    1811,
+    1810,
+    1809,
+    1806,
+    1807,
+    1804,
+    1805
+  ],
+  "last_tag": "@helixui/library@3.11.2",
+  "cem_sha256": "d0b6b3eb6baa119a9ebebbc4f29a5df01b31060a3ebbf2226e1b2a910010ce9a",
+  "cdn_budget_snapshot": {
+    "comment": "CDN bundle size budgets for @helixui/library (gzipped bytes). Enforced in CI by scripts/check-cdn-size.mjs. Changes require code review and a justification in the PR description. The CDN build emits several artifacts with different size profiles — this file tracks per-artifact budgets rather than a single aggregate ceiling so drift in one strategy (A vs B) is surfaced precisely.",
+    "rationale": "Measured from packages/hx-library/dist/cdn/ on main at v2.1.2 (full JS=183.4 KB, full CSS=46.3 KB, core JS=8.4 KB, Strategy A=229.7 KB). Re-baselined 2026-04-25 after the 3.2.0 component-tier + palette expansion landed. Re-baselined 2026-05-04 for ARIA Group 2 (selection controls). Re-baselined 2026-05-05 for ARIA Group 3 (selects/combos/pickers). Re-baselined 2026-05-05 (late) for the ARIA epic PR #1649 covering Groups 5b + 5c + 7 + 8 + 9 + 10. Re-baselined 2026-05-09 for the AAA Tier 3 epic (3.8.0): 43/43 P0 formal cert work added roving-tabindex on group hosts, focus-trap fix on dialog/drawer/popover, target-size compliance (40→44 across button family), token chain shift for AAA-strict 7:1, expanded forced-colors mode bindings, helixMeta JSDoc cert metadata. Full JS measured at 249.7 KB gz post-epic. Re-baselined 2026-05-09 for the @helixui/icons epic (3.9.0): introduces registry-pattern icon system + hx-icon library attribute + 29-component migration from inline SVG to <hx-icon library=\"helix\"> consumption. JS DECREASED ~1.5 KB gz (inline SVG removal nets out registry code overhead in CDN-inlined bundle). CSS INCREASED ~4.8 KB gz from hx-icon component CSS, --hx-icon-stroke-width semantic token, and per-component icon-related rule additions. Net Strategy A delta +2.5 KB gz. Healthcare AAA conformance is the load-bearing constraint; bytes-on-the-wire are secondary.",
+    "budgets": {
+      "fullBundleJs": {
+        "file": "helix-{version}.min.js",
+        "description": "Strategy A full self-contained JS bundle (all 81 components + Lit + @helixui/icons inlined).",
+        "ceilingBytes": 266240,
+        "warnBytes": 256000,
+        "currentBytes": 254157,
+        "currentNote": "248.2 KB gz at @helixui/icons epic head (3.9.0). DECREASED ~1.5 KB gz from 3.8.0 head (was 249.7 KB) — 29-component inline SVG removal nets out the bundled @helixui/icons registry code overhead. CDN inlines @helixui/icons (npm dist externalizes it as a peer dep)."
+      },
+      "fullBundleCss": {
+        "file": "helix-{version}.min.css",
+        "description": "Strategy A full CSS bundle (all component shadow-root-adoptable CSS).",
+        "ceilingBytes": 66560,
+        "warnBytes": 60416,
+        "currentBytes": 61286,
+        "currentNote": "59.9 KB gz at @helixui/icons epic head (3.9.0). INCREASED ~4.8 KB gz from 3.8.0 (was 55.1 KB) — adds hx-icon component CSS, --hx-icon-stroke-width semantic token, and per-component icon-related styles for the 29 migrated components. Over warn threshold but well under 65.0 KB ceiling. Headroom 5.1 KB."
+      },
+      "coreBundleJs": {
+        "file": "helix-core-{version}.min.js",
+        "description": "Strategy B shared Lit runtime (loaded once, cached across components).",
+        "ceilingBytes": 12288,
+        "warnBytes": 10240,
+        "currentBytes": 8602,
+        "currentNote": "8.4 KB gz at v2.1.2"
+      },
+      "strategyATotal": {
+        "description": "Aggregate Strategy A consumer payload (full JS + full CSS). This is what a page that loads the full bundle actually downloads.",
+        "ceilingBytes": 332800,
+        "warnBytes": 322560,
+        "currentBytes": 312832,
+        "currentNote": "305.5 KB gz at AAA Tier 3 epic head (was 291.1 KB at ARIA epic head; tracks fullBundleJs + fullBundleCss growth from 3.8.0 cert work)."
+      }
+    }
+  },
+  "coderabbit_final_review_sha": null,
+  "notes": "Emitted by scripts/generate-release-manifest.mjs during the publish workflow after changesets/action publishes to npm. Committed back to main via a dedicated step in publish.yml — not part of the version-bump PR."
+}
