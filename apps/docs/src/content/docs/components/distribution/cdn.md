@@ -416,11 +416,8 @@ This URL is permanently cached. When `3.10.0` ships, a new URL is served. Old UR
 <!-- ❌ BAD — a new release changes what this URL serves -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js"></script>
 
-<!-- ❌ BAD — minor/patch updates silently change the file -->
-<script
-  type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11/dist/index.js"
-></script>
+<!-- ❌ BAD — minor/patch updates silently change the file (illustrative; do not copy) -->
+<script type="module" src="https://unpkg.com/@helixui/library@3.11/dist/index.js"></script>
 ```
 
 Floating ranges work in `package.json` (with a lockfile) because `npm ci` resolves and pins the version. On CDN URLs there is no lockfile, so a minor update can silently break a Drupal site.
