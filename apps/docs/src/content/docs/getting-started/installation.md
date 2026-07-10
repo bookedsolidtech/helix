@@ -38,8 +38,8 @@ Current versions:
 
 | Package            | Version | Notes                                                                                                                              |
 | ------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `@helixui/library` | ^3.9.0  | Lit 3.x components (core)                                                                                                          |
-| `@helixui/icons`   | ^1.0.0  | Required peer — icon registry                                                                                                      |
+| `@helixui/library` | ^3.11.2 | Lit 3.x components (core)                                                                                                          |
+| `@helixui/icons`   | ^1.1.0  | Required peer — icon registry                                                                                                      |
 | `@floating-ui/dom` | ^1.7.6  | Required peer — positioning engine for popover-style parts                                                                         |
 | `@helixui/tokens`  | ^3.9.0  | Direct dependency of `@helixui/library`; installs automatically. Pin explicitly only if your build needs deterministic resolution. |
 | `@helixui/react`   | ^3.9.0  | Optional — React 18/19 wrappers                                                                                                    |

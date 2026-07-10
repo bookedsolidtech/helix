@@ -269,14 +269,14 @@ function build_article_card(NodeInterface $node): array {
 
 ### Browser cache via versioned CDN URLs
 
-jsDelivr URLs include the exact version number (`@1.1.2`). Browsers cache these with long-lived headers. A component update requires a new library version in Drupal's YAML — the URL changes, bypassing browser cache.
+jsDelivr URLs include the exact version number. Browsers cache these with long-lived headers. A component update requires a new library version in Drupal's YAML — the URL changes, bypassing browser cache.
 
 ```yaml
 # Old version — cached in browsers
 helix-button:
-  version: 3.11.2
+  version: PREVIOUS_VERSION
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js: ...
+    https://cdn.jsdelivr.net/npm/@helixui/library@PREVIOUS_VERSION/dist/components/hx-button/index.js: ...
 
 # New version — new URL, fresh download
 helix-button:
