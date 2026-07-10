@@ -79,7 +79,10 @@ For consumers who need only specific components, per-component CDN bundles reduc
 <script type="module" src="https://unpkg.com/@helixui/library@3.11.2/dist/cdn/core.js"></script>
 
 <!-- Per-component modules (~2KB each) -->
-<script type="module" src="https://unpkg.com/@helixui/library@3.11.2/dist/cdn/hx-button.js"></script>
+<script
+  type="module"
+  src="https://unpkg.com/@helixui/library@3.11.2/dist/cdn/hx-button.js"
+></script>
 <script type="module" src="https://unpkg.com/@helixui/library@3.11.2/dist/cdn/hx-card.js"></script>
 ```
 
@@ -205,8 +208,8 @@ jsDelivr proxies npm packages at `https://cdn.jsdelivr.net/npm/`. The shipped `d
     "imports": {
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/index.js",
       "lit/": "https://cdn.jsdelivr.net/npm/lit@3/",
-      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3/dist/index.js",
-      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1/dist/index.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
       "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1/+esm"
     }
   }
@@ -239,8 +242,8 @@ unpkg proxies npm at `https://unpkg.com/`. The same import-map prerequisite appl
     "imports": {
       "lit": "https://unpkg.com/lit@3/index.js?module",
       "lit/": "https://unpkg.com/lit@3/",
-      "@helixui/tokens": "https://unpkg.com/@helixui/tokens@3/dist/index.js",
-      "@helixui/icons": "https://unpkg.com/@helixui/icons@1/dist/index.js",
+      "@helixui/tokens": "https://unpkg.com/@helixui/tokens@3.9.4/dist/index.js",
+      "@helixui/icons": "https://unpkg.com/@helixui/icons@1.1.0/dist/index.js",
       "@floating-ui/dom": "https://unpkg.com/@floating-ui/dom@1/?module"
     }
   }
@@ -411,15 +414,12 @@ This URL is permanently cached. When `3.10.0` ships, a new URL is served. Old UR
 
 ```html
 <!-- ❌ BAD — a new release changes what this URL serves -->
-<script
-  type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"
-></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@helixui/library@3/dist/index.js"></script>
 
 <!-- ❌ BAD — minor/patch updates silently change the file -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js"
+  src="https://cdn.jsdelivr.net/npm/@helixui/library@3.11/dist/index.js"
 ></script>
 ```
 

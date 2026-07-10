@@ -270,12 +270,14 @@ async function scanFile(absPath, relPath, versions) {
       continue;
     }
 
-    // Skip bare floating-major forms (`@1`, `@3`, `@^4`) when they appear in
-    // a CDN / import-map context — those are intentional "track the major
-    // branch" pins, not stale exact pins. The context detector strips the
-    // matched span itself so a literal `@helixui/<pkg>@<ver>` on the line
+    // Skip floating forms (`@1`, `@3`, `@^4`, `@3.11`) when they appear in a
+    // CDN / import-map context — those track a branch rather than pinning a
+    // release, so they never go stale. A major.minor form like `@3.11` is a
+    // valid jsDelivr/unpkg range and is exactly what the "do not use floating
+    // ranges" anti-pattern examples need to show. The context detector strips
+    // the matched span itself so a literal `@helixui/<pkg>@<ver>` on the line
     // doesn't accidentally count as evidence of import-map shape.
-    if (/^\^?\d+$/.test(versionString)) {
+    if (/^\^?\d+(\.\d+)?$/.test(versionString)) {
       const cleanedContext = surroundingLines
         .slice(0, surroundingLines.indexOf(match[0]))
         .concat(surroundingLines.slice(surroundingLines.indexOf(match[0]) + match[0].length));
