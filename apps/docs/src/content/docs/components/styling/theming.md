@@ -902,7 +902,7 @@ export class AppComponent implements OnInit {
     <title>HELiX Theming Example</title>
 
     <!-- Load components from CDN -->
-    <script type="module" src="https://unpkg.com/@helixui/library@3.9.0/dist/index.js"></script>
+    <script type="module" src="https://unpkg.com/@helixui/library@3.11.2/dist/index.js"></script>
 
     <style>
       /* Global theme tokens */

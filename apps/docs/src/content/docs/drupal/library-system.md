@@ -67,7 +67,7 @@ For external URLs (CDN):
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
 ```
 
@@ -141,7 +141,7 @@ For CDN-hosted files:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
       attributes:
         type: module
@@ -236,7 +236,7 @@ helix-behaviors:
 
 ```yaml
 helix-button:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-button.js:
       attributes:
@@ -245,7 +245,7 @@ helix-button:
 
 **Version affects:**
 
-- Cache-busting query strings (`hx-button.js?v=3.9.0`)
+- Cache-busting query strings (`hx-button.js?v=3.11.2`)
 - Cache and dependency-graph metadata (the version contributes to cache hashes and library replacement keys; Drupal's libraries API does not perform semver dependency-compatibility checks)
 - Library replacement (modules can replace libraries with specific versions)
 
@@ -265,7 +265,7 @@ helix-button:
         type: module
 
 helix-button-theme-versioned:
-  version: '3.9.0' # Literal — track this library's version explicitly
+  version: '3.11.2' # Literal — track this library's version explicitly
   js:
     dist/components/hx-button/index.js:
       attributes:
@@ -279,7 +279,7 @@ For CDN assets with their own versioning:
 ```yaml
 helix-cdn:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
       version: -1 # Disable query string
       attributes:
@@ -382,9 +382,9 @@ For optimal performance, define one library per component. This enables tree-sha
 ```yaml
 # mytheme.libraries.yml
 helix-all:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
       type: external
       minified: true
       preprocess: false
@@ -410,7 +410,7 @@ helix-all:
 # mytheme.libraries.yml
 
 helix-button:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-button.js:
       preprocess: false
@@ -418,7 +418,7 @@ helix-button:
         type: module
 
 helix-card:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-card.js:
       preprocess: false
@@ -426,7 +426,7 @@ helix-card:
         type: module
 
 helix-text-input:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-text-input.js:
       preprocess: false
@@ -456,7 +456,7 @@ helix-text-input:
 
 # Core utilities and shared dependencies
 helix-core:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/helix-core.js:
       preprocess: false
@@ -465,7 +465,7 @@ helix-core:
 
 # Common component bundle (buttons, badges, alerts)
 helix-common:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/helix-common.js:
       preprocess: false
@@ -476,7 +476,7 @@ helix-common:
 
 # Heavy components loaded on-demand
 helix-data-table:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-data-table.js:
       preprocess: false
@@ -486,7 +486,7 @@ helix-data-table:
     - mytheme/helix-core
 
 helix-data-table:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/components/hx-data-table/index.js:
       preprocess: false
@@ -672,7 +672,7 @@ Drupal's library system integrates with its cache system:
    ```yaml
    helix-cdn:
      js:
-       https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/core.js:
+       https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/core.js:
          type: external
          minified: true
    ```
@@ -699,9 +699,9 @@ ls -lh dist/js/hx-*.js | awk '{print $5, $9}'
 # mytheme.libraries.yml
 
 helix-button-cdn:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button.js:
       type: external
       minified: true
       preprocess: false
@@ -746,7 +746,7 @@ helix-button:
     "dev": "vite build --watch"
   },
   "dependencies": {
-    "@helixui/library": "^3.9.0"
+    "@helixui/library": "^3.11.2"
   }
 }
 ```
@@ -789,7 +789,7 @@ import '@helixui/library/components/hx-button';
 # mytheme.libraries.yml
 
 helix-card:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-card.js:
       minified: true
@@ -808,7 +808,7 @@ helix-card:
 # mytheme.libraries.yml
 
 helix-card:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-card.js:
       minified: true
@@ -877,7 +877,7 @@ helix-card:
 
 # Core design tokens and utilities
 helix-core:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/helix-core.js:
       minified: true
@@ -887,7 +887,7 @@ helix-core:
 
 # Common UI components (bundled for performance)
 helix-common:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/helix-common.js:
       minified: true
@@ -900,7 +900,7 @@ helix-common:
 
 # Individual form components
 helix-text-input:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-text-input.js:
       minified: true
@@ -911,7 +911,7 @@ helix-text-input:
     - mytheme/helix-core
 
 helix-select:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-select.js:
       minified: true
@@ -922,7 +922,7 @@ helix-select:
     - mytheme/helix-core
 
 helix-checkbox:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-checkbox.js:
       minified: true
@@ -944,7 +944,7 @@ helix-forms:
 
 # Heavy components (load on-demand)
 helix-data-table:
-  version: 3.9.0
+  version: 3.11.2
   js:
     dist/js/hx-data-table.js:
       minified: true

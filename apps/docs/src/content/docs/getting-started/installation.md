@@ -38,11 +38,11 @@ Current versions:
 
 | Package            | Version | Notes                                                                                                                              |
 | ------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `@helixui/library` | ^3.9.0  | Lit 3.x components (core)                                                                                                          |
-| `@helixui/icons`   | ^1.0.0  | Required peer — icon registry                                                                                                      |
+| `@helixui/library` | ^3.11.2 | Lit 3.x components (core)                                                                                                          |
+| `@helixui/icons`   | ^1.1.0  | Required peer — icon registry                                                                                                      |
 | `@floating-ui/dom` | ^1.7.6  | Required peer — positioning engine for popover-style parts                                                                         |
-| `@helixui/tokens`  | ^3.9.0  | Direct dependency of `@helixui/library`; installs automatically. Pin explicitly only if your build needs deterministic resolution. |
-| `@helixui/react`   | ^3.9.0  | Optional — React 18/19 wrappers                                                                                                    |
+| `@helixui/tokens`  | ^3.9.4  | Direct dependency of `@helixui/library`; installs automatically. Pin explicitly only if your build needs deterministic resolution. |
+| `@helixui/react`   | ^3.11.2 | Optional — React 18/19 wrappers                                                                                                    |
 
 If you are upgrading an existing project from `@helixui/library@3.8.x` or earlier, see the [3.8.0 → 3.9.0 migration guide](/migration/3-8-0-to-3-9-0/) — `@helixui/icons` is a new required peer dependency.
 
@@ -53,15 +53,15 @@ The library is published in npm-package "library mode" — `dist/index.js` conta
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css"
+  href="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/css/helix-all.css"
 />
 
 <script type="importmap">
   {
     "imports": {
-      "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
-      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+      "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js",
+      "@helixui/tokens": "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+      "@helixui/icons": "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
       "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
       "lit": "https://cdn.jsdelivr.net/npm/lit@3/+esm",
       "lit/": "https://cdn.jsdelivr.net/npm/lit@3/"

@@ -288,7 +288,13 @@ export class HelixSwitch extends FormMixin(HelixElement) {
   private _handleHostKeyDown = (e: KeyboardEvent): void => {
     if (this.disabled) return;
     if (!this._supportsIdrefRefs) return;
-    if (e.target !== this) return;
+    // `e.target` is retargeted to the host for anything crossing the shadow
+    // boundary, so it cannot tell a keypress on the host from one that started
+    // on the inner `<button>` — where `_handleKeyDown` has already toggled.
+    // Compare against the true origin, or Space toggles twice and nets zero.
+    // Firefox also delivers `composed: false` events to the host, so checking
+    // the origin is what makes this engine-independent.
+    if (e.composedPath()[0] !== this) return;
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
       this._toggle();

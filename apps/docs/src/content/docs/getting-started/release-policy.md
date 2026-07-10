@@ -15,7 +15,7 @@ HELiX follows [Semantic Versioning 2.0.0](https://semver.org/) for canonical rel
 
 > **Note:** Versions in the `0.y.z` range are considered initial development. The public API is not yet stable and breaking changes may occur in any release during this phase.
 
-> **`@helixui/library@4.0.0` is a deprecated accidental release** that shipped as a major during the 2026-05 icons epic without intentional breaking changes. `3.9.0` is the supported current line; do not upgrade past it. A planned 4.x reset will follow once the affected packages republish from a known-clean state.
+> **`@helixui/library@4.0.0` is a deprecated accidental release** that shipped as a major during the 2026-05 icons epic without intentional breaking changes. The `3.x` line — currently `3.11.x` — is the supported current release; adopt the latest `3.x` and do **not** install `4.0.0`. A planned 4.x reset will follow once the affected packages republish from a known-clean state.
 
 ### What Counts as Public API
 
@@ -35,11 +35,11 @@ Internal implementation details (private methods, internal DOM structure, undocu
 
 Releases are driven by accumulated changesets rather than a fixed calendar — `.github/workflows/publish.yml` opens a Release PR whenever unreleased changesets exist on `main`, and the team merges that PR when the changes are ready to ship. There is no enforced monthly/quarterly mechanism in CI today.
 
-| Release Type | Trigger                                  | Content                      |
-| ------------ | ---------------------------------------- | ---------------------------- |
-| Patch        | As needed (bug fixes accumulated)        | Bug fixes, security patches  |
-| Minor        | When new-feature changesets accumulate   | New features, new components |
-| Major        | When breaking-change changesets land     | Breaking changes, batched    |
+| Release Type | Trigger                                | Content                      |
+| ------------ | -------------------------------------- | ---------------------------- |
+| Patch        | As needed (bug fixes accumulated)      | Bug fixes, security patches  |
+| Minor        | When new-feature changesets accumulate | New features, new components |
+| Major        | When breaking-change changesets land   | Breaking changes, batched    |
 
 ### Pre-release Versions
 
@@ -69,11 +69,11 @@ HELiX uses a **three-branch promotion pipeline** to ensure changes are validated
 feature/* → dev → staging → main
 ```
 
-| Stage             | Branch    | Purpose                                               |
-| ----------------- | --------- | ----------------------------------------------------- |
-| Development       | `dev`     | Active integration; all feature PRs target this branch |
-| Staging           | `staging` | Pre-release validation; promotion from `dev`          |
-| Production        | `main`    | Published releases; promotion from `staging`          |
+| Stage       | Branch    | Purpose                                                |
+| ----------- | --------- | ------------------------------------------------------ |
+| Development | `dev`     | Active integration; all feature PRs target this branch |
+| Staging     | `staging` | Pre-release validation; promotion from `dev`           |
+| Production  | `main`    | Published releases; promotion from `staging`           |
 
 ### How Releases Ship
 
@@ -103,11 +103,11 @@ Verify the gate's exact monitored-path list in `.github/workflows/ci.yml` before
 
 ## Support Policy
 
-| Version        | Support Level                                                                                       |
-| -------------- | --------------------------------------------------------------------------------------------------- |
-| Current major (3.x for `@helixui/library`) | Full support — bug fixes, security patches, new features                |
-| Previous major | Maintenance — critical bug fixes and security patches for a published support window (see migration guide for the active line) |
-| Older majors   | Unsupported — no fixes, no patches                                                                  |
+| Version                                    | Support Level                                                                                                                  |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Current major (3.x for `@helixui/library`) | Full support — bug fixes, security patches, new features                                                                       |
+| Previous major                             | Maintenance — critical bug fixes and security patches for a published support window (see migration guide for the active line) |
+| Older majors                               | Unsupported — no fixes, no patches                                                                                             |
 
 > See [Upgrading to 3](/migration/upgrading-to-3/) for the canonical support-window statement of the 2.x → 3.x line. Other package lines (`@helixui/drupal-starter`, `@helixui/drupal-behaviors` on 4.x; `@helixui/icons` on 1.x; `@helixui/mcp` on 0.x) version independently and their support windows follow the same pattern relative to each line's current major.
 

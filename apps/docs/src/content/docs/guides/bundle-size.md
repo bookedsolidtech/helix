@@ -124,14 +124,14 @@ module.exports = {
 For non-bundled usage (CDN, script tags), pin a specific version and point at the published library entry. The library is ESM with bare imports, so the browser needs an import map for `lit`, `@helixui/tokens`, etc. — see [Installation → CDN](/getting-started/installation/#cdn-no-build-step) for the full pattern:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/css/helix-all.css" />
 
 <script type="importmap">
 {
   "imports": {
-    "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js",
-    "@helixui/tokens":  "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/index.js",
-    "@helixui/icons":   "https://cdn.jsdelivr.net/npm/@helixui/icons@1.0.0/dist/index.js",
+    "@helixui/library": "https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js",
+    "@helixui/tokens":  "https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/index.js",
+    "@helixui/icons":   "https://cdn.jsdelivr.net/npm/@helixui/icons@1.1.0/dist/index.js",
     "@floating-ui/dom": "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.6/+esm",
     "lit":              "https://cdn.jsdelivr.net/npm/lit@3/+esm",
     "lit/":             "https://cdn.jsdelivr.net/npm/lit@3/"

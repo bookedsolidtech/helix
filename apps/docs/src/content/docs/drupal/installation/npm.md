@@ -63,14 +63,14 @@ This creates a minimal `package.json`. You'll customize it in a moment.
 # @helixui/library declares @helixui/icons + @floating-ui/dom as peer
 # dependencies and bundles @helixui/tokens + lit as regular dependencies.
 # Install the library together with its peer deps:
-npm install @helixui/library@3.9.0 @helixui/icons @floating-ui/dom
+npm install @helixui/library@3.11.2 @helixui/icons @floating-ui/dom
 ```
 
 If your theme needs to consume HELiX CSS custom properties outside of components (raw token CSS,
 brand registry, scoped overrides), install the tokens package explicitly:
 
 ```bash
-npm install @helixui/tokens@3.9.0
+npm install @helixui/tokens@3.9.4
 ```
 
 Verify the installation:
@@ -176,6 +176,7 @@ export default defineConfig({
 ```
 
 With `manualChunks`, Vite produces two output files:
+
 - `dist/js/helix.js` — The HELiX library chunk
 - `dist/js/theme.js` — Your theme code that imports the HELiX chunk
 
@@ -193,7 +194,7 @@ This separation allows browsers to cache HELiX independently of your theme code.
     "build:prod": "NODE_ENV=production vite build"
   },
   "dependencies": {
-    "@helixui/library": "3.9.0"
+    "@helixui/library": "3.11.2"
   },
   "devDependencies": {
     "vite": "^6.0.0"
@@ -201,7 +202,7 @@ This separation allows browsers to cache HELiX independently of your theme code.
 }
 ```
 
-Use exact versions (`"3.9.0"` not `"^3.9.0"`) for `@helixui/library` in production themes. This ensures identical bundles across environments.
+Use exact versions (`"3.11.2"` not `"^3.11.2"`) for `@helixui/library` in production themes. This ensures identical bundles across environments.
 
 ### Option B: Webpack
 
@@ -484,6 +485,7 @@ jobs:
 ```
 
 **Key points:**
+
 - Use `npm ci` (not `npm install`) in CI. It installs exactly what's in `package-lock.json` and fails if the lockfile is out of date.
 - Cache the `node_modules` directory using the lockfile hash for faster CI runs.
 - Never deploy `node_modules` to the server — only deploy compiled `dist/` assets.
@@ -496,7 +498,7 @@ jobs:
 cd web/themes/custom/mytheme
 
 # Install the new version
-npm install @helixui/library@3.9.0
+npm install @helixui/library@3.11.2
 
 # Review the HELiX changelog before rebuilding
 
@@ -507,7 +509,7 @@ npm run build:prod
 
 # Commit the updated package-lock.json and built assets
 git add package.json package-lock.json dist/
-git commit -m "chore(theme): update @helixui/library to 3.9.0"
+git commit -m "chore(theme): update @helixui/library to 3.11.2"
 ```
 
 Always review the HELiX changelog before updating. Check for attribute name changes, removed components, or slot renames that would require template updates.
@@ -539,7 +541,7 @@ HELiX components encapsulate their styles in Shadow DOM. They do not require you
 If you want to use HELiX design token CSS custom properties in your own theme CSS (outside of components), import the tokens:
 
 ```bash
-npm install @helixui/tokens@3.9.0
+npm install @helixui/tokens@3.9.4
 ```
 
 ```javascript
@@ -626,7 +628,7 @@ In local development with `npm run dev` (watch mode), clear caches once after se
 - [ ] `node_modules/` is never deployed (only used at build time)
 - [ ] `attributes: { type: module }` present in `.libraries.yml` for all JS entries
 - [ ] `package-lock.json` is committed to source control
-- [ ] Exact version pinned in `package.json` (`"3.9.0"` not `"^3.9.0"`)
+- [ ] Exact version pinned in `package.json` (`"3.11.2"` not `"^3.11.2"`)
 - [ ] Source maps generated for production debugging
 - [ ] `drush cr` runs post-deployment
 - [ ] Components tested in target browsers after deployment
