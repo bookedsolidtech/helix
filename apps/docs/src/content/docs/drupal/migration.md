@@ -43,10 +43,10 @@ helix-core:
   version: 1.1.2
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/tokens.css:
+      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/tokens.css:
         type: external
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -277,10 +277,10 @@ helix-gradual:
   version: 1.1.2
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.0/dist/tokens.css:
+      https://cdn.jsdelivr.net/npm/@helixui/tokens@3.9.4/dist/tokens.css:
         type: external
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }

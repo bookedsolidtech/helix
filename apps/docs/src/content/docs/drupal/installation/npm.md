@@ -63,14 +63,14 @@ This creates a minimal `package.json`. You'll customize it in a moment.
 # @helixui/library declares @helixui/icons + @floating-ui/dom as peer
 # dependencies and bundles @helixui/tokens + lit as regular dependencies.
 # Install the library together with its peer deps:
-npm install @helixui/library@3.9.0 @helixui/icons @floating-ui/dom
+npm install @helixui/library@3.11.2 @helixui/icons @floating-ui/dom
 ```
 
 If your theme needs to consume HELiX CSS custom properties outside of components (raw token CSS,
 brand registry, scoped overrides), install the tokens package explicitly:
 
 ```bash
-npm install @helixui/tokens@3.9.0
+npm install @helixui/tokens@3.9.4
 ```
 
 Verify the installation:
@@ -496,7 +496,7 @@ jobs:
 cd web/themes/custom/mytheme
 
 # Install the new version
-npm install @helixui/library@3.9.0
+npm install @helixui/library@3.11.2
 
 # Review the HELiX changelog before rebuilding
 
@@ -539,7 +539,7 @@ HELiX components encapsulate their styles in Shadow DOM. They do not require you
 If you want to use HELiX design token CSS custom properties in your own theme CSS (outside of components), import the tokens:
 
 ```bash
-npm install @helixui/tokens@3.9.0
+npm install @helixui/tokens@3.9.4
 ```
 
 ```javascript

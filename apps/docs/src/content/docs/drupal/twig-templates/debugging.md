@@ -179,7 +179,7 @@ View the page source and look for the HELiX script tag:
 ```html
 <!-- Look for something like this in the <head> or before </body>.
      Paths vary by setup: a Drupal library attachment generates a fingerprinted URL,
-     a CDN load looks like cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js,
+     a CDN load looks like cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js,
      and a self-hosted libraries/ install resolves to /libraries/helixui/dist/index.js. -->
 <script type="module" src="/libraries/helixui/dist/index.js"></script>
 ```

@@ -62,18 +62,18 @@ helix-components:
   version: 3.0.0
   js:
     # Core: registry + tokens, ~8.4KB min+gz
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/core.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/cdn/core.js:
       type: external
       attributes:
         type: module
       preprocess: false
     # Per-component modules — ~2KB each; only list what the theme uses
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/hx-button.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/cdn/hx-button.js:
       type: external
       attributes:
         type: module
       preprocess: false
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/cdn/hx-card.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/cdn/hx-card.js:
       type: external
       attributes:
         type: module
@@ -94,7 +94,7 @@ helix-components:
 helix-components:
   version: 3.0.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -112,7 +112,7 @@ Both jsDelivr and unpkg are reliable and serve correct ES module MIME types. jsD
 helix-components:
   version: 3.0.0
   js:
-    https://unpkg.com/@helixui/library@3.9.0/dist/cdn/core.js:
+    https://unpkg.com/@helixui/library@3.11.2/dist/cdn/core.js:
       type: external
       attributes:
         type: module
@@ -127,14 +127,14 @@ To load the HELiX CSS bundle alongside the JavaScript:
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
       preprocess: false
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css:
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/css/helix-all.css:
         type: external
         preprocess: false
 ```
@@ -254,7 +254,7 @@ For link cards, use `href` (not `href`):
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -277,7 +277,7 @@ When a new HELiX version is available:
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -287,7 +287,7 @@ helix-components:
 helix-components:
   version: 1.2.0
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -299,7 +299,7 @@ helix-components:
 ```yaml
 # DO NOT do this in production
 js:
-  https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+  https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
     type: external
     attributes:
       type: module
@@ -321,7 +321,7 @@ Loading the full bundle delivers all HELiX components. If your site uses only a 
 helix-button:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       attributes:
         type: module
@@ -330,7 +330,7 @@ helix-button:
 helix-card:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js:
       type: external
       attributes:
         type: module
@@ -339,7 +339,7 @@ helix-card:
 helix-text-input:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-text-input/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-text-input/index.js:
       type: external
       attributes:
         type: module
@@ -386,7 +386,7 @@ Subresource Integrity (SRI) lets browsers verify that CDN-delivered files haven'
 ### Generating the SRI Hash
 
 ```bash
-curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js | \
+curl -s https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js | \
   openssl dgst -sha384 -binary | \
   openssl base64 -A
 ```
@@ -399,7 +399,7 @@ This outputs a base64-encoded SHA-384 hash. Prepend `sha384-` to form the integr
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -464,7 +464,7 @@ web/themes/custom/mytheme/
 helix-components:
   version: 1.1.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -496,9 +496,10 @@ Download the local copy to include in your theme:
 
 ```bash
 cd web/themes/custom/mytheme/libraries/helix
-npm pack @helixui/library@3.9.0
-tar -xf helixui-library-3.9.0.tgz --strip-components=1 package/dist
-rm helixui-library-3.9.0.tgz
+# npm pack prints the tarball it wrote — capture it rather than guessing the name
+TARBALL=$(npm pack @helixui/library@3.11.2)
+tar -xf "$TARBALL" --strip-components=1 package/dist
+rm "$TARBALL"
 ```
 
 ---
@@ -533,7 +534,7 @@ helix-components:
   version: 1.1.2
   header: true
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -558,8 +559,8 @@ customElements.get('hx-button');
 
 // Lists all HELiX custom elements present on the page
 [...document.querySelectorAll('*')]
-  .filter(el => el.tagName.startsWith('HX-'))
-  .map(el => el.tagName.toLowerCase());
+  .filter((el) => el.tagName.startsWith('HX-'))
+  .map((el) => el.tagName.toLowerCase());
 ```
 
 ---
@@ -575,10 +576,10 @@ customElements.get('hx-button');
 ```yaml
 helix-components:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
-        type: module   # This line must be present and indented under attributes
+        type: module # This line must be present and indented under attributes
       preprocess: false
 ```
 
@@ -595,11 +596,11 @@ helix-components:
 **Fix:** Add the CSS bundle to your library definition:
 
 ```yaml
-  css:
-    theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css:
-        type: external
-        preprocess: false
+css:
+  theme:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/css/helix-all.css:
+      type: external
+      preprocess: false
 ```
 
 ### Stale components after version update
@@ -651,7 +652,7 @@ helix-components:
   version: 1.1.2
   header: true
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -659,7 +660,7 @@ helix-components:
       preprocess: false
   css:
     theme:
-      https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css:
+      https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/css/helix-all.css:
         type: external
         preprocess: false
 ```

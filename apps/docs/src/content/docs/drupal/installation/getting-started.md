@@ -53,21 +53,21 @@ Create (or install) a custom Drupal module that owns the HELiX files and registe
 
 ## Comparison Table
 
-| Criterion | CDN | npm | Module |
-|---|---|---|---|
-| **Setup time** | Minutes | Hours | Days |
-| **Developer skill required** | YAML only | npm + bundler | Drupal + Composer |
-| **Build pipeline** | None | Required | Optional |
-| **Tree-shaking** | No | Yes | No (or manual) |
-| **Bundle size control** | Limited | Excellent | Good |
-| **Offline development** | No | Yes | Yes |
-| **HIPAA / compliance** | Risky | Compliant | Compliant |
-| **Multi-site support** | Per-site setup | Per-theme setup | One-time setup |
-| **Version locking** | Manual URL update | `package-lock.json` | Module version |
-| **Drupal aggregation** | No | Yes | Yes |
-| **Cache management** | CDN-controlled | Build-controlled | Drupal-controlled |
-| **Deployment complexity** | Minimal | Moderate | High |
-| **Maintenance overhead** | Low | Medium | High |
+| Criterion                    | CDN               | npm                 | Module            |
+| ---------------------------- | ----------------- | ------------------- | ----------------- |
+| **Setup time**               | Minutes           | Hours               | Days              |
+| **Developer skill required** | YAML only         | npm + bundler       | Drupal + Composer |
+| **Build pipeline**           | None              | Required            | Optional          |
+| **Tree-shaking**             | No                | Yes                 | No (or manual)    |
+| **Bundle size control**      | Limited           | Excellent           | Good              |
+| **Offline development**      | No                | Yes                 | Yes               |
+| **HIPAA / compliance**       | Risky             | Compliant           | Compliant         |
+| **Multi-site support**       | Per-site setup    | Per-theme setup     | One-time setup    |
+| **Version locking**          | Manual URL update | `package-lock.json` | Module version    |
+| **Drupal aggregation**       | No                | Yes                 | Yes               |
+| **Cache management**         | CDN-controlled    | Build-controlled    | Drupal-controlled |
+| **Deployment complexity**    | Minimal           | Moderate            | High              |
+| **Maintenance overhead**     | Low               | Medium              | High              |
 
 ---
 
@@ -116,9 +116,9 @@ Open your theme's `mytheme.libraries.yml` and add:
 
 ```yaml
 helix-components:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js:
       type: external
       attributes:
         type: module
@@ -179,23 +179,23 @@ If the Shadow DOM is present, installation succeeded.
 
 ## Current Package Versions
 
-| Package | Version | Purpose |
-|---|---|---|
-| `@helixui/library` | `3.9.0` | Web components (buttons, cards, inputs, etc.) |
-| `@helixui/tokens` | `3.9.0` | Design tokens (colors, spacing, typography) |
+| Package            | Version  | Purpose                                       |
+| ------------------ | -------- | --------------------------------------------- |
+| `@helixui/library` | `3.11.2` | Web components (buttons, cards, inputs, etc.) |
+| `@helixui/tokens`  | `3.9.4`  | Design tokens (colors, spacing, typography)   |
 
-All installation guides on this site use these versions. The workspace publishes both packages in
-lockstep at the same minor release — check the latest tags on npm before pinning a production URL.
+All installation guides on this site use these versions. The two packages version independently —
+check the latest release of each on npm before pinning a production URL.
 
 ---
 
 ## CDN URLs Reference
 
-| Use case | URL |
-|---|---|
-| Full bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js` |
-| CSS bundle | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-all.css` |
-| Single component (example, **import map required**) | `https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js` |
+| Use case                                            | URL                                                                                       |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Full bundle                                         | `https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js`                      |
+| CSS bundle                                          | `https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/css/helix-all.css`             |
+| Single component (example, **import map required**) | `https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js` |
 
 > The single-component URL still imports a shared chunk and bare `lit` specifiers; supply an
 > import map (or use a bundler) before loading per-component modules in the browser. The full

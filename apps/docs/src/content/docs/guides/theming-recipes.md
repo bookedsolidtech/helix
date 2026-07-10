@@ -57,7 +57,7 @@ Load this file after the HELiX tokens:
 
 ```html
 <!-- Pin the version you've tested against — see /getting-started/installation/#cdn-no-build-step -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/css/helix-tokens.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/css/helix-tokens.css" />
 <link rel="stylesheet" href="/your-brand-theme.css" />
 ```
 

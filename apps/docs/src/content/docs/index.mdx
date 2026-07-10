@@ -27,11 +27,11 @@ Or step through manually:
 
 ## Latest release
 
-`@helixui/library@3.9.0` + `@helixui/icons@1.0.0` — see [CHANGELOG](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/CHANGELOG.md) for the release date.
+`@helixui/library@3.11.2` + `@helixui/icons@1.1.0` — see [CHANGELOG](https://github.com/bookedsolidtech/helix/blob/main/packages/hx-library/CHANGELOG.md) for the release date.
 
-Released: new icons package (registry-pattern with FA Free + curated helix glyph set), internal SVG migration across 25+ components, hx-slider + hx-file-upload form-validity integration, AAA cert remediation (every claim verified against the formal harness).
+Recent patches: the published `dist/css/` bundles no longer contain leaked JavaScript from components whose styles are split across several `css` tagged literals (`hx-table`, `hx-grid`, `hx-structured-list`, `hx-toast`, and the category bundles that include them), and `hx-icon-button`, `hx-copy-button`, and `hx-color-picker` no longer double-announce their label on NVDA. The `@helixui/library/authoring` subpath exposes `mixinDelegatesAria` and the light-DOM style utilities for consumer components.
 
-See the [3.8.0 → 3.9.0 migration guide](/migration/3-8-0-to-3-9-0/) for the back-compat notes.
+Upgrading from 3.8.x? The [3.8.0 → 3.9.0 migration guide](/migration/3-8-0-to-3-9-0/) covers the back-compat notes for that step.
 
 ## Accessibility
 

@@ -246,7 +246,7 @@ Add `integrity` attributes to CDN-loaded resources to verify file authenticity:
 # mytheme.libraries.yml
 helix-button:
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes:

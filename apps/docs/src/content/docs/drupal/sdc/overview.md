@@ -209,17 +209,17 @@ The `libraryOverrides.dependencies` key in `component.yml` attaches Drupal libra
 ```yaml
 # mytheme.libraries.yml
 helix-runtime:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/lit-runtime.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/lit-runtime.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
 
 helix-card:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -227,9 +227,9 @@ helix-card:
     - mytheme/helix-runtime
 
 helix-badge:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-badge/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-badge/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -237,9 +237,9 @@ helix-badge:
     - mytheme/helix-runtime
 
 helix-button:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }
@@ -247,9 +247,9 @@ helix-button:
     - mytheme/helix-runtime
 
 helix-avatar:
-  version: 3.9.0
+  version: 3.11.2
   js:
-    https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-avatar/index.js:
+    https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-avatar/index.js:
       type: external
       preprocess: false
       attributes: { type: module, crossorigin: anonymous }

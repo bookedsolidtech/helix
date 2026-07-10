@@ -74,13 +74,13 @@ Set the CDN URL in `settings.php` and the module's `hook_library_info_alter()` r
 // asset rewrite appends per-file paths (dist/index.js, fouc.css, …)
 // itself; don't include /dist in the CDN URL or you'll get
 // duplicate /dist/dist/ paths in the rendered <script> srcs.
-$settings['helixui_cdn_url'] = 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0';
+$settings['helixui_cdn_url'] = 'https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2';
 ```
 
 Or via environment variable:
 
 ```bash
-export HELIXUI_CDN_URL=https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0
+export HELIXUI_CDN_URL=https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2
 ```
 
 ### Strategy 3: Per-Route Loading

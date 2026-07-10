@@ -88,7 +88,7 @@ Add `data-hx-lazy` with the component CDN URL to any element that should load la
 ```twig
 {# node--article--teaser.html.twig #}
 <hx-card
-  data-hx-lazy="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js"
+  data-hx-lazy="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js"
   variant="default"
 >
   <span slot="heading">{{ node.label }}</span>
@@ -165,7 +165,7 @@ Template:
 ```twig
 {# Load hx-data-table only when the user clicks "Show Data" #}
 <button
-  data-hx-on-demand="https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-data-table/index.js"
+  data-hx-on-demand="https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-data-table/index.js"
   data-hx-target="#results-region"
 >
   Show Data Table
@@ -299,14 +299,14 @@ function mytheme_page_attachments(array &$attachments): void {
   // Always preload the runtime — it's shared by every component.
   $attachments['#attached']['html_head_link'][][] = [
     'rel' => 'modulepreload',
-    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/index.js',
+    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/index.js',
     'crossorigin' => 'anonymous',
   ];
 
   // Preload the button component on every page (used in navigation).
   $attachments['#attached']['html_head_link'][][] = [
     'rel' => 'modulepreload',
-    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-button/index.js',
+    'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-button/index.js',
     'crossorigin' => 'anonymous',
   ];
 
@@ -314,7 +314,7 @@ function mytheme_page_attachments(array &$attachments): void {
   if (str_starts_with($route, 'view.')) {
     $attachments['#attached']['html_head_link'][][] = [
       'rel' => 'modulepreload',
-      'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.9.0/dist/components/hx-card/index.js',
+      'href' => 'https://cdn.jsdelivr.net/npm/@helixui/library@3.11.2/dist/components/hx-card/index.js',
       'crossorigin' => 'anonymous',
     ];
   }
