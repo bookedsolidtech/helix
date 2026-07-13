@@ -99,7 +99,7 @@
   },
   "dependencies": {
     "@helixui/tokens": "workspace:*",
-    "lit": "^3.3.2"
+    "lit": "^3.3.3"
   },
   "peerDependencies": {
     "@floating-ui/dom": "^1.7.6",
