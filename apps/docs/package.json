@@ -20,7 +20,7 @@
     "@helixui/library": "workspace:*",
     "astro": "^5.6.1",
     "geist": "^1.7.0",
-    "lit": "^3.3.2",
+    "lit": "^3.3.3",
     "sharp": "^0.34.2",
     "shiki": "^3.22.0",
     "typescript": "^6.0.3"
