@@ -85,7 +85,7 @@ jobs:
           echo "pkg_dir=$PKG_DIR" >> "$GITHUB_OUTPUT"
           echo "Releasing $PKG_NAME version $VERSION from $PKG_DIR"
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6.0.9
 
       - uses: actions/setup-node@v4
         with:
